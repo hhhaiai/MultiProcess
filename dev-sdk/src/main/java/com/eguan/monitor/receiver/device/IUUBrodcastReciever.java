@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 
 import com.eguan.monitor.Constants;
 import com.eguan.monitor.commonutils.EgLog;
@@ -144,7 +143,9 @@ public class IUUBrodcastReciever extends BroadcastReceiver {
                 }
                 info.setActionType(flag);
                 info.setActionHappenTime(String.valueOf(time));// 程序安装时间
-                EgLog.e("installInfo：" + info.toString());
+                if (Constants.FLAG_DEBUG_INNER) {
+                    EgLog.d(info.toString());
+                }
                 /** ---------------------保存新装应用信息------------------ **/
                 lexList.add(info);
                 if (aBoolean) {

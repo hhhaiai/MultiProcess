@@ -45,7 +45,9 @@ public class MonitorService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        EgLog.i("MonitorService.onCreate");
+        if (Constants.FLAG_DEBUG_INNER) {
+            EgLog.v("MonitorService.onCreate");
+        }
         EGQueue.execute(new SafeRunnable() {
             @Override
             public void safeRun() {
@@ -68,6 +70,7 @@ public class MonitorService extends Service {
                 Constants.setRTLUploadUrl();
             }
         });
+
     }
 
     @Override
@@ -123,8 +126,9 @@ public class MonitorService extends Service {
             // 如果为true，则表示屏幕正在使用，false则屏幕关闭。
             if (isScreenOn) {
 
-                EgLog.e("----------------isScreenOn--------------");
-
+                if (Constants.FLAG_DEBUG_INNER) {
+                    EgLog.v("----------------ScreenOn will  registAllReceiver--------------");
+                }
                 /*--------------- 注册所有存活着的广播 -----------------------*/
                 ReceiverUtils.getInstance().registAllReceiver(context);
 //                GlobalTimer.getInstance(MonitorService.this).startAlarm();

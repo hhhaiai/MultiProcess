@@ -33,7 +33,10 @@ public class NetChangedReciever extends BroadcastReceiver {
             public void safeRun() {
                 if (intent.getAction().equals("android.net.conn.CONNECTIVITY_CHANGE")) {
                     InnerProcessCacheManager.getInstance().dealAppNetworkType(context);
-                    EgLog.e("inside NetChangedReciever 接收到网络变化");
+
+                    if (Constants.FLAG_DEBUG_INNER) {
+                        EgLog.v("inside NetChangedReciever 接收到网络变化");
+                    }
                     try {
                         Intent intent1 = new Intent();
                         intent1.setAction(Constants.NT_ACTION);
@@ -67,7 +70,10 @@ public class NetChangedReciever extends BroadcastReceiver {
                             }
 
                         }
-                        EgLog.i("Cache network type::::" + spUtil.getNetTypeChange());
+
+                        if (Constants.FLAG_DEBUG_INNER) {
+                            EgLog.v("Cache network type::::" + spUtil.getNetTypeChange());
+                        }
                     } catch (Throwable e) {
                         if (Constants.FLAG_DEBUG_INNER) {
                             EgLog.e(e);

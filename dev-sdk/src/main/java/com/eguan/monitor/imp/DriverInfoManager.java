@@ -372,7 +372,7 @@ public class DriverInfoManager {
         //同上,检查设备是否有模拟器特有对应的QEmu设备对应的目录,如果有则为模拟器
         //通过读取proc/net/tcp查看adb是否对应模拟器,如果对应,则为模拟器
         //检查设备上是否有模拟器目录,如果有,则为模拟器
-        //                || SimulatorUtils.hasQEmuProps(context)             //检查设备上否有模拟器相关的属性,如果有,且超过5个,则表示为模拟器
+        //                || SimulatorUtils.hasQEmuProps(mContext)             //检查设备上否有模拟器相关的属性,如果有,且超过5个,则表示为模拟器
         //检查设备上的网络连接状态是否为eth0,如果是,则为模拟器
         //                || SimulatorUtils.checkEmulatorByCpuInfo())         //通过cpu的类型来判断是否为模拟器,如果满足,其中一种类型,则为模拟器
         return SimulatorUtils.hasKnownDeviceId(context)                //检查设备的设备ID与常见的模拟器ID是否相同,如果相同,则为模拟器
@@ -384,7 +384,7 @@ public class DriverInfoManager {
                 || SimulatorUtils.hasQEmuDrivers()                  //同上,检查设备是否有模拟器特有对应的QEmu设备对应的目录,如果有则为模拟器
                 || SimulatorUtils.hasEmulatorAdb()                  //通过读取proc/net/tcp查看adb是否对应模拟器,如果对应,则为模拟器
                 || SimulatorUtils.hasGenyFiles()                    //检查设备上是否有模拟器目录,如果有,则为模拟器
-//                || SimulatorUtils.hasQEmuProps(context)             //检查设备上否有模拟器相关的属性,如果有,且超过5个,则表示为模拟器
+//                || SimulatorUtils.hasQEmuProps(mContext)             //检查设备上否有模拟器相关的属性,如果有,且超过5个,则表示为模拟器
                 || SimulatorUtils.hasEmulatorWifi();
     }
 

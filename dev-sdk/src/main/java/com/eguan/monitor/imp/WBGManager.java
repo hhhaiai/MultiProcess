@@ -1,6 +1,7 @@
 package com.eguan.monitor.imp;
 
 
+import android.Manifest;
 import android.content.Context;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
@@ -19,45 +20,50 @@ import java.util.List;
 
 public class WBGManager {
 
-    Context context;
-    WBGInfo wbgInfo;
-    private static WBGManager instance = null;
+    private Context mContext;
+    private WBGInfo mWbgInfo;
 
-    private WBGManager(Context context) {
-        this.context = context;
-        wbgInfo = new WBGInfo();
+    private int sCid = -1;
+    private int sLac = -1;
+
+    private static class Holder {
+        private static final WBGManager INSTANCE = new WBGManager();
     }
 
     public static WBGManager getInstance(Context context) {
-        if (instance == null) {
-            synchronized (WBGManager.class) {
-                if (instance == null) {
-                    instance = new WBGManager(context);
-                }
-            }
+
+        if (context != null) {
+            Holder.INSTANCE.mContext = context.getApplicationContext();
         }
-        return instance;
+        return WBGManager.Holder.INSTANCE;
+    }
+
+    private WBGManager() {
+        mWbgInfo = new WBGInfo();
     }
 
     /**
      * 将WiFi信息，基站信息，经纬度存储整合
      */
     public void getWBGInfo() {
+        // 30分钟获取一次。
         if (getDataTime()) {
-            EgLog.e("-- 获取WBG数据 --");
-            LocationChangeManager.getInstance(context).getLocationInfo();
-            wbgInfo.setCollectionTime(System.currentTimeMillis() + "");
+            if (Constants.FLAG_DEBUG_INNER) {
+                EgLog.v("-- 获取WBG数据 --");
+            }
+            LocationChangeManager.getInstance(mContext).getLocationInfo();
+            mWbgInfo.setCollectionTime(String.valueOf(System.currentTimeMillis()));
             getBaseStationInfo();
             getWifiInfo();
-            String location = SPUtil.getInstance(context).getLastLocation();
-            wbgInfo.setGeographyLocation(location);
+            String location = SPUtil.getInstance(mContext).getLastLocation();
+            mWbgInfo.setGeographyLocation(location);
             saveWBGInfo();
         }
     }
 
     private boolean getDataTime() {
         long nowTime = System.currentTimeMillis();
-        SPUtil sputil = SPUtil.getInstance(context);
+        SPUtil sputil = SPUtil.getInstance(mContext);
         long oldeTime = sputil.getWBGInfoTime();
         if (Constants.GIT_DATA_TIME_INTERVAL <= nowTime - oldeTime) {
             sputil.setWBGInfoTime(nowTime);
@@ -71,16 +77,16 @@ public class WBGManager {
      */
     private void getBaseStationInfo() {
         try {
-            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
             if (TelephonyManager.SIM_STATE_ABSENT != tm.getSimState()) {
-                TelephonyManager mTelNet = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+                TelephonyManager mTelNet = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
                 if (mTelNet == null) {
                     cleanWBGInfo();
                     return;
                 }
                 GsmCellLocation location = null;
-                if (SystemUtils.checkPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION)
-                        && SystemUtils.checkPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION))
+                if (SystemUtils.checkPermission(mContext, android.Manifest.permission.ACCESS_COARSE_LOCATION)
+                        && SystemUtils.checkPermission(mContext, android.Manifest.permission.ACCESS_COARSE_LOCATION))
                     location = (GsmCellLocation) mTelNet.getCellLocation();
                 if (location == null) {
                     cleanWBGInfo();
@@ -93,15 +99,21 @@ public class WBGManager {
                     return;
                 }
 
-                wbgInfo.setCellId(location.getCid() + "");
-                wbgInfo.setLocationAreaCode(location.getLac() + "");
 
+                cid = location.getCid();
+                mWbgInfo.setCellId(String.valueOf(location.getCid()));
+                mWbgInfo.setLocationAreaCode(String.valueOf(location.getLac()));
 
-                EgLog.e("location.getCid()::::::" + location.getCid());
+                if (Constants.FLAG_DEBUG_INNER) {
+                    EgLog.d("getBaseStationInfo  Cid:" + String.valueOf(location.getCid()) + "; LocationAreaCode: " + String.valueOf(location.getLac()));
+                }
+
 
             } else {
                 cleanWBGInfo();
-                EgLog.e("没有发现SIM卡");
+                if (Constants.FLAG_DEBUG_INNER) {
+                    EgLog.w("没有发现SIM卡");
+                }
             }
         } catch (Throwable e) {
             if (Constants.FLAG_DEBUG_INNER) {
@@ -111,9 +123,11 @@ public class WBGManager {
     }
 
     private void cleanWBGInfo() {
-//        wbgInfo.setCollectionTime("");
-        wbgInfo.setCellId("");
-        wbgInfo.setLocationAreaCode("");
+//        mWbgInfo.setCollectionTime("");
+        mWbgInfo.setCellId("");
+        mWbgInfo.setLocationAreaCode("");
+//        sCid = -1;
+//        sLac = -1;
     }
 
     /**
@@ -121,25 +135,20 @@ public class WBGManager {
      */
     private void getWifiInfo() {
         try {
-            WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+            WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
             WifiInfo wifiInfo = wifiManager.getConnectionInfo(); // 当前WIFI连接信息
-            wifiInfo.getMacAddress();
-            List<ScanResult> list = wifiManager.getScanResults();// 搜索到的设备列表
-            int listSize = list.size();
-            if (listSize == 0) {
-                if (SystemUtils.isWifi(context)) {
-                    wbgInfo.setSSID(wifiInfo.getSSID().replace("\"", ""));
-                    wbgInfo.setBSSID(wifiInfo.getBSSID());
-                    wbgInfo.setLevel(wifiInfo.getRssi() + "");
-                } else {
-                    wbgInfo.setSSID("");
-                    wbgInfo.setBSSID("");
-                    wbgInfo.setLevel("");
+
+            List<ScanResult> list = null;
+            if (SystemUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
+                    || SystemUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
+                    ) {
+
+                if (Constants.FLAG_DEBUG_INNER) {
+                    EgLog.v(" WBGInfo getWifiInfo 有权限。");
                 }
-            } else {
-                if (listSize > 3) {
-                    listSize = 3;
-                }
+                list = wifiManager.getScanResults();// 搜索到的设备列表
+
+                int listSize = list.size();
                 String SSID = null, BSSID = null, level = null;
                 for (int i = 0; i < listSize; i++) {
                     if (i == 0) {
@@ -151,9 +160,25 @@ public class WBGManager {
                         BSSID += "|" + list.get(i).BSSID;
                         level += "|" + list.get(i).level;
                     }
-                    wbgInfo.setSSID(SSID);
-                    wbgInfo.setBSSID(BSSID);
-                    wbgInfo.setLevel(level);
+                    mWbgInfo.setSSID(SSID);
+                    mWbgInfo.setBSSID(BSSID);
+                    mWbgInfo.setLevel(level);
+                }
+            } else {
+                if (SystemUtils.isWifi(mContext)) {
+                    if (Constants.FLAG_DEBUG_INNER) {
+                        EgLog.v(" WBGInfo getWifiInfo 没权限。 wifi");
+                    }
+                    mWbgInfo.setSSID(wifiInfo.getSSID().replace("\"", ""));
+                    mWbgInfo.setBSSID(wifiInfo.getBSSID());
+                    mWbgInfo.setLevel(wifiInfo.getRssi() + "");
+                } else {
+                    if (Constants.FLAG_DEBUG_INNER) {
+                        EgLog.v(" WBGInfo getWifiInfo 没权限。 wifi");
+                    }
+                    mWbgInfo.setSSID("");
+                    mWbgInfo.setBSSID("");
+                    mWbgInfo.setLevel("");
                 }
             }
         } catch (Exception e) {
@@ -167,20 +192,23 @@ public class WBGManager {
      * 将WiFi信息，基站信息，经纬度存储至数据库
      */
     private void saveWBGInfo() {
-        if (wbgInfo != null) {
-            EgLog.e("" + wbgInfo.getBSSID() + ",CellId:" + wbgInfo.getCellId() + ",GL:" + wbgInfo.getGeographyLocation());
+        if (mWbgInfo != null) {
 
+
+            if (Constants.FLAG_DEBUG_INNER) {
+                EgLog.v("saveWBGInfo==> BSSID:" + mWbgInfo.getBSSID() + " ,CellId:" + mWbgInfo.getCellId() + " ,GL:" + mWbgInfo.getGeographyLocation());
+            }
             try {
-                String tag = SPUtil.getInstance(context).getNetIpTag();
+                String tag = SPUtil.getInstance(mContext).getNetIpTag();
 
                 if (tag.equals("") || tag.equals("0")) {
-//                    wbgInfo.setIp(getNetIp());
+//                    mWbgInfo.setIp(getNetIp());
                     //update by sanbo
-                    wbgInfo.setIp("");
+                    mWbgInfo.setIp("");
                 } else {
-                    wbgInfo.setIp("");
+                    mWbgInfo.setIp("");
                 }
-                DeviceTableOperation.getInstance(context).insertWBGInfo(wbgInfo);
+                DeviceTableOperation.getInstance(mContext).insertWBGInfo(mWbgInfo);
             } catch (Throwable e) {
                 if (Constants.FLAG_DEBUG_INNER) {
                     EgLog.e(e);

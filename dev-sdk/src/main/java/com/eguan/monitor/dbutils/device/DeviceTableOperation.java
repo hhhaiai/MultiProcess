@@ -570,6 +570,9 @@ public class DeviceTableOperation {
             if (db == null) return;
             DeviceDatabaseHelper.getInstance(mContext).create("e_N108");
 
+            if (Constants.FLAG_DEBUG_INNER){
+                EgLog.w("insertWBGInfo===>" +info.toString());
+            }
             String sql = "insert into e_N108(aa,ab,ac,ad,ae,af,ag,ah) values (?,?,?,?,?,?,?,?)";
             db.execSQL(sql, new Object[]{
                     EncryptUtils.encrypt(mContext, info.getSSID()),
@@ -627,6 +630,9 @@ public class DeviceTableOperation {
                     }
                 }
             }
+            if (Constants.FLAG_DEBUG_INNER){
+                EgLog.w("selectWBGInfo===>" +list.toString());
+            }
 
         } catch (SQLiteDatabaseCorruptException e) {
             if (Constants.FLAG_DEBUG_INNER) {
@@ -653,6 +659,9 @@ public class DeviceTableOperation {
      */
     public synchronized void deleteWBGInfo() {
         try {
+            if (Constants.FLAG_DEBUG_INNER){
+                EgLog.w("deleteWBGInfo ");
+            }
             SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
             if (db == null) return;
             DeviceDatabaseHelper.getInstance(mContext).create("e_N108");
@@ -678,6 +687,9 @@ public class DeviceTableOperation {
 
     public synchronized void updateOcInfo(long closeTime) {
         try {
+            if (Constants.FLAG_DEBUG_INNER){
+                EgLog.w("updateOcInfo   closeTime:" +closeTime);
+            }
             SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
             if (db == null) return;
             DeviceDatabaseHelper.getInstance(mContext).create("e_N105");
@@ -749,7 +761,9 @@ public class DeviceTableOperation {
             String insertSql = "insert into e_N102(aa) values (?)";
             db.execSQL(deleteSql);
             db.execSQL(insertSql, new Object[]{EncryptUtils.encrypt(mContext, id)});
-            EgLog.e("------ 数据存储成功 ------");
+            if (Constants.FLAG_DEBUG_INNER){
+                EgLog.d("------insertTmpId() 数据存储成功 ------");
+            }
         } catch (EGDBEncryptException e) {
             if (Constants.FLAG_DEBUG_INNER) {
                 EgLog.e(e);

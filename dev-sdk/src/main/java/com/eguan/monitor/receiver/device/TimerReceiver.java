@@ -67,7 +67,9 @@ public class TimerReceiver extends BroadcastReceiver {
                 AccessibilityOCManager.getInstance(context).setEnable();
             } else {
                 //系统高于4.4且低于7.0,且并未开启AcessibilityService
-                EgLog.e("inside TimerReceiver.process. 识别到系统版本属于5.0以上");
+//                if (Constants.FLAG_DEBUG_INNER) {
+//                    EgLog.d("inside TimerReceiver.process. 识别到系统版本属于5.0以上");
+//                }
                 AppProcessManager.getInstance(context).appProcessInfo();
             }
             SPUtil.getInstance(context).setEndTime(System.currentTimeMillis());

@@ -7,7 +7,6 @@ import com.eguan.monitor.Constants;
 import com.eguan.monitor.commonutils.EgLog;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -46,11 +45,12 @@ public class AndroidProcessManager {
                         processes.add(process);
                     }
                 } catch (Exception e) {
-//                    if (Config.EG_DEBUG) {
-                    EgLog.e(EgLog.DEFAULT_TAG, String.format(Locale.getDefault(), "Error reading from /proc/%d.", pid), e);
-//                    }
                     // System apps will not be readable on Android 5.0+ if SELinux is enforcing.
                     // You will need root access or an elevated SELinux context to read all files under /proc.
+                    if (Constants.FLAG_DEBUG_INNER) {
+                        EgLog.e(String.format(Locale.getDefault(), "Error reading from /proc/%d.", pid), e);
+                    }
+
                 }
             }
         }

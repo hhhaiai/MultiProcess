@@ -436,14 +436,16 @@ public class SystemUtils {
             if (context == null) return false;
             return context.getPackageName().equals(getCurrentProcessName(context));
         } catch (Throwable e) {
-
-        } finally {
         }
         return false;
 
     }
 
-    private static String getCurrentProcessName(Context context) {
+    public static int getCurrentPID() {
+        return android.os.Process.myPid();
+    }
+
+    public static String getCurrentProcessName(Context context) {
         try {
             int pid = android.os.Process.myPid();
             ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
@@ -453,8 +455,6 @@ public class SystemUtils {
                 }
             }
         } catch (Throwable e) {
-
-        } finally {
 
         }
         return "";

@@ -34,7 +34,9 @@ public class ReceiverUtils {
 
     public void unRegistAllReceiver(Context context, boolean isFromService) {
 
-        EgLog.e("inside ReceiverUtils.unRegistAllReceiver. 即将注销广播接收器");
+        if (Constants.FLAG_DEBUG_INNER) {
+            EgLog.d("inside ReceiverUtils.unRegistAllReceiver. 即将注销广播接收器");
+        }
 
         try {
 //			GlobalTimer.getInstance(context).stopHeart();
@@ -71,8 +73,10 @@ public class ReceiverUtils {
     }
 
     public void registAllReceiver(Context context) {
-        EgLog.e("inside ReceiverUtils.registAllReceiver. 即将注册广播接收器");
 
+        if (Constants.FLAG_DEBUG_INNER) {
+            EgLog.v("inside ReceiverUtils.registAllReceiver. 即将注册广播接收器");
+        }
         try {
 //			GlobalTimer.getInstance(context).startAlarm();
 

@@ -75,4 +75,18 @@ public class WBGInfo {
         GeographyLocation = geographyLocation;
     }
 
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("WBGInfo [" + Integer.toHexString(hashCode()) + "]  SSID:").append(SSID).append("; ")
+                .append("BSSID: ").append(BSSID).append("; ")
+                .append("Level: ").append(Level).append("; ")
+                .append("LocationAreaCode: ").append(LocationAreaCode).append("; ")
+                .append("CollectionTime: ").append(CollectionTime).append("; ")
+                .append("CellId: ").append(CellId).append("; ")
+                .append("GeographyLocation: ").append(GeographyLocation).append("; ")
+        ;
+        return sb.toString();
+    }
 }

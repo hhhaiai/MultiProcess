@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">demo</string>
-    <string name="src_welcome">Welcome use Analysy SDK!</string>
+    <string name="title">设备SDK Demo</string>
 </resources>

@@ -39,7 +39,7 @@ public class ConnectionClient {
      * @return
      */
     public static String sendPost(Context context, String url, String name, String value, String policyVer) {
-        EgLog.i("--post请求--" + url);
+        EgLog.i("send message to [ " + url + " ]");
         return sendPostFromHttpURLConnection(url, name, value, context, policyVer);
     }
 
@@ -68,7 +68,9 @@ public class ConnectionClient {
                 }
             }
 
-            EgLog.v("sendPostFromHttpURLConnection F1:" + F1 + "\nF2:" + F2 + "\nF3:" + F3 + "\nF4:" + F4 + "\npolicyVer:" + policyVer);
+            if (Constants.FLAG_DEBUG_INNER) {
+                EgLog.v("sendPostFromHttpURLConnection F1:" + F1 + "\nF2:" + F2 + "\nF3:" + F3 + "\nF4:" + F4 + "\npolicyVer:" + policyVer);
+            }
 
             urlP = new URL(url);
             connection = (HttpURLConnection) urlP.openConnection();
@@ -99,7 +101,7 @@ public class ConnectionClient {
             pw.flush();
 
             int status = connection.getResponseCode();
-            EgLog.e("sendPostFromHttpURLConnection  result:" + status);
+            EgLog.i("receiver sever msg,  receiver  status:" + status);
             //获取数据
             if (HttpURLConnection.HTTP_OK == status) {
                 is = connection.getInputStream();

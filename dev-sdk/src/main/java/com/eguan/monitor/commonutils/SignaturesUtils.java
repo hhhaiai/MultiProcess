@@ -9,21 +9,23 @@ import com.eguan.monitor.Constants;
 
 import java.io.ByteArrayInputStream;
 import java.security.MessageDigest;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
-/**
- * Created on 17/5/22.
- * Author : chris
- * Email  : mengqi@analysys.com.cn
- * Detail :
- */
-
 public class SignaturesUtils {
-    public static String getSingInfo(Context mContext) {
+    public static String getSingInfo(Context context) {
         try {
-            PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo("com.aneesoft.ygqf", PackageManager.GET_SIGNATURES);
+            PackageManager pm = context.getPackageManager();
+            int flags = PackageManager.GET_SIGNATURES;
+            PackageInfo packageInfo = null;
+            try {
+                packageInfo = pm.getPackageInfo(context.getPackageName(), flags);
+            } catch (PackageManager.NameNotFoundException e) {
+            }
+            if (packageInfo == null) {
+                return null;
+            }
+
             Signature[] signs = packageInfo.signatures;
             Signature sign = signs[0];
             return parseSignature(sign.toByteArray());
@@ -34,12 +36,13 @@ public class SignaturesUtils {
         }
         return null;
     }
+
     private static String parseSignature(byte[] signature) {
         try {
-            CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+//            CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+            CertificateFactory certFactory = CertificateFactory.getInstance("X509");
             X509Certificate cert = (X509Certificate) certFactory.generateCertificate(new ByteArrayInputStream(signature));
             String pubKey = cert.getPublicKey().toString();
-//            String signNumber = cert.getSerialNumber().toString();
             return pubKey;
         } catch (Exception e) {
             if (Constants.FLAG_DEBUG_INNER) {
@@ -51,6 +54,7 @@ public class SignaturesUtils {
 
     /**
      * 获取对应mContext应用的认证指文
+     *
      * @param mContext
      */
     public static String getCertificateWithMd5(Context mContext) {
@@ -66,6 +70,7 @@ public class SignaturesUtils {
         }
         return null;
     }
+
     /**
      * @param certificateBytes 获取到应用的signature值
      * @param algorithm        在上文指定MD5算法

@@ -56,21 +56,27 @@ public class DevInfoUpload {
             if (spUtil.getFailedNumb() == 0) {
 
                 upload(context);
-                EgLog.e("--------------First upload--------------");
+                if (Constants.FLAG_DEBUG_INNER) {
+                    EgLog.v("--------------First upload--------------");
+                }
 
             } else if (spUtil.getFailedNumb() == 1
                     && System.currentTimeMillis() - spUtil.getFailedTime() > spUtil
                     .getRetryTime()) {
 
                 upload(context);
-                EgLog.e("--------------second upload	--------------");
+                if (Constants.FLAG_DEBUG_INNER) {
+                    EgLog.v("--------------second upload	--------------");
+                }
 
             } else if (spUtil.getFailedNumb() == 2
                     && System.currentTimeMillis() - spUtil.getFailedTime() > spUtil
                     .getRetryTime()) {
 
                 upload(context);
-                EgLog.e("--------------Third upload--------------");
+                if (Constants.FLAG_DEBUG_INNER) {
+                    EgLog.v("--------------Third upload--------------");
+                }
 
             } else if (spUtil.getFailedNumb() == 3) {
 
@@ -108,7 +114,10 @@ public class DevInfoUpload {
                     Constants.DEVICE_UPLOAD_KEY, DataDealUtils.dealUploadData(context, data),
                     AppSPUtils.getInstance(context).getPolicyVer());
             handlerAfterPost(context, postRsult);
-            EgLog.e("上传完毕....");
+
+            if (Constants.FLAG_DEBUG_INNER) {
+                EgLog.v("DevInfoUpload.upload() 上传完毕.... process handlerAfterPost over");
+            }
         } catch (Throwable e) {
             if (Constants.FLAG_DEBUG_INNER) {
                 EgLog.e(e);
@@ -133,8 +142,10 @@ public class DevInfoUpload {
             jsonObject.put("InstalledAppInfo", DeviceJsonFactory.getInstalledAPPInfos(mContext));
             jsonObject.put("WBGInfo", DeviceJsonFactory.getBaseStationInfos(mContext));
             jsonObject.put("OCTimes", DeviceJsonFactory.getOCTimesJson(mContext));
-            EgLog.i("设备上传数据结果：----:");
-            EgLog.v(jsonObject);
+
+            if (Constants.FLAG_DEBUG_INNER) {
+                EgLog.d("上传数据结果：----:" + jsonObject);
+            }
 
         } catch (Throwable e) {
             if (Constants.FLAG_DEBUG_INNER) {
@@ -146,9 +157,11 @@ public class DevInfoUpload {
     }
 
     private void handlerAfterPost(Context mContext, String response) {
-        EgLog.e("handlerAfterPost----设备的返回值 Json： ----" + response);
+
+        if (Constants.FLAG_DEBUG_INNER) {
+            EgLog.d("handlerAfterPost：" + response);
+        }
         if (mContext == null) return;//如果Context为空的话,不处理
-        EgLog.e("post returned data：" + response);
         SPUtil spUtil = SPUtil.getInstance(mContext);
         try {
             String returnCode = "";
@@ -196,7 +209,9 @@ public class DevInfoUpload {
      */
     private void uploadSuccess(Context mContext, long time) {
 
-        EgLog.i("<<< 数据长传成功，处理本地逻辑 >>>");
+//        if (Constants.FLAG_DEBUG_INNER) {
+//            EgLog.v("uploadSuccess() <<< 数据长传成功，处理本地逻辑 >>>");
+//        }
 
         SPUtil spUtil = SPUtil.getInstance(mContext);
         spUtil.setRequestState(0);
@@ -221,7 +236,9 @@ public class DevInfoUpload {
         SPUtil.getInstance(mContext).setRetryTime(0);
         DeviceTableOperation.getInstance(mContext).deleteWBGInfo();
         spUtil.setProcessLifecycle(0);
-        EgLog.i("upload data success!");
+//        if (Constants.FLAG_DEBUG_INNER) {
+//            EgLog.v("end uploadSuccess !");
+//        }
     }
 
     /**
@@ -230,13 +247,17 @@ public class DevInfoUpload {
     private void uploadFailure(Context mContext) {
         SPUtil spUtil = SPUtil.getInstance(mContext);
         /*--------------------------------上传失败记录上传次数-------------------------------------*/
-        EgLog.e("------------数据上传失败  开始重试---------");
+        if (Constants.FLAG_DEBUG_INNER) {
+            EgLog.w("----uploadFailure()--------数据上传失败  开始重试---------");
+        }
         spUtil.setRequestState(0);
         int numb = spUtil.getFailedNumb() + 1;
         spUtil.setFailedNumb(numb);
         spUtil.setFailedTime(System.currentTimeMillis());
         long time = TimeUtils.intervalTime();
-        EgLog.i("-------重试上传间隔时间-------" + time);
+        if (Constants.FLAG_DEBUG_INNER) {
+            EgLog.d("---uploadFailure()----重试上传间隔时间-------" + time);
+        }
         spUtil.setRetryTime(time);
     }
 

@@ -27,17 +27,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created on 17/2/19.
- * Author : chris
- * Email  : mengqi@analysys.com.cn
- * Detail : 优化项,将应用和设备接口上传需要的json组合放在此类中统一处理
- */
-
 public class DeviceJsonFactory {
 
     /**
-     * 基础信息,公用接口,应用设备都使用
+     * 获取设备信息
      *
      * @return
      */
@@ -55,7 +48,6 @@ public class DeviceJsonFactory {
             if (!TextUtils.isEmpty(driverInfo.getSystemName())) {
                 deviceInfo.put("SN", driverInfo.getSystemName());
             }
-
             if (!TextUtils.isEmpty(driverInfo.getDeviceId())) {
                 deviceInfo.put("DI", driverInfo.getDeviceId());
             }
@@ -135,8 +127,6 @@ public class DeviceJsonFactory {
             if (!TextUtils.isEmpty(Constants.SYSTEMNAME)) {
                 deviceInfo.put("SN", Constants.SYSTEMNAME);
             }
-            //3.7.0.0新加字段
-            //deviceInfo.put("DBG", "0");//TODO:需要方法实现,0表示非调试状态,1表示调试状态
             deviceInfo.put("DBG", SPUtil.getInstance(mContext).getDebugMode() ? "1" : "0");
             deviceInfo.put("HJK", "0");//TODO:需要方法实现,0表示没有被劫持,1表示被劫持
             deviceInfo.put("SIR", "0");//TODO:需要方法实现,0表示非模拟器,1表示模拟器
@@ -313,7 +303,9 @@ public class DeviceJsonFactory {
 
             deviceInfo.put("ETDM", extend);
 
-            EgLog.d("getDeviceJson 基础信息---：" + deviceInfo);
+            if (Constants.FLAG_DEBUG_INNER) {
+                EgLog.d("getDeviceJson 设备信息:" + deviceInfo);
+            }
         } catch (Exception e) {
             if (Constants.FLAG_DEBUG_INNER) {
                 EgLog.e(e);

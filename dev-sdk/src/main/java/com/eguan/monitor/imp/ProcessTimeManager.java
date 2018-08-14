@@ -42,7 +42,9 @@ public class ProcessTimeManager {
             long time = (endTime - startTime) / 1000;
             data += time;
 
-            EgLog.e("PL信息-------" + data);
+            if (Constants.FLAG_DEBUG_INNER){
+                EgLog.v("setProcessTime PL信息-------" + data);
+            }
             spUtil.setProcessLifecycle(data);
         }
         spUtil.setStartTime(System.currentTimeMillis());

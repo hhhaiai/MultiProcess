@@ -37,14 +37,13 @@ public class EguanImpl {
         EGQueue.execute(new SafeRunnable() {
             @Override
             public void safeRun() {
-                if (context == null) {
-                    EgLog.e("initEguan()传入Context参数为空!");
-                    return;
-                }
                 if (mContext == null) {
                     if (context != null) {
                         mContext = context.getApplicationContext();
                     }
+                }
+                if (mContext == null) {
+                    return;
                 }
 
                 if (TextUtils.isEmpty(key) || key.length() != 17) {
@@ -107,7 +106,11 @@ public class EguanImpl {
                         EgLog.e(e);
                     }
                 }
-                EgLog.i("init Android Analysys Java sdk success, version:" + Constants.SDK_VERSION);
+                if (Constants.FLAG_DEBUG_INNER) {
+                    EgLog.i("[" + SystemUtils.getCurrentProcessName(mContext) + "] (" + SystemUtils.getCurrentPID() + ") init Android Analysys Java sdk success, version:" + Constants.SDK_VERSION);
+                } else {
+                    EgLog.i("init Android Analysys Java sdk success, version:" + Constants.SDK_VERSION);
+                }
             }
         });
     }
@@ -125,7 +128,6 @@ public class EguanImpl {
                         mContext = context.getApplicationContext();
                     }
                 }
-//                if (mContext == null || !isAppTactics(mContext)) {
                 if (mContext == null) {
                     return;
                 }
@@ -135,7 +137,8 @@ public class EguanImpl {
                 Constants.changeUrlNormal(flag);
                 SPUtil.getInstance(context).setDebugMode(flag);
                 AppSPUtils.getInstance(context).setDebugMode(flag);
-                Constants.FLAG_DEBUG_INNER = flag;
+//                Constants.FLAG_DEBUG_INNER = flag;
+                EgLog.USER_DEBUG = flag;
                 if (flag) {
                     PolicyManger.getInstance(context).setDebugPolicy();
                 } else {

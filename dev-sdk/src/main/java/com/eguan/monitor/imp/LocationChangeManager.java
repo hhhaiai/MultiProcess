@@ -50,23 +50,19 @@ public class LocationChangeManager {
 
             return;
         }
-        List<String> pStrings = this.locationManager.getProviders(true);
+        List<String> providers = this.locationManager.getProviders(true);
 
         String provider;
-        if (pStrings.contains(LocationManager.GPS_PROVIDER)) {
+        if (providers.contains(LocationManager.GPS_PROVIDER)) {
             provider = LocationManager.GPS_PROVIDER;
 
-        } else if (pStrings.contains(LocationManager.NETWORK_PROVIDER)) {
+        } else if (providers.contains(LocationManager.NETWORK_PROVIDER)) {
             provider = LocationManager.NETWORK_PROVIDER;
-
         } else {
-
             return;
         }
         Location location = locationManager.getLastKnownLocation(provider);
-
         if (ifSaveLocation(location)) {
-
             resetLocaiton(location);
         }
     }
@@ -79,7 +75,6 @@ public class LocationChangeManager {
     public void resetLocaiton(Location location) {
 
         if (location != null) {
-
             spUtil.setLastLocation(location.getLongitude() + "-" + location.getLatitude());
             Intent intent = new Intent();
             intent.setAction(Constants.GL_ACTION);
