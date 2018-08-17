@@ -6,11 +6,11 @@ import android.app.job.JobService;
 import android.content.Intent;
 import android.os.Build;
 
-import com.eguan.monitor.Constants;
-import com.eguan.monitor.commonutils.EgLog;
-import com.eguan.monitor.commonutils.SystemUtils;
-import com.eguan.monitor.thread.EGQueue;
-import com.eguan.monitor.thread.SafeRunnable;
+import com.eguan.Constants;
+import com.eguan.utils.commonutils.EgLog;
+import com.eguan.utils.commonutils.SystemUtils;
+import com.eguan.utils.thread.EGQueue;
+import com.eguan.utils.thread.SafeRunnable;
 
 /**
  * Created by Wang on 2017/6/9.
@@ -30,7 +30,7 @@ public class MonitorJobService extends JobService {
                         startService(intent);
                     }
                 } catch (Throwable e) {
-                    if (Constants.FLAG_DEBUG_INNER){
+                    if (Constants.FLAG_DEBUG_INNER) {
                         EgLog.e(e);
                     }
                 }

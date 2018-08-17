@@ -2,10 +2,10 @@ package com.eguan.monitor.imp;
 
 import java.util.List;
 
-import com.eguan.monitor.Constants;
-import com.eguan.monitor.commonutils.EgLog;
-import com.eguan.monitor.commonutils.SPUtil;
-import com.eguan.monitor.commonutils.SystemUtils;
+import com.eguan.Constants;
+import com.eguan.utils.commonutils.EgLog;
+import com.eguan.utils.commonutils.SPUtil;
+import com.eguan.utils.commonutils.SystemUtils;
 
 import android.Manifest;
 import android.content.Context;
@@ -108,23 +108,23 @@ public class LocationChangeManager {
         return d * Math.PI / 180.0;
     }
 
-//    // 获取Location Provider
-//    private String getProvider() {
-//        // 构建位置查询条件
-//        Criteria criteria = new Criteria();
-//        // 查询精度：高
-//        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-//        // 是否查询海拨：否
-//        criteria.setAltitudeRequired(false);
-//        // 是否查询方位角 : 否
-//        criteria.setBearingRequired(false);
-//        // 是否允许付费：是
-//        criteria.setCostAllowed(false);
-//        // 电量要求：低
-//        criteria.setPowerRequirement(Criteria.POWER_LOW);
-//        // 返回最合适的符合条件的provider，第2个参数为true说明 , 如果只有一个provider是有效的,则返回当前provider
-//        return locationManager.getBestProvider(criteria, true);
-//    }
+    // // 获取Location Provider
+    // private String getProvider() {
+    // // 构建位置查询条件
+    // Criteria criteria = new Criteria();
+    // // 查询精度：高
+    // criteria.setAccuracy(Criteria.ACCURACY_FINE);
+    // // 是否查询海拨：否
+    // criteria.setAltitudeRequired(false);
+    // // 是否查询方位角 : 否
+    // criteria.setBearingRequired(false);
+    // // 是否允许付费：是
+    // criteria.setCostAllowed(false);
+    // // 电量要求：低
+    // criteria.setPowerRequirement(Criteria.POWER_LOW);
+    // // 返回最合适的符合条件的provider，第2个参数为true说明 , 如果只有一个provider是有效的,则返回当前provider
+    // return locationManager.getBestProvider(criteria, true);
+    // }
 
     /**
      * 判断距离是否可以存储信息

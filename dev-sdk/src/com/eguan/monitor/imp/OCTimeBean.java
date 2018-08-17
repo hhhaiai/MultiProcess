@@ -1,10 +1,7 @@
 package com.eguan.monitor.imp;
 
 /**
- * Created on 2018/1/4.
- * Author : chris
- * Email  : mengqi@analysys.com.cn
- * Detail :
+ * Created on 2018/1/4. Author : chris Email : mengqi@analysys.com.cn Detail :
  */
 
 public class OCTimeBean {
@@ -12,7 +9,7 @@ public class OCTimeBean {
     public String timeInterval;
     public int count;
 
-    public OCTimeBean(){
+    public OCTimeBean() {
 
     }
 

@@ -10,61 +10,60 @@ import java.io.Serializable;
  */
 public class NPLInfo implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-	/**
-	 * 网络类型，如“2142343-3G|2142343-4G“
-	 */
-	private String networkType;
-	/**
-	 * 地理位置，由时间戳、经度和纬度组成，用减号-连接，如：“2142343-123-456|2142389-127-456”
-	 */
-	private String geographyLocation;
-	/**
-	 * 进程生命周期，转换成时间戳，如：“1296035800-1296035890|1296035890-1296035900“
-	 */
-	private String processLifecycle;
+    private static final long serialVersionUID = 1L;
+    /**
+     * 网络类型，如“2142343-3G|2142343-4G“
+     */
+    private String networkType;
+    /**
+     * 地理位置，由时间戳、经度和纬度组成，用减号-连接，如：“2142343-123-456|2142389-127-456”
+     */
+    private String geographyLocation;
+    /**
+     * 进程生命周期，转换成时间戳，如：“1296035800-1296035890|1296035890-1296035900“
+     */
+    private String processLifecycle;
 
-	private static NPLInfo instance = null;
+    private static NPLInfo instance = null;
 
-	private NPLInfo() {
-	}
+    private NPLInfo() {
+    }
 
-	public static synchronized NPLInfo getInstance() {
-		if (instance == null) {
-			instance = new NPLInfo();
-		}
-		return instance;
-	}
+    public static synchronized NPLInfo getInstance() {
+        if (instance == null) {
+            instance = new NPLInfo();
+        }
+        return instance;
+    }
 
-	public String getNetworkType() {
-		return networkType;
-	}
+    public String getNetworkType() {
+        return networkType;
+    }
 
-	public void setNetworkType(String networkType) {
-		this.networkType = networkType;
-	}
+    public void setNetworkType(String networkType) {
+        this.networkType = networkType;
+    }
 
-	public String getGeographyLocation() {
-		return geographyLocation;
-	}
+    public String getGeographyLocation() {
+        return geographyLocation;
+    }
 
-	public void setGeographyLocation(String geographyLocation) {
-		this.geographyLocation = geographyLocation;
-	}
+    public void setGeographyLocation(String geographyLocation) {
+        this.geographyLocation = geographyLocation;
+    }
 
-	public String getProcessLifecycle() {
-		return processLifecycle;
-	}
+    public String getProcessLifecycle() {
+        return processLifecycle;
+    }
 
-	public void setProcessLifecycle(String processLifecycle) {
-		this.processLifecycle = processLifecycle;
-	}
+    public void setProcessLifecycle(String processLifecycle) {
+        this.processLifecycle = processLifecycle;
+    }
 
-	@Override
-	public String toString() {
-		return "NPLInfo [networkType=" + networkType + ", geographyLocation="
-				+ geographyLocation + ", processLifecycle=" + processLifecycle
-				+ "]";
-	}
+    @Override
+    public String toString() {
+        return "NPLInfo [networkType=" + networkType + ", geographyLocation=" + geographyLocation
+                + ", processLifecycle=" + processLifecycle + "]";
+    }
 
 }

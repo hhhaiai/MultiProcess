@@ -1,24 +1,24 @@
 package com.eguan.monitor.receiver.device;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-
-import com.eguan.monitor.Constants;
-import com.eguan.monitor.commonutils.EgLog;
-import com.eguan.monitor.commonutils.SPUtil;
-import com.eguan.monitor.dbutils.device.DeviceTableOperation;
-import com.eguan.monitor.imp.IUUInfo;
-import com.eguan.monitor.imp.InstalledAPPInfoManager;
-import com.eguan.monitor.imp.InstalledAppInfo;
-import com.eguan.monitor.thread.EGQueue;
-import com.eguan.monitor.thread.SafeRunnable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import com.eguan.Constants;
+import com.eguan.db.DeviceTableOperation;
+import com.eguan.monitor.imp.IUUInfo;
+import com.eguan.monitor.imp.InstalledAPPInfoManager;
+import com.eguan.monitor.imp.InstalledAppInfo;
+import com.eguan.utils.commonutils.EgLog;
+import com.eguan.utils.commonutils.SPUtil;
+import com.eguan.utils.thread.EGQueue;
+import com.eguan.utils.thread.SafeRunnable;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 
 /**
  * 应用安装、卸载、更新广播接收器，获取应用相关信息，并做入库缓存处理

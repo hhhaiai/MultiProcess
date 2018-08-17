@@ -1,13 +1,12 @@
 package com.eguan.monitor.receiver.app;
 
+import com.eguan.Constants;
+import com.eguan.monitor.InnerProcessCacheManager;
+import com.eguan.utils.commonutils.EgLog;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-
-import com.eguan.monitor.Constants;
-import com.eguan.monitor.cache.InnerProcessCacheManager;
-import com.eguan.monitor.commonutils.EgLog;
 
 public class NetworkReceiver extends BroadcastReceiver {
 
@@ -22,5 +21,3 @@ public class NetworkReceiver extends BroadcastReceiver {
         }
     }
 }
-
-	

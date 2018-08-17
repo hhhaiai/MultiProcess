@@ -3,9 +3,9 @@ package com.demo;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
-import com.eguan.monitor.EguanImpl;
-import com.eguan.monitor.commonutils.EgLog;
-import com.eguan.monitor.commonutils.EguanIdUtils;
+import com.eguan.EguanImpl;
+import com.eguan.utils.commonutils.EgLog;
+import com.eguan.utils.commonutils.EguanIdUtils;
 
 import android.Manifest;
 import android.app.Activity;

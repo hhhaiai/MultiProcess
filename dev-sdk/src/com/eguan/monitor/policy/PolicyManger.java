@@ -1,10 +1,10 @@
 package com.eguan.monitor.policy;
 
+import com.eguan.utils.commonutils.EgLog;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
-
-import com.eguan.monitor.commonutils.EgLog;
 
 /**
  * Created by chris on 16/11/19.
@@ -19,7 +19,6 @@ public class PolicyManger {
         SharedPreferences sp = mContext.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         servicePullPolicyVer = sp.getString("servicePullVer", "0");
     }
-
 
     public static boolean isNewPolicy(String newPolicyVer) {
         return Policy.isNewPolicy(newPolicyVer);
@@ -46,7 +45,7 @@ public class PolicyManger {
     public void useDefaultRtPolicy() {
         Policy localPolicy = PolicyManger.getLocalPolicy(mContext);
         if (!"".equals(localPolicy.getPolicyVer())) {
-//            saveNewPolicyToLocal(mContext,localPolicy);
+            // saveNewPolicyToLocal(mContext,localPolicy);
         } else {
             saveNewPolicyToLocal(mContext, getDefalutRtPolicy());
         }
@@ -89,7 +88,6 @@ public class PolicyManger {
         return Policy.getNativePolicy(mContext);
     }
 
-
     public static Policy getDefalutPolicy() {
         return Policy.getDefaultPolicyNative();
     }
@@ -110,8 +108,8 @@ public class PolicyManger {
     }
 
     public boolean canUpload() {
-        return Policy.getNativePolicy(mContext).getPermitForFailTime() < System.currentTimeMillis() &&
-                Policy.getNativePolicy(mContext).getPermitForServerTime() < System.currentTimeMillis();
+        return Policy.getNativePolicy(mContext).getPermitForFailTime() < System.currentTimeMillis()
+                && Policy.getNativePolicy(mContext).getPermitForServerTime() < System.currentTimeMillis();
     }
 
     public void setDebugPolicy() {

@@ -2,9 +2,9 @@ package com.eguan.monitor.imp;
 
 import android.text.TextUtils;
 
-import com.eguan.monitor.Constants;
-import com.eguan.monitor.commonutils.EgLog;
-import com.eguan.monitor.commonutils.TimeUtils;
+import com.eguan.Constants;
+import com.eguan.utils.commonutils.EgLog;
+import com.eguan.utils.commonutils.TimeUtils;
 
 import java.io.Serializable;
 
@@ -68,7 +68,6 @@ public class OCInfo implements Serializable, Cloneable {
         Network = network;
     }
 
-
     public String getApplicationOpenTime() {
         return ApplicationOpenTime;
     }
@@ -127,11 +126,13 @@ public class OCInfo implements Serializable, Cloneable {
 
     @Override
     public String toString() {
-        return "OCInfo [aot=" + TimeUtils.longToTime(Long.valueOf(TextUtils.isEmpty(ApplicationOpenTime) ? "0" : ApplicationOpenTime))
-                + ", act=" + TimeUtils.longToTime(Long.valueOf(TextUtils.isEmpty(ApplicationCloseTime) ? "0" : ApplicationCloseTime))
-                + ", packName=" + ApplicationPackageName
-                + ", AppName=" + ApplicationName
-                + ", AppVer=" + ApplicationVersionCode + "]";
+        return "OCInfo [aot="
+                + TimeUtils.longToTime(Long.valueOf(TextUtils.isEmpty(ApplicationOpenTime) ? "0" : ApplicationOpenTime))
+                + ", act="
+                + TimeUtils
+                        .longToTime(Long.valueOf(TextUtils.isEmpty(ApplicationCloseTime) ? "0" : ApplicationCloseTime))
+                + ", packName=" + ApplicationPackageName + ", AppName=" + ApplicationName + ", AppVer="
+                + ApplicationVersionCode + "]";
     }
 
     @Override

@@ -2,11 +2,11 @@ package com.eguan.monitor.imp;
 
 import java.util.List;
 
-import com.eguan.monitor.Constants;
-import com.eguan.monitor.commonutils.EgLog;
-import com.eguan.monitor.commonutils.SPUtil;
-import com.eguan.monitor.commonutils.SystemUtils;
-import com.eguan.monitor.dbutils.device.DeviceTableOperation;
+import com.eguan.Constants;
+import com.eguan.db.DeviceTableOperation;
+import com.eguan.utils.commonutils.EgLog;
+import com.eguan.utils.commonutils.SPUtil;
+import com.eguan.utils.commonutils.SystemUtils;
 
 import android.Manifest;
 import android.content.Context;

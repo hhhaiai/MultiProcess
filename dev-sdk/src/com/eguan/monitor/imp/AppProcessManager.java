@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.eguan.monitor.Constants;
-import com.eguan.monitor.commonutils.EgLog;
-import com.eguan.monitor.commonutils.SPUtil;
-import com.eguan.monitor.dbutils.device.DeviceTableOperation;
-import com.eguan.monitor.procutils.AndroidAppProcess;
-import com.eguan.monitor.procutils.AndroidProcessManager;
+import com.eguan.Constants;
+import com.eguan.db.DeviceTableOperation;
+import com.eguan.utils.commonutils.EgLog;
+import com.eguan.utils.commonutils.SPUtil;
+import com.eguan.utils.procutils.AndroidAppProcess;
+import com.eguan.utils.procutils.AndroidProcessManager;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;

@@ -1,7 +1,7 @@
 package com.eguan.monitor.imp;
 
-import com.eguan.monitor.Constants;
-import com.eguan.monitor.commonutils.EgLog;
+import com.eguan.Constants;
+import com.eguan.utils.commonutils.EgLog;
 
 import java.io.Serializable;
 import java.net.URLEncoder;
@@ -20,7 +20,7 @@ public class DriverInfo implements Serializable {
         return Holder.INSTANCE;
     }
 
-    private static class Holder{
+    private static class Holder {
         private static final DriverInfo INSTANCE = new DriverInfo();
     }
 
@@ -172,7 +172,7 @@ public class DriverInfo implements Serializable {
     /**
      * 模拟器描述,如果是模拟器才进行描述
      */
-//    private String SimulatorDescription;
+    // private String SimulatorDescription;
 
     /**
      * App签名MD5值
@@ -191,13 +191,13 @@ public class DriverInfo implements Serializable {
      */
     private String AndroidID;
 
-//    public String getSimulatorDescription() {
-//        return SimulatorDescription;
-//    }
-//
-//    public void setSimulatorDescription(String simulatorDescription) {
-//        SimulatorDescription = simulatorDescription;
-//    }
+    // public String getSimulatorDescription() {
+    // return SimulatorDescription;
+    // }
+    //
+    // public void setSimulatorDescription(String simulatorDescription) {
+    // SimulatorDescription = simulatorDescription;
+    // }
     public String getIMSI() {
         return IMSI;
     }
@@ -495,16 +495,12 @@ public class DriverInfo implements Serializable {
 
     @Override
     public String toString() {
-        return "DriverInfo [deviceId=" + deviceId + ", deviceBrand="
-                + deviceBrand + ", deviceModel=" + deviceModel
-                + ", systemVersion=" + systemVersion + ", applicationVersion="
-                + applicationVersionCode + ", ApplicationPackageName="
-                + ApplicationPackageName + ", ApplicationName="
-                + ApplicationName + ", applicationKey=" + applicationKey
-                + ", applicationChannel=" + applicationChannel
-                + ", applicationUserId=" + applicationUserId + ", sdkVersion="
-                + sdkVersion + ", apiLevel=" + apiLevel + ", mobileOperator="
-                + mobileOperator + ", phoneNum=" + phoneNum + "]";
+        return "DriverInfo [deviceId=" + deviceId + ", deviceBrand=" + deviceBrand + ", deviceModel=" + deviceModel
+                + ", systemVersion=" + systemVersion + ", applicationVersion=" + applicationVersionCode
+                + ", ApplicationPackageName=" + ApplicationPackageName + ", ApplicationName=" + ApplicationName
+                + ", applicationKey=" + applicationKey + ", applicationChannel=" + applicationChannel
+                + ", applicationUserId=" + applicationUserId + ", sdkVersion=" + sdkVersion + ", apiLevel=" + apiLevel
+                + ", mobileOperator=" + mobileOperator + ", phoneNum=" + phoneNum + "]";
     }
 
 }

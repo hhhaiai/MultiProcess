@@ -1,12 +1,12 @@
 package com.eguan.monitor.receiver;
 
-import com.eguan.monitor.Constants;
-import com.eguan.monitor.cache.InnerProcessCacheManager;
-import com.eguan.monitor.commonutils.EgLog;
-import com.eguan.monitor.commonutils.SPUtil;
-import com.eguan.monitor.commonutils.SystemUtils;
-import com.eguan.monitor.thread.EGQueue;
-import com.eguan.monitor.thread.SafeRunnable;
+import com.eguan.Constants;
+import com.eguan.monitor.InnerProcessCacheManager;
+import com.eguan.utils.commonutils.EgLog;
+import com.eguan.utils.commonutils.SPUtil;
+import com.eguan.utils.commonutils.SystemUtils;
+import com.eguan.utils.thread.EGQueue;
+import com.eguan.utils.thread.SafeRunnable;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;

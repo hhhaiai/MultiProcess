@@ -4,13 +4,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.eguan.monitor.Constants;
-import com.eguan.monitor.commonutils.EgLog;
-import com.eguan.monitor.commonutils.SPUtil;
-import com.eguan.monitor.commonutils.SystemUtils;
+import com.eguan.Constants;
 import com.eguan.monitor.fangzhou.service.MonitorService;
-import com.eguan.monitor.thread.EGQueue;
-import com.eguan.monitor.thread.SafeRunnable;
+import com.eguan.utils.commonutils.EgLog;
+import com.eguan.utils.commonutils.SPUtil;
+import com.eguan.utils.commonutils.SystemUtils;
+import com.eguan.utils.thread.EGQueue;
+import com.eguan.utils.thread.SafeRunnable;
 
 /**
  * Created by Wang on 2017/10/26.
@@ -43,7 +43,8 @@ public class SystemStartReciever extends BroadcastReceiver {
         try {
             boolean running = SystemUtils.isServiceRunning(context, Constants.MONITORSERVICE);
             String tactics = SPUtil.getInstance(context).getDeviceTactics();
-            if (!running && SystemUtils.classInspect(Constants.MONITORSERVICE) && !tactics.equals(Constants.TACTICS_STATE)) {
+            if (!running && SystemUtils.classInspect(Constants.MONITORSERVICE)
+                    && !tactics.equals(Constants.TACTICS_STATE)) {
                 Intent service = new Intent(context, MonitorService.class);
                 service.putExtra(Constants.APP_KEY, SPUtil.getInstance(context).getKey());
                 service.putExtra(Constants.APP_CHANNEL, SPUtil.getInstance(context).getChannel());

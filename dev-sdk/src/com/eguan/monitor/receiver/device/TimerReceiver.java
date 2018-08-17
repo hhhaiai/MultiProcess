@@ -7,18 +7,18 @@ import android.content.Intent;
 import android.os.Build;
 import android.provider.Settings;
 
-import com.eguan.monitor.Constants;
-import com.eguan.monitor.commonutils.EgLog;
-import com.eguan.monitor.commonutils.SPUtil;
-import com.eguan.monitor.commonutils.SystemUtils;
+import com.eguan.Constants;
+import com.eguan.monitor.AccessibilityOCManager;
 import com.eguan.monitor.fangzhou.service.EgAccessibilityService;
 import com.eguan.monitor.imp.AppProcessManager;
 import com.eguan.monitor.imp.OCInfoManager;
 import com.eguan.monitor.imp.WBGManager;
-import com.eguan.monitor.manager.AccessibilityOCManager;
-import com.eguan.monitor.netutils.DevInfoUpload;
-import com.eguan.monitor.thread.EGQueue;
-import com.eguan.monitor.thread.SafeRunnable;
+import com.eguan.utils.commonutils.EgLog;
+import com.eguan.utils.commonutils.SPUtil;
+import com.eguan.utils.commonutils.SystemUtils;
+import com.eguan.utils.netutils.DevInfoUpload;
+import com.eguan.utils.thread.EGQueue;
+import com.eguan.utils.thread.SafeRunnable;
 
 import java.io.File;
 
@@ -34,11 +34,11 @@ public class TimerReceiver extends BroadcastReceiver {
             @Override
             public void safeRun() {
                 try {
-                    //OC处理
+                    // OC处理
                     process(context);
-                    //WiFi信息，基站信息，经纬度存储整合
+                    // WiFi信息，基站信息，经纬度存储整合
                     WBGManager.getInstance(context).getWBGInfo();
-                    //upload上传
+                    // upload上传
                     DevInfoUpload.getInstance().StartpostData(context);
                 } catch (Throwable e) {
                     if (Constants.FLAG_DEBUG_INNER) {
@@ -53,23 +53,23 @@ public class TimerReceiver extends BroadcastReceiver {
         try {
             SystemUtils.startJobService(context);
 
-            //当处于锁屏,屏幕点亮.处理ST为锁屏类型OC数据,保全数组
+            // 当处于锁屏,屏幕点亮.处理ST为锁屏类型OC数据,保全数组
             if (isKeyguardRestrictedInputMode(context)) {
                 OCInfoManager.getInstance(context).filterInsertOCInfo(Constants.CLOSE_SCREEN, false);
                 return;
             }
-            //root设备或者(设备系统本小于LOLLIPOP且允许了GET_TASKS权限)
+            // root设备或者(设备系统本小于LOLLIPOP且允许了GET_TASKS权限)
             if (isRoot() || (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP && isPermitGetTask(context))) {
-                //使用getRunningTask获取OC信息
+                // 使用getRunningTask获取OC信息
                 OCInfoManager.getInstance(context).getOCInfo();
             } else if (isAccessibilitySettingsOn(context)) {
-                //使用AccessibilityService获取OC信息
+                // 使用AccessibilityService获取OC信息
                 AccessibilityOCManager.getInstance(context).setEnable();
             } else {
-                //系统高于4.4且低于7.0,且并未开启AcessibilityService
-//                if (Constants.FLAG_DEBUG_INNER) {
-//                    EgLog.d("inside TimerReceiver.process. 识别到系统版本属于5.0以上");
-//                }
+                // 系统高于4.4且低于7.0,且并未开启AcessibilityService
+                // if (Constants.FLAG_DEBUG_INNER) {
+                // EgLog.d("inside TimerReceiver.process. 识别到系统版本属于5.0以上");
+                // }
                 AppProcessManager.getInstance(context).appProcessInfo();
             }
             SPUtil.getInstance(context).setEndTime(System.currentTimeMillis());
@@ -87,15 +87,14 @@ public class TimerReceiver extends BroadcastReceiver {
     public boolean isRoot() {
         boolean root = false;
         try {
-            root = !((!new File("/system/bin/su").exists())
-                    && (!new File("/system/xbin/su").exists()));
+            root = !((!new File("/system/bin/su").exists()) && (!new File("/system/xbin/su").exists()));
         } catch (Exception e) {
         }
         return root;
     }
 
     /**
-     * 是否解锁   锁屏true 开屏false
+     * 是否解锁 锁屏true 开屏false
      *
      * @param context
      * @return
@@ -114,7 +113,8 @@ public class TimerReceiver extends BroadcastReceiver {
      * @return
      */
     public static boolean isAccessibilitySettingsOn(Context context) {
-        String accessibilityServiceName = new String(context.getPackageName() + "/" + EgAccessibilityService.class.getCanonicalName());
+        String accessibilityServiceName = new String(
+                context.getPackageName() + "/" + EgAccessibilityService.class.getCanonicalName());
         int accessibilityEnabled = 0;
         try {
             accessibilityEnabled = Settings.Secure.getInt(context.getContentResolver(),

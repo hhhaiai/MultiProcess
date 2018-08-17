@@ -1,18 +1,15 @@
 package com.eguan.monitor.fangzhou.service;
 
+import com.eguan.monitor.AccessibilityOCManager;
+import com.eguan.utils.thread.EGQueue;
+import com.eguan.utils.thread.SafeRunnable;
+
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.view.accessibility.AccessibilityEvent;
 
-import com.eguan.monitor.manager.AccessibilityOCManager;
-import com.eguan.monitor.thread.EGQueue;
-import com.eguan.monitor.thread.SafeRunnable;
-
 /**
- * Created on 2017/10/16.
- * Author : chris
- * Email  : mengqi@analysys.com.cn
- * Detail :
+ * Created on 2017/10/16. Author : chris Email : mengqi@analysys.com.cn Detail :
  */
 
 public class EgAccessibilityService extends AccessibilityService {
@@ -36,7 +33,7 @@ public class EgAccessibilityService extends AccessibilityService {
         mAccessibilityServiceInfo.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC;
         // 设置flag
         mAccessibilityServiceInfo.flags |= AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS;
-        //TODO:设置描述
+        // TODO:设置描述
         setServiceInfo(mAccessibilityServiceInfo);
     }
 
@@ -45,7 +42,8 @@ public class EgAccessibilityService extends AccessibilityService {
         EGQueue.execute(new SafeRunnable() {
             @Override
             public void safeRun() {
-                AccessibilityOCManager.getInstance(EgAccessibilityService.this).setAccessibilityOC(event.getPackageName().toString());
+                AccessibilityOCManager.getInstance(EgAccessibilityService.this)
+                        .setAccessibilityOC(event.getPackageName().toString());
             }
         });
     }

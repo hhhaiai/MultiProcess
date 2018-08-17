@@ -4,17 +4,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.eguan.monitor.Constants;
-import com.eguan.monitor.commonutils.EgLog;
-import com.eguan.monitor.commonutils.ReceiverUtils;
-import com.eguan.monitor.dbutils.device.DeviceTableOperation;
+import com.eguan.Constants;
+import com.eguan.db.DeviceTableOperation;
 import com.eguan.monitor.imp.AppProcessManager;
 import com.eguan.monitor.imp.OCInfoManager;
 import com.eguan.monitor.imp.ScreenTime;
-import com.eguan.monitor.netutils.DevInfoUpload;
-import com.eguan.monitor.thread.EGQueue;
-import com.eguan.monitor.thread.SafeRunnable;
-
+import com.eguan.utils.commonutils.EgLog;
+import com.eguan.utils.commonutils.ReceiverUtils;
+import com.eguan.utils.netutils.DevInfoUpload;
+import com.eguan.utils.thread.EGQueue;
+import com.eguan.utils.thread.SafeRunnable;
 
 public class ScreenReceiver extends BroadcastReceiver {
 
@@ -27,18 +26,18 @@ public class ScreenReceiver extends BroadcastReceiver {
                     String action = intent.getAction();
                     if (action != null) {
                         // TODO Auto-generated method stub
-                        /*点亮屏幕*/
+                        /* 点亮屏幕 */
                         if (action.equals(Intent.ACTION_SCREEN_ON)) {
                             ScreenTime.addOnOffTime(true);
                             DataUpload(context);
-                            /*注册广播*/
+                            /* 注册广播 */
                             ReceiverUtils.getInstance().registAllReceiver(context);
-                            /*关闭屏幕*/
+                            /* 关闭屏幕 */
                         } else if (action.equals(Intent.ACTION_SCREEN_OFF)) {
 
                             AppProcessManager.resetCounter();
                             ScreenTime.addOnOffTime(false);
-                            /*注销广播*/
+                            /* 注销广播 */
                             AppProcessManager.getInstance(context).dealScreenOff();
                             ReceiverUtils.getInstance().unRegistAllReceiver(context, false);
                             DataUpload(context);
@@ -61,22 +60,21 @@ public class ScreenReceiver extends BroadcastReceiver {
      * @return
      */
     private void DataUpload(final Context context) {
-//        EGThreadPool.pushDB(new Runnable() {
-//            @Override
-//            public void run() {
+        // EGThreadPool.pushDB(new Runnable() {
+        // @Override
+        // public void run() {
         try {
             int number = DeviceTableOperation.getInstance(context).DataQuantity();
             if (number >= Constants.DATA_NUMBER) {
                 DevInfoUpload.getInstance().upload(context);
             }
         } catch (Throwable e) {
-//            if (Config.EG_DEBUG) {
-                EgLog.e("DataUpload", e.toString());
-//            }
+            // if (Config.EG_DEBUG) {
+            EgLog.e("DataUpload", e.toString());
+            // }
         }
-//            }
-//        });
-
+        // }
+        // });
 
     }
 }

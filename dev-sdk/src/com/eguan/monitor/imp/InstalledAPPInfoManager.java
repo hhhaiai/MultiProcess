@@ -5,10 +5,10 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
 
-import com.eguan.monitor.Constants;
-import com.eguan.monitor.commonutils.EgLog;
-import com.eguan.monitor.commonutils.SPUtil;
-import com.eguan.monitor.commonutils.SystemUtils;
+import com.eguan.Constants;
+import com.eguan.utils.commonutils.EgLog;
+import com.eguan.utils.commonutils.SPUtil;
+import com.eguan.utils.commonutils.SystemUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,15 +22,11 @@ import java.util.List;
  */
 public class InstalledAPPInfoManager {
 
-
     private static final int APP_MIXSUM = 5;
 
-
     /**
-     * 获取设备所有应用列表信息(系统与三方应用,包含启动页面的)
-     * 1、先通过系统API(getInstalledPackages)获取(size必须>=5)
-     * 2、API获取不到通过pm 命令pm list packages 获取
-     * 3、如果API与pm方式都获取不到己安装列表的话,则返回一个空集合
+     * 获取设备所有应用列表信息(系统与三方应用,包含启动页面的) 1、先通过系统API(getInstalledPackages)获取(size必须>=5)
+     * 2、API获取不到通过pm 命令pm list packages 获取 3、如果API与pm方式都获取不到己安装列表的话,则返回一个空集合
      *
      * @param context
      * @return
@@ -52,13 +48,10 @@ public class InstalledAPPInfoManager {
             try {
                 PackageInfo packageInfo = packages.get(i);
                 String packageName = packageInfo.packageName;
-                if (!TextUtils.isEmpty(packageName) && pm.getLaunchIntentForPackage(packageName) !=
-                        null) {
+                if (!TextUtils.isEmpty(packageName) && pm.getLaunchIntentForPackage(packageName) != null) {
                     InstalledAppInfo appInfo = new InstalledAppInfo();
-                    String appName = packageInfo.applicationInfo.loadLabel(
-                            context.getPackageManager()).toString();
-                    String versionName = TextUtils.isEmpty(packageInfo.versionName) ? "1.0" :
-                            packageInfo.versionName;
+                    String appName = packageInfo.applicationInfo.loadLabel(context.getPackageManager()).toString();
+                    String versionName = TextUtils.isEmpty(packageInfo.versionName) ? "1.0" : packageInfo.versionName;
                     String versionCode = String.valueOf(packageInfo.versionCode);
 
                     appInfo.setApplicationPackageName(packageName);
@@ -78,7 +71,6 @@ public class InstalledAPPInfoManager {
 
     private final static String SHELL_PM_LIST_PACKAGES = "pm list packages";
 
-
     private static List<InstalledAppInfo> getAppsFromShell(Context context) {
         PackageManager pm = context.getPackageManager();
         List<InstalledAppInfo> appList = new ArrayList<InstalledAppInfo>();
@@ -92,9 +84,7 @@ public class InstalledAPPInfoManager {
                         String[] split = lines[i].split(":");
                         if (split.length >= 1) {
                             String packageName = split[1];
-                            if (!TextUtils.isEmpty(packageName) && pm.getLaunchIntentForPackage
-                                    (packageName)
-                                    != null) {
+                            if (!TextUtils.isEmpty(packageName) && pm.getLaunchIntentForPackage(packageName) != null) {
                                 info = new InstalledAppInfo();
                                 info.setApplicationName("");
                                 info.setApplicationPackageName(packageName);
@@ -138,7 +128,6 @@ public class InstalledAPPInfoManager {
         }
         return arr.toString();
     }
-
 
     /**
      * 将JSON字符串转为List集合

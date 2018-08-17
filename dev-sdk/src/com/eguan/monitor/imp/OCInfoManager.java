@@ -8,11 +8,11 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
 
-import com.eguan.monitor.Constants;
-import com.eguan.monitor.commonutils.EgLog;
-import com.eguan.monitor.commonutils.SPUtil;
-import com.eguan.monitor.commonutils.SystemUtils;
-import com.eguan.monitor.dbutils.device.DeviceTableOperation;
+import com.eguan.Constants;
+import com.eguan.db.DeviceTableOperation;
+import com.eguan.utils.commonutils.EgLog;
+import com.eguan.utils.commonutils.SPUtil;
+import com.eguan.utils.commonutils.SystemUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,19 +44,19 @@ public class OCInfoManager {
         PackageManager pm = null;
         String packageName = "";
         try {
-            ActivityManager actm = (ActivityManager) context
-                    .getSystemService(Context.ACTIVITY_SERVICE);
+            ActivityManager actm = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
             pm = context.getPackageManager();
             List<RunningTaskInfo> tasks = actm.getRunningTasks(1);// 获取正在运行的任务列表
             if (tasks.size() <= 0) {
                 return;
             }
             packageName = tasks.get(0).topActivity.getPackageName();// 得到当前正在运行的任务包名
-//            PackageInfo pInfo = pm.getPackageInfo(packageName, 0);
+            // PackageInfo pInfo = pm.getPackageInfo(packageName, 0);
 
             String lastPkgName = spUtil.getLastOpenPackgeName();
 
-            if (TextUtils.isEmpty(packageName)) return;
+            if (TextUtils.isEmpty(packageName))
+                return;
             // 是否首次打开
             if (lastPkgName.equals("")) {
                 // 如果打开的不是系统应用或者浏览器，做首次存储
@@ -92,7 +92,8 @@ public class OCInfoManager {
         String appName = "", versionName = "", versionCode = "", appType = "OA";
         try {
 
-            if (pm == null || TextUtils.isEmpty(pkgName)) return;
+            if (pm == null || TextUtils.isEmpty(pkgName))
+                return;
 
             PackageInfo pInfo = pm.getPackageInfo(pkgName, 0);
             if ((pInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0
@@ -100,8 +101,7 @@ public class OCInfoManager {
                 appType = "SA";
             }
 
-            appName = pm.getApplicationLabel(pm.getApplicationInfo(pkgName,
-                    PackageManager.GET_META_DATA)) + "";
+            appName = pm.getApplicationLabel(pm.getApplicationInfo(pkgName, PackageManager.GET_META_DATA)) + "";
             versionName = pm.getPackageInfo(pkgName, 0).versionName;
             versionCode = String.valueOf(pm.getPackageInfo(pkgName, 0).versionCode);
 
@@ -114,8 +114,8 @@ public class OCInfoManager {
         spUtil.setLastOpenPackgeName(pkgName);
         spUtil.setLastOpenTime(nowTime);
         spUtil.setLastAppName(appName);
-        spUtil.setLastAppVerison(versionName == null ||
-                versionName.equals("null") ? "1.0" : versionName + "|" + versionCode);
+        spUtil.setLastAppVerison(
+                versionName == null || versionName.equals("null") ? "1.0" : versionName + "|" + versionCode);
         spUtil.setAppType(appType);
     }
 
@@ -127,8 +127,7 @@ public class OCInfoManager {
         String openTime = spUtil.getLastOpenTime();
         Long closeTime = spUtil.getEndTime();
         String appType = spUtil.getAppType();
-        if (OldPkgName.equals("") || appName.equals("")
-                || appVersion.equals("") || openTime.equals("")) {
+        if (OldPkgName.equals("") || appName.equals("") || appVersion.equals("") || openTime.equals("")) {
             return;
         }
         long time = closeTime - Long.parseLong(openTime);

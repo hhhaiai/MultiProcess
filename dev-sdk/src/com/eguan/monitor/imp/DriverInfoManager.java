@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import com.eguan.monitor.Constants;
-import com.eguan.monitor.commonutils.EgLog;
-import com.eguan.monitor.commonutils.SignaturesUtils;
-import com.eguan.monitor.commonutils.SystemUtils;
-import com.eguan.monitor.simulator.SimulatorUtils;
+import com.eguan.Constants;
+import com.eguan.utils.commonutils.EgLog;
+import com.eguan.utils.commonutils.SignaturesUtils;
+import com.eguan.utils.commonutils.SystemUtils;
+import com.eguan.utils.simulator.SimulatorUtils;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;

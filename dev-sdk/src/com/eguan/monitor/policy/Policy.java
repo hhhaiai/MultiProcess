@@ -1,8 +1,8 @@
 package com.eguan.monitor.policy;
 
-import com.eguan.monitor.Constants;
-import com.eguan.monitor.commonutils.AppSPUtils;
-import com.eguan.monitor.commonutils.EgLog;
+import com.eguan.Constants;
+import com.eguan.utils.commonutils.AppSPUtils;
+import com.eguan.utils.commonutils.EgLog;
 
 import android.content.Context;
 import android.content.SharedPreferences;
