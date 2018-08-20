@@ -1,4 +1,4 @@
-package com.eguan.monitor.imp;
+package com.eguan.imp;
 
 import com.eguan.Constants;
 import com.eguan.utils.commonutils.EgLog;

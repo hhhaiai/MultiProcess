@@ -5,16 +5,17 @@ import java.util.List;
 import org.json.JSONObject;
 
 import com.eguan.Constants;
-import com.eguan.db.DeviceTableOperation;
+import com.eguan.db.DBPorcesser;
 import com.eguan.monitor.DeviceJsonFactory;
-import com.eguan.monitor.imp.IUUInfo;
-import com.eguan.monitor.imp.InstalledAPPInfoManager;
-import com.eguan.monitor.imp.OCInfo;
+import com.eguan.imp.IUUInfo;
+import com.eguan.imp.InstalledAPPInfoManager;
+import com.eguan.imp.OCInfo;
+import com.eguan.utils.commonutils.SPHodler;
+import com.eguan.utils.policy.TacticsManager;
 import com.eguan.utils.aesutils.DataDealUtils;
 import com.eguan.utils.commonutils.AppSPUtils;
 import com.eguan.utils.commonutils.EgLog;
 import com.eguan.utils.commonutils.EguanIdUtils;
-import com.eguan.utils.commonutils.SPUtil;
 import com.eguan.utils.commonutils.SystemUtils;
 import com.eguan.utils.commonutils.TimeUtils;
 
@@ -41,7 +42,7 @@ public class DevInfoUpload {
      */
     public void StartpostData(Context context) {
 
-        SPUtil spUtil = SPUtil.getInstance(context);
+        SPHodler spUtil = SPHodler.getInstance(context);
         if ((System.currentTimeMillis() - spUtil.getLastQuestTime()) > Constants.LONG_INVALIED_TIME) {
 
             if (spUtil.getRequestState() != 0) {
@@ -93,7 +94,7 @@ public class DevInfoUpload {
      */
 
     public void upload(final Context context) {
-        final SPUtil spUtil = SPUtil.getInstance(context);
+        final SPHodler spUtil = SPHodler.getInstance(context);
         // 如果时间超过一天，并且当前是可网络请求状态，则先上传开发者配置请求，然后上传数据
         spUtil.setRequestState(1);
         try {
@@ -168,7 +169,7 @@ public class DevInfoUpload {
         }
         if (mContext == null)
             return;// 如果Context为空的话,不处理
-        SPUtil spUtil = SPUtil.getInstance(mContext);
+        SPHodler spUtil = SPHodler.getInstance(mContext);
         try {
             String returnCode = "";
             if (response == null || response.equals("")) {
@@ -219,7 +220,7 @@ public class DevInfoUpload {
         // EgLog.v("uploadSuccess() <<< 数据长传成功，处理本地逻辑 >>>");
         // }
 
-        SPUtil spUtil = SPUtil.getInstance(mContext);
+        SPHodler spUtil = SPHodler.getInstance(mContext);
         spUtil.setRequestState(0);
         if (time != spUtil.getIntervalTime()) {
             spUtil.setIntervalTime(time);
@@ -228,19 +229,19 @@ public class DevInfoUpload {
         /*-----------------缓存这次上传成功的时间-------------------------*/
         spUtil.setLastQuestTime(System.currentTimeMillis());
         /*-----------------清除本地打开关闭应用行为信息缓存记录-------------------------*/
-        List<OCInfo> list = DeviceTableOperation.getInstance(mContext).selectOCInfo();
-        DeviceTableOperation.getInstance(mContext).deleteOCInfo(list);
+        List<OCInfo> list = DBPorcesser.getInstance(mContext).selectOCInfo();
+        DBPorcesser.getInstance(mContext).deleteOCInfo(list);
         /*-----------------清除本地应用安装卸载行为信息缓存记录------------------------*/
-        List<IUUInfo> list2 = DeviceTableOperation.getInstance(mContext).selectIUUInfo();
-        DeviceTableOperation.getInstance(mContext).deleteIUUInfo(list2);
+        List<IUUInfo> list2 = DBPorcesser.getInstance(mContext).selectIUUInfo();
+        DBPorcesser.getInstance(mContext).deleteIUUInfo(list2);
         /*-----------------重新缓存当前设备的所有应用列表信息------------------------*/
         InstalledAPPInfoManager appManager = new InstalledAPPInfoManager();
         spUtil.setInstallAppJson(appManager.getAppInfoToJson(InstalledAPPInfoManager.getAllApps(mContext)));
         /*-----------------清除OCTimeTable------------------------*/
-        DeviceTableOperation.getInstance(mContext).deleteOCTimeTable();
-        SPUtil.getInstance(mContext).setNetTypeChange("");
-        SPUtil.getInstance(mContext).setRetryTime(0);
-        DeviceTableOperation.getInstance(mContext).deleteWBGInfo();
+        DBPorcesser.getInstance(mContext).deleteOCTimeTable();
+        SPHodler.getInstance(mContext).setNetTypeChange("");
+        SPHodler.getInstance(mContext).setRetryTime(0);
+        DBPorcesser.getInstance(mContext).deleteWBGInfo();
         // spUtil.setProcessLifecycle(0);
         // if (Constants.FLAG_DEBUG_INNER) {
         // EgLog.v("end uploadSuccess !");
@@ -251,7 +252,7 @@ public class DevInfoUpload {
      * 数据上传失败 记录信息
      */
     private void uploadFailure(Context mContext) {
-        SPUtil spUtil = SPUtil.getInstance(mContext);
+        SPHodler spUtil = SPHodler.getInstance(mContext);
         /*--------------------------------上传失败记录上传次数-------------------------------------*/
         if (Constants.FLAG_DEBUG_INNER) {
             EgLog.w("----uploadFailure()--------数据上传失败  开始重试---------");

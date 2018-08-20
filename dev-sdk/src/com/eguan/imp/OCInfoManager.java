@@ -1,4 +1,4 @@
-package com.eguan.monitor.imp;
+package com.eguan.imp;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
@@ -9,9 +9,9 @@ import android.content.pm.PackageManager;
 import android.text.TextUtils;
 
 import com.eguan.Constants;
-import com.eguan.db.DeviceTableOperation;
+import com.eguan.db.DBPorcesser;
 import com.eguan.utils.commonutils.EgLog;
-import com.eguan.utils.commonutils.SPUtil;
+import com.eguan.utils.commonutils.SPHodler;
 import com.eguan.utils.commonutils.SystemUtils;
 
 import java.util.ArrayList;
@@ -19,13 +19,13 @@ import java.util.List;
 
 public class OCInfoManager {
 
-    SPUtil spUtil = null;
+    SPHodler spUtil = null;
     Context context;
     private static OCInfoManager instance = null;
 
     private OCInfoManager(Context context) {
         this.context = context;
-        spUtil = SPUtil.getInstance(context);
+        spUtil = SPHodler.getInstance(context);
     }
 
     public static synchronized OCInfoManager getInstance(Context context) {
@@ -182,7 +182,7 @@ public class OCInfoManager {
 
     private void insertForDataBase(List<OCInfo> ocInfo) {
         try {
-            DeviceTableOperation tOperation = DeviceTableOperation.getInstance(context);
+            DBPorcesser tOperation = DBPorcesser.getInstance(context);
             tOperation.insertOCInfo(ocInfo);
         } catch (Throwable e) {
             if (Constants.FLAG_DEBUG_INNER) {

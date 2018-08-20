@@ -29,7 +29,7 @@
     <methods>;
 }
 
--keep,allowshrinking class com.eguan.monitor.imp.EGUser$* {
+-keep,allowshrinking class com.eguan.imp.EGUser$* {
     <methods>;
 }
 
@@ -37,7 +37,7 @@
     <methods>;
 }
 
--keep,allowshrinking class com.eguan.monitor.imp.PushProvider {
+-keep,allowshrinking class com.eguan.imp.PushProvider {
     <fields>;
 }
 

@@ -1,18 +1,5 @@
 package com.eguan.utils.commonutils;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Method;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
-import com.eguan.Constants;
-import com.eguan.monitor.fangzhou.service.MonitorJobService;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -29,6 +16,19 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.text.TextUtils;
+
+import com.eguan.Constants;
+import com.eguan.monitor.fangzhou.service.MonitorJobService;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Method;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * Created by chris on 16/11/4.
@@ -59,7 +59,7 @@ public class SystemUtils {
         String key = "";
         if (context == null)
             return "";
-        SPUtil spUtil = SPUtil.getInstance(context);
+        SPHodler spUtil = SPHodler.getInstance(context);
         key = spUtil.getKey();
         if (TextUtils.isEmpty(key) || key.length() != 17) {
             try {
@@ -84,7 +84,7 @@ public class SystemUtils {
         String channel = "";
         if (context == null)
             return "";
-        SPUtil spUtil = SPUtil.getInstance(context);
+        SPHodler spUtil = SPHodler.getInstance(context);
         channel = spUtil.getChannel();
         if (TextUtils.isEmpty(channel)) {
             try {
@@ -156,8 +156,7 @@ public class SystemUtils {
      * 判断某个服务是否正在运行的方法
      *
      * @param mContext
-     * @param serviceName
-     *            是包名+服务的类名（例如：net.loonggg.testbackstage.TestService）
+     * @param serviceName 是包名+服务的类名（例如：net.loonggg.testbackstage.TestService）
      * @return true代表正在运行，false代表服务没有正在运行
      */
     public static boolean isServiceWork(Context mContext, String serviceName) {
@@ -337,86 +336,6 @@ public class SystemUtils {
         return sb.toString();
     }
 
-    // private static final int MAX_KEY_LENGTH = 255;
-    // private static final int MAX_STRING_VALUE_LENGTH = 255;
-    // private static final int ARRAY_LIST_MAXSIZE = 100;
-    //
-    // /**
-    // * 检测传入的参数Map中的数据结构是否匹配规则
-    // *
-    // * @param property
-    // */
-    // public static void checkProperty(Map<String, Object> property) {
-    // // 先判断是否为空值,如果为null,不做检测
-    // if (property == null)
-    // return;
-    // if (!property.isEmpty()) {
-    // for (Iterator<Map.Entry<String, Object>> iterator =
-    // property.entrySet().iterator(); iterator.hasNext();) {
-    //
-    // Map.Entry<String, Object> entry = iterator.next();
-    // if (!TextUtils.isEmpty(entry.getKey()) && entry.getKey().length() >
-    // MAX_KEY_LENGTH) {
-    // iterator.remove();
-    // EgLog.e("传入自定义属性中 Key=" + entry.getKey().substring(0, 10) + "…… 长度超过255,被丢弃
-    // ");
-    // continue;
-    // }
-    // boolean isNeedRemove = checkValue(entry.getValue());
-    // if (isNeedRemove) {
-    // iterator.remove();
-    // }
-    // }
-    // }
-    // }
-    //
-    // /**
-    // * 检测Map中Value规则
-    // *
-    // * @param o
-    // * @return 如果不匹配, 则需要从Map中删除，返回true;反之,匹配则返回false;
-    // */
-    // private static boolean checkValue(Object o) {
-    // if (o == null) {
-    // return false;
-    // }
-    // try {
-    // if (o instanceof Boolean || o instanceof Character || o instanceof Double ||
-    // o instanceof Float
-    // || o instanceof Integer || o instanceof Long || o instanceof Short
-    // || (o instanceof String && ((String) o).length() <= MAX_STRING_VALUE_LENGTH)
-    // || (o instanceof List && ((List<?>) o).size() <= ARRAY_LIST_MAXSIZE)
-    // || (o.getClass().isArray() && Array.getLength(o) <= ARRAY_LIST_MAXSIZE)) {
-    // // 正常范围
-    // return false;
-    // } else if (o instanceof String && ((String) o).length() >
-    // MAX_STRING_VALUE_LENGTH) {
-    // EgLog.e("传入自定义属性中 value为字符串:" + ((String) o).substring(0, 10) + "……
-    // 长度超过255,被丢弃 ");
-    // return true;
-    // } else if (o instanceof List && ((List<?>) o).size() > ARRAY_LIST_MAXSIZE) {
-    // EgLog.e("传入自定义属性中 value 为List，大小为" + ((List<?>) o).size() + "…… 大小超过100,被丢弃
-    // ");
-    // return true;
-    // } else if (o.getClass().isArray() && Array.getLength(o) > ARRAY_LIST_MAXSIZE)
-    // {
-    // EgLog.e("传入自定义属性中 value 为Array，长度为" + Array.getLength(o) + "…… 长度超过100,被丢弃
-    // ");
-    // return true;
-    // } else {
-    // EgLog.e("传入自定义属性中 " +
-    // "value类型不满足【String】【Number】【Boolean】【Datetime】【List】,被丢弃");
-    // return true;
-    // }
-    //
-    // } catch (Throwable e) {
-    // if (Constants.FLAG_DEBUG_INNER) {
-    // EgLog.e(e);
-    // }
-    // }
-    // // 默认返回true，表示如果异常则直接从map中删除
-    // return true;
-    // }
 
     public static boolean isMainProcess(Context context) {
         try {

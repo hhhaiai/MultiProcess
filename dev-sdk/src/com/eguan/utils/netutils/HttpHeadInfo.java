@@ -1,29 +1,29 @@
 package com.eguan.utils.netutils;
 
+import android.content.Context;
+import android.text.TextUtils;
+
+import com.eguan.imp.DriverInfo;
+import com.eguan.imp.DriverInfoManager;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import com.eguan.monitor.imp.DriverInfo;
-import com.eguan.monitor.imp.DriverInfoManager;
-
-import android.content.Context;
-import android.text.TextUtils;
-
 /**
  * Created by Wang on 2017/2/20.
  */
-public class HeadInfo {
+public class HttpHeadInfo {
 
-    private HeadInfo() {
+    private HttpHeadInfo() {
     }
 
-    public static HeadInfo getInstance() {
+    public static HttpHeadInfo getInstance() {
         return Holder.INSTANCE;
     }
 
     private static class Holder {
-        private static final HeadInfo INSTANCE = new HeadInfo();
+        private static final HttpHeadInfo INSTANCE = new HttpHeadInfo();
     }
 
     /**

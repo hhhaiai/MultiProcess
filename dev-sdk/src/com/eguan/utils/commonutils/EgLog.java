@@ -41,9 +41,7 @@ import javax.xml.transform.stream.StreamSource;
 
 /**
  * @Copyright © 2015 Sanbo Inc. All rights reserved.
- * @Description
- * 
- *              <pre>
+ * @Description              <pre>
  * Log统一管理类,提供功能：
  * 1.log工具类支持全部打印   「支持Log的所有功能.」
  * 2.支持类似C的格式化输出或Java的String.format「%个数和参数个数需要一直才能格式化」
@@ -55,7 +53,6 @@ import javax.xml.transform.stream.StreamSource;
  * 6.格式化输出.
  * 7.支持XML/JSON/Map/Array等更多对象打印
  *              </pre>
- * 
  * @Version: 6.1
  * @Create: 2015年6月18日 下午4:14:01
  * @Author: sanbo
@@ -130,22 +127,16 @@ public class EgLog {
     /**
      * 初始化接口
      *
-     * @param showLog
-     *            是否展示log，默认展示
-     * @param shellControl
-     *            是否使用shell控制log动态打印.默认不使用. shell设置方式：setprop log.tag.sanbo INFO
-     *            最后一个参数为log等级,可选项目：VERBOSE/DEBUG/INFO/WARN/ERROR/ASSERT
-     * @param needWarpper
-     *            是否需要格式化输出
-     * @param needCallStackInfo
-     *            是否需要打印详细的堆栈调用信息.
-     * @param format
-     *            是否需要格式化.
-     * @param defaultTag
-     *            android logcat的tag一个意义,不设置默认的tag为"sanbo"
+     * @param showLog           是否展示log，默认展示
+     * @param shellControl      是否使用shell控制log动态打印.默认不使用. shell设置方式：setprop log.tag.sanbo INFO
+     *                          最后一个参数为log等级,可选项目：VERBOSE/DEBUG/INFO/WARN/ERROR/ASSERT
+     * @param needWarpper       是否需要格式化输出
+     * @param needCallStackInfo 是否需要打印详细的堆栈调用信息.
+     * @param format            是否需要格式化.
+     * @param defaultTag        android logcat的tag一个意义,不设置默认的tag为"sanbo"
      */
     public static void init(boolean showLog, boolean shellControl, boolean needWarpper, boolean needCallStackInfo,
-            boolean format, String defaultTag) {
+                            boolean format, String defaultTag) {
         USER_DEBUG = showLog;
         isShellControl = shellControl;
         isNeedWrapper = needWarpper;
@@ -618,10 +609,8 @@ public class EgLog {
      *
      * @param cla
      * @param obj
-     * @param o
-     *            对象
-     * @param childOffset
-     *            递归解析属性的层级
+     * @param o           对象
+     * @param childOffset 递归解析属性的层级
      */
     private static void getClassFields(Class<?> cla, JSONObject obj, Object o, int childOffset) {
         try {
@@ -720,8 +709,7 @@ public class EgLog {
     /**
      * 获取数组类型
      *
-     * @param object
-     *            如L为int型
+     * @param object 如L为int型
      * @return
      */
     private static char getType(Object object) {
@@ -742,44 +730,44 @@ public class EgLog {
         if (isArray(array)) {
             if (getArrayDimension(array) == 1) {
                 switch (getType(array)) {
-                case 'I':
-                    result.append(Arrays.toString((int[]) array));
-                    break;
-                case 'D':
-                    result.append(Arrays.toString((double[]) array));
-                    break;
-                case 'Z':
-                    result.append(Arrays.toString((boolean[]) array));
-                    break;
-                case 'B':
-                    result.append(Arrays.toString((byte[]) array));
-                    break;
-                case 'S':
-                    result.append(Arrays.toString((short[]) array));
-                    break;
-                case 'J':
-                    result.append(Arrays.toString((long[]) array));
-                    break;
-                case 'F':
-                    result.append(Arrays.toString((float[]) array));
-                    break;
-                case 'C':
-                    result.append(Arrays.toString((char[]) array));
-                    break;
-                case 'L':
-                    Object[] objects = (Object[]) array;
-                    result.append("[");
-                    for (int i = 0; i < objects.length; ++i) {
-                        result.append(objectToString(objects[i]));
-                        if (i != objects.length - 1) {
-                            result.append(",");
+                    case 'I':
+                        result.append(Arrays.toString((int[]) array));
+                        break;
+                    case 'D':
+                        result.append(Arrays.toString((double[]) array));
+                        break;
+                    case 'Z':
+                        result.append(Arrays.toString((boolean[]) array));
+                        break;
+                    case 'B':
+                        result.append(Arrays.toString((byte[]) array));
+                        break;
+                    case 'S':
+                        result.append(Arrays.toString((short[]) array));
+                        break;
+                    case 'J':
+                        result.append(Arrays.toString((long[]) array));
+                        break;
+                    case 'F':
+                        result.append(Arrays.toString((float[]) array));
+                        break;
+                    case 'C':
+                        result.append(Arrays.toString((char[]) array));
+                        break;
+                    case 'L':
+                        Object[] objects = (Object[]) array;
+                        result.append("[");
+                        for (int i = 0; i < objects.length; ++i) {
+                            result.append(objectToString(objects[i]));
+                            if (i != objects.length - 1) {
+                                result.append(",");
+                            }
                         }
-                    }
-                    result.append("]");
-                    break;
-                default:
-                    result.append(Arrays.toString((Object[]) array));
-                    break;
+                        result.append("]");
+                        break;
+                    default:
+                        result.append(Arrays.toString((Object[]) array));
+                        break;
                 }
             } else {
                 result.append("[");
@@ -1180,7 +1168,7 @@ public class EgLog {
             sb.append(CONTENT_LOG_EMPTY);
             return sb.toString();
         }
-        String ss[] = new String[] {};
+        String ss[] = new String[]{};
         String temp = null;
         if (log.contains("\n")) {
             ss = log.split("\n");
@@ -1335,26 +1323,26 @@ public class EgLog {
      */
     private static void realPrint(int level, String tag, String printStr) {
         switch (level) {
-        case MLEVEL.DEBUG:
-            Log.d(tag, printStr);
-            break;
-        case MLEVEL.INFO:
-            Log.i(tag, printStr);
-            break;
-        case MLEVEL.ERROR:
-            Log.e(tag, printStr);
-            break;
-        case MLEVEL.VERBOSE:
-            Log.v(tag, printStr);
-            break;
-        case MLEVEL.WARN:
-            Log.w(tag, printStr);
-            break;
-        case MLEVEL.WTF:
-            Log.wtf(tag, printStr);
-            break;
-        default:
-            break;
+            case MLEVEL.DEBUG:
+                Log.d(tag, printStr);
+                break;
+            case MLEVEL.INFO:
+                Log.i(tag, printStr);
+                break;
+            case MLEVEL.ERROR:
+                Log.e(tag, printStr);
+                break;
+            case MLEVEL.VERBOSE:
+                Log.v(tag, printStr);
+                break;
+            case MLEVEL.WARN:
+                Log.w(tag, printStr);
+                break;
+            case MLEVEL.WTF:
+                Log.wtf(tag, printStr);
+                break;
+            default:
+                break;
         }
     }
 

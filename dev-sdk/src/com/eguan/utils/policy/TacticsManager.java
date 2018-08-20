@@ -1,28 +1,31 @@
-package com.eguan.utils.netutils;
+package com.eguan.utils.policy;
 
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
 import com.eguan.Constants;
-import com.eguan.db.DeviceTableOperation;
+import com.eguan.db.DBPorcesser;
 import com.eguan.monitor.fangzhou.service.MonitorService;
 import com.eguan.utils.commonutils.AppSPUtils;
 import com.eguan.utils.commonutils.EgLog;
 import com.eguan.utils.commonutils.ReceiverUtils;
-import com.eguan.utils.commonutils.SPUtil;
+import com.eguan.utils.commonutils.SPHodler;
 
 import org.json.JSONObject;
 
 /**
- * Created by Wang on 2017/4/25.
+ * @Copyright © 2018 Analysys Inc. All rights reserved.
+ * @Description: 下发的策略管理
+ * @Version: 1.0
+ * @Create: 2017/4/25 15:17:58
+ * @Author: Wang
  */
-
 public class TacticsManager {
 
     private static TacticsManager instance;
     private Context context;
-    SPUtil spUtil;
+    SPHodler spUtil;
 
     public static TacticsManager getInstance(Context context) {
         if (instance == null) {
@@ -37,7 +40,7 @@ public class TacticsManager {
 
     public TacticsManager(Context context) {
         this.context = context;
-        spUtil = SPUtil.getInstance(context);
+        spUtil = SPHodler.getInstance(context);
     }
 
     public void devTacticsProcess(JSONObject json) {
@@ -124,8 +127,11 @@ public class TacticsManager {
     }
 
     private void deleteDevData(final Context context) {
-        EgLog.e("deleteDevData -------- 清空设备信息 --------");
-        DeviceTableOperation.getInstance(context).deleteDeviceAllInfo();
+
+        if (Constants.FLAG_DEBUG_INNER) {
+            EgLog.v("deleteDevData -------- 清空设备信息 --------");
+        }
+        DBPorcesser.getInstance(context).deleteDeviceAllInfo();
     }
 
 }

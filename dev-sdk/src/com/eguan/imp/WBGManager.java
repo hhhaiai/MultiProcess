@@ -1,11 +1,11 @@
-package com.eguan.monitor.imp;
+package com.eguan.imp;
 
 import java.util.List;
 
 import com.eguan.Constants;
-import com.eguan.db.DeviceTableOperation;
+import com.eguan.db.DBPorcesser;
 import com.eguan.utils.commonutils.EgLog;
-import com.eguan.utils.commonutils.SPUtil;
+import com.eguan.utils.commonutils.SPHodler;
 import com.eguan.utils.commonutils.SystemUtils;
 
 import android.Manifest;
@@ -50,7 +50,7 @@ public class WBGManager {
             mWbgInfo.setCollectionTime(String.valueOf(System.currentTimeMillis()));
             getBaseStationInfo();
             getWifiInfo();
-            String location = SPUtil.getInstance(mContext).getLastLocation();
+            String location = SPHodler.getInstance(mContext).getLastLocation();
             mWbgInfo.setGeographyLocation(location);
             saveWBGInfo();
         }
@@ -58,7 +58,7 @@ public class WBGManager {
 
     private boolean getDataTime() {
         long nowTime = System.currentTimeMillis();
-        SPUtil sputil = SPUtil.getInstance(mContext);
+        SPHodler sputil = SPHodler.getInstance(mContext);
         long oldeTime = sputil.getWBGInfoTime();
         if (Constants.GIT_DATA_TIME_INTERVAL <= nowTime - oldeTime) {
             sputil.setWBGInfoTime(nowTime);
@@ -99,7 +99,7 @@ public class WBGManager {
                 mWbgInfo.setLocationAreaCode(String.valueOf(location.getLac()));
 
                 if (Constants.FLAG_DEBUG_INNER) {
-                    EgLog.d("getBaseStationInfo  Cid:" + String.valueOf(location.getCid()) + "; LocationAreaCode: "
+                    EgLog.v("getBaseStationInfo  Cid:" + String.valueOf(location.getCid()) + "; LocationAreaCode: "
                             + String.valueOf(location.getLac()));
                 }
 
@@ -192,7 +192,7 @@ public class WBGManager {
                         + mWbgInfo.getGeographyLocation());
             }
             try {
-                String tag = SPUtil.getInstance(mContext).getNetIpTag();
+                String tag = SPHodler.getInstance(mContext).getNetIpTag();
 
                 if (tag.equals("") || tag.equals("0")) {
                     // mWbgInfo.setIp(getNetIp());
@@ -201,7 +201,7 @@ public class WBGManager {
                 } else {
                     mWbgInfo.setIp("");
                 }
-                DeviceTableOperation.getInstance(mContext).insertWBGInfo(mWbgInfo);
+                DBPorcesser.getInstance(mContext).insertWBGInfo(mWbgInfo);
             } catch (Throwable e) {
                 if (Constants.FLAG_DEBUG_INNER) {
                     EgLog.e(e);

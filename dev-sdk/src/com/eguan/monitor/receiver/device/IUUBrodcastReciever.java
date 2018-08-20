@@ -6,12 +6,12 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.eguan.Constants;
-import com.eguan.db.DeviceTableOperation;
-import com.eguan.monitor.imp.IUUInfo;
-import com.eguan.monitor.imp.InstalledAPPInfoManager;
-import com.eguan.monitor.imp.InstalledAppInfo;
+import com.eguan.db.DBPorcesser;
+import com.eguan.imp.IUUInfo;
+import com.eguan.imp.InstalledAPPInfoManager;
+import com.eguan.imp.InstalledAppInfo;
 import com.eguan.utils.commonutils.EgLog;
-import com.eguan.utils.commonutils.SPUtil;
+import com.eguan.utils.commonutils.SPHodler;
 import com.eguan.utils.thread.EGQueue;
 import com.eguan.utils.thread.SafeRunnable;
 
@@ -150,7 +150,7 @@ public class IUUBrodcastReciever extends BroadcastReceiver {
                 IUUInfo info = null;
                 String packageName = intent.getDataString().substring(8);// 卸载程序包名
                 InstalledAPPInfoManager manager = new InstalledAPPInfoManager();
-                SPUtil spUtil = SPUtil.getInstance(context);
+                SPHodler spUtil = SPHodler.getInstance(context);
                 List<InstalledAppInfo> list = manager.jsonToList(spUtil.getAllAppForUninstall());
                 for (int i = 0; i < list.size(); i++) {
                     if (packageName.equalsIgnoreCase(list.get(i).getApplicationPackageName())) {
@@ -216,11 +216,11 @@ public class IUUBrodcastReciever extends BroadcastReceiver {
      */
     private void saveIuuinfo(final Context context, final IUUInfo info) {
         try {
-            SPUtil spUtil = SPUtil.getInstance(context);
+            SPHodler spUtil = SPHodler.getInstance(context);
             InstalledAPPInfoManager manager = new InstalledAPPInfoManager();
             List<InstalledAppInfo> list = InstalledAPPInfoManager.getAllApps(context);
             spUtil.setAllAppForUninstall(manager.getAppInfoToJson(list));
-            DeviceTableOperation tOperation = DeviceTableOperation.getInstance(context);
+            DBPorcesser tOperation = DBPorcesser.getInstance(context);
             tOperation.insertIUUInfo(info);
         } catch (Throwable e) {
             if (Constants.FLAG_DEBUG_INNER) {

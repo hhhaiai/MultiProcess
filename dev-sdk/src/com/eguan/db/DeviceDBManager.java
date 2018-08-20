@@ -1,9 +1,10 @@
 package com.eguan.db;
 
-import com.eguan.utils.commonutils.EgLog;
-
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.eguan.Constants;
+import com.eguan.utils.commonutils.EgLog;
 
 /**
  * Created by chris on 16/11/4.
@@ -24,7 +25,9 @@ public class DeviceDBManager {
 
     public static synchronized DeviceDBManager getInstance(Context context) {
         if (context == null) {
-            EgLog.e("DBManger参数传入Context为空");
+            if (Constants.FLAG_DEBUG_INNER) {
+                EgLog.e("DBManger参数传入Context为空");
+            }
             return null;
         } else {
             mContext = context.getApplicationContext();

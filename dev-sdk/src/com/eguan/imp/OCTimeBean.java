@@ -1,4 +1,4 @@
-package com.eguan.monitor.imp;
+package com.eguan.imp;
 
 /**
  * Created on 2018/1/4. Author : chris Email : mengqi@analysys.com.cn Detail :

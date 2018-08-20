@@ -1,5 +1,13 @@
 package com.eguan.utils.netutils;
 
+import android.content.Context;
+
+import com.eguan.Constants;
+import com.eguan.imp.DriverInfo;
+import com.eguan.utils.commonutils.EgLog;
+import com.eguan.utils.commonutils.EguanIdUtils;
+import com.eguan.utils.commonutils.SPHodler;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,14 +15,6 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
-
-import com.eguan.Constants;
-import com.eguan.monitor.imp.DriverInfo;
-import com.eguan.utils.commonutils.EgLog;
-import com.eguan.utils.commonutils.EguanIdUtils;
-import com.eguan.utils.commonutils.SPUtil;
-
-import android.content.Context;
 
 public class ConnectionClient {
     // private static final String TAG = "ConnectionClient";
@@ -29,8 +29,7 @@ public class ConnectionClient {
 
     /**
      * @param context
-     * @param url
-     *            上传地址
+     * @param url       上传地址
      * @param name
      * @param value
      * @param policyVer
@@ -42,7 +41,7 @@ public class ConnectionClient {
     }
 
     public static String sendPostFromHttpURLConnection(String url, String name, String value, Context context,
-            String policyVer) {
+                                                       String policyVer) {
         String response = "";
         URL urlP;
         HttpURLConnection connection;
@@ -59,7 +58,7 @@ public class ConnectionClient {
                 F4 = listId.get(1);
             }
             if (F3.isEmpty()) {
-                List<String> list = HeadInfo.getInstance().getDevInfo(context);
+                List<String> list = HttpHeadInfo.getInstance().getDevInfo(context);
                 if (list.size() == 2) {
                     F1 = list.get(0);
                     F2 = list.get(1);
@@ -87,7 +86,7 @@ public class ConnectionClient {
 
             connection.setRequestProperty(SDKV, Constants.SDK_VERSION + "");
             connection.setRequestProperty(Flag, EgLog.USER_DEBUG ? "1" : "0");
-            connection.setRequestProperty(AK, SPUtil.getInstance(context).getKey());
+            connection.setRequestProperty(AK, SPHodler.getInstance(context).getKey());
             connection.setRequestProperty(MAC, DriverInfo.getInstance().getMACAddress());
             connection.setRequestProperty(POLICY_VER, policyVer);
             connection.setRequestProperty(Constants.QIFAN_ENVIRONMENT_HEADER, Constants.QIFAN_TEST_ENVIRONMENT);

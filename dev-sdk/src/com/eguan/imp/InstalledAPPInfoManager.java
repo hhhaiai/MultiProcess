@@ -1,4 +1,4 @@
-package com.eguan.monitor.imp;
+package com.eguan.imp;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -7,7 +7,7 @@ import android.text.TextUtils;
 
 import com.eguan.Constants;
 import com.eguan.utils.commonutils.EgLog;
-import com.eguan.utils.commonutils.SPUtil;
+import com.eguan.utils.commonutils.SPHodler;
 import com.eguan.utils.commonutils.SystemUtils;
 
 import org.json.JSONArray;
@@ -163,7 +163,7 @@ public class InstalledAPPInfoManager {
     public List<InstalledAppInfo> getPostAppInfoData(Context context) {
 
         List<InstalledAppInfo> list = null;
-        SPUtil spUtil = SPUtil.getInstance(context);
+        SPHodler spUtil = SPHodler.getInstance(context);
         long time = spUtil.getAppList();
         if (time <= System.currentTimeMillis()) {
             spUtil.setAppList(System.currentTimeMillis() + Constants.GETAPPLIST);

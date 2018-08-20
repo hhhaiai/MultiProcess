@@ -3,7 +3,7 @@ package com.eguan.monitor.receiver;
 import com.eguan.Constants;
 import com.eguan.monitor.InnerProcessCacheManager;
 import com.eguan.utils.commonutils.EgLog;
-import com.eguan.utils.commonutils.SPUtil;
+import com.eguan.utils.commonutils.SPHodler;
 import com.eguan.utils.commonutils.SystemUtils;
 import com.eguan.utils.thread.EGQueue;
 import com.eguan.utils.thread.SafeRunnable;
@@ -41,7 +41,7 @@ public class NetChangedReciever extends BroadcastReceiver {
                         Intent intent1 = new Intent();
                         intent1.setAction(Constants.NT_ACTION);
                         context.sendBroadcast(intent1);
-                        SPUtil spUtil = SPUtil.getInstance(context);
+                        SPHodler spUtil = SPHodler.getInstance(context);
                         String netType = spUtil.getNetTypeChange();
                         String cnt = getCurrentNetType(context);
                         spUtil.setNetworkInfo(cnt);

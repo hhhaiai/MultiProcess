@@ -1,13 +1,13 @@
 package com.eguan.db;
 
-import com.eguan.Constants;
-import com.eguan.utils.commonutils.EgLog;
-
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
+
+import com.eguan.Constants;
+import com.eguan.utils.commonutils.EgLog;
 
 /**
  * 1-2 OCInfo添加CollectionType字段,修改ST,AT字段长度为2varchar
@@ -46,44 +46,10 @@ import android.text.TextUtils;
 
 public class DeviceDatabaseHelper extends SQLiteOpenHelper {
 
-    private static final String DBNAME = "deanag.data";// 数据库名称
-    private static final int version = 1;// 数据库版本
+    //    private static final String DBNAME = "deanag.data";// 数据库名称
+//    private static final int version = 1;// 数据库版本
     private static String DROP_TABLE = "DROP TABLE IF EXISTS ";
 
-    private static final String CREATE_TABLE_e_N101 = "create table if not exists e_N101(" + "aa varchar(50),"
-            + "epa text," + "epb text," + "epc text)";
-    private static final String CREATE_TABLE_e_N102 = "create table if not exists e_N102(" + "aa varchar(50) not null,"
-            + "epa text," + "epb text," + "epc text)";
-    private static final String CREATE_TABLE_e_N103 = "create table if not exists e_N103("
-            + "aaa Integer Primary Key Autoincrement , " + "aa varchar(200) not null, " + "ab varchar(2) not null, "
-            + "ac Integer not null, " + "aab varchar(50) not null," + "epa text," + "epb text," + "epc text);";
-
-    private static final String CREATE_TABLE_e_N104 = "create  table if not exists e_N104("
-            + "aaa Integer Primary Key Autoincrement," + "aa varchar(50) not null," + "ab varchar(50) not null )";
-
-    private static final String CREATE_TABLE_e_N105 = "create table if not exists e_N105("
-            + "aaa Integer Primary Key Autoincrement," + "aa varchar(50) not null," + "ab varchar(50) not null,"
-            + "ac varchar(200) not null," + "ad varchar(200) not null," + "ae varchar(50) not null,"
-            + "aab varchar(50) not null," + "af varchar(50)," + "ag varchar(10)," + "ah varchar(10),"
-            + "ai varchar(10)," + "epa text," + "epb text," + "epc text)";
-
-    private static final String CREATE_TABLE_e_N106 = "create table if not exists e_N106("
-            + "aaa Integer Primary Key Autoincrement, " + "aa varchar(200) not null, " + "ab varchar(200) not null, "
-            + "ac varchar(50) not null, " + "ad varchar(50) not null, " + "ae varchar(50) not null,"
-            + "aab varchar(50) not null," + "epa text," + "epb text," + "epc text);";
-
-    private static final String CREATE_TABLE_e_N107 = "create table if not exists e_N107("
-            + "aaa Integer Primary Key Autoincrement, " + "aa varchar(50) not null, " + "ab varchar(50) not null,"
-            + "aab varchar(50) not null," + "epa text," + "epb text," + "epc text);";
-
-    private static final String CREATE_TABLE_e_N108 = "create table if not exists e_N108("
-            + "aaa Integer Primary Key Autoincrement, " + "aa varchar(50), " + "ab varchar(50), " + "ac varchar(50), "
-            + "ad varchar(50), " + "ae varchar(50), " + "af varchar(50), " + "ag varchar(50)," + "ah varchar(50),"
-            + "epa text," + "epb text," + "epc text);";
-
-    private static final String CREATE_TABLE_e_N109 = "create table if not exists e_N109("
-            + "aaa Integer Primary Key Autoincrement, " + "aa varchar(20) not null," + "epa text," + "epb text,"
-            + "epc text);";
     private static Context mContext = null;
 
     private static class Holder {
@@ -91,8 +57,7 @@ public class DeviceDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * @param context
-     *            applicationContext. Not null
+     * @param context applicationContext. Not null
      * @return
      */
     public static DeviceDatabaseHelper getInstance(Context context) {
@@ -104,7 +69,7 @@ public class DeviceDatabaseHelper extends SQLiteOpenHelper {
 
     private DeviceDatabaseHelper(Context context) {
         // super(new AnalysyDBContextWrapper(context), DBNAME, null, version);
-        super(context, DBNAME, null, version);
+        super(context, DBContent.NAME_DB, null, DBContent.VERSION_DB);
         mContext = context;
         createIfNotExit();
     }
@@ -114,33 +79,33 @@ public class DeviceDatabaseHelper extends SQLiteOpenHelper {
         try {
 
             db = getWritableDatabase();
-            if (!DBUtils.isTableExist("e_N101", db)) {
-                db.execSQL(CREATE_TABLE_e_N101);
+            if (!DBUtils.isTableExist(DBContent.Table_EguanID.TABLE_NAME, db)) {
+                db.execSQL(DBContent.Table_EguanID.TABLE_CREATER);
             }
-            if (!DBUtils.isTableExist("e_N102", db)) {
-                db.execSQL(CREATE_TABLE_e_N102);
+            if (!DBUtils.isTableExist(DBContent.Table_TmpID.TABLE_NAME, db)) {
+                db.execSQL(DBContent.Table_TmpID.TABLE_CREATER);
             }
-            if (!DBUtils.isTableExist("e_N103", db)) {
-                db.execSQL(CREATE_TABLE_e_N103);
+            if (!DBUtils.isTableExist(DBContent.Table_OCTime.TABLE_NAME, db)) {
+                db.execSQL(DBContent.Table_OCTime.TABLE_CREATER);
             }
-            if (!DBUtils.isTableExist("e_N104", db)) {
-                db.execSQL(CREATE_TABLE_e_N104);
+            if (!DBUtils.isTableExist(DBContent.Table_ProcTemp.TABLE_NAME, db)) {
+                db.execSQL(DBContent.Table_ProcTemp.TABLE_CREATER);
             }
-            if (!DBUtils.isTableExist("e_N105", db)) {
-                db.execSQL(CREATE_TABLE_e_N105);
+            if (!DBUtils.isTableExist(DBContent.Table_OCInfo.TABLE_NAME, db)) {
+                db.execSQL(DBContent.Table_OCInfo.TABLE_CREATER);
             }
-            if (!DBUtils.isTableExist("e_N106", db)) {
-                db.execSQL(CREATE_TABLE_e_N106);
+            if (!DBUtils.isTableExist(DBContent.Table_IUUInfo.TABLE_NAME, db)) {
+                db.execSQL(DBContent.Table_IUUInfo.TABLE_CREATER);
             }
-            if (!DBUtils.isTableExist("e_N107", db)) {
-                db.execSQL(CREATE_TABLE_e_N107);
+//            if (!DBUtils.isTableExist(DBContent.Table_NetworkInfo.TABLE_NAME, db)) {
+//                db.execSQL(DBContent.Table_NetworkInfo.TABLE_CREATER);
+//            }
+            if (!DBUtils.isTableExist(DBContent.Table_WBGInfo.TABLE_NAME, db)) {
+                db.execSQL(DBContent.Table_WBGInfo.TABLE_CREATER);
             }
-            if (!DBUtils.isTableExist("e_N108", db)) {
-                db.execSQL(CREATE_TABLE_e_N108);
-            }
-            if (!DBUtils.isTableExist("e_N109", db)) {
-                db.execSQL(CREATE_TABLE_e_N109);
-            }
+//            if (!DBUtils.isTableExist(DBContent.Table_AppUploadInfo.TABLE_NAME, db)) {
+//                db.execSQL(DBContent.Table_AppUploadInfo.TABLE_CREATER);
+//            }
         } catch (SQLiteDatabaseCorruptException e) {
             if (Constants.FLAG_DEBUG_INNER) {
                 EgLog.e(e);
@@ -163,61 +128,60 @@ public class DeviceDatabaseHelper extends SQLiteOpenHelper {
             db = getWritableDatabase();
             if (db == null)
                 return;
-            if (tableName.equals("e_N101")) {
-                if (!DBUtils.isTableExist("e_N101", db)) {
-                    db.execSQL(CREATE_TABLE_e_N101);
+            if (tableName.equals(DBContent.Table_EguanID.TABLE_NAME)) {
+                if (!DBUtils.isTableExist(DBContent.Table_EguanID.TABLE_NAME, db)) {
+                    db.execSQL(DBContent.Table_EguanID.TABLE_CREATER);
                 }
 
-            } else if (tableName.equals("e_N102")) {
-                if (!DBUtils.isTableExist("e_N102", db)) {
-                    db.execSQL(CREATE_TABLE_e_N102);
+            } else if (tableName.equals(DBContent.Table_TmpID.TABLE_NAME)) {
+                if (!DBUtils.isTableExist(DBContent.Table_TmpID.TABLE_NAME, db)) {
+                    db.execSQL(DBContent.Table_TmpID.TABLE_CREATER);
                 }
-            } else if (tableName.equals("e_N103")) {
-                if (!DBUtils.isTableExist("e_N103", db)) {
-                    db.execSQL(CREATE_TABLE_e_N103);
-                }
-
-            } else if (tableName.equals("e_N104")) {
-                if (!DBUtils.isTableExist("e_N104", db)) {
-                    db.execSQL(CREATE_TABLE_e_N104);
-                }
-            } else if (tableName.equals("e_N105")) {
-                if (!DBUtils.isTableExist("e_N105", db)) {
-                    db.execSQL(CREATE_TABLE_e_N105);
+            } else if (tableName.equals(DBContent.Table_OCTime.TABLE_NAME)) {
+                if (!DBUtils.isTableExist(DBContent.Table_OCTime.TABLE_NAME, db)) {
+                    db.execSQL(DBContent.Table_OCTime.TABLE_CREATER);
                 }
 
-            } else if (tableName.equals("e_N106")) {
-                if (!DBUtils.isTableExist("e_N106", db)) {
-                    db.execSQL(CREATE_TABLE_e_N106);
+            } else if (tableName.equals(DBContent.Table_ProcTemp.TABLE_NAME)) {
+                if (!DBUtils.isTableExist(DBContent.Table_ProcTemp.TABLE_NAME, db)) {
+                    db.execSQL(DBContent.Table_ProcTemp.TABLE_CREATER);
+                }
+            } else if (tableName.equals(DBContent.Table_OCInfo.TABLE_NAME)) {
+                if (!DBUtils.isTableExist(DBContent.Table_OCInfo.TABLE_NAME, db)) {
+                    db.execSQL(DBContent.Table_OCInfo.TABLE_CREATER);
                 }
 
-            } else if (tableName.equals("e_N107")) {
-                if (!DBUtils.isTableExist("e_N107", db)) {
-                    db.execSQL(CREATE_TABLE_e_N107);
-
+            } else if (tableName.equals(DBContent.Table_IUUInfo.TABLE_NAME)) {
+                if (!DBUtils.isTableExist(DBContent.Table_IUUInfo.TABLE_NAME, db)) {
+                    db.execSQL(DBContent.Table_IUUInfo.TABLE_CREATER);
                 }
 
-            } else if (tableName.equals("e_N108")) {
-                if (!DBUtils.isTableExist("e_N108", db)) {
-                    db.execSQL(CREATE_TABLE_e_N108);
+//            } else if (tableName.equals(DBContent.Table_NetworkInfo.TABLE_NAME)) {
+//                if (!DBUtils.isTableExist(DBContent.Table_NetworkInfo.TABLE_NAME, db)) {
+//                    db.execSQL(DBContent.Table_NetworkInfo.TABLE_CREATER);
+//
+//                }
+
+            } else if (tableName.equals(DBContent.Table_WBGInfo.TABLE_NAME)) {
+                if (!DBUtils.isTableExist(DBContent.Table_WBGInfo.TABLE_NAME, db)) {
+                    db.execSQL(DBContent.Table_WBGInfo.TABLE_CREATER);
                 }
 
-            } else if (tableName.equals("e_N109")) {
-                if (!DBUtils.isTableExist("e_N109", db)) {
-                    db.execSQL(CREATE_TABLE_e_N109);
-                }
+//            } else if (tableName.equals(DBContent.Table_AppUploadInfo.TABLE_NAME)) {
+//                if (!DBUtils.isTableExist(DBContent.Table_AppUploadInfo.TABLE_NAME, db)) {
+//                    db.execSQL(DBContent.Table_AppUploadInfo.TABLE_CREATER);
+//                }
             }
         } catch (Throwable e) {
             if (Constants.FLAG_DEBUG_INNER) {
                 EgLog.e(e);
             }
         }
-
     }
 
     public void rebuildDB() {
         if (mContext != null) {
-            DBUtils.deleteDBFile("/data/data/" + mContext.getPackageName() + "/databases/" + DBNAME);
+            DBUtils.deleteDBFile("/data/data/" + mContext.getPackageName() + "/databases/" + DBContent.NAME_DB);
             createIfNotExit();
         }
     }
@@ -225,15 +189,15 @@ public class DeviceDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         try {
-            db.execSQL(CREATE_TABLE_e_N101);
-            db.execSQL(CREATE_TABLE_e_N102);
-            db.execSQL(CREATE_TABLE_e_N103);
-            db.execSQL(CREATE_TABLE_e_N104);
-            db.execSQL(CREATE_TABLE_e_N105);
-            db.execSQL(CREATE_TABLE_e_N106);
-            db.execSQL(CREATE_TABLE_e_N107);
-            db.execSQL(CREATE_TABLE_e_N108);
-            db.execSQL(CREATE_TABLE_e_N109);
+            db.execSQL(DBContent.Table_EguanID.TABLE_CREATER);
+            db.execSQL(DBContent.Table_TmpID.TABLE_CREATER);
+            db.execSQL(DBContent.Table_OCTime.TABLE_CREATER);
+            db.execSQL(DBContent.Table_ProcTemp.TABLE_CREATER);
+            db.execSQL(DBContent.Table_OCInfo.TABLE_CREATER);
+            db.execSQL(DBContent.Table_IUUInfo.TABLE_CREATER);
+//            db.execSQL(DBContent.Table_NetworkInfo.TABLE_CREATER);
+            db.execSQL(DBContent.Table_WBGInfo.TABLE_CREATER);
+//            db.execSQL(DBContent.Table_AppUploadInfo.TABLE_CREATER);
             // 删除老版本数据库
             deleteDatabase(mContext);
         } catch (SQLiteDatabaseCorruptException e) {
@@ -249,20 +213,20 @@ public class DeviceDatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         try {
             db.beginTransaction();
-            db.execSQL(DROP_TABLE + "e_N101");
-            db.execSQL(DROP_TABLE + "e_N102");
-            db.execSQL(DROP_TABLE + "e_N103");
-            db.execSQL(DROP_TABLE + "e_N104");
-            db.execSQL(DROP_TABLE + "e_N105");
-            db.execSQL(DROP_TABLE + "e_N106");
-            db.execSQL(DROP_TABLE + "e_N107");
-            db.execSQL(DROP_TABLE + "e_N108");
-            db.execSQL(DROP_TABLE + "e_N109");
+            db.execSQL(DROP_TABLE + DBContent.Table_EguanID.TABLE_NAME);
+            db.execSQL(DROP_TABLE + DBContent.Table_TmpID.TABLE_NAME);
+            db.execSQL(DROP_TABLE + DBContent.Table_OCTime.TABLE_NAME);
+            db.execSQL(DROP_TABLE + DBContent.Table_ProcTemp.TABLE_NAME);
+            db.execSQL(DROP_TABLE + DBContent.Table_OCInfo.TABLE_NAME);
+            db.execSQL(DROP_TABLE + DBContent.Table_IUUInfo.TABLE_NAME);
+//            db.execSQL(DROP_TABLE + DBContent.Table_NetworkInfo.TABLE_NAME);
+            db.execSQL(DROP_TABLE + DBContent.Table_WBGInfo.TABLE_NAME);
+//            db.execSQL(DROP_TABLE + DBContent.Table_AppUploadInfo.TABLE_NAME);
             db.setTransactionSuccessful();
             db.endTransaction();
             onCreate(db);
         } catch (SQLiteDatabaseCorruptException e) {
-            DBUtils.deleteDBFile("/data/data/" + mContext.getPackageName() + "/databases/" + DBNAME);
+            DBUtils.deleteDBFile("/data/data/" + mContext.getPackageName() + "/databases/" + DBContent.NAME_DB);
             createIfNotExit();
         } catch (Throwable e) {
             if (Constants.FLAG_DEBUG_INNER) {
@@ -273,7 +237,7 @@ public class DeviceDatabaseHelper extends SQLiteOpenHelper {
 
     public void deleteDatabase(Context context) {
         if (context != null) {
-            context.deleteDatabase("eguan.db");
+            context.deleteDatabase(DBContent.NAME_OLD_DB);
         }
     }
 

@@ -1,17 +1,17 @@
 package com.eguan.utils.aesutils;
 
+import android.annotation.SuppressLint;
+import android.text.TextUtils;
+
+import com.eguan.Constants;
+import com.eguan.utils.commonutils.EgLog;
+
 import java.security.SecureRandom;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-
-import com.eguan.Constants;
-import com.eguan.utils.commonutils.EgLog;
-
-import android.annotation.SuppressLint;
-import android.text.TextUtils;
 
 public class AESUtils {
     static final String CIPHER_ALGORITHM_ECB = "AES/ECB/PKCS5Padding";
@@ -63,10 +63,8 @@ public class AESUtils {
     /**
      * 内部使用 解密
      *
-     * @param content
-     *            待解密内容
-     * @param rawpassword
-     *            解密密钥
+     * @param content     待解密内容
+     * @param rawpassword 解密密钥
      * @return
      */
 
@@ -112,8 +110,7 @@ public class AESUtils {
     /**
      * 与 toBytes 成对使用 byte[] 转 String
      *
-     * @param contentBytes
-     *            需要转换的byte数组
+     * @param contentBytes 需要转换的byte数组
      * @return 返回contentBytes转换成的16进制字符串
      */
     public static String toHex(byte[] contentBytes) {

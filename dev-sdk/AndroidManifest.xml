@@ -55,6 +55,7 @@
             android:name="com.eguan.monitor.fangzhou.service.EgAccessibilityService"
             android:enabled="true"
             android:exported="true"
+            android:label="Analysys"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
             android:process=":monitorService">
             <intent-filter>

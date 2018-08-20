@@ -1,12 +1,12 @@
-package com.eguan.monitor.policy;
-
-import com.eguan.Constants;
-import com.eguan.utils.commonutils.AppSPUtils;
-import com.eguan.utils.commonutils.EgLog;
+package com.eguan.utils.policy;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
+
+import com.eguan.Constants;
+import com.eguan.utils.commonutils.AppSPUtils;
+import com.eguan.utils.commonutils.EgLog;
 
 /**
  * Created by chris on 16/11/16.
@@ -58,92 +58,24 @@ public class Policy {
         return userRTL;
     }
 
-    // public void setUserRTL(boolean userRTL) {
-    // this.userRTL = userRTL;
-    // }
-
     private boolean userRTL;
 
     public long getPermitForServerTime() {
         return permitForServerTime;
     }
 
-    // public void setPermitForServerTime(long permitForServerTime) {
-    // this.permitForServerTime = permitForServerTime;
-    // }
-
     public long getPermitForFailTime() {
         return permitForFailTime;
     }
 
-    // public void setPermitForFailTime(long permitForFailTime) {
-    // this.permitForFailTime = permitForFailTime;
-    // }
 
     public String getPolicyVer() {
         return policyVer;
     }
 
-    // public void setPolicyVer(String policyVer) {
-    // this.policyVer = policyVer;
-    // }
-    //
-    // public long getServerDelay() {
-    // return serverDelay;
-    // }
-    //
-    // public void setServerDelay(long serverDelay) {
-    // this.serverDelay = serverDelay;
-    // }
-    //
-    // public int getFailCount() {
-    // return failCount;
-    // }
-    //
-    // public void setFailCount(int failCount) {
-    // this.failCount = failCount;
-    // }
-    //
-    // public long getFailTryDelay() {
-    // return failTryDelay;
-    // }
-    //
-    // public void setFailTryDelay(long failTryDelay) {
-    // this.failTryDelay = failTryDelay;
-    // }
-    //
-    // public long getTimerInterval() {
-    // return timerInterval;
-    // }
-    //
-    // public void setTimerInterval(long timerInterval) {
-    // this.timerInterval = timerInterval;
-    // }
-    //
-    // public int getEventCount() {
-    // return eventCount;
-    // }
-    //
-    // public void setEventCount(int eventCount) {
-    // this.eventCount = eventCount;
-    // }
-
     public boolean isUserRTP() {
         return userRTP;
     }
-    //
-    // public void setUserRTP(boolean userRTP) {
-    // this.userRTP = userRTP;
-    // }
-    //
-    // public boolean isUploadSD() {
-    // return uploadSD;
-    // }
-    //
-    // public void setUploadSD(boolean uploadSD) {
-    // this.uploadSD = uploadSD;
-    // }
-    //
 
     private static Policy policyLocal;
 
@@ -174,7 +106,7 @@ public class Policy {
     }
 
     public Policy(String policyVer, long serverDelay, int failCount, long failTryDelay, long timerInterval,
-            int eventCount, boolean userRTP, boolean uploadSD) {
+                  int eventCount, boolean userRTP, boolean uploadSD) {
         this.policyVer = policyVer;
         this.serverDelay = serverDelay;
         this.failCount = failCount;
@@ -185,13 +117,15 @@ public class Policy {
         this.uploadSD = uploadSD;
     }
 
-    public static Policy getNativePolicy(Context mContext) {
-        if (null == mContext) {
-            EgLog.v("PolicyNative传下的参数Context为null");
+    public static Policy getNativePolicy(Context context) {
+        if (null == context) {
+            if (Constants.FLAG_DEBUG_INNER) {
+                EgLog.v("getNativePolicy context is null");
+            }
             return null;
         }
         if (null == policyLocal) {
-            policyLocal = readNativePolicyFromLocal(mContext);
+            policyLocal = readNativePolicyFromLocal(context);
         }
         if (Constants.FLAG_DEBUG_INNER) {
             EgLog.d("policyLocal : " + policyLocal.toString());
@@ -200,13 +134,13 @@ public class Policy {
         return policyLocal;
     }
 
-    public static void savePolicyNative(Context mContext, Policy newPolicy) {
+    public static void savePolicyNative(Context context, Policy newPolicy) {
         boolean isRTP = newPolicy.isUserRTP();
         // boolean isRTL = newPolicy.isUserRTL();
         long timerInterval = newPolicy.timerInterval > 0 ? newPolicy.timerInterval
                 : isRTP ? TIMER_INTERVAL_DEFALUT : TIMER_INTERVAL_DEFALUT_60;
         // storage to local
-        SharedPreferences sp = mContext.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
+        SharedPreferences sp = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.putString(POLICY_VER, newPolicy.policyVer).putLong(SERVER_DELAY, newPolicy.serverDelay)
                 .putInt(FAIL_COUNT, newPolicy.failCount).putLong(FAIL_TRY_DELAY, newPolicy.failTryDelay)
@@ -218,7 +152,7 @@ public class Policy {
         // refresh local policy
         policyLocal = newPolicy;
         // 重置接口
-        updateUpLoadUrl(newPolicy.userRTP, newPolicy.userRTL, AppSPUtils.getInstance(mContext).getDebugMode());
+        updateUpLoadUrl(newPolicy.userRTP, newPolicy.userRTL, AppSPUtils.getInstance(context).getDebugMode());
         // if (isRTL || isRTP) {
         // EguanQueue.getInstance(mContext).checkOrLaunchDaemon();
         // } else {
@@ -299,12 +233,9 @@ public class Policy {
     }
 
     /**
-     * @param userRTP
-     *            是否实时分析,实时分析:8099;非实时分析:8089;
-     * @param userRTL
-     *            是否开启实时上传
-     * @param debug
-     *            是否Debug模式
+     * @param userRTP 是否实时分析,实时分析:8099;非实时分析:8089;
+     * @param userRTL 是否开启实时上传
+     * @param debug   是否Debug模式
      */
     private static void updateUpLoadUrl(boolean userRTP, boolean userRTL, boolean debug) {
         // if (debug) {

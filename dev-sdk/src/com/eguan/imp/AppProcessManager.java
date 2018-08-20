@@ -1,4 +1,4 @@
-package com.eguan.monitor.imp;
+package com.eguan.imp;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Set;
 
 import com.eguan.Constants;
-import com.eguan.db.DeviceTableOperation;
+import com.eguan.db.DBPorcesser;
 import com.eguan.utils.commonutils.EgLog;
-import com.eguan.utils.commonutils.SPUtil;
+import com.eguan.utils.commonutils.SPHodler;
 import com.eguan.utils.procutils.AndroidAppProcess;
 import com.eguan.utils.procutils.AndroidProcessManager;
 
@@ -21,7 +21,7 @@ import android.content.pm.PackageManager;
 public class AppProcessManager {
 
     private static AppProcessManager instance = null;
-    private static SPUtil spUtil = null;
+    private static SPHodler spUtil = null;
     private Context context;
 
     private static int receiver_count = 0;
@@ -42,7 +42,7 @@ public class AppProcessManager {
 
     public AppProcessManager(Context context) {
         this.context = context.getApplicationContext();
-        spUtil = SPUtil.getInstance(context);
+        spUtil = SPHodler.getInstance(context);
     }
 
     public static AppProcessManager getInstance(Context context) {
@@ -78,7 +78,7 @@ public class AppProcessManager {
             prePackageNames = nowPackageNames;
             String startTime = System.currentTimeMillis() + "";
             for (String packageName : nowPackageNames) {
-                DeviceTableOperation.getInstance(context).addProcTemp(packageName, startTime);
+                DBPorcesser.getInstance(context).addProcTemp(packageName, startTime);
             }
             // 得到最初的OCInfo集合,并赋初值,有开始没有结束时间
             ocList = getOCInfoList(prePackageNames);
@@ -127,7 +127,7 @@ public class AppProcessManager {
                     // 将新加入的进程(只有开始时间)加入到ocList.
                     ocList.add(info);
                     // 将新增的数据同步到数据库表ProcTemp中
-                    DeviceTableOperation.getInstance(context).addProcTemp(packageName, startTime);
+                    DBPorcesser.getInstance(context).addProcTemp(packageName, startTime);
                 }
 
             }
@@ -145,7 +145,7 @@ public class AppProcessManager {
             OCTimeBean bean = new OCTimeBean(packageName, computerTimeInterval(), 1);
             ocTimeBeans.add(bean);
         }
-        DeviceTableOperation.getInstance(context).insertOCTimes(ocTimeBeans);
+        DBPorcesser.getInstance(context).insertOCTimes(ocTimeBeans);
     }
 
     private String computerTimeInterval() {
@@ -155,11 +155,11 @@ public class AppProcessManager {
     }
 
     private void deleteProcTemp(final String packageName) {
-        DeviceTableOperation.getInstance(context).deleteProcTemp(packageName);
+        DBPorcesser.getInstance(context).deleteProcTemp(packageName);
     }
 
     private void insertOCInfo(final OCInfo info) {
-        DeviceTableOperation.getInstance(context).insertOneOCInfo(info);
+        DBPorcesser.getInstance(context).insertOneOCInfo(info);
     }
 
     private List<OCInfo> getOCInfoList(List<String> names) {
@@ -235,7 +235,7 @@ public class AppProcessManager {
     public void saveDatabase() {
         spUtil.setAppProcess("");
         try {
-            DeviceTableOperation.getInstance(context).updateOcInfo(System.currentTimeMillis());
+            DBPorcesser.getInstance(context).updateOcInfo(System.currentTimeMillis());
         } catch (Throwable e) {
             if (Constants.FLAG_DEBUG_INNER) {
                 EgLog.e(e);
@@ -278,27 +278,27 @@ public class AppProcessManager {
             return;
         }
         // 保存ProcTemp表中数据至OCInfo表中
-        Map<String, String> map = DeviceTableOperation.getInstance(context).queryProcTemp();
+        Map<String, String> map = DBPorcesser.getInstance(context).queryProcTemp();
         ocList = getOCInfoProcTemp(map, 0);
-        DeviceTableOperation.getInstance(context).insertOCInfo(ocList);
+        DBPorcesser.getInstance(context).insertOCInfo(ocList);
 
         ocList.clear();
         ocCache.clear();
         // 清除ProcTemp表
-        DeviceTableOperation.getInstance(context).deleteProTemp();
+        DBPorcesser.getInstance(context).deleteProTemp();
         prePackageNames.clear();
     }
 
     public synchronized void dealRestartService() {
         // 保存ProcTemp表中数据至OCInfo表中
-        Map<String, String> map = DeviceTableOperation.getInstance(context).queryProcTemp();
+        Map<String, String> map = DBPorcesser.getInstance(context).queryProcTemp();
         ocList = getOCInfoProcTemp(map, 1);
-        DeviceTableOperation.getInstance(context).insertOCInfo(ocList);
+        DBPorcesser.getInstance(context).insertOCInfo(ocList);
 
         ocList.clear();
         ocCache.clear();
         // 清除ProcTemp表
-        DeviceTableOperation.getInstance(context).deleteProTemp();
+        DBPorcesser.getInstance(context).deleteProTemp();
         prePackageNames.clear();
     }
 
@@ -313,7 +313,7 @@ public class AppProcessManager {
         if (type == 0) {
             endTime = System.currentTimeMillis() + "";
         } else if (type == 1) {
-            endTime = SPUtil.getInstance(context).getEndTime() + "";
+            endTime = SPHodler.getInstance(context).getEndTime() + "";
         }
         List<OCInfo> result = new ArrayList<OCInfo>();
         OCInfo info;

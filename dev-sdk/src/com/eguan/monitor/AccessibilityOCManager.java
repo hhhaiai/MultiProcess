@@ -1,22 +1,22 @@
 package com.eguan.monitor;
 
-import com.eguan.Constants;
-import com.eguan.db.DeviceTableOperation;
-import com.eguan.monitor.imp.OCInfo;
-import com.eguan.utils.commonutils.EgLog;
-import com.eguan.utils.commonutils.SPUtil;
-
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
+import com.eguan.Constants;
+import com.eguan.db.DBPorcesser;
+import com.eguan.imp.OCInfo;
+import com.eguan.utils.commonutils.EgLog;
+import com.eguan.utils.commonutils.SPHodler;
+
 /**
- * @Copyright © 2018 sanbo Inc. All rights reserved.
+ * @Copyright © 2018 Analysy Inc. All rights reserved.
  * @Description: 辅助类获取OCInfo
  * @Version: 1.0
  * @Create: 2018年8月17日 下午4:02:13
- * @Author: sanbo
+ * @Author:
  */
 public class AccessibilityOCManager {
 
@@ -82,9 +82,9 @@ public class AccessibilityOCManager {
             }
             preTime = System.currentTimeMillis() + "";
             if (!isKeyGuard) {
-                SPUtil.getInstance(mContext).setAccessibilityOCPackageName(packageName);
-                SPUtil.getInstance(mContext).setAccessibilityOCStartTime(preTime);
-                SPUtil.getInstance(mContext).setNetworkState(InnerProcessCacheManager.getInstance().getNT());
+                SPHodler.getInstance(mContext).setAccessibilityOCPackageName(packageName);
+                SPHodler.getInstance(mContext).setAccessibilityOCStartTime(preTime);
+                SPHodler.getInstance(mContext).setNetworkState(InnerProcessCacheManager.getInstance().getNT());
             }
             return;
         }
@@ -95,9 +95,9 @@ public class AccessibilityOCManager {
             if (isKeyGuard) {
                 sa = ST_KEYGUARD;
             } else {
-                SPUtil.getInstance(mContext).setAccessibilityOCPackageName(packageName);
-                SPUtil.getInstance(mContext).setAccessibilityOCStartTime(System.currentTimeMillis() + "");
-                SPUtil.getInstance(mContext).setNetworkState(InnerProcessCacheManager.getInstance().getNT());
+                SPHodler.getInstance(mContext).setAccessibilityOCPackageName(packageName);
+                SPHodler.getInstance(mContext).setAccessibilityOCStartTime(System.currentTimeMillis() + "");
+                SPHodler.getInstance(mContext).setNetworkState(InnerProcessCacheManager.getInstance().getNT());
             }
             if (!prePackageName.equals(KEYGUARD_PACKAGENAME_DEFAULT)) {
                 saveOC(prePackageName, sa);
@@ -127,10 +127,10 @@ public class AccessibilityOCManager {
         ocInfo.setNetwork(InnerProcessCacheManager.getInstance().getNT());
         ocInfo.setApplicationVersionCode(getApplicationVersion(packageName));
         ocInfo.setApplicationType(isSystemApplication(packageName) ? AT_SYSTEM : AT_OTHER);
-        DeviceTableOperation.getInstance(mContext).insertOneOCInfo(ocInfo);
-        SPUtil.getInstance(mContext).setAccessibilityOCPackageName("");
-        SPUtil.getInstance(mContext).setAccessibilityOCStartTime("");
-        SPUtil.getInstance(mContext).setNetworkState("-1");
+        DBPorcesser.getInstance(mContext).insertOneOCInfo(ocInfo);
+        SPHodler.getInstance(mContext).setAccessibilityOCPackageName("");
+        SPHodler.getInstance(mContext).setAccessibilityOCStartTime("");
+        SPHodler.getInstance(mContext).setNetworkState("-1");
     }
 
     /**
@@ -186,21 +186,21 @@ public class AccessibilityOCManager {
     }
 
     public void updateServiceBootOCInfo() {
-        String packageName = SPUtil.getInstance(mContext).getAccessibilityOCPackageName();
+        String packageName = SPHodler.getInstance(mContext).getAccessibilityOCPackageName();
         if (!empty(packageName)) {
             final OCInfo ocInfo = new OCInfo();
-            String netType = SPUtil.getInstance(mContext).getNetworkState();
-            String startTime = SPUtil.getInstance(mContext).getAccessibilityOCStartTime();
+            String netType = SPHodler.getInstance(mContext).getNetworkState();
+            String startTime = SPHodler.getInstance(mContext).getAccessibilityOCStartTime();
             ocInfo.setSwitchType(ST_REBOOT);
             ocInfo.setApplicationType(isSystemApplication(packageName) ? AT_SYSTEM : AT_SYSTEM);
             ocInfo.setApplicationName(getApplicationName(packageName));
             ocInfo.setApplicationVersionCode(getApplicationVersion(packageName));
             ocInfo.setApplicationOpenTime(startTime);
-            ocInfo.setApplicationCloseTime(SPUtil.getInstance(mContext).getEndTime() + "");
+            ocInfo.setApplicationCloseTime(SPHodler.getInstance(mContext).getEndTime() + "");
             ocInfo.setNetwork(netType);
             ocInfo.setCollectionType(COLLECTION_TYPE);
             ocInfo.setApplicationPackageName(packageName);
-            DeviceTableOperation.getInstance(mContext).insertOneOCInfo(ocInfo);
+            DBPorcesser.getInstance(mContext).insertOneOCInfo(ocInfo);
         }
     }
 

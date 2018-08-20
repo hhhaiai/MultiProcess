@@ -10,11 +10,11 @@ import android.provider.Settings;
 import com.eguan.Constants;
 import com.eguan.monitor.AccessibilityOCManager;
 import com.eguan.monitor.fangzhou.service.EgAccessibilityService;
-import com.eguan.monitor.imp.AppProcessManager;
-import com.eguan.monitor.imp.OCInfoManager;
-import com.eguan.monitor.imp.WBGManager;
+import com.eguan.imp.AppProcessManager;
+import com.eguan.imp.OCInfoManager;
+import com.eguan.imp.WBGManager;
 import com.eguan.utils.commonutils.EgLog;
-import com.eguan.utils.commonutils.SPUtil;
+import com.eguan.utils.commonutils.SPHodler;
 import com.eguan.utils.commonutils.SystemUtils;
 import com.eguan.utils.netutils.DevInfoUpload;
 import com.eguan.utils.thread.EGQueue;
@@ -72,7 +72,7 @@ public class TimerReceiver extends BroadcastReceiver {
                 // }
                 AppProcessManager.getInstance(context).appProcessInfo();
             }
-            SPUtil.getInstance(context).setEndTime(System.currentTimeMillis());
+            SPHodler.getInstance(context).setEndTime(System.currentTimeMillis());
         } catch (Throwable e) {
             if (Constants.FLAG_DEBUG_INNER) {
                 EgLog.e(e);

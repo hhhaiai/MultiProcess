@@ -11,22 +11,22 @@ import android.content.SharedPreferences.Editor;
  * 本地XML格式字段缓存存储工具
  */
 @SuppressLint("CommitPrefEdits")
-public class SPUtil {
+public class SPHodler {
 
     private static SharedPreferences sp;
     private static Editor editor;
-    private static SPUtil instance = null;
+    private static SPHodler instance = null;
 
-    private SPUtil() {
+    private SPHodler() {
     }
 
     @SuppressLint("WorldReadableFiles")
-    public static synchronized SPUtil getInstance(Context context) {
+    public static synchronized SPHodler getInstance(Context context) {
         if (context == null) {
             return instance;
         }
         if (instance == null) {
-            instance = new SPUtil();
+            instance = new SPHodler();
             // sp = context.getApplicationContext().getSharedPreferences(Constants.SPUTIL,
             // Context.MODE_PRIVATE);
             sp = SharedPreferencesUtils.getSharedPreferences(context, Constants.SPUTIL);

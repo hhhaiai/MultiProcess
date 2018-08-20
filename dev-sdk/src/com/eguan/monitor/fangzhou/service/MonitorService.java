@@ -3,17 +3,17 @@ package com.eguan.monitor.fangzhou.service;
 import java.util.List;
 
 import com.eguan.Constants;
-import com.eguan.db.DeviceTableOperation;
+import com.eguan.db.DBPorcesser;
 import com.eguan.monitor.AccessibilityOCManager;
 import com.eguan.monitor.InnerProcessCacheManager;
-import com.eguan.monitor.imp.AppProcessManager;
-import com.eguan.monitor.imp.InstalledAPPInfoManager;
-import com.eguan.monitor.imp.InstalledAppInfo;
-import com.eguan.monitor.imp.OCInfoManager;
+import com.eguan.imp.AppProcessManager;
+import com.eguan.imp.InstalledAPPInfoManager;
+import com.eguan.imp.InstalledAppInfo;
+import com.eguan.imp.OCInfoManager;
 import com.eguan.utils.commonutils.EgLog;
 import com.eguan.utils.commonutils.MyThread;
 import com.eguan.utils.commonutils.ReceiverUtils;
-import com.eguan.utils.commonutils.SPUtil;
+import com.eguan.utils.commonutils.SPHodler;
 import com.eguan.utils.thread.EGQueue;
 import com.eguan.utils.thread.SafeRunnable;
 
@@ -33,7 +33,7 @@ public class MonitorService extends Service {
     Context context = MonitorService.this;
 
     // --------------地理位置信息--------------
-    private SPUtil spUtil = null;
+    private SPHodler spUtil = null;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -56,7 +56,7 @@ public class MonitorService extends Service {
                     AccessibilityOCManager.getInstance(context).updateServiceBootOCInfo();
                     // 处理5.0的proc数据
                     AppProcessManager.getInstance(context).dealRestartService();
-                    DeviceTableOperation.getInstance(context).initDB();
+                    DBPorcesser.getInstance(context).initDB();
                 } catch (Throwable e) {
                     if (Constants.FLAG_DEBUG_INNER) {
                         EgLog.e(e);
@@ -102,7 +102,7 @@ public class MonitorService extends Service {
     @SuppressWarnings("deprecation")
     private void initInfo() {
         try {
-            spUtil = SPUtil.getInstance(this);
+            spUtil = SPHodler.getInstance(this);
             // ProcessTimeManager.getInstance().setProcessTime(context);
             /*------------------ 初始化OCInfo存储信息 -----------------*/
             InitializationOCSP();
@@ -159,13 +159,13 @@ public class MonitorService extends Service {
         } catch (Exception e1) {
             e1.printStackTrace();
         }
-        SPUtil.getInstance(MonitorService.this).setLocation(appInfo.metaData.getString(Constants.LI));
+        SPHodler.getInstance(MonitorService.this).setLocation(appInfo.metaData.getString(Constants.LI));
     }
 
     private void getKeyAndChannel() {
         try {
-            Constants.APP_KEY_VALUE = SPUtil.getInstance(context).getKey();
-            Constants.APP_CHANNEL_VALUE = SPUtil.getInstance(context).getChannel();
+            Constants.APP_KEY_VALUE = SPHodler.getInstance(context).getKey();
+            Constants.APP_CHANNEL_VALUE = SPHodler.getInstance(context).getChannel();
         } catch (Throwable e) {
             if (Constants.FLAG_DEBUG_INNER) {
                 EgLog.e(e);

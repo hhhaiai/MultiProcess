@@ -29,18 +29,18 @@ public class TimeUtils {
         return "";
     }
 
-    public static String longToDay(long currentMillons) {
-        try {
-            Date date = new Date(currentMillons);
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            return format.format(date);
-        } catch (Throwable e) {
-            if (Constants.FLAG_DEBUG_INNER) {
-                EgLog.e(e);
-            }
-        }
-        return "";
-    }
+//    public static String longToDay(long currentMillons) {
+//        try {
+//            Date date = new Date(currentMillons);
+//            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+//            return format.format(date);
+//        } catch (Throwable e) {
+//            if (Constants.FLAG_DEBUG_INNER) {
+//                EgLog.e(e);
+//            }
+//        }
+//        return "";
+//    }
 
     /**
      * 获取当前时间
@@ -67,26 +67,26 @@ public class TimeUtils {
 
     /********************* 以下为应用监测SDK使用到的方法 **********************/
 
-    /**
-     * get时间戳
-     *
-     * @return
-     */
-    public static long getTimestamp() {
-
-        return System.currentTimeMillis();
-    }
-
-    /**
-     * get 年月日时分秒
-     *
-     * @return
-     */
-    public static String getTimeInfo() {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        // 为获取当前系统时间
-        return df.format(new Date());
-    }
+//    /**
+//     * get时间戳
+//     *
+//     * @return
+//     */
+//    public static long getTimestamp() {
+//
+//        return System.currentTimeMillis();
+//    }
+//
+//    /**
+//     * get 年月日时分秒
+//     *
+//     * @return
+//     */
+//    public static String getTimeInfo() {
+//        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+//        // 为获取当前系统时间
+//        return df.format(new Date());
+//    }
 
     /**
      * 获取从即刻起，到过去几天的时间戳点

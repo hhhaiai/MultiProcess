@@ -1,19 +1,5 @@
 package com.eguan.db;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.eguan.Constants;
-import com.eguan.monitor.imp.IUUInfo;
-import com.eguan.monitor.imp.OCInfo;
-import com.eguan.monitor.imp.OCTimeBean;
-import com.eguan.monitor.imp.WBGInfo;
-import com.eguan.utils.commonutils.EgLog;
-import com.eguan.utils.commonutils.TimeUtils;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -22,34 +8,48 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.text.TextUtils;
 
-public class DeviceTableOperation {
-    static Context mContext;
+import com.eguan.Constants;
+import com.eguan.imp.IUUInfo;
+import com.eguan.imp.OCInfo;
+import com.eguan.imp.OCTimeBean;
+import com.eguan.imp.WBGInfo;
+import com.eguan.utils.commonutils.EgLog;
+import com.eguan.utils.commonutils.TimeUtils;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class DBPorcesser {
+    private Context mContext = null;
+    private final String SP_CONTEXT = "eguan";
+    private final String SP_FIRST_LAUNCH = "fl";
 
     private static class Holder {
-        private static final DeviceTableOperation INSTANCE = new DeviceTableOperation();
+        private static final DBPorcesser INSTANCE = new DBPorcesser();
     }
 
-    private DeviceTableOperation() {
+    private DBPorcesser() {
     }
 
-    public static DeviceTableOperation getInstance(Context context) {
-        if (context == null) {
-            EgLog.e("context is null in TableOperation....");
-            return null;
+    public static DBPorcesser getInstance(Context context) {
+        if (Holder.INSTANCE.mContext == null) {
+            if (context != null) {
+                Holder.INSTANCE.mContext = context;
+            }
         }
-        mContext = context;
         return Holder.INSTANCE;
     }
 
-    private final String SP_CONTEXT = "eguan";
-    private final String SP_FIRST_LAUNCH = "fl";
 
     /**
      * <pre>
      * 初始化检查: 1.首次确认是否首次,首次只需要检查内存的加密key可用即可
      * 2.非首次启动,需要先确认内存数据可用,然后确认e_N1001(EGuanID所在库)中的预留字段epa的字段，是否可以解密成"eguan".
      * 3.如果解密失败，则清除表数据.确保后续可以工作 4.工作完成后，将最新的加密"eguan"保存到数据库e_N001中
-     * 
+     *
      * <pre/>
      */
     public synchronized void initDB() {
@@ -68,7 +68,7 @@ public class DeviceTableOperation {
                 SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
                 if (db == null)
                     return;
-                DeviceDatabaseHelper.getInstance(mContext).create("e_N101");
+                DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_EguanID.TABLE_NAME);
 
                 String sql = "select * from e_N101 ";
                 cursor = db.rawQuery(sql, null);
@@ -117,8 +117,8 @@ public class DeviceTableOperation {
             db.execSQL(sql);
             sql = "delete from e_N103";
             db.execSQL(sql);
-            sql = "delete from e_N104";
-            db.execSQL(sql);
+//            sql = "delete from e_N104";
+//            db.execSQL(sql);
             sql = "delete from e_N105";
             db.execSQL(sql);
             sql = "delete from e_N106";
@@ -127,8 +127,8 @@ public class DeviceTableOperation {
             db.execSQL(sql);
             sql = "delete from e_N108";
             db.execSQL(sql);
-            sql = "delete from e_N109";
-            db.execSQL(sql);
+//            sql = "delete from e_N109";
+//            db.execSQL(sql);
         } catch (Throwable e) {
         }
     }
@@ -143,7 +143,7 @@ public class DeviceTableOperation {
                 return;
             }
             String insertSql = "insert into e_N101(epa) values (?)";
-            db.execSQL(insertSql, new Object[] { EncryptUtils.getCheckID(mContext) });
+            db.execSQL(insertSql, new Object[]{EncryptUtils.getCheckID(mContext)});
         } catch (SQLiteDatabaseCorruptException e) {
             if (mContext != null) {
                 DeviceDatabaseHelper.getInstance(mContext).rebuildDB();
@@ -167,13 +167,13 @@ public class DeviceTableOperation {
             SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
             if (db == null)
                 return;
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N106");
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_IUUInfo.TABLE_NAME);
             String sql = "insert into e_N106(aa,ab,ac,ad,ae,aab) values (?,?,?,?,?,?)";
             db.execSQL(sql,
-                    new Object[] { EncryptUtils.encrypt(mContext, insertIUUInfo.getApplicationPackageName()),
+                    new Object[]{EncryptUtils.encrypt(mContext, insertIUUInfo.getApplicationPackageName()),
                             EncryptUtils.encrypt(mContext, insertIUUInfo.getApplicationName()),
                             insertIUUInfo.getApplicationVersionCode(), insertIUUInfo.getActionType(),
-                            insertIUUInfo.getActionHappenTime(), System.currentTimeMillis() });
+                            insertIUUInfo.getActionHappenTime(), System.currentTimeMillis()});
         } catch (EGDBEncryptException e) {
             if (Constants.FLAG_DEBUG_INNER) {
                 EgLog.e(e);
@@ -240,7 +240,7 @@ public class DeviceTableOperation {
             SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
             if (db == null)
                 return null;
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N106");
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_IUUInfo.TABLE_NAME);
 
             String sql = "select * from e_N106 where aab > " + TimeUtils.getDateBefore(new Date(), 15)
                     + " and ae is not '' order by ae ASC";
@@ -290,7 +290,7 @@ public class DeviceTableOperation {
             SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
             if (db == null)
                 return;
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N105");
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_OCInfo.TABLE_NAME);
 
             for (int i = 0; i < insertOCInfo.size(); i++) {
                 try {
@@ -302,11 +302,11 @@ public class DeviceTableOperation {
                     }
                     String sql = "insert into e_N105(" + "aa,ab,ac,ad,ae,aab,af,ag,ah,ai) values (?,?,?,?,?,?,?,?,?,?)";
                     db.execSQL(sql,
-                            new Object[] { ocInfo.getApplicationOpenTime(), ocInfo.getApplicationCloseTime(),
+                            new Object[]{ocInfo.getApplicationOpenTime(), ocInfo.getApplicationCloseTime(),
                                     EncryptUtils.encrypt(mContext, ocInfo.getApplicationPackageName()),
                                     EncryptUtils.encrypt(mContext, ocInfo.getApplicationName()),
                                     ocInfo.getApplicationVersionCode(), System.currentTimeMillis(), ocInfo.getNetwork(),
-                                    ocInfo.getSwitchType(), ocInfo.getApplicationType(), ocInfo.getCollectionType() });
+                                    ocInfo.getSwitchType(), ocInfo.getApplicationType(), ocInfo.getCollectionType()});
                 } catch (EGDBEncryptException e) {
                 }
             }
@@ -339,15 +339,15 @@ public class DeviceTableOperation {
             SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
             if (db == null)
                 return;
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N105");
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_OCInfo.TABLE_NAME);
 
             String sql = "insert into e_N105(aa,ab,ac,ad," + "ae,aab,af,ag,ah,ai) " + "values (?,?,?,?,?,?,?,?,?,?)";
             db.execSQL(sql,
-                    new Object[] { ocInfo.getApplicationOpenTime(), ocInfo.getApplicationCloseTime(),
+                    new Object[]{ocInfo.getApplicationOpenTime(), ocInfo.getApplicationCloseTime(),
                             EncryptUtils.encrypt(mContext, ocInfo.getApplicationPackageName()),
                             EncryptUtils.encrypt(mContext, ocInfo.getApplicationName()),
                             ocInfo.getApplicationVersionCode(), System.currentTimeMillis(), ocInfo.getNetwork(),
-                            ocInfo.getSwitchType(), ocInfo.getApplicationType(), ocInfo.getCollectionType() });
+                            ocInfo.getSwitchType(), ocInfo.getApplicationType(), ocInfo.getCollectionType()});
         } catch (EGDBEncryptException e) {
             if (Constants.FLAG_DEBUG_INNER) {
                 EgLog.e(e);
@@ -377,7 +377,7 @@ public class DeviceTableOperation {
             SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
             if (db == null)
                 return;
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N105");
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_OCInfo.TABLE_NAME);
 
             for (int j = 0; j < listInfo.size(); j++) {
                 String sql = "delete from e_N105 where ab='" + listInfo.get(j).getApplicationCloseTime() + "'";
@@ -409,7 +409,7 @@ public class DeviceTableOperation {
             SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
             if (db == null)
                 return null;
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N105");
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_OCInfo.TABLE_NAME);
 
             String sql = "select * from e_N105 where aab > " + TimeUtils.getDateBefore(new Date(), 15)
                     + " and aa is not '' " + " and ab is not '' order by aa ASC";
@@ -471,7 +471,7 @@ public class DeviceTableOperation {
             SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
             if (db == null)
                 return null;
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N105");
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_OCInfo.TABLE_NAME);
 
             String sql = "select * from e_N105 where ai = '" + CollectionType + "' and aab > "
                     + TimeUtils.getDateBefore(new Date(), 15) + " and aa is not '' "
@@ -531,7 +531,7 @@ public class DeviceTableOperation {
             return numb;
         Cursor cursor = null;
         try {
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N105");
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_OCInfo.TABLE_NAME);
 
             String sql = "select * from e_N105";
             cursor = db.rawQuery(sql, null);
@@ -568,15 +568,15 @@ public class DeviceTableOperation {
             SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
             if (db == null)
                 return;
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N108");
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_WBGInfo.TABLE_NAME);
 
             if (Constants.FLAG_DEBUG_INNER) {
                 EgLog.w("insertWBGInfo===>" + info.toString());
             }
             String sql = "insert into e_N108(aa,ab,ac,ad,ae,af,ag,ah) values (?,?,?,?,?,?,?,?)";
-            db.execSQL(sql, new Object[] { EncryptUtils.encrypt(mContext, info.getSSID()),
+            db.execSQL(sql, new Object[]{EncryptUtils.encrypt(mContext, info.getSSID()),
                     EncryptUtils.encrypt(mContext, info.getBSSID()), info.getLevel(), info.getLocationAreaCode(),
-                    info.getCellId(), info.getCollectionTime(), info.getGeographyLocation(), info.getIp() });
+                    info.getCellId(), info.getCollectionTime(), info.getGeographyLocation(), info.getIp()});
         } catch (SQLiteDatabaseCorruptException e) {
             if (Constants.FLAG_DEBUG_INNER) {
                 EgLog.e(e);
@@ -603,7 +603,7 @@ public class DeviceTableOperation {
             SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
             if (db == null)
                 return list;
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N108");
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_WBGInfo.TABLE_NAME);
 
             String sql = "select * from e_N108";
             cursor = db.rawQuery(sql, null);
@@ -660,7 +660,7 @@ public class DeviceTableOperation {
             SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
             if (db == null)
                 return;
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N108");
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_WBGInfo.TABLE_NAME);
 
             String sql = "delete from e_N108"; // 清空数据
             db.execSQL(sql);
@@ -689,7 +689,7 @@ public class DeviceTableOperation {
             SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
             if (db == null)
                 return;
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N105");
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_OCInfo.TABLE_NAME);
 
             String sql = "update e_N105 set ab = " + closeTime + " where ab='';";
             db.execSQL(sql);
@@ -720,13 +720,16 @@ public class DeviceTableOperation {
             if (db == null) {
                 return;
             }
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N101");
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_EguanID.TABLE_NAME);
 
             String deleteSql = "delete from e_N101";
             String insertSql = "insert into e_N101(aa) values (?)";
             db.execSQL(deleteSql);
-            db.execSQL(insertSql, new Object[] { EncryptUtils.encrypt(mContext, id) });
-            EgLog.e("------ 数据存储成功 ------");
+            db.execSQL(insertSql, new Object[]{EncryptUtils.encrypt(mContext, id)});
+
+            if (Constants.FLAG_DEBUG_INNER) {
+                EgLog.w("insertEguanId [" + id + "]");
+            }
         } catch (EGDBEncryptException e) {
         } catch (SQLiteDatabaseCorruptException e) {
             if (Constants.FLAG_DEBUG_INNER) {
@@ -751,12 +754,12 @@ public class DeviceTableOperation {
             if (db == null) {
                 return;
             }
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N102");
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_TmpID.TABLE_NAME);
 
             String deleteSql = "delete from e_N102";
             String insertSql = "insert into e_N102(aa) values (?)";
             db.execSQL(deleteSql);
-            db.execSQL(insertSql, new Object[] { EncryptUtils.encrypt(mContext, id) });
+            db.execSQL(insertSql, new Object[]{EncryptUtils.encrypt(mContext, id)});
             if (Constants.FLAG_DEBUG_INNER) {
                 EgLog.d("------insertTmpId() 数据存储成功 ------");
             }
@@ -789,7 +792,7 @@ public class DeviceTableOperation {
             if (db == null) {
                 return "";
             }
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N101");
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_EguanID.TABLE_NAME);
 
             String sql = "select aa from e_N101 ";
             cursor = db.rawQuery(sql, null);
@@ -831,7 +834,7 @@ public class DeviceTableOperation {
             if (db == null) {
                 return "";
             }
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N102");
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_TmpID.TABLE_NAME);
 
             String sql = "select aa from e_N102 ";
             cursor = db.rawQuery(sql, null);
@@ -870,14 +873,14 @@ public class DeviceTableOperation {
             SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
             if (db == null)
                 return;
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N106");
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N105");
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N108");
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_IUUInfo.TABLE_NAME);
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_OCInfo.TABLE_NAME);
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_WBGInfo.TABLE_NAME);
 
             String IUUInfo = "delete from e_N106;";
             String OCInfo = "delete from e_N105;";
             String WBGInfo = "delete from e_N108;";
-            String[] sql = { IUUInfo, OCInfo, WBGInfo };
+            String[] sql = {IUUInfo, OCInfo, WBGInfo};
             for (int i = 0; i < sql.length; i++) {
                 db.execSQL(sql[i]);
             }
@@ -905,7 +908,7 @@ public class DeviceTableOperation {
             SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
             if (db == null)
                 return;
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N103");
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_OCTime.TABLE_NAME);
             for (OCTimeBean bean : beans) {
                 try {
                     ContentValues cv = new ContentValues();
@@ -913,15 +916,15 @@ public class DeviceTableOperation {
                     cv.put("ab", bean.timeInterval);
                     cv.put("ac", bean.count);
                     cv.put("aab", System.currentTimeMillis());
-                    cursor = db.query("e_N103", null, "aa = ? and ab = ?",
-                            new String[] { EncryptUtils.encrypt(mContext, bean.packageName), bean.timeInterval }, null,
+                    cursor = db.query(DBContent.Table_OCTime.TABLE_NAME, null, "aa = ? and ab = ?",
+                            new String[]{EncryptUtils.encrypt(mContext, bean.packageName), bean.timeInterval}, null,
                             null, null, "1");
                     if (cursor.moveToNext()) {
                         cv.put("ac", cursor.getInt(cursor.getColumnIndexOrThrow("ac")) + 1);
-                        db.update("e_N103", cv, "aa = ? and ab = ?",
-                                new String[] { EncryptUtils.encrypt(mContext, bean.packageName), bean.timeInterval });
+                        db.update(DBContent.Table_OCTime.TABLE_NAME, cv, "aa = ? and ab = ?",
+                                new String[]{EncryptUtils.encrypt(mContext, bean.packageName), bean.timeInterval});
                     } else {
-                        db.insert("e_N103", null, cv);
+                        db.insert(DBContent.Table_OCTime.TABLE_NAME, null, cv);
                     }
 
                 } catch (EGDBEncryptException e) {
@@ -954,8 +957,8 @@ public class DeviceTableOperation {
             SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
             if (db == null)
                 return;
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N103");
-            db.delete("e_N103", null, null);
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_OCTime.TABLE_NAME);
+            db.delete(DBContent.Table_OCTime.TABLE_NAME, null, null);
         } catch (SQLiteDatabaseCorruptException e) {
             if (Constants.FLAG_DEBUG_INNER) {
                 EgLog.e(e);
@@ -979,8 +982,8 @@ public class DeviceTableOperation {
             SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
             if (db == null)
                 return ocTimeBeans;
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N103");
-            cursor = db.query("e_N103", null, null, null, null, null, null);
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_OCTime.TABLE_NAME);
+            cursor = db.query(DBContent.Table_OCTime.TABLE_NAME, null, null, null, null, null, null);
             OCTimeBean bean;
             while (cursor.moveToNext()) {
                 try {
@@ -1029,14 +1032,14 @@ public class DeviceTableOperation {
                 SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
                 if (db == null)
                     return;
-                DeviceDatabaseHelper.getInstance(mContext).create("e_N104");
+                DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_ProcTemp.TABLE_NAME);
 
                 ContentValues cv = new ContentValues();
                 if (packageName == null || openTime == null)
                     return;
                 cv.put("aa", EncryptUtils.encrypt(mContext, packageName));
                 cv.put("ab", openTime);
-                db.insert("e_N104", null, cv);
+                db.insert(DBContent.Table_ProcTemp.TABLE_NAME, null, cv);
             }
         } catch (EGDBEncryptException e) {
             if (Constants.FLAG_DEBUG_INNER) {
@@ -1063,9 +1066,9 @@ public class DeviceTableOperation {
             SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
             if (db == null)
                 return;
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N104");
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_ProcTemp.TABLE_NAME);
 
-            db.delete("e_N104", null, null);
+            db.delete(DBContent.Table_ProcTemp.TABLE_NAME, null, null);
             packageContainer.clear();
         } catch (SQLiteDatabaseCorruptException e) {
             if (Constants.FLAG_DEBUG_INNER) {
@@ -1089,9 +1092,9 @@ public class DeviceTableOperation {
                 SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
                 if (db == null)
                     return;
-                DeviceDatabaseHelper.getInstance(mContext).create("e_N104");
+                DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_ProcTemp.TABLE_NAME);
 
-                db.delete("e_N104", "aa=?", new String[] { EncryptUtils.encrypt(mContext, packageName) });
+                db.delete(DBContent.Table_ProcTemp.TABLE_NAME, "aa=?", new String[]{EncryptUtils.encrypt(mContext, packageName)});
                 DeviceDBManager.getInstance(mContext).closeDB();
                 packageContainer.remove(packageName);
             } else {
@@ -1120,9 +1123,9 @@ public class DeviceTableOperation {
             SQLiteDatabase db = DeviceDBManager.getInstance(mContext).openDB();
             if (db == null)
                 return null;
-            DeviceDatabaseHelper.getInstance(mContext).create("e_N104");
+            DeviceDatabaseHelper.getInstance(mContext).create(DBContent.Table_ProcTemp.TABLE_NAME);
 
-            cursor = db.query("e_N104", null, null, null, null, null, null);
+            cursor = db.query(DBContent.Table_ProcTemp.TABLE_NAME, null, null, null, null, null, null);
             while (cursor.moveToNext()) {
                 try {
                     String packageName = EncryptUtils.decrypt(mContext,

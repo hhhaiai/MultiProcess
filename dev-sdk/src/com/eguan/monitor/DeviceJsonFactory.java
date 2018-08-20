@@ -5,18 +5,18 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import com.eguan.Constants;
-import com.eguan.db.DeviceTableOperation;
-import com.eguan.monitor.imp.DriverInfo;
-import com.eguan.monitor.imp.DriverInfoManager;
-import com.eguan.monitor.imp.IUUInfo;
-import com.eguan.monitor.imp.InstalledAPPInfoManager;
-import com.eguan.monitor.imp.InstalledAppInfo;
-import com.eguan.monitor.imp.OCInfo;
-import com.eguan.monitor.imp.OCTimeBean;
-import com.eguan.monitor.imp.WBGInfo;
+import com.eguan.db.DBPorcesser;
+import com.eguan.imp.DriverInfo;
+import com.eguan.imp.DriverInfoManager;
+import com.eguan.imp.IUUInfo;
+import com.eguan.imp.InstalledAPPInfoManager;
+import com.eguan.imp.InstalledAppInfo;
+import com.eguan.imp.OCInfo;
+import com.eguan.imp.OCTimeBean;
+import com.eguan.imp.WBGInfo;
 import com.eguan.utils.commonutils.EgLog;
 import com.eguan.utils.commonutils.EguanIdUtils;
-import com.eguan.utils.commonutils.SPUtil;
+import com.eguan.utils.commonutils.SPHodler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -124,7 +124,7 @@ public class DeviceJsonFactory {
             if (!TextUtils.isEmpty(Constants.SYSTEMNAME)) {
                 deviceInfo.put("SN", Constants.SYSTEMNAME);
             }
-            deviceInfo.put("DBG", SPUtil.getInstance(mContext).getDebugMode() ? "1" : "0");
+            deviceInfo.put("DBG", SPHodler.getInstance(mContext).getDebugMode() ? "1" : "0");
             deviceInfo.put("HJK", "0");// TODO:需要方法实现,0表示没有被劫持,1表示被劫持
             deviceInfo.put("SIR", "0");// TODO:需要方法实现,0表示非模拟器,1表示模拟器
             List<String> list = EguanIdUtils.getInstance(mContext).getId();
@@ -185,7 +185,7 @@ public class DeviceJsonFactory {
             deviceInfo.put("SIR", simulator + ""); // 是否为模拟器,0代表非模拟器;1代表模拟器
 
             if (Constants.FLAG_DEBUG_INNER) {
-                EgLog.d("getDeviceJson 设备信息:" + deviceInfo);
+                EgLog.v("getDeviceJson 设备信息:" + deviceInfo);
             }
         } catch (Exception e) {
             if (Constants.FLAG_DEBUG_INNER) {
@@ -205,7 +205,7 @@ public class DeviceJsonFactory {
 
         JSONArray iuuJsonArray = new JSONArray();
         try {
-            List<IUUInfo> list = DeviceTableOperation.getInstance(context).selectIUUInfo();
+            List<IUUInfo> list = DBPorcesser.getInstance(context).selectIUUInfo();
             list = dataFiltering(list);
             for (int i = 0; i < list.size(); i++) {
                 String AN = list.get(i).getApplicationName();
@@ -290,15 +290,15 @@ public class DeviceJsonFactory {
         List<OCInfo> getRunningTaskLists;
         JSONArray sumJSONArray = new JSONArray();
         try {
-            List<OCInfo> list = DeviceTableOperation.getInstance(context).selectOCInfo("1");
+            List<OCInfo> list = DBPorcesser.getInstance(context).selectOCInfo("1");
             if (list.size() > 1) {
                 getRunningTaskLists = dataMerge(context, dataIntersection(list));
             } else {
                 getRunningTaskLists = list;
             }
 
-            List<OCInfo> procList = DeviceTableOperation.getInstance(context).selectOCInfo("2");
-            List<OCInfo> accessiblityList = DeviceTableOperation.getInstance(context).selectOCInfo("3");
+            List<OCInfo> procList = DBPorcesser.getInstance(context).selectOCInfo("2");
+            List<OCInfo> accessiblityList = DBPorcesser.getInstance(context).selectOCInfo("3");
             transfer(context, getRunningTaskLists, sumJSONArray);
             transfer(context, procList, sumJSONArray);
             transfer(context, accessiblityList, sumJSONArray);
@@ -369,7 +369,7 @@ public class DeviceJsonFactory {
 
     private static List<OCInfo> dataMerge(Context context, List<OCInfo> list) {
 
-        long mergeInterval = SPUtil.getInstance(context).getMergeInterval();
+        long mergeInterval = SPHodler.getInstance(context).getMergeInterval();
         if (mergeInterval == 0) {
             mergeInterval = Constants.TIME_INTERVAL;
         } else {
@@ -432,7 +432,7 @@ public class DeviceJsonFactory {
      */
     public static JSONArray getBaseStationInfos(Context mContext) {
         JSONArray wbgJsonArray = new JSONArray();
-        List<WBGInfo> WBGInfos = DeviceTableOperation.getInstance(mContext).selectWBGInfo();
+        List<WBGInfo> WBGInfos = DBPorcesser.getInstance(mContext).selectWBGInfo();
 
         try {
             for (WBGInfo info : WBGInfos) {
@@ -487,7 +487,7 @@ public class DeviceJsonFactory {
     public static JSONArray getOCTimesJson(Context mContext) {
         JSONArray result = new JSONArray();
         try {
-            List<OCTimeBean> beans = DeviceTableOperation.getInstance(mContext).selectOCTimes();
+            List<OCTimeBean> beans = DBPorcesser.getInstance(mContext).selectOCTimes();
             JSONObject jo;
             for (OCTimeBean bean : beans) {
                 jo = new JSONObject();

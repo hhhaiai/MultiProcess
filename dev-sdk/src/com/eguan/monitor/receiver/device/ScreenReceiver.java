@@ -5,10 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.eguan.Constants;
-import com.eguan.db.DeviceTableOperation;
-import com.eguan.monitor.imp.AppProcessManager;
-import com.eguan.monitor.imp.OCInfoManager;
-import com.eguan.monitor.imp.ScreenTime;
+import com.eguan.db.DBPorcesser;
+import com.eguan.imp.AppProcessManager;
+import com.eguan.imp.OCInfoManager;
+import com.eguan.imp.ScreenTime;
 import com.eguan.utils.commonutils.EgLog;
 import com.eguan.utils.commonutils.ReceiverUtils;
 import com.eguan.utils.netutils.DevInfoUpload;
@@ -64,7 +64,7 @@ public class ScreenReceiver extends BroadcastReceiver {
         // @Override
         // public void run() {
         try {
-            int number = DeviceTableOperation.getInstance(context).DataQuantity();
+            int number = DBPorcesser.getInstance(context).DataQuantity();
             if (number >= Constants.DATA_NUMBER) {
                 DevInfoUpload.getInstance().upload(context);
             }

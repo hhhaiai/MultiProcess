@@ -7,7 +7,7 @@ import android.provider.Settings;
 import android.text.TextUtils;
 
 import com.eguan.Constants;
-import com.eguan.db.DeviceTableOperation;
+import com.eguan.db.DBPorcesser;
 
 import org.json.JSONObject;
 
@@ -28,11 +28,10 @@ public class EguanIdUtils {
     private final String CACHE_FILE_EGID = "eg.a";
     private final String KEY_ID_EG = "egid";
     private final String KEY_ID_TMP = "tmpid";
-    private final String TAG_TMP = "sanbo";
 
     private static EguanIdUtils instance;
     private Context mContext;
-    private SPUtil spUtil;
+    private SPHodler spUtil;
 
     public static EguanIdUtils getInstance(Context context) {
         if (instance == null) {
@@ -47,7 +46,7 @@ public class EguanIdUtils {
 
     private EguanIdUtils(Context context) {
         this.mContext = context.getApplicationContext();
-        spUtil = SPUtil.getInstance(context);
+        spUtil = SPHodler.getInstance(context);
     }
 
     /**
@@ -91,7 +90,7 @@ public class EguanIdUtils {
      * @return
      */
     private String getContrastId(List<String> fileId, List<String> settingId, List<String> shardId,
-            List<String> databaseId, String key) {
+                                 List<String> databaseId, String key) {
 
         List<String> list = new ArrayList<String>();
         String id = "";
@@ -196,7 +195,7 @@ public class EguanIdUtils {
      */
     private void writeDatabase(String egId, String tmpId) {
 
-        DeviceTableOperation tabOpe = DeviceTableOperation.getInstance(mContext);
+        DBPorcesser tabOpe = DBPorcesser.getInstance(mContext);
         if (!TextUtils.isEmpty(egId)) {
             tabOpe.insertEguanId(egId);
         }
@@ -211,7 +210,7 @@ public class EguanIdUtils {
      * @return
      */
     private List<String> readDatabase() {
-        DeviceTableOperation tabOpe = DeviceTableOperation.getInstance(mContext);
+        DBPorcesser tabOpe = DBPorcesser.getInstance(mContext);
         List<String> list = new ArrayList<String>();
         list.add(tabOpe.selectEguanId());
         list.add(tabOpe.selectTmpId());
@@ -297,7 +296,7 @@ public class EguanIdUtils {
 
         try {
             if (Constants.FLAG_DEBUG_INNER) {
-                EgLog.v(TAG_TMP, "writeFile-----egid:" + egId + "----TMPID:" + tmpId + "-------" + permisJudgment());
+                EgLog.v("writeFile-----egid:" + egId + "----TMPID:" + tmpId + "-------" + permisJudgment());
             }
             if (!permisJudgment()) {
                 return;
@@ -323,7 +322,7 @@ public class EguanIdUtils {
 
             if (!SystemUtils.checkPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE)) {
                 if (Constants.FLAG_DEBUG_INNER) {
-                    EgLog.v(TAG_TMP, "fileJudgment 没有权限");
+                    EgLog.v("fileJudgment 没有权限");
                 }
                 return;
             }
@@ -333,7 +332,7 @@ public class EguanIdUtils {
             out.close();
 
             if (Constants.FLAG_DEBUG_INNER) {
-                EgLog.v(TAG_TMP, "写入文件成功");
+                EgLog.v("写入文件成功");
             }
 
         } catch (Throwable e) {
@@ -390,7 +389,7 @@ public class EguanIdUtils {
 
             if (!SystemUtils.checkPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 if (Constants.FLAG_DEBUG_INNER) {
-                    EgLog.v(TAG_TMP, "readIdFile 没有权限");
+                    EgLog.v("readIdFile 没有权限");
                 }
                 return "";
             }
@@ -434,7 +433,7 @@ public class EguanIdUtils {
     private boolean fileJudgment() {
         if (!SystemUtils.checkPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE)) {
             if (Constants.FLAG_DEBUG_INNER) {
-                EgLog.v(TAG_TMP, "fileJudgment 没有权限");
+                EgLog.v("fileJudgment 没有权限");
             }
             return false;
         }

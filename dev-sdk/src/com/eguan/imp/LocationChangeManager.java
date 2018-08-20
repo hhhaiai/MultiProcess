@@ -1,10 +1,10 @@
-package com.eguan.monitor.imp;
+package com.eguan.imp;
 
 import java.util.List;
 
 import com.eguan.Constants;
 import com.eguan.utils.commonutils.EgLog;
-import com.eguan.utils.commonutils.SPUtil;
+import com.eguan.utils.commonutils.SPHodler;
 import com.eguan.utils.commonutils.SystemUtils;
 
 import android.Manifest;
@@ -22,7 +22,7 @@ public class LocationChangeManager {
 
     private LocationManager locationManager;
     private Context context;
-    SPUtil spUtil = null;
+    SPHodler spUtil = null;
     private static LocationChangeManager instance = null;
 
     public static LocationChangeManager getInstance(Context context) {
@@ -36,7 +36,7 @@ public class LocationChangeManager {
 
     private LocationChangeManager(Context context) {
         this.context = context.getApplicationContext();
-        spUtil = SPUtil.getInstance(context);
+        spUtil = SPHodler.getInstance(context);
         if (locationManager == null) {
             locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         }

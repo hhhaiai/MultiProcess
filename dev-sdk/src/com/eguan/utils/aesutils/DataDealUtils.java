@@ -1,10 +1,10 @@
 package com.eguan.utils.aesutils;
 
+import android.content.Context;
+
 import com.eguan.Constants;
 import com.eguan.utils.commonutils.EgLog;
-import com.eguan.utils.commonutils.SPUtil;
-
-import android.content.Context;
+import com.eguan.utils.commonutils.SPHodler;
 
 public class DataDealUtils {
 
@@ -13,7 +13,7 @@ public class DataDealUtils {
     public static final String ORIGINKEY_STRING = "sysylana";
 
     public static String dealUploadData(Context mContext, String original) {
-        String key_inner = SPUtil.getInstance(mContext).getKey();
+        String key_inner = SPHodler.getInstance(mContext).getKey();
         if (null != key_inner && key_inner.length() == 17) {
             key = makeSercretKey(key_inner);
         } else {

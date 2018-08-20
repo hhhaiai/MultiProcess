@@ -17,7 +17,6 @@ public class ReceiverUtils {
     private ScreenReceiver mScreenReceiver;// 锁屏广播
     private IntentFilter intentFilter;
     private LocalBroadcastManager localBroadcastManager;
-    // private BatteryReceiver mBatteryReceiver; //电池changed广播
 
     // --------------地理位置信息--------------
     private ReceiverUtils() {
@@ -38,7 +37,6 @@ public class ReceiverUtils {
         }
 
         try {
-            // GlobalTimer.getInstance(context).stopHeart();
             MyThread.getInstance(context).stopThread();
             /*-------------注销IUU广播-------------*/
             if (iuuReceiver != null) {
@@ -56,14 +54,6 @@ public class ReceiverUtils {
             if (isFromService && mScreenReceiver != null) {
                 context.unregisterReceiver(mScreenReceiver);
             }
-
-            /*-------------取消LBS监听——————————————————*/
-            // String str = SPUtil.getInstance(context).getLocation();
-            // if (str != null && str.equalsIgnoreCase("yes")) {
-            // LocationChangeManager.getInstance(context).unRegistLocation();
-            // }
-            //
-            // unregisterBatteryReceiver(context);
         } catch (Throwable e) {
             if (Constants.FLAG_DEBUG_INNER) {
                 EgLog.e(e);

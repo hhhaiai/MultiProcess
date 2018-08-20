@@ -1,4 +1,4 @@
-package com.eguan.monitor.imp;
+package com.eguan.imp;
 
 /**
  * Created by XRC on 2017/3/28.

@@ -31,8 +31,7 @@ public class DBUtils {
         }
         Cursor cursor = null;
         try {
-            String sql = "select count(*) as c from sqlite_master where type ='table' and name ='" + tabName.trim()
-                    + "' ";
+            String sql = "select count(*) as c from sqlite_master where type ='table' and name ='" + tabName.trim() + "' ";
             cursor = db.rawQuery(sql, null);
             if (cursor.moveToNext()) {
                 int count = cursor.getInt(0);

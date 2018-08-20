@@ -3,7 +3,7 @@ package com.eguan.drivermonitor.receiver;
 import com.eguan.Constants;
 import com.eguan.monitor.fangzhou.service.MonitorService;
 import com.eguan.utils.commonutils.EgLog;
-import com.eguan.utils.commonutils.SPUtil;
+import com.eguan.utils.commonutils.SPHodler;
 import com.eguan.utils.commonutils.SystemUtils;
 import com.eguan.utils.thread.EGQueue;
 import com.eguan.utils.thread.SafeRunnable;
@@ -45,12 +45,12 @@ public class SystemStartReceiver extends BroadcastReceiver {
     private void startService(final Context context) {
         try {
             boolean running = SystemUtils.isServiceRunning(context, Constants.MONITORSERVICE);
-            String tactics = SPUtil.getInstance(context).getDeviceTactics();
+            String tactics = SPHodler.getInstance(context).getDeviceTactics();
             if (!running && SystemUtils.classInspect(Constants.MONITORSERVICE)
                     && !tactics.equals(Constants.TACTICS_STATE)) {
                 Intent service = new Intent(context, MonitorService.class);
-                service.putExtra(Constants.APP_KEY, SPUtil.getInstance(context).getKey());
-                service.putExtra(Constants.APP_CHANNEL, SPUtil.getInstance(context).getChannel());
+                service.putExtra(Constants.APP_KEY, SPHodler.getInstance(context).getKey());
+                service.putExtra(Constants.APP_CHANNEL, SPHodler.getInstance(context).getChannel());
                 context.startService(service);
             }
         } catch (Throwable e) {

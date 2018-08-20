@@ -1,14 +1,14 @@
-package com.eguan.monitor.imp;
+package com.eguan.imp;
 
 import java.io.Serializable;
 
 /**
- * 应用安装、卸载、更新实体类
+ * 已安装应用列表实体类
  * 
  * @author Machenike
  *
  */
-public class IUUInfo implements Serializable {
+public class InstalledAppInfo implements Serializable {
 
     /**
      * 
@@ -27,13 +27,9 @@ public class IUUInfo implements Serializable {
      */
     private String applicationVersionCode;
     /**
-     * 行为类型， 0代表安装；1代表卸载；2代表更新
+     * 应用是否新装还是卸载，“0”表示卸载；“1”表示新装
      */
-    private String actionType;
-    /**
-     * 行为发生时间，转换成时间戳，如：“1296035800“
-     */
-    private String actionHappenTime;
+    private String isNew;
 
     public String getApplicationPackageName() {
         return applicationPackageName;
@@ -59,27 +55,39 @@ public class IUUInfo implements Serializable {
         this.applicationVersionCode = applicationVersionCode;
     }
 
-    public String getActionType() {
-        return actionType;
+    public String getIsNew() {
+        return isNew;
     }
 
-    public void setActionType(String actionType) {
-        this.actionType = actionType;
+    public void setIsNew(String isNew) {
+        this.isNew = isNew;
     }
 
-    public String getActionHappenTime() {
-        return actionHappenTime;
-    }
+    /**
+     * 重写equals方法，用于表两个对象是否是同一个对象，以包名是否相同为参照标准
+     * 
+     * @param obj
+     * @return
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        } else {
+            if (this.getClass() == obj.getClass()) {
+                InstalledAppInfo u = (InstalledAppInfo) obj;
+                return this.getApplicationPackageName().equals(u.getApplicationPackageName());
 
-    public void setActionHappenTime(String actionHappenTime) {
-        this.actionHappenTime = actionHappenTime;
+            } else {
+                return false;
+            }
+        }
     }
 
     @Override
     public String toString() {
-        return "IUUInfo [applicationPackageName=" + applicationPackageName + ", applicationName=" + applicationName
-                + ", applicationVersionCode=" + applicationVersionCode + ", actionType=" + actionType
-                + ", actionHappenTime=" + actionHappenTime + "]";
+        return "InstalledAppInfo [applicationPackageName=" + applicationPackageName + ", applicationName="
+                + applicationName + ", applicationVersionCode=" + applicationVersionCode + ", isNew=" + isNew + "]";
     }
 
 }
