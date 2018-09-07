@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.eguan"
     android:versionCode="1"
-    android:versionName="1.0">
+    android:versionName="1.0" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -25,16 +25,25 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
     <uses-permission
         android:name="android.permission.WRITE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
 
     <application
         android:allowBackup="true"
-        android:label="@string/app_name">
-        <receiver android:name="com.eguan.monitor.receiver.SystemStartReceiver">
-            <intent-filter android:priority="9999">
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:logo="@mipmap/ic_launcher" >
+        <activity android:name="a.test.MainActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <receiver android:name="com.eguan.monitor.receiver.SystemStartReceiver" >
+            <intent-filter android:priority="9999" >
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.USER_PRESENT" />
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
@@ -55,9 +64,8 @@
             android:name="com.eguan.monitor.fangzhou.service.EgAccessibilityService"
             android:enabled="true"
             android:exported="true"
-            android:label="Analysys"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-            android:process=":monitorService">
+            android:process=":monitorService" >
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
