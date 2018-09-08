@@ -3,7 +3,6 @@ package com.eguan.utils;
 import java.util.Arrays;
 
 import com.eguan.EDContext;
-
 import android.Manifest.permission;
 import android.accessibilityservice.AccessibilityService;
 import android.content.Context;
@@ -66,7 +65,7 @@ public class AccessibilityHelper {
          */
         try {
             accessibilityEnabled = Settings.Secure.getInt(context.getApplicationContext().getContentResolver(),
-                android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
+                    android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
         } catch (Settings.SettingNotFoundException e) {
             return false;
         }
@@ -76,7 +75,7 @@ public class AccessibilityHelper {
          */
         if (accessibilityEnabled == 1) {
             String settingValue = Settings.Secure.getString(context.getApplicationContext().getContentResolver(),
-                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
 
             if (TextUtils.isEmpty(settingValue)) {
                 return false;
