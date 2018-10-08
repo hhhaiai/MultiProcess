@@ -1,0 +1,333 @@
+package com.analysys.dev.internal.Content;
+
+/**
+ * @Copyright © 2018 Analysys Inc. All rights reserved.
+ * @Description: 协议变量。包含上传变量、策略变量
+ * @Version: 1.0
+ * @Create: 2018年9月4日 上午10:51:36
+ * @Author: sanbo
+ */
+public class ProtocolInfo {
+
+    /**
+     * @Copyright © 2018 Analysys Inc. All rights reserved.
+     * @Description: 设备信息详情
+     * @Version: 1.0
+     * @Create: 2018年9月11日 上午10:28:03
+     * @Author: sanbo
+     */
+    public static class DevInfo {
+        public static final String NAME = "DevInfo";
+        // 设备AndroidID，如：“144379774dc1c0b8”
+        public static final String AndroidID = "AID";
+        // 蓝牙MAC，如“6c:5c:14:25:be:ba”
+        public static final String BluetoothMAC = "BMAC";
+
+
+
+        // H5 SDK唤醒app时传过来的ID，用来打通PC和移动设备的H5采集数据
+        // public static final String H5UserID = "HUID";
+        // 多卡IMEI，采集手机上的多个IMEI值，如“86015700327|86098790529”
+        public static final String Imeis = "IMS";
+        // 手机IMSI号，如：“460019031508084”
+        public static final String IMSI = "IMSI";
+
+        // sim卡运营商名字，如：“CHINA MOBILE“
+        public static final String MobileOperatorName = "MPN";
+        // 接入运营商编码，如：“60202“
+        public static final String NetworkOperatorCode = "NOC";
+        // 接入运营商名字，如：“vodafone“
+        public static final String NetworkOperatorName = "NON";
+        // 分辨率，如“480-800”
+        public static final String Resolution = "RES";
+        // 设备所在地，如“CN”
+        public static final String SystemArea = "SA";
+
+        // 系统字体大小，如“17”
+        public static final String SystemFontSize = "SFS";
+        // 系统小时制，如“12”
+        public static final String SystemHour = "SH";
+        // 系统语言，如“zh-Hans-CN”
+        public static final String SystemLanguage = "SL";
+        // 设备序列号，如：”c83eccca”
+        public static final String SerialNumber = "SNR";
+        // 当前时区，如“GMT+8”
+        public static final String TimeZone = "TZ";
+
+// 临时ID，易观自己生成的用来识别设备的ID，38位字符
+public static final String TempID = "TMPID";
+// 判断是否是模拟器，"0”= 不是模拟器“1”= 是模拟器
+public static final String Simulator = "SIR";
+// 判断设备本身、APP、以及工作环境是否是被调试状态，“0”= 不在调试状态“1”= 在调试状态
+public static final String Debug = "DBG";
+// 易观ID，易观自己根据设备数据生成的标识设备的ID，如："123456789"
+public static final String EguanID = "EGID";
+// 判断设备的OS是否被劫持，"0”= 没有被劫持“1”= 被劫持
+public static final String Hijack = "HJK";
+// 是否root，值为1表示获取root权限；值为0表示没获取root权限
+public static final String IsJailbreak = "IJ";       
+ // 系统名称，如：“Android“、”iPhone OS“
+public static final String SystemName = "SN";
+// 系统版本，如：”2.3.4”
+public static final String SystemVersion = "SV";        
+ // 推广渠道
+public static final String ApplicationChannel = "AC";
+// 样本应用key，由易观为样本应用分配的key
+public static final String ApplicationKey = "AK";
+// 应用程序名，如：“QQ空间”
+public static final String ApplicationName = "AN";
+// [STG字段APILevel] API等级（仅供安卓使用）
+public static final String APILevel = "APIL";
+// 应用包名，如：“com.eguan.sdkdemo”
+public static final String ApplicationPackageName = "APN";
+// 设备品牌，如：“联想”、“魅族”。（苹果设备的品牌名都为apple）
+public static final String DeviceBrand = "DB";
+// 设备Id，由IMEI-IMSI-AndroidId组成，如：863363036038592-460019031508084-144379774dc1c0b8
+public static final String DeviceId = "DI";
+// 设备型号 , 如：“Lenovo S760”
+public static final String DeviceModel = "DM";
+// 设备MAC地址，如：“6c:5c:14:25:be:ba”
+public static final String MAC = "MAC";
+// 运营商，如“联通”、“移动”
+public static final String MobileOperator = "MO";
+// SDK版本，如：“3.7.0|170215”
+public static final String SDKVersion = "SDKV";
+ // [锆云用---是否可以和AVC合并？]应用版本，如“5.4.1”
+public static final String ApplicationVersion = "AV";
+// [以前在其他列表里]应用版本名|应用版本号. eg: 5.2.1|521
+public static final String ApplicationVersionCode = "AVC";
+// ? 使用样本应用的用户Id
+public static final String Sameple_user_id = "AUI";
+// 手机号码 
+public static final String PHONE_NUM = "PN";
+    }
+
+    /**
+     * @Copyright © 2018 Analysys Inc. All rights reserved.
+     * @Description: 打开关闭应用详情
+     * @Version: 1.0
+     * @Create: 2018年9月11日 上午10:27:35
+     * @Author: sanbo
+     */
+    public static class OCInfo {
+        public static final String NAME = "OCInfo";
+// 应用打开时间，转换成时间戳，如：“1296035591”
+public static final String ApplicationOpenTime = "AOT";
+// 应用关闭时间，转换成时间戳，如：“1296035599”
+public static final String ApplicationCloseTime = "ACT";
+// 应用包名，如：“com.qzone”
+public static final String ApplicationPackageName = "APN";
+// 应用程序名，如：“QQ空间”
+public static final String ApplicationName = "AN";
+// 应用版本名|应用版本号，如“5.4.1|89”
+public static final String ApplicationVersionCode = "AVC";
+// 网络类型，如：“12”
+public static final String NetworkType = "NT";
+        // 扩展字段结构，便于后端解析，把下面的字段放到扩展的结构中
+        public static final String ExtendedMap = "ETDM";
+            // OC切换的类型，1-正常使用，2-开关屏幕切换，3-服务重启
+            public static final String SwitchType = "ST";
+            // 应用类型，SA-系统应用，OA-第三方应用
+            public static final String ApplicationType = "AT";
+            // 采集来源类型，1-getRunningTask，2-读取proc，3-辅助功能，4-系统统计
+            public static final String CollectionType = "CT";
+    }
+
+    /**
+     * @Copyright © 2018 Analysys Inc. All rights reserved.
+     * @Description: Open、Close时间 千帆需要概量。  打开算一个
+     * @Version: 1.0
+     * @Create: 2018年9月11日 上午10:22:56
+     * @Author: sanbo
+     */
+    public static class OCTimes {
+        public static final String NAME = "OCTimes";
+        // 应用包名，如: "com.test"
+        public static final String ApplicationPackageName = "PN";
+        // 在进程列表中快照的次数，如:"200"
+        public static final String Count = "CU";
+        // 快照次数所属的时段，1表示0～6小时，2表示6～12小时，3表示12～18小时，4表示18～24小时
+        public static final String TimeInterval = "TI";
+    }
+
+    /**
+     * @Copyright © 2018 Analysys Inc. All rights reserved.
+     * @Description: 安装应用列表信息
+     * @Version: 1.0
+     * @Create: 2018年9月7日 下午3:31:45
+     * @Author: sanbo
+     */
+    public static class InstalledAppInfo {
+        public static final String NAME = "InstalledAppInfo";
+// 应用包名. eg:com.hello
+public static final String ApplicationPackageName = "APN";
+// 应用程序名.eg: QQ
+public static final String ApplicationName = "AN";
+// 应用版本名|应用版本号. eg: 5.2.1|521
+public static final String ApplicationVersionCode = "AVC";
+        // 数据使用. 字段值为"3"
+        public static final String IsNew = "IN";
+    }
+
+    /**
+     * @Copyright © 2018 Analysys Inc. All rights reserved.
+     * @Description: 安装、卸载、更新信息
+     * @Version: 1.0
+     * @Create: 2018年9月7日 下午3:25:32
+     * @Author: sanbo
+     */
+    public static class IUUInfo {
+        public static final String NAME = "IUUInfo";
+// 应用包名. eg:com.hello   后端表: ods.ods_dev_app_installed_d [锆云]
+public static final String ApplicationPackageName = "APN";
+// 应用程序名.eg: QQ   后端表: ods.ods_dev_app_installed_d [锆云]
+public static final String ApplicationName = "AN";
+// 应用版本名|应用版本号. eg: 5.2.1|521   后端表: ods.ods_dev_app_installed_d [锆云]
+public static final String ApplicationVersionCode = "AVC";
+// 行为类型. 0:安装 1:卸载 2:更新   后端表: ods.ods_dev_app_installed_d [锆云]
+public static final String ActionType = "AT";
+// 行为发生时间.时间戳   后端表: ods.ods_dev_app_installed_d [锆云]
+public static final String ActionHappenTime = "AHT";
+
+    }
+
+    /**
+     * @Copyright © 2018 Analysys Inc. All rights reserved.
+     * @Description: 热点信息
+     * @Version: 1.0
+     * @Create: 2018年9月7日 下午3:25:18
+     * @Author: sanbo
+     */
+    public static class WBGInfo {
+        public static final String NAME = "WBGInfo";
+// wifi名称
+public static final String SSID = "SSID";
+// 无线路由器的mac地址
+public static final String BSSID = "BSSID";
+// 信号强度
+public static final String Level = "LEVEL";
+// ods.ods_dev_user_geo_lbs_d [锆云] 位置区编码
+public static final String LocationAreaCode = "LAC";
+// ods.ods_dev_user_geo_lbs_d [锆云] 基站编号
+public static final String CellId = "CellId";
+// [服务器字段 SSIDT]采集时间 、--ods.ods_dev_user_geo_lbs_d [锆云] 
+public static final String CollectionTime = "CT";
+        // 地理位置，由经度和纬度组成，用减号-连接
+        public static final String GeographyLocation = "GL";
+        // 公网IP
+        public static final String ip = "ip";
+    }
+
+    /**
+     * @Copyright © 2018 Analysys Inc. All rights reserved.
+     * @Description: 字段太大，暂时不要了
+     * @Version: 1.0
+     * @Create: 2018年9月6日 上午11:28:04
+     * @Author: sanbo
+     */
+    @Deprecated
+    public static class PLInfo {
+        public static final String NAME = "PLInfo";
+        // 进程生命周期，开始-结束|开始-结束
+        public static final String ProcessLifecycle = "PL";
+    }
+
+    /**
+     * @Copyright © 2018 Analysys Inc. All rights reserved.
+     * @Description: 以前sdk传递是个空array
+     * @Version: 1.0
+     * @Create: 2018年9月6日 上午11:28:12
+     * @Author: sanbo
+     */
+    @Deprecated
+    public static class WebInfo {
+        public static final String NAME = "WebInfo";
+        // 网页地址，如："http://www.baidu.com" . 现在代码中用为WRL
+        public static final String Url = "URL";
+        // 网页打开时间，转换成时间戳，如："1296035591"
+        public static final String WebOpenTime = "WOT";
+    }
+
+    /**
+     * @Copyright © 2018 Analysys Inc. All rights reserved.
+     * @Description: 网络相应
+     * @Version: 1.0
+     * @Create: 2018年9月4日 下午2:58:31
+     * @Author: sanbo
+     */
+    public static class Response {
+        /**
+         * 状态回执
+         */
+        public static final String RES_CODE = "code";
+        /**
+         * 策略相关的
+         */
+        public static final String RES_POLICY = "policy";
+        // 策略版本
+        public static final String RES_POLICY_VERSION = "policyVer";
+        // 服务器延迟上传时间
+        public static final String RES_POLICY_SERVERDELAY = "serverDelay";
+        // 上传失败次数
+        public static final String RES_POLICY_FAILCOUNT = "failCount";
+        // 上传失败后延迟时间
+        public static final String RES_POLICY_FAILTRYDELAY = "failTryDelay";
+        // 客户端上传时间间隔
+        public static final String RES_POLICY_TIMERINTERVAL = "timerInterval";
+        // 客户端上传时数据条数
+        public static final String RES_POLICY_EVENTCOUNT = "eventCount";
+        // 是否使用实时策略， 1不使用 0使用
+        public static final String RES_POLICY_USERTP = "useRTP";
+        // 是否实时上传[非实时分析策略下，是否实时上传] 0不实时上传，1实时上传
+        public static final String RES_POLICY_USERTL = "useRTL";
+        // 是否采集公网IP
+        public static final String RES_POLICY_REMOTEIP = "remoteIp";
+        // 是否上传敏感数据, 0,1
+        public static final String RES_POLICY_UPLOADSD = "uploadSD";
+        // 数据合并间隔
+        public static final String RES_POLICY_MERGEINTERVAL = "mergeInterval";
+        // 最小使用时长
+        public static final String RES_POLICY_MINDURATION = "minDuration";
+        // 最长使用时长
+        public static final String RES_POLICY_MAXDURATION = "maxDuration";
+        // 域名更新次数
+        public static final String RES_POLICY_DOMAINUPDATETIMES = "domainUpdateTimes";
+
+        // 拉活服务 相关的
+        public static final String RES_POLICY_SERVICEPULL = "servicePull";
+        public static final String RES_POLICY_SERVICEPULL_PACKAGENAME = "packageName";
+        public static final String RES_POLICY_SERVICEPULL_CLASSNAME = "className";
+        public static final String RES_POLICY_SERVICEPULL_ACTION = "action";
+        public static final String RES_POLICY_SERVICEPULL_EXTRA = "extra";
+
+        // deeplink拉活
+        public static final String RES_POLICY_APPPULL = "appPull";
+        public static final String RES_POLICY_APPPULL_PACKAGENAME = "packageName";
+        public static final String RES_POLICY_APPPULL_DEEPLINK = "deepLink";
+        public static final String RES_POLICY_APPPULL_TITLE = "title";
+        public static final String RES_POLICY_APPPULL_CONTENT = "content";
+        public static final String RES_POLICY_APPPULL_ICON = "icon";
+
+        // oc打开应用次数限制.暂时没用
+        public static final String RES_POLICY_OCRULE = "ocRule";
+        public static final String RES_POLICY_OCRULE_MERGEINTERVAL = "mergeInterval";
+        public static final String RES_POLICY_OCRULE_MINDURATION = "minDuration";
+
+        // 广告
+        public static final String RES_POLICY_AD = "ad";
+        public static final String RES_POLICY_AD_ID = "id";
+        public static final String RES_POLICY_AD_TITLE = "title";
+        public static final String RES_POLICY_AD_CONTENT = "content";
+        public static final String RES_POLICY_AD_ICON = "icon";
+        public static final String RES_POLICY_AD_URL = "url";
+
+        // 是否同意隐私权限
+        public static final String RES_POLICY_UE = "ue";
+        // 应用SDK控制 0,1
+        public static final String RES_POLICY_UE_AVALID = "aValid";
+        // 设备SDK控制 0,1
+        public static final String RES_POLICY_UE_DVALID = "dValid";
+
+    }
+
+}
