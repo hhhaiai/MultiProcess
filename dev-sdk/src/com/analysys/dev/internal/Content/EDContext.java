@@ -25,7 +25,7 @@ public class EDContext {
     /**
      * SDK版本
      */
-    public static final String SDK_VERSION = "3.7.9.3|20180822";
+    public static final String SDK_VERSION = "4.0.1";
 
     public static final String LOGTAG_DEBUG = "xxx";
 

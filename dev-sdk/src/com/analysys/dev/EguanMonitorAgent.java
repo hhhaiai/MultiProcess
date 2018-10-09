@@ -1,6 +1,6 @@
-package com.analysys.dev.monitor;
+package com.analysys.dev;
 
-import com.analysys.dev.AnalysysInternal;
+import com.analysys.dev.internal.AnalysysInternal;
 import com.analysys.dev.internal.Content.EDContext;
 import com.analysys.dev.internal.utils.LL;
 

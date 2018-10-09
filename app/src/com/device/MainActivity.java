@@ -3,7 +3,7 @@ package com.device;
 import android.app.Activity;
 import android.os.Bundle;
 
-import com.analysys.dev.monitor.EguanMonitorAgent;
+import com.analysys.dev.EguanMonitorAgent;
 
 public class MainActivity extends Activity {
 

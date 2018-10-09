@@ -1,4 +1,4 @@
-package com.analysys.dev;
+package com.analysys.dev.internal;
 
 import com.analysys.dev.internal.Content.EDContext;
 import com.analysys.dev.internal.utils.AndroidManifestHelper;

@@ -153,10 +153,10 @@ public class AndroidManifestHelper {
                         return true;
                     }
                 }
-
             }
 
         } catch (Throwable e) {
+            LL.e(e);
         }
         return false;
     }

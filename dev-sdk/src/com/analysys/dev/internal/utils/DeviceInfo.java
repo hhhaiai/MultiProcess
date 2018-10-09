@@ -1,6 +1,17 @@
 package com.analysys.dev.internal.utils;
 
-import static java.lang.Runtime.getRuntime;
+import android.Manifest.permission;
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.os.Build;
+import android.text.TextUtils;
+import android.util.Base64;
+
+import com.analysys.dev.internal.utils.sp.SPHelper;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -13,26 +24,15 @@ import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.Locale;
 
-import com.analysys.dev.internal.utils.sp.SPHelper;
-
-import android.Manifest.permission;
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
-import android.os.Build;
-import android.text.TextUtils;
-import android.util.Base64;
+import static java.lang.Runtime.getRuntime;
 
 public class DeviceInfo {
 
     private static final String DEFALT_MAC = "02:00:00:00:00:00";
     private static final String[] FILE_LIST =
-        {Base64.encodeToString("/sys/class/net/wlan0/address".getBytes(), Base64.DEFAULT),
-            Base64.encodeToString("/sys/class/net/eth0/address".getBytes(), Base64.DEFAULT),
-            Base64.encodeToString("/sys/devices/virtual/net/wlan0/address".getBytes(), Base64.DEFAULT)};
+            {Base64.encodeToString("/sys/class/net/wlan0/address".getBytes(), Base64.DEFAULT),
+                    Base64.encodeToString("/sys/class/net/eth0/address".getBytes(), Base64.DEFAULT),
+                    Base64.encodeToString("/sys/devices/virtual/net/wlan0/address".getBytes(), Base64.DEFAULT)};
 
     /**
      * 读取手机MAC地址
@@ -44,7 +44,6 @@ public class DeviceInfo {
     /**
      * 读取手机mac地址
      *
-     * 
      * @param context
      * @return
      */
@@ -118,7 +117,7 @@ public class DeviceInfo {
 
     /**
      * android 9以上没权限获取
-     * 
+     *
      * @return
      * @throws IOException
      */
@@ -149,7 +148,7 @@ public class DeviceInfo {
 
     /**
      * 需要打开wifi才能获取
-     * 
+     *
      * @return
      * @throws SocketException
      */
@@ -177,7 +176,7 @@ public class DeviceInfo {
     }
 
     private static String getMacByAndridAPI(Context context) {
-        WifiManager wifi = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         if (PermissionUtils.checkPermission(context, permission.ACCESS_WIFI_STATE)) {
             WifiInfo info = wifi.getConnectionInfo();
             return info.getMacAddress();
@@ -188,11 +187,12 @@ public class DeviceInfo {
 
     private static boolean isNetworkAlive(Context context) {
         if (PermissionUtils.checkPermission(context, permission.ACCESS_NETWORK_STATE)) {
-            ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             if (cm != null) {
                 NetworkInfo ni = cm.getActiveNetworkInfo();
-                if (ni != null)
+                if (ni != null) {
                     return ni.isConnected();
+                }
             }
         }
         return false;
@@ -201,7 +201,7 @@ public class DeviceInfo {
     @SuppressWarnings("deprecation")
     private static boolean isWifiAlive(Context context) {
         if (PermissionUtils.checkPermission(context, permission.ACCESS_NETWORK_STATE)) {
-            ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             if (cm != null) {
                 NetworkInfo wifiNetwork = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 if (wifiNetwork != null) {

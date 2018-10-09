@@ -235,7 +235,7 @@ public class MProt {
 
     /**
      * @Copyright © 2018 Analysys Inc. All rights reserved.
-     * @Description: 进程信息,几种方式获取
+     * @Description: 进程信息, 几种方式获取
      * @Version: 1.0
      * @Create: 2018年10月8日 下午1:38:24
      * @Author: sanbo
@@ -399,9 +399,12 @@ public class MProt {
         public static final String RES_POLICY_UE_DVALID = "dValid";
 
         /*
-         * 控制ProcessInfo模块的采集 
+         * 控制ProcessInfo模块的采集
          */
         public static final String RES_POLICY_CL = "pi_cl";
+        public static final String RES_POLICY_CL_module_proc = "pi_proc";
+        public static final String RES_POLICY_CL_module_ps = "pi_ps";
+        public static final String RES_POLICY_CL_module_top = "pi_top";
         // 控制策略. 1,0
         public static final String RES_POLICY_CL_PROCESSINFO = "use_process_info";
         // 获取策略频率
@@ -427,5 +430,5 @@ public class MProt {
         public static final String RES_POLICY_MODULE_CL_MORE_INFO = "module_cl_more_info";
 
     }
-    
+
 }
