@@ -203,8 +203,8 @@ public class AndroidManifestHelper {
             }
             if (context != null) {
                 PackageManager manager = context.getPackageManager();
-                ApplicationInfo info =
-                    manager.getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+                ApplicationInfo info = manager.getApplicationInfo(
+                    context.getPackageName(), PackageManager.GET_META_DATA);
                 if (info != null) {
                     return info.metaData;
                 }

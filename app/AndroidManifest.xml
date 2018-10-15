@@ -1,33 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.device"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.0"
+    package="com.device">
 
-    <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="23"
-        tools:ignore="OldTargetApi" />
+  <uses-permission android:name="android.permission.INTERNET"/>
+  <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+  <uses-permission
+      android:name="android.permission.MOUNT_FORMAT_FILESYSTEMS"
+      tools:ignore="ProtectedPermissions"/>
+  <uses-permission
+      android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
+      tools:ignore="ProtectedPermissions"/>
+  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+  <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+  <uses-permission android:name="android.permission.BLUETOOTH"/>
+  <uses-permission android:name="android.permission.GET_TASKS"/>
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+  <!-- P和以后版本 通知需要该权限 -->
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+  <uses-permission
+      android:name="android.permission.WRITE_SETTINGS"
+      tools:ignore="ProtectedPermissions"/>
 
-    <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:logo="@mipmap/ic_launcher"
-        android:theme="@style/AppTheme" >
-        <activity android:name=".MainActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-    </application>
+  <uses-sdk
+      android:minSdkVersion="14"
+      android:targetSdkVersion="23"
+      tools:ignore="OldTargetApi"/>
+
+  <application
+      android:name=".AnalysysApplication"
+      android:allowBackup="true"
+      android:icon="@mipmap/ic_launcher"
+      android:label="@string/app_name"
+      android:logo="@mipmap/ic_launcher"
+      android:theme="@style/AppTheme">
+    <activity android:name=".MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN"/>
+
+        <category android:name="android.intent.category.LAUNCHER"/>
+      </intent-filter>
+    </activity>
+
+    <service
+        android:name="com.analysys.dev.service.AnalysysService"
+        android:enabled="true"
+        android:exported="true"
+        android:process=":AnalysysService"
+        tools:ignore="ExportedService"/>
+
     <meta-data
-        android:name="ANALYSYS_APPKEY"
-        android:value="qwertyuiop123" />
+        android:name="ANALYSYS_APP_KEY"
+        android:value="qwertyuiop123"/>
     <meta-data
-        android:name="ANALYSYS_CHANNEL"
-        android:value="WanDouJia" />
+        android:name="ANALYSYS_APP_CHANNEL"
+        android:value="WanDouJia"/>
+
+
+  </application>
+
+
 </manifest>

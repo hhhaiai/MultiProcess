@@ -16,7 +16,7 @@ import android.os.Build;
 public class PermissionUtils {
     /**
      * 检查权限
-     * 
+     * 权限申请被拒绝检测返回false，权限申请通过检测返回true
      * @param context
      * @param permission
      * @return
