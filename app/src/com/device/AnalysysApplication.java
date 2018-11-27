@@ -15,6 +15,6 @@ public class AnalysysApplication extends Application {
   @Override public void onCreate() {
     super.onCreate();
     EguanMonitorAgent.getInstance().initEguan(
-        this, "", "WanDouJia", true);
+        this, "aaaaaa", "WanDouJia", true);
   }
 }
