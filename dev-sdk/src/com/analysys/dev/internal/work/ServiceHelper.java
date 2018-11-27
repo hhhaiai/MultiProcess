@@ -3,13 +3,13 @@ package com.analysys.dev.internal.work;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
-import android.os.Message;
 import com.analysys.dev.internal.Content.EDContext;
 import com.analysys.dev.internal.utils.EContextHelper;
-import com.analysys.dev.internal.utils.LL;
 import com.analysys.dev.internal.utils.PermissionUtils;
 import com.analysys.dev.internal.utils.Utils;
+import com.analysys.dev.receiver.DynamicReceivers;
 import com.analysys.dev.service.AnalysysService;
 import java.lang.reflect.Method;
 
@@ -21,41 +21,46 @@ import java.lang.reflect.Method;
  * @Author: sanbo
  */
 public class ServiceHelper {
-  private Context mContext = null;
+  Context mContext;
+  private static DynamicReceivers dynamicReceivers = null;
 
   private ServiceHelper() {
 
   }
 
   private static class Holder {
-    private static ServiceHelper instance = new ServiceHelper();
+    private static ServiceHelper INSTANCE = new ServiceHelper();
   }
 
   public static ServiceHelper getInstance(Context context) {
-    if (Holder.instance.mContext == null) {
+    if (Holder.INSTANCE.mContext == null) {
       if (context != null) {
-        Holder.instance.mContext = context;
+        Holder.INSTANCE.mContext = context;
       } else {
-        Holder.instance.mContext = EContextHelper.getContext();
+        Holder.INSTANCE.mContext = EContextHelper.getContext();
       }
     }
-    return Holder.instance;
+    return Holder.INSTANCE;
   }
 
   /**
-   * 启动服务任务接入
+   * 注册动态广播
    */
-  public void startService(int delay) {
-    Message msg = new Message();
-    msg.what = MessageDispatcher.MSG_START_SERVICE_SELF;
-    MessageDispatcher.getInstance(mContext).sendMessage(msg, delay);
+  public void registerReceiver() {
+    if (dynamicReceivers==null){
+      dynamicReceivers = new DynamicReceivers();
+      IntentFilter intentFilter = new IntentFilter();
+      intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+      intentFilter.addAction(Intent.ACTION_SCREEN_ON);
+      intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+      mContext.registerReceiver(dynamicReceivers, intentFilter);
+    }
   }
 
   /**
    * 官方api方式打开服务
    */
-  public void startSelfService() {
-    LL.d("是否启动服务："+isStartService());
+  protected void startSelfService() {
     if (isStartService()) {
       boolean isWork = Utils.isServiceWork(mContext, EDContext.SERVICE_NAME);
       if (!isWork) {
@@ -74,7 +79,7 @@ public class ServiceHelper {
         }
       }
     } else {
-      startWork();
+      MessageDispatcher.getInstance(mContext).initModule();
     }
   }
 
@@ -98,11 +103,6 @@ public class ServiceHelper {
     return false;
   }
 
-  public void startWork() {
-    Message msg = new Message();
-    msg.what = MessageDispatcher.MSG_WORK;
-    MessageDispatcher.getInstance(mContext).sendMessage(msg, 5 * 1000);
-  }
   /**
    * 通过系统接口启动服务，用作拉活使用
    */

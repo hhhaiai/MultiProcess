@@ -1,10 +1,9 @@
 package com.analysys.dev.internal.utils;
 
-import java.lang.reflect.Method;
-
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import java.lang.reflect.Method;
 
 /**
  * @Copyright © 2018 Analysys Inc. All rights reserved.

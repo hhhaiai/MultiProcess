@@ -6,8 +6,13 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
+import com.analysys.dev.internal.impl.AppSnapshotImpl;
+import com.analysys.dev.internal.impl.LocationImpl;
+import com.analysys.dev.internal.impl.OCImpl;
+import com.analysys.dev.internal.impl.UploadImpl;
 import com.analysys.dev.internal.utils.EContextHelper;
 import com.analysys.dev.internal.utils.LL;
+import com.analysys.dev.internal.utils.Utils;
 
 /**
  * @Copyright © 2018 Analysys Inc. All rights reserved.
@@ -23,21 +28,93 @@ public class MessageDispatcher {
   }
 
   private static class Holder {
-    private static MessageDispatcher instance = new MessageDispatcher();
+    private static final MessageDispatcher INSTANCE = new MessageDispatcher();
   }
 
   public static MessageDispatcher getInstance(Context context) {
-    if (Holder.instance.mContext == null) {
+    if (Holder.INSTANCE.mContext == null) {
       if (context != null) {
-        Holder.instance.mContext = context;
+        Holder.INSTANCE.mContext = context;
       } else {
-        Holder.instance.mContext = EContextHelper.getContext();
+        Holder.INSTANCE.mContext = EContextHelper.getContext();
       }
     }
-    return Holder.instance;
+    return Holder.INSTANCE;
   }
 
-  protected void sendMessage(Message msg, int delay) {
+  // 初始化各模块
+  public void initModule() {
+    Message msg = new Message();
+    msg.what = MessageDispatcher.MSG_INIT_MODULE;
+    sendMessage(msg, 0);
+  }
+
+  // 心跳检查
+  public void checkHeartbeat() {
+    Message msg = new Message();
+    msg.what = MessageDispatcher.MSG_CHECK_HEARTBEAT;
+    sendMessage(msg, 0);
+  }
+
+  // 启动服务任务接入
+  public void startService(int delay) {
+    Message msg = new Message();
+    msg.what = MessageDispatcher.MSG_START_SERVICE_SELF;
+    sendMessage(msg, delay);
+  }
+
+  // 停止工作
+  public void killWorker() {
+    Message msg = new Message();
+    msg.what = MessageDispatcher.MSG_KILL_WORKER;
+    sendMessage(msg, 0);
+  }
+
+  // 应用安装卸载更新
+  public void appChangeReceiver(String pkgName, int type) {
+    Message msg = new Message();
+    msg.what = MessageDispatcher.MSG_APP_CHANGE_RECEIVER;
+    msg.arg1 = type;
+    msg.obj = pkgName;
+    sendMessage(msg, 0);
+  }
+
+  // 屏幕开关
+  public void screenReceiver() {
+    Message msg = new Message();
+    msg.what = MessageDispatcher.MSG_SCREEN_RECEIVER;
+    sendMessage(msg, 0);
+  }
+
+  // 应用列表
+  public void snapshotInfo(int delay) {
+    Message msg = new Message();
+    msg.what = MessageDispatcher.MSG_SNAPSHOT;
+    sendMessage(msg, delay);
+  }
+
+  // 位置信息
+  public void locationInfo(int delay) {
+    Message msg = new Message();
+    msg.what = MessageDispatcher.MSG_LOCATION;
+    sendMessage(msg, delay);
+  }
+
+  // 应用打开关闭信息
+  public void ocInfo(int delay) {
+    Message msg = new Message();
+    msg.what = MessageDispatcher.MSG_OC_INFO;
+    sendMessage(msg, delay);
+  }
+
+  // 数据上传
+  public void uploadInfo(int delay) {
+    Message msg = new Message();
+    msg.what = MessageDispatcher.MSG_UPLOAD;
+    sendMessage(msg, delay);
+  }
+
+  private void sendMessage(Message msg, int delay) {
     synchronized (mHandlerLock) {
       if (mHandler != null) {
         if (delay > 0) {
@@ -79,34 +156,100 @@ public class MessageDispatcher {
     public void handleMessage(Message msg) {
 
       switch (msg.what) {
-        case MSG_KILL_WORKER:
-          exitHandler();
+        case MSG_INIT_MODULE:
+          LL.d("接收到初始化消息");
+          msgInitModule();
+          break;
+        case MSG_CHECK_HEARTBEAT:
+          LL.e("接收到心跳检测消息");
+          isHasMessage(this);
           break;
         case MSG_START_SERVICE_SELF:
-          LL.d("接收到消息：启动服务");
+          LL.d("接收到启动服务消息");
           ServiceHelper.getInstance(mContext).startSelfService();
           break;
-        case MSG_WORK:
-          LL.d("进程：< " + Process.myPid() + " > 接收到消息：" + MSG_WORK);
-          ServiceHelper.getInstance(mContext).startWork();
+        case MSG_KILL_WORKER:
+          exitHandler();
+          LL.d("接收到kill消息");
           break;
-
-        //case 10:
-          //LL.e("进程：< " + Process.myPid() + " > 接收到消息：10101010101010");
-          //ServiceHelper.getInstance(mContext).testWork();
-          //break;
-
+        case MSG_APP_CHANGE_RECEIVER:
+          LL.d("接收到应用安装/卸载/更新消息");
+          AppSnapshotImpl.getInstance(mContext).changeActionType(String.valueOf(msg.obj), msg.arg1);
+          break;
+        case MSG_SCREEN_RECEIVER:
+          LL.d("接收到屏幕操作消息");
+          break;
+        case MSG_SNAPSHOT:
+          LL.d("接收到获取应用列表消息");
+          AppSnapshotImpl.getInstance(mContext).snapshotsInfo();
+          break;
+        case MSG_LOCATION:
+          LL.d("接收到获取地理位置消息");
+          LocationImpl.getInstance(mContext).location();
+          break;
+        case MSG_OC_INFO:
+          LL.d("接收到获取OC消息,进程 Id：" + Process.myPid());
+          OCImpl.getInstance(mContext).ocInfo();
+          break;
+        case MSG_UPLOAD:
+          LL.d("接收到上传消息");
+          UploadImpl.getInstance(mContext).upload();
+          break;
+        case MSG_OC_COUNT:
+          LL.d("接收到屏幕处理消息");
+          break;
         default:
-          LL.e("其他消息"+msg.what);
+          LL.e("其他消息:" + msg.what);
           break;
       }
+    }
+
+    /**
+     * 心跳检测，
+     * 确保Handler有任务，
+     * 如果没有进行初始化各个模块
+     * @param handler
+     */
+    public void isHasMessage(Handler handler) {
+      if (handler.hasMessages(MSG_SNAPSHOT)
+          || handler.hasMessages(MSG_LOCATION)
+          || handler.hasMessages(MSG_OC_INFO)
+          || handler.hasMessages(MSG_UPLOAD)) {
+        return;
+      }
+      MessageDispatcher.getInstance(mContext).initModule();
+    }
+
+    /**
+     * 用于启动各个模块，
+     * OC模块，snapshot模块，Location模块，
+     * 注册动态广播，启动心跳检测
+     */
+    private void msgInitModule() {
+      if (!Utils.isAccessibilitySettingsOn(mContext)) {
+        ocInfo(0);
+      }
+      snapshotInfo(0);
+      locationInfo(0);
+      uploadInfo(0);
+      ServiceHelper.getInstance(mContext).registerReceiver();
+      CheckHeardbeat.getInstance(mContext).sendMessages();
     }
   }
 
   private Context mContext = null;
   private Handler mHandler;
   private final Object mHandlerLock = new Object();
-  protected static final int MSG_KILL_WORKER = 0x01;
-  protected static final int MSG_START_SERVICE_SELF = 0x02;
-  protected static final int MSG_WORK = 0x03;
+
+  protected static final int MSG_INIT_MODULE = 0x01;
+  protected static final int MSG_CHECK_HEARTBEAT = 0x02;
+  protected static final int MSG_START_SERVICE_SELF = 0x03;
+  protected static final int MSG_KILL_WORKER = 0x04;
+  protected static final int MSG_APP_CHANGE_RECEIVER = 0x05;
+  protected static final int MSG_SCREEN_RECEIVER = 0x06;
+  protected static final int MSG_SNAPSHOT = 0x07;
+  protected static final int MSG_LOCATION = 0x08;
+  protected static final int MSG_OC_INFO = 0x09;
+  protected static final int MSG_UPLOAD = 0x0a;
+  protected static final int MSG_OC_COUNT = 0x0b;
 }

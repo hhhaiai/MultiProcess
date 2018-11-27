@@ -1,11 +1,7 @@
 package com.analysys.dev;
 
-import com.analysys.dev.internal.AnalysysInternal;
-import com.analysys.dev.internal.Content.EDContext;
-import com.analysys.dev.internal.utils.LL;
-
 import android.content.Context;
-import android.text.TextUtils;
+import com.analysys.dev.internal.AnalysysInternal;
 
 /**
  * @Copyright © 2018 Analysys Inc. All rights reserved.
@@ -32,4 +28,5 @@ public class EguanMonitorAgent {
   public void initEguan(Context context, String key, String channel, boolean isDebug) {
     AnalysysInternal.getInstance(context).initEguan(key, channel, isDebug);
   }
+
 }

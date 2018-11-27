@@ -37,6 +37,30 @@ public class EDContext {
 
   public static final String SERVICE_NAME = "com.analysys.dev.service.AnalysysService";
 
+  // 应用列表获取周期时间
+  public static final int SNAPSHOT_CYCLE = 30 * 60 * 1000;
+  // 位置获取周期时间
+  public static final int LOCATION_CYCLE = 5 * 60 * 1000;
+  // 应用打开关闭获取周期时间
+  public static final int OC_CYCLE = 5 * 1000;
+  // 应用打开关闭获取周期时间
+  public static final int UPLOAD_CYCLE = 6 * 60 * 60 * 1000;
+  // 心跳检查
+  public static final int CHECK_HEARTBEAT_CYCLE = 15 * 1000;
+
+  public static final String SP_APP_KEY = "appKey";
+  public static final String SP_APP_CHANNEL = "appKey";
+
+  public static final String SP_SNAPSHOT_TIME = "getSnapshotTime";
+
+  public static final String SP_WIFI = "wifi";
+  public static final String SP_WIFI_DETAIL = "wifiDetail";
+
+  public static final String SP_BASE_STATION = "baseStation";
+  public static final String SP_LOCATION = "location";
+
+  public static final String SP_LOCATION_TIME = "getLocationTime";
+
 
 
   public class LOGINFO {

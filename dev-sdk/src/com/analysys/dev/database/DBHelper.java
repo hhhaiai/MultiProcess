@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteOpenHelper;
-import com.analysys.dev.internal.utils.LL;
+import com.analysys.dev.internal.utils.EContextHelper;
 
 /**
  * @Copyright © 2018 EGuan Inc. All rights reserved.
@@ -25,8 +25,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
   public static DBHelper getInstance(Context context) {
 
-    if (mContext == null) {
+    if (context != null) {
       mContext = context;
+    } else {
+      mContext = EContextHelper.getContext();
     }
     return Holder.INSTANCES;
   }
@@ -38,7 +40,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
   @Override
   public void onCreate(SQLiteDatabase db) {
-    createTables();
+
+    db.execSQL(DBConfig.OC.CREATE_TABLE);
+    db.execSQL(DBConfig.OCCount.CREATE_TABLE);
+    db.execSQL(DBConfig.Location.CREATE_TABLE);
+    db.execSQL(DBConfig.AppSnapshot.CREATE_TABLE);
   }
 
   @Override
@@ -47,30 +53,35 @@ public class DBHelper extends SQLiteOpenHelper {
   }
 
   public void createTables() {
-    SQLiteDatabase db = null;
     try {
-      db = getWritableDatabase();
-
-      if (DBUtils.isTableExist(db, DBConfig.TableOCInfo.TABLE_NAME)) {
-        db.execSQL(DBConfig.TableOCInfo.CREATE_TABLE);
-      }
-
-      if (DBUtils.isTableExist(db, DBConfig.TableOCTimes.TABLE_NAME)) {
-        db.execSQL(DBConfig.TableOCTimes.CREATE_TABLE);
-      }
-
-      if (DBUtils.isTableExist(db, DBConfig.TableLocation.TABLE_NAME)) {
-        db.execSQL(DBConfig.TableLocation.CREATE_TABLE);
-      }
-
-      if (DBUtils.isTableExist(db, DBConfig.TableAppSnapshotInfo.TABLE_NAME)) {
-        db.execSQL(DBConfig.TableAppSnapshotInfo.CREATE_TABLE);
-      }
+      SQLiteDatabase db = getWritableDatabase();
+      db.execSQL(DBConfig.OC.CREATE_TABLE);
+      db.execSQL(DBConfig.OCCount.CREATE_TABLE);
+      db.execSQL(DBConfig.Location.CREATE_TABLE);
+      db.execSQL(DBConfig.AppSnapshot.CREATE_TABLE);
     } catch (SQLiteDatabaseCorruptException e) {
+      rebuildDB();
+    }
+  }
+
+  public void rebuildDB() {
+    if (mContext != null) {
       DBUtils.deleteDBFile("/data/data/" + mContext.getPackageName() + "/databases/" + DB_NAME);
       createTables();
-    } catch (Throwable e) {
-      LL.e(e);
+    }
+  }
+
+  /**
+   * 建表
+   */
+  public void createTable(String createSQL, String tableName) {
+    try {
+      SQLiteDatabase db = getWritableDatabase();
+      if (!DBUtils.isTableExist(db, tableName)) {
+        db.execSQL(createSQL);
+      }
+    } catch (SQLiteDatabaseCorruptException e) {
+      rebuildDB();
     }
   }
 }

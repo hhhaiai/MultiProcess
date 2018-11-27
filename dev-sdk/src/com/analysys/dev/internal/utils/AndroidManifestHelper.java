@@ -1,11 +1,5 @@
 package com.analysys.dev.internal.utils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import com.analysys.dev.internal.Content.EDContext;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -15,6 +9,10 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ServiceInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
+import com.analysys.dev.internal.Content.EDContext;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @Copyright © 2018 sanbo Inc. All rights reserved.

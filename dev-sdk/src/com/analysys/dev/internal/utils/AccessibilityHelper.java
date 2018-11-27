@@ -1,15 +1,13 @@
 package com.analysys.dev.internal.utils;
 
-import java.util.Arrays;
-
-import com.analysys.dev.internal.Content.EDContext;
-
 import android.Manifest.permission;
 import android.accessibilityservice.AccessibilityService;
 import android.content.Context;
 import android.content.Intent;
 import android.provider.Settings;
 import android.text.TextUtils;
+import com.analysys.dev.internal.Content.EDContext;
+import java.util.Arrays;
 
 /**
  * @Copyright © 2018 sanbo Inc. All rights reserved.

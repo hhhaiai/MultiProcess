@@ -78,7 +78,7 @@ public class MProt {
     public static final String Simulator = "SIR";
     // 判断设备本身、APP、以及工作环境是否是被调试状态，“0”= 不在调试状态“1”= 在调试状态
     public static final String Debug = "DBG";
-    // 判断设备的OS是否被劫持，"0”= 没有被劫持“1”= 被劫持
+    // 判断设备的OS是否被劫持，"0”= 没有被劫持“1”= 被劫持//原SDK有字段，没有实现
     public static final String Hijack = "HJK";
     // 是否root，值为1表示获取root权限；值为0表示没获取root权限
     public static final String IsJailbreak = "IJ";
@@ -108,6 +108,8 @@ public class MProt {
     public static final String BatteryPlugged = "BP";
     // 电源类型，比如"Li-ion"
     public static final String BatteryTechnology = "BT";
+    // 电池温度，如：270
+    public static final String BatteryTemperature = "BTP";
     /*
      * 传感器,默认不上传
      */
@@ -119,6 +121,12 @@ public class MProt {
     public static final String SenSorVersion = "SSV";
     // 传感器厂商
     public static final String SenSorManufacturer = "SSM";
+    // 传感器id，同一个应用程序传感器ID将是唯一的，除非该设备是恢复出厂设置
+    public static final String SenSorId = "SSI";
+    // 当传感器是唤醒状态返回true
+    public static final String SenSorWakeUpSensor = "SSWUS";
+    // 传感器耗电量
+    public static final String SenSorPower = "SSP";
     /*
      * 系统阶段保持信息，默认不上传.根据服务器控制来上传
      */
@@ -189,7 +197,7 @@ public class MProt {
    * @Author: sanbo
    */
   public static class OCInfo {
-    public static final String NAME = "OCInfo";
+    public static final String NAME = "OCImpl";
     // 应用打开时间，转换成时间戳，如：“1296035591”
     public static final String ApplicationOpenTime = "AOT";
     // 应用关闭时间，转换成时间戳，如：“1296035599”
@@ -203,7 +211,7 @@ public class MProt {
     // 网络类型， 选项: WIFI/2G/3G/4G/无网络
     public static final String NetworkType = "NT";
     // OC 切换的类型，1-正常使用，2-开关屏幕切换，3-服务重启
-    public static final String SwitchType = "ST";
+    public static final String SwitchType = "IT";
     // 应用类型，SA-系统应用，OA-第三方应用
     public static final String ApplicationType = "AT";
     // 采集来源类型，1-getRunningTask，2-读取proc，3-辅助功能，4-系统统计
@@ -217,10 +225,11 @@ public class MProt {
    * @Create: 2018年10月8日 下午2:13:36
    * @Author: sanbo
    */
-  public static class OCTimes {
+  public static class OCCount {
     public static final String NAME = "OCTimes";
     // 应用包名，如: "com.test"
-    public static final String ApplicationPackageName = "PN";
+    public static final String ApplicationPackageName = "APN";
+    public static final String ApplicationName = "AN";
     // 在进程列表中快照的次数，如:200
     public static final String Count = "CU";
     // 快照次数所属的时段，1表示0～6小时，2表示6～12小时，3表示12～18小时，4表示18～24小时
@@ -237,7 +246,7 @@ public class MProt {
    * @Author: sanbo
    */
   public static class ProcessInfo {
-    public static final String NAME = "Processinfo";
+    public static final String NAME = "ProcessImpl";
     // proc方式读取的数据
     public static final String POC = "PROC";
     // shell 执行top指令获取的数据
@@ -254,7 +263,7 @@ public class MProt {
    * @Author: sanbo
    */
   public static class AppSnapshotInfo {
-    public static final String NAME = "AppSnapshotInfo";
+    public static final String NAME = "AppSnapshotImpl";
     // 应用包名. eg:com.hello
     public static final String ApplicationPackageName = "APN";
     // 应用程序名.eg: QQ
@@ -275,7 +284,7 @@ public class MProt {
    * @Author: sanbo
    */
   public static class LocationInfo {
-    public static final String NAME = "LocationInfo";
+    public static final String NAME = "LocationImpl";
 
     public static final String CollectionTime = "CT";
     // 地理位置，由经度和纬度组成，用减号-连接
@@ -298,7 +307,7 @@ public class MProt {
 
     // 基站信息
     public static class BaseStationInfo {
-      public static final String NAME = "BaseStationInfo";
+      public static final String NAME = "BaseStationImpl";
       // ods.ods_dev_user_geo_lbs_d [锆云] 位置区编码
       public static final String LocationAreaCode = "LAC";
       // ods.ods_dev_user_geo_lbs_d [锆云] 基站编号

@@ -1,6 +1,7 @@
 package com.analysys.dev.internal;
 
-import android.os.Message;
+import android.content.Context;
+import android.os.Bundle;
 import android.os.Process;
 import android.text.TextUtils;
 import com.analysys.dev.internal.Content.EDContext;
@@ -9,11 +10,6 @@ import com.analysys.dev.internal.utils.EContextHelper;
 import com.analysys.dev.internal.utils.LL;
 import com.analysys.dev.internal.utils.sp.SPHelper;
 import com.analysys.dev.internal.work.MessageDispatcher;
-import com.analysys.dev.internal.work.ServiceHelper;
-
-import android.content.Context;
-import android.os.Bundle;
-import org.w3c.dom.Text;
 
 /**
  * @Copyright © 2018 Analysys Inc. All rights reserved.
@@ -52,26 +48,25 @@ public class AnalysysInternal {
    */
   public void initEguan(String key, String channel, boolean isDebug) {
 
-    LL.d("初始化，进程Id：< "+Process.myPid()+" >");
+    LL.d("初始化，进程Id：< " + Process.myPid() + " >");
 
-    // 1. key值处理
     if (TextUtils.isEmpty(key)) {
       Bundle bundle = AndroidManifestHelper.getMetaData(mContext);
       if (bundle == null) {
         LL.e(EDContext.LOGINFO.LOG_NOT_APPKEY);
       }
-      String appKey = bundle.getString("ANALYSYS_APP_KEY");
-      if (TextUtils.isEmpty(appKey)) {
+      key = bundle.getString(EDContext.XML_METADATA_APPID);
+      channel = bundle.getString(EDContext.XML_METADATA_CHANNEL);
+      if (TextUtils.isEmpty(key)) {
         LL.e(EDContext.LOGINFO.LOG_NOT_APPKEY);
       }
-      //LL.i("应存储key:" + bundle.getString("ANALYSYS_APP_KEY"));
-      //LL.i("应存储Channel:" + bundle.getString("ANALYSYS_APP_CHANNEL"));
     }
-    // 2. Debug.
+    SPHelper.getDefault(mContext).edit().putString(EDContext.SP_APP_KEY, key).commit();
+    SPHelper.getDefault(mContext).edit().putString(EDContext.SP_APP_CHANNEL, channel).commit();
+
     EDContext.FLAG_DEBUG_USER = isDebug;
 
-    // 3.开启服务
-    ServiceHelper.getInstance(mContext).startService(2 * 1000);
+    MessageDispatcher.getInstance(mContext).startService(0);
     // 4.启动页面监听相关的
     // PageViewHelper.getInstance(mContext).init();
 

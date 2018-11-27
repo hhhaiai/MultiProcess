@@ -1,10 +1,10 @@
 package com.analysys.dev.receiver;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import com.analysys.dev.internal.utils.LL;
+import com.analysys.dev.internal.work.MessageDispatcher;
 
 /**
  * @Copyright © 2018 Analysys Inc. All rights reserved.
@@ -13,98 +13,27 @@ import android.content.IntentFilter;
  * @Create: 2018年10月8日 下午5:54:14
  * @Author: sanbo
  */
-public class DynamicReceivers {
+public class DynamicReceivers extends BroadcastReceiver {
+  String SCREEN_ON = "android.intent.action.SCREEN_ON";
+  String SCREEN_OFF = "android.intent.action.SCREEN_OFF";
+  String CONNECTIVITY_CHANGE = "android.net.conn.CONNECTIVITY_CHANGE";
 
-    Context mContext;
-    IuuBroadcastReceiver iuuBroadcastReceiver = null;
-    NetChangedReceiver netChangedReceiver = null;
-    ScreenReceiver screenReceiver = null;
-    public DynamicReceivers(Context context){
-        this.mContext = context;
-        registerIUUReceiver();
-        registerNetChangedReceiver();
-        registerScreenReceiver();
+  Context mContext;
+
+  @Override
+  public void onReceive(Context context, Intent intent) {
+    mContext = context.getApplicationContext();
+    if (CONNECTIVITY_CHANGE.equals(intent.getAction())) {
+      LL.d("接收网络变化广播");
+      MessageDispatcher.getInstance(mContext).startService(0);
     }
-
-    /**
-     * 注册应用安装/卸载/更新广播
-     */
-    private void registerIUUReceiver(){
-        iuuBroadcastReceiver = new IuuBroadcastReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("android.intent.action.PACKAGE_ADDED");
-        intentFilter.addAction("android.intent.action.PACKAGE_REPLACED");
-        intentFilter.addAction("android.intent.action.PACKAGE_REMOVED");
-        mContext.registerReceiver(iuuBroadcastReceiver,intentFilter);
+    if (SCREEN_ON.equals(intent.getAction())) {
+      LL.e("接收开启屏幕广播");
+      MessageDispatcher.getInstance(mContext).startService(0);
     }
-
-    /**
-     * 注册网络变化广播
-     */
-    private void registerNetChangedReceiver(){
-        netChangedReceiver = new NetChangedReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-        mContext.registerReceiver(netChangedReceiver,intentFilter);
+    if (SCREEN_OFF.equals(intent.getAction())) {
+      MessageDispatcher.getInstance(mContext).killWorker();
+      LL.e("接收关闭屏幕广播");
     }
-
-    /**
-     * 注册屏幕开关广播
-     */
-    private void registerScreenReceiver(){
-        screenReceiver = new ScreenReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction((Intent.ACTION_SCREEN_ON));
-        intentFilter.addAction((Intent.ACTION_SCREEN_OFF));
-        mContext.registerReceiver(screenReceiver,intentFilter);
-    }
-
-
-
-
-    /**
-     * @Copyright © 2018 Analysys Inc. All rights reserved.
-     * @Description: TODO
-     * @Version: 1.0
-     * @Create: 2018年9月6日 上午11:02:24
-     * @Author: sanbo
-     */
-    public class IuuBroadcastReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-        }
-
-    }
-    /**
-     * @Copyright © 2018 Analysys Inc. All rights reserved.
-     * @Description: TODO
-     * @Version: 1.0
-     * @Create: 2018年9月6日 上午11:02:05
-     * @Author: sanbo
-     */
-    public class NetChangedReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-        }
-
-    }
-    /**
-     * @Copyright © 2018 Analysys Inc. All rights reserved.
-     * @Description: TODO
-     * @Version: 1.0
-     * @Create: 2018年9月6日 上午11:02:32
-     * @Author: sanbo
-     */
-    public class ScreenReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-        }
-
-    }
+  }
 }

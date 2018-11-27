@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.Process;
 import com.analysys.dev.internal.utils.LL;
-import com.analysys.dev.internal.work.ServiceHelper;
+import com.analysys.dev.internal.work.MessageDispatcher;
 
 public class AnalysysService extends Service {
 
@@ -17,6 +17,6 @@ public class AnalysysService extends Service {
   @Override public void onCreate() {
     super.onCreate();
     LL.d("服务启动 进程ID：< " + Process.myPid() + " >");
-    ServiceHelper.getInstance(this).startWork();
+    MessageDispatcher.getInstance(this).initModule();
   }
 }
