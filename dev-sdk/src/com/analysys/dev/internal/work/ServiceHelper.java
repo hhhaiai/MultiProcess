@@ -5,12 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
+
 import com.analysys.dev.internal.Content.EDContext;
-import com.analysys.dev.internal.utils.EContextHelper;
 import com.analysys.dev.internal.utils.PermissionUtils;
 import com.analysys.dev.internal.utils.Utils;
+import com.analysys.dev.internal.utils.reflectinon.EContextHelper;
 import com.analysys.dev.receiver.DynamicReceivers;
 import com.analysys.dev.service.AnalysysService;
+
 import java.lang.reflect.Method;
 
 /**
@@ -21,99 +23,95 @@ import java.lang.reflect.Method;
  * @Author: sanbo
  */
 public class ServiceHelper {
-  Context mContext;
-  private static DynamicReceivers dynamicReceivers = null;
+    Context mContext;
+    private static DynamicReceivers dynamicReceivers = null;
 
-  private ServiceHelper() {
+    private ServiceHelper() {
 
-  }
-
-  private static class Holder {
-    private static ServiceHelper INSTANCE = new ServiceHelper();
-  }
-
-  public static ServiceHelper getInstance(Context context) {
-    if (Holder.INSTANCE.mContext == null) {
-      if (context != null) {
-        Holder.INSTANCE.mContext = context;
-      } else {
-        Holder.INSTANCE.mContext = EContextHelper.getContext();
-      }
     }
-    return Holder.INSTANCE;
-  }
 
-  /**
-   * 注册动态广播
-   */
-  public void registerReceiver() {
-    if (dynamicReceivers==null){
-      dynamicReceivers = new DynamicReceivers();
-      IntentFilter intentFilter = new IntentFilter();
-      intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-      intentFilter.addAction(Intent.ACTION_SCREEN_ON);
-      intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
-      mContext.registerReceiver(dynamicReceivers, intentFilter);
+    private static class Holder {
+        private static ServiceHelper INSTANCE = new ServiceHelper();
     }
-  }
 
-  /**
-   * 官方api方式打开服务
-   */
-  protected void startSelfService() {
-    if (isStartService()) {
-      boolean isWork = Utils.isServiceWork(mContext, EDContext.SERVICE_NAME);
-      if (!isWork) {
-        try {
-          ComponentName cn = new ComponentName(mContext, AnalysysService.class);
-          Intent intent = new Intent();
-          intent.setComponent(cn);
-          if (Build.VERSION.SDK_INT >= 26) {
-            Class<?> clazz = Class.forName("android.content.Context");
-            Method startForegroundService = clazz.getMethod("startForegroundService", Intent.class);
-            startForegroundService.invoke(mContext, intent);
-          } else {
-            mContext.startService(intent);
-          }
-        } catch (Throwable e) {
+    public static ServiceHelper getInstance(Context context) {
+        if (Holder.INSTANCE.mContext == null) {
+            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
         }
-      }
-    } else {
-      MessageDispatcher.getInstance(mContext).initModule();
+        return Holder.INSTANCE;
     }
-  }
 
-  /**
-   * 判断是否可以启动服务
-   */
-  private boolean isStartService() {
-    if (Build.VERSION.SDK_INT < 26) {
-      return true;
-    }
-    if (EDContext.FLAG_SHOW_NOTIFY) {
-      if (Build.VERSION.SDK_INT >= 28) {
-        if (PermissionUtils.checkPermission(mContext,
-            "android.permission.FOREGROUND_SERVICE")) {
-          return true;
+    /**
+     * 注册动态广播
+     */
+    public void registerReceiver() {
+        if (dynamicReceivers == null) {
+            dynamicReceivers = new DynamicReceivers();
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+            intentFilter.addAction(Intent.ACTION_SCREEN_ON);
+            intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+            mContext.registerReceiver(dynamicReceivers, intentFilter);
         }
-      } else {
-        return true;
-      }
     }
-    return false;
-  }
 
-  /**
-   * 通过系统接口启动服务，用作拉活使用
-   */
-  protected void startServiceByCode(Intent intent) {
+    /**
+     * 官方api方式打开服务
+     */
+    protected void startSelfService() {
+        if (isStartService()) {
+            boolean isWork = Utils.isServiceWork(mContext, EDContext.SERVICE_NAME);
+            if (!isWork) {
+                try {
+                    ComponentName cn = new ComponentName(mContext, AnalysysService.class);
+                    Intent intent = new Intent();
+                    intent.setComponent(cn);
+                    if (Build.VERSION.SDK_INT >= 26) {
+                        Class<?> clazz = Class.forName("android.content.Context");
+                        Method startForegroundService = clazz.getMethod("startForegroundService", Intent.class);
+                        startForegroundService.invoke(mContext, intent);
+                    } else {
+                        mContext.startService(intent);
+                    }
+                } catch (Throwable e) {
+                }
+            }
+        } else {
+            MessageDispatcher.getInstance(mContext).initModule();
+        }
+    }
 
-  }
+    /**
+     * 判断是否可以启动服务
+     */
+    private boolean isStartService() {
+        if (Build.VERSION.SDK_INT < 26) {
+            return true;
+        }
+        if (EDContext.FLAG_SHOW_NOTIFY) {
+            if (Build.VERSION.SDK_INT >= 28) {
+                if (PermissionUtils.checkPermission(mContext,
+                        "android.permission.FOREGROUND_SERVICE")) {
+                    return true;
+                }
+            } else {
+                return true;
+            }
+        }
+        return false;
+    }
 
-  /**
-   * 通过shell方式启动服务，用作拉活使用
-   */
-  protected void startServiceByShell(Intent intent) {
+    /**
+     * 通过系统接口启动服务，用作拉活使用
+     */
+    protected void startServiceByCode(Intent intent) {
 
-  }
+    }
+
+    /**
+     * 通过shell方式启动服务，用作拉活使用
+     */
+    protected void startServiceByShell(Intent intent) {
+
+    }
 }

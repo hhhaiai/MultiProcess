@@ -1,5 +1,21 @@
 package com.analysys.dev.internal.utils;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.BaseBundle;
+import android.os.Bundle;
+import android.os.Message;
+import android.text.TextUtils;
+import android.util.Log;
+import android.util.SparseArray;
+
+import com.analysys.dev.internal.Content.EDContext;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -24,27 +40,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.analysys.dev.internal.Content.EDContext;
-
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.content.Intent;
-import android.os.BaseBundle;
-import android.os.Bundle;
-import android.os.Message;
-import android.text.TextUtils;
-import android.util.Log;
-import android.util.SparseArray;
-
 /**
  * @Copyright © 2015 Sanbo Inc. All rights reserved.
- * @Description
- * 
- *              <pre>
+ * @Description <pre>
  * Log统一管理类,提供功能：
  * 1.log工具类支持全部打印   「支持Log的所有功能.」
  * 2.支持类似C的格式化输出或Java的String.format「%个数和参数个数需要一直才能格式化」
@@ -56,14 +54,14 @@ import android.util.SparseArray;
  * 6.格式化输出.
  * 7.支持XML/JSON/Map/Array等更多对象打印
  *              </pre>
- * 
  * @Version: 6.1
  * @Create: 2015年6月18日 下午4:14:01
  * @Author: sanbo
  */
 public class LL {
 
-    private LL() {}
+    private LL() {
+    }
 
     private static final int JSON_INDENT = 2;
     // 是否打印bug.建议在application中调用init接口初始化
@@ -99,17 +97,17 @@ public class LL {
     private static String CONTENT_LOG_EMPTY = "打印的日志信息为空!";
 
     private static String content_title_begin =
-        "╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
+            "╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
     private static String content_title_info_callstack =
-        "╔══════════════════════════════════════════════════════════════调用详情══════════════════════════════════════════════════════════════";
+            "╔══════════════════════════════════════════════════════════════调用详情══════════════════════════════════════════════════════════════";
     private static String content_title_info_log =
-        "╔══════════════════════════════════════════════════════════════日志详情══════════════════════════════════════════════════════════════";
+            "╔══════════════════════════════════════════════════════════════日志详情══════════════════════════════════════════════════════════════";
     private static String content_title_info_error =
-        "╔══════════════════════════════════════════════════════════════异常详情══════════════════════════════════════════════════════════════";
+            "╔══════════════════════════════════════════════════════════════异常详情══════════════════════════════════════════════════════════════";
     private static String content_title_info_type = "╔════════════════════════════════════════════════════「%s"
-        + "」════════════════════════════════════════════════════";
+            + "」════════════════════════════════════════════════════";
     private static String content_title_end =
-        "╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
+            "╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
 
     /**
      * 行首为该符号时，不增加行首封闭符
@@ -121,7 +119,7 @@ public class LL {
     private static String CONTENT_E = " ╚";
 
     private static String CONTENT_WARNNING_SHELL =
-        "Wranning....不够打印级别,请在命令行设置指令后重新尝试打印,命令行指令: adb shell setprop log.tag." + DEFAULT_TAG + " ";
+            "Wranning....不够打印级别,请在命令行设置指令后重新尝试打印,命令行指令: adb shell setprop log.tag." + DEFAULT_TAG + " ";
 
     public static final class MLEVEL {
         public static final int VERBOSE = 0x1;
@@ -135,16 +133,16 @@ public class LL {
     /**
      * 初始化接口
      *
-     * @param showLog 是否展示log，默认展示
-     * @param shellControl 是否使用shell控制log动态打印.默认不使用. shell设置方式：setprop log.tag.sanbo INFO
-     *        最后一个参数为log等级,可选项目：VERBOSE/DEBUG/INFO/WARN/ERROR/ASSERT
-     * @param needWarpper 是否需要格式化输出
+     * @param showLog           是否展示log，默认展示
+     * @param shellControl      是否使用shell控制log动态打印.默认不使用. shell设置方式：setprop log.tag.sanbo INFO
+     *                          最后一个参数为log等级,可选项目：VERBOSE/DEBUG/INFO/WARN/ERROR/ASSERT
+     * @param needWarpper       是否需要格式化输出
      * @param needCallStackInfo 是否需要打印详细的堆栈调用信息.
-     * @param format 是否需要格式化.
-     * @param defaultTag android logcat的tag一个意义,不设置默认的tag为"sanbo"
+     * @param format            是否需要格式化.
+     * @param defaultTag        android logcat的tag一个意义,不设置默认的tag为"sanbo"
      */
     public static void init(boolean showLog, boolean shellControl, boolean needWarpper, boolean needCallStackInfo,
-        boolean format, String defaultTag) {
+                            boolean format, String defaultTag) {
         USER_DEBUG = showLog;
         isShellControl = shellControl;
         isNeedWrapper = needWarpper;
@@ -254,7 +252,7 @@ public class LL {
             // if (isNeedWrapper) {
             // sb.append(content_title_info_log).append("\n");
             // }
-            String one = (String)args[0];
+            String one = (String) args[0];
             // 解析fromat
             if (one.contains(String.valueOf(FORMATER)) && args.length > 1) {
 
@@ -387,7 +385,7 @@ public class LL {
      * @return
      */
     private static String processTagCase(Object[] args) {
-        String one = (String)args[0];
+        String one = (String) args[0];
         StringBuilder sb = new StringBuilder();
         TEMP_TAG = one;
         for (int i = 1; i < args.length; i++) {
@@ -448,7 +446,7 @@ public class LL {
                         StringBuilder tempSB = new StringBuilder();
                         for (int i = 1; i < tempArray.length; i++) {
                             tempSB.append(CONTENT_SPACE).append(CONTENT_SPACE).append(CONTENT_SPACE)
-                                .append(tempArray[i]);
+                                    .append(tempArray[i]);
                             if (i != tempArray.length - 1) {
                                 tempSB.append("\n");
                             }
@@ -460,34 +458,34 @@ public class LL {
                         if (isNeedCallstackInfo) {
 
                             sb.append("\n").append(content_title_info_callstack).append("\n").append(CONTENT_LINE)
-                                .append(CONTENT_SPACE).append("文件名:     " + ste.getFileName()).append("\n")
-                                .append(CONTENT_LINE).append(CONTENT_SPACE).append("类名:      " + ste.getClassName())
-                                .append("\n").append(CONTENT_LINE).append(CONTENT_SPACE)
-                                .append("方法名:     " + ste.getMethodName()).append("\n").append(CONTENT_LINE)
-                                .append(CONTENT_SPACE).append("行号:      " + ste.getLineNumber()).append("\n")
-                                .append(CONTENT_LINE).append(CONTENT_SPACE)
-                                .append("Native方法:" + (!ste.isNativeMethod() ? "不是" : "是")).append("\n")
-                                .append(CONTENT_LINE).append(CONTENT_SPACE).append("调用堆栈详情:").append("\n")
-                                .append(wrapperString(cc));
+                                    .append(CONTENT_SPACE).append("文件名:     " + ste.getFileName()).append("\n")
+                                    .append(CONTENT_LINE).append(CONTENT_SPACE).append("类名:      " + ste.getClassName())
+                                    .append("\n").append(CONTENT_LINE).append(CONTENT_SPACE)
+                                    .append("方法名:     " + ste.getMethodName()).append("\n").append(CONTENT_LINE)
+                                    .append(CONTENT_SPACE).append("行号:      " + ste.getLineNumber()).append("\n")
+                                    .append(CONTENT_LINE).append(CONTENT_SPACE)
+                                    .append("Native方法:" + (!ste.isNativeMethod() ? "不是" : "是")).append("\n")
+                                    .append(CONTENT_LINE).append(CONTENT_SPACE).append("调用堆栈详情:").append("\n")
+                                    .append(wrapperString(cc));
                         } else {
                             sb.append("\n").append(content_title_begin).append("\n").append(CONTENT_LINE)
-                                .append(String.format(content_simple_callstack, ste.getClassName(), ste.getMethodName(),
-                                    ste.getLineNumber()));
+                                    .append(String.format(content_simple_callstack, ste.getClassName(), ste.getMethodName(),
+                                            ste.getLineNumber()));
                             // 上一层会处理
                             // .append("\n");
                         }
                     } else {
                         if (isNeedCallstackInfo) {
                             sb.append("文件名:    " + ste.getFileName()).append("\n")
-                                .append("类名:      " + ste.getClassName()).append("\n")
-                                .append("方法名:    " + ste.getMethodName()).append("\n")
-                                .append("行号:      " + ste.getLineNumber()).append("\n")
-                                .append("Native方法:" + (!ste.isNativeMethod() ? "不是" : "是")).append("\n")
-                                .append("调用堆栈详情:").append("\n").append(wrapperString(cc));
+                                    .append("类名:      " + ste.getClassName()).append("\n")
+                                    .append("方法名:    " + ste.getMethodName()).append("\n")
+                                    .append("行号:      " + ste.getLineNumber()).append("\n")
+                                    .append("Native方法:" + (!ste.isNativeMethod() ? "不是" : "是")).append("\n")
+                                    .append("调用堆栈详情:").append("\n").append(wrapperString(cc));
                         } else {
                             if (isFormat) {
                                 sb.append(String.format(content_simple_callstack, ste.getClassName(),
-                                    ste.getMethodName(), ste.getLineNumber()));
+                                        ste.getMethodName(), ste.getLineNumber()));
                             }
                         }
                     }
@@ -544,47 +542,47 @@ public class LL {
         // 支持的类型.单独处理
         Class<?> czz = object.getClass();
         if (Bundle.class.isAssignableFrom(czz)) {
-            Bundle bundle = (Bundle)object;
+            Bundle bundle = (Bundle) object;
             return parseString(bundle);
         } else if (String.class.isAssignableFrom(czz)) {
-            String obj = (String)object;
+            String obj = (String) object;
             return parseString(obj);
         } else if (Number.class.isAssignableFrom(czz)) {
-            Number obj = (Number)object;
+            Number obj = (Number) object;
             return String.valueOf(obj);
         } else if (Intent.class.isAssignableFrom(czz)) {
-            Intent obj = (Intent)object;
+            Intent obj = (Intent) object;
             return parseString(obj);
         } else if (Collection.class.isAssignableFrom(czz)) {
-            Collection<?> obj = (Collection<?>)object;
+            Collection<?> obj = (Collection<?>) object;
             return parseString(obj);
         } else if (Map.class.isAssignableFrom(czz)) {
-            Map<?, ?> obj = (Map<?, ?>)object;
+            Map<?, ?> obj = (Map<?, ?>) object;
             return parseString(obj);
         } else if (Throwable.class.isAssignableFrom(czz)) {
-            Throwable obj = (Throwable)object;
+            Throwable obj = (Throwable) object;
             return parseString(obj);
         } else if (Reference.class.isAssignableFrom(czz)) {
-            Reference<?> obj = (Reference<?>)object;
+            Reference<?> obj = (Reference<?>) object;
             return parseString(obj);
         } else if (Message.class.isAssignableFrom(czz)) {
-            Message obj = (Message)object;
+            Message obj = (Message) object;
             return parseString(obj);
             // } else if (isSubClass(czz, Activity.class)) {
         } else if (Activity.class.isAssignableFrom(czz)) {
-            Activity obj = (Activity)object;
+            Activity obj = (Activity) object;
             return parseString(obj);
         } else if (JSONArray.class.isAssignableFrom(czz)) {
-            JSONArray obj = (JSONArray)object;
+            JSONArray obj = (JSONArray) object;
             return format(obj);
         } else if (JSONObject.class.isAssignableFrom(czz)) {
-            JSONObject obj = (JSONObject)object;
+            JSONObject obj = (JSONObject) object;
             return format(obj);
         } else if (StringBuilder.class.isAssignableFrom(czz)) {
-            StringBuilder obj = (StringBuilder)object;
+            StringBuilder obj = (StringBuilder) object;
             return obj.toString();
         } else if (StringBuffer.class.isAssignableFrom(czz)) {
-            StringBuffer obj = (StringBuffer)object;
+            StringBuffer obj = (StringBuffer) object;
             return obj.toString();
         } else if (Class.class.isAssignableFrom(czz)) {
             return parseStringByObject(object, childLevel);
@@ -607,7 +605,7 @@ public class LL {
      *
      * @param cla
      * @param obj
-     * @param o 对象
+     * @param o           对象
      * @param childOffset 递归解析属性的层级
      */
     private static void getClassFields(Class<?> cla, JSONObject obj, Object o, int childOffset) {
@@ -633,7 +631,7 @@ public class LL {
                 // System.out.println(field.getName()+ "***" +subObject.getClass() + "啊啊啊啊啊啊" +
                 // cla);
                 if (!isStaticInnerClass(cla)
-                    && (field.getName().equals("$change") || field.getName().equalsIgnoreCase("this$0"))) {
+                        && (field.getName().equals("$change") || field.getName().equalsIgnoreCase("this$0"))) {
                     continue;
                 }
                 Object subObject = null;
@@ -647,7 +645,7 @@ public class LL {
                         if (childOffset < MAX_CHILD_LEVEL) {
                             if (!Number.class.isAssignableFrom(subObject.getClass())) {
                                 subObject = objectToString(subObject, childOffset + 1);
-                                String s = (String)subObject;
+                                String s = (String) subObject;
                                 s = s.replaceAll("\n", "").replaceAll("\r", "").replaceAll("\r\n", "");
                                 try {
                                     JSONObject temp = new JSONObject(s);
@@ -729,31 +727,31 @@ public class LL {
             if (getArrayDimension(array) == 1) {
                 switch (getType(array)) {
                     case 'I':
-                        result.append(Arrays.toString((int[])array));
+                        result.append(Arrays.toString((int[]) array));
                         break;
                     case 'D':
-                        result.append(Arrays.toString((double[])array));
+                        result.append(Arrays.toString((double[]) array));
                         break;
                     case 'Z':
-                        result.append(Arrays.toString((boolean[])array));
+                        result.append(Arrays.toString((boolean[]) array));
                         break;
                     case 'B':
-                        result.append(Arrays.toString((byte[])array));
+                        result.append(Arrays.toString((byte[]) array));
                         break;
                     case 'S':
-                        result.append(Arrays.toString((short[])array));
+                        result.append(Arrays.toString((short[]) array));
                         break;
                     case 'J':
-                        result.append(Arrays.toString((long[])array));
+                        result.append(Arrays.toString((long[]) array));
                         break;
                     case 'F':
-                        result.append(Arrays.toString((float[])array));
+                        result.append(Arrays.toString((float[]) array));
                         break;
                     case 'C':
-                        result.append(Arrays.toString((char[])array));
+                        result.append(Arrays.toString((char[]) array));
                         break;
                     case 'L':
-                        Object[] objects = (Object[])array;
+                        Object[] objects = (Object[]) array;
                         result.append("[");
                         for (int i = 0; i < objects.length; ++i) {
                             result.append(objectToString(objects[i]));
@@ -764,14 +762,14 @@ public class LL {
                         result.append("]");
                         break;
                     default:
-                        result.append(Arrays.toString((Object[])array));
+                        result.append(Arrays.toString((Object[]) array));
                         break;
                 }
             } else {
                 result.append("[");
-                for (int i = 0; i < ((Object[])array).length; i++) {
-                    traverseArray(result, ((Object[])array)[i]);
-                    if (i != ((Object[])array).length - 1) {
+                for (int i = 0; i < ((Object[]) array).length; i++) {
+                    traverseArray(result, ((Object[]) array)[i]);
+                    if (i != ((Object[]) array).length - 1) {
                         result.append(",");
                     }
                 }
@@ -1077,7 +1075,7 @@ public class LL {
                     int value = 0;
                     Object object = field.get(cla);
                     if (object instanceof Integer || object.getClass().getSimpleName().equals("int")) {
-                        value = (Integer)object;
+                        value = (Integer) object;
                     }
 
                     if (flagMap.get(value) == null) {
@@ -1166,7 +1164,7 @@ public class LL {
             sb.append(CONTENT_LOG_EMPTY);
             return sb.toString();
         }
-        String ss[] = new String[] {};
+        String ss[] = new String[]{};
         String temp = null;
         if (log.contains("\n")) {
             ss = log.split("\n");
@@ -1175,9 +1173,9 @@ public class LL {
                 for (int i = 0; i < ss.length; i++) {
                     temp = ss[i];
                     if (isNeedWrapper && !temp.startsWith(CONTENT_A) && !temp.startsWith(CONTENT_B)
-                        && !temp.startsWith(CONTENT_C) && !temp.startsWith(CONTENT_D)
-                        && !temp.startsWith(CONTENT_LOG_INFO) && !TextUtils.isEmpty(temp)
-                        && !temp.startsWith(CONTENT_E)) {
+                            && !temp.startsWith(CONTENT_C) && !temp.startsWith(CONTENT_D)
+                            && !temp.startsWith(CONTENT_LOG_INFO) && !TextUtils.isEmpty(temp)
+                            && !temp.startsWith(CONTENT_E)) {
                         sb.append(CONTENT_LINE);
                     }
                     sb.append(temp);
@@ -1195,9 +1193,9 @@ public class LL {
                     temp = ss[i];
 
                     if (isNeedWrapper && !temp.startsWith(CONTENT_A) && !temp.startsWith(CONTENT_B)
-                        && !temp.startsWith(CONTENT_D) && !temp.startsWith(CONTENT_E)
-                        && !temp.startsWith(CONTENT_LOG_INFO) && !TextUtils.isEmpty(temp)
-                        && !temp.startsWith(CONTENT_C)) {
+                            && !temp.startsWith(CONTENT_D) && !temp.startsWith(CONTENT_E)
+                            && !temp.startsWith(CONTENT_LOG_INFO) && !TextUtils.isEmpty(temp)
+                            && !temp.startsWith(CONTENT_C)) {
                         sb.append(CONTENT_LINE);
                     }
                     sb.append(temp);
@@ -1214,9 +1212,9 @@ public class LL {
                     temp = ss[i];
 
                     if (isNeedWrapper && !temp.startsWith(CONTENT_A) && !temp.startsWith(CONTENT_B)
-                        && !temp.startsWith(CONTENT_D) && !temp.startsWith(CONTENT_E)
-                        && !temp.startsWith(CONTENT_LOG_INFO) && !TextUtils.isEmpty(temp)
-                        && !temp.startsWith(CONTENT_C)) {
+                            && !temp.startsWith(CONTENT_D) && !temp.startsWith(CONTENT_E)
+                            && !temp.startsWith(CONTENT_LOG_INFO) && !TextUtils.isEmpty(temp)
+                            && !temp.startsWith(CONTENT_C)) {
                         sb.append(CONTENT_LINE);
                     }
                     sb.append(temp);
@@ -1233,9 +1231,9 @@ public class LL {
                 for (int i = 0; i < ss.length; i++) {
                     temp = ss[i];
                     if (isNeedWrapper && !temp.startsWith(CONTENT_A) && !temp.startsWith(CONTENT_B)
-                        && !temp.startsWith(CONTENT_D) && !temp.startsWith(CONTENT_E)
-                        && !temp.startsWith(CONTENT_LOG_INFO) && !TextUtils.isEmpty(temp)
-                        && !temp.startsWith(CONTENT_C)) {
+                            && !temp.startsWith(CONTENT_D) && !temp.startsWith(CONTENT_E)
+                            && !temp.startsWith(CONTENT_LOG_INFO) && !TextUtils.isEmpty(temp)
+                            && !temp.startsWith(CONTENT_C)) {
                         sb.append(CONTENT_LINE);
                     }
                     sb.append(temp);
@@ -1247,8 +1245,8 @@ public class LL {
             }
         } else {
             if (isNeedWrapper && !log.startsWith(CONTENT_A) && !log.startsWith(CONTENT_B) && !log.startsWith(CONTENT_D)
-                && !log.startsWith(CONTENT_LOG_INFO) && !TextUtils.isEmpty(log) && !log.startsWith(CONTENT_E)
-                && !log.startsWith(CONTENT_C)) {
+                    && !log.startsWith(CONTENT_LOG_INFO) && !TextUtils.isEmpty(log) && !log.startsWith(CONTENT_E)
+                    && !log.startsWith(CONTENT_C)) {
                 sb.append(CONTENT_LINE);
             }
             sb.append(log);

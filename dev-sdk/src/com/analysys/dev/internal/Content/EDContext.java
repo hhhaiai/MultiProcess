@@ -9,61 +9,60 @@ package com.analysys.dev.internal.Content;
  */
 public class EDContext {
 
-  /**
-   * EGuan 内部调试控制. 主要用于控制堆栈打印、错误打印、内部提示信息打印
-   */
-  public static final boolean FLAG_DEBUG_INNER = true;
-  /**
-   * 用户debug控制
-   */
-  public static boolean FLAG_DEBUG_USER = true;
-  /**
-   * 是否展示广告通知。授权后，服务高版本可以切换成前台服务
-   */
-  public static boolean FLAG_SHOW_NOTIFY = true;
+    /**
+     * EGuan 内部调试控制. 主要用于控制堆栈打印、错误打印、内部提示信息打印
+     */
+    public static final boolean FLAG_DEBUG_INNER = true;
+    /**
+     * 用户debug控制
+     */
+    public static boolean FLAG_DEBUG_USER = true;
+    /**
+     * 是否展示广告通知。授权后，服务高版本可以切换成前台服务
+     */
+    public static boolean FLAG_SHOW_NOTIFY = true;
 
-  /**
-   * SDK版本
-   */
-  public static final String SDK_VERSION = "4.0.1";
+    /**
+     * SDK版本
+     */
+    public static final String SDK_VERSION = "4.0.1";
 
-  public static final String LOGTAG_DEBUG = "xxx";
+    public static final String LOGTAG_DEBUG = "xxx";
 
-  /**
-   * xml 中声明的 appid、channel
-   */
-  public static final String XML_METADATA_APPID = "ANALYSYS_APPKEY";
-  public static final String XML_METADATA_CHANNEL = "ANALYSYS_CHANNEL";
+    /**
+     * xml 中声明的 appid、channel
+     */
+    public static final String XML_METADATA_APPID = "ANALYSYS_APPKEY";
+    public static final String XML_METADATA_CHANNEL = "ANALYSYS_CHANNEL";
 
-  public static final String SERVICE_NAME = "com.analysys.dev.service.AnalysysService";
+    public static final String SERVICE_NAME = "com.analysys.dev.service.AnalysysService";
 
-  // 应用列表获取周期时间
-  public static final int SNAPSHOT_CYCLE = 30 * 60 * 1000;
-  // 位置获取周期时间
-  public static final int LOCATION_CYCLE = 5 * 60 * 1000;
-  // 应用打开关闭获取周期时间
-  public static final int OC_CYCLE = 5 * 1000;
-  // 应用打开关闭获取周期时间
-  public static final int UPLOAD_CYCLE = 6 * 60 * 60 * 1000;
-  // 心跳检查
-  public static final int CHECK_HEARTBEAT_CYCLE = 15 * 1000;
+    // 应用列表获取周期时间
+    public static final int SNAPSHOT_CYCLE = 30 * 60 * 1000;
+    // 位置获取周期时间
+    public static final int LOCATION_CYCLE = 5 * 60 * 1000;
+    // 应用打开关闭获取周期时间
+    public static final int OC_CYCLE = 5 * 1000;
+    // 应用打开关闭获取周期时间
+    public static final int UPLOAD_CYCLE = 6 * 60 * 60 * 1000;
+    // 心跳检查
+    public static final int CHECK_HEARTBEAT_CYCLE = 15 * 1000;
 
-  public static final String SP_APP_KEY = "appKey";
-  public static final String SP_APP_CHANNEL = "appKey";
+    public static final String SP_APP_KEY = "appKey";
+    public static final String SP_APP_CHANNEL = "appKey";
 
-  public static final String SP_SNAPSHOT_TIME = "getSnapshotTime";
+    public static final String SP_SNAPSHOT_TIME = "getSnapshotTime";
 
-  public static final String SP_WIFI = "wifi";
-  public static final String SP_WIFI_DETAIL = "wifiDetail";
+    public static final String SP_WIFI = "wifi";
+    public static final String SP_WIFI_DETAIL = "wifiDetail";
 
-  public static final String SP_BASE_STATION = "baseStation";
-  public static final String SP_LOCATION = "location";
+    public static final String SP_BASE_STATION = "baseStation";
+    public static final String SP_LOCATION = "location";
 
-  public static final String SP_LOCATION_TIME = "getLocationTime";
+    public static final String SP_LOCATION_TIME = "getLocationTime";
 
 
-
-  public class LOGINFO {
-    public static final String LOG_NOT_APPKEY = "please check you appkey!";
-  }
+    public class LOGINFO {
+        public static final String LOG_NOT_APPKEY = "please check you appkey!";
+    }
 }

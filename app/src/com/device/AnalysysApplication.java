@@ -12,9 +12,9 @@ import com.analysys.dev.EguanMonitorAgent;
  */
 public class AnalysysApplication extends Application {
 
-  @Override public void onCreate() {
-    super.onCreate();
-    EguanMonitorAgent.getInstance().initEguan(
-        this, "aaaaaa", "WanDouJia", true);
-  }
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        EguanMonitorAgent.getInstance().initEguan(this, "aaaaaa", "WanDouJia", true);
+    }
 }

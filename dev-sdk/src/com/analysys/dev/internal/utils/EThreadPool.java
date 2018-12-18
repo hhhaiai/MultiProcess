@@ -2,7 +2,6 @@ package com.analysys.dev.internal.utils;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @Copyright © 2018 EGuan Inc. All rights reserved.
@@ -13,14 +12,12 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 public class EThreadPool {
 
+    private static ExecutorService executor = Executors.newSingleThreadExecutor();
 
-
-  private static ExecutorService executor = Executors.newSingleThreadExecutor();
-
-  public static void execute(Runnable command) {
-    if (executor.isShutdown()) {
-      executor = Executors.newSingleThreadExecutor();
+    public static void execute(Runnable command) {
+        if (executor.isShutdown()) {
+            executor = Executors.newSingleThreadExecutor();
+        }
+        executor.execute(command);
     }
-    executor.execute(command);
-  }
 }

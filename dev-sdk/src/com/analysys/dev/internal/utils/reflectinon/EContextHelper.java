@@ -1,4 +1,4 @@
-package com.analysys.dev.internal.utils;
+package com.analysys.dev.internal.utils.reflectinon;
 
 import android.app.Application;
 import android.content.Context;
@@ -12,18 +12,24 @@ import android.content.Context;
  */
 public class EContextHelper {
 
-    public static Context getContext() {
+    public static Context getContext(Context context) {
+        if (context != null) {
+            return context.getApplicationContext();
+        } else {
+            return getApplication();
+        }
+    }
+
+    private static Application getApplication() {
         try {
             Class<?> activityThread = Class.forName("android.app.ActivityThread");
             Object at = activityThread.getMethod("currentActivityThread").invoke(null);
             Object app = activityThread.getMethod("getApplication").invoke(at);
             if (app != null) {
-                Application a = (Application)app;
-                if (a != null) {
-                    return a.getApplicationContext();
-                }
+                return (Application) app;
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }

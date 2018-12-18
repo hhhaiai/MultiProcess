@@ -9,7 +9,10 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ServiceInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
+
 import com.analysys.dev.internal.Content.EDContext;
+import com.analysys.dev.internal.utils.reflectinon.EContextHelper;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,16 +27,14 @@ import java.util.List;
 public class AndroidManifestHelper {
     /**
      * 判断AndroidManifest中是否声明Activity
-     * 
+     *
      * @param context
-     * @param clazz 判断的Activity
+     * @param clazz   判断的Activity
      * @return
      */
     public static boolean isActivityDefineInManifest(Context context, Class<?> clazz) {
         try {
-            if (context == null) {
-                context = EContextHelper.getContext();
-            }
+            context = EContextHelper.getContext(context);
             if (context == null || clazz == null) {
                 return false;
             }
@@ -52,16 +53,14 @@ public class AndroidManifestHelper {
 
     /**
      * 判断AndroidManifest中是否声明BroadcastReceiver
-     * 
+     *
      * @param context
-     * @param clazz 判断的BroadcastReceiver
+     * @param clazz   判断的BroadcastReceiver
      * @return
      */
     public static boolean isBroadcastReceiverDefineInManifest(Context context, Class<?> clazz) {
         try {
-            if (context == null) {
-                context = EContextHelper.getContext();
-            }
+            context = EContextHelper.getContext(context);
             if (context == null || clazz == null) {
                 return false;
             }
@@ -78,16 +77,14 @@ public class AndroidManifestHelper {
 
     /**
      * 判断AndroidManifest中是否声明contextResolver
-     * 
+     *
      * @param context
-     * @param clazz 判断的contextResolver
+     * @param clazz   判断的contextResolver
      * @return
      */
     public static boolean isContentResolverDefineInManifest(Context context, Class<?> clazz) {
         try {
-            if (context == null) {
-                context = EContextHelper.getContext();
-            }
+            context = EContextHelper.getContext(context);
             if (context == null || clazz == null) {
                 return false;
             }
@@ -104,16 +101,14 @@ public class AndroidManifestHelper {
 
     /**
      * 判断AndroidManifest中是否声明该服务
-     * 
+     *
      * @param context
-     * @param clazz 判断的服务
+     * @param clazz   判断的服务
      * @return
      */
     public static boolean isServiceDefineInManifest(Context context, Class<?> clazz) {
         try {
-            if (context == null) {
-                context = EContextHelper.getContext();
-            }
+            context = EContextHelper.getContext(context);
             if (context != null) {
                 ServiceInfo info = getServiceInfo(context, clazz);
                 if (info != null) {
@@ -128,7 +123,7 @@ public class AndroidManifestHelper {
 
     /**
      * 判断AndroidManifest是否包含权限
-     * 
+     *
      * @param context
      * @param permission
      * @return
@@ -136,12 +131,10 @@ public class AndroidManifestHelper {
     public static boolean isPermissionDefineInManifest(Context context, String permission) {
         try {
 
-            if (context == null) {
-                context = EContextHelper.getContext();
-            }
+            context = EContextHelper.getContext(context);
             if (context != null && TextUtils.isEmpty(permission)) {
                 PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(),
-                    PackageManager.GET_PERMISSIONS);
+                        PackageManager.GET_PERMISSIONS);
                 if (packageInfo != null) {
                     String[] permissions = packageInfo.requestedPermissions;
                     if (permissions.length <= 0) {
@@ -161,7 +154,7 @@ public class AndroidManifestHelper {
 
     /**
      * 获取AndroidManifest中service的label
-     * 
+     *
      * @param context
      * @param clazz
      * @return
@@ -170,9 +163,7 @@ public class AndroidManifestHelper {
 
         String label = "";
         try {
-            if (context == null) {
-                context = EContextHelper.getContext();
-            }
+            context = EContextHelper.getContext(context);
             if (context != null) {
                 ServiceInfo info = getServiceInfo(context, clazz);
                 if (info != null) {
@@ -190,19 +181,17 @@ public class AndroidManifestHelper {
 
     /**
      * 获取XML中的metadata对象
-     * 
+     *
      * @param context
      * @return
      */
     public static Bundle getMetaData(Context context) {
         try {
-            if (context == null) {
-                context = EContextHelper.getContext();
-            }
+            context = EContextHelper.getContext(context);
             if (context != null) {
                 PackageManager manager = context.getPackageManager();
                 ApplicationInfo info = manager.getApplicationInfo(
-                    context.getPackageName(), PackageManager.GET_META_DATA);
+                        context.getPackageName(), PackageManager.GET_META_DATA);
                 if (info != null) {
                     return info.metaData;
                 }
@@ -217,7 +206,7 @@ public class AndroidManifestHelper {
 
     /**
      * 判断是否两个类是否是有祖、父类关系
-     * 
+     *
      * @param subClass
      * @param fatherClass
      * @return
@@ -241,9 +230,7 @@ public class AndroidManifestHelper {
 
     private static ServiceInfo getServiceInfo(Context context, Class<?> clazz) {
         try {
-            if (context == null) {
-                context = EContextHelper.getContext();
-            }
+            context = EContextHelper.getContext(context);
             if (context == null || clazz == null) {
                 return null;
             }
