@@ -1,6 +1,8 @@
 package com.device;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -29,16 +31,17 @@ public class MainActivity extends Activity {
         registerPermission();
     }
 
+    @TargetApi(23)
     private void registerPermission() {
         if (Build.VERSION.SDK_INT > 22) {
             if (!PermissionUtils.checkPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+                requestPermissions(new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
             }
             if (!PermissionUtils.checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
             }
             if (!PermissionUtils.checkPermission(this, Manifest.permission.INTERNET)) {
-                requestPermissions(new String[]{Manifest.permission.INTERNET}, 2);
+                requestPermissions(new String[] {Manifest.permission.INTERNET}, 2);
             }
         }
     }
@@ -53,9 +56,11 @@ public class MainActivity extends Activity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnLocale:
-//                LL.i(LocationImpl.getInstance(this).getBaseStationInfo());
-                LL.i(LocationImpl.getInstance(this).getBaseStation());
-
+                // LL.i(LocationImpl.getInstance(this).getBaseStationInfo());
+                // 获取基站信息
+                // LL.i(LocationImpl.getInstance(this).getBaseStation());
+                // 获取GPS位置
+                LocationImpl.getInstance(this).getGPSInfo();
 
                 break;
             case R.id.btnTT:
@@ -70,7 +75,7 @@ public class MainActivity extends Activity {
      * 获取传感器方法
      */
     private void test() {
-        SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        SensorManager sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         List<Sensor> sensorList = sensorManager.getSensorList(Sensor.TYPE_ALL);
         String type;
         for (int i = 0; i < sensorList.size(); i++) {
@@ -197,6 +202,5 @@ public class MainActivity extends Activity {
             LL.e("名称：" + s.getName() + "，版本：" + s.getVersion() + "，厂商：" + s.getVendor());
         }
     }
-
 
 }

@@ -25,9 +25,7 @@ public class DBManager {
     }
 
     public static synchronized DBManager getInstance(Context context) {
-        if (mContext == null) {
-            mContext = EContextHelper.getContext(context);
-        }
+        mContext = EContextHelper.getContext(context);
         if (dbHelper == null) {
             dbHelper = DBHelper.getInstance(mContext);
         }
@@ -35,7 +33,6 @@ public class DBManager {
     }
 
     public synchronized SQLiteDatabase openDB() {
-
         db = dbHelper.getWritableDatabase();
         return db;
     }

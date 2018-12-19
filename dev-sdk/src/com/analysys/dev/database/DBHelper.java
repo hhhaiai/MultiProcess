@@ -1,11 +1,11 @@
 package com.analysys.dev.database;
 
+import com.analysys.dev.internal.utils.reflectinon.EContextHelper;
+
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteOpenHelper;
-
-import com.analysys.dev.internal.utils.reflectinon.EContextHelper;
 
 /**
  * @Copyright © 2018 EGuan Inc. All rights reserved.
@@ -21,19 +21,18 @@ public class DBHelper extends SQLiteOpenHelper {
     private static Context mContext = null;
 
     private static class Holder {
-        private static final DBHelper INSTANCES = new DBHelper(mContext);
+        private static final DBHelper INSTANCE = new DBHelper(mContext);
     }
 
     public static DBHelper getInstance(Context context) {
-
         if (mContext != null) {
             mContext = EContextHelper.getContext(context);
         }
-        return Holder.INSTANCES;
+        return Holder.INSTANCE;
     }
 
     public DBHelper(Context context) {
-        super(context, DB_NAME, null, DB_VERSION);
+        super(EContextHelper.getContext(context), DB_NAME, null, DB_VERSION);
         createTables();
     }
 
@@ -47,8 +46,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-    }
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {}
 
     public void createTables() {
         try {

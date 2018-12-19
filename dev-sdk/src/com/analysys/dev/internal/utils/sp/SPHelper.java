@@ -1,11 +1,14 @@
 package com.analysys.dev.internal.utils.sp;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import com.analysys.dev.internal.utils.LL;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -48,7 +51,13 @@ public class SPHelper {
         } else {
             SharedPreferences res = getSharedPreferences(context, name);
             File f = getSystemSharedPrefsFile(context, name);
-            Log.e("sanbo", "File[" + f.getAbsolutePath() + "]====>" + f.exists());
+            if (!f.exists()) {
+                try {
+                    f.createNewFile();
+                } catch (IOException e) {
+                }
+            }
+            LL.v("File[" + f.getAbsolutePath() + "]====>" + f.exists());
             return res;
         }
     }
