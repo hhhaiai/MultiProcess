@@ -32,7 +32,7 @@ public class EDContext {
     /**
      * xml 中声明的 appid、channel
      */
-    public static final String XML_METADATA_APPID = "ANALYSYS_APPKEY";
+    public static final String XML_METADATA_APPKEY = "ANALYSYS_APPKEY";
     public static final String XML_METADATA_CHANNEL = "ANALYSYS_CHANNEL";
 
     public static final String SERVICE_NAME = "com.analysys.dev.service.AnalysysService";
@@ -60,9 +60,10 @@ public class EDContext {
     public static final String SP_LOCATION = "location";
 
     public static final String SP_LOCATION_TIME = "getLocationTime";
-
+    public static final String SP_MAC_ADDRESS = "MACAddress";
 
     public class LOGINFO {
         public static final String LOG_NOT_APPKEY = "please check you appkey!";
     }
+
 }

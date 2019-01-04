@@ -1,6 +1,6 @@
 package com.analysys.dev.database;
 
-import com.analysys.dev.internal.utils.reflectinon.EContextHelper;
+import com.analysys.dev.utils.reflectinon.EContextHelper;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

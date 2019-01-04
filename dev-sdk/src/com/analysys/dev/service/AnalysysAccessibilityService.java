@@ -1,7 +1,7 @@
 package com.analysys.dev.service;
 
 import com.analysys.dev.internal.impl.OCImpl;
-import com.analysys.dev.internal.utils.reflectinon.Reflecer;
+import com.analysys.dev.utils.reflectinon.Reflecer;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;

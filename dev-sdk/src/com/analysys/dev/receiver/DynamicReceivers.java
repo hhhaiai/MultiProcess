@@ -3,8 +3,8 @@ package com.analysys.dev.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import com.analysys.dev.internal.utils.LL;
-import com.analysys.dev.internal.utils.reflectinon.Reflecer;
+import com.analysys.dev.utils.LL;
+import com.analysys.dev.utils.reflectinon.Reflecer;
 import com.analysys.dev.internal.work.MessageDispatcher;
 
 /**

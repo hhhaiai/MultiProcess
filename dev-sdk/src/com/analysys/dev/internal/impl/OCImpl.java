@@ -10,11 +10,11 @@ import com.analysys.dev.database.TableOCCount;
 import com.analysys.dev.internal.Content.EDContext;
 import com.analysys.dev.internal.impl.proc.AppProcess;
 import com.analysys.dev.internal.impl.proc.ProcessManager;
-import com.analysys.dev.internal.utils.EThreadPool;
-import com.analysys.dev.internal.utils.LL;
-import com.analysys.dev.internal.utils.PermissionUtils;
-import com.analysys.dev.internal.utils.Utils;
-import com.analysys.dev.internal.utils.reflectinon.EContextHelper;
+import com.analysys.dev.utils.EThreadPool;
+import com.analysys.dev.utils.LL;
+import com.analysys.dev.utils.PermissionUtils;
+import com.analysys.dev.utils.Utils;
+import com.analysys.dev.utils.reflectinon.EContextHelper;
 import com.analysys.dev.internal.work.MessageDispatcher;
 
 import android.Manifest;
@@ -53,21 +53,18 @@ public class OCImpl {
      */
     public void ocInfo() {
         EThreadPool.execute(new Runnable() {
-            @SuppressWarnings("deprecation")
             @Override
             public void run() {
                 if (!Utils.isAccessibilitySettingsOn(mContext)) {
                     // 判断系统版本
                     if (Build.VERSION.SDK_INT < 21) {
-                        if (PermissionUtils.checkPermission(mContext, Manifest.permission.GET_TASKS)) {
+                        if(PermissionUtils.checkPermission(mContext, Manifest.permission.GET_TASKS)){
                             RunningApps(getRunningApp(), 1);
-                        } else {
-                            getProcApps();
                         }
-                    } else if (Build.VERSION.SDK_INT < 24) {
+                    }else if(Build.VERSION.SDK_INT > 21 && Build.VERSION.SDK_INT < 24 ){
                         getProcApps();
-                    } else {
-
+                    }else{
+                        //TODO 7.0以上待调研
                     }
                     MessageDispatcher.getInstance(mContext).ocInfo(EDContext.OC_CYCLE);
                 }
@@ -129,12 +126,14 @@ public class OCImpl {
             List<JSONObject> ocList = new ArrayList<JSONObject>();
             for (int i = 0; i < runApps.size(); i++) {
                 String pkgName = runApps.get(i).getPackageName();
+                LL.i(pkgName +"   pkgName   ");
                 if (!TextUtils.isEmpty(pkgName)) {
                     ocList.add(getOCInfo(pkgName, 2));
                 }
             }
             TableOCCount.getInstance(mContext).insertArray(ocList);
         } else {
+            LL.i("135  OCImlp"+runApps.toString()+"   vs cache: "+cacheApps.toString());
             // 去重
             removeRepeat(cacheApps, runApps);
             // 更新缓存表
@@ -201,6 +200,7 @@ public class OCImpl {
             // 将新增列表拆开，该时段有应用打开记录的修改更新记录，该时段没有应用打开记录的新增记录
             for (int i = runList.size() - 1; i >= 0; i--) {
                 String pkgName = runList.get(i).optString(OC.APN);
+                LL.i(pkgName+"   pkgName 202");
                 if (!TextUtils.isEmpty(pkgName) && ocInfo.contains(pkgName)) {
                     updateOCInfo.add(runList.get(i));
                     runList.remove(i);
@@ -226,6 +226,7 @@ public class OCImpl {
             list = new ArrayList<JSONObject>();
             for (int i = 0; i < runApps.size(); i++) {
                 String pkgName = runApps.get(i).getPackageName();
+                LL.i(pkgName+"     getOCArray  ");
                 if (!TextUtils.isEmpty(pkgName)) {
                     JSONObject ocJson = getOCInfo(pkgName, 2);
                     list.add(ocJson);
@@ -263,8 +264,10 @@ public class OCImpl {
             for (int i = cacheApps.size() - 1; i >= 0; i--) {
                 JSONObject job = cacheApps.get(i);
                 String apn = job.getString(OC.APN);
+                LL.i(apn +" -------apn");
                 if (!TextUtils.isEmpty(apn) && apn.equals(pkgName)) {
                     cacheApps.remove(i);
+                    LL.i(" -------remove repeat ");
                     pkgName = null;
                     continue;
                 }

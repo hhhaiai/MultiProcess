@@ -6,11 +6,11 @@ import android.os.Process;
 import android.text.TextUtils;
 
 import com.analysys.dev.internal.Content.EDContext;
-import com.analysys.dev.internal.utils.AndroidManifestHelper;
-import com.analysys.dev.internal.utils.LL;
-import com.analysys.dev.internal.utils.reflectinon.EContextHelper;
-import com.analysys.dev.internal.utils.reflectinon.Reflecer;
-import com.analysys.dev.internal.utils.sp.SPHelper;
+import com.analysys.dev.utils.AndroidManifestHelper;
+import com.analysys.dev.utils.LL;
+import com.analysys.dev.utils.reflectinon.EContextHelper;
+import com.analysys.dev.utils.reflectinon.Reflecer;
+import com.analysys.dev.utils.sp.SPHelper;
 import com.analysys.dev.internal.work.MessageDispatcher;
 
 /**
@@ -54,7 +54,7 @@ public class AnalysysInternal {
             if (bundle == null) {
                 LL.e(EDContext.LOGINFO.LOG_NOT_APPKEY);
             }
-            key = bundle.getString(EDContext.XML_METADATA_APPID);
+            key = bundle.getString(EDContext.XML_METADATA_APPKEY);
             channel = bundle.getString(EDContext.XML_METADATA_CHANNEL);
             if (TextUtils.isEmpty(key)) {
                 LL.e(EDContext.LOGINFO.LOG_NOT_APPKEY);

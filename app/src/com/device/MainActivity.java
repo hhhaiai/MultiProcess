@@ -13,8 +13,9 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.analysys.dev.internal.impl.LocationImpl;
-import com.analysys.dev.internal.utils.LL;
-import com.analysys.dev.internal.utils.PermissionUtils;
+import com.analysys.dev.internal.impl.OCImpl;
+import com.analysys.dev.utils.LL;
+import com.analysys.dev.utils.PermissionUtils;
 
 import java.util.List;
 
@@ -65,6 +66,10 @@ public class MainActivity extends Activity {
                 break;
             case R.id.btnTT:
                 test();
+                break;
+            case R.id.btnOC:
+                LL.i("btnOC ---------");
+//                OCImpl.getInstance(this).ocInfo();
                 break;
             default:
                 break;

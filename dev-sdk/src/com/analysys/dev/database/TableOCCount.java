@@ -7,9 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
 import com.analysys.dev.internal.impl.OCImpl;
-import com.analysys.dev.internal.utils.LL;
-import com.analysys.dev.internal.utils.Utils;
-import com.analysys.dev.internal.utils.reflectinon.EContextHelper;
+import com.analysys.dev.utils.LL;
+import com.analysys.dev.utils.Utils;
+import com.analysys.dev.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -97,6 +97,7 @@ public class TableOCCount {
             String day = Utils.getDay();
             int timeInterval = Utils.getTimeTag(System.currentTimeMillis());
             ContentValues cv = getContentValues(ocInfo);
+            LL.i(ocInfo+"  ocInfo update()");
             db.update(DBConfig.OCCount.TABLE_NAME, cv,
                     DBConfig.OCCount.Column.APN + "=? and " + DBConfig.OCCount.Column.DY + "=? and "
                             + DBConfig.OCCount.Column.TI + "=? and " + DBConfig.OCCount.Column.RS + "=?",
@@ -116,6 +117,7 @@ public class TableOCCount {
             cv = new ContentValues();
             long insertTime = System.currentTimeMillis();
             String an = Utils.encrypt(ocInfo.optString(OCImpl.OC.AN), insertTime);
+            LL.i(ocInfo.toString()+"     ocInfo  ");
             cv.put(DBConfig.OCCount.Column.APN, ocInfo.optString(OCImpl.OC.APN));
             cv.put(DBConfig.OCCount.Column.AN, an);
             cv.put(DBConfig.OCCount.Column.AOT, ocInfo.optString(OCImpl.OC.AOT));

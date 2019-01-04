@@ -6,8 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
-import com.analysys.dev.internal.utils.Utils;
-import com.analysys.dev.internal.utils.reflectinon.EContextHelper;
+import com.analysys.dev.utils.Utils;
+import com.analysys.dev.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

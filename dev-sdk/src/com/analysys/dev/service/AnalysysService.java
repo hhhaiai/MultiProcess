@@ -4,8 +4,8 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.Process;
-import com.analysys.dev.internal.utils.LL;
-import com.analysys.dev.internal.utils.reflectinon.Reflecer;
+import com.analysys.dev.utils.LL;
+import com.analysys.dev.utils.reflectinon.Reflecer;
 import com.analysys.dev.internal.work.MessageDispatcher;
 
 public class AnalysysService extends Service {

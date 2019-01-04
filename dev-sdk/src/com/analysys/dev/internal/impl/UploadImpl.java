@@ -9,14 +9,15 @@ import com.analysys.dev.database.TableLocation;
 import com.analysys.dev.database.TableOC;
 import com.analysys.dev.database.TableOCCount;
 import com.analysys.dev.internal.Content.EDContext;
-import com.analysys.dev.internal.utils.EThreadPool;
-import com.analysys.dev.internal.utils.RequestUtils;
-import com.analysys.dev.internal.utils.Utils;
-import com.analysys.dev.internal.utils.reflectinon.EContextHelper;
+import com.analysys.dev.utils.EThreadPool;
+import com.analysys.dev.utils.RequestUtils;
+import com.analysys.dev.utils.Utils;
+import com.analysys.dev.utils.reflectinon.EContextHelper;
 import com.analysys.dev.internal.work.MessageDispatcher;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import com.analysys.dev.internal.impl.DeviceImpl;
 
 /**
  * @Copyright © 2018 EGuan Inc. All rights reserved.
@@ -31,7 +32,7 @@ public class UploadImpl {
     private final String ASI = "AppSnapshotInfo";
     private final String LI = "LocationInfo";
     private final String OCC = "OCCount";
-    private final String OCI = "OCCount";
+    private final String OCI = "OCIount";
 
     private static class Holder {
         private static final UploadImpl INSTANCE = new UploadImpl();

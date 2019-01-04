@@ -10,12 +10,12 @@ import org.json.JSONObject;
 
 import com.analysys.dev.database.TableLocation;
 import com.analysys.dev.internal.Content.EDContext;
-import com.analysys.dev.internal.utils.EThreadPool;
-import com.analysys.dev.internal.utils.LL;
-import com.analysys.dev.internal.utils.PermissionUtils;
-import com.analysys.dev.internal.utils.reflectinon.EContextHelper;
-import com.analysys.dev.internal.utils.reflectinon.Reflecer;
-import com.analysys.dev.internal.utils.sp.SPHelper;
+import com.analysys.dev.utils.EThreadPool;
+import com.analysys.dev.utils.LL;
+import com.analysys.dev.utils.PermissionUtils;
+import com.analysys.dev.utils.reflectinon.EContextHelper;
+import com.analysys.dev.utils.reflectinon.Reflecer;
+import com.analysys.dev.utils.sp.SPHelper;
 import com.analysys.dev.internal.work.MessageDispatcher;
 
 import android.Manifest;
@@ -287,24 +287,24 @@ public class LocationImpl {
                         CellInfoGsm cellInfoGsm = (CellInfoGsm)info;
                         CellIdentityGsm cellIdentity = cellInfoGsm.getCellIdentity();
 
-                        LL.i("CellInfoGsm.getCellConnectionStatus:" + cellInfoGsm.getCellConnectionStatus());
+//                        LL.i("CellInfoGsm.getCellConnectionStatus:" + cellInfoGsm.getCellConnectionStatus());
                         LL.i("CellInfoGsm.getTimeStamp:" + cellInfoGsm.getTimeStamp());
                         LL.i("CellIdentityGsm.getLac:" + cellIdentity.getLac());
                         LL.i("CellIdentityGsm.getCid:" + cellIdentity.getCid());
                         LL.i("CellIdentityGsm.getMcc:" + cellIdentity.getMcc());
                         LL.i("CellIdentityGsm.getMnc:" + cellIdentity.getMnc());
                         LL.i("CellIdentityGsm.getArfcn:" + cellIdentity.getArfcn());
-                        LL.i("CellIdentityGsm.getMobileNetworkOperator:" + cellIdentity.getMobileNetworkOperator());
+//                        LL.i("CellIdentityGsm.getMobileNetworkOperator:" + cellIdentity.getMobileNetworkOperator());
                         LL.i("CellIdentityGsm.getPsc:" + cellIdentity.getPsc());
                         LL.i("CellIdentityGsm.getBsic:" + cellIdentity.getBsic());
-                        LL.i("CellIdentityGsm.getOperatorAlphaLong:" + cellIdentity.getOperatorAlphaLong());
-                        LL.i("CellIdentityGsm.getOperatorAlphaShort:" + cellIdentity.getOperatorAlphaShort());
+//                        LL.i("CellIdentityGsm.getOperatorAlphaLong:" + cellIdentity.getOperatorAlphaLong());
+//                        LL.i("CellIdentityGsm.getOperatorAlphaShort:" + cellIdentity.getOperatorAlphaShort());
 
                     } else if (info instanceof CellInfoCdma) {
                         LL.i("-----CDMA------");
                         CellInfoCdma cellInfoCdma = (CellInfoCdma)info;
                         CellIdentityCdma cellIdentity = cellInfoCdma.getCellIdentity();
-                        LL.i("CellInfoCdma.getCellConnectionStatus:" + cellInfoCdma.getCellConnectionStatus());
+//                        LL.i("CellInfoCdma.getCellConnectionStatus:" + cellInfoCdma.getCellConnectionStatus());
                         LL.i("CellInfoCdma.getTimeStamp:" + cellInfoCdma.getTimeStamp());
 
                         LL.i("CellIdentityCdma.getLatitude:" + cellIdentity.getLatitude());
@@ -358,7 +358,7 @@ public class LocationImpl {
                         CellInfoWcdma cellInfoWcdma = (CellInfoWcdma)info;
                         CellIdentityWcdma cellIdentity = cellInfoWcdma.getCellIdentity();
 
-                        LL.i("CellInfoWcdma.getCellConnectionStatus:" + cellInfoWcdma.getCellConnectionStatus());
+//                        LL.i("CellInfoWcdma.getCellConnectionStatus:" + cellInfoWcdma.getCellConnectionStatus());
                         LL.i("CellInfoWcdma.getTimeStamp:" + cellInfoWcdma.getTimeStamp());
 
                         LL.i("CellIdentityWcdma.getCid:" + cellIdentity.getCid());
@@ -367,8 +367,8 @@ public class LocationImpl {
                         LL.i("CellIdentityWcdma.getLac:" + cellIdentity.getLac());
                         LL.i("CellIdentityWcdma.getPsc:" + cellIdentity.getPsc());
                         LL.i("CellIdentityWcdma.getUarfcn:" + cellIdentity.getUarfcn());
-                        LL.i("CellIdentityWcdma.getOperatorAlphaLong:" + cellIdentity.getOperatorAlphaLong());
-                        LL.i("CellIdentityWcdma.getOperatorAlphaShort:" + cellIdentity.getOperatorAlphaShort());
+//                        LL.i("CellIdentityWcdma.getOperatorAlphaLong:" + cellIdentity.getOperatorAlphaLong());
+//                        LL.i("CellIdentityWcdma.getOperatorAlphaShort:" + cellIdentity.getOperatorAlphaShort());
 
                         CellSignalStrengthWcdma csw = cellInfoWcdma.getCellSignalStrength();
                         LL.i("CellSignalStrengthWcdma.getAsuLevel:" + csw.getAsuLevel());
@@ -376,7 +376,7 @@ public class LocationImpl {
                         LL.i("CellSignalStrengthWcdma.getLevel:" + csw.getLevel());
                     } else {
                         LL.i("----其他------");
-                        LL.i("CellInfo.getCellConnectionStatus:" + info.getCellConnectionStatus());
+//                        LL.i("CellInfo.getCellConnectionStatus:" + info.getCellConnectionStatus());
                         LL.i("CellInfo.getTimeStamp:" + info.getTimeStamp());
                     }
                 }

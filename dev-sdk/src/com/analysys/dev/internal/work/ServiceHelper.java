@@ -7,9 +7,9 @@ import android.content.IntentFilter;
 import android.os.Build;
 
 import com.analysys.dev.internal.Content.EDContext;
-import com.analysys.dev.internal.utils.PermissionUtils;
-import com.analysys.dev.internal.utils.Utils;
-import com.analysys.dev.internal.utils.reflectinon.EContextHelper;
+import com.analysys.dev.utils.PermissionUtils;
+import com.analysys.dev.utils.Utils;
+import com.analysys.dev.utils.reflectinon.EContextHelper;
 import com.analysys.dev.receiver.DynamicReceivers;
 import com.analysys.dev.service.AnalysysService;
 
