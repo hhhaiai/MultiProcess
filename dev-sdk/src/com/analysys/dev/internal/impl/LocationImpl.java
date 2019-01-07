@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.analysys.dev.database.DBConfig;
 import com.analysys.dev.database.TableLocation;
 import com.analysys.dev.internal.Content.EDContext;
 import com.analysys.dev.utils.EThreadPool;
@@ -98,7 +99,20 @@ public class LocationImpl {
             }
         }
     }
-
+    private Location getLocationInfo(){
+        //TODO 获取6.0以上和以下的location对象信息并返回
+        LocationManager manager =
+                (LocationManager)mContext.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        return null;
+    }
+    public String getGeographyLocation(){
+        try{
+            Location l = getLocationInfo();
+            return l.getLatitude()+"-"+l.getLongitude();
+        }catch (Throwable t){
+            return getCoordinate();
+        }
+    }
     private JSONObject getLocation() {
         JSONObject locationJson = null;
         try {
@@ -111,7 +125,7 @@ public class LocationImpl {
                 locationJson.put("GL", locationInfo);
             }
 
-            JSONArray wifiInfo = getWifiInfo();
+            JSONArray wifiInfo = WifiImpl.getInstance(mContext).getWifiInfo();
             int wifi = SPHelper.getDefault(mContext).getInt(EDContext.SP_WIFI, 1);
             if (wifiInfo != null && wifiInfo.length() != 0 && wifi == 1) {
                 locationJson.put("WifiInfo", wifiInfo);
@@ -135,58 +149,9 @@ public class LocationImpl {
         return "2.00000" + "-" + "6.233232323";
     }
 
-    /**
-     * WiFi信息
-     */
-    private JSONArray getWifiInfo() {
-        JSONArray jar = new JSONArray();
-        try {
-            if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_WIFI_STATE)) {
-                WifiManager wm = (WifiManager)mContext.getSystemService(WIFI_SERVICE);
-                int wifiDetail = SPHelper.getDefault(mContext).getInt(EDContext.SP_WIFI_DETAIL, 0);
-                if (wm.getWifiState() == WifiManager.WIFI_STATE_ENABLED) {
-                    List<ScanResult> list = wm.getScanResults();
-                    wifiSort(list);
-                    for (int i = 0; i < list.size(); i++) {
-                        if (i < 5) {
-                            ScanResult s = list.get(i);
-                            JSONObject job = new JSONObject();
-                            job.put("SSID", s.SSID);
-                            job.put("BSSID", s.BSSID);
-                            job.put("level", s.level);
-                            if (wifiDetail == 1) {
-                                if (Build.VERSION.SDK_INT >= 23) {
-                                    job.put("channelWidth", s.channelWidth);
-                                }
-                                job.put("capabilities", s.capabilities);
-                                job.put("frequency", s.frequency);
-                            }
-                            jar.put(job);
-                        }
-                    }
-                }
-            }
-        } catch (JSONException e) {
-        }
-        return jar;
-    }
 
-    /**
-     * wifi 列表排序
-     */
-    private void wifiSort(List<ScanResult> list) {
-        for (int i = 0; i < list.size() - 1; i++) {
-            for (int j = i + 1; j < list.size(); j++) {
-                if (list.get(i).level > list.get(j).level) {
-                    ScanResult scanResult = list.get(i);
-                    list.set(i, list.get(j));
-                    list.set(j, scanResult);
-                }
-            }
-        }
-    }
 
-    /**
+       /**
      * 基站信息
      */
     @SuppressWarnings("deprecation")
@@ -239,166 +204,166 @@ public class LocationImpl {
      * @return
      */
     @SuppressWarnings("deprecation")
-    public JSONArray getBaseStation() {
-        try {
-            if (Build.VERSION.SDK_INT > 22) {
-                if (!PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
-                    && !PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    LL.e("has no permission");
-                    return new JSONArray();
-                }
-
-            }
-            TelephonyManager tm = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
-
-            LL.i("===================基站信息===============================");
-
-            // 1. 基站信息
-            CellLocation cellLocation = tm.getCellLocation();
-            if (cellLocation instanceof GsmCellLocation) {
-                GsmCellLocation gsmCellLocation = (GsmCellLocation)cellLocation;
-                if (gsmCellLocation != null) {
-                    LL.i("GsmCellLocation.getLac:" + gsmCellLocation.getLac());
-                    LL.i("GsmCellLocation.getCid:" + gsmCellLocation.getCid());
-                    LL.i("GsmCellLocation.getPsc:" + gsmCellLocation.getPsc());
-                }
-            } else if (cellLocation instanceof CdmaCellLocation) {
-                CdmaCellLocation cdmaCellLocation = (CdmaCellLocation)cellLocation;
-                if (cdmaCellLocation != null) {
-                    LL.i("CdmaCellLocation.getSystemId:" + cdmaCellLocation.getSystemId());
-                    LL.i("CdmaCellLocation.getNetworkId:" + cdmaCellLocation.getNetworkId());
-                    LL.i("CdmaCellLocation.getBaseStationId:" + cdmaCellLocation.getBaseStationId());
-                    LL.i("CdmaCellLocation.getBaseStationLatitude:" + cdmaCellLocation.getBaseStationLatitude());
-                    LL.i("CdmaCellLocation.getBaseStationLongitude:" + cdmaCellLocation.getBaseStationLongitude());
-                }
-            }
-
-            LL.i("===================附近小区信息================================");
-            // 2. 附近小区信息
-            List<CellInfo> allCellInfo = tm.getAllCellInfo();
-            if (allCellInfo != null) {
-                LL.i("=====>" + allCellInfo.size() + "<=====");
-                for (CellInfo info : allCellInfo) {
-                    LL.i("CellInfo.isRegistered: " + info.isRegistered());
-                    LL.i("CellInfo.ts: " + info.getTimeStamp());
-                    if (info instanceof CellInfoGsm) {
-                        LL.i("-----GSM------");
-
-                        CellInfoGsm cellInfoGsm = (CellInfoGsm)info;
-                        CellIdentityGsm cellIdentity = cellInfoGsm.getCellIdentity();
-
-//                        LL.i("CellInfoGsm.getCellConnectionStatus:" + cellInfoGsm.getCellConnectionStatus());
-                        LL.i("CellInfoGsm.getTimeStamp:" + cellInfoGsm.getTimeStamp());
-                        LL.i("CellIdentityGsm.getLac:" + cellIdentity.getLac());
-                        LL.i("CellIdentityGsm.getCid:" + cellIdentity.getCid());
-                        LL.i("CellIdentityGsm.getMcc:" + cellIdentity.getMcc());
-                        LL.i("CellIdentityGsm.getMnc:" + cellIdentity.getMnc());
-                        LL.i("CellIdentityGsm.getArfcn:" + cellIdentity.getArfcn());
-//                        LL.i("CellIdentityGsm.getMobileNetworkOperator:" + cellIdentity.getMobileNetworkOperator());
-                        LL.i("CellIdentityGsm.getPsc:" + cellIdentity.getPsc());
-                        LL.i("CellIdentityGsm.getBsic:" + cellIdentity.getBsic());
-//                        LL.i("CellIdentityGsm.getOperatorAlphaLong:" + cellIdentity.getOperatorAlphaLong());
-//                        LL.i("CellIdentityGsm.getOperatorAlphaShort:" + cellIdentity.getOperatorAlphaShort());
-
-                    } else if (info instanceof CellInfoCdma) {
-                        LL.i("-----CDMA------");
-                        CellInfoCdma cellInfoCdma = (CellInfoCdma)info;
-                        CellIdentityCdma cellIdentity = cellInfoCdma.getCellIdentity();
-//                        LL.i("CellInfoCdma.getCellConnectionStatus:" + cellInfoCdma.getCellConnectionStatus());
-                        LL.i("CellInfoCdma.getTimeStamp:" + cellInfoCdma.getTimeStamp());
-
-                        LL.i("CellIdentityCdma.getLatitude:" + cellIdentity.getLatitude());
-                        LL.i("CellIdentityCdma.getLongitude:" + cellIdentity.getLongitude());
-                        LL.i("CellIdentityCdma.getSystemId:" + cellIdentity.getSystemId());
-                        LL.i("CellIdentityCdma.getNetworkId:" + cellIdentity.getNetworkId());
-                        LL.i("CellIdentityCdma.getBasestationId:" + cellIdentity.getBasestationId());
-
-                        CellSignalStrength cellSignalStrength = cellInfoCdma.getCellSignalStrength();
-                        LL.i("CellSignalStrength.getDbm:" + cellSignalStrength.getDbm());
-                        LL.i("CellSignalStrength.getAsuLevel:" + cellSignalStrength.getAsuLevel());
-                        LL.i("CellSignalStrength.getLevel:" + cellSignalStrength.getLevel());
-
-                    } else if (info instanceof CellInfoLte) {
-                        LL.i("-----LTE------");
-                        CellInfoLte cellInfoLte = (CellInfoLte)info;
-                        CellIdentityLte cellIdentity = cellInfoLte.getCellIdentity();
-
-                        LL.i("CellInfoLte.getCellConnectionStatus:"
-                            + Reflecer.hook(cellInfoLte, "getCellConnectionStatus"));
-                        // LL.i("CellInfoLte.getCellConnectionStatus:" + cellInfoLte.getCellConnectionStatus());
-                        LL.i("CellInfoLte.getTimeStamp:" + cellInfoLte.getTimeStamp());
-
-                        LL.i("CellIdentityLte.getTac:" + cellIdentity.getTac());
-                        LL.i("CellIdentityLte.getCi:" + cellIdentity.getCi());
-                        LL.i("CellIdentityLte.getEarfcn:" + cellIdentity.getEarfcn());
-                        // LL.i("CellIdentityLte.getBandwidth:" + cellIdentity.getBandwidth());
-                        LL.i("CellIdentityLte.getBandwidth:" + Reflecer.hook(cellIdentity, "getBandwidth"));
-                        LL.i("CellIdentityLte.getPci:" + cellIdentity.getPci());
-                        LL.i("CellIdentityLte.getMnc:" + cellIdentity.getMnc());
-                        LL.i("CellIdentityLte.getMcc:" + cellIdentity.getMcc());
-
-                        CellSignalStrengthLte csl = cellInfoLte.getCellSignalStrength();
-
-                        LL.i("CellSignalStrengthLte.getAsuLevel:" + csl.getAsuLevel());
-                        // LL.i("CellSignalStrengthLte.getCqi:" + csl.getCqi());
-                        LL.i("CellSignalStrengthLte.getRsrq:" + Reflecer.hook(csl, "getCqi"));
-                        LL.i("CellSignalStrengthLte.getDbm:" + csl.getDbm());
-                        LL.i("CellSignalStrengthLte.getLevel:" + csl.getLevel());
-                        // LL.i("CellSignalStrengthLte.getRsrp:" + csl.getRsrp());
-                        LL.i("CellSignalStrengthLte.getRsrp:" + Reflecer.hook(csl, "getRsrp"));
-                        // LL.i("CellSignalStrengthLte.getRsrq:" + csl.getRsrq());
-                        LL.i("CellSignalStrengthLte.getRsrq:" + Reflecer.hook(csl, "getRsrq"));
-                        // LL.i("CellSignalStrengthLte.getRssnr:" + csl.getRssnr());
-                        LL.i("CellSignalStrengthLte.getRssnr:" + Reflecer.hook(csl, "getRssnr"));
-                        // LL.i("CellSignalStrengthLte.getTimingAdvance:" + csl.getTimingAdvance());
-                        LL.i("CellSignalStrengthLte.getTimingAdvance:" + Reflecer.hook(csl, "getTimingAdvance"));
-
-                    } else if (info instanceof CellInfoWcdma) {
-                        LL.i("-----WCDMA------");
-                        CellInfoWcdma cellInfoWcdma = (CellInfoWcdma)info;
-                        CellIdentityWcdma cellIdentity = cellInfoWcdma.getCellIdentity();
-
-//                        LL.i("CellInfoWcdma.getCellConnectionStatus:" + cellInfoWcdma.getCellConnectionStatus());
-                        LL.i("CellInfoWcdma.getTimeStamp:" + cellInfoWcdma.getTimeStamp());
-
-                        LL.i("CellIdentityWcdma.getCid:" + cellIdentity.getCid());
-                        LL.i("CellIdentityWcdma.getMnc:" + cellIdentity.getMnc());
-                        LL.i("CellIdentityWcdma.getMcc:" + cellIdentity.getMcc());
-                        LL.i("CellIdentityWcdma.getLac:" + cellIdentity.getLac());
-                        LL.i("CellIdentityWcdma.getPsc:" + cellIdentity.getPsc());
-                        LL.i("CellIdentityWcdma.getUarfcn:" + cellIdentity.getUarfcn());
-//                        LL.i("CellIdentityWcdma.getOperatorAlphaLong:" + cellIdentity.getOperatorAlphaLong());
-//                        LL.i("CellIdentityWcdma.getOperatorAlphaShort:" + cellIdentity.getOperatorAlphaShort());
-
-                        CellSignalStrengthWcdma csw = cellInfoWcdma.getCellSignalStrength();
-                        LL.i("CellSignalStrengthWcdma.getAsuLevel:" + csw.getAsuLevel());
-                        LL.i("CellSignalStrengthWcdma.getDbm:" + csw.getDbm());
-                        LL.i("CellSignalStrengthWcdma.getLevel:" + csw.getLevel());
-                    } else {
-                        LL.i("----其他------");
-//                        LL.i("CellInfo.getCellConnectionStatus:" + info.getCellConnectionStatus());
-                        LL.i("CellInfo.getTimeStamp:" + info.getTimeStamp());
-                    }
-                }
-            }
-
-            LL.i("===================其他附近信息===============================");
-            // 3. 附近小区获取
-            List<NeighboringCellInfo> neighboringCellInfo = tm.getNeighboringCellInfo();
-            if (neighboringCellInfo != null) {
-                for (NeighboringCellInfo nci : neighboringCellInfo) {
-                    LL.i("NeighboringCellInfo.getLac:" + nci.getLac());
-                    LL.i("NeighboringCellInfo.getCid:" + nci.getCid());
-                    LL.i("NeighboringCellInfo.getPsc:" + nci.getPsc());
-                    LL.i("NeighboringCellInfo.getNetworkType:" + nci.getNetworkType());
-                    LL.i("NeighboringCellInfo.getRssi:" + nci.getRssi());
-                }
-            }
-        } catch (Throwable e) {
-            LL.e(e);
-        }
-        return new JSONArray();
-    }
+//    public JSONArray getBaseStation() {
+//        try {
+//            if (Build.VERSION.SDK_INT > 22) {
+//                if (!PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
+//                    && !PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
+//                    LL.e("has no permission");
+//                    return new JSONArray();
+//                }
+//
+//            }
+//            TelephonyManager tm = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
+//
+//            LL.i("===================基站信息===============================");
+//
+//            // 1. 基站信息
+//            CellLocation cellLocation = tm.getCellLocation();
+//            if (cellLocation instanceof GsmCellLocation) {
+//                GsmCellLocation gsmCellLocation = (GsmCellLocation)cellLocation;
+//                if (gsmCellLocation != null) {
+//                    LL.i("GsmCellLocation.getLac:" + gsmCellLocation.getLac());
+//                    LL.i("GsmCellLocation.getCid:" + gsmCellLocation.getCid());
+//                    LL.i("GsmCellLocation.getPsc:" + gsmCellLocation.getPsc());
+//                }
+//            } else if (cellLocation instanceof CdmaCellLocation) {
+//                CdmaCellLocation cdmaCellLocation = (CdmaCellLocation)cellLocation;
+//                if (cdmaCellLocation != null) {
+//                    LL.i("CdmaCellLocation.getSystemId:" + cdmaCellLocation.getSystemId());
+//                    LL.i("CdmaCellLocation.getNetworkId:" + cdmaCellLocation.getNetworkId());
+//                    LL.i("CdmaCellLocation.getBaseStationId:" + cdmaCellLocation.getBaseStationId());
+//                    LL.i("CdmaCellLocation.getBaseStationLatitude:" + cdmaCellLocation.getBaseStationLatitude());
+//                    LL.i("CdmaCellLocation.getBaseStationLongitude:" + cdmaCellLocation.getBaseStationLongitude());
+//                }
+//            }
+//
+//            LL.i("===================附近小区信息================================");
+//            // 2. 附近小区信息
+//            List<CellInfo> allCellInfo = tm.getAllCellInfo();
+//            if (allCellInfo != null) {
+//                LL.i("=====>" + allCellInfo.size() + "<=====");
+//                for (CellInfo info : allCellInfo) {
+//                    LL.i("CellInfo.isRegistered: " + info.isRegistered());
+//                    LL.i("CellInfo.ts: " + info.getTimeStamp());
+//                    if (info instanceof CellInfoGsm) {
+//                        LL.i("-----GSM------");
+//
+//                        CellInfoGsm cellInfoGsm = (CellInfoGsm)info;
+//                        CellIdentityGsm cellIdentity = cellInfoGsm.getCellIdentity();
+//
+////                        LL.i("CellInfoGsm.getCellConnectionStatus:" + cellInfoGsm.getCellConnectionStatus());
+//                        LL.i("CellInfoGsm.getTimeStamp:" + cellInfoGsm.getTimeStamp());
+//                        LL.i("CellIdentityGsm.getLac:" + cellIdentity.getLac());
+//                        LL.i("CellIdentityGsm.getCid:" + cellIdentity.getCid());
+//                        LL.i("CellIdentityGsm.getMcc:" + cellIdentity.getMcc());
+//                        LL.i("CellIdentityGsm.getMnc:" + cellIdentity.getMnc());
+//                        LL.i("CellIdentityGsm.getArfcn:" + cellIdentity.getArfcn());
+////                        LL.i("CellIdentityGsm.getMobileNetworkOperator:" + cellIdentity.getMobileNetworkOperator());
+//                        LL.i("CellIdentityGsm.getPsc:" + cellIdentity.getPsc());
+//                        LL.i("CellIdentityGsm.getBsic:" + cellIdentity.getBsic());
+////                        LL.i("CellIdentityGsm.getOperatorAlphaLong:" + cellIdentity.getOperatorAlphaLong());
+////                        LL.i("CellIdentityGsm.getOperatorAlphaShort:" + cellIdentity.getOperatorAlphaShort());
+//
+//                    } else if (info instanceof CellInfoCdma) {
+//                        LL.i("-----CDMA------");
+//                        CellInfoCdma cellInfoCdma = (CellInfoCdma)info;
+//                        CellIdentityCdma cellIdentity = cellInfoCdma.getCellIdentity();
+////                        LL.i("CellInfoCdma.getCellConnectionStatus:" + cellInfoCdma.getCellConnectionStatus());
+//                        LL.i("CellInfoCdma.getTimeStamp:" + cellInfoCdma.getTimeStamp());
+//
+//                        LL.i("CellIdentityCdma.getLatitude:" + cellIdentity.getLatitude());
+//                        LL.i("CellIdentityCdma.getLongitude:" + cellIdentity.getLongitude());
+//                        LL.i("CellIdentityCdma.getSystemId:" + cellIdentity.getSystemId());
+//                        LL.i("CellIdentityCdma.getNetworkId:" + cellIdentity.getNetworkId());
+//                        LL.i("CellIdentityCdma.getBasestationId:" + cellIdentity.getBasestationId());
+//
+//                        CellSignalStrength cellSignalStrength = cellInfoCdma.getCellSignalStrength();
+//                        LL.i("CellSignalStrength.getDbm:" + cellSignalStrength.getDbm());
+//                        LL.i("CellSignalStrength.getAsuLevel:" + cellSignalStrength.getAsuLevel());
+//                        LL.i("CellSignalStrength.getLevel:" + cellSignalStrength.getLevel());
+//
+//                    } else if (info instanceof CellInfoLte) {
+//                        LL.i("-----LTE------");
+//                        CellInfoLte cellInfoLte = (CellInfoLte)info;
+//                        CellIdentityLte cellIdentity = cellInfoLte.getCellIdentity();
+//
+//                        LL.i("CellInfoLte.getCellConnectionStatus:"
+//                            + Reflecer.hook(cellInfoLte, "getCellConnectionStatus"));
+//                        // LL.i("CellInfoLte.getCellConnectionStatus:" + cellInfoLte.getCellConnectionStatus());
+//                        LL.i("CellInfoLte.getTimeStamp:" + cellInfoLte.getTimeStamp());
+//
+//                        LL.i("CellIdentityLte.getTac:" + cellIdentity.getTac());
+//                        LL.i("CellIdentityLte.getCi:" + cellIdentity.getCi());
+//                        LL.i("CellIdentityLte.getEarfcn:" + cellIdentity.getEarfcn());
+//                        // LL.i("CellIdentityLte.getBandwidth:" + cellIdentity.getBandwidth());
+//                        LL.i("CellIdentityLte.getBandwidth:" + Reflecer.hook(cellIdentity, "getBandwidth"));
+//                        LL.i("CellIdentityLte.getPci:" + cellIdentity.getPci());
+//                        LL.i("CellIdentityLte.getMnc:" + cellIdentity.getMnc());
+//                        LL.i("CellIdentityLte.getMcc:" + cellIdentity.getMcc());
+//
+//                        CellSignalStrengthLte csl = cellInfoLte.getCellSignalStrength();
+//
+//                        LL.i("CellSignalStrengthLte.getAsuLevel:" + csl.getAsuLevel());
+//                        // LL.i("CellSignalStrengthLte.getCqi:" + csl.getCqi());
+//                        LL.i("CellSignalStrengthLte.getRsrq:" + Reflecer.hook(csl, "getCqi"));
+//                        LL.i("CellSignalStrengthLte.getDbm:" + csl.getDbm());
+//                        LL.i("CellSignalStrengthLte.getLevel:" + csl.getLevel());
+//                        // LL.i("CellSignalStrengthLte.getRsrp:" + csl.getRsrp());
+//                        LL.i("CellSignalStrengthLte.getRsrp:" + Reflecer.hook(csl, "getRsrp"));
+//                        // LL.i("CellSignalStrengthLte.getRsrq:" + csl.getRsrq());
+//                        LL.i("CellSignalStrengthLte.getRsrq:" + Reflecer.hook(csl, "getRsrq"));
+//                        // LL.i("CellSignalStrengthLte.getRssnr:" + csl.getRssnr());
+//                        LL.i("CellSignalStrengthLte.getRssnr:" + Reflecer.hook(csl, "getRssnr"));
+//                        // LL.i("CellSignalStrengthLte.getTimingAdvance:" + csl.getTimingAdvance());
+//                        LL.i("CellSignalStrengthLte.getTimingAdvance:" + Reflecer.hook(csl, "getTimingAdvance"));
+//
+//                    } else if (info instanceof CellInfoWcdma) {
+//                        LL.i("-----WCDMA------");
+//                        CellInfoWcdma cellInfoWcdma = (CellInfoWcdma)info;
+//                        CellIdentityWcdma cellIdentity = cellInfoWcdma.getCellIdentity();
+//
+////                        LL.i("CellInfoWcdma.getCellConnectionStatus:" + cellInfoWcdma.getCellConnectionStatus());
+//                        LL.i("CellInfoWcdma.getTimeStamp:" + cellInfoWcdma.getTimeStamp());
+//
+//                        LL.i("CellIdentityWcdma.getCid:" + cellIdentity.getCid());
+//                        LL.i("CellIdentityWcdma.getMnc:" + cellIdentity.getMnc());
+//                        LL.i("CellIdentityWcdma.getMcc:" + cellIdentity.getMcc());
+//                        LL.i("CellIdentityWcdma.getLac:" + cellIdentity.getLac());
+//                        LL.i("CellIdentityWcdma.getPsc:" + cellIdentity.getPsc());
+//                        LL.i("CellIdentityWcdma.getUarfcn:" + cellIdentity.getUarfcn());
+////                        LL.i("CellIdentityWcdma.getOperatorAlphaLong:" + cellIdentity.getOperatorAlphaLong());
+////                        LL.i("CellIdentityWcdma.getOperatorAlphaShort:" + cellIdentity.getOperatorAlphaShort());
+//
+//                        CellSignalStrengthWcdma csw = cellInfoWcdma.getCellSignalStrength();
+//                        LL.i("CellSignalStrengthWcdma.getAsuLevel:" + csw.getAsuLevel());
+//                        LL.i("CellSignalStrengthWcdma.getDbm:" + csw.getDbm());
+//                        LL.i("CellSignalStrengthWcdma.getLevel:" + csw.getLevel());
+//                    } else {
+//                        LL.i("----其他------");
+////                        LL.i("CellInfo.getCellConnectionStatus:" + info.getCellConnectionStatus());
+//                        LL.i("CellInfo.getTimeStamp:" + info.getTimeStamp());
+//                    }
+//                }
+//            }
+//
+//            LL.i("===================其他附近信息===============================");
+//            // 3. 附近小区获取
+//            List<NeighboringCellInfo> neighboringCellInfo = tm.getNeighboringCellInfo();
+//            if (neighboringCellInfo != null) {
+//                for (NeighboringCellInfo nci : neighboringCellInfo) {
+//                    LL.i("NeighboringCellInfo.getLac:" + nci.getLac());
+//                    LL.i("NeighboringCellInfo.getCid:" + nci.getCid());
+//                    LL.i("NeighboringCellInfo.getPsc:" + nci.getPsc());
+//                    LL.i("NeighboringCellInfo.getNetworkType:" + nci.getNetworkType());
+//                    LL.i("NeighboringCellInfo.getRssi:" + nci.getRssi());
+//                }
+//            }
+//        } catch (Throwable e) {
+//            LL.e(e);
+//        }
+//        return new JSONArray();
+//    }
 
     /**
      * 获取GPS信息
@@ -413,6 +378,7 @@ public class LocationImpl {
         }
         LocationManager lm =
             (LocationManager)mContext.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+
         if (lm == null) {
             return;
         }

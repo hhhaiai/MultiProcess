@@ -300,9 +300,9 @@ public class MProt {
       // 信号强度
       public static final String Level = "LEVEL";
       // WiFi加密方式
-      public static final String capabilities = "capabilities";
+      public static final String Capabilities = "CBT";
       // 以MHz为单位的接入频率值
-      public static final String frequency = "frequency";
+      public static final String Frequency = "FQC";
     }
 
     // 基站信息

@@ -30,7 +30,9 @@ import android.text.TextUtils;
 public class AppSnapshotImpl {
 
     Context mContext;
+    private AppSnapshotImpl(){
 
+    }
     private static class Holder {
         private static final AppSnapshotImpl INSTANCE = new AppSnapshotImpl();
     }
@@ -58,12 +60,12 @@ public class AppSnapshotImpl {
             EThreadPool.execute(new Runnable() {
                 @Override
                 public void run() {
-                    Map<String, String> selectMap = TableAppSnapshot.getInstance(mContext).mSelect();
-                    List<JSONObject> getSnapshots = getSnapshots();
-                    if (!selectMap.isEmpty()) {
-                        getDifference(getSnapshots, selectMap);
+                    Map<String, String> dbSnapshotsMap = TableAppSnapshot.getInstance(mContext).mSelect();
+                    List<JSONObject> currentSnapshotsList = getCurrentSnapshots();
+                    if (!dbSnapshotsMap.isEmpty()) {
+                        currentSnapshotsList = getDifference(currentSnapshotsList, dbSnapshotsMap);
                     }
-                    TableAppSnapshot.getInstance(mContext).coverInsert(getSnapshots);
+                    TableAppSnapshot.getInstance(mContext).coverInsert(currentSnapshotsList);
                     SPHelper.getDefault(mContext).edit().putLong(EDContext.SP_SNAPSHOT_TIME, System.currentTimeMillis())
                         .commit();
                     MessageDispatcher.getInstance(mContext).snapshotInfo(EDContext.SNAPSHOT_CYCLE);
@@ -88,42 +90,43 @@ public class AppSnapshotImpl {
     }
 
     /**
-     * 数据库与新获取的列表做对比合并成新的list 存储
-     * 
-     * @param list
-     * @param map
+     * 数据库与新获取的当前列表list做对比合并成新的list 存储
+     * @param currentSnapshotsList
+     * @param dbSnapshotsMap
      */
-    private void getDifference(List<JSONObject> list, Map<String, String> map) {
+    private List<JSONObject> getDifference(List<JSONObject> currentSnapshotsList, Map<String, String> dbSnapshotsMap) {
         try {
-            for (int i = 0; i < list.size(); i++) {
-                JSONObject lJson = list.get(i);
-                String apn = lJson.getString(Snapshot.APN);
-                if (map.containsKey(apn)) {
-                    JSONObject mJson = new JSONObject(map.get(apn));
-                    String lAvc = lJson.optString(Snapshot.AVC);
-                    String mAvc = mJson.optString(Snapshot.AVC);
-                    if (!TextUtils.isEmpty(lAvc) && !lAvc.equals(mAvc)) {
-                        lJson.put(Snapshot.AT, "2");
+            for (int i = 0; i < currentSnapshotsList.size(); i++) {
+                JSONObject item = currentSnapshotsList.get(i);
+                String apn = item.getString(Snapshot.APN);
+                if (dbSnapshotsMap.containsKey(apn)) {
+                    JSONObject dbitem = new JSONObject(dbSnapshotsMap.get(apn));
+                    String avc = item.optString(Snapshot.AVC);
+                    String dbAvc = dbitem.optString(Snapshot.AVC);
+                    if (!TextUtils.isEmpty(avc) && !avc.equals(dbAvc)) {
+                        item.put(Snapshot.AT, "2");
                     }
-                    map.remove(apn);
+                    dbSnapshotsMap.remove(apn);
                     continue;
                 }
-                lJson.put(Snapshot.AT, "0");
+                item.put(Snapshot.AT, "0");
             }
-            Set<String> set = map.keySet();
+            Set<String> set = dbSnapshotsMap.keySet();
             for (String json : set) {
-                JSONObject j = new JSONObject(map.get(json));
+                JSONObject j = new JSONObject(dbSnapshotsMap.get(json));
                 j.put(Snapshot.AT, "1");
-                list.add(j);
+                currentSnapshotsList.add(j);
             }
         } catch (Throwable e) {
+            return currentSnapshotsList;
         }
+        return currentSnapshotsList;
     }
 
     /**
      * 获取应用列表快照
      */
-    private List<JSONObject> getSnapshots() {
+    private List<JSONObject> getCurrentSnapshots() {
         List<JSONObject> list = null;
         try {
             PackageManager packageManager = mContext.getPackageManager();

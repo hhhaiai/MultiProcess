@@ -65,5 +65,7 @@ public class EDContext {
     public class LOGINFO {
         public static final String LOG_NOT_APPKEY = "please check you appkey!";
     }
+    public static final String APPSNAPSHOT_PROC_SYNC_NAME = "install.txt";
+    public static final String SP_APP_IDFA = "appIDFA";
 
 }

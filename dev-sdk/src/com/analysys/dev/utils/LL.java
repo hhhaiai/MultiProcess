@@ -1274,11 +1274,9 @@ public class LL {
 
         if (msg.length() > LOG_MAXLENGTH) {
             List<String> splitStr = getStringBysplitLine(msg, LOG_MAXLENGTH);
-
             StringBuilder sb = null;
             for (int i = 0; i < splitStr.size(); i++) {
                 String line = splitStr.get(i);
-
                 if (sb == null) {
                     sb = new StringBuilder();
                 }
