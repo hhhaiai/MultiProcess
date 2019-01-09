@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
+import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.impl.OCImpl;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.Utils;
@@ -101,7 +102,7 @@ public class TableOCCount {
             db.update(DBConfig.OCCount.TABLE_NAME, cv,
                     DBConfig.OCCount.Column.APN + "=? and " + DBConfig.OCCount.Column.DY + "=? and "
                             + DBConfig.OCCount.Column.TI + "=? and " + DBConfig.OCCount.Column.RS + "=?",
-                    new String[]{ocInfo.optString(OCImpl.OC.APN), day, String.valueOf(timeInterval), ZERO});
+                    new String[]{ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName), day, String.valueOf(timeInterval), ZERO});
         } catch (Throwable e) {
             ELOG.e(e);
         }
@@ -116,17 +117,17 @@ public class TableOCCount {
         if (ocInfo != null) {
             cv = new ContentValues();
             long insertTime = System.currentTimeMillis();
-            String an = Utils.encrypt(ocInfo.optString(OCImpl.OC.AN), insertTime);
+            String an = Utils.encrypt(ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationName), insertTime);
             ELOG.i(ocInfo.toString()+"     ocInfo  ");
-            cv.put(DBConfig.OCCount.Column.APN, ocInfo.optString(OCImpl.OC.APN));
+            cv.put(DBConfig.OCCount.Column.APN, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName));
             cv.put(DBConfig.OCCount.Column.AN, an);
-            cv.put(DBConfig.OCCount.Column.AOT, ocInfo.optString(OCImpl.OC.AOT));
+            cv.put(DBConfig.OCCount.Column.AOT, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationOpenTime));
             cv.put(DBConfig.OCCount.Column.DY, Utils.getDay());
             cv.put(DBConfig.OCCount.Column.IT, String.valueOf(insertTime));
-            cv.put(DBConfig.OCCount.Column.AVC, ocInfo.optString(OCImpl.OC.AVC));
-            cv.put(DBConfig.OCCount.Column.NT, ocInfo.optString(OCImpl.OC.NT));
-            cv.put(DBConfig.OCCount.Column.AT, ocInfo.optString(OCImpl.OC.AT));
-            cv.put(DBConfig.OCCount.Column.CT, ocInfo.optString(OCImpl.OC.CT));
+            cv.put(DBConfig.OCCount.Column.AVC, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationVersionCode));
+            cv.put(DBConfig.OCCount.Column.NT, ocInfo.optString(DeviceKeyContacts.OCInfo.NetworkType));
+            cv.put(DBConfig.OCCount.Column.AT, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationType));
+            cv.put(DBConfig.OCCount.Column.CT, ocInfo.optString(DeviceKeyContacts.OCInfo.CollectionType));
             cv.put(DBConfig.OCCount.Column.TI, Utils.getTimeTag(insertTime));
             cv.put(DBConfig.OCCount.Column.ST, ZERO);
             cv.put(DBConfig.OCCount.Column.RS, ONE);
@@ -150,13 +151,13 @@ public class TableOCCount {
                 JSONObject job = new JSONObject();
                 String insertTime = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.IT));
                 String appName = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AN));
-                job.put(OCImpl.OC.APN, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.APN)));
-                job.put(OCImpl.OC.AN, Utils.decrypt(appName, Long.valueOf(insertTime)));
-                job.put(OCImpl.OC.AOT, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AOT)));
-                job.put(OCImpl.OC.AVC, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AVC)));
-                job.put(OCImpl.OC.NT, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.NT)));
-                job.put(OCImpl.OC.AT, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AT)));
-                job.put(OCImpl.OC.CT, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.CT)));
+                job.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.APN)));
+                job.put(DeviceKeyContacts.OCInfo.ApplicationName, Utils.decrypt(appName, Long.valueOf(insertTime)));
+                job.put(DeviceKeyContacts.OCInfo.ApplicationOpenTime, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AOT)));
+                job.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AVC)));
+                job.put(DeviceKeyContacts.OCInfo.NetworkType, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.NT)));
+                job.put(DeviceKeyContacts.OCInfo.ApplicationType, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AT)));
+                job.put(DeviceKeyContacts.OCInfo.CollectionType, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.CT)));
                 list.add(job);
             }
         } catch (Throwable e) {
@@ -177,7 +178,7 @@ public class TableOCCount {
             cv.put(DBConfig.OCCount.Column.RS, ONE);
             cv.put(DBConfig.OCCount.Column.ACT, String.valueOf(System.currentTimeMillis()));
             for (int i = 0; i < ocInfo.size(); i++) {
-                String pkgName = ocInfo.get(i).optString(OCImpl.OC.APN);
+                String pkgName = ocInfo.get(i).optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
                 db.update(DBConfig.OCCount.TABLE_NAME, cv,
                         DBConfig.OCCount.Column.APN + "=? and "
                                 + DBConfig.OCCount.Column.RS + "=?",
@@ -204,7 +205,7 @@ public class TableOCCount {
             cv.put(DBConfig.OCCount.Column.RS, ZERO);
             cv.put(DBConfig.OCCount.Column.ACT, String.valueOf(System.currentTimeMillis()));
             for (int i = 0; i < ocInfo.size(); i++) {
-                String pkgName = ocInfo.get(i).optString(OCImpl.OC.APN);
+                String pkgName = ocInfo.get(i).optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
                 db.execSQL("update e_occ set occ_e = occ_e + 1 where occ_a = '" + pkgName + "'");
                 db.update(DBConfig.OCCount.TABLE_NAME, cv,
                         DBConfig.OCCount.Column.APN + "=? and " + DBConfig.OCCount.Column.RS + "=?",
@@ -264,11 +265,11 @@ public class TableOCCount {
                 String insertTime = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.IT));
                 String encryptAn = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AN));
                 String an = Utils.decrypt(encryptAn, Long.valueOf(insertTime));
-                job.put(OCImpl.OC.APN, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.APN)));
-                job.put(OCImpl.OC.AN, an);
-                job.put(OCImpl.OC.CU, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.CU)));
-                job.put(OCImpl.OC.TI, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.TI)));
-                job.put(OCImpl.OC.DY, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.DY)));
+                job.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.APN)));
+                job.put(DeviceKeyContacts.OCInfo.ApplicationName, an);
+                job.put(DeviceKeyContacts.OCInfo.CU, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.CU)));
+                job.put(DeviceKeyContacts.OCInfo.TI, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.TI)));
+                job.put(DeviceKeyContacts.OCInfo.DY, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.DY)));
                 ocCountJar.put(job);
             }
         } catch (Exception e) {

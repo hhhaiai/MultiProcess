@@ -199,7 +199,7 @@ public class DeviceKeyContacts {
    * @Author: sanbo
    */
   public static class OCInfo {
-    public static final String NAME = "OCImpl";
+    public static final String NAME = "OCInfo";
     // 应用打开时间，转换成时间戳，如：“1296035591”
     public static final String ApplicationOpenTime = "AOT";
     // 应用关闭时间，转换成时间戳，如：“1296035599”
@@ -218,6 +218,12 @@ public class DeviceKeyContacts {
     public static final String ApplicationType = "AT";
     // 采集来源类型，1-getRunningTask，2-读取proc，3-辅助功能，4-系统统计
     public static final String CollectionType = "CT";
+    // 应用打开关闭次数
+    public static final String CU = "CU";
+    // 快照次数所属的时段，1表示0～6小时，2表示6～12小时，3表示12～18小时，4表示18～24小时
+    public static final String TI = "TI";
+    // 发生日期
+    public static final String DY = "DY";
   }
 
   /**

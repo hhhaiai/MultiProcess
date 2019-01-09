@@ -6,13 +6,12 @@ import android.text.TextUtils;
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.impl.DeviceImpl;
+import com.analysys.dev.internal.impl.OCImpl;
 import com.analysys.dev.model.BatteryModuleNameInfo;
-import com.analysys.dev.model.DevInfo;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.List;
 
 /**
  * 存储、上传数据组装
@@ -122,19 +121,11 @@ public class DataPackaging {
     }
 
     /**
-     * OCInfo
-     * @return
-     */
-    public static JSONArray getOCInfo(){
-
-        return null;
-    }
-
-    /**
      * OCCount
      * @return
      */
     public static JSONArray getOCCount(){
+        //暂时这版不要
         return null;
     }
 
@@ -143,6 +134,7 @@ public class DataPackaging {
      * @return
      */
     public static JSONObject getProcessinfo(){
+        //这版暂时预留接口
         return null;
     }
 
@@ -151,6 +143,7 @@ public class DataPackaging {
      * @return
      */
     public static JSONArray getAppSnapshotInfo(){
+
         return null;
     }
 

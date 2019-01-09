@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.impl.AppSnapshotImpl;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
@@ -75,11 +77,11 @@ public class TableAppSnapshot {
 
     private ContentValues getContentValues(JSONObject snapshot) {
         ContentValues cv = new ContentValues();
-        cv.put(DBConfig.AppSnapshot.Column.APN, snapshot.optString(AppSnapshotImpl.Snapshot.APN));
-        cv.put(DBConfig.AppSnapshot.Column.AN, snapshot.optString(AppSnapshotImpl.Snapshot.AN));
-        cv.put(DBConfig.AppSnapshot.Column.AVC, snapshot.optString(AppSnapshotImpl.Snapshot.AVC));
-        cv.put(DBConfig.AppSnapshot.Column.AT, snapshot.optString(AppSnapshotImpl.Snapshot.AT));
-        cv.put(DBConfig.AppSnapshot.Column.AHT, snapshot.optString(AppSnapshotImpl.Snapshot.AHT));
+        cv.put(DBConfig.AppSnapshot.Column.APN, snapshot.optString(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName));
+        cv.put(DBConfig.AppSnapshot.Column.AN, snapshot.optString(DeviceKeyContacts.AppSnapshotInfo.ApplicationName));
+        cv.put(DBConfig.AppSnapshot.Column.AVC, snapshot.optString(DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode));
+        cv.put(DBConfig.AppSnapshot.Column.AT, snapshot.optString(DeviceKeyContacts.AppSnapshotInfo.ActionType));
+        cv.put(DBConfig.AppSnapshot.Column.AHT, snapshot.optString(DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime));
         return cv;
     }
 
@@ -105,15 +107,15 @@ public class TableAppSnapshot {
         JSONObject job = null;
         try {
             job = new JSONObject();
-            job.put(AppSnapshotImpl.Snapshot.APN,
+            job.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,
                 cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN)));
-            job.put(AppSnapshotImpl.Snapshot.AN,
+            job.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationName,
                 cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AN)));
-            job.put(AppSnapshotImpl.Snapshot.AVC,
+            job.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode,
                 cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AVC)));
-            job.put(AppSnapshotImpl.Snapshot.AT,
+            job.put(DeviceKeyContacts.AppSnapshotInfo.ActionType,
                 cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AT)));
-            job.put(AppSnapshotImpl.Snapshot.AHT,
+            job.put(DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
                 cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AHT)));
         } catch (Throwable e) {
         }

@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import com.analysys.dev.database.TableOC;
 import com.analysys.dev.database.TableOCCount;
+import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.impl.proc.AppProcess;
 import com.analysys.dev.internal.impl.proc.ProcessManager;
@@ -59,7 +60,7 @@ public class OCImpl {
                     // 判断系统版本
                     if (Build.VERSION.SDK_INT < 21) {
                         if(PermissionUtils.checkPermission(mContext, Manifest.permission.GET_TASKS)){
-                            RunningApps(getRunningApp(), 1);
+                            RunningApps(getRunningApp(), EGContext.OC_COLLECTION_TYPE_RUNNING_TASK);
                         }
                     }else if(Build.VERSION.SDK_INT > 21 && Build.VERSION.SDK_INT < 24 ){
                         getProcApps();
@@ -128,7 +129,7 @@ public class OCImpl {
                 String pkgName = runApps.get(i).getPackageName();
                 ELOG.i(pkgName +"   pkgName   ");
                 if (!TextUtils.isEmpty(pkgName)) {
-                    ocList.add(getOCInfo(pkgName, 2));
+                    ocList.add(getOCInfo(pkgName, EGContext.OC_COLLECTION_TYPE_PROC));
                 }
             }
             TableOCCount.getInstance(mContext).insertArray(ocList);
@@ -151,7 +152,7 @@ public class OCImpl {
     private void removeRepeat(List<JSONObject> cacheApps, List<AppProcess> runApps) {
         for (int i = cacheApps.size() - 1; i >= 0; i--) {
             JSONObject ocInfo = cacheApps.get(i);
-            String apn = ocInfo.optString(OC.APN);
+            String apn = ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
             for (int j = runApps.size() - 1; j >= 0; j--) {
                 String pkgName = runApps.get(j).getPackageName();
                 if (!TextUtils.isEmpty(apn) && apn.equals(pkgName)) {
@@ -173,12 +174,12 @@ public class OCImpl {
                 List<JSONObject> ocList = new ArrayList<JSONObject>();
                 for (int i = 0; i < cacheApps.size(); i++) {
                     JSONObject oc = cacheApps.get(i);
-                    int numb = oc.optInt(OC.CU) + 1;
-                    String apn = oc.optString(OC.APN);
-                    oc.remove(OC.CU);
+                    int numb = oc.optInt(DeviceKeyContacts.OCInfo.CU) + 1;
+                    String apn = oc.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
+                    oc.remove(DeviceKeyContacts.OCInfo.CU);
                     JSONObject job = new JSONObject();
-                    job.put(OC.APN, apn);
-                    job.put(OC.CU, numb);
+                    job.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, apn);
+                    job.put(DeviceKeyContacts.OCInfo.CU, numb);
                     ocList.add(job);
                 }
                 TableOCCount.getInstance(mContext).updateStopState(ocList);
@@ -199,7 +200,7 @@ public class OCImpl {
             List<JSONObject> updateOCInfo = new ArrayList<JSONObject>();
             // 将新增列表拆开，该时段有应用打开记录的修改更新记录，该时段没有应用打开记录的新增记录
             for (int i = runList.size() - 1; i >= 0; i--) {
-                String pkgName = runList.get(i).optString(OC.APN);
+                String pkgName = runList.get(i).optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
                 ELOG.i(pkgName+"   pkgName 202");
                 if (!TextUtils.isEmpty(pkgName) && ocInfo.contains(pkgName)) {
                     updateOCInfo.add(runList.get(i));
@@ -228,7 +229,7 @@ public class OCImpl {
                 String pkgName = runApps.get(i).getPackageName();
                 ELOG.i(pkgName+"     getOCArray  ");
                 if (!TextUtils.isEmpty(pkgName)) {
-                    JSONObject ocJson = getOCInfo(pkgName, 2);
+                    JSONObject ocJson = getOCInfo(pkgName, EGContext.OC_COLLECTION_TYPE_PROC);
                     list.add(ocJson);
                 }
             }
@@ -245,7 +246,7 @@ public class OCImpl {
         if (!TextUtils.isEmpty(pkgName)) {
             // 根据包名和时段查询，判断当前时段是否已经启动过，如果有就更新，如果没有就新建
             List<String> ocInfo = TableOCCount.getInstance(mContext).getIntervalApps();
-            JSONObject ocJson = getOCInfo(pkgName, 1);
+            JSONObject ocJson = getOCInfo(pkgName, EGContext.OC_COLLECTION_TYPE_RUNNING_TASK);
             if (ocInfo.contains(pkgName)) {
                 // 该时段存在数据,使用已有记录的数据 更新开始时间结束时间
                 TableOCCount.getInstance(mContext).update(ocJson);
@@ -263,7 +264,7 @@ public class OCImpl {
         try {
             for (int i = cacheApps.size() - 1; i >= 0; i--) {
                 JSONObject job = cacheApps.get(i);
-                String apn = job.getString(OC.APN);
+                String apn = job.getString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
                 ELOG.i(apn +" -------apn");
                 if (!TextUtils.isEmpty(apn) && apn.equals(pkgName)) {
                     cacheApps.remove(i);
@@ -271,8 +272,8 @@ public class OCImpl {
                     pkgName = null;
                     continue;
                 }
-                job.put(OC.ACT, String.valueOf(System.currentTimeMillis()));
-                job.put(OC.AST, "1");
+                job.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime, String.valueOf(System.currentTimeMillis()));
+                job.put(DeviceKeyContacts.OCInfo.SwitchType, EGContext.SWITCH_TYPE_DEFAULT);
             }
         } catch (Throwable e) {
             ELOG.e(e);
@@ -282,7 +283,6 @@ public class OCImpl {
     /**
      * 根据包名 获取应用信息并组成json格式
      */
-    @SuppressWarnings("deprecation")
     private JSONObject getOCInfo(String packageName, int collectionType) {
         JSONObject ocInfo = null;
         try {
@@ -290,14 +290,15 @@ public class OCImpl {
                 PackageManager pm = mContext.getPackageManager();
                 ApplicationInfo appInfo = pm.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
                 ocInfo = new JSONObject();
-                ocInfo.put(OC.APN, packageName);
-                ocInfo.put(OC.AN, appInfo.loadLabel(pm).toString());
-                ocInfo.put(OC.AOT, String.valueOf(System.currentTimeMillis()));
-                ocInfo.put(OC.AVC, pm.getPackageInfo(packageName, 0).versionName + "|"
+                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, packageName);
+                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName, appInfo.loadLabel(pm).toString());
+                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationOpenTime, String.valueOf(System.currentTimeMillis()));
+                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode, pm.getPackageInfo(packageName, 0).versionName + "|"
                     + pm.getPackageInfo(packageName, 0).versionCode);
-                ocInfo.put(OC.NT, Utils.getNetworkType(mContext));
-                ocInfo.put(OC.AT, appType(packageName));
-                ocInfo.put(OC.CT, collectionType);
+                ocInfo.put(DeviceKeyContacts.OCInfo.NetworkType, Utils.getNetworkType(mContext));
+                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationType, appType(packageName));
+                ocInfo.put(DeviceKeyContacts.OCInfo.CollectionType, collectionType);
+                ocInfo.put(DeviceKeyContacts.OCInfo.SwitchType,EGContext.SWITCH_TYPE_DEFAULT);
             }
         } catch (Throwable e) {
 
@@ -321,30 +322,30 @@ public class OCImpl {
         }
     }
 
-    public class OC {
-        // 应用包名
-        public static final String APN = "APN";
-        // 应用名称
-        public static final String AN = "AN";
-        // 开始时间
-        public static final String AOT = "AOT";
-        // 结束时间
-        public static final String ACT = "ACT";
-        // 应用打开关闭次数
-        public static final String CU = "CU";
-        // 应用版本信息
-        public static final String AVC = "AVC";
-        // 网络类型
-        public static final String NT = "NT";
-        // 应用切换类型，1-正常使用，2-开关屏幕切换，3-服务重启
-        public static final String AST = "AST";
-        // 应用类型
-        public static final String AT = "AT";
-        // OC采集来源，1-getRunningTask，2-读取proc，3-辅助功能，4-系统统计
-        public static final String CT = "CT";
-        // 快照次数所属的时段，1表示0～6小时，2表示6～12小时，3表示12～18小时，4表示18～24小时
-        public static final String TI = "TI";
-        // 发生日期
-        public static final String DY = "DY";
-    }
+//    public class OC {
+//        // 应用包名
+//        public static final String APN = "APN";
+//        // 应用名称
+//        public static final String AN = "AN";
+//        // 开始时间
+//        public static final String AOT = "AOT";
+//        // 结束时间
+//        public static final String ACT = "ACT";
+//        // 应用打开关闭次数
+//        public static final String CU = "CU";
+//        // 应用版本信息
+//        public static final String AVC = "AVC";
+//        // 网络类型
+//        public static final String NT = "NT";
+//        // 应用切换类型，1-正常使用，2-开关屏幕切换，3-服务重启
+//        public static final String AST = "AST";
+//        // 应用类型
+//        public static final String AT = "AT";
+//        // OC采集来源，1-getRunningTask，2-读取proc，3-辅助功能，4-系统统计
+//        public static final String CT = "CT";
+//        // 快照次数所属的时段，1表示0～6小时，2表示6～12小时，3表示12～18小时，4表示18～24小时
+//        public static final String TI = "TI";
+//        // 发生日期
+//        public static final String DY = "DY";
+//    }
 }

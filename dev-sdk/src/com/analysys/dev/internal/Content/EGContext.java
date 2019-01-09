@@ -67,7 +67,7 @@ public class EGContext {
     }
     public static final String APPSNAPSHOT_PROC_SYNC_NAME = "install.txt";
     public static final String SP_APP_IDFA = "appIDFA";
-
+    public static final String SWITCH_TYPE_DEFAULT = "1";
 
     //防作弊相关信息开关，默认不上传，可控制上传
     public static boolean SWITCH_OF_PREVENT_CHEATING = false;
@@ -79,4 +79,16 @@ public class EGContext {
     public static boolean SWITCH_OF_DEV_FURTHER_DETAIL= false;
     //系统阶段保持信息，默认可不上传，根据服务器控制来上传
     public static boolean SWITCH_OF_SYSTEM_INFO= false;
+
+
+    public static int OC_COLLECTION_TYPE_RUNNING_TASK = 1;//getRunningTask
+    public static int OC_COLLECTION_TYPE_PROC = 2;//读取proc
+    public static int OC_COLLECTION_TYPE_AUX = 3;//辅助功能
+    public static int OC_COLLECTION_TYPE_SYSTEM = 4;//系统统计
+
+    public static String SNAP_SHOT_DEFAULT = "-1";
+    public static String SNAP_SHOT_INSTALL = "0";
+    public static String SNAP_SHOT_UNINSTALL = "1";
+    public static String SNAP_SHOT_UPDATE = "2";
+
 }

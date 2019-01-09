@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.analysys.dev.database.TableLocation;
+import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.EThreadPool;
@@ -114,24 +115,24 @@ public class LocationImpl {
         JSONObject locationJson = null;
         try {
             locationJson = new JSONObject();
-            locationJson.put("CT", String.valueOf(System.currentTimeMillis()));
+            locationJson.put(DeviceKeyContacts.LocationInfo.CollectionTime, String.valueOf(System.currentTimeMillis()));
 
             String locationInfo = getCoordinate();
             int location = SPHelper.getDefault(mContext).getInt(EGContext.SP_LOCATION, 1);
             if (!TextUtils.isEmpty(locationInfo) && location == 1) {
-                locationJson.put("GL", locationInfo);
+                locationJson.put(DeviceKeyContacts.LocationInfo.GeographyLocation, locationInfo);
             }
 
             JSONArray wifiInfo = WifiImpl.getInstance(mContext).getWifiInfo();
             int wifi = SPHelper.getDefault(mContext).getInt(EGContext.SP_WIFI, 1);
             if (wifiInfo != null && wifiInfo.length() != 0 && wifi == 1) {
-                locationJson.put("WifiInfo", wifiInfo);
+                locationJson.put(DeviceKeyContacts.LocationInfo.WifiInfo.NAME, wifiInfo);
             }
 
             JSONArray baseStation = getBaseStationInfo();
             int base = SPHelper.getDefault(mContext).getInt(EGContext.SP_BASE_STATION, 1);
             if (baseStation != null && baseStation.length() != 0 && base == 1) {
-                locationJson.put("BaseStationInfo", baseStation);
+                locationJson.put(DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME, baseStation);
             }
         } catch (Throwable e) {
             e.printStackTrace();
@@ -151,28 +152,28 @@ public class LocationImpl {
        /**
      * 基站信息
      */
-    @SuppressWarnings("deprecation")
     public JSONArray getBaseStationInfo() {
         JSONArray jar = new JSONArray();
         try {
             TelephonyManager mTelephonyManager = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                // List<NeighboringCellInfo> list = mTelephonyManager.getNeighboringCellInfo();
-                // baseStationSort(list);
-                // for (int i = 0; i < list.size(); i++) {
-                // if (i < 5) {
-                // JSONObject job = new JSONObject();
-                // job.put("Lac", list.get(i).getLac());
-                // job.put("CellId", list.get(i).getCid());
-                // job.put("level", list.get(i).getRssi());
-                // jar.put(job);
-                // }
-                // }
+                 List<NeighboringCellInfo> list = mTelephonyManager.getNeighboringCellInfo();
+                 baseStationSort(list);
+                JSONObject locationJson = null;
+                 for (int i = 0; i < list.size(); i++) {
+                     if (i < 5) {//TODO 只要小于5个的？
+                         locationJson = new JSONObject();
+                         locationJson.put(DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, list.get(i).getLac());
+                         locationJson.put(DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, list.get(i).getCid());
+                         locationJson.put(DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, list.get(i).getRssi());
+                         jar.put(locationJson);
+                     }
+                 }
                 GsmCellLocation location = (GsmCellLocation)mTelephonyManager.getCellLocation();
-                JSONObject locationJson = new JSONObject();
-                locationJson.put("Lac", location.getLac());
-                locationJson.put("CellId", location.getCid());
-                locationJson.put("level", location.getPsc());
+                locationJson = new JSONObject();
+                locationJson.put(DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, location.getLac());
+                locationJson.put(DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, location.getCid());
+                locationJson.put(DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, location.getPsc());
                 jar.put(locationJson);
             }
         } catch (Exception e) {

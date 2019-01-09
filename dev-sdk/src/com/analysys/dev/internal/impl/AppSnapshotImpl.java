@@ -8,6 +8,7 @@ import java.util.Set;
 import org.json.JSONObject;
 
 import com.analysys.dev.database.TableAppSnapshot;
+import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.EThreadPool;
@@ -44,13 +45,13 @@ public class AppSnapshotImpl {
         return Holder.INSTANCE;
     }
 
-    public class Snapshot {
-        public final static String APN = "APN";
-        public final static String AN = "AN";
-        public final static String AVC = "AVC";
-        public final static String AT = "AT";
-        public final static String AHT = "AHT";
-    }
+//    public class Snapshot {
+//        public final static String APN = "APN";
+//        public final static String AN = "AN";
+//        public final static String AVC = "AVC";
+//        public final static String AT = "AT";
+//        public final static String AHT = "AHT";
+//    }
 
     /**
      * 应用列表
@@ -98,23 +99,23 @@ public class AppSnapshotImpl {
         try {
             for (int i = 0; i < currentSnapshotsList.size(); i++) {
                 JSONObject item = currentSnapshotsList.get(i);
-                String apn = item.getString(Snapshot.APN);
+                String apn = item.getString(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName);
                 if (dbSnapshotsMap.containsKey(apn)) {
                     JSONObject dbitem = new JSONObject(dbSnapshotsMap.get(apn));
-                    String avc = item.optString(Snapshot.AVC);
-                    String dbAvc = dbitem.optString(Snapshot.AVC);
+                    String avc = item.optString(DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode);
+                    String dbAvc = dbitem.optString(DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode);
                     if (!TextUtils.isEmpty(avc) && !avc.equals(dbAvc)) {
-                        item.put(Snapshot.AT, "2");
+                        item.put(DeviceKeyContacts.AppSnapshotInfo.ActionType, EGContext.SNAP_SHOT_UPDATE);
                     }
                     dbSnapshotsMap.remove(apn);
                     continue;
                 }
-                item.put(Snapshot.AT, "0");
+                item.put(DeviceKeyContacts.AppSnapshotInfo.ActionType, EGContext.SNAP_SHOT_INSTALL);
             }
             Set<String> set = dbSnapshotsMap.keySet();
             for (String json : set) {
                 JSONObject j = new JSONObject(dbSnapshotsMap.get(json));
-                j.put(Snapshot.AT, "1");
+                j.put(DeviceKeyContacts.AppSnapshotInfo.ActionType, EGContext.SNAP_SHOT_UNINSTALL);
                 currentSnapshotsList.add(j);
             }
         } catch (Throwable e) {
@@ -138,7 +139,7 @@ public class AppSnapshotImpl {
                 // if ((ApplicationInfo.FLAG_SYSTEM & pi.applicationInfo.flags) != 0) {
                 // continue;
                 // }
-                JSONObject job = getAppInfo(pi, "-1");
+                JSONObject job = getAppInfo(pi, EGContext.SNAP_SHOT_DEFAULT);
                 if (job != null) {
                     list.add(job);
                 }
@@ -155,20 +156,19 @@ public class AppSnapshotImpl {
      * @param tag
      * @return
      */
-    @SuppressWarnings("deprecation")
     private JSONObject getAppInfo(PackageInfo pkgInfo, String tag) {
-        JSONObject job = null;
+        JSONObject appInfo = null;
         try {
             PackageManager packageManager = mContext.getPackageManager();
-            job = new JSONObject();
-            job.put(Snapshot.APN, pkgInfo.packageName);
-            job.put(Snapshot.AN, String.valueOf(pkgInfo.applicationInfo.loadLabel(packageManager)));
-            job.put(Snapshot.AVC, pkgInfo.versionName + "|" + pkgInfo.versionCode);
-            job.put(Snapshot.AT, tag);
-            job.put(Snapshot.AHT, String.valueOf(System.currentTimeMillis()));
+            appInfo = new JSONObject();
+            appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName, pkgInfo.packageName);
+            appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationName, String.valueOf(pkgInfo.applicationInfo.loadLabel(packageManager)));
+            appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode, pkgInfo.versionName + "|" + pkgInfo.versionCode);
+            appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ActionType, tag);
+            appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime, String.valueOf(System.currentTimeMillis()));
         } catch (Throwable e) {
         }
-        return job;
+        return appInfo;
     }
 
     /**
@@ -185,7 +185,7 @@ public class AppSnapshotImpl {
                 try {
                     if (type == 0) {
                         PackageInfo pi = mContext.getPackageManager().getPackageInfo(pkgName, 0);
-                        JSONObject job = getAppInfo(pi, "0");
+                        JSONObject job = getAppInfo(pi, EGContext.SNAP_SHOT_INSTALL);
                         if (job != null) {
                             // 判断数据表中是否有该应用的存在，如果有标识此次安装是应用更新所导致
                             boolean isHas = TableAppSnapshot.getInstance(mContext).isHasPkgName(pkgName);
@@ -194,9 +194,9 @@ public class AppSnapshotImpl {
                             }
                         }
                     } else if (type == 1) {
-                        TableAppSnapshot.getInstance(mContext).update(pkgName, "1");
+                        TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UNINSTALL);
                     } else if (type == 2) {
-                        TableAppSnapshot.getInstance(mContext).update(pkgName, "2");
+                        TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UPDATE);
                     }
                 } catch (Throwable e) {
                     ELOG.e(e);

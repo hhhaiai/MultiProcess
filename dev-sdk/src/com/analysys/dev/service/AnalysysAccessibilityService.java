@@ -1,5 +1,6 @@
 package com.analysys.dev.service;
 
+import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.impl.OCImpl;
 import com.analysys.dev.utils.reflectinon.Reflecer;
 
@@ -55,7 +56,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         String pkgName = String.valueOf(event.getPackageName());
-        OCImpl.getInstance(this).RunningApps(pkgName, 3);
+        OCImpl.getInstance(this).RunningApps(pkgName, EGContext.OC_COLLECTION_TYPE_AUX);
     }
 
     @Override
