@@ -8,7 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.analysys.dev.database.TableLocation;
-import com.analysys.dev.internal.Content.EDContext;
+import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.EThreadPool;
 import com.analysys.dev.utils.PermissionUtils;
@@ -76,20 +76,20 @@ public class LocationImpl {
                 JSONObject location = getLocation();
                 if (location != null) {
                     TableLocation.getInstance(mContext).insert(String.valueOf(location));
-                    SPHelper.getDefault(mContext).edit().putLong(EDContext.SP_LOCATION_TIME, System.currentTimeMillis())
+                    SPHelper.getDefault(mContext).edit().putLong(EGContext.SP_LOCATION_TIME, System.currentTimeMillis())
                         .commit();
                 }
-                MessageDispatcher.getInstance(mContext).locationInfo(EDContext.LOCATION_CYCLE);
+                MessageDispatcher.getInstance(mContext).locationInfo(EGContext.LOCATION_CYCLE);
             }
         });
     }
 
     private boolean isGetLocation() {
-        long time = SPHelper.getDefault(mContext).getLong(EDContext.SP_LOCATION_TIME, 0);
+        long time = SPHelper.getDefault(mContext).getLong(EGContext.SP_LOCATION_TIME, 0);
         if (time == 0) {
             return true;
         } else {
-            if (System.currentTimeMillis() - time >= EDContext.LOCATION_CYCLE) {
+            if (System.currentTimeMillis() - time >= EGContext.LOCATION_CYCLE) {
                 return true;
             } else {
                 return false;
@@ -117,19 +117,19 @@ public class LocationImpl {
             locationJson.put("CT", String.valueOf(System.currentTimeMillis()));
 
             String locationInfo = getCoordinate();
-            int location = SPHelper.getDefault(mContext).getInt(EDContext.SP_LOCATION, 1);
+            int location = SPHelper.getDefault(mContext).getInt(EGContext.SP_LOCATION, 1);
             if (!TextUtils.isEmpty(locationInfo) && location == 1) {
                 locationJson.put("GL", locationInfo);
             }
 
             JSONArray wifiInfo = WifiImpl.getInstance(mContext).getWifiInfo();
-            int wifi = SPHelper.getDefault(mContext).getInt(EDContext.SP_WIFI, 1);
+            int wifi = SPHelper.getDefault(mContext).getInt(EGContext.SP_WIFI, 1);
             if (wifiInfo != null && wifiInfo.length() != 0 && wifi == 1) {
                 locationJson.put("WifiInfo", wifiInfo);
             }
 
             JSONArray baseStation = getBaseStationInfo();
-            int base = SPHelper.getDefault(mContext).getInt(EDContext.SP_BASE_STATION, 1);
+            int base = SPHelper.getDefault(mContext).getInt(EGContext.SP_BASE_STATION, 1);
             if (baseStation != null && baseStation.length() != 0 && base == 1) {
                 locationJson.put("BaseStationInfo", baseStation);
             }

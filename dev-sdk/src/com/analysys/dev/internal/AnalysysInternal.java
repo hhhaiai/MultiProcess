@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.os.Process;
 import android.text.TextUtils;
 
-import com.analysys.dev.internal.Content.EDContext;
+import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.utils.AndroidManifestHelper;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
@@ -52,18 +52,18 @@ public class AnalysysInternal {
         if (TextUtils.isEmpty(key)) {
             Bundle bundle = AndroidManifestHelper.getMetaData(mContext);
             if (bundle == null) {
-                ELOG.e(EDContext.LOGINFO.LOG_NOT_APPKEY);
+                ELOG.e(EGContext.LOGINFO.LOG_NOT_APPKEY);
             }
-            key = bundle.getString(EDContext.XML_METADATA_APPKEY);
-            channel = bundle.getString(EDContext.XML_METADATA_CHANNEL);
+            key = bundle.getString(EGContext.XML_METADATA_APPKEY);
+            channel = bundle.getString(EGContext.XML_METADATA_CHANNEL);
             if (TextUtils.isEmpty(key)) {
-                ELOG.e(EDContext.LOGINFO.LOG_NOT_APPKEY);
+                ELOG.e(EGContext.LOGINFO.LOG_NOT_APPKEY);
             }
         }
-        SPHelper.getDefault(mContext).edit().putString(EDContext.SP_APP_KEY, key).commit();
-        SPHelper.getDefault(mContext).edit().putString(EDContext.SP_APP_CHANNEL, channel).commit();
+        SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_KEY, key).commit();
+        SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_CHANNEL, channel).commit();
 
-        EDContext.FLAG_DEBUG_USER = isDebug;
+        EGContext.FLAG_DEBUG_USER = isDebug;
 
         MessageDispatcher.getInstance(mContext).startService(0);
         // 4.启动页面监听相关的

@@ -5,7 +5,7 @@ import android.content.Context;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 
-import com.analysys.dev.internal.Content.EDContext;
+import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.utils.PermissionUtils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 import com.analysys.dev.utils.sp.SPHelper;
@@ -40,7 +40,7 @@ public class WifiImpl {
         try {
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_WIFI_STATE)) {
                 WifiManager wm = (WifiManager)mContext.getSystemService(WIFI_SERVICE);
-                int wifiDetail = SPHelper.getDefault(mContext).getInt(EDContext.SP_WIFI_DETAIL, 0);
+                int wifiDetail = SPHelper.getDefault(mContext).getInt(EGContext.SP_WIFI_DETAIL, 0);
                 if (wm.getWifiState() == WifiManager.WIFI_STATE_ENABLED) {
                     List<ScanResult> list = wm.getScanResults();
                     wifiSort(list);

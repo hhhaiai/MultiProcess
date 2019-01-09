@@ -10,7 +10,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.analysys.dev.internal.Content.EDContext;
+import com.analysys.dev.internal.Content.EGContext;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,7 +65,7 @@ public class ELOG {
 
     private static final int JSON_INDENT = 2;
     // 是否打印bug.建议在application中调用init接口初始化
-    public static boolean USER_DEBUG = EDContext.FLAG_DEBUG_USER;
+    public static boolean USER_DEBUG = EGContext.FLAG_DEBUG_USER;
     // 是否接受shell控制打印
     private static boolean isShellControl = true;
     // 是否打印详细log,详细打印调用的堆栈
@@ -76,7 +76,7 @@ public class ELOG {
     private static boolean isFormat = false;
 
     // 默认tag
-    private static String DEFAULT_TAG = EDContext.LOGTAG_DEBUG;
+    private static String DEFAULT_TAG = EGContext.LOGTAG_DEBUG;
     // 临时tag.用法：调用log中大于1个参数,且第一个参数为字符串,且不是format用法,字符串长度没超过协议值,此时启用临时tag
     private static String TEMP_TAG = "";
     // 规定每段显示的长度.每行最大日志长度 (Android Studio3.1最多2902字符)

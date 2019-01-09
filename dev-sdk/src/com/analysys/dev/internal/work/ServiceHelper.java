@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 
-import com.analysys.dev.internal.Content.EDContext;
+import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.utils.PermissionUtils;
 import com.analysys.dev.utils.Utils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
@@ -60,7 +60,7 @@ public class ServiceHelper {
      */
     protected void startSelfService() {
         if (isStartService()) {
-            boolean isWork = Utils.isServiceWork(mContext, EDContext.SERVICE_NAME);
+            boolean isWork = Utils.isServiceWork(mContext, EGContext.SERVICE_NAME);
             if (!isWork) {
                 try {
                     ComponentName cn = new ComponentName(mContext, AnalysysService.class);
@@ -88,7 +88,7 @@ public class ServiceHelper {
         if (Build.VERSION.SDK_INT < 26) {
             return true;
         }
-        if (EDContext.FLAG_SHOW_NOTIFY) {
+        if (EGContext.FLAG_SHOW_NOTIFY) {
             if (Build.VERSION.SDK_INT >= 28) {
                 if (PermissionUtils.checkPermission(mContext,
                         "android.permission.FOREGROUND_SERVICE")) {

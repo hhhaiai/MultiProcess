@@ -8,7 +8,7 @@ import java.util.Set;
 import org.json.JSONObject;
 
 import com.analysys.dev.database.TableAppSnapshot;
-import com.analysys.dev.internal.Content.EDContext;
+import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.EThreadPool;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
@@ -66,9 +66,9 @@ public class AppSnapshotImpl {
                         currentSnapshotsList = getDifference(currentSnapshotsList, dbSnapshotsMap);
                     }
                     TableAppSnapshot.getInstance(mContext).coverInsert(currentSnapshotsList);
-                    SPHelper.getDefault(mContext).edit().putLong(EDContext.SP_SNAPSHOT_TIME, System.currentTimeMillis())
+                    SPHelper.getDefault(mContext).edit().putLong(EGContext.SP_SNAPSHOT_TIME, System.currentTimeMillis())
                         .commit();
-                    MessageDispatcher.getInstance(mContext).snapshotInfo(EDContext.SNAPSHOT_CYCLE);
+                    MessageDispatcher.getInstance(mContext).snapshotInfo(EGContext.SNAPSHOT_CYCLE);
                 }
             });
         }
@@ -78,11 +78,11 @@ public class AppSnapshotImpl {
      * 判断是否到达获取快照时间
      */
     private boolean isGetSnapshots() {
-        Long time = SPHelper.getDefault(mContext).getLong(EDContext.SP_SNAPSHOT_TIME, 0);
+        Long time = SPHelper.getDefault(mContext).getLong(EGContext.SP_SNAPSHOT_TIME, 0);
         if (time == 0) {
             return true;
         } else {
-            if (EDContext.SNAPSHOT_CYCLE <= (System.currentTimeMillis() - time)) {
+            if (EGContext.SNAPSHOT_CYCLE <= (System.currentTimeMillis() - time)) {
                 return true;
             }
         }

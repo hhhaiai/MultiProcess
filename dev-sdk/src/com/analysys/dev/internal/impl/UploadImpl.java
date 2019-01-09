@@ -8,7 +8,7 @@ import com.analysys.dev.database.TableAppSnapshot;
 import com.analysys.dev.database.TableLocation;
 import com.analysys.dev.database.TableOC;
 import com.analysys.dev.database.TableOCCount;
-import com.analysys.dev.internal.Content.EDContext;
+import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.utils.EThreadPool;
 import com.analysys.dev.utils.RequestUtils;
 import com.analysys.dev.utils.Utils;
@@ -70,7 +70,7 @@ public class UploadImpl {
                 // 策略处理
             }
         });
-        MessageDispatcher.getInstance(mContext).uploadInfo(EDContext.UPLOAD_CYCLE);
+        MessageDispatcher.getInstance(mContext).uploadInfo(EGContext.UPLOAD_CYCLE);
     }
 
     /**

@@ -10,7 +10,7 @@ import android.content.pm.ServiceInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.analysys.dev.internal.Content.EDContext;
+import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 
 import java.util.ArrayList;
@@ -197,7 +197,7 @@ public class AndroidManifestHelper {
                 }
             }
         } catch (Throwable e) {
-            if (EDContext.FLAG_DEBUG_INNER) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
         }

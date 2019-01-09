@@ -6,7 +6,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 
-import com.analysys.dev.internal.Content.EDContext;
+import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 
 /**
@@ -45,7 +45,7 @@ public class CheckHeartbeat {
     public void sendMessages() {
         Message msg = new Message();
         msg.what = MSG_CHECK;
-        mHandler.sendMessageDelayed(msg, EDContext.CHECK_HEARTBEAT_CYCLE);
+        mHandler.sendMessageDelayed(msg, EGContext.CHECK_HEARTBEAT_CYCLE);
     }
 
     class CheckHandler extends Handler {

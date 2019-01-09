@@ -7,7 +7,7 @@ import org.json.JSONObject;
 
 import com.analysys.dev.database.TableOC;
 import com.analysys.dev.database.TableOCCount;
-import com.analysys.dev.internal.Content.EDContext;
+import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.impl.proc.AppProcess;
 import com.analysys.dev.internal.impl.proc.ProcessManager;
 import com.analysys.dev.utils.ELOG;
@@ -66,7 +66,7 @@ public class OCImpl {
                     }else{
                         //TODO 7.0以上待调研
                     }
-                    MessageDispatcher.getInstance(mContext).ocInfo(EDContext.OC_CYCLE);
+                    MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE);
                 }
             }
         });
