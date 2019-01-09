@@ -7,7 +7,7 @@ package com.analysys.dev.internal.Content;
  * @Create: 2018年9月3日 下午2:40:40
  * @Author: sanbo
  */
-public class EDContext {
+public class EGContext {
 
     /**
      * EGuan 内部调试控制. 主要用于控制堆栈打印、错误打印、内部提示信息打印
@@ -68,4 +68,15 @@ public class EDContext {
     public static final String APPSNAPSHOT_PROC_SYNC_NAME = "install.txt";
     public static final String SP_APP_IDFA = "appIDFA";
 
+
+    //防作弊相关信息开关，默认不上传，可控制上传
+    public static boolean SWITCH_OF_PREVENT_CHEATING = false;
+    //蓝牙信息，默认不上传，需要根据服务器控制
+    public static boolean SWITCH_OF_BLUETOOTH = false;
+    //电量信息，默认不上传，需要根据服务器控制
+    public static boolean SWITCH_OF_BATTERY = false;
+    //更加详细的设备详情信息，默认可不上传，可用于确定设备信息
+    public static boolean SWITCH_OF_DEV_FURTHER_DETAIL= false;
+    //系统阶段保持信息，默认可不上传，根据服务器控制来上传
+    public static boolean SWITCH_OF_SYSTEM_INFO= false;
 }

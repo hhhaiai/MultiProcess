@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.provider.Settings;
 import android.text.TextUtils;
-import com.analysys.dev.internal.Content.EDContext;
+import com.analysys.dev.internal.Content.EGContext;
 import java.util.Arrays;
 
 /**
@@ -26,8 +26,8 @@ public class AccessibilityHelper {
      */
     public static boolean isAccessibilitySettingsOn(Context context, Class<?> clazz) {
         if (context == null || clazz == null) {
-            if (EDContext.FLAG_DEBUG_INNER) {
-                LL.e("AccessibilityHelper.isAccessibilitySettingsOn  the param is null!");
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e("AccessibilityHelper.isAccessibilitySettingsOn  the param is null!");
             }
             return false;
         }
@@ -36,7 +36,7 @@ public class AccessibilityHelper {
          * 1.确保类型是辅助功能
          */
         if (!AndroidManifestHelper.isSubClass(clazz, AccessibilityService.class)) {
-            // if (EDContext.FLAG_DEBUG_INNER) {
+            // if (EGContext.FLAG_DEBUG_INNER) {
             // L.e("请检查传入参数是辅助功能的类!");
             // }
             return false;
@@ -45,14 +45,14 @@ public class AccessibilityHelper {
          * 2.确认xml中声明该类。声明权限
          */
         if (!AndroidManifestHelper.isServiceDefineInManifest(context, clazz)) {
-            if (EDContext.FLAG_DEBUG_INNER) {
-                LL.e("please define  service [" + clazz.getCanonicalName() + "]  in AndroidManifest.xml! ");
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e("please define  service [" + clazz.getCanonicalName() + "]  in AndroidManifest.xml! ");
             }
             return false;
         }
         if (!AndroidManifestHelper.isPermissionDefineInManifest(context, permission.BIND_ACCESSIBILITY_SERVICE)) {
-            if (EDContext.FLAG_DEBUG_INNER) {
-                LL.e("please check android.permission.BIND_ACCESSIBILITY_SERVICEAndroid about service["
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e("please check android.permission.BIND_ACCESSIBILITY_SERVICEAndroid about service["
                     + clazz.getCanonicalName() + "] in AndroidManifest.xml !");
             }
             return false;
@@ -93,8 +93,8 @@ public class AccessibilityHelper {
                 }
             }
         } else {
-            if (EDContext.FLAG_DEBUG_INNER) {
-                LL.v("please make sure  accessibility  Enabled!");
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.v("please make sure  accessibility  Enabled!");
             }
         }
         return false;

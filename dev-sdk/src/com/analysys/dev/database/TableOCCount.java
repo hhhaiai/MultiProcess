@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
 import com.analysys.dev.internal.impl.OCImpl;
-import com.analysys.dev.utils.LL;
+import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.Utils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 
@@ -57,7 +57,7 @@ public class TableOCCount {
             cv.put(DBConfig.OCCount.Column.CU, 0);
             db.insert(DBConfig.OCCount.TABLE_NAME, null, cv);
         } catch (Exception e) {
-            LL.e(e);
+            ELOG.e(e);
         }
         DBManager.getInstance(mContext).closeDB();
     }
@@ -78,7 +78,7 @@ public class TableOCCount {
                 db.setTransactionSuccessful();
             }
         } catch (Throwable e) {
-            LL.e(e);
+            ELOG.e(e);
         } finally {
             db.endTransaction();
         }
@@ -97,13 +97,13 @@ public class TableOCCount {
             String day = Utils.getDay();
             int timeInterval = Utils.getTimeTag(System.currentTimeMillis());
             ContentValues cv = getContentValues(ocInfo);
-            LL.i(ocInfo+"  ocInfo update()");
+            ELOG.i(ocInfo+"  ocInfo update()");
             db.update(DBConfig.OCCount.TABLE_NAME, cv,
                     DBConfig.OCCount.Column.APN + "=? and " + DBConfig.OCCount.Column.DY + "=? and "
                             + DBConfig.OCCount.Column.TI + "=? and " + DBConfig.OCCount.Column.RS + "=?",
                     new String[]{ocInfo.optString(OCImpl.OC.APN), day, String.valueOf(timeInterval), ZERO});
         } catch (Throwable e) {
-            LL.e(e);
+            ELOG.e(e);
         }
         DBManager.getInstance(mContext).closeDB();
     }
@@ -117,7 +117,7 @@ public class TableOCCount {
             cv = new ContentValues();
             long insertTime = System.currentTimeMillis();
             String an = Utils.encrypt(ocInfo.optString(OCImpl.OC.AN), insertTime);
-            LL.i(ocInfo.toString()+"     ocInfo  ");
+            ELOG.i(ocInfo.toString()+"     ocInfo  ");
             cv.put(DBConfig.OCCount.Column.APN, ocInfo.optString(OCImpl.OC.APN));
             cv.put(DBConfig.OCCount.Column.AN, an);
             cv.put(DBConfig.OCCount.Column.AOT, ocInfo.optString(OCImpl.OC.AOT));
@@ -160,7 +160,7 @@ public class TableOCCount {
                 list.add(job);
             }
         } catch (Throwable e) {
-            LL.e(e);
+            ELOG.e(e);
         }
         return list;
     }
@@ -185,7 +185,7 @@ public class TableOCCount {
             }
             db.setTransactionSuccessful();
         } catch (Throwable e) {
-            LL.e(e);
+            ELOG.e(e);
         } finally {
             db.endTransaction();
         }
@@ -212,7 +212,7 @@ public class TableOCCount {
             }
             db.setTransactionSuccessful();
         } catch (Throwable e) {
-            LL.e(e);
+            ELOG.e(e);
         } finally {
             db.endTransaction();
         }
@@ -242,7 +242,7 @@ public class TableOCCount {
                 }
             }
         } catch (Exception e) {
-            LL.e(e);
+            ELOG.e(e);
         }
         DBManager.getInstance(mContext).closeDB();
         return list;

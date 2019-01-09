@@ -9,8 +9,8 @@ import org.json.JSONObject;
 
 import com.analysys.dev.database.TableAppSnapshot;
 import com.analysys.dev.internal.Content.EDContext;
+import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.EThreadPool;
-import com.analysys.dev.utils.LL;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 import com.analysys.dev.utils.sp.SPHelper;
 import com.analysys.dev.internal.work.MessageDispatcher;
@@ -199,7 +199,7 @@ public class AppSnapshotImpl {
                         TableAppSnapshot.getInstance(mContext).update(pkgName, "2");
                     }
                 } catch (Throwable e) {
-                    LL.e(e);
+                    ELOG.e(e);
                 }
             }
         });

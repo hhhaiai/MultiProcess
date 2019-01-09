@@ -4,7 +4,12 @@ import java.io.Serializable;
  * 设备相关信息,每次上传
  */
 public class DevInfo implements Serializable{
-
+    private static class Holder {
+        private static final DevInfo INSTANCE = new DevInfo();
+    }
+    public static DevInfo getInstance() {
+        return Holder.INSTANCE;
+    }
     private static final long serialVersionUID = 1L;
     /**
      * 系统名称

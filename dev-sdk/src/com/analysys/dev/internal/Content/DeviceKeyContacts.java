@@ -1,6 +1,6 @@
 package com.analysys.dev.internal.Content;
 
-public class MProt {
+public class DeviceKeyContacts {
   /**
    * 设备相关信息
    */
@@ -25,6 +25,8 @@ public class MProt {
     public static final String SerialNumber = "SNR";
     // 分辨率，如“480-800”
     public static final String Resolution = "RES";
+    //屏幕密度，如360
+    public static final String DotPerInch = "DPI";
     /*
      * 运营商相关的
      */
@@ -81,7 +83,7 @@ public class MProt {
     // 判断设备的OS是否被劫持，"0”= 没有被劫持“1”= 被劫持//原SDK有字段，没有实现
     public static final String Hijack = "HJK";
     // 是否root，值为1表示获取root权限；值为0表示没获取root权限
-    public static final String IsJailbreak = "IJ";
+    public static final String IsRoot = "IR";
     /*
      * 蓝牙信息,默认不上传,需要根据服务器控制
      */

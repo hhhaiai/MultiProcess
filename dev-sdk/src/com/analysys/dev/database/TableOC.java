@@ -6,7 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
-import com.analysys.dev.utils.LL;
+import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.Utils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 
@@ -44,7 +44,7 @@ public class TableOC {
             db.beginTransaction();
             long time = System.currentTimeMillis();
             for (int i = 0; i < ocInfo.size(); i++) {
-                LL.i("OC存储内容：" + ocInfo);
+                ELOG.i("OC存储内容：" + ocInfo);
                 String encryptOC = Utils.encrypt(String.valueOf(ocInfo.get(i)), time);
                 if (!TextUtils.isEmpty(encryptOC)) {
                     ContentValues cv = new ContentValues();
@@ -56,7 +56,7 @@ public class TableOC {
             }
             db.setTransactionSuccessful();
         } catch (Throwable e) {
-            LL.e(e);
+            ELOG.e(e);
         } finally {
             db.endTransaction();
         }
@@ -81,7 +81,7 @@ public class TableOC {
                 }
             }
         } catch (Throwable e) {
-            LL.e(e);
+            ELOG.e(e);
         }
         DBManager.getInstance(mContext).closeDB();
         return jar;

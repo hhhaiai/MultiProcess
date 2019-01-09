@@ -58,9 +58,9 @@ import javax.xml.transform.stream.StreamSource;
  * @Create: 2015年6月18日 下午4:14:01
  * @Author: sanbo
  */
-public class LL {
+public class ELOG {
 
-    private LL() {
+    private ELOG() {
     }
 
     private static final int JSON_INDENT = 2;
@@ -429,7 +429,7 @@ public class LL {
             if (currentFile && !isKeeping) {
                 break;
             }
-            if (ste.getClassName().equals(LL.class.getName())) {
+            if (ste.getClassName().equals(ELOG.class.getName())) {
                 if (!currentFile) {
                     currentFile = true;
                 }

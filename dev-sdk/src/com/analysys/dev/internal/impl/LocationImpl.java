@@ -5,17 +5,14 @@ import static android.content.Context.WIFI_SERVICE;
 import java.util.List;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.analysys.dev.database.DBConfig;
 import com.analysys.dev.database.TableLocation;
 import com.analysys.dev.internal.Content.EDContext;
+import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.EThreadPool;
-import com.analysys.dev.utils.LL;
 import com.analysys.dev.utils.PermissionUtils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
-import com.analysys.dev.utils.reflectinon.Reflecer;
 import com.analysys.dev.utils.sp.SPHelper;
 import com.analysys.dev.internal.work.MessageDispatcher;
 
@@ -372,7 +369,7 @@ public class LocationImpl {
         if (Build.VERSION.SDK_INT > 22) {
             if (!PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
                 && !PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                LL.e("has no permission");
+                ELOG.e("has no permission");
                 return;
             }
         }
@@ -382,7 +379,7 @@ public class LocationImpl {
         if (lm == null) {
             return;
         }
-        LL.i("是否包含GPS: " + lm.isProviderEnabled(LocationManager.GPS_PROVIDER));
+        ELOG.i("是否包含GPS: " + lm.isProviderEnabled(LocationManager.GPS_PROVIDER));
 
         // lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
         // location = locationManager .getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -414,7 +411,7 @@ public class LocationImpl {
         // }
         // };
 
-        LL.i("是否包含网络: " + lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
+        ELOG.i("是否包含网络: " + lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
         // lm.requestLocationUpdates( LocationManager.NETWORK_PROVIDER, 1000, 0, locationListener);
         // location = lm .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         // if (location != null) {
@@ -428,15 +425,15 @@ public class LocationImpl {
         // 特殊的位置提供
         Location loc = lm.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
         if (loc == null) {
-            LL.e("getLastKnownLocation is null!");
+            ELOG.e("getLastKnownLocation is null!");
             return;
         }
-        LL.i("getLatitude:" + loc.getLatitude());
-        LL.i("getLongitude:" + loc.getLongitude());
-        LL.i("getSpeed:" + loc.getSpeed());
-        LL.i("getTime:" + loc.getTime());
+        ELOG.i("getLatitude:" + loc.getLatitude());
+        ELOG.i("getLongitude:" + loc.getLongitude());
+        ELOG.i("getSpeed:" + loc.getSpeed());
+        ELOG.i("getTime:" + loc.getTime());
 
-        LL.i("===================");
+        ELOG.i("===================");
         // 查找到服务信息
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE); // 高精度
@@ -445,14 +442,14 @@ public class LocationImpl {
         criteria.setCostAllowed(true);
         criteria.setPowerRequirement(Criteria.POWER_LOW); // 低功耗
         String provider = lm.getBestProvider(criteria, true); // 获取GPS信息
-        LL.i("provider: " + provider);
+        ELOG.i("provider: " + provider);
         Location location = lm.getLastKnownLocation(provider); // 通过GPS获取位置
         if (location == null) {
-            LL.e("获取异常  location is null! ");
+            ELOG.e("获取异常  location is null! ");
             return;
         }
-        LL.i("===getLatitude===>" + location.getLatitude());
-        LL.i("===getLongitude===>" + location.getLongitude());
+        ELOG.i("===getLatitude===>" + location.getLatitude());
+        ELOG.i("===getLongitude===>" + location.getLongitude());
 
     }
 

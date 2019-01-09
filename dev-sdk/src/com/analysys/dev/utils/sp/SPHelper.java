@@ -8,11 +8,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.analysys.dev.utils.LL;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+
+import com.analysys.dev.utils.ELOG;
 
 /**
  * @Copyright © 2017 sanbo Inc. All rights reserved.
@@ -57,7 +58,7 @@ public class SPHelper {
                 } catch (IOException e) {
                 }
             }
-            LL.v("File[" + f.getAbsolutePath() + "]====>" + f.exists());
+            ELOG.v("File[" + f.getAbsolutePath() + "]====>" + f.exists());
             return res;
         }
     }

@@ -14,7 +14,7 @@ import android.view.View;
 
 import com.analysys.dev.internal.impl.LocationImpl;
 import com.analysys.dev.internal.impl.OCImpl;
-import com.analysys.dev.utils.LL;
+import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.PermissionUtils;
 
 import java.util.List;
@@ -68,7 +68,7 @@ public class MainActivity extends Activity {
                 test();
                 break;
             case R.id.btnOC:
-                LL.i("btnOC ---------");
+                ELOG.i("btnOC ---------");
 //                OCImpl.getInstance(this).ocInfo();
                 break;
             default:
@@ -203,8 +203,8 @@ public class MainActivity extends Activity {
                 s.getId();
             }
 
-            LL.e("传感器类型：" + type);
-            LL.e("名称：" + s.getName() + "，版本：" + s.getVersion() + "，厂商：" + s.getVendor());
+            ELOG.e("传感器类型：" + type);
+            ELOG.e("名称：" + s.getName() + "，版本：" + s.getVersion() + "，厂商：" + s.getVendor());
         }
     }
 

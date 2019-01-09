@@ -74,7 +74,7 @@ public class RequestUtils {
         response = "413";
       }
     } catch (Throwable e) {
-      LL.e(e);
+      ELOG.e(e);
     } finally {
       if (is != null) {
         try {
@@ -121,7 +121,7 @@ public class RequestUtils {
         return null;
       }
     } catch (Throwable e) {
-      LL.e(e);
+      ELOG.e(e);
     } finally {
       if (connection != null) {
         connection.disconnect();

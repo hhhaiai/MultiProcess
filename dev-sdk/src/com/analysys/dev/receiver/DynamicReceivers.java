@@ -3,7 +3,8 @@ package com.analysys.dev.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import com.analysys.dev.utils.LL;
+
+import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.reflectinon.Reflecer;
 import com.analysys.dev.internal.work.MessageDispatcher;
 
@@ -26,16 +27,16 @@ public class DynamicReceivers extends BroadcastReceiver {
         Reflecer.init();
         mContext = context.getApplicationContext();
         if (CONNECTIVITY_CHANGE.equals(intent.getAction())) {
-            LL.d("接收网络变化广播");
+            ELOG.d("接收网络变化广播");
             MessageDispatcher.getInstance(mContext).startService(0);
         }
         if (SCREEN_ON.equals(intent.getAction())) {
-            LL.e("接收开启屏幕广播");
+            ELOG.e("接收开启屏幕广播");
             MessageDispatcher.getInstance(mContext).startService(0);
         }
         if (SCREEN_OFF.equals(intent.getAction())) {
             MessageDispatcher.getInstance(mContext).killWorker();
-            LL.e("接收关闭屏幕广播");
+            ELOG.e("接收关闭屏幕广播");
         }
     }
 }

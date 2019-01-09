@@ -7,6 +7,12 @@ import java.io.Serializable;
  */
 public class BatteryModuleNameInfo implements Serializable {
 
+    private static class Holder {
+        private static final BatteryModuleNameInfo INSTANCE = new BatteryModuleNameInfo();
+    }
+    public static BatteryModuleNameInfo getInstance() {
+        return BatteryModuleNameInfo.Holder.INSTANCE;
+    }
     private static final long serialVersionUID = 1L;
     /**
      * BS电源状态，下面有Android和iOS的传值与对应电源状态的码表

@@ -147,7 +147,7 @@ public class AndroidManifestHelper {
             }
 
         } catch (Throwable e) {
-            LL.e(e);
+            ELOG.e(e);
         }
         return false;
     }
@@ -198,7 +198,7 @@ public class AndroidManifestHelper {
             }
         } catch (Throwable e) {
             if (EDContext.FLAG_DEBUG_INNER) {
-                LL.e(e);
+                ELOG.e(e);
             }
         }
         return Bundle.EMPTY;

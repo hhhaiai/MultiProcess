@@ -5,8 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import com.analysys.dev.internal.impl.AppSnapshotImpl;
+import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
-import com.analysys.dev.utils.LL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -179,7 +179,7 @@ public class TableAppSnapshot {
                 jar.put(getCursor(cursor));
             }
         } catch (Throwable e) {
-            LL.e(e);
+            ELOG.e(e);
         }
         return jar;
     }

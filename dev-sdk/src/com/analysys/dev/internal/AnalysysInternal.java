@@ -7,7 +7,7 @@ import android.text.TextUtils;
 
 import com.analysys.dev.internal.Content.EDContext;
 import com.analysys.dev.utils.AndroidManifestHelper;
-import com.analysys.dev.utils.LL;
+import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 import com.analysys.dev.utils.reflectinon.Reflecer;
 import com.analysys.dev.utils.sp.SPHelper;
@@ -47,17 +47,17 @@ public class AnalysysInternal {
     public void initEguan(String key, String channel, boolean isDebug) {
 
         Reflecer.init();
-        LL.d("初始化，进程Id：< " + Process.myPid() + " >");
+        ELOG.d("初始化，进程Id：< " + Process.myPid() + " >");
 
         if (TextUtils.isEmpty(key)) {
             Bundle bundle = AndroidManifestHelper.getMetaData(mContext);
             if (bundle == null) {
-                LL.e(EDContext.LOGINFO.LOG_NOT_APPKEY);
+                ELOG.e(EDContext.LOGINFO.LOG_NOT_APPKEY);
             }
             key = bundle.getString(EDContext.XML_METADATA_APPKEY);
             channel = bundle.getString(EDContext.XML_METADATA_CHANNEL);
             if (TextUtils.isEmpty(key)) {
-                LL.e(EDContext.LOGINFO.LOG_NOT_APPKEY);
+                ELOG.e(EDContext.LOGINFO.LOG_NOT_APPKEY);
             }
         }
         SPHelper.getDefault(mContext).edit().putString(EDContext.SP_APP_KEY, key).commit();

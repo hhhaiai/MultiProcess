@@ -11,7 +11,7 @@ import com.analysys.dev.internal.impl.AppSnapshotImpl;
 import com.analysys.dev.internal.impl.LocationImpl;
 import com.analysys.dev.internal.impl.OCImpl;
 import com.analysys.dev.internal.impl.UploadImpl;
-import com.analysys.dev.utils.LL;
+import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.Utils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 
@@ -154,50 +154,50 @@ public class MessageDispatcher {
 
             switch (msg.what) {
                 case MSG_INIT_MODULE:
-          LL.d("接收到初始化消息");
+          ELOG.d("接收到初始化消息");
                     msgInitModule();
                     break;
                 case MSG_CHECK_HEARTBEAT:
-          LL.e("接收到心跳检测消息");
+          ELOG.e("接收到心跳检测消息");
                     isHasMessage(this);
                     break;
                 case MSG_START_SERVICE_SELF:
-          LL.d("接收到启动服务消息");
+          ELOG.d("接收到启动服务消息");
                     ServiceHelper.getInstance(mContext).startSelfService();
                     break;
                 case MSG_KILL_WORKER:
                     exitHandler();
-          LL.d("接收到kill消息");
+          ELOG.d("接收到kill消息");
                     break;
                 case MSG_APP_CHANGE_RECEIVER:
-          LL.d("接收到应用安装/卸载/更新消息");
+          ELOG.d("接收到应用安装/卸载/更新消息");
                     AppSnapshotImpl.getInstance(mContext).changeActionType(String.valueOf(msg.obj), msg.arg1);
                     break;
                 case MSG_SCREEN_RECEIVER:
-          LL.d("接收到屏幕操作消息");
+          ELOG.d("接收到屏幕操作消息");
                     break;
                 case MSG_SNAPSHOT:
-          LL.d("接收到获取应用列表消息");
+          ELOG.d("接收到获取应用列表消息");
                     AppSnapshotImpl.getInstance(mContext).snapshotsInfo();
                     break;
                 case MSG_LOCATION:
-          LL.d("接收到获取地理位置消息");
+          ELOG.d("接收到获取地理位置消息");
                     LocationImpl.getInstance(mContext).location();
                     break;
                 case MSG_OC_INFO:
-          LL.i("接收到获取OC消息,进程 Id：" );
-                    LL.d("接收到获取OC消息,进程 Id：");
+          ELOG.i("接收到获取OC消息,进程 Id：" );
+                    ELOG.d("接收到获取OC消息,进程 Id：");
                     OCImpl.getInstance(mContext).ocInfo();
                     break;
                 case MSG_UPLOAD:
-          LL.d("接收到上传消息");
+          ELOG.d("接收到上传消息");
                     UploadImpl.getInstance(mContext).upload();
                     break;
                 case MSG_OC_COUNT:
-          LL.d("接收到屏幕处理消息");
+          ELOG.d("接收到屏幕处理消息");
                     break;
                 default:
-          LL.e("其他消息:" + msg.what);
+          ELOG.e("其他消息:" + msg.what);
                     break;
             }
         }
