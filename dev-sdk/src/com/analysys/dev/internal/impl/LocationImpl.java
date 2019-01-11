@@ -7,6 +7,7 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.analysys.dev.database.DBConfig;
 import com.analysys.dev.database.TableLocation;
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
@@ -21,10 +22,12 @@ import android.Manifest;
 import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.telephony.CellIdentityCdma;
 import android.telephony.CellIdentityGsm;
 import android.telephony.CellIdentityLte;
@@ -98,12 +101,95 @@ public class LocationImpl {
         }
     }
     private Location getLocationInfo(){
-        //TODO 获取6.0以上和以下的location对象信息并返回
-        LocationManager manager =
+        //TODO 获取6.0以上的location对象信息并返回
+        if (Build.VERSION.SDK_INT > 22) {
+            if (!PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
+                    && !PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                ELOG.e("has no permission");
+                return null;
+            }
+        }
+        LocationManager lm =
                 (LocationManager)mContext.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-        return null;
+
+        if (lm == null) {
+            return null;
+        }
+        ELOG.i("是否包含GPS: " + lm.isProviderEnabled(LocationManager.GPS_PROVIDER));
+
+        // lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
+        // location = locationManager .getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        // if (location != null) {
+        // //支持
+        // }
+
+
+        //监听地理位置变化，地理位置变化时，能够重置location
+        LocationListener locationListener = new LocationListener() {
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
+            @Override
+            public void onProviderEnabled(String provider) {
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+
+            @Override
+            public void onLocationChanged(Location loc) {
+                if (loc != null) {
+                    //TODO
+//         location = loc;
+//         showLocation(location);
+                }
+            }
+        };
+
+        ELOG.i("是否包含网络: " + lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
+        // lm.requestLocationUpdates( LocationManager.NETWORK_PROVIDER, 1000, 0, locationListener);
+        // location = lm .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        // if (location != null) {
+        // //支持
+        // }
+        // // 谷歌网站可以请求对应地域
+        // url.append("http://maps.googleapis.com/maps/api/geocode/json?latlng=");
+        // url.append(loc.getLatitude()).append(",");
+        // url.append(loc.getLongitude());
+
+        // 特殊的位置提供
+        Location loc = lm.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+        if (loc == null) {
+            ELOG.e("getLastKnownLocation is null!");
+            return null;
+        }
+//        ELOG.i("getLatitude:" + loc.getLatitude());
+//        ELOG.i("getLongitude:" + loc.getLongitude());
+//        ELOG.i("getSpeed:" + loc.getSpeed());
+//        ELOG.i("getTime:" + loc.getTime());
+
+        ELOG.i("===================");
+        // 查找到服务信息
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE); // 高精度
+        criteria.setAltitudeRequired(false);
+        criteria.setBearingRequired(false);
+        criteria.setCostAllowed(true);
+        criteria.setPowerRequirement(Criteria.POWER_LOW); // 低功耗
+        String provider = lm.getBestProvider(criteria, true); // 获取GPS信息
+        ELOG.i("provider: " + provider);
+        Location location = lm.getLastKnownLocation(provider); // 通过GPS获取位置
+        if (location == null) {
+            ELOG.e("获取异常  location is null! ");
+            return null;
+        }
+//        ELOG.i("===getLatitude===>" + location.getLatitude());
+//        ELOG.i("===getLongitude===>" + location.getLongitude());
+        return location;
     }
-    public String getGeographyLocation(){
+    private String getGeographyLocation(){
         try{
             Location l = getLocationInfo();
             return l.getLatitude()+"-"+l.getLongitude();
@@ -117,9 +203,11 @@ public class LocationImpl {
             locationJson = new JSONObject();
             locationJson.put(DeviceKeyContacts.LocationInfo.CollectionTime, String.valueOf(System.currentTimeMillis()));
 
-            String locationInfo = getCoordinate();
-            int location = SPHelper.getDefault(mContext).getInt(EGContext.SP_LOCATION, 1);
-            if (!TextUtils.isEmpty(locationInfo) && location == 1) {
+            String locationInfo = getGeographyLocation();
+//            int location = SPHelper.getDefault(mContext).getInt(EGContext.SP_LOCATION, 1);
+            if (!TextUtils.isEmpty(locationInfo)
+//                    && location == 1
+                    ) {
                 locationJson.put(DeviceKeyContacts.LocationInfo.GeographyLocation, locationInfo);
             }
 
@@ -130,8 +218,10 @@ public class LocationImpl {
             }
 
             JSONArray baseStation = getBaseStationInfo();
-            int base = SPHelper.getDefault(mContext).getInt(EGContext.SP_BASE_STATION, 1);
-            if (baseStation != null && baseStation.length() != 0 && base == 1) {
+//            int base = SPHelper.getDefault(mContext).getInt(EGContext.SP_BASE_STATION, 1);
+            if (baseStation != null && baseStation.length() != 0
+//                    && base == 1
+                    ) {
                 locationJson.put(DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME, baseStation);
             }
         } catch (Throwable e) {
@@ -201,7 +291,7 @@ public class LocationImpl {
      *
      * @return
      */
-    @SuppressWarnings("deprecation")
+
 //    public JSONArray getBaseStation() {
 //        try {
 //            if (Build.VERSION.SDK_INT > 22) {
@@ -366,92 +456,93 @@ public class LocationImpl {
     /**
      * 获取GPS信息
      */
-    public void getGPSInfo() {
-        if (Build.VERSION.SDK_INT > 22) {
-            if (!PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
-                && !PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                ELOG.e("has no permission");
-                return;
-            }
-        }
-        LocationManager lm =
-            (LocationManager)mContext.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-
-        if (lm == null) {
-            return;
-        }
-        ELOG.i("是否包含GPS: " + lm.isProviderEnabled(LocationManager.GPS_PROVIDER));
-
-        // lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
-        // location = locationManager .getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        // if (location != null) {
-        // //支持
-        // }
-
-        //
-        // //监听地理位置变化，地理位置变化时，能够重置location
-        // LocationListener locationListener = new LocationListener() {
-        // @Override
-        // public void onStatusChanged(String provider, int status, Bundle extras) {
-        // }
-        // @Override
-        // public void onProviderEnabled(String provider) {
-        // }
-        //
-        // @Override
-        // public void onProviderDisabled(String provider) {
-        // tv_show.setText("更新失败失败");
-        // }
-        //
-        // @Override
-        // public void onLocationChanged(Location loc) {
-        // if (loc != null) {
-        // location = loc;
-        // showLocation(location);
-        // }
-        // }
-        // };
-
-        ELOG.i("是否包含网络: " + lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
-        // lm.requestLocationUpdates( LocationManager.NETWORK_PROVIDER, 1000, 0, locationListener);
-        // location = lm .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        // if (location != null) {
-        // //支持
-        // }
-        // // 谷歌网站可以请求对应地域
-        // url.append("http://maps.googleapis.com/maps/api/geocode/json?latlng=");
-        // url.append(loc.getLatitude()).append(",");
-        // url.append(loc.getLongitude());
-
-        // 特殊的位置提供
-        Location loc = lm.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-        if (loc == null) {
-            ELOG.e("getLastKnownLocation is null!");
-            return;
-        }
-        ELOG.i("getLatitude:" + loc.getLatitude());
-        ELOG.i("getLongitude:" + loc.getLongitude());
-        ELOG.i("getSpeed:" + loc.getSpeed());
-        ELOG.i("getTime:" + loc.getTime());
-
-        ELOG.i("===================");
-        // 查找到服务信息
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_FINE); // 高精度
-        criteria.setAltitudeRequired(false);
-        criteria.setBearingRequired(false);
-        criteria.setCostAllowed(true);
-        criteria.setPowerRequirement(Criteria.POWER_LOW); // 低功耗
-        String provider = lm.getBestProvider(criteria, true); // 获取GPS信息
-        ELOG.i("provider: " + provider);
-        Location location = lm.getLastKnownLocation(provider); // 通过GPS获取位置
-        if (location == null) {
-            ELOG.e("获取异常  location is null! ");
-            return;
-        }
-        ELOG.i("===getLatitude===>" + location.getLatitude());
-        ELOG.i("===getLongitude===>" + location.getLongitude());
-
-    }
+//    public Location getGPSInfo() {
+//
+//        if (Build.VERSION.SDK_INT > 22) {
+//            if (!PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
+//                && !PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
+//                ELOG.e("has no permission");
+//                return null;
+//            }
+//        }
+//        LocationManager lm =
+//            (LocationManager)mContext.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+//
+//        if (lm == null) {
+//            return null;
+//        }
+//        ELOG.i("是否包含GPS: " + lm.isProviderEnabled(LocationManager.GPS_PROVIDER));
+//
+//        // lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
+//        // location = locationManager .getLastKnownLocation(LocationManager.GPS_PROVIDER);
+//        // if (location != null) {
+//        // //支持
+//        // }
+//
+//
+//         //监听地理位置变化，地理位置变化时，能够重置location
+//         LocationListener locationListener = new LocationListener() {
+//         @Override
+//         public void onStatusChanged(String provider, int status, Bundle extras) {
+//         }
+//         @Override
+//         public void onProviderEnabled(String provider) {
+//         }
+//
+//         @Override
+//         public void onProviderDisabled(String provider) {
+//
+//         }
+//
+//         @Override
+//         public void onLocationChanged(Location loc) {
+//         if (loc != null) {
+////         location = loc;
+////         showLocation(location);
+//         }
+//         }
+//         };
+//
+//        ELOG.i("是否包含网络: " + lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
+//        // lm.requestLocationUpdates( LocationManager.NETWORK_PROVIDER, 1000, 0, locationListener);
+//        // location = lm .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+//        // if (location != null) {
+//        // //支持
+//        // }
+//        // // 谷歌网站可以请求对应地域
+//        // url.append("http://maps.googleapis.com/maps/api/geocode/json?latlng=");
+//        // url.append(loc.getLatitude()).append(",");
+//        // url.append(loc.getLongitude());
+//
+//        // 特殊的位置提供
+//        Location loc = lm.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+//        if (loc == null) {
+//            ELOG.e("getLastKnownLocation is null!");
+//            return null;
+//        }
+////        ELOG.i("getLatitude:" + loc.getLatitude());
+////        ELOG.i("getLongitude:" + loc.getLongitude());
+////        ELOG.i("getSpeed:" + loc.getSpeed());
+////        ELOG.i("getTime:" + loc.getTime());
+//
+//        ELOG.i("===================");
+//        // 查找到服务信息
+//        Criteria criteria = new Criteria();
+//        criteria.setAccuracy(Criteria.ACCURACY_FINE); // 高精度
+//        criteria.setAltitudeRequired(false);
+//        criteria.setBearingRequired(false);
+//        criteria.setCostAllowed(true);
+//        criteria.setPowerRequirement(Criteria.POWER_LOW); // 低功耗
+//        String provider = lm.getBestProvider(criteria, true); // 获取GPS信息
+//        ELOG.i("provider: " + provider);
+//        Location location = lm.getLastKnownLocation(provider); // 通过GPS获取位置
+//        if (location == null) {
+//            ELOG.e("获取异常  location is null! ");
+//            return null;
+//        }
+////        ELOG.i("===getLatitude===>" + location.getLatitude());
+////        ELOG.i("===getLongitude===>" + location.getLongitude());
+//        return location;
+//    }
 
 }

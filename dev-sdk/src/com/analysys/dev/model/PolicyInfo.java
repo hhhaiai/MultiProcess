@@ -5,7 +5,13 @@ import java.io.Serializable;
 /**
  * 策略相关信息
  */
-public class StrategyInfo implements Serializable {
+public class PolicyInfo implements Serializable {
+    private static class Holder {
+        private static final PolicyInfo INSTANCE = new PolicyInfo();
+    }
+    public static PolicyInfo getInstance() {
+        return PolicyInfo.Holder.INSTANCE;
+    }
     private static final long serialVersionUID = 1L;
     /**
      * 状态回执
@@ -22,55 +28,56 @@ public class StrategyInfo implements Serializable {
     /**
      * 服务器延迟上传时间
      */
-    private String ServerDelay;
+    private long ServerDelay;
     /**
      *上传失败次数
      */
-    private String FailCount;
+    private int FailCount;
     /**
      *上传失败后延迟时间
      */
-    private String FailTryDelay;
+    private long FailTryDelay;
     /**
      *客户端上传时间间隔
      */
-    private String TimerInterval;
+    private long TimerInterval;
     /**
      *客户端上传时数据条数
      */
-    private String EventCount;
+    private int EventCount;
     /**
      *是否使用实时策略，1不使用0使用
      */
-    private String UseRTP;
+    private int UseRTP;
     /**
      *是否实时上传[非实时分析策略下，是否实时上传]0不实时上传，1实时上传
      */
-    private String UseRTL;
+    private int UseRTL;
     /**
      *是否采集公网ip
      */
-    private String Remotelp;
+    private int Remotelp;
     /**
      *是否上传敏感数据，1不上传，0上传
      */
-    private String UploadSD;
+    private int UploadSD;
     /**
      *数据合并间隔
      */
-    private String MergeInterval;
+    private long MergeInterval;
     /**
      *最小使用时长
      */
-    private String MinDuration;
+    private long MinDuration;
     /**
      *最常使用时长
      */
-    private String MaxDuration;
+    private long MaxDuration;
     /**
      *域名更新次数
      */
-    private String DomainUpdateTimes;
+    private int DomainUpdateTimes;
+
 
     public String getCode() {
         return code;
@@ -84,55 +91,55 @@ public class StrategyInfo implements Serializable {
         return PolicyVer;
     }
 
-    public String getServerDelay() {
+    public long getServerDelay() {
         return ServerDelay;
     }
 
-    public String getFailCount() {
+    public int getFailCount() {
         return FailCount;
     }
 
-    public String getFailTryDelay() {
+    public long getFailTryDelay() {
         return FailTryDelay;
     }
 
-    public String getTimerInterval() {
+    public long getTimerInterval() {
         return TimerInterval;
     }
 
-    public String getEventCount() {
+    public int getEventCount() {
         return EventCount;
     }
 
-    public String getUseRTP() {
+    public int isUseRTP() {
         return UseRTP;
     }
 
-    public String getUseRTL() {
+    public int isUseRTL() {
         return UseRTL;
     }
 
-    public String getRemotelp() {
+    public int getRemotelp() {
         return Remotelp;
     }
 
-    public String getUploadSD() {
+    public int getUploadSD() {
         return UploadSD;
     }
 
-    public String getMergeInterval() {
+    public long getMergeInterval() {
         return MergeInterval;
     }
 
-    public String getMinDuration() {
+    public long getMinDuration() {
         return MinDuration;
     }
 
-    public String getMaxDuration() {
+    public long getMaxDuration() {
         return MaxDuration;
     }
 
-    public String getDomainUpdateTimes() {
+    public int getDomainUpdateTimes() {
         return DomainUpdateTimes;
     }
 
@@ -148,55 +155,55 @@ public class StrategyInfo implements Serializable {
         PolicyVer = policyVer;
     }
 
-    public void setServerDelay(String serverDelay) {
+    public void setServerDelay(long serverDelay) {
         ServerDelay = serverDelay;
     }
 
-    public void setFailCount(String failCount) {
+    public void setFailCount(int failCount) {
         FailCount = failCount;
     }
 
-    public void setFailTryDelay(String failTryDelay) {
+    public void setFailTryDelay(long failTryDelay) {
         FailTryDelay = failTryDelay;
     }
 
-    public void setTimerInterval(String timerInterval) {
+    public void setTimerInterval(long timerInterval) {
         TimerInterval = timerInterval;
     }
 
-    public void setEventCount(String eventCount) {
+    public void setEventCount(int eventCount) {
         EventCount = eventCount;
     }
 
-    public void setUseRTP(String useRTP) {
+    public void setUseRTP(int useRTP) {
         UseRTP = useRTP;
     }
 
-    public void setUseRTL(String useRTL) {
+    public void setUseRTL(int useRTL) {
         UseRTL = useRTL;
     }
 
-    public void setRemotelp(String remotelp) {
+    public void setRemotelp(int remotelp) {
         Remotelp = remotelp;
     }
 
-    public void setUploadSD(String uploadSD) {
+    public void setUploadSD(int uploadSD) {
         UploadSD = uploadSD;
     }
 
-    public void setMergeInterval(String mergeInterval) {
+    public void setMergeInterval(long mergeInterval) {
         MergeInterval = mergeInterval;
     }
 
-    public void setMinDuration(String minDuration) {
+    public void setMinDuration(long minDuration) {
         MinDuration = minDuration;
     }
 
-    public void setMaxDuration(String maxDuration) {
+    public void setMaxDuration(long maxDuration) {
         MaxDuration = maxDuration;
     }
 
-    public void setDomainUpdateTimes(String domainUpdateTimes) {
+    public void setDomainUpdateTimes(int domainUpdateTimes) {
         DomainUpdateTimes = domainUpdateTimes;
     }
 }

@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.impl.DeviceImpl;
-import com.analysys.dev.internal.impl.OCImpl;
 import com.analysys.dev.model.BatteryModuleNameInfo;
 
 import org.json.JSONArray;

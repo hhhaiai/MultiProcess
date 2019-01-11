@@ -19,6 +19,7 @@ import com.analysys.dev.utils.reflectinon.EContextHelper;
 public class CheckHeartbeat {
     Context mContext;
     Handler mHandler;
+    final HandlerThread thread = new HandlerThread("com.analysys", android.os.Process.THREAD_PRIORITY_BACKGROUND);;
 
     public CheckHeartbeat() {
         mHandler = startWorkHandler();
@@ -36,7 +37,6 @@ public class CheckHeartbeat {
     }
 
     private Handler startWorkHandler() {
-        final HandlerThread thread = new HandlerThread("com.analysys", android.os.Process.THREAD_PRIORITY_BACKGROUND);
         thread.start();
         final Handler ret = new CheckHandler(thread.getLooper());
         return ret;
@@ -70,4 +70,12 @@ public class CheckHeartbeat {
     }
 
     private static final int MSG_CHECK = 0x0c;
+//    /**
+//     * 空闲时,自动退出,如果有事件进来,自动调起. reboot只需要关闭一次就可以了
+//     */
+//    public void reboot() {
+//        if (null != thread) {
+//            thread.quit();
+//        }
+//    }
 }

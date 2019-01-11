@@ -16,6 +16,7 @@ import java.util.zip.GZIPOutputStream;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.service.AnalysysAccessibilityService;
 
 import android.app.ActivityManager;
@@ -89,7 +90,7 @@ public class Utils {
      */
     @SuppressWarnings("deprecation")
     public static String getNetworkType(Context context) {
-        String netType = "无网络";
+        String netType = EGContext.NETWORK_TYPE_NO_NET;
         ConnectivityManager manager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
         if (networkInfo == null) {
@@ -97,36 +98,36 @@ public class Utils {
         }
         int nType = networkInfo.getType();
         if (nType == ConnectivityManager.TYPE_WIFI) {
-            netType = "WIFI";
+            netType = EGContext.NETWORK_TYPE_WIFI;
         } else if (nType == ConnectivityManager.TYPE_MOBILE) {
 
             int nSubType = networkInfo.getSubtype();
             TelephonyManager telephonyManager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
             if (telephonyManager.isNetworkRoaming()) {
-                netType = "2G";
+                netType = EGContext.NETWORK_TYPE_2G;
             } else {
                 switch (nSubType) {
                     case TelephonyManager.NETWORK_TYPE_LTE:
-                        netType = "4G";
+                        netType =EGContext.NETWORK_TYPE_4G;
                         break;
                     case TelephonyManager.NETWORK_TYPE_UMTS:
                     case TelephonyManager.NETWORK_TYPE_EVDO_0:
                     case TelephonyManager.NETWORK_TYPE_HSDPA:
-                        netType = "3G";
+                        netType = EGContext.NETWORK_TYPE_3G;
                         break;
                     case TelephonyManager.NETWORK_TYPE_GPRS:
                     case TelephonyManager.NETWORK_TYPE_EDGE:
                     case TelephonyManager.NETWORK_TYPE_CDMA:
-                        netType = "2G";
+                        netType = EGContext.NETWORK_TYPE_2G;
                         break;
                     default:
-                        netType = "2G";
+                        netType = EGContext.NETWORK_TYPE_2G;
                         break;
                 }
             }
 
         } else {
-            netType = "无网络";
+            netType = EGContext.NETWORK_TYPE_NO_NET;
         }
         return netType;
     }
