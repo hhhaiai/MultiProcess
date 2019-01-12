@@ -184,5 +184,9 @@ public class EGContext {
 
 
     public static String POLICY_SERVICE_PULL_VER = "servicePullVer";
-
+    public static String USERKEY = "keyValue";
+    public static final String ORIGINKEY_STRING = "sysylana";
+    public static final String EGUANFILE = "eg.a";
+    public static final String EGIDKEY = "egid";
+    public static final String TMPIDKEY = "tmpid";
 }

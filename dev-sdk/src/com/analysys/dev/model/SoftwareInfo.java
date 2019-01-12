@@ -6,6 +6,12 @@ import java.io.Serializable;
  * 软件相关信息，宿主信息，每次上传
  */
 public class SoftwareInfo implements Serializable {
+    private static class Holder {
+        private static final SoftwareInfo INSTANCE = new SoftwareInfo();
+    }
+    public static SoftwareInfo getInstance() {
+        return SoftwareInfo.Holder.INSTANCE;
+    }
     private static final long serialVersionUID = 1L;
     /**
      * 宿主应用名称
@@ -40,6 +46,12 @@ public class SoftwareInfo implements Serializable {
      */
     private String TempID;
 
+    /**
+     * 易观id
+     * @return
+     */
+    private String EguanID;
+
     public String getApplicationName() {
         return ApplicationName;
     }
@@ -72,6 +84,10 @@ public class SoftwareInfo implements Serializable {
         return TempID;
     }
 
+    public String getEguanID() {
+        return EguanID;
+    }
+
     public void setApplicationName(String applicationName) {
         ApplicationName = applicationName;
     }
@@ -102,5 +118,9 @@ public class SoftwareInfo implements Serializable {
 
     public void setTempID(String tempID) {
         TempID = tempID;
+    }
+
+    public void setEguanID(String eguanID) {
+        EguanID = eguanID;
     }
 }

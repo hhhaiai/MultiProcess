@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.utils.ELOG;
 
 /**
@@ -173,5 +174,4 @@ public class SPHelper {
 
         return returnValue;
     }
-
 }
