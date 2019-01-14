@@ -1,12 +1,5 @@
 package com.analysys.dev.database;
 
-/**
- * @Copyright © 2018 EGuan Inc. All rights reserved.
- * @Description: TODO
- * @Version: 1.0
- * @Create: 2018/10/12 16:53
- * @Author: Wang-X-C
- */
 public class DBConfig {
 
   public static class Type {
