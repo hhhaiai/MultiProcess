@@ -18,13 +18,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @Copyright © 2018 EGuan Inc. All rights reserved.
- * @Description: TODO
- * @Version: 1.0
- * @Create: 2018/10/17 12:06
- * @Author: Wang-X-C
- */
 public class TableOCCount {
     // sv 查询的值selectValue，iv写入的值insertValue
     //private final String sv = "0";
@@ -273,7 +266,7 @@ public class TableOCCount {
                 ocCountJar.put(job);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+
         }
         DBManager.getInstance(mContext).closeDB();
         return ocCountJar;

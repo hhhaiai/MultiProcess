@@ -21,6 +21,7 @@ import org.json.JSONObject;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.model.BatteryModuleNameInfo;
 import com.analysys.dev.utils.ELOG;
+import com.analysys.dev.utils.NetworkUtils;
 import com.analysys.dev.utils.PermissionUtils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 import com.analysys.dev.utils.simulator.SimulatorUtils;
@@ -39,8 +40,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.Signature;
 import android.content.res.Configuration;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -140,7 +139,7 @@ public class DeviceImpl {
             if (Build.VERSION.SDK_INT < 23) {
                 mac = getMacByAndridAPI();
             } else {
-                if (isWifiAlive()) {
+                if (NetworkUtils.isWifiAlive(mContext)) {
                     mac = getMacByJavaAPI();
                 } else {
                     mac = getMacFile();
@@ -169,22 +168,6 @@ public class DeviceImpl {
         } else {
             return DEFALT_MAC;
         }
-    }
-
-    @SuppressWarnings("deprecation")
-    private boolean isWifiAlive() {
-        if (PermissionUtils.checkPermission(mContext, permission.ACCESS_NETWORK_STATE)) {
-            ConnectivityManager cm = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-            if (cm != null) {
-                NetworkInfo wifiNetwork = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-                if (wifiNetwork != null) {
-                    if (wifiNetwork.getState() == NetworkInfo.State.CONNECTED) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
     }
 
     /**
@@ -852,16 +835,4 @@ public class DeviceImpl {
         return sb.toString();
     }
 
-    public boolean isNetworkAlive() {
-        if (PermissionUtils.checkPermission(mContext, permission.ACCESS_NETWORK_STATE)) {
-            ConnectivityManager cm = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-            if (cm != null) {
-                NetworkInfo ni = cm.getActiveNetworkInfo();
-                if (ni != null) {
-                    return ni.isConnected();
-                }
-            }
-        }
-        return false;
-    }
 }

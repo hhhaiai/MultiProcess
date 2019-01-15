@@ -16,12 +16,7 @@ public class AESUtils {
         if (strLen > 16) {
             rawpassword = rawpassword.substring(0, 16);
         } else {
-            while (strLen < 16) {
-                StringBuffer buffer = new StringBuffer();
-                buffer.append(rawpassword).append("0");
-                rawpassword = buffer.toString();
-                strLen = rawpassword.length();
-            }
+            rawpassword = String.format("%-16s", rawpassword).replace(' ', '0');
         }
         return rawpassword;
     }

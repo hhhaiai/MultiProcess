@@ -12,13 +12,6 @@ import com.analysys.dev.utils.reflectinon.EContextHelper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-/**
- * @Copyright © 2018 EGuan Inc. All rights reserved.
- * @Description: TODO
- * @Version: 1.0
- * @Create: 2018/10/17 12:10
- * @Author: Wang-X-C
- */
 public class TableLocation {
 
     Context mContext;

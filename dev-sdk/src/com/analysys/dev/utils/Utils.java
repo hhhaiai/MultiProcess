@@ -32,14 +32,11 @@ import com.analysys.dev.utils.sp.SPHelper;
 import android.Manifest;
 import android.app.ActivityManager;
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Environment;
 import android.provider.Settings;
-import android.telephony.TelephonyManager;
+
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -100,52 +97,7 @@ public class Utils {
         return false;
     }
 
-    /**
-     * 获取当前的网络状态
-     */
-    @SuppressWarnings("deprecation")
-    public static String getNetworkType(Context context) {
-        String netType = EGContext.NETWORK_TYPE_NO_NET;
-        ConnectivityManager manager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
-        if (networkInfo == null) {
-            return netType;
-        }
-        int nType = networkInfo.getType();
-        if (nType == ConnectivityManager.TYPE_WIFI) {
-            netType = EGContext.NETWORK_TYPE_WIFI;
-        } else if (nType == ConnectivityManager.TYPE_MOBILE) {
 
-            int nSubType = networkInfo.getSubtype();
-            TelephonyManager telephonyManager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
-            if (telephonyManager.isNetworkRoaming()) {
-                netType = EGContext.NETWORK_TYPE_2G;
-            } else {
-                switch (nSubType) {
-                    case TelephonyManager.NETWORK_TYPE_LTE:
-                        netType =EGContext.NETWORK_TYPE_4G;
-                        break;
-                    case TelephonyManager.NETWORK_TYPE_UMTS:
-                    case TelephonyManager.NETWORK_TYPE_EVDO_0:
-                    case TelephonyManager.NETWORK_TYPE_HSDPA:
-                        netType = EGContext.NETWORK_TYPE_3G;
-                        break;
-                    case TelephonyManager.NETWORK_TYPE_GPRS:
-                    case TelephonyManager.NETWORK_TYPE_EDGE:
-                    case TelephonyManager.NETWORK_TYPE_CDMA:
-                        netType = EGContext.NETWORK_TYPE_2G;
-                        break;
-                    default:
-                        netType = EGContext.NETWORK_TYPE_2G;
-                        break;
-                }
-            }
-
-        } else {
-            netType = EGContext.NETWORK_TYPE_NO_NET;
-        }
-        return netType;
-    }
 
     /**
      * 获取时段标记
@@ -350,7 +302,8 @@ public class Utils {
                 writeFile(egid, tmpId);
                 writeShared(egid, tmpId);
                 writeSetting(egid, tmpId);
-                writeDatabase(egid, tmpId);
+//                writeDatabase(egid, tmpId);
+                //TODO
             }
         } catch (Throwable e) {
         }

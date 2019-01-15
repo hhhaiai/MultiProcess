@@ -1,22 +1,9 @@
 package com.analysys.dev.database;
 
 public class DBConfig {
-
-  public static class Type {
-    public static final String AUTOINCREMENT = " Integer Primary Key Autoincrement ";
-    public static final String VARCHAR_TEN = " varchar(10) not null ";
-    public static final String VARCHAR_TEN_NULL = " varchar(10) ";
-    public static final String VARCHAR_TWENTY = " varchar(20) not null ";
-    public static final String VARCHAR_TWENTY_NULL = " varchar(20) ";
-    public static final String VARCHAR_HUNDRED = " varchar(100) not null ";
-    public static final String INT_NOT_NULL = " int not null ";
-    public static final String TEXT = " text ";
-  }
-
   public static class OC {
     // 表名
     public static final String TABLE_NAME = "e_oci";
-
     /**
      * 列名
      */
@@ -33,30 +20,10 @@ public class DBConfig {
       public static final String OCIRB = "oci_rb";
       public static final String OCIRC = "oci_rc";
     }
-
-    /**
-     * 字段类型
-     */
-    public static class Types {
-      public static final String ID = Type.AUTOINCREMENT;
-      public static final String OCI = Type.TEXT;
-      public static final String IT = Type.VARCHAR_TWENTY;
-      public static final String ST = Type.INT_NOT_NULL;
-      public static final String OCIRA = Type.TEXT;
-      public static final String OCIRB = Type.TEXT;
-      public static final String OCIRC = Type.TEXT;
-    }
-
     //建表
-    public static final String CREATE_TABLE = "create table if not exists " +
-        TABLE_NAME + " (" +
-        Column.ID + Types.ID + "," +
-        Column.OCI + Types.OCI + "," +
-        Column.IT + Types.IT + "," +
-        Column.ST + Types.ST + "," +
-        Column.OCIRA + Types.OCIRA + "," +
-        Column.OCIRB + Types.OCIRB + "," +
-        Column.OCIRC + Types.OCIRC + ")";
+    public static final String CREATE_TABLE  = String.format("create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)",
+            TABLE_NAME,Column.ID ,DBType.AUTOINCREMENT ,Column.OCI , DBType.TEXT ,Column.IT ,DBType.VARCHAR_TWENTY ,
+            Column.ST,DBType.INT_NOT_NULL,Column.OCIRA , DBType.TEXT ,Column.OCIRB , DBType.TEXT ,Column.OCIRC ,DBType.TEXT );
   }
 
   public static class OCCount {
@@ -101,53 +68,11 @@ public class DBConfig {
       public static final String OCT_RB = "oct_rb";
       public static final String OCT_RC = "oct_rc";
     }
-
-    public static class Types {
-      public static final String ID = Type.AUTOINCREMENT;
-      public static final String APN = Type.VARCHAR_HUNDRED;
-      public static final String AN = Type.VARCHAR_TWENTY;
-      public static final String AOT = Type.VARCHAR_TWENTY;
-      public static final String ACT = Type.VARCHAR_TWENTY_NULL;
-      public static final String CU = Type.INT_NOT_NULL;
-      public static final String DY = Type.VARCHAR_TWENTY;
-      public static final String IT = Type.VARCHAR_TWENTY;
-
-      public static final String AVC = Type.VARCHAR_TWENTY;
-      public static final String NT = Type.VARCHAR_TEN;
-      public static final String AST = Type.VARCHAR_TEN_NULL;
-      public static final String AT = Type.VARCHAR_TEN;
-      public static final String CT = Type.VARCHAR_TEN;
-      public static final String TI = Type.VARCHAR_TEN;
-      public static final String ST = Type.VARCHAR_TEN;
-      public static final String RS = Type.VARCHAR_TEN;
-
-      public static final String OCT_RA = Type.TEXT;
-      public static final String OCT_RB = Type.TEXT;
-      public static final String OCT_RC = Type.TEXT;
-    }
-
     //建表
-    public static final String CREATE_TABLE = "create table if not exists " +
-        TABLE_NAME + " (" +
-        Column.ID + Types.ID + "," +
-        Column.APN + Types.APN + "," +
-        Column.AN + Types.AN + "," +
-        Column.AOT + Types.AOT + "," +
-        Column.ACT + Types.ACT + "," +
-        Column.CU + Types.CU + "," +
-        Column.DY + Types.DY + "," +
-        Column.IT + Types.IT + "," +
-        Column.AVC + Types.AVC + "," +
-        Column.NT + Types.NT + "," +
-        Column.AST + Types.AST + "," +
-        Column.AT + Types.AT + "," +
-        Column.CT + Types.CT + "," +
-        Column.TI + Types.TI + "," +
-        Column.ST + Types.ST + "," +
-        Column.RS + Types.RS + "," +
-        Column.OCT_RA + Types.OCT_RA + "," +
-        Column.OCT_RB + Types.OCT_RB + "," +
-        Column.OCT_RC + Types.OCT_RC + ")";
+    public static final String CREATE_TABLE = String.format("create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)",
+            TABLE_NAME,Column.ID,DBType.AUTOINCREMENT ,Column.APN,DBType.VARCHAR_HUNDRED ,Column.AN,DBType.VARCHAR_TWENTY ,Column.AOT,DBType.VARCHAR_TWENTY ,Column.ACT,DBType.VARCHAR_TWENTY_NULL ,Column.CU,DBType.INT_NOT_NULL ,
+            Column.DY,DBType.VARCHAR_TWENTY ,Column.IT,DBType.VARCHAR_TWENTY ,Column.AVC,DBType.VARCHAR_TWENTY ,Column.NT,DBType.VARCHAR_TEN ,Column.AST,DBType.VARCHAR_TEN_NULL ,Column.AT,DBType.VARCHAR_TEN ,
+            Column.CT,DBType.VARCHAR_TEN,Column.TI,DBType.VARCHAR_TEN ,Column.ST,DBType.VARCHAR_TEN ,Column.RS,DBType.VARCHAR_TEN ,Column.OCT_RA,DBType.TEXT ,Column.OCT_RB,DBType.TEXT ,Column.OCT_RC,DBType.TEXT);
   }
 
   public static class AppSnapshot {
@@ -171,32 +96,11 @@ public class DBConfig {
       public static final String ASI_RB = "asi_rb";
       public static final String ASI_RC = "asi_rc";
     }
-
-    public static class Types {
-      public static final String ID = Type.AUTOINCREMENT;
-      public static final String APN = Type.VARCHAR_HUNDRED;
-      public static final String AN = Type.VARCHAR_HUNDRED;
-      public static final String AVC = Type.VARCHAR_TWENTY;
-      public static final String AT = Type.VARCHAR_TWENTY;
-      public static final String AHT = Type.VARCHAR_TWENTY;
-
-      public static final String ASI_RA = Type.TEXT;
-      public static final String ASI_RB = Type.TEXT;
-      public static final String ASI_RC = Type.TEXT;
-    }
-
     //建表
-    public static final String CREATE_TABLE = "create table if not exists " +
-        TABLE_NAME + " (" +
-        Column.ID + Types.ID + "," +
-        Column.APN + Types.APN + "," +
-        Column.AN + Types.AN + "," +
-        Column.AVC + Types.AVC + "," +
-        Column.AT + Types.AT + "," +
-        Column.AHT + Types.AHT + "," +
-        Column.ASI_RA + Types.ASI_RA + "," +
-        Column.ASI_RB + Types.ASI_RB + "," +
-        Column.ASI_RC + Types.ASI_RC + ")";
+    public static final String CREATE_TABLE  = String.format("create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)",
+            TABLE_NAME,Column.ID,DBType.AUTOINCREMENT ,Column.APN,DBType.VARCHAR_HUNDRED ,Column.AN,DBType.VARCHAR_HUNDRED ,
+            Column.AVC,DBType.VARCHAR_TWENTY ,Column.AT,DBType.VARCHAR_TWENTY  ,Column.AHT,DBType.VARCHAR_TWENTY  ,
+            Column.ASI_RA,DBType.TEXT ,Column.ASI_RB,DBType.TEXT ,Column.ASI_RC,DBType.TEXT );
   }
 
   public static class Location {
@@ -217,26 +121,9 @@ public class DBConfig {
       public static final String L_RB = "l_rb";
       public static final String L_RC = "l_rc";
     }
-
-    public static class Types {
-      public static final String ID = Type.AUTOINCREMENT;
-      public static final String LI = Type.TEXT;
-      public static final String IT = Type.VARCHAR_TWENTY;
-      public static final String ST = Type.VARCHAR_TEN;
-      public static final String L_RA = Type.TEXT;
-      public static final String L_RB = Type.TEXT;
-      public static final String L_RC = Type.TEXT;
-    }
-
     //建表
-    public static final String CREATE_TABLE = "create table if not exists " +
-        TABLE_NAME + " (" +
-        Column.ID + Types.ID + "," +
-        Column.LI + Types.LI + "," +
-        Column.IT + Types.IT + "," +
-        Column.ST + Types.ST + "," +
-        Column.L_RA + Types.L_RA + "," +
-        Column.L_RB + Types.L_RB + "," +
-        Column.L_RC + Types.L_RC + "  )";
+    public static final String CREATE_TABLE  = String.format("create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)",
+            TABLE_NAME,Column.ID,DBType.AUTOINCREMENT ,Column.LI,DBType.TEXT,Column.IT,DBType.VARCHAR_TWENTY ,
+            Column.ST,DBType.VARCHAR_TEN , Column.L_RA,DBType.TEXT ,Column.L_RB,DBType.TEXT ,Column.L_RC,DBType.TEXT);
   }
 }

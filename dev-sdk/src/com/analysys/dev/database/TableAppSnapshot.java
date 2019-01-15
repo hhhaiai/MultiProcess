@@ -15,13 +15,6 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-/**
- * @Copyright © 2018 EGuan Inc. All rights reserved.
- * @Description: TODO
- * @Version: 1.0
- * @Create: 2018/10/17 15:02
- * @Author: Wang-X-C
- */
 public class TableAppSnapshot {
 
     Context mContext;
@@ -37,7 +30,6 @@ public class TableAppSnapshot {
 
         return Holder.INSTANCE;
     }
-
     /**
      * 覆盖新增数据，多条
      */
@@ -104,22 +96,22 @@ public class TableAppSnapshot {
     }
 
     private JSONObject getCursor(Cursor cursor) {
-        JSONObject job = null;
+        JSONObject jsonObj = null;
         try {
-            job = new JSONObject();
-            job.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,
+            jsonObj = new JSONObject();
+            jsonObj.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,
                 cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN)));
-            job.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationName,
+            jsonObj.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationName,
                 cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AN)));
-            job.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode,
+            jsonObj.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode,
                 cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AVC)));
-            job.put(DeviceKeyContacts.AppSnapshotInfo.ActionType,
+            jsonObj.put(DeviceKeyContacts.AppSnapshotInfo.ActionType,
                 cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AT)));
-            job.put(DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
+            jsonObj.put(DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
                 cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AHT)));
         } catch (Throwable e) {
         }
-        return job;
+        return jsonObj;
     }
 
     /**
@@ -133,9 +125,9 @@ public class TableAppSnapshot {
             cv.put(DBConfig.AppSnapshot.Column.AT, "-1");
             db.update(DBConfig.AppSnapshot.TABLE_NAME, cv, DBConfig.AppSnapshot.Column.AT + "!=? ",
                 new String[] {"-1"});
-            DBManager.getInstance(mContext).closeDB();
         } catch (Throwable e) {
         }
+        DBManager.getInstance(mContext).closeDB();
     }
 
     /**

@@ -5,13 +5,6 @@ import com.analysys.dev.utils.reflectinon.EContextHelper;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-/**
- * @Copyright © 2018 EGuan Inc. All rights reserved.
- * @Description:
- * @Version: 1.0
- * @Create: 2018/10/13 15:11
- * @Author: Wang-X-C
- */
 public class DBManager {
 
     private static Context mContext = null;

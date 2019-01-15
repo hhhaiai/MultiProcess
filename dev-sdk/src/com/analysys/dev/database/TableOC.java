@@ -15,13 +15,6 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-/**
- * @Copyright © 2018 EGuan Inc. All rights reserved.
- * @Description: TODO
- * @Version: 1.0
- * @Create: 2018/10/30 16:06
- * @Author: Wang-X-C
- */
 public class TableOC {
     Context mContext;
 

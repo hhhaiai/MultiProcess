@@ -1,5 +1,6 @@
 package com.analysys.dev.database;
 
+import com.analysys.dev.utils.FileUtils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 
 import android.content.Context;
@@ -7,13 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteOpenHelper;
 
-/**
- * @Copyright © 2018 EGuan Inc. All rights reserved.
- * @Description: TODO
- * @Version: 1.0
- * @Create: 2018/10/12 16:32
- * @Author: Wang-X-C
- */
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "e.data";
@@ -33,7 +27,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public DBHelper(Context context) {
         super(EContextHelper.getContext(context), DB_NAME, null, DB_VERSION);
-        createTables();
+        recreateTables();
     }
 
     @Override
@@ -48,13 +42,23 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {}
 
-    public void createTables() {
+    public void recreateTables() {
+        SQLiteDatabase db = null;
         try {
-            SQLiteDatabase db = getWritableDatabase();
-            db.execSQL(DBConfig.OC.CREATE_TABLE);
-            db.execSQL(DBConfig.OCCount.CREATE_TABLE);
-            db.execSQL(DBConfig.Location.CREATE_TABLE);
-            db.execSQL(DBConfig.AppSnapshot.CREATE_TABLE);
+            db = getWritableDatabase();
+            if( db == null) return;
+            if(!DBUtils.isTableExist(db ,DBConfig.OC.CREATE_TABLE)){
+                db.execSQL(DBConfig.OC.CREATE_TABLE);
+            }
+            if(DBUtils.isTableExist(db , DBConfig.OCCount.CREATE_TABLE)){
+                db.execSQL(DBConfig.OCCount.CREATE_TABLE);
+            }
+            if(DBUtils.isTableExist(db ,DBConfig.Location.CREATE_TABLE)){
+                db.execSQL(DBConfig.Location.CREATE_TABLE);
+            }
+            if(DBUtils.isTableExist(db , DBConfig.AppSnapshot.CREATE_TABLE)){
+                db.execSQL(DBConfig.AppSnapshot.CREATE_TABLE);
+            }
         } catch (SQLiteDatabaseCorruptException e) {
             rebuildDB();
         }
@@ -62,8 +66,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public void rebuildDB() {
         if (mContext != null) {
-            DBUtils.deleteDBFile("/data/data/" + mContext.getPackageName() + "/databases/" + DB_NAME);
-            createTables();
+            FileUtils.deleteFile("/data/data/" + mContext.getPackageName() + "/databases/" + DB_NAME);
+            recreateTables();
         }
     }
 
@@ -76,8 +80,8 @@ public class DBHelper extends SQLiteOpenHelper {
             if (!DBUtils.isTableExist(db, tableName)) {
                 db.execSQL(createSQL);
             }
-        } catch (SQLiteDatabaseCorruptException e) {
-            rebuildDB();
+        } catch (Throwable t) {
+
         }
     }
 }

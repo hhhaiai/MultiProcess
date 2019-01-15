@@ -13,6 +13,7 @@ import com.analysys.dev.internal.impl.proc.AppProcess;
 import com.analysys.dev.internal.impl.proc.ProcessManager;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.EThreadPool;
+import com.analysys.dev.utils.NetworkUtils;
 import com.analysys.dev.utils.PermissionUtils;
 import com.analysys.dev.utils.Utils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
@@ -295,7 +296,7 @@ public class OCImpl {
                 ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationOpenTime, String.valueOf(System.currentTimeMillis()));
                 ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode, pm.getPackageInfo(packageName, 0).versionName + "|"
                     + pm.getPackageInfo(packageName, 0).versionCode);
-                ocInfo.put(DeviceKeyContacts.OCInfo.NetworkType, Utils.getNetworkType(mContext));
+                ocInfo.put(DeviceKeyContacts.OCInfo.NetworkType, NetworkUtils.getNetworkType(mContext));
                 ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationType, appType(packageName));
                 ocInfo.put(DeviceKeyContacts.OCInfo.CollectionType, collectionType);
                 ocInfo.put(DeviceKeyContacts.OCInfo.SwitchType,EGContext.SWITCH_TYPE_DEFAULT);

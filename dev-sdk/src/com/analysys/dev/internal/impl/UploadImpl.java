@@ -3,15 +3,16 @@ package com.analysys.dev.internal.impl;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Log;
 
 import com.analysys.dev.database.TableAppSnapshot;
 import com.analysys.dev.database.TableLocation;
 import com.analysys.dev.database.TableOC;
 import com.analysys.dev.database.TableOCCount;
 import com.analysys.dev.internal.Content.EGContext;
+import com.analysys.dev.model.PolicyInfo;
 import com.analysys.dev.utils.DeflterCompressUtils;
 import com.analysys.dev.utils.EThreadPool;
+import com.analysys.dev.utils.NetworkUtils;
 import com.analysys.dev.utils.RequestUtils;
 import com.analysys.dev.utils.Utils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
@@ -19,7 +20,7 @@ import com.analysys.dev.internal.work.MessageDispatcher;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import com.analysys.dev.internal.impl.DeviceImpl;
+
 import com.analysys.dev.utils.sp.SPHelper;
 
 public class UploadImpl {
@@ -29,6 +30,7 @@ public class UploadImpl {
     private final String LI = "LocationInfo";
     private final String OCC = "OCCount";
     private final String OCI = "OCIount";
+    private int count = 0;
 
     private static class Holder {
         private static final UploadImpl INSTANCE = new UploadImpl();
@@ -52,15 +54,24 @@ public class UploadImpl {
                     return;
                 }
 //                encryptInfo = messageEncrypt(uploadInfo);
-                String url = URLGeneral.getURL();
-                if (TextUtils.isEmpty(url)) {
-                    return;
+                boolean boo = DeviceImpl.getInstance(mContext).getDebug()== "1"?true:false;
+//                String data = DataDealUtils.dealUploadData(context, json.toString());
+                boolean userRTP = PolicyInfo.getInstance().isUseRTP() == 0 ?true:false;
+                String url = "";
+                if (boo) {
+                    url  = EGContext.TEST_URL;
+                } else {
+                    if (userRTP) {
+                      url = EGContext.USERTP_URL;
+                    } else {
+                        url = EGContext.RT_URL;//?哪个接口
+                    }
                 }
-                String returnInfo = RequestUtils.httpRequest(url, messageEncrypt(uploadInfo));
-                if (TextUtils.isEmpty(returnInfo)) {
-                    return;
-                }
-            }});
+                handleUpload(url, uploadInfo);
+            }
+        });
+
+
                 // 策略处理
         MessageDispatcher.getInstance(mContext).uploadInfo(EGContext.UPLOAD_CYCLE);
     }
@@ -126,5 +137,80 @@ public class UploadImpl {
         }
         return null;
     }
+    /**
+     * 判断是否上传成功.200和413都是成功。策略（即500）的时候失败，需要重发.
+     *
+     * @param json
+     * @return
+     */
+    private boolean analysysReturnJson(String json) {
+        boolean result = false;
+        try {
+            if (!TextUtils.isEmpty(json)) {
+                //返回413，表示包太大，大于1M字节，本地直接删除
+                if ("413".equals(json)) {
+                    //删除源数据
+                    return true;
+                }
+                JSONObject job = new JSONObject(json);
+                String code = job.get("code").toString();
+                if(code != null){
+                    if("200".equals(code)){
+                        //TODO 清除本地数据
+                        result = true;
+                    }
+                    if("500".equals(code)){
+                        //TODO 重试
+                        result = false;
+                    }
+                }
 
+                //处理策略变更
+//                    String policy = job.get(POLICY).toString();
+//                    if (null != policy) {
+//                        //处理本地策略逻辑
+//                        JSONObject policyEntry = new JSONObject(policy);
+//
+//                        if (null != policyEntry) {
+//                            parserPolicy(PolicyManger.getDefalutPolicy(), policyEntry);
+//                        }
+//                    } else {
+//                        // 有新的策略返回的都是500+新的策略信息
+//                        // 因为策略版本不一致的话不能判断是客户端策略版本没更新成功，
+//                        // 还是恶意上传，所以只要版本发生变化，都是返回500，
+//                        // 即本次上传不成功，服务器不保存，客户端需要重新上传
+//                        // 所以不需要清空本地记录.服务端没有接收
+//                        //clearLocalData();
+//                    }
+
+
+            }
+        } catch (Throwable e) {
+        }
+        return result;
+    }
+    private void handleUpload(String url,String uploadInfo){
+        String result = RequestUtils.httpRequest(url, messageEncrypt(uploadInfo));
+        if (TextUtils.isEmpty(result)) {
+            return;
+        }
+        if (!analysysReturnJson(result)) {
+            count++;
+            //加入网络判断,如果无网情况下,不进行失败上传
+            if (count <= PolicyInfo.getInstance().getFailCount() && !NetworkUtils.getNetworkType(mContext).equals(EGContext.NETWORK_TYPE_NO_NET)) {
+                long dur = (long)((Math.random() + 1) * PolicyInfo.getInstance().getTimerInterval());
+                handleUpload(url, uploadInfo);
+            } else if (PolicyInfo.getInstance().isUseRTP() == 0) {
+                long failTryDelayInterval = System.currentTimeMillis() +
+                        PolicyInfo.getInstance().getFailTryDelay();
+                PolicyInfo.getInstance().setFailTryDelay
+                        (failTryDelayInterval);
+                PolicyImpl.getInstance(mContext).savePermitForFailTimes(mContext,
+                        failTryDelayInterval);
+            }
+        } else {
+            handleUpload(url, uploadInfo);
+            count = 0;
+        }
+    }
 }
