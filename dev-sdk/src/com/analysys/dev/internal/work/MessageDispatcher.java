@@ -6,13 +6,13 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 
-import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.impl.AppSnapshotImpl;
 import com.analysys.dev.internal.impl.LocationImpl;
 import com.analysys.dev.internal.impl.OCImpl;
 import com.analysys.dev.internal.impl.UploadImpl;
+import com.analysys.dev.service.AnalysysAccessibilityService;
+import com.analysys.dev.utils.AccessibilityHelper;
 import com.analysys.dev.utils.ELOG;
-import com.analysys.dev.utils.Utils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 
 /**
@@ -225,9 +225,10 @@ public class MessageDispatcher {
          * 注册动态广播，启动心跳检测
          */
         private void msgInitModule() {
-            if (!Utils.isAccessibilitySettingsOn(mContext)) {
-                ocInfo(0);
-            }
+//            if (!AccessibilityHelper.isAccessibilitySettingsOn(mContext,AnalysysAccessibilityService.class)) {
+//
+//            }
+            ocInfo(0);
             snapshotInfo(0);
             locationInfo(0);
             uploadInfo(0);

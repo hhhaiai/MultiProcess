@@ -11,6 +11,8 @@ import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.impl.proc.AppProcess;
 import com.analysys.dev.internal.impl.proc.ProcessManager;
+import com.analysys.dev.service.AnalysysAccessibilityService;
+import com.analysys.dev.utils.AccessibilityHelper;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.EThreadPool;
 import com.analysys.dev.utils.NetworkUtils;
@@ -57,7 +59,7 @@ public class OCImpl {
         EThreadPool.execute(new Runnable() {
             @Override
             public void run() {
-                if (!Utils.isAccessibilitySettingsOn(mContext)) {
+                if (!AccessibilityHelper.isAccessibilitySettingsOn(mContext,AnalysysAccessibilityService.class)) {
                     // 判断系统版本
                     if (Build.VERSION.SDK_INT < 21) {
                         if(PermissionUtils.checkPermission(mContext, Manifest.permission.GET_TASKS)){

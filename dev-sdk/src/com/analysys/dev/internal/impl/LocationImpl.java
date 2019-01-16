@@ -212,8 +212,10 @@ public class LocationImpl {
             }
 
             JSONArray wifiInfo = WifiImpl.getInstance(mContext).getWifiInfo();
-            int wifi = SPHelper.getDefault(mContext).getInt(EGContext.SP_WIFI, 1);
-            if (wifiInfo != null && wifiInfo.length() != 0 && wifi == 1) {
+//            int wifi = SPHelper.getDefault(mContext).getInt(EGContext.SP_WIFI, 1);
+            if (wifiInfo != null && wifiInfo.length() != 0
+//                    && wifi == 1
+                    ) {
                 locationJson.put(DeviceKeyContacts.LocationInfo.WifiInfo.NAME, wifiInfo);
             }
 

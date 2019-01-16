@@ -55,9 +55,8 @@ public class Utils {
     public static boolean isServiceWork(Context mContext, String serviceName) {
         boolean isWork = false;
         try {
-            ActivityManager myAM = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
-            @SuppressWarnings("deprecation")
-            List<ActivityManager.RunningServiceInfo> myList = myAM.getRunningServices(Integer.MAX_VALUE);
+            ActivityManager manager = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
+            List<ActivityManager.RunningServiceInfo> myList = manager.getRunningServices(Integer.MAX_VALUE);
             if (myList.size() <= 0) {
                 return false;
             }
@@ -73,29 +72,29 @@ public class Utils {
         return isWork;
     }
 
-    /**
-     * 此方法用来判断当前应用的辅助功能服务是否开启
-     */
-    public static boolean isAccessibilitySettingsOn(Context context) {
-        String accessibilityServiceName =
-            new String(context.getPackageName() + "/" + AnalysysAccessibilityService.class.getCanonicalName());
-        int accessibilityEnabled = 0;
-        try {
-            accessibilityEnabled = Settings.Secure.getInt(context.getContentResolver(),
-                android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
-        } catch (Settings.SettingNotFoundException e) {
-        }
-        if (accessibilityEnabled == 1) {
-            String services =
-                Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
-
-            if (services != null) {
-                return services.toLowerCase(Locale.getDefault())
-                    .contains(accessibilityServiceName.toLowerCase(Locale.getDefault()));
-            }
-        }
-        return false;
-    }
+//    /**
+//     * 此方法用来判断当前应用的辅助功能服务是否开启
+//     */
+//    public static boolean isAccessibilitySettingsOn(Context context) {
+//        String accessibilityServiceName =
+//            new String(context.getPackageName() + "/" + AnalysysAccessibilityService.class.getCanonicalName());
+//        int accessibilityEnabled = 0;
+//        try {
+//            accessibilityEnabled = Settings.Secure.getInt(context.getContentResolver(),
+//                android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
+//        } catch (Settings.SettingNotFoundException e) {
+//        }
+//        if (accessibilityEnabled == 1) {
+//            String services =
+//                Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+//
+//            if (services != null) {
+//                return services.toLowerCase(Locale.getDefault())
+//                    .contains(accessibilityServiceName.toLowerCase(Locale.getDefault()));
+//            }
+//        }
+//        return false;
+//    }
 
 
 
