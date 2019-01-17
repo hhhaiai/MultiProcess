@@ -6,6 +6,7 @@ import android.os.Process;
 import android.text.TextUtils;
 
 import com.analysys.dev.internal.Content.EGContext;
+import com.analysys.dev.internal.work.ServiceHelper;
 import com.analysys.dev.utils.AndroidManifestHelper;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
@@ -64,7 +65,8 @@ public class AnalysysInternal {
         SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_CHANNEL, channel).commit();
 
         EGContext.FLAG_DEBUG_USER = isDebug;
-
+        //JobService
+        ServiceHelper.getInstance(mContext).startJobService(mContext);
         MessageDispatcher.getInstance(mContext).startService(0);
         // 4.启动页面监听相关的
         // PageViewHelper.getInstance(mContext).init();

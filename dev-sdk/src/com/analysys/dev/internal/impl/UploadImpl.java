@@ -10,6 +10,7 @@ import com.analysys.dev.database.TableOC;
 import com.analysys.dev.database.TableOCCount;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.model.PolicyInfo;
+import com.analysys.dev.utils.AESUtils;
 import com.analysys.dev.utils.DeflterCompressUtils;
 import com.analysys.dev.utils.EThreadPool;
 import com.analysys.dev.utils.NetworkUtils;
@@ -123,7 +124,7 @@ public class UploadImpl {
         } else {
             key = EGContext.ORIGINKEY_STRING;
         }
-        byte[] encryptMessage = Utils.aesEncrypt(DeflterCompressUtils.compress(msg.getBytes()),key.getBytes());
+        byte[] encryptMessage = AESUtils.encrypt(DeflterCompressUtils.compress(msg.getBytes()),key.getBytes());
         if (encryptMessage == null) {
             return null;
         }

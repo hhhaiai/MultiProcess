@@ -2,30 +2,22 @@ package com.analysys.dev.utils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
 
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
-import com.analysys.dev.model.DevInfo;
+
 import com.analysys.dev.model.SoftwareInfo;
-import com.analysys.dev.service.AnalysysAccessibilityService;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 import com.analysys.dev.utils.sp.SPHelper;
 
@@ -40,13 +32,6 @@ import android.util.Base64;
 
 import org.json.JSONObject;
 
-/**
- * @Copyright © 2018 EGuan Inc. All rights reserved.
- * @Description: TODO
- * @Version: 1.0
- * @Create: 2018/10/12 11:29
- * @Author: Wang-X-C
- */
 public class Utils {
 
     /**
@@ -71,32 +56,6 @@ public class Utils {
         }
         return isWork;
     }
-
-//    /**
-//     * 此方法用来判断当前应用的辅助功能服务是否开启
-//     */
-//    public static boolean isAccessibilitySettingsOn(Context context) {
-//        String accessibilityServiceName =
-//            new String(context.getPackageName() + "/" + AnalysysAccessibilityService.class.getCanonicalName());
-//        int accessibilityEnabled = 0;
-//        try {
-//            accessibilityEnabled = Settings.Secure.getInt(context.getContentResolver(),
-//                android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
-//        } catch (Settings.SettingNotFoundException e) {
-//        }
-//        if (accessibilityEnabled == 1) {
-//            String services =
-//                Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
-//
-//            if (services != null) {
-//                return services.toLowerCase(Locale.getDefault())
-//                    .contains(accessibilityServiceName.toLowerCase(Locale.getDefault()));
-//            }
-//        }
-//        return false;
-//    }
-
-
 
     /**
      * 获取时段标记
@@ -163,85 +122,6 @@ public class Utils {
         return time;
     }
 
-    /**
-     * Gzip 压缩数据
-     */
-    public static byte[] compressGzip(byte[] unGzipData) {
-        if (unGzipData == null) {
-            return null;
-        }
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            GZIPOutputStream gzip = new GZIPOutputStream(baos);
-            gzip.write(unGzipData);
-            gzip.close();
-            byte[] encode = baos.toByteArray();
-            baos.flush();
-            baos.close();
-            return encode;
-        } catch (Throwable e) {
-
-        }
-        return null;
-    }
-
-    /**
-     * Gzip解压数据
-     */
-    public static String decompressGzip(byte[] gzipData) {
-        try {
-            if (gzipData == null) {
-                return null;
-            }
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            ByteArrayInputStream in = new ByteArrayInputStream(gzipData);
-            GZIPInputStream gzip = new GZIPInputStream(in);
-            byte[] buffer = new byte[256];
-            int n = 0;
-            while ((n = gzip.read(buffer, 0, buffer.length)) > 0) {
-                out.write(buffer, 0, n);
-            }
-            gzip.close();
-            in.close();
-            out.close();
-            return out.toString();
-        } catch (Throwable e) {
-        }
-        return null;
-    }
-
-    /**
-     * 内部使用 加密 通过 rawpassword 加密 content
-     */
-    public static byte[] aesEncrypt(byte[] content, byte[] pwd) {
-        try {
-            SecretKeySpec secretKeySpec = new SecretKeySpec(pwd, "AES");
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
-            return cipher.doFinal(content);
-        } catch (Throwable e) {
-        }
-
-        return null;
-    }
-
-    /**
-     * 内部使用 解密
-     */
-    public static byte[] aesDecrypt(byte[] content, byte[] pwd) {
-        try {
-            SecretKeySpec secretKeySpec = new SecretKeySpec(pwd, "AES");
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
-
-            byte[] result = cipher.doFinal(content);
-            return result;
-        } catch (Throwable e) {
-        }
-
-        return null;
-    }
-
     public static String shell(String cmd) {
         if (TextUtils.isEmpty(cmd)) {
             return null;
@@ -284,7 +164,7 @@ public class Utils {
     /**
      * 更新易观id和临时id
      */
-    public void setId(String json) {
+    public void setId(String json,Context ctx) {
 
         try {
             String tmpId = "", egid = "";
@@ -313,11 +193,11 @@ public class Utils {
     private void writeFile(String egId, String tmpId) {
 
         try {
-            if (!permisJudgment()) {
+            if (!FileUtils.permisJudgment()) {
                 return;
             }
             String id = "", egid = "", tmpid = "";
-            List<String> idInfo = readFile();
+            List<String> idInfo = FileUtils.readFile();
             if (idInfo.size() == 2) {
                 egid = idInfo.get(0);
                 tmpid = idInfo.get(1);
@@ -341,102 +221,7 @@ public class Utils {
 
         }
     }
-    private List<String> readFile() {
 
-        String idInfo = readIdFile();
-
-        List<String> list = new ArrayList<>();
-        try {
-            if (!TextUtils.isEmpty(idInfo)) {
-                int index = idInfo.indexOf("$");
-                int lastIndex = idInfo.lastIndexOf("$");
-                if (idInfo.length() > 2 && index == lastIndex) {
-                    if (index == 0 && idInfo.length() - 1 > 0) {
-                        list.add("");
-                        list.add(idInfo.substring(1, idInfo.length()));
-                        return list;
-                    }
-                    if (index != 0 && index == idInfo.length() - 1) {
-                        list.add(idInfo.substring(0, index));
-                        list.add("");
-                    } else {
-                        String[] ids = idInfo.split("\\$");
-                        if (ids.length == 2) {
-                            list.add(ids[0]);
-                            list.add(ids[1]);
-                        }
-                    }
-                }
-            }
-        } catch (Throwable e) {
-
-        }
-        return list;
-    }
-    /**
-     * 判断SDCard是否为可读写状态
-     *
-     * @return
-     */
-    private boolean permisJudgment() {
-        String en = Environment.getExternalStorageState();
-        if (en.equals(Environment.MEDIA_MOUNTED)) {
-            return true;
-        }
-        return false;
-    }
-    /**
-     * 从SD卡读数据
-     *
-     * @return
-     */
-    private String readIdFile() {
-        try {
-            if (fileJudgment() && !permisJudgment()) {
-                return "";
-            }
-            File file = new File(Environment.getExternalStorageDirectory(), EGContext.EGUANFILE);
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String readline;
-            StringBuffer sb = new StringBuffer();
-            while ((readline = br.readLine()) != null) {
-                sb.append(readline);
-            }
-            br.close();
-            return sb.toString();
-        } catch (Throwable e) {
-        }
-        return "";
-    }
-    /**
-     * 判断文件是否存在 ，true 存在 false 不存在
-     */
-    private boolean fileJudgment() {
-        String address = Environment.getExternalStorageDirectory().toString() + "/" + EGContext.EGUANFILE;
-        File file = new File(address);
-        if (file.exists()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * 向shared中存储数据
-     *
-     * @param eguanId
-     */
-    private void writeShared(String eguanId, String tmpid) {
-
-        if (!TextUtils.isEmpty(eguanId)) {
-            SoftwareInfo.getInstance().setEguanID(eguanId);
-            SPHelper.getDefault(EContextHelper.getContext(null)).edit().putString(DeviceKeyContacts.DevInfo.EguanID,eguanId);
-        }
-        if (!TextUtils.isEmpty(tmpid)) {
-            SoftwareInfo.getInstance().setTempID(tmpid);
-            SPHelper.getDefault(EContextHelper.getContext(null)).edit().putString(DeviceKeyContacts.DevInfo.TempID,tmpid);
-        }
-    }
 
     /**
      * 向Setting中存储数据
@@ -467,5 +252,21 @@ public class Utils {
 //            tabOpe.insertTmpId(tmpId);
 //        }
 //    }
+    /**
+     * 向shared中存储数据
+     *
+     * @param eguanId
+     */
+    public void writeShared(String eguanId, String tmpid) {
+
+        if (!TextUtils.isEmpty(eguanId)) {
+            SoftwareInfo.getInstance().setEguanID(eguanId);
+            SPHelper.getDefault(EContextHelper.getContext(null)).edit().putString(DeviceKeyContacts.DevInfo.EguanID,eguanId);
+        }
+        if (!TextUtils.isEmpty(tmpid)) {
+            SoftwareInfo.getInstance().setTempID(tmpid);
+            SPHelper.getDefault(EContextHelper.getContext(null)).edit().putString(DeviceKeyContacts.DevInfo.TempID,tmpid);
+        }
+    }
 
 }

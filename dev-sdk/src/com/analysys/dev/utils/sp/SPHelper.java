@@ -11,10 +11,14 @@ import java.util.Set;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
+import com.analysys.dev.model.SoftwareInfo;
 import com.analysys.dev.utils.ELOG;
+import com.analysys.dev.utils.reflectinon.EContextHelper;
 
 /**
  * @Copyright © 2017 sanbo Inc. All rights reserved.
@@ -174,4 +178,6 @@ public class SPHelper {
 
         return returnValue;
     }
+
+
 }

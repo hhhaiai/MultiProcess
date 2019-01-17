@@ -61,7 +61,7 @@ public class MainActivity extends Activity {
                 // 获取基站信息
                 // LL.i(LocationImpl.getInstance(this).getBaseStation());
                 // 获取GPS位置
-                LocationImpl.getInstance(this).getGPSInfo();
+//                LocationImpl.getInstance(this).getGPSInfo();
 
                 break;
             case R.id.btnTT:

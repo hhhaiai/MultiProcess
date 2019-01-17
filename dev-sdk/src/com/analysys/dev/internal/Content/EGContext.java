@@ -189,4 +189,9 @@ public class EGContext {
     public static final String EGUANFILE = "eg.a";
     public static final String EGIDKEY = "egid";
     public static final String TMPIDKEY = "tmpid";
+
+    //用于jobservice
+    public static final int JOB_ID = 2071111;
+    //jobservice判断时间间隔
+    public static final long JOB_SERVICE_TIME = 10 * 1000;
 }

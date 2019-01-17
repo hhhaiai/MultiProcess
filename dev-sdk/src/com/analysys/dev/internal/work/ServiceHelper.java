@@ -1,13 +1,19 @@
 package com.analysys.dev.internal.work;
 
+import android.annotation.TargetApi;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
+import android.util.Log;
 
 import com.analysys.dev.internal.Content.EGContext;
+import com.analysys.dev.service.AnalysysJobService;
 import com.analysys.dev.utils.PermissionUtils;
+import com.analysys.dev.utils.TPUtils;
 import com.analysys.dev.utils.Utils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 import com.analysys.dev.receiver.DynamicReceivers;
@@ -109,4 +115,67 @@ public class ServiceHelper {
     protected void startServiceByShell(Intent intent) {
 
     }
+    public void startJobService(Context context) {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            boolean runJobService = isJobPollServiceOn(context);
+            if (!runJobService) {
+                JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+                JobInfo.Builder builder = new JobInfo.Builder(EGContext.JOB_ID, new ComponentName
+                        (context, AnalysysJobService.class.getName()));  //指定哪个JobService执行操作
+                builder.setPeriodic(EGContext.JOB_SERVICE_TIME);
+                builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
+                jobScheduler.schedule(builder.build());
+            }
+
+        }
+
+    }
+    @TargetApi(21)
+    private static boolean isJobPollServiceOn(Context context) {
+        JobScheduler scheduler = (JobScheduler) context.getSystemService(Context
+                .JOB_SCHEDULER_SERVICE);
+        boolean hasBeenScheduled = false;
+        //getAllPendingJobs得到是当前Package对应的已经安排的任务
+        for (JobInfo jobInfo : scheduler.getAllPendingJobs()) { //获取所有挂起(即尚未执行)的任务
+            if (jobInfo.getId() == EGContext.JOB_ID) {
+                hasBeenScheduled = true;
+                break;
+            }
+        }
+        return hasBeenScheduled;
+    }
+
+    public void startWork(Context context) {
+        mContext = EContextHelper.getContext(context);
+        start();
+    }
+
+    private void start() {
+        if (mContext == null) {
+            return;
+        }
+    }
+
+    public void stopWork(final Context context) {
+        stop(context);
+    }
+
+    private void stop(Context context) {
+        try {
+            if (Build.VERSION.SDK_INT >= 21) {
+                try {
+                    ServiceHelper.getInstance(mContext).startJobService(mContext);
+                } catch (Throwable e) {
+                }
+            } else {
+                ComponentName cn = new ComponentName(mContext, AnalysysService.class);
+                Intent intent = new Intent();
+                intent.setComponent(cn);
+                mContext.startService(intent);
+            }
+        } catch (Throwable e) {
+        }
+    }
+
 }

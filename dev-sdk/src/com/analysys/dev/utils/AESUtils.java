@@ -43,8 +43,6 @@ public class AESUtils {
      */
     public static byte[] encrypt(byte[] content, byte[] rawpassword) {
         try {
-//            byte[] rawkey = getRawKey(rawpassword);
-            // 应该使用rawkey;
             SecretKeySpec secretKeySpec = new SecretKeySpec(rawpassword, "AES");
             Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM_ECB);
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
