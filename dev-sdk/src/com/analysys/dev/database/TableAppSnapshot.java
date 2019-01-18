@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDatabaseCorruptException;
+import android.util.Log;
 
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.impl.AppSnapshotImpl;
@@ -164,17 +166,29 @@ public class TableAppSnapshot {
      * 数据查询，格式：{JSONObject}
      */
     public JSONArray select() {
-        JSONArray jar = null;
+        JSONArray array = null;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            jar = new JSONArray();
+            array = new JSONArray();
             Cursor cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null, null, null);
             while (cursor.moveToNext()) {
-                jar.put(getCursor(cursor));
+                array.put(getCursor(cursor));
             }
         } catch (Throwable e) {
             ELOG.e(e);
         }
-        return jar;
+        return array;
+    }
+    public void delete(){
+        try {
+            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            if (db == null) {
+                return;
+            }
+            db.delete(DBConfig.AppSnapshot.TABLE_NAME, null, null);
+        } catch (Throwable e) {
+        } finally {
+            DBManager.getInstance(mContext).closeDB();
+        }
     }
 }

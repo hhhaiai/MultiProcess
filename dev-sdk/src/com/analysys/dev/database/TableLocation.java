@@ -72,9 +72,11 @@ public class TableLocation {
     public void delete() {
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            if(db == null) return;
             db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?", new String[]{"1"});
-            DBManager.getInstance(mContext).closeDB();
         } catch (Throwable e) {
+        }finally {
+            DBManager.getInstance(mContext).closeDB();
         }
     }
 

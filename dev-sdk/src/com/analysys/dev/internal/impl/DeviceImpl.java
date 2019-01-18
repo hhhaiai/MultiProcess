@@ -21,6 +21,7 @@ import org.json.JSONObject;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.model.BatteryModuleNameInfo;
 import com.analysys.dev.utils.ELOG;
+import com.analysys.dev.utils.HiJack;
 import com.analysys.dev.utils.NetworkUtils;
 import com.analysys.dev.utils.PermissionUtils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
@@ -596,8 +597,8 @@ public class DeviceImpl {
      * 判断设备的OS是否被劫持，"0”= 没有被劫持“1”= 被劫持
      */
     public String isHijack() {
-        //TODO 是否装xpose等
-        return null;
+        //是否装xpose等
+        return (HiJack.byCheckXposeFile()||HiJack.byLoadXposedClass()) == true ?"1":"0";
     }
 
     /**

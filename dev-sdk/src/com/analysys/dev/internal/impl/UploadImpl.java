@@ -24,13 +24,14 @@ import org.json.JSONObject;
 
 import com.analysys.dev.utils.sp.SPHelper;
 
+import java.util.List;
+
 public class UploadImpl {
     Context mContext;
     private final String DI = "DevInfo";
     private final String ASI = "AppSnapshotInfo";
     private final String LI = "LocationInfo";
     private final String OCC = "OCCount";
-    private final String OCI = "OCIount";
     private int count = 0;
 
     private static class Holder {
@@ -97,14 +98,14 @@ public class UploadImpl {
             if (locationJar != null) {
                 uploadJob.put(LI, locationJar);
             }
-            JSONArray ocCountJar = TableOCCount.getInstance(mContext).select();
-            if (ocCountJar != null) {
-                uploadJob.put(OCC, ocCountJar);
-            }
-            JSONArray ocJar = TableOC.getInstance(mContext).select();
-            if (ocJar != null) {
-                uploadJob.put(OCI, ocJar);
-            }
+//            JSONArray ocCountJar = TableOCCount.getInstance(mContext).select();
+//            if (ocCountJar != null) {
+//                uploadJob.put(OCC, ocCountJar);
+//            }
+//            JSONArray ocJar = TableOC.getInstance(mContext).select();
+//            if (ocJar != null) {
+//                uploadJob.put(OCI, ocJar);
+//            }
         } catch (Throwable e) {
         }
         return String.valueOf(uploadJob);
@@ -128,10 +129,6 @@ public class UploadImpl {
         if (encryptMessage == null) {
             return null;
         }
-//        byte[] compressGzip = Utils.compressGzip(encryptMessage);
-//        if (compressGzip == null) {
-//            return null;
-//        }
         byte[] baseData = Base64.encode(encryptMessage, Base64.NO_WRAP);
         if (baseData != null) {
             return baseData;
@@ -151,13 +148,15 @@ public class UploadImpl {
                 //返回413，表示包太大，大于1M字节，本地直接删除
                 if ("413".equals(json)) {
                     //删除源数据
+                    cleanData();
                     return true;
                 }
                 JSONObject job = new JSONObject(json);
                 String code = job.get("code").toString();
                 if(code != null){
                     if("200".equals(code)){
-                        //TODO 清除本地数据
+                        //清除本地数据
+                        cleanData();
                         result = true;
                     }
                     if("500".equals(code)){
@@ -165,25 +164,6 @@ public class UploadImpl {
                         result = false;
                     }
                 }
-
-                //处理策略变更
-//                    String policy = job.get(POLICY).toString();
-//                    if (null != policy) {
-//                        //处理本地策略逻辑
-//                        JSONObject policyEntry = new JSONObject(policy);
-//
-//                        if (null != policyEntry) {
-//                            parserPolicy(PolicyManger.getDefalutPolicy(), policyEntry);
-//                        }
-//                    } else {
-//                        // 有新的策略返回的都是500+新的策略信息
-//                        // 因为策略版本不一致的话不能判断是客户端策略版本没更新成功，
-//                        // 还是恶意上传，所以只要版本发生变化，都是返回500，
-//                        // 即本次上传不成功，服务器不保存，客户端需要重新上传
-//                        // 所以不需要清空本地记录.服务端没有接收
-//                        //clearLocalData();
-//                    }
-
 
             }
         } catch (Throwable e) {
@@ -213,5 +193,9 @@ public class UploadImpl {
             handleUpload(url, uploadInfo);
             count = 0;
         }
+    }
+    private void cleanData(){
+      TableAppSnapshot.getInstance(mContext).delete();
+      TableLocation.getInstance(mContext).delete();
     }
 }

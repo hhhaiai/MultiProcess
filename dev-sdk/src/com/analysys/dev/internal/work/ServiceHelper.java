@@ -148,14 +148,11 @@ public class ServiceHelper {
 
     public void startWork(Context context) {
         mContext = EContextHelper.getContext(context);
-        start();
-    }
-
-    private void start() {
         if (mContext == null) {
             return;
         }
     }
+
 
     public void stopWork(final Context context) {
         stop(context);

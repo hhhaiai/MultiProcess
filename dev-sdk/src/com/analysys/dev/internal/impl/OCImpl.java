@@ -17,7 +17,6 @@ import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.EThreadPool;
 import com.analysys.dev.utils.NetworkUtils;
 import com.analysys.dev.utils.PermissionUtils;
-import com.analysys.dev.utils.Utils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 import com.analysys.dev.internal.work.MessageDispatcher;
 
@@ -65,7 +64,7 @@ public class OCImpl {
                         if(PermissionUtils.checkPermission(mContext, Manifest.permission.GET_TASKS)){
                             RunningApps(getRunningApp(), EGContext.OC_COLLECTION_TYPE_RUNNING_TASK);
                         }
-                    }else if(Build.VERSION.SDK_INT > 21 && Build.VERSION.SDK_INT < 24 ){
+                    }else if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24 ){
                         getProcApps();
                     }else{
                         //TODO 7.0以上待调研
