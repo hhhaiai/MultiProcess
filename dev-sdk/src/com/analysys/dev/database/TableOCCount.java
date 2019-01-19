@@ -8,6 +8,7 @@ import android.text.TextUtils;
 
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.impl.OCImpl;
+import com.analysys.dev.utils.Base64Utils;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.Utils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
@@ -89,7 +90,7 @@ public class TableOCCount {
             }
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             String day = Utils.getDay();
-            int timeInterval = Utils.getTimeTag(System.currentTimeMillis());
+            int timeInterval = Base64Utils.getTimeTag(System.currentTimeMillis());
             ContentValues cv = getContentValues(ocInfo);
             ELOG.i(ocInfo+"  ocInfo update()");
             db.update(DBConfig.OCCount.TABLE_NAME, cv,
@@ -110,7 +111,7 @@ public class TableOCCount {
         if (ocInfo != null) {
             cv = new ContentValues();
             long insertTime = System.currentTimeMillis();
-            String an = Utils.encrypt(ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationName), insertTime);
+            String an = Base64Utils.encrypt(ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationName), insertTime);
             ELOG.i(ocInfo.toString()+"     ocInfo  ");
             cv.put(DBConfig.OCCount.Column.APN, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName));
             cv.put(DBConfig.OCCount.Column.AN, an);
@@ -121,7 +122,7 @@ public class TableOCCount {
             cv.put(DBConfig.OCCount.Column.NT, ocInfo.optString(DeviceKeyContacts.OCInfo.NetworkType));
             cv.put(DBConfig.OCCount.Column.AT, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationType));
             cv.put(DBConfig.OCCount.Column.CT, ocInfo.optString(DeviceKeyContacts.OCInfo.CollectionType));
-            cv.put(DBConfig.OCCount.Column.TI, Utils.getTimeTag(insertTime));
+            cv.put(DBConfig.OCCount.Column.TI, Base64Utils.getTimeTag(insertTime));
             cv.put(DBConfig.OCCount.Column.ST, ZERO);
             cv.put(DBConfig.OCCount.Column.RS, ONE);
         }
@@ -145,7 +146,7 @@ public class TableOCCount {
                 String insertTime = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.IT));
                 String appName = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AN));
                 job.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.APN)));
-                job.put(DeviceKeyContacts.OCInfo.ApplicationName, Utils.decrypt(appName, Long.valueOf(insertTime)));
+                job.put(DeviceKeyContacts.OCInfo.ApplicationName, Base64Utils.decrypt(appName, Long.valueOf(insertTime)));
                 job.put(DeviceKeyContacts.OCInfo.ApplicationOpenTime, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AOT)));
                 job.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AVC)));
                 job.put(DeviceKeyContacts.OCInfo.NetworkType, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.NT)));
@@ -221,7 +222,7 @@ public class TableOCCount {
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             String day = Utils.getDay();
-            int timeInterval = Utils.getTimeTag(System.currentTimeMillis());
+            int timeInterval = Base64Utils.getTimeTag(System.currentTimeMillis());
             Cursor cursor = db.query(DBConfig.OCCount.TABLE_NAME, new String[]{DBConfig.OCCount.Column.APN},
                     DBConfig.OCCount.Column.DY + "=? and "
                             + DBConfig.OCCount.Column.TI + "=? and "
@@ -257,7 +258,7 @@ public class TableOCCount {
                 JSONObject job = new JSONObject();
                 String insertTime = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.IT));
                 String encryptAn = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AN));
-                String an = Utils.decrypt(encryptAn, Long.valueOf(insertTime));
+                String an = Base64Utils.decrypt(encryptAn, Long.valueOf(insertTime));
                 job.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.APN)));
                 job.put(DeviceKeyContacts.OCInfo.ApplicationName, an);
                 job.put(DeviceKeyContacts.OCInfo.CU, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.CU)));

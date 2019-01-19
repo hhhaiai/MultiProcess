@@ -151,6 +151,7 @@ public class UploadImpl {
                     cleanData();
                     return true;
                 }
+                Utils.setId(json , mContext);
                 JSONObject job = new JSONObject(json);
                 String code = job.get("code").toString();
                 if(code != null){

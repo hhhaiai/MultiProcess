@@ -684,8 +684,11 @@ public class DeviceImpl {
 
         }
     }
-//SystemImpl
 
+    /**
+     * 系统字体大小
+     * @return
+     */
     public String getSystemFontSize() {
         try {
             Configuration mCurConfig = null;

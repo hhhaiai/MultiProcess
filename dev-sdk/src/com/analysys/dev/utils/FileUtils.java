@@ -7,7 +7,9 @@ import com.analysys.dev.internal.Content.EGContext;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,21 +17,15 @@ public class FileUtils {
 
     public static void deleteFile(String filePath) {
         try{
-            if (!TextUtils.isEmpty(filePath)) {
-                File result = new File(filePath);
-                if (result != null) {
-                    if (result.exists()) {
-                        result.delete();
-                    }
-                }
-            }
+            if(isFileExist(filePath))  new File(filePath).delete();
         }catch (Throwable t){
 
         }
     }
-    public static List<String> readFile() {
 
-        String idInfo = readIdFile();
+    public static List<String> readFile(String filePath) {
+
+        String idInfo = readIdFile(filePath);
 
         List<String> list = new ArrayList<>();
         try {
@@ -64,12 +60,12 @@ public class FileUtils {
      *
      * @return
      */
-    private static String readIdFile() {
+    private static String readIdFile(String filePath) {
         try {
-            if (fileJudgment() && !permisJudgment()) {
+            if (isFileExist(filePath) && !permisJudgment()) {
                 return "";
             }
-            File file = new File(Environment.getExternalStorageDirectory(), EGContext.EGUANFILE);
+            File file = new File(filePath);
             BufferedReader br = new BufferedReader(new FileReader(file));
             String readline;
             StringBuffer sb = new StringBuffer();
@@ -85,14 +81,12 @@ public class FileUtils {
     /**
      * 判断文件是否存在 ，true 存在 false 不存在
      */
-    private static boolean fileJudgment() {
-        String address = Environment.getExternalStorageDirectory().toString() + "/" + EGContext.EGUANFILE;
-        File file = new File(address);
-        if (file.exists()) {
-            return true;
-        } else {
-            return false;
+    private static boolean isFileExist(String filePath) {
+        if(TextUtils.isEmpty(filePath)){
+            File file = new File(filePath);
+            if(file != null) return file.exists();
         }
+        return false;
     }
 
     /**
@@ -102,10 +96,41 @@ public class FileUtils {
      */
     public static boolean permisJudgment() {
         String en = Environment.getExternalStorageState();
-        if (en.equals(Environment.MEDIA_MOUNTED)) {
-            return true;
+        return en.equals(Environment.MEDIA_MOUNTED);
+    }
+    /**
+     * 向SD卡存储数据
+     */
+    public static void writeFile(String egId, String tmpId ,String filePath) {
+
+        try {
+            if (!FileUtils.permisJudgment()) {
+                return;
+            }
+            String id = "", egid = "", tmpid = "";
+            List<String> idInfo = FileUtils.readFile(filePath);
+            if (idInfo.size() == 2) {
+                egid = idInfo.get(0);
+                tmpid = idInfo.get(1);
+            }
+            if (!TextUtils.isEmpty(egId) && !TextUtils.isEmpty(tmpId)) {
+                id = egId + "$" + tmpId;
+            } else if (!TextUtils.isEmpty(egId)) {
+                id = egId + "$" + tmpid;
+            } else if (!TextUtils.isEmpty(tmpId)) {
+                id = egid + "$" + tmpId;
+            } else {
+                return;
+            }
+
+            String st = new String(id.getBytes(), "utf-8");
+            File file = new File(Environment.getExternalStorageDirectory(), EGContext.EGUANFILE);
+            OutputStream out = new FileOutputStream(file, false);
+            out.write(st.getBytes());
+            out.close();
+        } catch (Throwable e) {
+
         }
-        return false;
     }
 
 }

@@ -136,7 +136,6 @@ public class OCImpl {
             }
             TableOCCount.getInstance(mContext).insertArray(ocList);
         } else {
-            ELOG.i("135  OCImlp"+runApps.toString()+"   vs cache: "+cacheApps.toString());
             // 去重
             removeRepeat(cacheApps, runApps);
             // 更新缓存表

@@ -3,13 +3,9 @@ package com.analysys.dev.utils;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -57,60 +53,6 @@ public class Utils {
         return isWork;
     }
 
-    /**
-     * 获取时段标记
-     */
-    public static int getTimeTag(long timestamp) {
-        int tag = 0;
-        final Calendar mCalendar = Calendar.getInstance();
-        mCalendar.setTimeInMillis(timestamp);
-        int h = mCalendar.get(Calendar.HOUR_OF_DAY);
-        if (0 < h && h < 6) {
-            tag = 1;
-        } else if (6 <= h && h < 12) {
-            tag = 2;
-        } else if (12 <= h && h < 18) {
-            tag = 3;
-        } else if (18 <= h && h < 24) {
-            tag = 4;
-        }
-        return tag;
-    }
-
-    /**
-     * 数据加密
-     */
-    public static String encrypt(String info, long time) {
-        if (TextUtils.isEmpty(info)) {
-            return null;
-        }
-        int key = getTimeTag(time);
-        byte[] bytes = info.getBytes();
-        int len = bytes.length;
-        for (int i = 0; i < len; i++) {
-            bytes[i] = (byte)(bytes[i] ^ key);
-            key = bytes[i];
-        }
-        byte[] bt = Base64.encode(bytes, Base64.NO_WRAP);
-        return new String(bt);
-    }
-
-    /**
-     * 数据解密
-     */
-    public static String decrypt(String info, long time) {
-        if (TextUtils.isEmpty(info)) {
-            return null;
-        }
-        int key = getTimeTag(time);
-        byte[] bytes = Base64.decode(info.getBytes(), Base64.NO_WRAP);
-        int len = bytes.length;
-        for (int i = len - 1; i > 0; i--) {
-            bytes[i] = (byte)(bytes[i] ^ bytes[i - 1]);
-        }
-        bytes[0] = (byte)(bytes[0] ^ key);
-        return new String(bytes);
-    }
 
     /**
      * 获取日期
@@ -164,7 +106,7 @@ public class Utils {
     /**
      * 更新易观id和临时id
      */
-    public void setId(String json,Context ctx) {
+    public static void setId(String json,Context ctx) {
 
         try {
             String tmpId = "", egid = "";
@@ -178,47 +120,14 @@ public class Utils {
             }
 
             if (!TextUtils.isEmpty(tmpId) || !TextUtils.isEmpty(egid)) {
-                writeFile(egid, tmpId);
+                String filePath = Environment.getExternalStorageDirectory().toString() + "/" + EGContext.EGUANFILE;
+                FileUtils.writeFile(egid, tmpId ,filePath);
                 writeShared(egid, tmpId);
                 writeSetting(egid, tmpId);
 //                writeDatabase(egid, tmpId);
                 //TODO
             }
         } catch (Throwable e) {
-        }
-    }
-    /**
-     * 向SD卡存储数据
-     */
-    private void writeFile(String egId, String tmpId) {
-
-        try {
-            if (!FileUtils.permisJudgment()) {
-                return;
-            }
-            String id = "", egid = "", tmpid = "";
-            List<String> idInfo = FileUtils.readFile();
-            if (idInfo.size() == 2) {
-                egid = idInfo.get(0);
-                tmpid = idInfo.get(1);
-            }
-            if (!TextUtils.isEmpty(egId) && !TextUtils.isEmpty(tmpId)) {
-                id = egId + "$" + tmpId;
-            } else if (!TextUtils.isEmpty(egId)) {
-                id = egId + "$" + tmpid;
-            } else if (!TextUtils.isEmpty(tmpId)) {
-                id = egid + "$" + tmpId;
-            } else {
-                return;
-            }
-
-            String st = new String(id.getBytes(), "utf-8");
-            File file = new File(Environment.getExternalStorageDirectory(), EGContext.EGUANFILE);
-            OutputStream out = new FileOutputStream(file, false);
-            out.write(st.getBytes());
-            out.close();
-        } catch (Throwable e) {
-
         }
     }
 
@@ -228,7 +137,8 @@ public class Utils {
      *
      * @param egId
      */
-    private void writeSetting(String egId, String tmpId) {
+    private static void writeSetting(String egId, String tmpId) {
+
         Context ctx = EContextHelper.getContext(null);
         if (PermissionUtils.checkPermission(ctx, Manifest.permission.WRITE_SETTINGS)) {
             if (!TextUtils.isEmpty(egId)) {
@@ -257,7 +167,7 @@ public class Utils {
      *
      * @param eguanId
      */
-    public void writeShared(String eguanId, String tmpid) {
+    public static void writeShared(String eguanId, String tmpid) {
 
         if (!TextUtils.isEmpty(eguanId)) {
             SoftwareInfo.getInstance().setEguanID(eguanId);

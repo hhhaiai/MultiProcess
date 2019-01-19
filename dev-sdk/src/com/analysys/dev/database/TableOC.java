@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
+import com.analysys.dev.utils.Base64Utils;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.Utils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
@@ -38,7 +39,7 @@ public class TableOC {
             long time = System.currentTimeMillis();
             for (int i = 0; i < ocInfo.size(); i++) {
                 ELOG.i("OC存储内容：" + ocInfo);
-                String encryptOC = Utils.encrypt(String.valueOf(ocInfo.get(i)), time);
+                String encryptOC = Base64Utils.encrypt(String.valueOf(ocInfo.get(i)), time);
                 if (!TextUtils.isEmpty(encryptOC)) {
                     ContentValues cv = new ContentValues();
                     cv.put(DBConfig.OC.Column.OCI, encryptOC);
@@ -68,7 +69,7 @@ public class TableOC {
             while (cursor.moveToNext()) {
                 String insertTime = cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.IT));
                 String encryptInfo = cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.OCI));
-                String ocInfo = Utils.decrypt(encryptInfo, Long.valueOf(insertTime));
+                String ocInfo = Base64Utils.decrypt(encryptInfo, Long.valueOf(insertTime));
                 if (!TextUtils.isEmpty(ocInfo)) {
                     jar.put(new JSONObject(ocInfo));
                 }
