@@ -72,15 +72,15 @@ public class EGContext {
     public static final String SWITCH_TYPE_DEFAULT = "1";
 
     //防作弊相关信息开关，默认不上传，可控制上传
-    public static boolean SWITCH_OF_PREVENT_CHEATING = false;
+    public static boolean SWITCH_OF_PREVENT_CHEATING = true;
     //蓝牙信息，默认不上传，需要根据服务器控制
-    public static boolean SWITCH_OF_BLUETOOTH = false;
+    public static boolean SWITCH_OF_BLUETOOTH = true;
     //电量信息，默认不上传，需要根据服务器控制
-    public static boolean SWITCH_OF_BATTERY = false;
+    public static boolean SWITCH_OF_BATTERY = true;
     //更加详细的设备详情信息，默认可不上传，可用于确定设备信息
-    public static boolean SWITCH_OF_DEV_FURTHER_DETAIL= false;
+    public static boolean SWITCH_OF_DEV_FURTHER_DETAIL= true;
     //系统阶段保持信息，默认可不上传，根据服务器控制来上传
-    public static boolean SWITCH_OF_SYSTEM_INFO= false;
+    public static boolean SWITCH_OF_SYSTEM_INFO= true;
 
 
     public static int OC_COLLECTION_TYPE_RUNNING_TASK = 1;//getRunningTask

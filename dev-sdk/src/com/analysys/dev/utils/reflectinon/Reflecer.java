@@ -7,7 +7,6 @@ import java.lang.reflect.Method;
 
 /**
  * @Copyright © 2018 Analysys Inc. All rights reserved.
- * @Description TODO
  * @Version 1.0
  * @Create 2018/12/18 16:17
  * @Author sanbo
@@ -45,22 +44,22 @@ public class Reflecer {
      * @param args
      * @return
      */
-    public static String hook(Object o, String methodName, String... args) {
-        try {
-            Class<?> clz = o.getClass();
-            Method mz = clz.getMethod("getCellConnectionStatus");
-            if (args.length > 0) {
-                Object invoke = mz.invoke(o, args);
-                if (invoke != null) {
-                    return (String)invoke;
-                }
-            } else {
-                return (String)mz.invoke(o);
-            }
-        } catch (Throwable e) {
-        }
-        return "";
-    }
+//    public static String hook(Object o, String methodName, String... args) {
+//        try {
+//            Class<?> clz = o.getClass();
+//            Method mz = clz.getMethod("getCellConnectionStatus");
+//            if (args.length > 0) {
+//                Object invoke = mz.invoke(o, args);
+//                if (invoke != null) {
+//                    return (String)invoke;
+//                }
+//            } else {
+//                return (String)mz.invoke(o);
+//            }
+//        } catch (Throwable e) {
+//        }
+//        return "";
+//    }
 
     /**
      * 
@@ -69,21 +68,21 @@ public class Reflecer {
      * @param args
      * @return
      */
-    public static String hookStatic(Object o, String methodName, String... args) {
-        try {
-            Class<?> clz = o.getClass();
-            Method mz = clz.getMethod("getCellConnectionStatus");
-            if (args.length > 0) {
-                Object invoke = mz.invoke(o, args);
-                if (invoke != null) {
-                    return (String)invoke;
-                }
-            } else {
-                return (String)mz.invoke(null);
-            }
-
-        } catch (Throwable e) {
-        }
-        return "";
-    }
+//    public static String hookStatic(Object o, String methodName, String... args) {
+//        try {
+//            Class<?> clz = o.getClass();
+//            Method mz = clz.getMethod("getCellConnectionStatus");
+//            if (args.length > 0) {
+//                Object invoke = mz.invoke(o, args);
+//                if (invoke != null) {
+//                    return (String)invoke;
+//                }
+//            } else {
+//                return (String)mz.invoke(null);
+//            }
+//
+//        } catch (Throwable e) {
+//        }
+//        return "";
+//    }
 }

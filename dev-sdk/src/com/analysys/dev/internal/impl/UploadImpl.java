@@ -9,9 +9,11 @@ import com.analysys.dev.database.TableLocation;
 import com.analysys.dev.database.TableOC;
 import com.analysys.dev.database.TableOCCount;
 import com.analysys.dev.internal.Content.EGContext;
+import com.analysys.dev.internal.impl.proc.DataPackaging;
 import com.analysys.dev.model.PolicyInfo;
 import com.analysys.dev.utils.AESUtils;
 import com.analysys.dev.utils.DeflterCompressUtils;
+import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.EThreadPool;
 import com.analysys.dev.utils.NetworkUtils;
 import com.analysys.dev.utils.RequestUtils;
@@ -51,13 +53,11 @@ public class UploadImpl {
             @Override
             public void run() {
                 String uploadInfo = getInfo();
-//                byte[] encryptInfo = null;
+                ELOG.i("uploadInfo ::::  "+uploadInfo);
                 if (TextUtils.isEmpty(uploadInfo)) {
                     return;
                 }
-//                encryptInfo = messageEncrypt(uploadInfo);
                 boolean boo = DeviceImpl.getInstance(mContext).getDebug()== "1"?true:false;
-//                String data = DataDealUtils.dealUploadData(context, json.toString());
                 boolean userRTP = PolicyInfo.getInstance().isUseRTP() == 0 ?true:false;
                 String url = "";
                 if (boo) {
@@ -86,9 +86,9 @@ public class UploadImpl {
         JSONObject uploadJob = null;
         try {
             uploadJob = new JSONObject();
-            JSONObject deviceJob = DeviceImpl.getInstance(mContext).getDeviceInfo();
-            if (deviceJob != null) {
-                uploadJob.put(DI, deviceJob);
+            JSONObject devJson = DataPackaging.getDevInfo(mContext);
+            if (devJson != null) {
+                uploadJob.put(DI, devJson);
             }
             JSONArray snapshotJar = TableAppSnapshot.getInstance(mContext).select();
             if (snapshotJar != null) {
@@ -125,12 +125,15 @@ public class UploadImpl {
         } else {
             key = EGContext.ORIGINKEY_STRING;
         }
+        AESUtils.checkKey(key);
+        ELOG.i("key：：：：：："+key);
         byte[] encryptMessage = AESUtils.encrypt(DeflterCompressUtils.compress(msg.getBytes()),key.getBytes());
         if (encryptMessage == null) {
             return null;
         }
         byte[] baseData = Base64.encode(encryptMessage, Base64.NO_WRAP);
         if (baseData != null) {
+            ELOG.i("baseData :::::::::::::"+ AESUtils.toHex(baseData));
             return baseData;
         }
         return null;
@@ -144,6 +147,7 @@ public class UploadImpl {
     private boolean analysysReturnJson(String json) {
         boolean result = false;
         try {
+            ELOG.i("json   :::::::::"+json);
             if (!TextUtils.isEmpty(json)) {
                 //返回413，表示包太大，大于1M字节，本地直接删除
                 if ("413".equals(json)) {

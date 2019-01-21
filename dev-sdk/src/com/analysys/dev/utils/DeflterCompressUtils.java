@@ -28,7 +28,7 @@ public class DeflterCompressUtils {
             output = bos.toByteArray();
         } catch (Exception e) {
             output = data;
-            e.printStackTrace();
+            ELOG.e(e.getMessage()+"  compress has an exception.");
         } finally {
             try {
                 bos.close();

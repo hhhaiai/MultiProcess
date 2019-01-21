@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
+import com.analysys.dev.EguanMonitorAgent;
 import com.analysys.dev.internal.impl.LocationImpl;
 import com.analysys.dev.internal.impl.OCImpl;
 import com.analysys.dev.utils.ELOG;
@@ -29,6 +30,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+//        EguanMonitorAgent.getInstance().initEguan(this,"qwertyuiop123","WanDouJia",false);
         registerPermission();
     }
 
@@ -65,7 +67,7 @@ public class MainActivity extends Activity {
 
                 break;
             case R.id.btnTT:
-                test();
+//                test();
                 break;
             case R.id.btnOC:
                 ELOG.i("btnOC ---------");

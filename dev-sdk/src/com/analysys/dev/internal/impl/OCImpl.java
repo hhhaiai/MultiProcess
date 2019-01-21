@@ -264,8 +264,8 @@ public class OCImpl {
     private void removeRepeat(List<JSONObject> cacheApps) {
         try {
             for (int i = cacheApps.size() - 1; i >= 0; i--) {
-                JSONObject job = cacheApps.get(i);
-                String apn = job.getString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
+                JSONObject json = cacheApps.get(i);
+                String apn = json.getString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
                 ELOG.i(apn +" -------apn");
                 if (!TextUtils.isEmpty(apn) && apn.equals(pkgName)) {
                     cacheApps.remove(i);
@@ -273,8 +273,8 @@ public class OCImpl {
                     pkgName = null;
                     continue;
                 }
-                job.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime, String.valueOf(System.currentTimeMillis()));
-                job.put(DeviceKeyContacts.OCInfo.SwitchType, EGContext.SWITCH_TYPE_DEFAULT);
+                json.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime, String.valueOf(System.currentTimeMillis()));
+                json.put(DeviceKeyContacts.OCInfo.SwitchType, EGContext.SWITCH_TYPE_DEFAULT);
             }
         } catch (Throwable e) {
             ELOG.e(e);

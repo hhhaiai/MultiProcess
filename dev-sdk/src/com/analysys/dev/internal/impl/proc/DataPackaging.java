@@ -7,6 +7,7 @@ import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.impl.DeviceImpl;
 import com.analysys.dev.model.BatteryModuleNameInfo;
+import com.analysys.dev.utils.ELOG;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -53,10 +54,12 @@ public class DataPackaging {
             deviceInfo.put(DeviceKeyContacts.DevInfo.AppMD5, devImpl.getAppMD5());
             deviceInfo.put(DeviceKeyContacts.DevInfo.AppSign, devImpl.getAppSign());
             deviceInfo.put(DeviceKeyContacts.DevInfo.TempID, devImpl.getTempID());
+            ELOG.i("deviceInfo ::::::"+deviceInfo);
+
             if (EGContext.SWITCH_OF_PREVENT_CHEATING) {
                 deviceInfo.put(DeviceKeyContacts.DevInfo.Simulator, devImpl.isSimulator());
                 deviceInfo.put(DeviceKeyContacts.DevInfo.Debug, devImpl.getDebug());
-                deviceInfo.put(DeviceKeyContacts.DevInfo.Hijack, devImpl.isHijack());//TODO:需要方法实现,0表示没有被劫持,1表示被劫持
+                deviceInfo.put(DeviceKeyContacts.DevInfo.Hijack, devImpl.isHijack());//0表示没有被劫持,1表示被劫持
                 deviceInfo.put(DeviceKeyContacts.DevInfo.IsRoot, devImpl.IsRoot());
             }
             if (EGContext.SWITCH_OF_BLUETOOTH) {
@@ -114,7 +117,7 @@ public class DataPackaging {
             }
             deviceInfo.put("ETDM", batteryJson.toString());
         }catch (Throwable t){
-
+            ELOG.e(t.getMessage()+" datapackaging has an exception.....");
         }
         return deviceInfo;
     }

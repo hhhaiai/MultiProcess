@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.os.Message;
 
 import com.analysys.dev.internal.Content.EGContext;
+import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 
 /**
@@ -59,7 +60,7 @@ public class CheckHeartbeat {
             switch (msg.what) {
                 case MSG_CHECK:
 
-                    //LL.i("心跳检查,进程："+Process.myPid());
+                    ELOG.i("心跳检查,进程：");
                     MessageDispatcher.getInstance(mContext).checkHeartbeat();
                     sendMessages();
                     break;

@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 public class HiJack {
@@ -17,30 +16,34 @@ public class HiJack {
      * 如果进程加载了xposed相关的so库或者jar则表示xposed框架已注入
      * @return
      */
-    public static boolean byCheckXposeFile(){
-        try{
-            Set set = new HashSet();
-            // 读取maps文件信息
-            BufferedReader localBufferedReader =
-                    new BufferedReader(new FileReader("/proc/" + android.os.Process.myPid() + "/maps"));
-            // 遍历查询关键词
-            String readline;
-            while ((readline = localBufferedReader.readLine()) != null ){
-                if ((readline.endsWith(".so")) || (readline.endsWith(".jar"))) {
-                   set.add(readline.substring(readline.lastIndexOf(" ") + 1));
-                }
-            }
-            localBufferedReader.close();
-            while (set.iterator().hasNext()){
-                if(((String)set.iterator().next()).toLowerCase().contains("xposed")){
-                    return true;
-                }
-            }
-        }catch (Exception e) {
-            return false;
-        }
-        return false;
-    }
+//    public static boolean byCheckXposeFile(){
+//        try{
+//            Set set = new HashSet();
+//            // 读取maps文件信息
+//            BufferedReader localBufferedReader =
+//                    new BufferedReader(new FileReader("/proc/" + android.os.Process.myPid() + "/maps"));
+//            // 遍历查询关键词
+//            if(localBufferedReader != null){
+//                String readline;
+//                //TODO cat一下 拿最新文件
+//                while ((readline = localBufferedReader.readLine()) != null ){
+//                    if ((readline.endsWith(".so")) || (readline.endsWith(".jar"))) {
+//                        set.add(readline.substring(readline.lastIndexOf(" ") + 1));
+//                    }
+//                }
+//                localBufferedReader.close();
+//                while (set.iterator().hasNext()){
+//                    if(((String)set.iterator().next()).toLowerCase().contains("xposed")){
+//                        return true;
+//                    }
+//                }
+//            }
+//        }catch (Exception e) {
+//            ELOG.i(e.getMessage()+"  byCheckXposeFile");
+//            return false;
+//        }
+//        return false;
+//    }
     //尝试加载xposed的类,如果能加载则表示已经安装了
     public static boolean byLoadXposedClass(){
         try{
@@ -49,6 +52,7 @@ public class HiJack {
             // 如果加载类失败 则表示当前环境没有xposed
             return localObject != null;
         }catch (Throwable localThrowable) {
+            ELOG.i(localThrowable.getMessage()+"  byLoadXposedClass");
             return false;
         }
     }

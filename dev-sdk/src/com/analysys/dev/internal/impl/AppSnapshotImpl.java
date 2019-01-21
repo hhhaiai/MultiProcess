@@ -198,6 +198,7 @@ public class AppSnapshotImpl {
                     } else if (type == 2) {
                         TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UPDATE);
                     }
+                    ELOG.i(type+"   type");
                 } catch (Throwable e) {
                     ELOG.e(e);
                 }

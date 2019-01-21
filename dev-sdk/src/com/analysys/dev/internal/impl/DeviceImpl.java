@@ -67,10 +67,6 @@ public class DeviceImpl {
         }
         return Holder.INSTANCE;
     }
-    public JSONObject getDeviceInfo() {
-
-        return null;
-    }
     //设备硬件信息DevInfoImpl
 
        /**
@@ -588,6 +584,7 @@ public class DeviceImpl {
             ApplicationInfo appinfo = pm.getApplicationInfo(mContext.getPackageName(), 0);
             if(0 != (appinfo.flags & ApplicationInfo.FLAG_DEBUGGABLE)) return ZERO;
         }catch(Exception e){
+            ELOG.i(e.getMessage()+"  getDebug  ");
           return ONE;
         }
         return ONE;
@@ -598,7 +595,7 @@ public class DeviceImpl {
      */
     public String isHijack() {
         //是否装xpose等
-        return (HiJack.byCheckXposeFile()||HiJack.byLoadXposedClass()) == true ?"1":"0";
+        return HiJack.byLoadXposedClass() == true ?"1":"0";
     }
 
     /**
@@ -610,6 +607,7 @@ public class DeviceImpl {
                 return ZERO;
             }
         } catch (Throwable e) {
+            return ZERO;
         }
         return ONE;
     }
@@ -637,7 +635,7 @@ public class DeviceImpl {
 //                    return null;
 //                }
         }
-        return null;
+        return "";
     }
 
     /**
@@ -650,7 +648,7 @@ public class DeviceImpl {
         }else{
         // TODO 6.0以上
         }
-        return null;
+        return "unknown";
     }
 
     //电池相关信息BatteryModuleNameImpl

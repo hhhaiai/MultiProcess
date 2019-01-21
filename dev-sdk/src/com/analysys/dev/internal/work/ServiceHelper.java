@@ -12,6 +12,7 @@ import android.util.Log;
 
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.service.AnalysysJobService;
+import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.PermissionUtils;
 import com.analysys.dev.utils.TPUtils;
 import com.analysys.dev.utils.Utils;
@@ -67,6 +68,7 @@ public class ServiceHelper {
     protected void startSelfService() {
         if (isStartService()) {
             boolean isWork = Utils.isServiceWork(mContext, EGContext.SERVICE_NAME);
+            ELOG.i(isWork+"  is servicework");
             if (!isWork) {
                 try {
                     ComponentName cn = new ComponentName(mContext, AnalysysService.class);
@@ -119,6 +121,7 @@ public class ServiceHelper {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             boolean runJobService = isJobPollServiceOn(context);
+            ELOG.i(runJobService+ " ==runJobService");
             if (!runJobService) {
                 JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
                 JobInfo.Builder builder = new JobInfo.Builder(EGContext.JOB_ID, new ComponentName

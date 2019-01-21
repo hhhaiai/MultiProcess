@@ -61,6 +61,7 @@ public class AnalysysInternal {
                 ELOG.e(EGContext.LOGINFO.LOG_NOT_APPKEY);
             }
         }
+        SPHelper.getDefault(mContext).edit().putString(EGContext.USERKEY, key).commit();
         SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_KEY, key).commit();
         SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_CHANNEL, channel).commit();
 

@@ -43,13 +43,15 @@ public class AESUtils {
      */
     public static byte[] encrypt(byte[] content, byte[] rawpassword) {
         try {
-            SecretKeySpec secretKeySpec = new SecretKeySpec(rawpassword, "AES");
+
+            SecretKeySpec secretKeySpec = new SecretKeySpec(getRawKey(rawpassword), "AES");
             Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM_ECB);
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
 
             byte[] result = cipher.doFinal(content);
             return result;
         } catch (Throwable e) {
+            ELOG.e(e.getMessage()+"   encrypt has an exception");
         }
 
         return null;
@@ -66,9 +68,9 @@ public class AESUtils {
     public static byte[] decrypt(byte[] content, byte[] rawpassword) {
 
         try {
-            // byte[] rawkey = getRawKey(rawpassword);
+             byte[] rawkey = getRawKey(rawpassword);
             // 应该使用RAWKEY;
-            SecretKeySpec secretKeySpec = new SecretKeySpec(rawpassword, "AES");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(rawkey, "AES");
 
             Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM_ECB);
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
