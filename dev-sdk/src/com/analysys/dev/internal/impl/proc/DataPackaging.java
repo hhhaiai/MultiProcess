@@ -114,8 +114,9 @@ public class DataPackaging {
                 batteryJson.put(DeviceKeyContacts.DevInfo.BuildPreviewSdkInt, devImpl.getBuildPreviewSdkInt());
                 batteryJson.put(DeviceKeyContacts.DevInfo.BuildCodename, devImpl.getBuildCodename());
                 batteryJson.put(DeviceKeyContacts.DevInfo.IDFA, devImpl.getIDFA());
+                ELOG.i(batteryJson+"   ::::::::batteryJson batteryJson");
             }
-            deviceInfo.put("ETDM", batteryJson.toString());
+            deviceInfo.put("ETDM", batteryJson);
         }catch (Throwable t){
             ELOG.e(t.getMessage()+" datapackaging has an exception.....");
         }

@@ -10,6 +10,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.View;
 
 import com.analysys.dev.EguanMonitorAgent;
@@ -32,6 +33,8 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 //        EguanMonitorAgent.getInstance().initEguan(this,"qwertyuiop123","WanDouJia",false);
         registerPermission();
+//        Intent intent = new Intent(this, testAct.class);
+//        startActivity(intent);
     }
 
     @TargetApi(23)
@@ -47,6 +50,7 @@ public class MainActivity extends Activity {
                 requestPermissions(new String[] {Manifest.permission.INTERNET}, 2);
             }
         }
+
     }
 
     @Override

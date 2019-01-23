@@ -1,6 +1,12 @@
 package com.analysys.dev.utils;
 
+import android.content.Context;
 import android.text.TextUtils;
+
+import com.analysys.dev.internal.Content.EGContext;
+import com.analysys.dev.internal.impl.DeviceImpl;
+import com.analysys.dev.utils.sp.SPHelper;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,6 +20,8 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.List;
+
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -36,59 +44,54 @@ public class RequestUtils {
   /**
    * HTTP
    */
-  public static String httpRequest(String url, byte[] value) {
-    String response = null;
+  public static String httpRequest(String url, byte[] value , Context ctx) {
+    String response = "";
+    URL urlP;
+    HttpURLConnection connection;
     InputStream is = null;
     ByteArrayOutputStream bos = null;
-    PrintWriter pw = null;
+    PrintWriter pw;
+    byte[] buffer = new byte[1024];
     try {
-      response = "";
-      URL urlP;
-      HttpURLConnection connection;
-      is = null;
-      bos = null;
-      byte[] buffer = new byte[1024];
-      urlP = new URL(url);
-      connection = (HttpURLConnection) urlP.openConnection();
-      connection.setDoInput(true);
-      connection.setDoOutput(true);
-      connection.setConnectTimeout(20 * 1000);
-      connection.setReadTimeout(20 * 1000);
-      connection.setRequestMethod("POST");
-      //connection.setRequestProperty("spv", spv);
-      pw = new PrintWriter(connection.getOutputStream());
-      pw.print(value);
-      pw.flush();
-      pw.close();
-      //获取数据
-      if (HttpURLConnection.HTTP_OK == connection.getResponseCode()) {
-        is = connection.getInputStream();
-        bos = new ByteArrayOutputStream();
-        int len;
-        while (-1 != (len = is.read(buffer))) {
-          bos.write(buffer, 0, len);
-        }
-        bos.flush();
-        return bos.toString("utf-8");
-      } else if (HttpURLConnection.HTTP_ENTITY_TOO_LARGE == connection.getResponseCode()) {
-        response = "413";
-      }
-    } catch (Throwable e) {
-      ELOG.e(e);
-    } finally {
-      if (is != null) {
-        try {
-          is.close();
-        } catch (Throwable e) {
+        urlP = new URL(url);
+        connection = (HttpURLConnection) urlP.openConnection();
+        connection.setDoInput(true);
+        connection.setDoOutput(true);
+        connection.setConnectTimeout(EGContext.TIME_OUT_TIME);
+        connection.setReadTimeout(EGContext.TIME_OUT_TIME);
+        connection.setRequestMethod("POST");
+        // 添加头信息
+        connection.setRequestProperty(EGContext.SDKV, SPHelper.getDefault(ctx).getString(EGContext.SDKV,""));
+        connection.setRequestProperty(EGContext.DEBUG, DeviceImpl.getInstance(ctx).getDebug());
+        connection.setRequestProperty(EGContext.APPKEY, SPHelper.getDefault(ctx).getString(EGContext.APPKEY ,""));
+        connection.setRequestProperty(EGContext.TIME, SPHelper.getDefault(ctx).getString(EGContext.TIME , ""));
+        ELOG.i("头文件字段：：：：：："+SPHelper.getDefault(ctx).getString(EGContext.SDKV,"")+"  debug::: "+ DeviceImpl.getInstance(ctx).getDebug()
+        +"APPKEY::: "+SPHelper.getDefault(ctx).getString(EGContext.APPKEY ,"")+"   TIME:::   "+SPHelper.getDefault(ctx).getString(EGContext.TIME , ""));
+        // 发送数据
+        pw = new PrintWriter(connection.getOutputStream());
+        pw.print(value);
+        pw.flush();
+        pw.close();
 
+        int status = connection.getResponseCode();
+        // 获取数据
+        if (HttpURLConnection.HTTP_OK == status) {
+          is = connection.getInputStream();
+          bos = new ByteArrayOutputStream();
+          int len;
+          while (-1 != (len = is.read(buffer))) {
+          bos.write(buffer, 0, len);
+          }
+          bos.flush();
+          return bos.toString("utf-8");
+        } else if (HttpURLConnection.HTTP_ENTITY_TOO_LARGE == connection.getResponseCode()) {
+          response = EGContext.HTTP_DATA_OVERLOAD;
         }
-      }
-      if (bos != null) {
-        try {
-          bos.close();
-        } catch (Throwable e) {
-        }
-      }
+    } catch (Throwable e) {
+
+    } finally {
+      StreamerUtils.safeClose(is);
+      StreamerUtils.safeClose(bos);
     }
     return response;
   }

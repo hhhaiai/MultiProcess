@@ -1,4 +1,4 @@
-package com.analysys.dev.utils;
+package com.device;
 
 import java.security.SecureRandom;
 
@@ -22,7 +22,7 @@ public class AESUtils {
     }
 
     /**
-     * 与 toBytes 成对使用 byte[] 转 String
+     * 与 toBytes 成对使用  byte[] 转 String
      */
     public static String toHex(byte[] contentBytes) {
 
@@ -39,11 +39,12 @@ public class AESUtils {
     }
 
     /**
-     * 内部使用 加密 通过 rawpassword 加密 content
+     * 内部使用
+     * 加密
+     * 通过 rawpassword 加密 content
      */
     public static byte[] encrypt(byte[] content, byte[] rawpassword) {
         try {
-
             SecretKeySpec secretKeySpec = new SecretKeySpec(rawpassword, "AES");
             Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM_ECB);
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
@@ -51,16 +52,18 @@ public class AESUtils {
             byte[] result = cipher.doFinal(content);
             return result;
         } catch (Throwable e) {
-            ELOG.e(e.getMessage()+"   encrypt has an exception");
+            e.printStackTrace();
         }
 
         return null;
+
     }
 
     /**
-     * 内部使用 解密
+     * 内部使用
+     * 解密
      *
-     * @param content 待解密内容
+     * @param content     待解密内容
      * @param rawpassword 解密密钥
      */
 
@@ -68,8 +71,8 @@ public class AESUtils {
     public static byte[] decrypt(byte[] content, byte[] rawpassword) {
 
         try {
-//             byte[] rawkey = getRawKey(rawpassword);
-//            // 应该使用RAWKEY;
+//            byte[] rawkey = getRawKey(rawpassword);
+            // 应该使用RAWKEY;
             SecretKeySpec secretKeySpec = new SecretKeySpec(rawpassword, "AES");
 
             Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM_ECB);
@@ -78,7 +81,6 @@ public class AESUtils {
             byte[] result = cipher.doFinal(content);
             return result;
         } catch (Throwable e) {
-         ELOG.i(e.getMessage()+"  decrypt has an exception");
         }
 
         return null;

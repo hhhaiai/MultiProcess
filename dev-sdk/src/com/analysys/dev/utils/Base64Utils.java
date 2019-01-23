@@ -27,12 +27,12 @@ public class Base64Utils {
     /**
      * 数据解密
      */
-    public static String decrypt(String info, long time) {
+    public static String decrypt(String info, long time) throws Exception{
         if (TextUtils.isEmpty(info)) {
             return null;
         }
         int key = getTimeTag(time);
-        byte[] bytes = Base64.decode(info.getBytes(), Base64.NO_WRAP);
+        byte[] bytes = Base64.decode(info.getBytes("UTF-8"), Base64.NO_WRAP);
         int len = bytes.length;
         for (int i = len - 1; i > 0; i--) {
             bytes[i] = (byte)(bytes[i] ^ bytes[i - 1]);

@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -131,6 +132,36 @@ public class FileUtils {
         } catch (Throwable e) {
 
         }
+    }
+    /**
+     * @param filePath$Name 要写入文件夹和文件名，如：data/data/com.test/files/abc.txt
+     * @param string        要写文件的文件内容
+     */
+    public static void write(String filePath$Name, String string) throws IOException {
+        File file = new File(filePath$Name);
+        // 判断文件是否存在
+        if (!file.exists()) {
+            File path = new File(file.getParent());
+            if (!path.exists() && !path.mkdirs()) {   // 判断文件夹是否存在，不存在则创建文件夹
+                ELOG.i("文件创建失败");
+                return;
+            }
+            if (!file.createNewFile()) {    // 创建文件
+                ELOG.i("文件创建失败");
+                return;
+            }
+        }
+        // 实例化对象：文件输出流
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
+
+        // 写入文件
+        fileOutputStream.write(string.getBytes());
+
+        // 清空输出流缓存
+        fileOutputStream.flush();
+
+        // 关闭输出流
+        fileOutputStream.close();
     }
 
 }

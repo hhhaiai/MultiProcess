@@ -1,6 +1,7 @@
 package com.analysys.dev.internal.impl;
 
 import android.content.Context;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Base64;
 
@@ -12,9 +13,11 @@ import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.impl.proc.DataPackaging;
 import com.analysys.dev.model.PolicyInfo;
 import com.analysys.dev.utils.AESUtils;
+import com.analysys.dev.utils.Base64Utils;
 import com.analysys.dev.utils.DeflterCompressUtils;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.EThreadPool;
+import com.analysys.dev.utils.FileUtils;
 import com.analysys.dev.utils.NetworkUtils;
 import com.analysys.dev.utils.RequestUtils;
 import com.analysys.dev.utils.Utils;
@@ -26,6 +29,8 @@ import org.json.JSONObject;
 
 import com.analysys.dev.utils.sp.SPHelper;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.List;
 
 public class UploadImpl {
@@ -115,27 +120,40 @@ public class UploadImpl {
      * 上传数据加密
      */
     public byte[] messageEncrypt(String msg) {
-        String key = "";
-        if (TextUtils.isEmpty(msg)) {
-            return null;
+        try {
+            String key = "";
+            if (TextUtils.isEmpty(msg)) {
+                return null;
+            }
+            String key_inner = SPHelper.getDefault(mContext).getString(EGContext.USERKEY,"");
+            if (null == key_inner) {
+                key_inner = EGContext.ORIGINKEY_STRING;
+            }
+            key = DeflterCompressUtils.makeSercretKey(key_inner , mContext);
+            ELOG.i("key：：：：：："+key);
+
+            byte[] def = DeflterCompressUtils.compress(URLEncoder.encode(URLEncoder.encode(msg)).getBytes("UTF-8"));
+            byte[] encryptMessage = AESUtils.encrypt(def,key.getBytes("UTF-8"));
+            if (encryptMessage != null) {
+                  final byte[]  returnData = Base64.encode(encryptMessage,Base64.DEFAULT);
+//                ELOG.i("returnData :::::::::::::"+ new String(returnData));
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        try{
+//                            ELOG.i("==========================="+Environment.getExternalStorageDirectory()+"/lly.txt");
+//                            FileUtils.write(Environment.getExternalStorageDirectory()+"/lly.txt",new String(returnData).replace("\n",""));
+//                        }catch (Throwable t){
+//                            ELOG.i("THREAD HAS AN EXCEPTION  "+t.getMessage());
+//                        }
+//                    }
+//                }).start();
+                return new String(returnData).replace("\n","").getBytes("UTF-8");
+            }
+        }catch (Throwable t){
+           ELOG.i("messageEncrypt has an exception."+ t.getMessage());
         }
-        String key_inner = SPHelper.getDefault(mContext).getString(EGContext.USERKEY,"");
-        if (null != key_inner && key_inner.length() == 17) {
-            key = DeflterCompressUtils.makeSercretKey(key_inner);
-        } else {
-            key = EGContext.ORIGINKEY_STRING;
-        }
-        AESUtils.checkKey(key);
-        ELOG.i("key：：：：：："+key);
-        byte[] encryptMessage = AESUtils.encrypt(DeflterCompressUtils.compress(msg.getBytes()),key.getBytes());
-        if (encryptMessage == null) {
-            return null;
-        }
-        byte[] baseData = Base64.encode(encryptMessage, Base64.NO_WRAP);
-        if (baseData != null) {
-            ELOG.i("baseData :::::::::::::"+ AESUtils.toHex(baseData));
-            return baseData;
-        }
+
         return null;
     }
     /**
@@ -150,7 +168,7 @@ public class UploadImpl {
             ELOG.i("json   :::::::::"+json);
             if (!TextUtils.isEmpty(json)) {
                 //返回413，表示包太大，大于1M字节，本地直接删除
-                if ("413".equals(json)) {
+                if (EGContext.HTTP_DATA_OVERLOAD.equals(json)) {
                     //删除源数据
                     cleanData();
                     return true;
@@ -159,12 +177,12 @@ public class UploadImpl {
                 JSONObject job = new JSONObject(json);
                 String code = job.get("code").toString();
                 if(code != null){
-                    if("200".equals(code)){
+                    if(EGContext.HTTP_SUCCESS.equals(code)){
                         //清除本地数据
                         cleanData();
                         result = true;
                     }
-                    if("500".equals(code)){
+                    if(EGContext.HTTP_RETRY.equals(code)){
                         //TODO 重试
                         result = false;
                     }
@@ -176,7 +194,7 @@ public class UploadImpl {
         return result;
     }
     private void handleUpload(String url,String uploadInfo){
-        String result = RequestUtils.httpRequest(url, messageEncrypt(uploadInfo));
+        String result = RequestUtils.httpRequest(url, messageEncrypt(uploadInfo),mContext);
         if (TextUtils.isEmpty(result)) {
             return;
         }

@@ -185,7 +185,7 @@ public class EGContext {
 
     public static String POLICY_SERVICE_PULL_VER = "servicePullVer";
     public static String USERKEY = "keyValue";
-    public static final String ORIGINKEY_STRING = "sysylana";
+    public static final String ORIGINKEY_STRING = "analysys";
     public static final String EGUANFILE = "eg.a";
     public static final String EGIDKEY = "egid";
     public static final String TMPIDKEY = "tmpid";
@@ -194,4 +194,17 @@ public class EGContext {
     public static final int JOB_ID = 2071111;
     //jobservice判断时间间隔
     public static final long JOB_SERVICE_TIME = 10 * 1000;
+
+    public static final int TIME_OUT_TIME = 30 * 1000; // 设置为30秒
+    public static final String SDKV = "SDKV";
+    public static final String DEBUG = "DEBUG";
+    public static final String APPKEY = "AK";
+    public static final String TIME = "TIME";
+    // HTTP Status-Code 413: Request Entity Too Large
+    public static final String HTTP_DATA_OVERLOAD = "413";
+    //200 SUCCESS
+    public static final String HTTP_SUCCESS = "200";
+    //500 RETRY
+    public static final String HTTP_RETRY = "500";
+
 }

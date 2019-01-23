@@ -16,6 +16,7 @@ import java.util.Enumeration;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.analysys.dev.internal.Content.EGContext;
@@ -763,13 +764,13 @@ public class DeviceImpl {
         return Build.HARDWARE;
     }
     public String getBuildSupportedAbis(){
-        return Build.SUPPORTED_ABIS.toString();
+        return stringArrayToString(Build.SUPPORTED_ABIS);
     }
     public String getBuildSupportedAbis32(){
-        return Build.SUPPORTED_32_BIT_ABIS.toString();
+        return stringArrayToString(Build.SUPPORTED_32_BIT_ABIS);
     }
     public String getBuildSupportedAbis64(){
-        return Build.SUPPORTED_64_BIT_ABIS.toString();
+        return stringArrayToString(Build.SUPPORTED_64_BIT_ABIS);
     }
     public String getBuildType(){
         return Build.TYPE;
@@ -836,5 +837,18 @@ public class DeviceImpl {
         }
         return sb.toString();
     }
-
+    private String stringArrayToString(String[] stringArray){
+        StringBuilder sb = null;
+        try{
+            sb = new StringBuilder();
+            for(int i = 0; i< stringArray.length;i++){
+                sb.append(stringArray[i]);
+            }
+        }catch (Throwable t){
+            ELOG.e(t.getMessage()+" stringArrayToString has an exception.");
+            return null;
+        }
+        ELOG.e(sb.toString()+" ::::::::::stringArrayToString");
+        return sb.toString();
+    }
 }
