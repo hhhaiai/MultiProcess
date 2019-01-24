@@ -1,23 +1,18 @@
 package com.analysys.dev.internal.impl;
 
 import android.content.Context;
-import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Base64;
 
 import com.analysys.dev.database.TableAppSnapshot;
 import com.analysys.dev.database.TableLocation;
-import com.analysys.dev.database.TableOC;
-import com.analysys.dev.database.TableOCCount;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.impl.proc.DataPackaging;
 import com.analysys.dev.model.PolicyInfo;
 import com.analysys.dev.utils.AESUtils;
-import com.analysys.dev.utils.Base64Utils;
 import com.analysys.dev.utils.DeflterCompressUtils;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.EThreadPool;
-import com.analysys.dev.utils.FileUtils;
 import com.analysys.dev.utils.NetworkUtils;
 import com.analysys.dev.utils.RequestUtils;
 import com.analysys.dev.utils.Utils;
@@ -29,9 +24,7 @@ import org.json.JSONObject;
 
 import com.analysys.dev.utils.sp.SPHelper;
 
-import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.List;
 
 public class UploadImpl {
     Context mContext;
@@ -125,6 +118,17 @@ public class UploadImpl {
             if (TextUtils.isEmpty(msg)) {
                 return null;
             }
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    try{
+//                        ELOG.i("==========================="+Environment.getExternalStorageDirectory()+"/origin.txt");
+//                        FileUtils.write(Environment.getExternalStorageDirectory()+"/origin.txt",msg);
+//                    }catch (Throwable t){
+//                        ELOG.i("THREAD HAS AN EXCEPTION  "+t.getMessage());
+//                    }
+//                }
+//            }).start();
             String key_inner = SPHelper.getDefault(mContext).getString(EGContext.USERKEY,"");
             if (null == key_inner) {
                 key_inner = EGContext.ORIGINKEY_STRING;
@@ -135,14 +139,14 @@ public class UploadImpl {
             byte[] def = DeflterCompressUtils.compress(URLEncoder.encode(URLEncoder.encode(msg)).getBytes("UTF-8"));
             byte[] encryptMessage = AESUtils.encrypt(def,key.getBytes("UTF-8"));
             if (encryptMessage != null) {
-                  final byte[]  returnData = Base64.encode(encryptMessage,Base64.DEFAULT);
+                  byte[]  returnData = Base64.encode(encryptMessage,Base64.DEFAULT);
 //                ELOG.i("returnData :::::::::::::"+ new String(returnData));
 //                new Thread(new Runnable() {
 //                    @Override
 //                    public void run() {
 //                        try{
-//                            ELOG.i("==========================="+Environment.getExternalStorageDirectory()+"/lly.txt");
-//                            FileUtils.write(Environment.getExternalStorageDirectory()+"/lly.txt",new String(returnData).replace("\n",""));
+//                            ELOG.i("==========================="+Environment.getExternalStorageDirectory()+"/encode.txt");
+//                            FileUtils.write(Environment.getExternalStorageDirectory()+"/encode.txt",new String(returnData).replace("\n",""));
 //                        }catch (Throwable t){
 //                            ELOG.i("THREAD HAS AN EXCEPTION  "+t.getMessage());
 //                        }
