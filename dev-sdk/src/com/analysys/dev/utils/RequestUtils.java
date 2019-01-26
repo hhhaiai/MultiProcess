@@ -45,6 +45,7 @@ public class RequestUtils {
    * HTTP
    */
   public static String httpRequest(String url, byte[] value , Context ctx) {
+    ELOG.i("URL::::::::::"+url);
     String response = "";
     URL urlP;
     HttpURLConnection connection;
@@ -69,11 +70,12 @@ public class RequestUtils {
         +"APPKEY::: "+SPHelper.getDefault(ctx).getString(EGContext.APPKEY ,"")+"   TIME:::   "+SPHelper.getDefault(ctx).getString(EGContext.TIME , ""));
         // 发送数据
         pw = new PrintWriter(connection.getOutputStream());
-        pw.print(value);
+        pw.print("app3="+value);
         pw.flush();
         pw.close();
 
         int status = connection.getResponseCode();
+        ELOG.e(status +"  :::::::status  ::::::  "+connection.getResponseMessage());
         // 获取数据
         if (HttpURLConnection.HTTP_OK == status) {
           is = connection.getInputStream();
@@ -88,7 +90,7 @@ public class RequestUtils {
           response = EGContext.HTTP_DATA_OVERLOAD;
         }
     } catch (Throwable e) {
-
+        ELOG.e(e.getMessage()+"  :::::::http has an exception.");
     } finally {
       StreamerUtils.safeClose(is);
       StreamerUtils.safeClose(bos);

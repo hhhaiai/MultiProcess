@@ -139,9 +139,9 @@ public class AppSnapshotImpl {
                 // if ((ApplicationInfo.FLAG_SYSTEM & pi.applicationInfo.flags) != 0) {
                 // continue;
                 // }
-                JSONObject job = getAppInfo(pi, EGContext.SNAP_SHOT_DEFAULT);
-                if (job != null) {
-                    list.add(job);
+                JSONObject jsonObject = getAppInfo(pi, EGContext.SNAP_SHOT_DEFAULT);
+                if (jsonObject != null) {
+                    list.add(jsonObject);
                 }
             }
         } catch (Exception e) {
@@ -185,12 +185,12 @@ public class AppSnapshotImpl {
                 try {
                     if (type == 0) {
                         PackageInfo pi = mContext.getPackageManager().getPackageInfo(pkgName, 0);
-                        JSONObject job = getAppInfo(pi, EGContext.SNAP_SHOT_INSTALL);
-                        if (job != null) {
+                        JSONObject jsonObject = getAppInfo(pi, EGContext.SNAP_SHOT_INSTALL);
+                        if (jsonObject != null) {
                             // 判断数据表中是否有该应用的存在，如果有标识此次安装是应用更新所导致
                             boolean isHas = TableAppSnapshot.getInstance(mContext).isHasPkgName(pkgName);
                             if (!isHas) {
-                                TableAppSnapshot.getInstance(mContext).insert(job);
+                                TableAppSnapshot.getInstance(mContext).insert(jsonObject);
                             }
                         }
                     } else if (type == 1) {

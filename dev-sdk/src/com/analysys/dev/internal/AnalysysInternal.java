@@ -64,6 +64,7 @@ public class AnalysysInternal {
         SPHelper.getDefault(mContext).edit().putString(EGContext.USERKEY, key).commit();
         SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_KEY, key).commit();
         SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_CHANNEL, channel).commit();
+        SPHelper.getDefault(mContext).edit().putInt(EGContext.SP_WIFI_DETAIL, 1).commit();
 
         EGContext.FLAG_DEBUG_USER = isDebug;
         //JobService

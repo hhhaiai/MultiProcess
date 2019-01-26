@@ -142,17 +142,17 @@ public class TableOCCount {
                     DBConfig.OCCount.Column.RS + "=?", new String[]{ONE},
                     null, null, null);
             while (cursor.moveToNext()) {
-                JSONObject job = new JSONObject();
+                JSONObject jsonObject = new JSONObject();
                 String insertTime = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.IT));
                 String appName = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AN));
-                job.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.APN)));
-                job.put(DeviceKeyContacts.OCInfo.ApplicationName, Base64Utils.decrypt(appName, Long.valueOf(insertTime)));
-                job.put(DeviceKeyContacts.OCInfo.ApplicationOpenTime, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AOT)));
-                job.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AVC)));
-                job.put(DeviceKeyContacts.OCInfo.NetworkType, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.NT)));
-                job.put(DeviceKeyContacts.OCInfo.ApplicationType, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AT)));
-                job.put(DeviceKeyContacts.OCInfo.CollectionType, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.CT)));
-                list.add(job);
+                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.APN)));
+                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationName, Base64Utils.decrypt(appName, Long.valueOf(insertTime)));
+                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationOpenTime, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AOT)));
+                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AVC)));
+                jsonObject.put(DeviceKeyContacts.OCInfo.NetworkType, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.NT)));
+                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationType, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AT)));
+                jsonObject.put(DeviceKeyContacts.OCInfo.CollectionType, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.CT)));
+                list.add(jsonObject);
             }
         } catch (Throwable e) {
             ELOG.e(e);
@@ -255,16 +255,16 @@ public class TableOCCount {
                     null, null, null,
                     null, null, null);
             while (cursor.moveToNext()) {
-                JSONObject job = new JSONObject();
+                JSONObject jsonObject = new JSONObject();
                 String insertTime = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.IT));
                 String encryptAn = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AN));
                 String an = Base64Utils.decrypt(encryptAn, Long.valueOf(insertTime));
-                job.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.APN)));
-                job.put(DeviceKeyContacts.OCInfo.ApplicationName, an);
-                job.put(DeviceKeyContacts.OCInfo.CU, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.CU)));
-                job.put(DeviceKeyContacts.OCInfo.TI, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.TI)));
-                job.put(DeviceKeyContacts.OCInfo.DY, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.DY)));
-                ocCountJar.put(job);
+                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.APN)));
+                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationName, an);
+                jsonObject.put(DeviceKeyContacts.OCInfo.CU, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.CU)));
+                jsonObject.put(DeviceKeyContacts.OCInfo.TI, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.TI)));
+                jsonObject.put(DeviceKeyContacts.OCInfo.DY, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.DY)));
+                ocCountJar.put(jsonObject);
             }
         } catch (Exception e) {
 

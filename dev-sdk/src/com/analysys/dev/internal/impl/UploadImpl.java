@@ -6,6 +6,7 @@ import android.util.Base64;
 
 import com.analysys.dev.database.TableAppSnapshot;
 import com.analysys.dev.database.TableLocation;
+import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.impl.proc.DataPackaging;
 import com.analysys.dev.model.PolicyInfo;
@@ -24,6 +25,7 @@ import org.json.JSONObject;
 
 import com.analysys.dev.utils.sp.SPHelper;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 public class UploadImpl {
@@ -50,24 +52,28 @@ public class UploadImpl {
         EThreadPool.execute(new Runnable() {
             @Override
             public void run() {
-                String uploadInfo = getInfo();
-                ELOG.i("uploadInfo ::::  "+uploadInfo);
-                if (TextUtils.isEmpty(uploadInfo)) {
-                    return;
-                }
-                boolean boo = DeviceImpl.getInstance(mContext).getDebug()== "1"?true:false;
-                boolean userRTP = PolicyInfo.getInstance().isUseRTP() == 0 ?true:false;
-                String url = "";
-                if (boo) {
-                    url  = EGContext.TEST_URL;
-                } else {
-                    if (userRTP) {
-                      url = EGContext.USERTP_URL;
-                    } else {
-                        url = EGContext.RT_URL;//?哪个接口
+                try {
+                    String uploadInfo = getInfo();
+                    ELOG.i("uploadInfo ::::  "+uploadInfo);
+                    if (TextUtils.isEmpty(uploadInfo)) {
+                        return;
                     }
+                    boolean isDebugMode = SPHelper.getDebugMode(mContext);
+                    boolean userRTP = PolicyInfo.getInstance().isUseRTP() == 0 ?true:false;
+                    String url = "";
+                    if (isDebugMode) {
+                        url  = EGContext.TEST_URL;
+                    } else {
+                        if (userRTP) {
+                            url = EGContext.USERTP_URL;
+                        } else {
+                            url = EGContext.RT_URL;//?哪个接口
+                        }
+                    }
+                    handleUpload(url, messageEncrypt(uploadInfo));
+                }catch (Throwable t){
+                 ELOG.i("EThreadPool upload has an exception:::"+t.getMessage());
                 }
-                handleUpload(url, uploadInfo);
             }
         });
 
@@ -81,38 +87,38 @@ public class UploadImpl {
      * 获取各个模块数据组成json
      */
     private String getInfo() {
-        JSONObject uploadJob = null;
+        JSONObject object = null;
         try {
-            uploadJob = new JSONObject();
+            object = new JSONObject();
             JSONObject devJson = DataPackaging.getDevInfo(mContext);
             if (devJson != null) {
-                uploadJob.put(DI, devJson);
+                object.put(DI, devJson);
             }
             JSONArray snapshotJar = TableAppSnapshot.getInstance(mContext).select();
             if (snapshotJar != null) {
-                uploadJob.put(ASI, snapshotJar);
+                object.put(ASI, snapshotJar);
             }
             JSONArray locationJar = TableLocation.getInstance(mContext).select();
             if (locationJar != null) {
-                uploadJob.put(LI, locationJar);
+                object.put(LI, locationJar);
             }
 //            JSONArray ocCountJar = TableOCCount.getInstance(mContext).select();
 //            if (ocCountJar != null) {
-//                uploadJob.put(OCC, ocCountJar);
+//                object.put(OCC, ocCountJar);
 //            }
 //            JSONArray ocJar = TableOC.getInstance(mContext).select();
 //            if (ocJar != null) {
-//                uploadJob.put(OCI, ocJar);
+//                object.put(OCI, ocJar);
 //            }
         } catch (Throwable e) {
         }
-        return String.valueOf(uploadJob);
+        return String.valueOf(object);
     }
 //
     /**
      * 上传数据加密
      */
-    public byte[] messageEncrypt(String msg) {
+    public String messageEncrypt(String msg) {
         try {
             String key = "";
             if (TextUtils.isEmpty(msg)) {
@@ -152,7 +158,7 @@ public class UploadImpl {
 //                        }
 //                    }
 //                }).start();
-                return new String(returnData).replace("\n","").getBytes("UTF-8");
+                return new String(returnData).replace("\n","");
             }
         }catch (Throwable t){
            ELOG.i("messageEncrypt has an exception."+ t.getMessage());
@@ -177,17 +183,17 @@ public class UploadImpl {
                     cleanData();
                     return true;
                 }
-                Utils.setId(json , mContext);
-                JSONObject job = new JSONObject(json);
-                String code = job.get("code").toString();
+                JSONObject object = new JSONObject(json);
+                String code = object.get("code").toString();
                 if(code != null){
                     if(EGContext.HTTP_SUCCESS.equals(code)){
+                        Utils.setId(json , mContext);
                         //清除本地数据
                         cleanData();
                         result = true;
                     }
                     if(EGContext.HTTP_RETRY.equals(code)){
-                        //TODO 重试
+                        PolicyImpl.getInstance(mContext).saveRespParams(object.getJSONObject("policy"));
                         result = false;
                     }
                 }
@@ -197,15 +203,16 @@ public class UploadImpl {
         }
         return result;
     }
-    private void handleUpload(String url,String uploadInfo){
-        String result = RequestUtils.httpRequest(url, messageEncrypt(uploadInfo),mContext);
+    private void handleUpload(String url,String uploadInfo) throws UnsupportedEncodingException {
+
+        String result = RequestUtils.httpRequest(url, uploadInfo.getBytes("UTF-8"),mContext);
         if (TextUtils.isEmpty(result)) {
             return;
         }
         if (!analysysReturnJson(result)) {
             count++;
             //加入网络判断,如果无网情况下,不进行失败上传
-            if (count <= PolicyInfo.getInstance().getFailCount() && !NetworkUtils.getNetworkType(mContext).equals(EGContext.NETWORK_TYPE_NO_NET)) {
+            if (count <= PolicyImpl.getInstance(mContext).getFailCount()&& !NetworkUtils.getNetworkType(mContext).equals(EGContext.NETWORK_TYPE_NO_NET)) {
                 long dur = (long)((Math.random() + 1) * PolicyInfo.getInstance().getTimerInterval());
                 handleUpload(url, uploadInfo);
             } else if (PolicyInfo.getInstance().isUseRTP() == 0) {
@@ -213,11 +220,9 @@ public class UploadImpl {
                         PolicyInfo.getInstance().getFailTryDelay();
                 PolicyInfo.getInstance().setFailTryDelay
                         (failTryDelayInterval);
-                PolicyImpl.getInstance(mContext).savePermitForFailTimes(mContext,
-                        failTryDelayInterval);
+                PolicyImpl.getInstance(mContext).savePermitForFailTimes(failTryDelayInterval);
             }
         } else {
-            handleUpload(url, uploadInfo);
             count = 0;
         }
     }

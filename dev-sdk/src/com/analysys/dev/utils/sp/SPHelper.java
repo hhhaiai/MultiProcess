@@ -178,6 +178,13 @@ public class SPHelper {
 
         return returnValue;
     }
+    public static boolean getDebugMode(Context ctx) {
+        return getDefault(ctx).getBoolean(EGContext.DEBUG, false);
+    }
 
+    public static void setDebugMode(Context ctx, boolean debug) {
+        SharedPreferences sp = getDefault(ctx);
+        sp.edit().putBoolean(EGContext.DEBUG, debug).commit();
+    }
 
 }

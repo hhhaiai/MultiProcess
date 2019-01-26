@@ -110,11 +110,11 @@ public class EGContext {
     public static final int USER_RTP_DEFALUT = 1;
     public static final int USER_RTL_DEFAULT = 1;
     public static final int UPLOAD_SD_DEFALUT = 1;
-    public static final int REMOTE_IP = 1;
+    public static final int REMOTE_IP = 0;
     public static final int MERGE_INTERVAL = 30 * 60 * 60 * 1000;//TODO 需确认
     public static final int MIN_DURATION = 60 * 1000;//TODO 需确认
     public static final int MAX_DURATION = 5 * 60 * 1000;//TODO 需确认
-    public static final int DOMAIN_UPDATE_TIMES = 0;//TODO 需确认
+    public static final int DOMAIN_UPDATE_TIMES = 1;//TODO 需确认
     public static final long PERMIT_FOR_FAIL_TIME_DEFALUT = 0;
     private static final int PERMIT_FOR_SERVER_TIME_DEFALUT = 0;
 
@@ -136,11 +136,7 @@ public class EGContext {
     /**
      * 测试回传接口.Debug模式
      */
-    public final static String TEST_CALLBACK_PORT = ":10031";
-    /**
-     * 非实时上传端口
-     */
-    public final static String ORI_PORT = ":8089";
+    public final static String TEST_CALLBACK_PORT = ":8089";
     /**
      * 实时域名
      */
@@ -149,7 +145,7 @@ public class EGContext {
     /**
      * 测试域名
      */
-    public static final String TEST_CALLBACK_DOMAIN_NAME = "apptest.analysys.cn";
+    public static final String TEST_CALLBACK_DOMAIN_NAME = "192.168.220.167";
     /**
      * 非实时上传是,使用的域名池,以ait开始的为应用上传接口;以urd开始的为设备上传接口
      */
@@ -206,5 +202,6 @@ public class EGContext {
     public static final String HTTP_SUCCESS = "200";
     //500 RETRY
     public static final String HTTP_RETRY = "500";
-
+    //int default 值
+    public static final int DEFAULT = 0;
 }

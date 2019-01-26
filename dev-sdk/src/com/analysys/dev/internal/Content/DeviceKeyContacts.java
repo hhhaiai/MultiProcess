@@ -369,6 +369,8 @@ public class DeviceKeyContacts {
     public static final String RES_POLICY_MAXDURATION = "maxDuration";
     // 域名更新次数
     public static final String RES_POLICY_DOMAINUPDATETIMES = "domainUpdateTimes";
+    //动态采集模块
+    public static final String RES_POLICY_CTRL_LIST = "ctrlList";
 
     /*
      *  拉活服务 相关的

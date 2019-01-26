@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -163,5 +164,20 @@ public class FileUtils {
         // 关闭输出流
         fileOutputStream.close();
     }
-
+    public static String loadFileAsString(String fileName) throws Exception {
+        FileReader reader = new FileReader(fileName);
+        String text = loadReaderAsString(reader);
+        reader.close();
+        return text;
+    }
+    private static String loadReaderAsString(Reader reader) throws Exception {
+        StringBuilder builder = new StringBuilder();
+        char[] buffer = new char[4096];
+        int readLength = reader.read(buffer);
+        while (readLength >= 0) {
+            builder.append(buffer, 0, readLength);
+            readLength = reader.read(buffer);
+        }
+        return builder.toString();
+    }
 }

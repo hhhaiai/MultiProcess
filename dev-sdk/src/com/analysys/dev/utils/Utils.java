@@ -111,12 +111,12 @@ public class Utils {
         try {
             String tmpId = "", egid = "";
             JSONObject jsonObject = new JSONObject(json);
-            if (jsonObject.has(DeviceKeyContacts.DevInfo.TempID)) {
-                tmpId =  jsonObject.optString(DeviceKeyContacts.DevInfo.TempID);
+            if (jsonObject.has("tmpid")) {
+                tmpId =  jsonObject.optString("tmpid");
 
             }
-            if (jsonObject.has(DeviceKeyContacts.DevInfo.EguanID)) {
-                egid =  jsonObject.optString(DeviceKeyContacts.DevInfo.EguanID);
+            if (jsonObject.has("egid")) {
+                egid =  jsonObject.optString("egid");
             }
 
             if (!TextUtils.isEmpty(tmpId) || !TextUtils.isEmpty(egid)) {
@@ -171,11 +171,11 @@ public class Utils {
 
         if (!TextUtils.isEmpty(eguanId)) {
             SoftwareInfo.getInstance().setEguanID(eguanId);
-            SPHelper.getDefault(EContextHelper.getContext(null)).edit().putString(DeviceKeyContacts.DevInfo.EguanID,eguanId);
+            SPHelper.getDefault(EContextHelper.getContext(null)).edit().putString(DeviceKeyContacts.DevInfo.EguanID,eguanId).commit();
         }
         if (!TextUtils.isEmpty(tmpid)) {
             SoftwareInfo.getInstance().setTempID(tmpid);
-            SPHelper.getDefault(EContextHelper.getContext(null)).edit().putString(DeviceKeyContacts.DevInfo.TempID,tmpid);
+            SPHelper.getDefault(EContextHelper.getContext(null)).edit().putString(DeviceKeyContacts.DevInfo.TempID,tmpid).commit();
         }
     }
 

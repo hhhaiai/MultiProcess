@@ -1,5 +1,9 @@
 package com.analysys.dev.model;
 
+import com.analysys.dev.internal.Content.EGContext;
+
+import org.json.JSONArray;
+
 import java.io.Serializable;
 
 /**
@@ -28,55 +32,60 @@ public class PolicyInfo implements Serializable {
     /**
      * 服务器延迟上传时间
      */
-    private long ServerDelay;
+    private long ServerDelay = EGContext.DEFAULT;
     /**
      *上传失败次数
      */
-    private int FailCount;
+    private int FailCount = EGContext.DEFAULT;
     /**
      *上传失败后延迟时间
      */
-    private long FailTryDelay;
+    private long FailTryDelay = EGContext.DEFAULT;
     /**
      *客户端上传时间间隔
      */
-    private long TimerInterval;
+    private long TimerInterval = EGContext.DEFAULT;
     /**
      *客户端上传时数据条数
      */
-    private int EventCount;
+    private int EventCount = EGContext.DEFAULT;
     /**
      *是否使用实时策略，1不使用0使用
      */
-    private int UseRTP;
+    private int UseRTP = EGContext.DEFAULT;
     /**
      *是否实时上传[非实时分析策略下，是否实时上传]0不实时上传，1实时上传
      */
-    private int UseRTL;
+    private int UseRTL = EGContext.DEFAULT;
     /**
      *是否采集公网ip
      */
-    private int Remotelp;
+    private int Remotelp = EGContext.DEFAULT;
     /**
      *是否上传敏感数据，1不上传，0上传
      */
-    private int UploadSD;
+    private int UploadSD = EGContext.DEFAULT;
     /**
      *数据合并间隔
      */
-    private long MergeInterval;
+    private long MergeInterval = EGContext.DEFAULT;
     /**
      *最小使用时长
      */
-    private long MinDuration;
+    private long MinDuration = EGContext.DEFAULT;
     /**
      *最常使用时长
      */
-    private long MaxDuration;
+    private long MaxDuration = EGContext.DEFAULT;
     /**
      *域名更新次数
      */
-    private int DomainUpdateTimes;
+    private int DomainUpdateTimes = EGContext.DEFAULT;
+
+    /**
+     * 动态采集模块
+     */
+    private JSONArray CtrlList ;
 
 
     public String getCode() {
@@ -143,6 +152,18 @@ public class PolicyInfo implements Serializable {
         return DomainUpdateTimes;
     }
 
+    public int getUseRTP() {
+        return UseRTP;
+    }
+
+    public int getUseRTL() {
+        return UseRTL;
+    }
+
+    public JSONArray getCtrlList() {
+        return CtrlList;
+    }
+
     public void setCode(String code) {
         this.code = code;
     }
@@ -205,5 +226,9 @@ public class PolicyInfo implements Serializable {
 
     public void setDomainUpdateTimes(int domainUpdateTimes) {
         DomainUpdateTimes = domainUpdateTimes;
+    }
+
+    public void setCtrlList(JSONArray ctrlList) {
+        CtrlList = ctrlList;
     }
 }

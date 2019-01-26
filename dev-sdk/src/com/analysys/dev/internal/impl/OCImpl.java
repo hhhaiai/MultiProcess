@@ -178,10 +178,10 @@ public class OCImpl {
                     int numb = oc.optInt(DeviceKeyContacts.OCInfo.CU) + 1;
                     String apn = oc.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
                     oc.remove(DeviceKeyContacts.OCInfo.CU);
-                    JSONObject job = new JSONObject();
-                    job.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, apn);
-                    job.put(DeviceKeyContacts.OCInfo.CU, numb);
-                    ocList.add(job);
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, apn);
+                    jsonObject.put(DeviceKeyContacts.OCInfo.CU, numb);
+                    ocList.add(jsonObject);
                 }
                 TableOCCount.getInstance(mContext).updateStopState(ocList);
             }

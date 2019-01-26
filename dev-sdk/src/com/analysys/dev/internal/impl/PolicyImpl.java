@@ -2,13 +2,18 @@ package com.analysys.dev.internal.impl;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.text.TextUtils;
 
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.work.CheckHeartbeat;
 import com.analysys.dev.model.PolicyInfo;
+import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class PolicyImpl {
     static Context mContext;
@@ -24,7 +29,7 @@ public class PolicyImpl {
         return PolicyImpl.Holder.INSTANCE;
     }
 
-    public static PolicyInfo getNativePolicy(Context context) {
+    private PolicyInfo getNativePolicy(Context context) {
         context = EContextHelper.getContext(context);
         if (null == context) {
             return null;
@@ -35,7 +40,7 @@ public class PolicyImpl {
         return policyLocal;
     }
 
-    private static PolicyInfo readNativePolicyFromLocal(Context context) {
+    private PolicyInfo readNativePolicyFromLocal(Context context) {
         SharedPreferences sp = context.getSharedPreferences(EGContext.SP_NAME, Context.MODE_PRIVATE);
         PolicyInfo policyLocal = PolicyInfo.getInstance();
         policyLocal.setPolicyVer(sp.getString(DeviceKeyContacts.Response.RES_POLICY_VERSION, EGContext.POLICY_VER_DEFALUT));
@@ -65,7 +70,7 @@ public class PolicyImpl {
      * @param userRTL 是否开启实时上传
      * @param debug   是否Debug模式
      */
-    private static void updateUpLoadUrl(boolean userRTP, boolean userRTL, boolean debug) {
+    private void updateUpLoadUrl(boolean userRTP, boolean userRTL, boolean debug) {
         if (debug) {
             EGContext.APP_URL = EGContext.TEST_CALLBACK_URL;
             return;
@@ -85,14 +90,13 @@ public class PolicyImpl {
 
 
 
-    public static void saveNewPolicyToLocal(Context context, PolicyInfo newPolicy) {
+    private void saveNewPolicyToLocal(PolicyInfo newPolicy) {
         boolean isRTP = newPolicy.isUseRTP()==0?true:false;
         boolean isRTL = newPolicy.isUseRTL()==0?true:false;
         long timerInterval = newPolicy.getTimerInterval()> 0 ? newPolicy.getTimerInterval()
                 : isRTP ? EGContext.TIMER_INTERVAL_DEFALUT : EGContext.TIMER_INTERVAL_DEFALUT_60;
         //storage to local
-        SharedPreferences sp = context.getSharedPreferences(EGContext.SP_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
+        Editor editor = getEditor();
         editor.putString(DeviceKeyContacts.Response.RES_POLICY_VERSION, newPolicy.getPolicyVer())
                 .putLong(DeviceKeyContacts.Response.RES_POLICY_SERVERDELAY, newPolicy.getServerDelay())
                 .putInt(DeviceKeyContacts.Response.RES_POLICY_FAILCOUNT, newPolicy.getFailCount())
@@ -108,15 +112,14 @@ public class PolicyImpl {
                 .putLong(DeviceKeyContacts.Response.RES_POLICY_MINDURATION, newPolicy.getMinDuration())
                 .putLong(DeviceKeyContacts.Response.RES_POLICY_MAXDURATION, newPolicy.getMaxDuration())
                 .putInt(DeviceKeyContacts.Response.RES_POLICY_DOMAINUPDATETIMES,newPolicy.getDomainUpdateTimes())
-                //把服务端delay策略放进去,其中上传失败测试在上传逻辑中存储
-//                .putLong(PERMIT_FOR_SERVER_TIME, newPolicy.serverDelay + System.currentTimeMillis())
+                .putString(DeviceKeyContacts.Response.RES_POLICY_CTRL_LIST, newPolicy.getCtrlList().toString())
                 .apply();
         //refresh local policy
         policyLocal = newPolicy;
         //重置接口
-        updateUpLoadUrl(newPolicy.isUseRTP()==0?true:false, policyLocal.isUseRTL()==0?true:false, DeviceImpl.getInstance(context).getDebug()=="0"?true:false);
+        updateUpLoadUrl(newPolicy.isUseRTP()==0?true:false, policyLocal.isUseRTL()==0?true:false, DeviceImpl.getInstance(mContext).getDebug()=="0"?true:false);
         if (isRTL || isRTP) {
-            CheckHeartbeat.getInstance(context).sendMessages();
+            CheckHeartbeat.getInstance(mContext).sendMessages();
         }
 //        else {
 //            heckHeartbeat.getInstance(context).reboot();
@@ -133,7 +136,7 @@ public class PolicyImpl {
         editor.commit();
 
     }
-    public static boolean isNewPolicy(String newPolicyVer) {
+    private boolean isNewPolicy(String newPolicyVer) {
         if (TextUtils.isEmpty(newPolicyVer)) {
             return false;
         }
@@ -149,26 +152,89 @@ public class PolicyImpl {
             return false;
         }
     }
-    public static PolicyInfo getDefaultPolicyNative() {
+    private void setDefaultPolicyNative() {
         PolicyInfo policyNative = PolicyInfo.getInstance();
-        policyNative.setPolicyVer(EGContext.POLICY_VER_DEFALUT);
-        policyNative.setServerDelay(EGContext.SERVER_DELAY_DEFAULT);
-        policyNative.setFailCount(EGContext.FAIL_COUNT_DEFALUT);
-        policyNative.setFailTryDelay(EGContext.FAIL_TRY_DELAY_DEFALUT);
-        policyNative.setTimerInterval(EGContext.TIMER_INTERVAL_DEFALUT);
-        policyNative.setEventCount(EGContext.EVENT_COUNT_DEFALUT);
-        policyNative.setUseRTP(EGContext.USER_RTP_DEFALUT);
-        policyNative.setUploadSD(EGContext.UPLOAD_SD_DEFALUT);
-        return policyNative;
+        if(policyNative.getPolicyVer() == null)policyNative.setPolicyVer(EGContext.POLICY_VER_DEFALUT);
+        if(policyNative.getServerDelay() == EGContext.DEFAULT)policyNative.setServerDelay(EGContext.SERVER_DELAY_DEFAULT);
+        if(policyNative.getFailCount() == EGContext.DEFAULT)policyNative.setFailCount(EGContext.FAIL_COUNT_DEFALUT);
+        if(policyNative.getFailTryDelay() == EGContext.DEFAULT)policyNative.setFailTryDelay(EGContext.FAIL_TRY_DELAY_DEFALUT);
+        if(policyNative.getTimerInterval() == EGContext.DEFAULT)policyNative.setTimerInterval(EGContext.TIMER_INTERVAL_DEFALUT);
+        if(policyNative.getEventCount() == EGContext.DEFAULT)policyNative.setEventCount(EGContext.EVENT_COUNT_DEFALUT);
+        if(policyNative.getUseRTP() == EGContext.DEFAULT)policyNative.setUseRTP(EGContext.USER_RTP_DEFALUT);
+        if(policyNative.getUploadSD() == EGContext.DEFAULT)policyNative.setUploadSD(EGContext.UPLOAD_SD_DEFALUT);
+        if(policyNative.getUseRTL() == EGContext.DEFAULT)policyNative.setUseRTL(EGContext.USER_RTL_DEFAULT);
+        if(policyNative.getRemotelp() == EGContext.DEFAULT)policyNative.setRemotelp(EGContext.REMOTE_IP);
+        if(policyNative.getMergeInterval() == EGContext.DEFAULT)policyNative.setMergeInterval(EGContext.MERGE_INTERVAL);
+        if(policyNative.getMinDuration() == EGContext.DEFAULT)policyNative.setMinDuration(EGContext.MIN_DURATION);
+        if(policyNative.getMaxDuration() == EGContext.DEFAULT)policyNative.setMaxDuration(EGContext.MAX_DURATION);
+        if(policyNative.getDomainUpdateTimes() == EGContext.DEFAULT)policyNative.setDomainUpdateTimes(EGContext.DOMAIN_UPDATE_TIMES);
+        if(policyNative.getCtrlList() == null)policyNative.setCtrlList(null);
     }
-    public void savePermitForFailTimes(Context mContext, long interval) {
-        SharedPreferences sp = mContext.getSharedPreferences(EGContext.SP_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
+    private SharedPreferences getSP(){
+        return mContext.getSharedPreferences(EGContext.SP_NAME, Context.MODE_PRIVATE);
+    }
+    private Editor getEditor(){
+        return getSP().edit();
+    }
+    public void savePermitForFailTimes(long interval) {
+        Editor editor = getEditor();
         editor.putLong(EGContext.PERMIT_FOR_FAIL_TIME, interval);
         editor.commit();
     }
+    public int getFailCount(){
+        return getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_FAILCOUNT,0);
+    }
+    public void setFailCount(int count){
+       getEditor().putInt(DeviceKeyContacts.Response.RES_POLICY_FAILCOUNT,count);
+    }
+    public void saveRespParams(JSONObject policyObject){
+        try {
+            PolicyInfo policyInfo = PolicyInfo.getInstance();
+            policyInfo.setPolicyVer(policyObject.optString("policyVer"));
+            policyInfo.setServerDelay(policyObject.optLong("serverDelay"));
+            policyInfo.setFailCount(policyObject.getJSONObject("fail").optInt("failCount"));
+            policyInfo.setFailTryDelay(policyObject.getJSONObject("fail").optLong("failTryDelay"));
+            policyInfo.setTimerInterval(policyObject.optLong("timerInterval"));
+            policyInfo.setEventCount(policyObject.optInt("eventCount"));
+            policyInfo.setUseRTP(policyObject.optInt("useRTP"));
+            policyInfo.setUseRTL(policyObject.optInt("useRTL"));
+            policyInfo.setRemotelp(policyObject.optInt("remoteIp"));
+            policyInfo.setUploadSD(policyObject.optInt("uploadSD"));
+            policyInfo.setMergeInterval(policyObject.optInt("mergeInterval"));
+            policyInfo.setMinDuration(policyObject.optInt("minDuration"));
+            policyInfo.setMaxDuration(policyObject.optInt("maxDuration"));
+            policyInfo.setDomainUpdateTimes(policyObject.optInt("domainUpdateTimes"));
 
-    public static String currentPolicyVer(Context context) {
+            JSONArray ctrlList = policyObject.optJSONArray("ctrlList");
+            policyInfo.setCtrlList(ctrlList);
+//            ResponseCtrlInfo ctrlInfo = null;
+//            JSONObject object ,subJsonObj;
+//            for(int i = 0;i < ctrlList.length();i++){
+//                ctrlInfo = ResponseCtrlInfo.getInstance();
+//                object = (JSONObject) ctrlList.get(i);
+//                ctrlInfo.setModule(object.optString("module"));
+//                ctrlInfo.setStatus(object.optString("status"));
+//                ctrlInfo.setDefaultFreq(object.optString("defFreq"));
+//                ctrlInfo.setMinFreq(object.optString("minFreq"));
+//                ctrlInfo.setMaxFreq(object.optString("maxFreq"));
+//                ctrlInfo.setSubControl(object.optJSONObject("subControl"));
+//                subJsonObj = object.optJSONObject("subControl");
+//                ctrlInfo.setSubModule(subJsonObj.optString("subModule"));
+//                ctrlInfo.setSubStatus(subJsonObj.optString("status"));
+//                ctrlInfo.setSubDefaultFreq(subJsonObj.optString("defFreq"));
+//                ctrlInfo.setSubMinFreq(subJsonObj.optString("minFreq"));
+//                ctrlInfo.setSubMaxFreq(subJsonObj.optString("maxFreq"));
+//                ctrlInfo.setCount(subJsonObj.optString("count"));
+//            }
+            setDefaultPolicyNative();
+            saveNewPolicyToLocal(policyInfo);
+
+        }catch (Throwable t){
+            ELOG.i("saveRespParams() has an exception :::"+t.getMessage());
+        }
+
+    }
+    public String currentPolicyVer(Context context) {
         String rtVer = getNativePolicy(context).getPolicyVer();
         String servicePullPolicyVer = mContext.getSharedPreferences(EGContext.SP_NAME, Context.MODE_PRIVATE).getString(EGContext.POLICY_SERVICE_PULL_VER,"0");
         boolean newVer = isNewPolicy(servicePullPolicyVer);

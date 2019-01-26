@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.lang.reflect.Method;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -19,9 +20,13 @@ import java.util.TimeZone;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.model.BatteryModuleNameInfo;
+import com.analysys.dev.model.DevInfo;
+import com.analysys.dev.model.SoftwareInfo;
 import com.analysys.dev.utils.ELOG;
+import com.analysys.dev.utils.FileUtils;
 import com.analysys.dev.utils.HiJack;
 import com.analysys.dev.utils.NetworkUtils;
 import com.analysys.dev.utils.PermissionUtils;
@@ -282,18 +287,21 @@ public class DeviceImpl {
         }
         return serialNumber;
     }
-
+        private DisplayMetrics getDisplayMetrics(){
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            displayMetrics = mContext.getApplicationContext().getResources().getDisplayMetrics();
+            return displayMetrics;
+        }
         /**
          * 分辨率
          */
         public String getResolution() {
-            DisplayMetrics displayMetrics = new DisplayMetrics();
-            return displayMetrics.widthPixels + "-" + displayMetrics.heightPixels;
+
+            return getDisplayMetrics().widthPixels + "-" + getDisplayMetrics().heightPixels;
         }
 
         public String getDotPerInch(){
-            //TODO
-            return "";
+            return String.valueOf(getDisplayMetrics().densityDpi);
         }
 
 
@@ -535,8 +543,11 @@ public class DeviceImpl {
      * 获取临时id
      */
     public String getTempID() {
-        //TODO TempID从哪里取
-        return null;
+        String id = SoftwareInfo.getInstance().getTempID();
+        if(TextUtils.isEmpty(id)){
+            id = SPHelper.getDefault(mContext).getString(DeviceKeyContacts.DevInfo.TempID,"");
+        }
+        return id;
     }
 
 
@@ -547,32 +558,37 @@ public class DeviceImpl {
      * 判断是否是模拟器，"0”= 不是模拟器“1”= 是模拟器
      */
     public String isSimulator() {
-        // 检查设备的设备ID与常见的模拟器ID是否相同,如果相同,则为模拟器
-        if (SimulatorUtils.hasKnownDeviceId(mContext)
-            // 检查设备的IMSI号与常见的模拟器IMSI是否相同,如果相同,则为模拟器
-            || SimulatorUtils.hasKnownImsi(mContext)
-            // 检查设备的板载,品牌,工业设计,硬件等信息是否匹配模拟器的信息,如果相同,则为模拟器
-            || SimulatorUtils.hasEmulatorBuild(mContext)
-            // 检查设备的手机号,是否与常见的模拟器加载的手机号相同,如果相同,则为模拟器
-            || SimulatorUtils.hasKnownPhoneNumber(mContext)
-            // 检查设备是否有模拟器特有的pipe目录,如果有,则为模拟器
-            || SimulatorUtils.hasPipes()
-            // 同上,检查设备是否有模拟器特有的QEmu目录,如果有,则为模拟器
-            || SimulatorUtils.hasQEmuFiles()
-            // 同上,检查设备是否有模拟器特有对应的QEmu设备对应的目录,如果有则为模拟器
-            || SimulatorUtils.hasQEmuDrivers()
-            // 通过读取proc/net/tcp查看adb是否对应模拟器,如果对应,则为模拟器
-            || SimulatorUtils.hasEmulatorAdb()
-            // 检查设备上是否有模拟器目录,如果有,则为模拟器
-            || SimulatorUtils.hasGenyFiles()
-            // 检查设备上否有模拟器相关的属性,如果有,且超过5个,则表示为模拟器
-            || SimulatorUtils.hasQEmuProps(mContext)
-            // 检查设备上的网络连接状态是否为eth0,如果是,则为模拟器
-            || SimulatorUtils.hasEmulatorWifi()
-            // 通过cpu的类型来判断是否为模拟器,如果满足,其中一种类型,则为模拟器
-            || SimulatorUtils.checkEmulatorByCpuInfo()) {
-            return ONE;
+        try {
+            // 检查设备的设备ID与常见的模拟器ID是否相同,如果相同,则为模拟器
+            if (SimulatorUtils.hasKnownDeviceId(mContext)
+                    // 检查设备的IMSI号与常见的模拟器IMSI是否相同,如果相同,则为模拟器
+                    || SimulatorUtils.hasKnownImsi(mContext)
+                    // 检查设备的板载,品牌,工业设计,硬件等信息是否匹配模拟器的信息,如果相同,则为模拟器
+                    || SimulatorUtils.hasEmulatorBuild(mContext)
+                    // 检查设备的手机号,是否与常见的模拟器加载的手机号相同,如果相同,则为模拟器
+                    || SimulatorUtils.hasKnownPhoneNumber(mContext)
+                    // 检查设备是否有模拟器特有的pipe目录,如果有,则为模拟器
+                    || SimulatorUtils.hasPipes()
+                    // 同上,检查设备是否有模拟器特有的QEmu目录,如果有,则为模拟器
+                    || SimulatorUtils.hasQEmuFiles()
+                    // 同上,检查设备是否有模拟器特有对应的QEmu设备对应的目录,如果有则为模拟器
+                    || SimulatorUtils.hasQEmuDrivers()
+                    // 通过读取proc/net/tcp查看adb是否对应模拟器,如果对应,则为模拟器
+                    || SimulatorUtils.hasEmulatorAdb()
+                    // 检查设备上是否有模拟器目录,如果有,则为模拟器
+                    || SimulatorUtils.hasGenyFiles()
+                    // 检查设备上否有模拟器相关的属性,如果有,且超过5个,则表示为模拟器
+                    || SimulatorUtils.hasQEmuProps(mContext)
+                    // 检查设备上的网络连接状态是否为eth0,如果是,则为模拟器
+                    || SimulatorUtils.hasEmulatorWifi()
+                    // 通过cpu的类型来判断是否为模拟器,如果满足,其中一种类型,则为模拟器
+                    || SimulatorUtils.checkEmulatorByCpuInfo()) {
+                return ONE;
+            }
+        }catch (Throwable t){
+           return ZERO;
         }
+
         return ZERO;
     }
 
@@ -580,9 +596,9 @@ public class DeviceImpl {
      * 判断设备本身、APP、以及工作环境是否是被调试状态，“0”= 不在调试状态“1”= 在调试状态
      */
     public String getDebug() {
-        PackageManager pm = mContext.getPackageManager();
         try{
-            ApplicationInfo appinfo = pm.getApplicationInfo(mContext.getPackageName(), 0);
+            PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(),0);
+            ApplicationInfo appinfo = packageInfo.applicationInfo;
             if(0 != (appinfo.flags & ApplicationInfo.FLAG_DEBUGGABLE)) return ZERO;
         }catch(Exception e){
             ELOG.i(e.getMessage()+"  getDebug  ");
@@ -624,32 +640,42 @@ public class DeviceImpl {
         if(Build.VERSION.SDK_INT < 23){
             return adapter.getAddress();
         }else{
-            //TODO
-//                Object bluetoothManagerService = new Mirror().on(adapter).get().field("mService");
-//                if (bluetoothManagerService == null) {
-//                    return null;
-//                }
-//                Object address = new Mirror().on(bluetoothManagerService).invoke().method("getAddress").withoutArgs();
-//                if (address != null && address instanceof String) {
-//                    return (String) address;
-//                } else {
-//                    return null;
-//                }
+            String macSerial = "";
+            try {
+                Process pp = Runtime.getRuntime().exec(
+                        "cat /sys/class/net/wlan0/address ");
+                InputStreamReader ir = new InputStreamReader(pp.getInputStream());
+                LineNumberReader input = new LineNumberReader(ir);
+                String str = "";
+                while((str = input.readLine()) !=null ) {
+                    macSerial = str.trim();// 去空格
+                    break;
+                }
+            } catch (Exception ex) {
+                return "02:00:00:00:00:00";
+            }
+            if ("".equals(macSerial)) {
+                try {
+                    return FileUtils.loadFileAsString("/sys/class/net/eth0/address")
+                            .toUpperCase().substring(0, 17);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            return macSerial;
         }
-        return "";
     }
 
     /**
      * 蓝牙信息
      */
     public String getBluetoothName() {
-        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-        if(Build.VERSION.SDK_INT < 23){
+        try {
+            BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
             return adapter.getName();
-        }else{
-        // TODO 6.0以上
+        }catch (Throwable t){
+            return "unknown";
         }
-        return "unknown";
     }
 
     //电池相关信息BatteryModuleNameImpl
@@ -843,12 +869,14 @@ public class DeviceImpl {
             sb = new StringBuilder();
             for(int i = 0; i< stringArray.length;i++){
                 sb.append(stringArray[i]);
+                sb.append(",");
             }
         }catch (Throwable t){
             ELOG.e(t.getMessage()+" stringArrayToString has an exception.");
             return null;
         }
-        ELOG.e(sb.toString()+" ::::::::::stringArrayToString");
-        return sb.toString();
+        String result = sb.toString();
+        ELOG.e(result.substring(0,result.length()-1)+" ::::::::::stringArrayToString");
+        return result.substring(0,result.length()-1);
     }
 }

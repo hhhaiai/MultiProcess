@@ -10,5 +10,6 @@ public class AnalysysApplication extends Application {
     public void onCreate() {
         super.onCreate();
         EguanMonitorAgent.getInstance().initEguan(this, "7752552892442721d", "WanDouJia", true);
+        EguanMonitorAgent.getInstance().setDebugMode(this,true);
     }
 }

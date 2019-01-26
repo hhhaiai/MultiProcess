@@ -2,6 +2,7 @@ package com.analysys.dev;
 
 import android.content.Context;
 import com.analysys.dev.internal.AnalysysInternal;
+import com.analysys.dev.utils.sp.SPHelper;
 
 /**
  * @Copyright © 2018 Analysys Inc. All rights reserved.
@@ -28,5 +29,11 @@ public class EguanMonitorAgent {
   public void initEguan(Context context, String key, String channel, boolean isDebug) {
     AnalysysInternal.getInstance(context).initEguan(key, channel, isDebug);
   }
-
+  /**
+   * 设置Debug模式
+   * @param isDebug
+   */
+  public void setDebugMode(Context ctx ,boolean isDebug) {
+    SPHelper.setDebugMode( ctx, isDebug);
+  }
 }

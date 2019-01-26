@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 
+import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.utils.PermissionUtils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
@@ -47,15 +48,15 @@ public class WifiImpl {
                     for (int i = 0; i < list.size(); i++) {
                         if (i < 5) {
                             ScanResult s = list.get(i);
-                            JSONObject job = new JSONObject();
-                            job.put("SSID", s.SSID);
-                            job.put("BSSID", s.BSSID);
-                            job.put("LEVEL", s.level);
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.put(DeviceKeyContacts.LocationInfo.WifiInfo.SSID, s.SSID);
+                            jsonObject.put(DeviceKeyContacts.LocationInfo.WifiInfo.BSSID, s.BSSID);
+                            jsonObject.put(DeviceKeyContacts.LocationInfo.WifiInfo.Level, s.level);
                             if (wifiDetail == 1) {
-                                job.put("CBT", s.capabilities);
-                                job.put("FQC", s.frequency);
+                                jsonObject.put(DeviceKeyContacts.LocationInfo.WifiInfo.Capabilities, s.capabilities);
+                                jsonObject.put(DeviceKeyContacts.LocationInfo.WifiInfo.Frequency, s.frequency);
                             }
-                            jar.put(job);
+                            jar.put(jsonObject);
                         }
                     }
                 }
