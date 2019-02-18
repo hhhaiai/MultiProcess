@@ -17,31 +17,31 @@ public class BatteryModuleNameInfo implements Serializable {
     /**
      * BS电源状态，下面有Android和iOS的传值与对应电源状态的码表
      */
-    private String BatteryStatus;
+    private String BatteryStatus = "0";
     /**
      * BH电源健康状态情况
      */
-    private String BatteryHealth;
+    private String BatteryHealth = "unknown";
     /**
      * BL电源当前电量，0-100的值
      */
-    private String BatteryLevel;
+    private String BatteryLevel = "0";
     /**
      * BSL电源总电量，0-100的值
      */
-    private String BatteryScale;
+    private String BatteryScale = "0";
     /**
      * BP电源连接插座
      */
-    private String BatteryPlugged;
+    private String BatteryPlugged = "0";
     /**
      * BT电源类型,比如"Li-ion"
      */
-    private String BatteryTechnology;
+    private String BatteryTechnology = "unknown";
     /**
      * BTP电池温度，如270
      */
-    private String BatteryTemperature;
+    private String BatteryTemperature = "0";
 
     public String getBatteryStatus() {
         return BatteryStatus;

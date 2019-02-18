@@ -33,7 +33,7 @@ public class UploadImpl {
     private final String DI = "DevInfo";
     private final String ASI = "AppSnapshotInfo";
     private final String LI = "LocationInfo";
-    private final String OCC = "OCCount";
+    private final String OCI = "OCInfo";
     private int count = 0;
 
     private static class Holder {
@@ -76,8 +76,6 @@ public class UploadImpl {
                 }
             }
         });
-
-
                 // 策略处理
         MessageDispatcher.getInstance(mContext).uploadInfo(EGContext.UPLOAD_CYCLE);
     }
@@ -93,6 +91,10 @@ public class UploadImpl {
             JSONObject devJson = DataPackaging.getDevInfo(mContext);
             if (devJson != null) {
                 object.put(DI, devJson);
+            }
+            JSONArray ocJson = DataPackaging.getOCInfo(mContext);
+            if(ocJson != null ){
+                object.put(OCI,ocJson);
             }
             JSONArray snapshotJar = TableAppSnapshot.getInstance(mContext).select();
             if (snapshotJar != null) {
@@ -205,7 +207,7 @@ public class UploadImpl {
     }
     private void handleUpload(String url,String uploadInfo) throws UnsupportedEncodingException {
 
-        String result = RequestUtils.httpRequest(url, uploadInfo.getBytes("UTF-8"),mContext);
+        String result = RequestUtils.httpRequest(url, uploadInfo,mContext);
         if (TextUtils.isEmpty(result)) {
             return;
         }

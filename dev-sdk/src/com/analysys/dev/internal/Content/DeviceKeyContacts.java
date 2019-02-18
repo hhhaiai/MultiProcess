@@ -7,7 +7,7 @@ public class DeviceKeyContacts {
   public static class DevInfo {
     public static final String NAME = "DevInfo";
     /*
-     * 设备硬件信息
+     * 设备硬件信息f
      */
     // 系统名称，如：“Android“、”iPhone OS“
     public static final String SystemName = "SN";
@@ -319,9 +319,9 @@ public class DeviceKeyContacts {
       // ods.ods_dev_user_geo_lbs_d [锆云] 位置区编码
       public static final String LocationAreaCode = "LAC";
       // ods.ods_dev_user_geo_lbs_d [锆云] 基站编号
-      public static final String CellId = "CellId";
+      public static final String CellId = "CI";
       // 信号强度
-      public static final String Level = "LEVEL";
+      public static final String Level = "LV";
     }
   }
 

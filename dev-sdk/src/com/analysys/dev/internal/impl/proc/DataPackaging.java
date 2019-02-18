@@ -76,19 +76,19 @@ public class DataPackaging {
             JSONObject batteryJson = new JSONObject();
             if (EGContext.SWITCH_OF_BATTERY) {
                 BatteryModuleNameInfo battery = BatteryModuleNameInfo.getInstance();
-                if (!TextUtils.isEmpty(battery.getBatteryStatus()))
+//                if (!TextUtils.isEmpty(battery.getBatteryStatus()))
                     batteryJson.put(DeviceKeyContacts.DevInfo.BatteryStatus, battery.getBatteryStatus());
-                if (!TextUtils.isEmpty(battery.getBatteryHealth()))
+//                if (!TextUtils.isEmpty(battery.getBatteryHealth()))
                     batteryJson.put(DeviceKeyContacts.DevInfo.BatteryHealth, battery.getBatteryHealth());
-                if (!TextUtils.isEmpty(battery.getBatteryLevel()))
+//                if (!TextUtils.isEmpty(battery.getBatteryLevel()))
                     batteryJson.put(DeviceKeyContacts.DevInfo.BatteryLevel, battery.getBatteryLevel());
-                if (!TextUtils.isEmpty(battery.getBatteryScale()))
+//                if (!TextUtils.isEmpty(battery.getBatteryScale()))
                     batteryJson.put(DeviceKeyContacts.DevInfo.BatteryScale, battery.getBatteryScale());
-                if (!TextUtils.isEmpty(battery.getBatteryPlugged()))
+//                if (!TextUtils.isEmpty(battery.getBatteryPlugged()))
                     batteryJson.put(DeviceKeyContacts.DevInfo.BatteryPlugged, battery.getBatteryPlugged());
-                if (!TextUtils.isEmpty(battery.getBatteryTechnology()))
+//                if (!TextUtils.isEmpty(battery.getBatteryTechnology()))
                     batteryJson.put(DeviceKeyContacts.DevInfo.BatteryTechnology, battery.getBatteryTechnology());
-                if (!TextUtils.isEmpty(battery.getBatteryTemperature()))
+//                if (!TextUtils.isEmpty(battery.getBatteryTemperature()))
                     batteryJson.put(DeviceKeyContacts.DevInfo.BatteryTemperature, battery.getBatteryTemperature());
             }
             if (EGContext.SWITCH_OF_DEV_FURTHER_DETAIL) {
@@ -127,8 +127,8 @@ public class DataPackaging {
      * OCCount
      * @return
      */
-    public static JSONArray getOCCount(){
-        //暂时这版不要
+    public static JSONArray getOCInfo(Context ctx){
+
         return null;
     }
 

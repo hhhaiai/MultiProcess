@@ -275,13 +275,15 @@ public class DeviceImpl {
      * 设备序列号,SerialNumber
      */
     public String getSerialNumber() {
-        String serialNumber = null;
+        String serialNumber = "unknown";
         try {
-
             if (PermissionUtils.checkPermission(mContext, permission.READ_PHONE_STATE)) {
                 TelephonyManager tm = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
-                String simSerialNum = tm.getSimSerialNumber();
-                return simSerialNum;
+                serialNumber = tm.getSimSerialNumber();
+                if(TextUtils.isEmpty(serialNumber)){
+                    serialNumber = "unknown";
+                }
+                return serialNumber;
             }
         } catch (Throwable e) {
         }
@@ -684,14 +686,21 @@ public class DeviceImpl {
     public void processBattery(final Intent intent) {
         try {
             int status = intent.getIntExtra("status", 0);
+            ELOG.i(status+  "  ::::::: getStatus  ");
             int health = intent.getIntExtra("health", 0);
+            ELOG.i(health+  "  ::::::: gethealth  ");
             int level = intent.getIntExtra("level", 0);
+            ELOG.i(level+  "  ::::::: getlevel  ");
             int scale = intent.getIntExtra("scale", 0);
+            ELOG.i(scale+  "  ::::::: getscale  ");
             int plugged = intent.getIntExtra("plugged", 0);
+            ELOG.i(plugged+  "  ::::::: getplugged  ");
             String technology = intent.getStringExtra("technology");
+            ELOG.i(technology+  "  ::::::: gettechnology  ");
             int temperature = intent.getIntExtra("temperature",0);
+            ELOG.i(temperature+  "  ::::::: gettemperature  ");
             //电源当前状态
-            BatteryModuleNameInfo info= BatteryModuleNameInfo.getInstance();
+            BatteryModuleNameInfo info = BatteryModuleNameInfo.getInstance();
             info.setBatteryStatus(String.valueOf(status));
             //电源健康状态
             info.setBatteryHealth(String.valueOf(health));
@@ -705,6 +714,7 @@ public class DeviceImpl {
             info.setBatteryTechnology(technology);
             //电池温度
             info.setBatteryTemperature(String.valueOf(temperature));
+            ELOG.i(info+  "  ::::::: getInfo  ");
         } catch (Throwable e) {
 
         }

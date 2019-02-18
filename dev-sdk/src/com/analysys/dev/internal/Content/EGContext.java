@@ -196,6 +196,9 @@ public class EGContext {
     public static final String DEBUG = "DEBUG";
     public static final String APPKEY = "AK";
     public static final String TIME = "TIME";
+    public static final String  POLICYVER= "policyVer";
+    public static final String  PRO= "PRO";
+
     // HTTP Status-Code 413: Request Entity Too Large
     public static final String HTTP_DATA_OVERLOAD = "413";
     //200 SUCCESS

@@ -84,6 +84,15 @@
 
       </intent-filter>
     </receiver>
+    <receiver android:name="com.analysys.dev.receiver.DynamicReceivers">
+      <intent-filter android:priority="9999">
+        <action android:name="android.intent.action.SCREEN_ON" />
+        <action android:name="android.intent.action.SCREEN_OFF" />
+        <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+        <action android:name="android.intent.action.BOOT_COMPLETED" />
+        <action android:name="android.intent.action.BATTERY_CHANGED" />
+      </intent-filter>
+    </receiver>
     <service
         android:name="com.analysys.dev.service.AnalysysAccessibilityService"
         android:enabled="true"

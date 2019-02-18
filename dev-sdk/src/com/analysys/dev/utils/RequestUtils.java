@@ -44,7 +44,7 @@ public class RequestUtils {
   /**
    * HTTP
    */
-  public static String httpRequest(String url, byte[] value , Context ctx) {
+  public static String httpRequest(String url, String value , Context ctx) {
     ELOG.i("URL::::::::::"+url);
     String response = "";
     URL urlP;
@@ -66,11 +66,13 @@ public class RequestUtils {
         connection.setRequestProperty(EGContext.DEBUG, DeviceImpl.getInstance(ctx).getDebug());
         connection.setRequestProperty(EGContext.APPKEY, SPHelper.getDefault(ctx).getString(EGContext.APPKEY ,""));
         connection.setRequestProperty(EGContext.TIME, SPHelper.getDefault(ctx).getString(EGContext.TIME , ""));
+        connection.setRequestProperty(EGContext.POLICYVER, "0");//策略覆盖
+        connection.setRequestProperty(EGContext.PRO, "QF4");//写死
         ELOG.i("头文件字段：：：：：："+SPHelper.getDefault(ctx).getString(EGContext.SDKV,"")+"  debug::: "+ DeviceImpl.getInstance(ctx).getDebug()
         +"APPKEY::: "+SPHelper.getDefault(ctx).getString(EGContext.APPKEY ,"")+"   TIME:::   "+SPHelper.getDefault(ctx).getString(EGContext.TIME , ""));
         // 发送数据
         pw = new PrintWriter(connection.getOutputStream());
-        pw.print("app3="+value);
+        pw.print("facility4="+value);
         pw.flush();
         pw.close();
 
