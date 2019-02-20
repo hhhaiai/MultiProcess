@@ -6,9 +6,12 @@ import android.util.Base64;
 
 import com.analysys.dev.database.TableAppSnapshot;
 import com.analysys.dev.database.TableLocation;
+import com.analysys.dev.database.TableOCCount;
+import com.analysys.dev.database.TableXXXInfo;
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.impl.proc.DataPackaging;
+import com.analysys.dev.internal.impl.proc.ProcessManager;
 import com.analysys.dev.model.PolicyInfo;
 import com.analysys.dev.utils.AESUtils;
 import com.analysys.dev.utils.DeflterCompressUtils;
@@ -34,6 +37,8 @@ public class UploadImpl {
     private final String ASI = "AppSnapshotInfo";
     private final String LI = "LocationInfo";
     private final String OCI = "OCInfo";
+    private final String XXXInfo = "XXXInfo";
+
     private int count = 0;
 
     private static class Holder {
@@ -92,10 +97,17 @@ public class UploadImpl {
             if (devJson != null) {
                 object.put(DI, devJson);
             }
-            JSONArray ocJson = DataPackaging.getOCInfo(mContext);
+            JSONArray ocJson = TableOCCount.getInstance(mContext).select();
             if(ocJson != null ){
                 object.put(OCI,ocJson);
             }
+
+            JSONArray xxxInfo = TableXXXInfo.getInstance(mContext).select();
+//            ELOG.i(xxxInfo+"   :::::::xxxInfo");
+            if(xxxInfo != null){
+                object.put(XXXInfo, xxxInfo);
+            }
+
             JSONArray snapshotJar = TableAppSnapshot.getInstance(mContext).select();
             if (snapshotJar != null) {
                 object.put(ASI, snapshotJar);
@@ -113,6 +125,7 @@ public class UploadImpl {
 //                object.put(OCI, ocJar);
 //            }
         } catch (Throwable e) {
+            ELOG.e(e.getMessage()+" getInfo has an exception");
         }
         return String.valueOf(object);
     }

@@ -213,7 +213,7 @@ public class DeviceKeyContacts {
     // 网络类型， 选项: WIFI/2G/3G/4G/无网络
     public static final String NetworkType = "NT";
     // OC 切换的类型，1-正常使用，2-开关屏幕切换，3-服务重启
-    public static final String SwitchType = "IT";
+    public static final String SwitchType = "ST";
     // 应用类型，SA-系统应用，OA-第三方应用
     public static final String ApplicationType = "AT";
     // 采集来源类型，1-getRunningTask，2-读取proc，3-辅助功能，4-系统统计
@@ -315,7 +315,7 @@ public class DeviceKeyContacts {
 
     // 基站信息
     public static class BaseStationInfo {
-      public static final String NAME = "BaseStationImpl";
+      public static final String NAME = "BaseStationInfo";
       // ods.ods_dev_user_geo_lbs_d [锆云] 位置区编码
       public static final String LocationAreaCode = "LAC";
       // ods.ods_dev_user_geo_lbs_d [锆云] 基站编号

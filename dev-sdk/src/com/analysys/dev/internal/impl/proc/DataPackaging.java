@@ -3,9 +3,11 @@ package com.analysys.dev.internal.impl.proc;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.analysys.dev.database.DBConfig;
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.impl.DeviceImpl;
+import com.analysys.dev.internal.impl.OCImpl;
 import com.analysys.dev.model.BatteryModuleNameInfo;
 import com.analysys.dev.utils.ELOG;
 
@@ -54,7 +56,7 @@ public class DataPackaging {
             deviceInfo.put(DeviceKeyContacts.DevInfo.AppMD5, devImpl.getAppMD5());
             deviceInfo.put(DeviceKeyContacts.DevInfo.AppSign, devImpl.getAppSign());
             deviceInfo.put(DeviceKeyContacts.DevInfo.TempID, devImpl.getTempID());
-            ELOG.i("deviceInfo ::::::"+deviceInfo);
+//            ELOG.i("deviceInfo ::::::"+deviceInfo);
 
             if (EGContext.SWITCH_OF_PREVENT_CHEATING) {
                 deviceInfo.put(DeviceKeyContacts.DevInfo.Simulator, devImpl.isSimulator());
@@ -128,7 +130,8 @@ public class DataPackaging {
      * @return
      */
     public static JSONArray getOCInfo(Context ctx){
-
+//         OCImpl.getInstance(ctx).getInfoByVersion();
+         //TODO
         return null;
     }
 

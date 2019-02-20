@@ -37,6 +37,9 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(DBConfig.OCCount.CREATE_TABLE);
         db.execSQL(DBConfig.Location.CREATE_TABLE);
         db.execSQL(DBConfig.AppSnapshot.CREATE_TABLE);
+        db.execSQL(DBConfig.XXXInfo.CREATE_TABLE);
+        db.execSQL(DBConfig.PROCInfo.CREATE_TABLE);
+
     }
 
     @Override
@@ -59,6 +62,13 @@ public class DBHelper extends SQLiteOpenHelper {
             if(DBUtils.isTableExist(db , DBConfig.AppSnapshot.CREATE_TABLE)){
                 db.execSQL(DBConfig.AppSnapshot.CREATE_TABLE);
             }
+            if(DBUtils.isTableExist(db , DBConfig.XXXInfo.CREATE_TABLE)){
+                db.execSQL(DBConfig.XXXInfo.CREATE_TABLE);
+            }
+            if(DBUtils.isTableExist(db , DBConfig.PROCInfo.CREATE_TABLE)){
+                db.execSQL(DBConfig.PROCInfo.CREATE_TABLE);
+            }
+
         } catch (SQLiteDatabaseCorruptException e) {
             rebuildDB();
         }

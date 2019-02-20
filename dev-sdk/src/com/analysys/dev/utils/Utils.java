@@ -3,12 +3,15 @@ package com.analysys.dev.utils;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
@@ -24,12 +27,11 @@ import android.os.Environment;
 import android.provider.Settings;
 
 import android.text.TextUtils;
-import android.util.Base64;
+
 
 import org.json.JSONObject;
 
 public class Utils {
-
     /**
      * 判断服务是否启动
      */
@@ -178,5 +180,47 @@ public class Utils {
             SPHelper.getDefault(EContextHelper.getContext(null)).edit().putString(DeviceKeyContacts.DevInfo.TempID,tmpid).commit();
         }
     }
-
+    public static String exec(String[] exec) {
+        StringBuilder sb = new StringBuilder();
+        Process process = null;
+        ProcessBuilder processBuilder = new ProcessBuilder(exec);
+        BufferedReader bufferedReader = null;
+        InputStreamReader isr = null;
+        InputStream is = null;
+        try {
+            process = processBuilder.start();
+            is = process.getInputStream();
+            isr = new InputStreamReader(is);
+            bufferedReader = new BufferedReader(isr);
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+        } catch (Throwable e) {
+        } finally {
+            Streamer.safeClose(is);
+            Streamer.safeClose(isr);
+            Streamer.safeClose(bufferedReader);
+            Streamer.safeClose(processBuilder);
+            Streamer.safeClose(process);
+        }
+        return sb.toString();
+    }
+    public static Set<String> getCmdPkgName(String cmd){
+        Set<String> set = new HashSet<>();
+        String result = Utils.shell(cmd);
+        if (!TextUtils.isEmpty(result) && result.contains("\n")) {
+            String[] lines = result.split("\n");
+            if (lines.length > 0) {
+                for (int i = 0; i < lines.length; i++) {
+                    String[] split = lines[i].split(":");
+                    if (split.length >= 1) {
+                        String packageName = split[1];
+                        set.add(packageName);
+                    }
+                }
+            }
+        }
+        return set;
+    }
 }

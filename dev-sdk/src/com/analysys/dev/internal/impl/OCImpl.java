@@ -2,21 +2,28 @@ package com.analysys.dev.internal.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.analysys.dev.database.TableOC;
 import com.analysys.dev.database.TableOCCount;
+import com.analysys.dev.database.TableXXXInfo;
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.impl.proc.AppProcess;
+import com.analysys.dev.internal.impl.proc.ProcParser;
+import com.analysys.dev.internal.impl.proc.Process;
 import com.analysys.dev.internal.impl.proc.ProcessManager;
+import com.analysys.dev.model.AppSnapshotInfo;
 import com.analysys.dev.service.AnalysysAccessibilityService;
 import com.analysys.dev.utils.AccessibilityHelper;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.EThreadPool;
 import com.analysys.dev.utils.NetworkUtils;
 import com.analysys.dev.utils.PermissionUtils;
+import com.analysys.dev.utils.Utils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 import com.analysys.dev.internal.work.MessageDispatcher;
 
@@ -29,16 +36,13 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.text.TextUtils;
 
-/**
- * @Copyright © 2018 EGuan Inc. All rights reserved.
- * @Description: TODO
- * @Version: 1.0
- * @Create: 2018/10/18 11:38
- * @Author: Wang-X-C
- */
 public class OCImpl {
 
     Context mContext;
+    private final String SHELL_PM_LIST_PACKAGES = "pm list packages";//all
+    private final String SHELL_SYSTEM_LIST_PACKAGES = "pm list packages -s";//system
+    private final String SHELL_THIRD_PARTY_LIST_PACKAGES = "pm list packages -3";//third party
+
 
     private static class Holder {
         private static final OCImpl INSTANCE = new OCImpl();
@@ -59,24 +63,28 @@ public class OCImpl {
             @Override
             public void run() {
                 if (!AccessibilityHelper.isAccessibilitySettingsOn(mContext,AnalysysAccessibilityService.class)) {
-                    // 判断系统版本
-                    if (Build.VERSION.SDK_INT < 21) {
-                        if(PermissionUtils.checkPermission(mContext, Manifest.permission.GET_TASKS)){
-                            RunningApps(getRunningApp(), EGContext.OC_COLLECTION_TYPE_RUNNING_TASK);
-                        }
-                    }else if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24 ){
-                        getProcApps();
-                    }else{
-                        //TODO 7.0以上待调研
-                    }
+                    getInfoByVersion();
                     MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE);
+                }else{
+                    //利用辅助功能获取当前app
                 }
             }
         });
     }
 
     String pkgName = null;
-
+    public void getInfoByVersion(){
+        // 判断系统版本
+        if (Build.VERSION.SDK_INT < 21) {
+            if(PermissionUtils.checkPermission(mContext, Manifest.permission.GET_TASKS)){
+                RunningApps(getRunningApp(), EGContext.OC_COLLECTION_TYPE_RUNNING_TASK);
+            }
+        }else if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24 ){
+            getProcApps();
+        }else{
+            //TODO 7.0以上待调研
+        }
+    }
     /**
      * getRunningTask、辅助功能 OC 信息采集
      */
@@ -124,38 +132,56 @@ public class OCImpl {
      */
     private void getProcApps() {
         List<JSONObject> cacheApps = TableOCCount.getInstance(mContext).selectRunning();
-        List<AppProcess> runApps = ProcessManager.getRunningForegroundApps(mContext);
-        if (cacheApps == null || cacheApps.isEmpty()) {
-            List<JSONObject> ocList = new ArrayList<JSONObject>();
-            for (int i = 0; i < runApps.size(); i++) {
-                String pkgName = runApps.get(i).getPackageName();
-                ELOG.i(pkgName +"   pkgName   ");
-                if (!TextUtils.isEmpty(pkgName)) {
-                    ocList.add(getOCInfo(pkgName, EGContext.OC_COLLECTION_TYPE_PROC));
+        JSONObject obj = ProcessManager.getRunningForegroundApps(mContext);
+        List<Process> run = new ArrayList<Process>();
+        JSONObject jsonObject = new JSONObject();
+        try {
+            JSONArray xxxArray = new JSONArray(obj.get("XXXInfo").toString());
+            TableXXXInfo.getInstance(mContext).insert(xxxArray);
+            for (int i = 0;i<xxxArray.length();i++) {
+                jsonObject = (JSONObject) xxxArray.get(i);
+                String res = jsonObject.get(ProcParser.RUNNING_RESULT).toString().replace("[","").replace("]","");
+                String[] strArray = res.split(",");
+                Process ap = null;
+                for (String pkgName : strArray) {
+                    ap =  new Process(null,pkgName);
+                    run.add(ap);
                 }
             }
-            TableOCCount.getInstance(mContext).insertArray(ocList);
-        } else {
-            // 去重
-            removeRepeat(cacheApps, runApps);
-            // 更新缓存表
-            updateCacheState(cacheApps);
-            // 存储关闭信息到OC表
-            TableOC.getInstance(mContext).insert(cacheApps);
-            // 新增该时段缓存信息
-            addCache(runApps);
+            if (cacheApps == null || cacheApps.isEmpty()) {
+                List<JSONObject> ocList = new ArrayList<JSONObject>();
+                for (int i = 0; i < run.size(); i++) {
+                    String pkgName = run.get(i).getName();
+                    if (!TextUtils.isEmpty(pkgName)) {
+                        ocList.add(getOCInfo(pkgName.replaceAll(" ",""), EGContext.OC_COLLECTION_TYPE_PROC));
+                    }
+                }
+                TableOCCount.getInstance(mContext).insertArray(ocList);
+            } else {
+                // 去重
+                removeRepeat(cacheApps, run);
+                // 更新缓存表
+                updateCacheState(cacheApps);
+                // 存储关闭信息到OC表
+                TableOC.getInstance(mContext).insert(cacheApps);
+                // 新增该时段缓存信息
+                addCache(run);
+            }
+        }catch (Throwable t){
+            ELOG.i("getProcApps has an exception :::"+ t.getMessage());
         }
     }
 
     /**
      * 缓存中应用列表与新获取应用列表去重
      */
-    private void removeRepeat(List<JSONObject> cacheApps, List<AppProcess> runApps) {
+    private void removeRepeat(List<JSONObject> cacheApps, List<Process> runApps) {
+        JSONObject ocInfo = null;
         for (int i = cacheApps.size() - 1; i >= 0; i--) {
-            JSONObject ocInfo = cacheApps.get(i);
+            ocInfo = cacheApps.get(i);
             String apn = ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
             for (int j = runApps.size() - 1; j >= 0; j--) {
-                String pkgName = runApps.get(j).getPackageName();
+                String pkgName = runApps.get(j).getName();
                 if (!TextUtils.isEmpty(apn) && apn.equals(pkgName)) {
                     cacheApps.remove(i);
                     runApps.remove(j);
@@ -173,8 +199,9 @@ public class OCImpl {
             if (!cacheApps.isEmpty()) {
                 // 缓存数据列表与新获取数据列表去重，缓存列表剩余为已经关闭的应用，需要转存储到OC表，并更新运行状态为0
                 List<JSONObject> ocList = new ArrayList<JSONObject>();
+                JSONObject oc = null;
                 for (int i = 0; i < cacheApps.size(); i++) {
-                    JSONObject oc = cacheApps.get(i);
+                    oc = cacheApps.get(i);
                     int numb = oc.optInt(DeviceKeyContacts.OCInfo.CU) + 1;
                     String apn = oc.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
                     oc.remove(DeviceKeyContacts.OCInfo.CU);
@@ -193,7 +220,7 @@ public class OCImpl {
     /**
      * 新增缓存
      */
-    private void addCache(List<AppProcess> runApps) {
+    private void addCache(List<Process> runApps) {
         if (!runApps.isEmpty()) {
             // 缓存数据列表与新获取数据列表去重，新获取列表剩余未新打开的应用，需要缓存到OCCount中，
             List<String> ocInfo = TableOCCount.getInstance(mContext).getIntervalApps();
@@ -202,7 +229,6 @@ public class OCImpl {
             // 将新增列表拆开，该时段有应用打开记录的修改更新记录，该时段没有应用打开记录的新增记录
             for (int i = runList.size() - 1; i >= 0; i--) {
                 String pkgName = runList.get(i).optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
-                ELOG.i(pkgName+"   pkgName 202");
                 if (!TextUtils.isEmpty(pkgName) && ocInfo.contains(pkgName)) {
                     updateOCInfo.add(runList.get(i));
                     runList.remove(i);
@@ -222,13 +248,12 @@ public class OCImpl {
     /**
      * 根据读取出的包列表，获取应用信息并组成json格式添加到列表
      */
-    private List<JSONObject> getOCArray(List<AppProcess> runApps) {
+    private List<JSONObject> getOCArray(List<Process> runApps) {
         List<JSONObject> list = null;
         try {
             list = new ArrayList<JSONObject>();
             for (int i = 0; i < runApps.size(); i++) {
-                String pkgName = runApps.get(i).getPackageName();
-                ELOG.i(pkgName+"     getOCArray  ");
+                String pkgName = runApps.get(i).getName();
                 if (!TextUtils.isEmpty(pkgName)) {
                     JSONObject ocJson = getOCInfo(pkgName, EGContext.OC_COLLECTION_TYPE_PROC);
                     list.add(ocJson);
@@ -263,8 +288,9 @@ public class OCImpl {
      */
     private void removeRepeat(List<JSONObject> cacheApps) {
         try {
+            JSONObject json = null;
             for (int i = cacheApps.size() - 1; i >= 0; i--) {
-                JSONObject json = cacheApps.get(i);
+                json = cacheApps.get(i);
                 String apn = json.getString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
                 ELOG.i(apn +" -------apn");
                 if (!TextUtils.isEmpty(apn) && apn.equals(pkgName)) {
@@ -288,21 +314,35 @@ public class OCImpl {
         JSONObject ocInfo = null;
         try {
             if (!TextUtils.isEmpty(packageName)) {
-                PackageManager pm = mContext.getPackageManager();
-                ApplicationInfo appInfo = pm.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
+                PackageManager pm = null;
+                ApplicationInfo appInfo = null;
+                try {
+                    pm = mContext.getPackageManager();
+                    appInfo = pm.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
+                }catch (Throwable t){
+                }
                 ocInfo = new JSONObject();
                 ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, packageName);
-                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName, appInfo.loadLabel(pm).toString());
                 ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationOpenTime, String.valueOf(System.currentTimeMillis()));
-                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode, pm.getPackageInfo(packageName, 0).versionName + "|"
-                    + pm.getPackageInfo(packageName, 0).versionCode);
                 ocInfo.put(DeviceKeyContacts.OCInfo.NetworkType, NetworkUtils.getNetworkType(mContext));
-                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationType, appType(packageName));
                 ocInfo.put(DeviceKeyContacts.OCInfo.CollectionType, collectionType);
                 ocInfo.put(DeviceKeyContacts.OCInfo.SwitchType,EGContext.SWITCH_TYPE_DEFAULT);
+                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationType, appType(packageName));
+                try {
+                    ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode, pm.getPackageInfo(packageName, 0).versionName + "|"
+                            + pm.getPackageInfo(packageName, 0).versionCode);
+                }catch (Throwable t){
+                    ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode, "unknown");
+                }
+                try {
+                    ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName, appInfo.loadLabel(pm).toString());
+                }catch (Throwable t){
+                    ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName, "unknown");
+                }
+
             }
         } catch (Throwable e) {
-
+            ELOG.e(e+"    ::::::getOCInfo has an exception");
         }
         return ocInfo;
     }
@@ -311,17 +351,52 @@ public class OCImpl {
      * 判断应用为系统应用还是第三方应用
      */
     private String appType(String pkgName) {
+        String type = "unknown";
         try {
             PackageInfo pkgInfo = mContext.getPackageManager().getPackageInfo(pkgName, 0);
             if ((pkgInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) <= 0) {
-                return "OA";
+                type = "OA";//sanfang
             } else {
-                return "SA";
+                type = "SA";
             }
         } catch (Throwable e) {
-            return "";
+            if(Utils.getCmdPkgName(SHELL_SYSTEM_LIST_PACKAGES).contains(pkgName)) type = "SA";
+            if(Utils.getCmdPkgName(SHELL_THIRD_PARTY_LIST_PACKAGES).contains(pkgName)) type = "OA";
         }
+        return type;
     }
+
+//    private List<AppSnapshotInfo> getAppsFromShell() {
+//        List<AppSnapshotInfo> appList = new ArrayList<AppSnapshotInfo>();
+//        try {
+//            AppSnapshotInfo info;
+//            PackageManager pm = mContext.getPackageManager();
+//            String result = Utils.shell(SHELL_PM_LIST_PACKAGES);
+//            if (!TextUtils.isEmpty(result) && result.contains("\n")) {
+//                String[] lines = result.split("\n");
+//                if (lines.length > 0) {
+//                    for (int i = 0; i < lines.length; i++) {
+//                        try {
+//                            String[] split = lines[i].split(":");
+//                            if (split.length >= 1) {
+//                                String packageName = split[1];
+//                                if (!TextUtils.isEmpty(packageName)
+//                                        && pm.getLaunchIntentForPackage(packageName) != null) {
+//                                    info = new AppSnapshotInfo();
+//                                    info.setApplicationPackageName(packageName);
+//                                    appList.add(info);
+//                                }
+//                            }
+//                        } catch (Throwable e) {
+//                        }
+//                    }
+//                }
+//            }
+//        } catch (Throwable e) {
+//            // igone
+//        }
+//        return appList;
+//    }
 
 //    public class OC {
 //        // 应用包名

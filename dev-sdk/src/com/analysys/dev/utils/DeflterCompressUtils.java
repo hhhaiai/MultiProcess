@@ -53,13 +53,14 @@ public class DeflterCompressUtils {
             value = value.substring(0,3);
         }
         String sdkv = DeviceImpl.getInstance(ctx).getSdkVersion();
+        SPHelper.getDefault(ctx).edit().putString(EGContext.SDKV , sdkv).commit();
         if(sdkv.contains("|")){
             sdkv = sdkv.substring(0,sdkv.indexOf("|")).replace(".", "");
         }else{
             sdkv = sdkv.replace(".", "");
         }
-        sb.append(sdkv);//版本号-主版本号去掉点
-        SPHelper.getDefault(ctx).edit().putString(EGContext.SDKV , sdkv).commit();
+        sb.append(sdkv);//版本号-主版本号去掉点---规则变动，不需要处理了
+
         sb.append(DeviceImpl.getInstance(ctx).getDebug());//是否debug模式，0/1值
         sb.append(value);//前三位
         long time = System.currentTimeMillis();

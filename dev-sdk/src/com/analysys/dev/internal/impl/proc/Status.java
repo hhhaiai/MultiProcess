@@ -182,11 +182,11 @@ public final class Status extends ProcFile {
 	/**
 	 * @return The process' UID or -1 if parsing the UID failed.
 	 */
-	public int getUid() {
+	public String getUid() {
 		try {
-			return Integer.parseInt(getValue("Uid").split("\\s+")[0]);
+			return getValue("Uid").split("\\s+")[0];
 		} catch (Exception e) {
-			return -1;
+			return "-1";
 		}
 	}
 

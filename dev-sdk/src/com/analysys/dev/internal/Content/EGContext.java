@@ -43,6 +43,9 @@ public class EGContext {
     public static final int LOCATION_CYCLE = 5 * 60 * 1000;
     // 应用打开关闭获取周期时间
     public static final int OC_CYCLE = 5 * 1000;
+    // 5.0以上30s
+    public static final int OC_CYCLE_OVER_5 = 5 * 1000;
+
     // 应用打开关闭获取周期时间
     public static final int UPLOAD_CYCLE = 6 * 60 * 60 * 1000;
     // 心跳检查
@@ -88,7 +91,6 @@ public class EGContext {
     public static int OC_COLLECTION_TYPE_AUX = 3;//辅助功能
     public static int OC_COLLECTION_TYPE_SYSTEM = 4;//系统统计
 
-    public static String SNAP_SHOT_DEFAULT = "-1";
     public static String SNAP_SHOT_INSTALL = "0";
     public static String SNAP_SHOT_UNINSTALL = "1";
     public static String SNAP_SHOT_UPDATE = "2";

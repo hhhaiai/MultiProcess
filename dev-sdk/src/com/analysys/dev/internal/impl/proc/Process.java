@@ -22,24 +22,32 @@ public class Process implements Parcelable {
 	 * @throws IOException
 	 *             if the file does not exist or we don't have read permissions.
 	 */
-	static String getProcessName(int pid) throws IOException {
-		String cmdline = null;
-		try {
-			cmdline = ProcFile.readFile(String.format("/proc/%d/cmdline", pid))
-					.trim();
-		} catch (IOException ignored) {
-		}
-		if (TextUtils.isEmpty(cmdline)) {
-			return Stat.get(pid).getComm();
-		}
-		return cmdline;
-	}
+//	static String getProcessName(String pid) throws IOException {
+//		String cmdline = null;
+//		try {
+//			cmdline = ProcFile.readFile(String.format("/proc/%d/cmdline", pid))
+//					.trim();
+//		} catch (IOException ignored) {
+//		}
+//		if (TextUtils.isEmpty(cmdline)) {
+//			return Stat.get(pid).getComm();
+//		}
+//		return cmdline;
+//	}
 
 	/** the process name */
 	public final String name;
 
 	/** the process id */
-	public final int pid;
+	public final String pid;
+
+	public String getName() {
+		return name;
+	}
+
+	public String getPid() {
+		return pid;
+	}
 
 	/**
 	 * Process constructor
@@ -49,9 +57,9 @@ public class Process implements Parcelable {
 	 * @throws IOException
 	 *             if /proc/[pid] does not exist or we don't have read access.
 	 */
-	public Process(int pid) throws IOException {
+	public Process(String pid ,String pname) throws IOException {
 		this.pid = pid;
-		this.name = getProcessName(pid);
+		this.name = pname;
 	}
 
 	/**
@@ -164,7 +172,7 @@ public class Process implements Parcelable {
 	 * @throws IOException
 	 */
 	public Cgroup cgroup() throws IOException {
-		return Cgroup.get(pid);
+		return Cgroup.get(Integer.parseInt(pid));
 	}
 
 	/**
@@ -684,7 +692,7 @@ public class Process implements Parcelable {
 	 *             if the file does not exist or we don't have read permissions.
 	 */
 	public Status status() throws IOException {
-		return Status.get(pid);
+		return Status.get(Integer.parseInt(pid));
 	}
 
 	/**
@@ -707,12 +715,12 @@ public class Process implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(this.name);
-		dest.writeInt(this.pid);
+		dest.writeInt(Integer.parseInt(this.pid));
 	}
 
 	protected Process(Parcel in) {
 		this.name = in.readString();
-		this.pid = in.readInt();
+		this.pid = String.valueOf(in.readInt());
 	}
 
 	public static final Creator<Process> CREATOR = new Creator<Process>() {

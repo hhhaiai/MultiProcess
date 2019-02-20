@@ -30,16 +30,15 @@ public class AppProcess extends Process {
      * {@code true} if the process is in the foreground
      */
     public final boolean foreground;
+    public final String uid ;
 
     /**
      * The user id of this process.
      */
-    public final int uid;
-
-    public AppProcess(int pid) throws IOException, NotAndroidAppProcessException {
-        super(pid);
+    public AppProcess(String pid) throws IOException, NotAndroidAppProcessException {
+        super(null);
         final boolean foreground;
-        int uid;
+        String uid;
 
         if (SYS_SUPPORTS_SCHEDGROUPS) {
             Cgroup cgroup = cgroup();
@@ -51,7 +50,7 @@ public class AppProcess extends Process {
                 }
                 foreground = !cpu.group.contains("bg_non_interactive");
                 try {
-                    uid = Integer.parseInt(cpuacct.group.split("/")[1].replace("uid_", ""));
+                    uid = cpuacct.group.split("/")[1].replace("uid_", "");
                 } catch (Exception e) {
                     uid = status().getUid();
                 }
@@ -61,7 +60,7 @@ public class AppProcess extends Process {
                 }
                 foreground = !cpu.group.contains("bg_non_interactive");
                 try {
-                    uid = Integer.parseInt(cpuacct.group.substring(cpuacct.group.lastIndexOf("/") + 1));
+                    uid = cpuacct.group.substring(cpuacct.group.lastIndexOf("/") + 1);
                 } catch (Exception e) {
                     uid = status().getUid();
                 }
@@ -79,7 +78,6 @@ public class AppProcess extends Process {
         this.foreground = foreground;
         this.uid = uid;
     }
-
     /**
      * @return the app's package name
      * @see #name
@@ -92,13 +90,13 @@ public class AppProcess extends Process {
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeByte((byte) (foreground ? 0x01 : 0x00));
-        dest.writeInt(uid);
+        dest.writeInt(Integer.parseInt(uid));
     }
 
     protected AppProcess(Parcel in) {
         super(in);
         foreground = in.readByte() != 0x00;
-        uid = in.readInt();
+        uid = in.readString();
     }
 
     public static final Creator<AppProcess> CREATOR = new Creator<AppProcess>() {
@@ -117,7 +115,7 @@ public class AppProcess extends Process {
     @SuppressWarnings("serial")
 	public static final class NotAndroidAppProcessException extends Exception {
 
-        public NotAndroidAppProcessException(int pid) {
+        public NotAndroidAppProcessException(String pid) {
             super(String.format("The process %d does not belong to any application", pid));
         }
     }

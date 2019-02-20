@@ -7,6 +7,7 @@ import android.content.Intent;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.impl.DeviceImpl;
 import com.analysys.dev.internal.impl.WifiImpl;
+import com.analysys.dev.internal.impl.proc.ProcessManager;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.reflectinon.Reflecer;
 import com.analysys.dev.internal.work.MessageDispatcher;
@@ -41,6 +42,7 @@ public class DynamicReceivers extends BroadcastReceiver {
             MessageDispatcher.getInstance(mContext).startService(0);
         }
         if (SCREEN_OFF.equals(intent.getAction())) {
+            ProcessManager.setIsCollected(false);
             MessageDispatcher.getInstance(mContext).killWorker();
             ELOG.e("接收关闭屏幕广播");
         }

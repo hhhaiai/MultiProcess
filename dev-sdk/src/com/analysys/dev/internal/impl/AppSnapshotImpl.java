@@ -139,7 +139,7 @@ public class AppSnapshotImpl {
                 // if ((ApplicationInfo.FLAG_SYSTEM & pi.applicationInfo.flags) != 0) {
                 // continue;
                 // }
-                JSONObject jsonObject = getAppInfo(pi, EGContext.SNAP_SHOT_DEFAULT);
+                JSONObject jsonObject = getAppInfo(pi, EGContext.SNAP_SHOT_INSTALL);
                 if (jsonObject != null) {
                     list.add(jsonObject);
                 }

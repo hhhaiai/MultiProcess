@@ -38,7 +38,7 @@ public class TableOC {
             db.beginTransaction();
             long time = System.currentTimeMillis();
             for (int i = 0; i < ocInfo.size(); i++) {
-                ELOG.i("OC存储内容：" + ocInfo);
+//                ELOG.i("OC存储内容：" + ocInfo);
                 String encryptOC = Base64Utils.encrypt(String.valueOf(ocInfo.get(i)), time);
                 if (!TextUtils.isEmpty(encryptOC)) {
                     ContentValues cv = new ContentValues();

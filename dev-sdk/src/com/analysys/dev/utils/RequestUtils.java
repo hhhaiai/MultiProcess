@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -27,14 +28,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-
-/**
- * @Copyright © 2018 EGuan Inc. All rights reserved.
- * @Description: TODO
- * @Version: 1.0
- * @Create: 2018/11/3 16:35
- * @Author: Wang-X-C
- */
 public class RequestUtils {
 
   private static TrustManager[] tm = null;
@@ -45,7 +38,7 @@ public class RequestUtils {
    * HTTP
    */
   public static String httpRequest(String url, String value , Context ctx) {
-    ELOG.i("URL::::::::::"+url);
+    ELOG.i("URL ::::::::::"+ url);
     String response = "";
     URL urlP;
     HttpURLConnection connection;
@@ -54,6 +47,7 @@ public class RequestUtils {
     PrintWriter pw;
     byte[] buffer = new byte[1024];
     try {
+        ELOG.i("value::::::::::"+ URLEncoder.encode(value,"UTF-8"));
         urlP = new URL(url);
         connection = (HttpURLConnection) urlP.openConnection();
         connection.setDoInput(true);
@@ -72,7 +66,7 @@ public class RequestUtils {
         +"APPKEY::: "+SPHelper.getDefault(ctx).getString(EGContext.APPKEY ,"")+"   TIME:::   "+SPHelper.getDefault(ctx).getString(EGContext.TIME , ""));
         // 发送数据
         pw = new PrintWriter(connection.getOutputStream());
-        pw.print("facility4="+value);
+        pw.print("facility4="+URLEncoder.encode(value,"UTF-8"));
         pw.flush();
         pw.close();
 
