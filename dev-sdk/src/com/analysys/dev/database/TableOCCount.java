@@ -49,7 +49,7 @@ public class TableOCCount {
             }
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             ContentValues cv = getContentValues(ocInfo);
-            ELOG.i(cv+"     ：：：：ocInfo  "+DBConfig.OCCount.Column.CU);
+//            ELOG.i(cv+"     ：：：：ocInfo  "+DBConfig.OCCount.Column.CU);
             cv.put(DBConfig.OCCount.Column.CU, 0);
             db.insert(DBConfig.OCCount.TABLE_NAME, null, cv);
         } catch (Exception e) {
@@ -67,11 +67,11 @@ public class TableOCCount {
             db = DBManager.getInstance(mContext).openDB();
             if (ocInfo != null && !ocInfo.isEmpty()) {
                 db.beginTransaction();
-                ELOG.i(ocInfo.size() +"     ：：：：ocInfo size  ");
+//                ELOG.i(ocInfo.size() +"     ：：：：ocInfo size  ");
                 for (int i = 0; i < ocInfo.size(); i++) {
                     if(ocInfo.get(i) == null) continue;
                     ContentValues cv = getContentValues(ocInfo.get(i));
-                    ELOG.i(cv+"     ：：：：ocInfo  "+DBConfig.OCCount.Column.CU);
+//                    ELOG.i(cv+"     ：：：：ocInfo  "+DBConfig.OCCount.Column.CU);
                     cv.put(DBConfig.OCCount.Column.CU, 0);
                     db.insert(DBConfig.OCCount.TABLE_NAME, null, cv);
                 }
@@ -127,6 +127,7 @@ public class TableOCCount {
                 cv.put(DBConfig.OCCount.Column.NT, ocInfo.optString(DeviceKeyContacts.OCInfo.NetworkType));
                 cv.put(DBConfig.OCCount.Column.AT, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationType));
                 cv.put(DBConfig.OCCount.Column.CT, ocInfo.optString(DeviceKeyContacts.OCInfo.CollectionType));
+                cv.put(DBConfig.OCCount.Column.AST, ocInfo.optString(DeviceKeyContacts.OCInfo.SwitchType));
                 cv.put(DBConfig.OCCount.Column.TI, Base64Utils.getTimeTag(insertTime));
                 cv.put(DBConfig.OCCount.Column.ST, ZERO);
                 cv.put(DBConfig.OCCount.Column.RS, ONE);

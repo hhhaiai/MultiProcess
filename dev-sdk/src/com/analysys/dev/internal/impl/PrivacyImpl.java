@@ -446,17 +446,18 @@ public class PrivacyImpl {
      *
      * @return
      */
-    public static List<Process> getTopPkg() {
+    public static List<Process> getTopPkg( String top, String ps) {
         List<Process> infos = new ArrayList<Process>();
 //        String top = Utils.exec(new String[]{"top", "-n", "1"});
-        String top = Utils.shell("top -n 1");
-        if (TextUtils.isEmpty(top)) {
-            top = Utils.shell("ps -P -p -x -c");
-            if(TextUtils.isEmpty(top)){
+        String sourceData = top;
+
+        if (TextUtils.isEmpty(sourceData)) {
+            sourceData = ps;
+            if(TextUtils.isEmpty(sourceData)){
                 return infos;
             }
         }
-        String[] tts = top.split("\n");
+        String[] tts = sourceData.split("\n");
         if (tts != null && tts.length > 0) {
             for (int i = 0; i < tts.length; i++) {
                 try {

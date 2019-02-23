@@ -63,7 +63,7 @@ public class AppSnapshotImpl {
                 public void run() {
                     Map<String, String> dbSnapshotsMap = TableAppSnapshot.getInstance(mContext).mSelect();
                     List<JSONObject> currentSnapshotsList = getCurrentSnapshots();
-                    if (!dbSnapshotsMap.isEmpty()) {
+                    if (dbSnapshotsMap !=null  && !dbSnapshotsMap.isEmpty()) {
                         currentSnapshotsList = getDifference(currentSnapshotsList, dbSnapshotsMap);
                     }
                     TableAppSnapshot.getInstance(mContext).coverInsert(currentSnapshotsList);

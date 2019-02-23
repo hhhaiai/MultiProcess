@@ -71,12 +71,12 @@ public class CheckHeartbeat {
     }
 
     private static final int MSG_CHECK = 0x0c;
-//    /**
-//     * 空闲时,自动退出,如果有事件进来,自动调起. reboot只需要关闭一次就可以了
-//     */
-//    public void reboot() {
-//        if (null != thread) {
-//            thread.quit();
-//        }
-//    }
+    /**
+     * 空闲时,自动退出,如果有事件进来,自动调起. reboot只需要关闭一次就可以了
+     */
+    public void reboot() {
+        if (null != thread) {
+            thread.quit();
+        }
+    }
 }

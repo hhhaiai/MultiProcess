@@ -47,7 +47,7 @@ public class RequestUtils {
     PrintWriter pw;
     byte[] buffer = new byte[1024];
     try {
-        ELOG.i("value::::::::::"+ URLEncoder.encode(value,"UTF-8"));
+//        ELOG.i("value::::::::::"+ URLEncoder.encode(value,"UTF-8"));
         urlP = new URL(url);
         connection = (HttpURLConnection) urlP.openConnection();
         connection.setDoInput(true);
@@ -78,7 +78,7 @@ public class RequestUtils {
           bos = new ByteArrayOutputStream();
           int len;
           while (-1 != (len = is.read(buffer))) {
-          bos.write(buffer, 0, len);
+            bos.write(buffer, 0, len);
           }
           bos.flush();
           return bos.toString("utf-8");

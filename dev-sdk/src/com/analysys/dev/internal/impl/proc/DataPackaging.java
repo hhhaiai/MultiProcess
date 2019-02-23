@@ -1,13 +1,13 @@
 package com.analysys.dev.internal.impl.proc;
 
 import android.content.Context;
-import android.text.TextUtils;
 
-import com.analysys.dev.database.DBConfig;
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.impl.DeviceImpl;
-import com.analysys.dev.internal.impl.OCImpl;
+
+import com.analysys.dev.internal.impl.PolicyImpl;
+import com.analysys.dev.internal.impl.SenSorModuleNameImpl;
 import com.analysys.dev.model.BatteryModuleNameInfo;
 import com.analysys.dev.utils.ELOG;
 
@@ -58,25 +58,33 @@ public class DataPackaging {
             deviceInfo.put(DeviceKeyContacts.DevInfo.TempID, devImpl.getTempID());
 //            ELOG.i("deviceInfo ::::::"+deviceInfo);
 
-            if (EGContext.SWITCH_OF_PREVENT_CHEATING) {
+            if (PolicyImpl.getInstance(mContext).getValueFromSp(EGContext.PREVENT_CHEATING_SWITCH,EGContext.SWITCH_OF_PREVENT_CHEATING)) {
                 deviceInfo.put(DeviceKeyContacts.DevInfo.Simulator, devImpl.isSimulator());
                 deviceInfo.put(DeviceKeyContacts.DevInfo.Debug, devImpl.getDebug());
                 deviceInfo.put(DeviceKeyContacts.DevInfo.Hijack, devImpl.isHijack());//0表示没有被劫持,1表示被劫持
                 deviceInfo.put(DeviceKeyContacts.DevInfo.IsRoot, devImpl.IsRoot());
             }
-            if (EGContext.SWITCH_OF_BLUETOOTH) {
+
+            if (PolicyImpl.getInstance(mContext).getValueFromSp(EGContext.BLUETOOTH_SWITCH,EGContext.SWITCH_OF_BLUETOOTH)) {
                 deviceInfo.put(DeviceKeyContacts.DevInfo.BluetoothMac, devImpl.getBluetoothMac());
                 deviceInfo.put(DeviceKeyContacts.DevInfo.BluetoothName, devImpl.getBluetoothName());
             }
-            if (EGContext.SWITCH_OF_SYSTEM_INFO) {
+            if (PolicyImpl.getInstance(mContext).getValueFromSp(EGContext.SYSTEM_INFO_SWITCH,EGContext.SWITCH_OF_SYSTEM_INFO)) {
                 deviceInfo.put(DeviceKeyContacts.DevInfo.SystemFontSize, devImpl.getSystemFontSize());
                 deviceInfo.put(DeviceKeyContacts.DevInfo.SystemHour, devImpl.getSystemHour());
                 deviceInfo.put(DeviceKeyContacts.DevInfo.SystemLanguage, devImpl.getSystemLanguage());
                 deviceInfo.put(DeviceKeyContacts.DevInfo.SystemArea, devImpl.getSystemArea());
                 deviceInfo.put(DeviceKeyContacts.DevInfo.TimeZone, devImpl.getTimeZone());
             }
+            if(PolicyImpl.getInstance(mContext).getValueFromSp(EGContext.SENSOR_SWITCH,EGContext.SWITCH_OF_SENSOR)){
+                JSONArray senSorArray = SenSorModuleNameImpl.getInstance(mContext).getSensorInfo();
+                if(senSorArray != null && senSorArray.length()>0){
+                    deviceInfo.put(DeviceKeyContacts.DevInfo.SenSorModuleName,senSorArray);
+                }
+            }
             JSONObject batteryJson = new JSONObject();
-            if (EGContext.SWITCH_OF_BATTERY) {
+
+            if (PolicyImpl.getInstance(mContext).getValueFromSp(EGContext.BATTERY_SWITCH,EGContext.SWITCH_OF_BATTERY)) {
                 BatteryModuleNameInfo battery = BatteryModuleNameInfo.getInstance();
 //                if (!TextUtils.isEmpty(battery.getBatteryStatus()))
                     batteryJson.put(DeviceKeyContacts.DevInfo.BatteryStatus, battery.getBatteryStatus());
@@ -93,7 +101,8 @@ public class DataPackaging {
 //                if (!TextUtils.isEmpty(battery.getBatteryTemperature()))
                     batteryJson.put(DeviceKeyContacts.DevInfo.BatteryTemperature, battery.getBatteryTemperature());
             }
-            if (EGContext.SWITCH_OF_DEV_FURTHER_DETAIL) {
+
+            if (PolicyImpl.getInstance(mContext).getValueFromSp(EGContext.DEV_FURTHER_DETAIL_SWITCH,EGContext.SWITCH_OF_DEV_FURTHER_DETAIL)) {
                 batteryJson.put(DeviceKeyContacts.DevInfo.CPUModel, devImpl.getCPUModel());
                 batteryJson.put(DeviceKeyContacts.DevInfo.BuildId, devImpl.getBuildId());
                 batteryJson.put(DeviceKeyContacts.DevInfo.BuildDisplay, devImpl.getBuildDisplay());

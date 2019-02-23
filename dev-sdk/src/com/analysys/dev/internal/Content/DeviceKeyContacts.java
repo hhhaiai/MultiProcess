@@ -189,6 +189,7 @@ public class DeviceKeyContacts {
     public static final String BuildCodename = "BC";
     // 谷歌广告ID.
     public static final String IDFA = "IDFA";
+
   }
 
   /**
@@ -343,6 +344,8 @@ public class DeviceKeyContacts {
     public static final String RES_POLICY = "policy";
     // 策略版本
     public static final String RES_POLICY_VERSION = "policyVer";
+    // 策略--失败
+    public static final String RES_POLICY_FAIL = "policyVer";
     // 服务器延迟上传时间
     public static final String RES_POLICY_SERVERDELAY = "serverDelay";
     // 上传失败次数
@@ -372,24 +375,35 @@ public class DeviceKeyContacts {
     //动态采集模块
     public static final String RES_POLICY_CTRL_LIST = "ctrlList";
 
-    /*
-     *  拉活服务 相关的
-     */
-    public static final String RES_POLICY_SERVICEPULL = "servicePull";
-    public static final String RES_POLICY_SERVICEPULL_PACKAGENAME = "packageName";
-    public static final String RES_POLICY_SERVICEPULL_CLASSNAME = "className";
-    public static final String RES_POLICY_SERVICEPULL_ACTION = "action";
-    public static final String RES_POLICY_SERVICEPULL_EXTRA = "extra";
 
-    /*
-     * deeplink拉活
-     */
-    public static final String RES_POLICY_APPPULL = "appPull";
-    public static final String RES_POLICY_APPPULL_PACKAGENAME = "packageName";
-    public static final String RES_POLICY_APPPULL_DEEPLINK = "deepLink";
-    public static final String RES_POLICY_APPPULL_TITLE = "title";
-    public static final String RES_POLICY_APPPULL_CONTENT = "content";
-    public static final String RES_POLICY_APPPULL_ICON = "icon";
+    //动态采集模块
+    public static final String RES_POLICY_CTRL_MODULE = "module";
+    //动态采集模块
+    public static final String RES_POLICY_CTRL_STATUS = "status";
+    //动态采集模块
+    public static final String RES_POLICY_CTRL_DEUFREQ = "deuFreq";
+    //动态采集模块
+    public static final String RES_POLICY_CTRL_MINFREQ= "minFreq";
+    //动态采集模块
+    public static final String RES_POLICY_CTRL_MAXFREQ = "maxFreq";
+    //动态采集模块
+    public static final String RES_POLICY_CTRL_MAXCOUNT = "maxCount";
+    //动态采集模块
+    public static final String RES_POLICY_CTRL_SUBCONTROL = "subControl";
+    //动态采集模块
+    public static final String RES_POLICY_CTRL_SUBMODULE = "submodule";
+    //动态采集模块
+    public static final String RES_POLICY_CTRL_SUBSTATUS = "sub_status";
+    //动态采集模块
+    public static final String RES_POLICY_CTRL_SUB_DEUFREQ = "sub_deuFreq";
+    //动态采集模块
+    public static final String RES_POLICY_CTRL_SUB_MINFREQ = "sub_minFreq";
+    //动态采集模块
+    public static final String RES_POLICY_CTRL_SUB_MAXFREQ = "sub_maxFreq";
+    //动态采集模块
+    public static final String RES_POLICY_CTRL_COUNT= "count";
+
+
 
     /*
      * oc打开应用次数限制.暂时没用
@@ -398,15 +412,6 @@ public class DeviceKeyContacts {
     public static final String RES_POLICY_OCRULE_MERGEINTERVAL = "mergeInterval";
     public static final String RES_POLICY_OCRULE_MINDURATION = "minDuration";
 
-    /*
-     * 广告
-     */
-    public static final String RES_POLICY_AD = "ad";
-    public static final String RES_POLICY_AD_ID = "id";
-    public static final String RES_POLICY_AD_TITLE = "title";
-    public static final String RES_POLICY_AD_CONTENT = "content";
-    public static final String RES_POLICY_AD_ICON = "icon";
-    public static final String RES_POLICY_AD_URL = "url";
 
     /*
      * 是否同意隐私权限

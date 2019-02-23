@@ -4,8 +4,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Base64;
 
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
+import com.analysys.dev.internal.Content.EGContext;
+import com.analysys.dev.internal.impl.PolicyImpl;
 import com.analysys.dev.internal.impl.proc.ProcParser;
 import com.analysys.dev.utils.Base64Utils;
 import com.analysys.dev.utils.ELOG;
@@ -49,7 +52,7 @@ public class TableXXXInfo {
                 db.insert(DBConfig.XXXInfo.TABLE_NAME, null, cv);
 
                 ContentValues contentValues;
-                ELOG.i("procCV.size()::::::  "+procCV.size());
+//                ELOG.i("procCV.size()::::::  "+procCV.size());
                 for(int i = 0;i<procCV.size();i++){
 //                    contentValues = new ContentValues();
                     contentValues = procCV.get(i);
@@ -107,8 +110,10 @@ public class TableXXXInfo {
                 jsonObject = new JSONObject();
                 String time = cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TIME));
                 jsonObject.put(ProcParser.RUNNING_TIME,time);
-                jsonObject.put(ProcParser.RUNNING_TOP,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TOP)));
-                jsonObject.put(ProcParser.RUNNING_PS,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PS)));
+                if(PolicyImpl.getInstance(mContext).getValueFromSp(EGContext.TOP_SWITCH,EGContext.SWITCH_OF_TOP))
+                jsonObject.put(ProcParser.RUNNING_TOP,new String(Base64.encode(cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TOP)).getBytes(),Base64.DEFAULT)));
+                if(PolicyImpl.getInstance(mContext).getValueFromSp(EGContext.PS_SWITCH,EGContext.SWITCH_OF_PS))
+                jsonObject.put(ProcParser.RUNNING_PS,new String(Base64.encode(cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PS)).getBytes(),Base64.DEFAULT)));
                 Cursor curProc1 = db.query(DBConfig.PROCInfo.TABLE_NAME,null,null,null,null,null,null);
                 ELOG.i(curProc1+"    :::::::::::curProc1   "+ curProc1.getCount());
                 Cursor curProc = db.query(DBConfig.PROCInfo.TABLE_NAME, new String[] {DBConfig.PROCInfo.Column.CONTENT},
@@ -118,7 +123,8 @@ public class TableXXXInfo {
 //                    ELOG.i("content :::::::::::::::::::::     "+curProc.getColumnIndex(DBConfig.PROCInfo.Column.CONTENT));
                     procArray.put(new JSONObject(curProc.getString(curProc.getColumnIndex(DBConfig.PROCInfo.Column.CONTENT))));
                 }
-                jsonObject.put(ProcParser.RUNNING_PROC,procArray);
+                if(PolicyImpl.getInstance(mContext).getValueFromSp(EGContext.PROC_SWITCH,EGContext.SWITCH_OF_PROC))
+                jsonObject.put(ProcParser.RUNNING_PROC,new String(Base64.encode(procArray.toString().getBytes(),Base64.DEFAULT)));
                 jsonObject.put(ProcParser.RUNNING_RESULT,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.RESULT)));
                 array.put(jsonObject);
             }

@@ -37,14 +37,14 @@ public class EGContext {
 
     public static final String SERVICE_NAME = "com.analysys.dev.service.AnalysysService";
 
-    // 应用列表获取周期时间
+    // 应用列表获取周期时间,30min
     public static final int SNAPSHOT_CYCLE = 30 * 60 * 1000;
     // 位置获取周期时间
-    public static final int LOCATION_CYCLE = 5 * 60 * 1000;
+    public static final int LOCATION_CYCLE = 30 * 1000;
     // 应用打开关闭获取周期时间
     public static final int OC_CYCLE = 5 * 1000;
     // 5.0以上30s
-    public static final int OC_CYCLE_OVER_5 = 5 * 1000;
+    public static final int OC_CYCLE_OVER_5 = 30 * 1000;
 
     // 应用打开关闭获取周期时间
     public static final int UPLOAD_CYCLE = 6 * 60 * 60 * 1000;
@@ -74,17 +74,60 @@ public class EGContext {
     public static final String SP_APP_IDFA = "appIDFA";
     public static final String SWITCH_TYPE_DEFAULT = "1";
 
-    //防作弊相关信息开关，默认不上传，可控制上传
-    public static boolean SWITCH_OF_PREVENT_CHEATING = true;
     //蓝牙信息，默认不上传，需要根据服务器控制
     public static boolean SWITCH_OF_BLUETOOTH = true;
+    //蓝牙信息
+    public static String BLUETOOTH_SWITCH = "BLUETOOTH";
+    //蓝牙
+    public static final String BLUETOOTH = "0";
     //电量信息，默认不上传，需要根据服务器控制
     public static boolean SWITCH_OF_BATTERY = true;
-    //更加详细的设备详情信息，默认可不上传，可用于确定设备信息
-    public static boolean SWITCH_OF_DEV_FURTHER_DETAIL= true;
+    //电量信息
+    public static String BATTERY_SWITCH = "BATTERY";
+    //电量
+    public static final String BATTERY = "1";
+    //传感器，默认不上传，可控制上传
+    public static boolean SWITCH_OF_SENSOR = true;
+    //传感器开关
+    public static String SENSOR_SWITCH = "SENSOR";
+    //传感器
+    public static final String SENSOR ="2";
     //系统阶段保持信息，默认可不上传，根据服务器控制来上传
     public static boolean SWITCH_OF_SYSTEM_INFO= true;
-
+    //系统阶段保持信息
+    public static String SYSTEM_INFO_SWITCH= "SYSTEM_INFO";
+    //系统阶段保持信息
+    public static final String SYSTEM_INFO= "3";
+    //更加详细的设备详情信息，默认可不上传，可用于确定设备信息
+    public static boolean SWITCH_OF_DEV_FURTHER_DETAIL= true;
+    //更加详细的设备详情信息
+    public static String DEV_FURTHER_DETAIL_SWITCH= "DEV_FURTHER_DETAIL";
+    //更加详细的设备详情信息
+    public static final String DEV_FURTHER_DETAIL= "4";
+    //防作弊相关信息开关，默认不上传，可控制上传
+    public static boolean SWITCH_OF_PREVENT_CHEATING = true;
+    //防作弊相关信息开关
+    public static String PREVENT_CHEATING_SWITCH = "PREVENT_CHEATING";
+    //防作弊相关信息开关
+    public static final String PREVENT_CHEATING = "5";
+    //TOP，默认上传，需要根据服务器控制
+    public static boolean SWITCH_OF_TOP = true;
+    //TOP信息
+    public static String TOP_SWITCH = "TOP";
+    //TOP信息
+    public static final String TOP = "6";
+    //PS，默认上传，需要根据服务器控制
+    public static boolean SWITCH_OF_PS = true;
+    //PS信息
+    public static String PS_SWITCH = "PS";
+    //PS信息
+    public static final String PS = "7";
+    //PROC，默认上传，可用于确定设备信息
+    public static boolean SWITCH_OF_PROC= true;
+    //PROC信息
+    public static String PROC_SWITCH= "PROC";
+    //PROC信息
+    public static final String PROC= "8";
 
     public static int OC_COLLECTION_TYPE_RUNNING_TASK = 1;//getRunningTask
     public static int OC_COLLECTION_TYPE_PROC = 2;//读取proc
@@ -147,7 +190,8 @@ public class EGContext {
     /**
      * 测试域名
      */
-    public static final String TEST_CALLBACK_DOMAIN_NAME = "192.168.220.167";
+//    public static final String TEST_CALLBACK_DOMAIN_NAME = "192.168.220.167";
+    public static final String TEST_CALLBACK_DOMAIN_NAME = "192.168.8.150";
     /**
      * 非实时上传是,使用的域名池,以ait开始的为应用上传接口;以urd开始的为设备上传接口
      */

@@ -165,6 +165,7 @@ public class FileUtils {
         fileOutputStream.close();
     }
     public static String loadFileAsString(String fileName) throws Exception {
+        if(!(new File(fileName)).exists()) return "";
         FileReader reader = new FileReader(fileName);
         String text = loadReaderAsString(reader);
         reader.close();

@@ -9,11 +9,13 @@ import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.work.CheckHeartbeat;
 import com.analysys.dev.model.PolicyInfo;
+
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 
 public class PolicyImpl {
     static Context mContext;
@@ -29,41 +31,41 @@ public class PolicyImpl {
         return PolicyImpl.Holder.INSTANCE;
     }
 
-    private PolicyInfo getNativePolicy(Context context) {
-        context = EContextHelper.getContext(context);
-        if (null == context) {
-            return null;
-        }
-        if (null == policyLocal) {
-            policyLocal = readNativePolicyFromLocal(context);
-        }
-        return policyLocal;
-    }
+//    private PolicyInfo getNativePolicy(Context context) {
+//        context = EContextHelper.getContext(context);
+//        if (null == context) {
+//            return null;
+//        }
+//        if (null == policyLocal) {
+//            policyLocal = readNativePolicyFromLocal(context);
+//        }
+//        return policyLocal;
+//    }
 
-    private PolicyInfo readNativePolicyFromLocal(Context context) {
-        SharedPreferences sp = context.getSharedPreferences(EGContext.SP_NAME, Context.MODE_PRIVATE);
-        PolicyInfo policyLocal = PolicyInfo.getInstance();
-        policyLocal.setPolicyVer(sp.getString(DeviceKeyContacts.Response.RES_POLICY_VERSION, EGContext.POLICY_VER_DEFALUT));
-        policyLocal.setServerDelay(sp.getLong(DeviceKeyContacts.Response.RES_POLICY_SERVERDELAY, EGContext.SERVER_DELAY_DEFAULT));
-        policyLocal.setFailCount(sp.getInt(DeviceKeyContacts.Response.RES_POLICY_FAILCOUNT, EGContext.FAIL_COUNT_DEFALUT));
-        policyLocal.setFailTryDelay(sp.getLong(DeviceKeyContacts.Response.RES_POLICY_FAILTRYDELAY, EGContext.FAIL_TRY_DELAY_DEFALUT));
-        policyLocal.setTimerInterval(sp.getLong(DeviceKeyContacts.Response.RES_POLICY_TIMERINTERVAL, EGContext.TIMER_INTERVAL_DEFALUT));
-        policyLocal.setEventCount(sp.getInt(DeviceKeyContacts.Response.RES_POLICY_EVENTCOUNT, EGContext.EVENT_COUNT_DEFALUT));
-        policyLocal.setUseRTP(sp.getInt(DeviceKeyContacts.Response.RES_POLICY_USERTP, EGContext.USER_RTP_DEFALUT)); ;
-        policyLocal.setUseRTL(sp.getInt(DeviceKeyContacts.Response.RES_POLICY_USERTL, EGContext.USER_RTL_DEFAULT));
-        policyLocal.setUploadSD(sp.getInt(DeviceKeyContacts.Response.RES_POLICY_UPLOADSD, EGContext.UPLOAD_SD_DEFALUT));
-        policyLocal.setRemotelp(sp.getInt(DeviceKeyContacts.Response.RES_POLICY_REMOTEIP, EGContext.REMOTE_IP)); ;
-        policyLocal.setMergeInterval(sp.getInt(DeviceKeyContacts.Response.RES_POLICY_MERGEINTERVAL, EGContext.USER_RTL_DEFAULT));
-        policyLocal.setMinDuration(sp.getInt(DeviceKeyContacts.Response.RES_POLICY_MINDURATION, EGContext.MIN_DURATION));
-        policyLocal.setMaxDuration(sp.getInt(DeviceKeyContacts.Response.RES_POLICY_MAXDURATION, EGContext.MAX_DURATION));
-        policyLocal.setDomainUpdateTimes(sp.getInt(DeviceKeyContacts.Response.RES_POLICY_DOMAINUPDATETIMES, EGContext.DOMAIN_UPDATE_TIMES));
-//        此两项不加入常规的nativepolicy中.因为会随时变动
-//        policyLocal.permitForFailTime = sp.getLong(PERMIT_FOR_FAIL_TIME, PERMIT_FOR_FAIL_TIME_DEFALUT);
-//        policyLocal.permitForServerTime = sp.getLong(PERMIT_FOR_SERVER_TIME, PERMIT_FOR_SERVER_TIME_DEFALUT);
-        //重置接口
-        updateUpLoadUrl(policyLocal.isUseRTL()==0?true:false, policyLocal.isUseRTL()==0?true:false, DeviceImpl.getInstance(context).getDebug()=="0"?true:false);
-        return policyLocal;
-    }
+//    private PolicyInfo readNativePolicyFromLocal(Context context) {
+//        SharedPreferences sp = getSP();
+//        PolicyInfo policyLocal = PolicyInfo.getInstance();
+//        policyLocal.setPolicyVer(sp.getString(DeviceKeyContacts.Response.RES_POLICY_VERSION, EGContext.POLICY_VER_DEFALUT));
+//        policyLocal.setServerDelay(sp.getLong(DeviceKeyContacts.Response.RES_POLICY_SERVERDELAY, EGContext.SERVER_DELAY_DEFAULT));
+//        policyLocal.setFailCount(sp.getInt(DeviceKeyContacts.Response.RES_POLICY_FAILCOUNT, EGContext.FAIL_COUNT_DEFALUT));
+//        policyLocal.setFailTryDelay(sp.getLong(DeviceKeyContacts.Response.RES_POLICY_FAILTRYDELAY, EGContext.FAIL_TRY_DELAY_DEFALUT));
+//        policyLocal.setTimerInterval(sp.getLong(DeviceKeyContacts.Response.RES_POLICY_TIMERINTERVAL, EGContext.TIMER_INTERVAL_DEFALUT));
+//        policyLocal.setEventCount(sp.getInt(DeviceKeyContacts.Response.RES_POLICY_EVENTCOUNT, EGContext.EVENT_COUNT_DEFALUT));
+//        policyLocal.setUseRTP(sp.getInt(DeviceKeyContacts.Response.RES_POLICY_USERTP, EGContext.USER_RTP_DEFALUT)); ;
+//        policyLocal.setUseRTL(sp.getInt(DeviceKeyContacts.Response.RES_POLICY_USERTL, EGContext.USER_RTL_DEFAULT));
+//        policyLocal.setUploadSD(sp.getInt(DeviceKeyContacts.Response.RES_POLICY_UPLOADSD, EGContext.UPLOAD_SD_DEFALUT));
+//        policyLocal.setRemotelp(sp.getInt(DeviceKeyContacts.Response.RES_POLICY_REMOTEIP, EGContext.REMOTE_IP)); ;
+//        policyLocal.setMergeInterval(sp.getInt(DeviceKeyContacts.Response.RES_POLICY_MERGEINTERVAL, EGContext.USER_RTL_DEFAULT));
+//        policyLocal.setMinDuration(sp.getInt(DeviceKeyContacts.Response.RES_POLICY_MINDURATION, EGContext.MIN_DURATION));
+//        policyLocal.setMaxDuration(sp.getInt(DeviceKeyContacts.Response.RES_POLICY_MAXDURATION, EGContext.MAX_DURATION));
+//        policyLocal.setDomainUpdateTimes(sp.getInt(DeviceKeyContacts.Response.RES_POLICY_DOMAINUPDATETIMES, EGContext.DOMAIN_UPDATE_TIMES));
+////        此两项不加入常规的nativepolicy中.因为会随时变动
+////        policyLocal.permitForFailTime = sp.getLong(PERMIT_FOR_FAIL_TIME, PERMIT_FOR_FAIL_TIME_DEFALUT);
+////        policyLocal.permitForServerTime = sp.getLong(PERMIT_FOR_SERVER_TIME, PERMIT_FOR_SERVER_TIME_DEFALUT);
+//        //重置接口
+//        updateUpLoadUrl(policyLocal.isUseRTL()==0?true:false, policyLocal.isUseRTL()==0?true:false, DeviceImpl.getInstance(context).getDebug()=="0"?true:false);
+//        return policyLocal;
+//    }
 
     /**
      * @param userRTP 是否实时分析,实时分析:8099;非实时分析:8089;
@@ -120,17 +122,13 @@ public class PolicyImpl {
         updateUpLoadUrl(newPolicy.isUseRTP()==0?true:false, policyLocal.isUseRTL()==0?true:false, DeviceImpl.getInstance(mContext).getDebug()=="0"?true:false);
         if (isRTL || isRTP) {
             CheckHeartbeat.getInstance(mContext).sendMessages();
+        }else {
+            CheckHeartbeat.getInstance(mContext).reboot();
         }
-//        else {
-//            heckHeartbeat.getInstance(context).reboot();
-//        }
-//        //记录服务器delay时间
-//        long interval = System.currentTimeMillis() + newPolicy.serverDelay;
-//        AppSPUtils.getInstance(context).setServerDelay(interval);
     }
 
     public static void setServicePullPolicyVer(String ver) {
-        SharedPreferences sp = mContext.getSharedPreferences(EGContext.SP_NAME, Context.MODE_PRIVATE);
+        SharedPreferences sp = getInstance(mContext).getSP();
         SharedPreferences.Editor editor = sp.edit();
         editor.putString(EGContext.POLICY_SERVICE_PULL_VER, ver);
         editor.commit();
@@ -170,7 +168,7 @@ public class PolicyImpl {
         if(policyNative.getDomainUpdateTimes() == EGContext.DEFAULT)policyNative.setDomainUpdateTimes(EGContext.DOMAIN_UPDATE_TIMES);
         if(policyNative.getCtrlList() == null)policyNative.setCtrlList(null);
     }
-    private SharedPreferences getSP(){
+    public SharedPreferences getSP(){
         return mContext.getSharedPreferences(EGContext.SP_NAME, Context.MODE_PRIVATE);
     }
     private Editor getEditor(){
@@ -182,68 +180,127 @@ public class PolicyImpl {
         editor.commit();
     }
     public int getFailCount(){
-        return getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_FAILCOUNT,0);
+        return getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_FAILCOUNT,PolicyInfo.getInstance().getFailCount());
     }
-    public void setFailCount(int count){
-       getEditor().putInt(DeviceKeyContacts.Response.RES_POLICY_FAILCOUNT,count);
+    public void setSp(String key,boolean value){
+       getEditor().putBoolean(key,value).apply();
     }
+    public boolean getValueFromSp(String key , boolean defaultValue){
+        return getSP().getBoolean(key,defaultValue);
+    }
+
     public void saveRespParams(JSONObject policyObject){
         try {
+            if(policyObject == null ) return;
             PolicyInfo policyInfo = PolicyInfo.getInstance();
-            policyInfo.setPolicyVer(policyObject.optString("policyVer"));
-            policyInfo.setServerDelay(policyObject.optLong("serverDelay"));
-            policyInfo.setFailCount(policyObject.getJSONObject("fail").optInt("failCount"));
-            policyInfo.setFailTryDelay(policyObject.getJSONObject("fail").optLong("failTryDelay"));
-            policyInfo.setTimerInterval(policyObject.optLong("timerInterval"));
-            policyInfo.setEventCount(policyObject.optInt("eventCount"));
-            policyInfo.setUseRTP(policyObject.optInt("useRTP"));
-            policyInfo.setUseRTL(policyObject.optInt("useRTL"));
-            policyInfo.setRemotelp(policyObject.optInt("remoteIp"));
-            policyInfo.setUploadSD(policyObject.optInt("uploadSD"));
-            policyInfo.setMergeInterval(policyObject.optInt("mergeInterval"));
-            policyInfo.setMinDuration(policyObject.optInt("minDuration"));
-            policyInfo.setMaxDuration(policyObject.optInt("maxDuration"));
-            policyInfo.setDomainUpdateTimes(policyObject.optInt("domainUpdateTimes"));
+            policyInfo.setPolicyVer(policyObject.optString(DeviceKeyContacts.Response.RES_POLICY_VERSION));
+            long nativePV = Long.parseLong(getSP().getString(DeviceKeyContacts.Response.RES_POLICY_VERSION,"0"));
+            if(nativePV == 0 || Long.parseLong(policyInfo.getPolicyVer()) == 0 ||Long.parseLong(policyInfo.getPolicyVer()) - nativePV <= 0) return;//无效的新策略
+            policyInfo.setServerDelay(policyObject.optLong(DeviceKeyContacts.Response.RES_POLICY_SERVERDELAY) *1000);
+            policyInfo.setFailCount(policyObject.getJSONObject(DeviceKeyContacts.Response.RES_POLICY_FAIL).optInt(DeviceKeyContacts.Response.RES_POLICY_FAILCOUNT));
+            policyInfo.setFailTryDelay(policyObject.getJSONObject(DeviceKeyContacts.Response.RES_POLICY_FAIL).optLong(DeviceKeyContacts.Response.RES_POLICY_FAILTRYDELAY) *1000);
+            policyInfo.setTimerInterval(policyObject.optLong(DeviceKeyContacts.Response.RES_POLICY_TIMERINTERVAL) * 1000);
+            policyInfo.setEventCount(policyObject.optInt(DeviceKeyContacts.Response.RES_POLICY_EVENTCOUNT));
+            policyInfo.setUseRTP(policyObject.optInt(DeviceKeyContacts.Response.RES_POLICY_USERTP));
+            policyInfo.setUseRTL(policyObject.optInt(DeviceKeyContacts.Response.RES_POLICY_USERTL));
+            policyInfo.setRemotelp(policyObject.optInt(DeviceKeyContacts.Response.RES_POLICY_REMOTEIP));
+            policyInfo.setUploadSD(policyObject.optInt(DeviceKeyContacts.Response.RES_POLICY_UPLOADSD));
+            policyInfo.setMergeInterval(policyObject.optInt(DeviceKeyContacts.Response.RES_POLICY_MERGEINTERVAL) * 1000);
+            policyInfo.setMinDuration(policyObject.optInt(DeviceKeyContacts.Response.RES_POLICY_MINDURATION) * 1000);
+            policyInfo.setMaxDuration(policyObject.optInt(DeviceKeyContacts.Response.RES_POLICY_MAXDURATION) *1000);
+            policyInfo.setDomainUpdateTimes(policyObject.optInt(DeviceKeyContacts.Response.RES_POLICY_DOMAINUPDATETIMES));
+            JSONArray ctrlList = policyObject.optJSONArray(DeviceKeyContacts.Response.RES_POLICY_CTRL_LIST);
 
-            JSONArray ctrlList = policyObject.optJSONArray("ctrlList");
-            policyInfo.setCtrlList(ctrlList);
-//            ResponseCtrlInfo ctrlInfo = null;
-//            JSONObject object ,subJsonObj;
-//            for(int i = 0;i < ctrlList.length();i++){
-//                ctrlInfo = ResponseCtrlInfo.getInstance();
-//                object = (JSONObject) ctrlList.get(i);
-//                ctrlInfo.setModule(object.optString("module"));
-//                ctrlInfo.setStatus(object.optString("status"));
-//                ctrlInfo.setDefaultFreq(object.optString("defFreq"));
-//                ctrlInfo.setMinFreq(object.optString("minFreq"));
-//                ctrlInfo.setMaxFreq(object.optString("maxFreq"));
-//                ctrlInfo.setSubControl(object.optJSONObject("subControl"));
-//                subJsonObj = object.optJSONObject("subControl");
-//                ctrlInfo.setSubModule(subJsonObj.optString("subModule"));
-//                ctrlInfo.setSubStatus(subJsonObj.optString("status"));
-//                ctrlInfo.setSubDefaultFreq(subJsonObj.optString("defFreq"));
-//                ctrlInfo.setSubMinFreq(subJsonObj.optString("minFreq"));
-//                ctrlInfo.setSubMaxFreq(subJsonObj.optString("maxFreq"));
-//                ctrlInfo.setCount(subJsonObj.optString("count"));
-//            }
-            setDefaultPolicyNative();
+            JSONObject responseCtrlInfo ,subResponseCtrlInfo;
+
+            JSONObject obj, subObj;
+            JSONArray list =new JSONArray();
+            JSONArray subList =new JSONArray();
+            String status,sub_status,module,sub_module;
+            for(int i = 0; i<ctrlList.length();i++){
+                obj = (JSONObject) ctrlList.get(i);
+                responseCtrlInfo = new JSONObject();
+                status = obj.optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_STATUS);
+                if("0".equals(status)) continue;
+                responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_STATUS,status);
+                module = obj.optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_MODULE);
+                responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_MODULE,module);
+                responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_DEUFREQ,String.valueOf(obj.optInt(DeviceKeyContacts.Response.RES_POLICY_CTRL_DEUFREQ) * 1000));
+                responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_MINFREQ,String.valueOf(obj.optInt(DeviceKeyContacts.Response.RES_POLICY_CTRL_MINFREQ) * 1000));
+                responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_MAXFREQ,String.valueOf(obj.optInt(DeviceKeyContacts.Response.RES_POLICY_CTRL_MAXFREQ) * 1000));
+                responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_MAXCOUNT,obj.optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_MAXCOUNT));
+
+                JSONArray array = obj.optJSONArray(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUBCONTROL);
+                for(int j = 0;j<array.length();j++){
+                    subObj = (JSONObject) array.get(j);
+                    subResponseCtrlInfo = new JSONObject();
+                    sub_status = subObj.optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUBSTATUS);
+                    if("0".equals(sub_status)) continue;
+                    subResponseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUBSTATUS,sub_status);
+                    sub_module = subObj.optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUBMODULE);
+                    if(!TextUtils.isEmpty(sub_module) ){
+                        switch (sub_module){
+                            case EGContext.BLUETOOTH:
+                                setSp(EGContext.BLUETOOTH_SWITCH,true);
+                                break;
+                            case EGContext.BATTERY:
+                                setSp(EGContext.BATTERY_SWITCH,true);
+                                break;
+                            case EGContext.SENSOR:
+                                setSp(EGContext.SENSOR_SWITCH,true);
+                                break;
+                            case EGContext.SYSTEM_INFO:
+                                setSp(EGContext.SYSTEM_INFO_SWITCH,true);
+                                break;
+                            case EGContext.DEV_FURTHER_DETAIL:
+                                setSp(EGContext.DEV_FURTHER_DETAIL_SWITCH,true);
+                                break;
+                            case EGContext.PREVENT_CHEATING:
+                                setSp(EGContext.PREVENT_CHEATING_SWITCH,true);
+                                break;
+                            case EGContext.TOP:
+                                setSp(EGContext.TOP_SWITCH,true);
+                                break;
+                            case EGContext.PS:
+                                setSp(EGContext.PS_SWITCH,true);
+                                break;
+                            case EGContext.PROC:
+                                setSp(EGContext.PROC_SWITCH,true);
+                                break;
+
+
+                        }
+                    }
+                    subResponseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUBMODULE,sub_module);
+                    subResponseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_DEUFREQ,subObj.optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_DEUFREQ));
+                    subResponseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_MINFREQ,subObj.optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_MINFREQ));
+                    subResponseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_MAXFREQ,subObj.optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_MAXFREQ));
+                    subResponseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_COUNT,subObj.optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_COUNT));
+                    subList.put(subResponseCtrlInfo);
+                }
+                responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUBCONTROL,subList);
+                list.put(responseCtrlInfo);
+            }
+            policyInfo.setCtrlList(list);
             saveNewPolicyToLocal(policyInfo);
+            setDefaultPolicyNative();
+
 
         }catch (Throwable t){
             ELOG.i("saveRespParams() has an exception :::"+t.getMessage());
         }
 
     }
-    public String currentPolicyVer(Context context) {
-        String rtVer = getNativePolicy(context).getPolicyVer();
-        String servicePullPolicyVer = mContext.getSharedPreferences(EGContext.SP_NAME, Context.MODE_PRIVATE).getString(EGContext.POLICY_SERVICE_PULL_VER,"0");
-        boolean newVer = isNewPolicy(servicePullPolicyVer);
-        if (newVer) {
-            return servicePullPolicyVer;
-        } else {
-            return TextUtils.isEmpty(rtVer) ? "0" : rtVer;
-        }
-    }
+//    public String currentPolicyVer(Context context) {
+//        String rtVer = getNativePolicy(context).getPolicyVer();
+//        String servicePullPolicyVer = mContext.getSharedPreferences(EGContext.SP_NAME, Context.MODE_PRIVATE).getString(EGContext.POLICY_SERVICE_PULL_VER,"0");
+//        boolean newVer = isNewPolicy(servicePullPolicyVer);
+//        if (newVer) {
+//            return servicePullPolicyVer;
+//        } else {
+//            return TextUtils.isEmpty(rtVer) ? "0" : rtVer;
+//        }
+//    }
     public boolean canUpload() {
         if (Integer.valueOf(mContext.getSharedPreferences(EGContext.SP_NAME, Context.MODE_PRIVATE).
                 getString(EGContext.PERMIT_FOR_FAIL_TIME,"0"))< System.currentTimeMillis()) {

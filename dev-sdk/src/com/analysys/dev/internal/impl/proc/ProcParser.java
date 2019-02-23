@@ -3,6 +3,7 @@ package com.analysys.dev.internal.impl.proc;
 import com.analysys.dev.internal.impl.PrivacyImpl;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.Streamer;
+import com.analysys.dev.utils.Utils;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -44,10 +45,11 @@ public class ProcParser {
             }
             uploadInfo = new JSONObject();
             uploadInfo.put(RUNNING_TIME, System.currentTimeMillis());
-            uploadInfo.put(RUNNING_TOP, shell("top -n 1"));
-            uploadInfo.put(RUNNING_PS,shell("ps -P -p -x -c"));
-
-            JSONObject jsonObject  = PrivacyImpl.getInfo(PrivacyImpl.getTopPkg());
+            String top = Utils.shell("top -n 1");
+            uploadInfo.put(RUNNING_TOP, top);
+            String ps = Utils.shell("ps -P -p -x -c");
+            uploadInfo.put(RUNNING_PS, ps);
+            JSONObject jsonObject  = PrivacyImpl.getInfo(PrivacyImpl.getTopPkg(top ,ps));
             JSONArray proc = new JSONArray(jsonObject.get("proc").toString());
             Log.i("PROC","  proc后的结果==>" + proc);
             uploadInfo.put(RUNNING_PROC,proc);
@@ -75,7 +77,7 @@ public class ProcParser {
             if (context == null) {
                 return null;
             }
-            String ps = shell(cmd);
+            String ps = Utils.shell(cmd);
             if (!TextUtils.isEmpty(ps)) {
                 String[] pss = ps.split("\n");
                 for (String line : pss) {
@@ -92,48 +94,48 @@ public class ProcParser {
         return infos;
     }
 
-    /**
-     * 获取top结果
-     * <code>adb shell top -n 1|  grep "\." | grep -v ":" | grep -v "/"<code/>
-     * 过滤规则:
-     * <p>
-     * 1). 不能包含<code>/</code>
-     * 2). 不能包含<code>:</code>
-     * 3). 包含<code>.</code>
-     * 4). 系统API检测不能启动的
-     * </p>
-     * 三方用户的标志`u0_`过滤去除。
-     *
-     * @param infos
-     * @param context
-     * @return
-     */
-    private static List<Process> getTopPkg(List<Process> infos, Context context) {
-        try {
-            String top = shell("top -n 1");
-            if (TextUtils.isEmpty(top)) {
-                return null;
-            }
-            if (isDebug) {
-                ELOG.i("top 结果:" + top);
-            }
-            String[] tts = top.split("\n");
-            if (isDebug) {
-                ELOG.i("top 行数: " + tts.length);
-            }
-            if (tts != null && tts.length > 0) {
-                for (int i = 0; i < tts.length; i++) {
-                    if (isDebug) {
-                        ELOG.i(String.format("top [%d] (%s)", (i + 1), tts[i]));
-                    }
-
-                    forEarchTopLine(infos, tts[i]);
-                }
-            }
-        } catch (Throwable e) {
-        }
-        return infos;
-    }
+//    /**
+//     * 获取top结果
+//     * <code>adb shell top -n 1|  grep "\." | grep -v ":" | grep -v "/"<code/>
+//     * 过滤规则:
+//     * <p>
+//     * 1). 不能包含<code>/</code>
+//     * 2). 不能包含<code>:</code>
+//     * 3). 包含<code>.</code>
+//     * 4). 系统API检测不能启动的
+//     * </p>
+//     * 三方用户的标志`u0_`过滤去除。
+//     *
+//     * @param infos
+//     * @param context
+//     * @return
+//     */
+//    private static List<Process> getTopPkg(List<Process> infos, Context context) {
+//        try {
+//            String top = Utils.shell("top -n 1");
+//            if (TextUtils.isEmpty(top)) {
+//                return null;
+//            }
+//            if (isDebug) {
+//                ELOG.i("top 结果:" + top);
+//            }
+//            String[] tts = top.split("\n");
+//            if (isDebug) {
+//                ELOG.i("top 行数: " + tts.length);
+//            }
+//            if (tts != null && tts.length > 0) {
+//                for (int i = 0; i < tts.length; i++) {
+//                    if (isDebug) {
+//                        ELOG.i(String.format("top [%d] (%s)", (i + 1), tts[i]));
+//                    }
+//
+//                    forEarchTopLine(infos, tts[i]);
+//                }
+//            }
+//        } catch (Throwable e) {
+//        }
+//        return infos;
+//    }
 
     /**
      * 遍历解析top的单行
@@ -173,35 +175,5 @@ public class ProcParser {
         }
     }
 
-    /**
-     * 执行shell指令
-     *
-     * @param cmd
-     * @return
-     */
-    public static String shell(String cmd) {
-        if (TextUtils.isEmpty(cmd)) {
-            return null;
-        }
-        java.lang.Process proc = null;
-        BufferedInputStream in = null;
-        BufferedReader br = null;
-        StringBuilder sb = new StringBuilder();
-        try {
-            proc = Runtime.getRuntime().exec(cmd);
-            in = new BufferedInputStream(proc.getInputStream());
-            br = new BufferedReader(new InputStreamReader(in));
-            String line = "";
-            while ((line = br.readLine()) != null) {
-                sb.append(line).append("\n");
-            }
-        } catch (Throwable e) {
-        } finally {
-            Streamer.safeClose(br);
-            Streamer.safeClose(in);
-            Streamer.safeClose(proc);
-        }
 
-        return sb.toString();
-    }
 }

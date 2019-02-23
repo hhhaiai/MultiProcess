@@ -3,8 +3,10 @@ package com.analysys.dev.model;
 import com.analysys.dev.internal.Content.EGContext;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 策略相关信息
@@ -87,6 +89,23 @@ public class PolicyInfo implements Serializable {
      */
     private JSONArray CtrlList ;
 
+    private String Module;
+    private String Status;
+    private String SecModule;
+    private String SecStatus;
+    private String DeuFreq;
+    private String MinFreq;
+    private String MaxFreq;
+    private String MaxCount;
+    private JSONArray SubControl;
+    private String SubModule;
+    private String SubStatus;
+    private String SubDeuFreq;
+    private String SubMinFreq;
+    private String SubMaxFreq;
+    private String Count;
+    private String SecSubModule;
+    private String SecSubStatus;
 
     public String getCode() {
         return code;
@@ -230,5 +249,141 @@ public class PolicyInfo implements Serializable {
 
     public void setCtrlList(JSONArray ctrlList) {
         CtrlList = ctrlList;
+    }
+
+    public String getModule() {
+        return Module;
+    }
+
+    public String getStatus() {
+        return Status;
+    }
+
+    public String getSecModule() {
+        return SecModule;
+    }
+
+    public String getSecStatus() {
+        return SecStatus;
+    }
+
+    public String getDeuFreq() {
+        return DeuFreq;
+    }
+
+    public String getMinFreq() {
+        return MinFreq;
+    }
+
+    public String getMaxFreq() {
+        return MaxFreq;
+    }
+
+    public String getMaxCount() {
+        return MaxCount;
+    }
+
+    public JSONArray getSubControl() {
+        return SubControl;
+    }
+
+    public String getSubModule() {
+        return SubModule;
+    }
+
+    public String getSubStatus() {
+        return SubStatus;
+    }
+
+    public String getSubDeuFreq() {
+        return SubDeuFreq;
+    }
+
+    public String getSubMinFreq() {
+        return SubMinFreq;
+    }
+
+    public String getSubMaxFreq() {
+        return SubMaxFreq;
+    }
+
+    public String getCount() {
+        return Count;
+    }
+
+    public String getSecSubModule() {
+        return SecSubModule;
+    }
+
+    public String getSecSubStatus() {
+        return SecSubStatus;
+    }
+
+    public void setModule(String module) {
+        Module = module;
+    }
+
+    public void setStatus(String status) {
+        Status = status;
+    }
+
+    public void setSecModule(String secModule) {
+        SecModule = secModule;
+    }
+
+    public void setSecStatus(String secStatus) {
+        SecStatus = secStatus;
+    }
+
+    public void setDeuFreq(String deuFreq) {
+        DeuFreq = deuFreq;
+    }
+
+    public void setMinFreq(String minFreq) {
+        MinFreq = minFreq;
+    }
+
+    public void setMaxFreq(String maxFreq) {
+        MaxFreq = maxFreq;
+    }
+
+    public void setMaxCount(String maxCount) {
+        MaxCount = maxCount;
+    }
+
+    public void setSubControl(JSONArray subControl) {
+        SubControl = subControl;
+    }
+
+    public void setSubModule(String subModule) {
+        SubModule = subModule;
+    }
+
+    public void setSubStatus(String subStatus) {
+        SubStatus = subStatus;
+    }
+
+    public void setSubDeuFreq(String subDeuFreq) {
+        SubDeuFreq = subDeuFreq;
+    }
+
+    public void setSubMinFreq(String subMinFreq) {
+        SubMinFreq = subMinFreq;
+    }
+
+    public void setSubMaxFreq(String subMaxFreq) {
+        SubMaxFreq = subMaxFreq;
+    }
+
+    public void setCount(String count) {
+        Count = count;
+    }
+
+    public void setSecSubModule(String secSubModule) {
+        SecSubModule = secSubModule;
+    }
+
+    public void setSecSubStatus(String secSubStatus) {
+        SecSubStatus = secSubStatus;
     }
 }

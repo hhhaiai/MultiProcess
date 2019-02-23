@@ -33,7 +33,7 @@ import java.net.URLEncoder;
 
 public class UploadImpl {
     Context mContext;
-    private final String DI = "DevInfo";
+    public final String DI = "DevInfo";
     private final String ASI = "AppSnapshotInfo";
     private final String LI = "LocationInfo";
     private final String OCI = "OCInfo";
@@ -127,7 +127,7 @@ public class UploadImpl {
         } catch (Throwable e) {
             ELOG.e(e.getMessage()+" getInfo has an exception");
         }
-        return String.valueOf(object);
+        return object.toString();
     }
 //
     /**
@@ -199,7 +199,7 @@ public class UploadImpl {
                     return true;
                 }
                 JSONObject object = new JSONObject(json);
-                String code = object.get("code").toString();
+                String code = object.get(DeviceKeyContacts.Response.RES_CODE).toString();
                 if(code != null){
                     if(EGContext.HTTP_SUCCESS.equals(code)){
                         Utils.setId(json , mContext);
@@ -208,17 +208,20 @@ public class UploadImpl {
                         result = true;
                     }
                     if(EGContext.HTTP_RETRY.equals(code)){
-                        PolicyImpl.getInstance(mContext).saveRespParams(object.getJSONObject("policy"));
+                        PolicyImpl.getInstance(mContext).saveRespParams(object.getJSONObject(DeviceKeyContacts.Response.RES_POLICY));
                         result = false;
                     }
                 }
 
+            }else{
+                result = false;
             }
         } catch (Throwable e) {
+            result = false;
         }
         return result;
     }
-    private void handleUpload(String url,String uploadInfo) throws UnsupportedEncodingException {
+    private void handleUpload(final String url,final String uploadInfo){
 
         String result = RequestUtils.httpRequest(url, uploadInfo,mContext);
         if (TextUtils.isEmpty(result)) {
@@ -229,8 +232,14 @@ public class UploadImpl {
             //加入网络判断,如果无网情况下,不进行失败上传
             if (count <= PolicyImpl.getInstance(mContext).getFailCount()&& !NetworkUtils.getNetworkType(mContext).equals(EGContext.NETWORK_TYPE_NO_NET)) {
                 long dur = (long)((Math.random() + 1) * PolicyInfo.getInstance().getTimerInterval());
-                handleUpload(url, uploadInfo);
-            } else if (PolicyInfo.getInstance().isUseRTP() == 0) {
+                EThreadPool.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        handleUpload(url, uploadInfo);
+                    }
+                }, dur);
+
+            } else if (PolicyInfo.getInstance().isUseRTP() == 0) {//使用实时策略
                 long failTryDelayInterval = System.currentTimeMillis() +
                         PolicyInfo.getInstance().getFailTryDelay();
                 PolicyInfo.getInstance().setFailTryDelay

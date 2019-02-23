@@ -66,11 +66,56 @@ public class Utils {
         return time;
     }
 
+//    public static String shell(String cmd) {
+//        if (TextUtils.isEmpty(cmd)) {
+//            return null;
+//        }
+//        Process proc = null;
+//        BufferedInputStream in = null;
+//        BufferedReader br = null;
+//        StringBuilder sb = new StringBuilder();
+//        try {
+//            proc = Runtime.getRuntime().exec(cmd);
+//            in = new BufferedInputStream(proc.getInputStream());
+//            br = new BufferedReader(new InputStreamReader(in));
+//            String line = "";
+//            while ((line = br.readLine()) != null) {
+//                sb.append(line).append("\n");
+//            }
+//        } catch (Throwable e) {
+//        } finally {
+//            if (br != null) {
+//                try {
+//                    br.close();
+//                } catch (Throwable e) {
+//
+//                }
+//            }
+//            if (in != null) {
+//                try {
+//                    in.close();
+//                } catch (Throwable e) {
+//
+//                }
+//            }
+//            if (proc != null) {
+//                proc.destroy();
+//            }
+//        }
+//
+//        return sb.toString();
+//    }
+    /**
+     * 执行shell指令
+     *
+     * @param cmd
+     * @return
+     */
     public static String shell(String cmd) {
         if (TextUtils.isEmpty(cmd)) {
             return null;
         }
-        Process proc = null;
+        java.lang.Process proc = null;
         BufferedInputStream in = null;
         BufferedReader br = null;
         StringBuilder sb = new StringBuilder();
@@ -84,23 +129,9 @@ public class Utils {
             }
         } catch (Throwable e) {
         } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (Throwable e) {
-
-                }
-            }
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (Throwable e) {
-
-                }
-            }
-            if (proc != null) {
-                proc.destroy();
-            }
+            Streamer.safeClose(br);
+            Streamer.safeClose(in);
+            Streamer.safeClose(proc);
         }
 
         return sb.toString();
