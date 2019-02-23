@@ -44,7 +44,7 @@ public class SenSorModuleNameImpl{
                 info = new JSONObject();
                 // 传感器名称
                 info.put(DeviceKeyContacts.DevInfo.SenSorName,s.getName());
-                ELOG.i("SenSorName :::::::"+s.getName());
+//                ELOG.i("SenSorName :::::::"+s.getName());
                 // 传感器版本
                 info.put(DeviceKeyContacts.DevInfo.SenSorVersion,s.getVersion());
                 // 传感器厂商

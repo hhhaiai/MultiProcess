@@ -17,13 +17,11 @@ import java.util.Enumeration;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
-import com.analysys.dev.model.BatteryModuleNameInfo;
-import com.analysys.dev.model.DevInfo;
+
 import com.analysys.dev.model.SoftwareInfo;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.FileUtils;
@@ -275,13 +273,13 @@ public class DeviceImpl {
      * 设备序列号,SerialNumber
      */
     public String getSerialNumber() {
-        String serialNumber = "unknown";
+        String serialNumber = "";
         try {
             if (PermissionUtils.checkPermission(mContext, permission.READ_PHONE_STATE)) {
                 TelephonyManager tm = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
                 serialNumber = tm.getSimSerialNumber();
                 if(TextUtils.isEmpty(serialNumber)){
-                    serialNumber = "unknown";
+                    serialNumber = "";
                 }
                 return serialNumber;
             }
@@ -676,7 +674,7 @@ public class DeviceImpl {
             BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
             return adapter.getName();
         }catch (Throwable t){
-            return "unknown";
+            return "";
         }
     }
 
@@ -686,35 +684,29 @@ public class DeviceImpl {
     public void processBattery(final Intent intent) {
         try {
             int status = intent.getIntExtra("status", 0);
-            ELOG.i(status+  "  ::::::: getStatus  ");
             int health = intent.getIntExtra("health", 0);
-            ELOG.i(health+  "  ::::::: gethealth  ");
             int level = intent.getIntExtra("level", 0);
-            ELOG.i(level+  "  ::::::: getlevel  ");
             int scale = intent.getIntExtra("scale", 0);
-            ELOG.i(scale+  "  ::::::: getscale  ");
             int plugged = intent.getIntExtra("plugged", 0);
-            ELOG.i(plugged+  "  ::::::: getplugged  ");
             String technology = intent.getStringExtra("technology");
-            ELOG.i(technology+  "  ::::::: gettechnology  ");
             int temperature = intent.getIntExtra("temperature",0);
-            ELOG.i(temperature+  "  ::::::: gettemperature  ");
             //电源当前状态
-            BatteryModuleNameInfo info = BatteryModuleNameInfo.getInstance();
-            info.setBatteryStatus(String.valueOf(status));
+            JSONObject info = new JSONObject();
+            info.put(DeviceKeyContacts.DevInfo.BatteryStatus,String.valueOf(status));
             //电源健康状态
-            info.setBatteryHealth(String.valueOf(health));
+            info.put(DeviceKeyContacts.DevInfo.BatteryHealth,String.valueOf(health));
             //电源发前电量
-            info.setBatteryLevel(String.valueOf(level));
+            info.put(DeviceKeyContacts.DevInfo.BatteryLevel,String.valueOf(level));
             //电源总电量
-            info.setBatteryScale(String.valueOf(scale));
+            info.put(DeviceKeyContacts.DevInfo.BatteryScale,String.valueOf(scale));
             //电源充电状态
-            info.setBatteryPlugged (String.valueOf(plugged));
+            info.put (DeviceKeyContacts.DevInfo.BatteryPlugged,String.valueOf(plugged));
             //电源类型
-            info.setBatteryTechnology(technology);
+            info.put(DeviceKeyContacts.DevInfo.BatteryTechnology,technology);
             //电池温度
-            info.setBatteryTemperature(String.valueOf(temperature));
+            info.put(DeviceKeyContacts.DevInfo.BatteryTemperature,String.valueOf(temperature));
             ELOG.i(info+  "  ::::::: getInfo  ");
+            PolicyImpl.getInstance(mContext).getSP().edit().putString(DeviceKeyContacts.DevInfo.BatteryModuleName,info.toString());
         } catch (Throwable e) {
 
         }
@@ -886,7 +878,7 @@ public class DeviceImpl {
             return null;
         }
         String result = sb.toString();
-        ELOG.e(result.substring(0,result.length()-1)+" ::::::::::stringArrayToString");
+//        ELOG.e(result.substring(0,result.length()-1)+" ::::::::::stringArrayToString");
         return result.substring(0,result.length()-1);
     }
 }

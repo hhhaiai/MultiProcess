@@ -81,7 +81,7 @@ public class UploadImpl {
                 }
             }
         });
-                // 策略处理
+        // 策略处理
         MessageDispatcher.getInstance(mContext).uploadInfo(EGContext.UPLOAD_CYCLE);
     }
 

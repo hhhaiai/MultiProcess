@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
+import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.utils.Base64Utils;
 import com.analysys.dev.utils.Utils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
@@ -28,11 +29,11 @@ public class TableLocation {
         return Holder.INSTANCE;
     }
 
-    public void insert(String locationInfo) {
+    public void insert(JSONObject locationInfo) {
         try {
-            if (!TextUtils.isEmpty(locationInfo)) {
-                long time = System.currentTimeMillis();
-                String encryptLocation = Base64Utils.encrypt(locationInfo, time);
+            if (!TextUtils.isEmpty(locationInfo.toString())) {
+                long time = Long.parseLong(locationInfo.getString(DeviceKeyContacts.LocationInfo.CollectionTime));
+                String encryptLocation = Base64Utils.encrypt(locationInfo.toString(), time);
                 if (!TextUtils.isEmpty(encryptLocation)) {
                     ContentValues cv = new ContentValues();
                     cv.put(DBConfig.Location.Column.LI, encryptLocation);
@@ -63,7 +64,7 @@ public class TableLocation {
                 cv.put(DBConfig.Location.Column.ST, "1");
                 db.update(DBConfig.Location.TABLE_NAME, cv, DBConfig.Location.Column.ID + "=?", new String[]{id});
                 String decryptLocation = Base64Utils.decrypt(encryptLocation, Long.valueOf(time));
-                jar.put(new JSONObject(decryptLocation));
+                if(!TextUtils.isEmpty(decryptLocation)) jar.put(new JSONObject(decryptLocation));
             }
         } catch (Throwable e) {
         }

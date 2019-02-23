@@ -97,12 +97,13 @@ public class TableXXXInfo {
     }
     //连表查询
     public JSONArray select(){
-        JSONArray procArray = null, array = null;
+        JSONArray procArray, array;
+        Cursor cursor = null,curProc = null;
         try {
             procArray = new JSONArray();
             array = new JSONArray();
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            Cursor cursor = db.query(DBConfig.XXXInfo.TABLE_NAME,
+            cursor = db.query(DBConfig.XXXInfo.TABLE_NAME,
                     null, null, null,
                     null, null, null);
             JSONObject jsonObject = null;
@@ -114,9 +115,9 @@ public class TableXXXInfo {
                 jsonObject.put(ProcParser.RUNNING_TOP,new String(Base64.encode(cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TOP)).getBytes(),Base64.DEFAULT)));
                 if(PolicyImpl.getInstance(mContext).getValueFromSp(EGContext.PS_SWITCH,EGContext.SWITCH_OF_PS))
                 jsonObject.put(ProcParser.RUNNING_PS,new String(Base64.encode(cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PS)).getBytes(),Base64.DEFAULT)));
-                Cursor curProc1 = db.query(DBConfig.PROCInfo.TABLE_NAME,null,null,null,null,null,null);
-                ELOG.i(curProc1+"    :::::::::::curProc1   "+ curProc1.getCount());
-                Cursor curProc = db.query(DBConfig.PROCInfo.TABLE_NAME, new String[] {DBConfig.PROCInfo.Column.CONTENT},
+//                curProc1 = db.query(DBConfig.PROCInfo.TABLE_NAME,null,null,null,null,null,null);
+//                ELOG.i(curProc1+"    :::::::::::curProc1   "+ curProc1.getCount());
+                curProc = db.query(DBConfig.PROCInfo.TABLE_NAME, new String[] {DBConfig.PROCInfo.Column.CONTENT},
                         DBConfig.PROCInfo.Column.PARENT_ID_TIME + "=?", new String[] {time}, null, null, null);
                 ELOG.i(curProc+"    :::::::::::curProc   "+ curProc.getCount());
                 while (curProc.moveToNext()) {
@@ -131,8 +132,11 @@ public class TableXXXInfo {
         } catch (Exception e) {
             ELOG.e(e.getMessage()+"  TableXXXInfo select() has an exception... ");
             array = null;
+        }finally {
+            if(curProc != null) curProc.close();
+            if(cursor != null) cursor.close();
+            DBManager.getInstance(mContext).closeDB();
         }
-        DBManager.getInstance(mContext).closeDB();
         return array;
     }
 

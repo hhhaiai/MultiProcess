@@ -64,7 +64,6 @@ public class OCImpl {
             public void run() {
                 if (!AccessibilityHelper.isAccessibilitySettingsOn(mContext,AnalysysAccessibilityService.class)) {
                     getInfoByVersion();
-                    MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE);
                 }else{
                     //利用辅助功能获取当前app
                 }
@@ -79,8 +78,10 @@ public class OCImpl {
             if(PermissionUtils.checkPermission(mContext, Manifest.permission.GET_TASKS)){
                 RunningApps(getRunningApp(), EGContext.OC_COLLECTION_TYPE_RUNNING_TASK);
             }
+            MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE);
         }else if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24 ){
             getProcApps();
+            MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE_OVER_5);
         }else{
             //TODO 7.0以上待调研
         }
@@ -332,12 +333,12 @@ public class OCImpl {
                     ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode, pm.getPackageInfo(packageName, 0).versionName + "|"
                             + pm.getPackageInfo(packageName, 0).versionCode);
                 }catch (Throwable t){
-                    ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode, "unknown");
+//                    ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode, "");
                 }
                 try {
                     ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName, appInfo.loadLabel(pm).toString());
                 }catch (Throwable t){
-                    ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName, "unknown");
+//                    ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName, "unknown");
                 }
 
             }
@@ -351,7 +352,7 @@ public class OCImpl {
      * 判断应用为系统应用还是第三方应用
      */
     private String appType(String pkgName) {
-        String type = "unknown";
+        String type = "";
         try {
             PackageInfo pkgInfo = mContext.getPackageManager().getPackageInfo(pkgName, 0);
             if ((pkgInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) <= 0) {

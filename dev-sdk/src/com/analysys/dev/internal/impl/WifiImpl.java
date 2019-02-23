@@ -6,10 +6,10 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
-import com.analysys.dev.internal.Content.EGContext;
+
+import com.analysys.dev.utils.AndroidManifestHelper;
 import com.analysys.dev.utils.PermissionUtils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
-import com.analysys.dev.utils.sp.SPHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,9 +39,14 @@ public class WifiImpl {
     public JSONArray getWifiInfo() {
         JSONArray jar = new JSONArray();
         try {
+//            if (!AndroidManifestHelper.isPermissionDefineInManifest(mContext, Manifest.permission.CHANGE_WIFI_STATE)) {
+//                return null;
+//            }
+            if (!PermissionUtils.checkPermission(mContext, Manifest.permission.CHANGE_WIFI_STATE)) {
+                return null;
+            }
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_WIFI_STATE)) {
                 WifiManager wm = (WifiManager)mContext.getSystemService(WIFI_SERVICE);
-                int wifiDetail = SPHelper.getDefault(mContext).getInt(EGContext.SP_WIFI_DETAIL, 0);
                 if (wm.getWifiState() == WifiManager.WIFI_STATE_ENABLED) {
                     List<ScanResult> list = wm.getScanResults();
                     wifiSort(list);
@@ -52,10 +57,9 @@ public class WifiImpl {
                             jsonObject.put(DeviceKeyContacts.LocationInfo.WifiInfo.SSID, s.SSID);
                             jsonObject.put(DeviceKeyContacts.LocationInfo.WifiInfo.BSSID, s.BSSID);
                             jsonObject.put(DeviceKeyContacts.LocationInfo.WifiInfo.Level, s.level);
-                            if (wifiDetail == 1) {
-                                jsonObject.put(DeviceKeyContacts.LocationInfo.WifiInfo.Capabilities, s.capabilities);
-                                jsonObject.put(DeviceKeyContacts.LocationInfo.WifiInfo.Frequency, s.frequency);
-                            }
+                            jsonObject.put(DeviceKeyContacts.LocationInfo.WifiInfo.Capabilities, s.capabilities);
+                            jsonObject.put(DeviceKeyContacts.LocationInfo.WifiInfo.Frequency, s.frequency);
+
                             jar.put(jsonObject);
                         }
                     }

@@ -71,6 +71,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
         } catch (SQLiteDatabaseCorruptException e) {
             rebuildDB();
+        }finally {
+            db.close();
         }
     }
 
@@ -85,13 +87,16 @@ public class DBHelper extends SQLiteOpenHelper {
      * 建表
      */
     public void createTable(String createSQL, String tableName) {
+        SQLiteDatabase db = null;
         try {
-            SQLiteDatabase db = getWritableDatabase();
+            db = getWritableDatabase();
             if (!DBUtils.isTableExist(db, tableName)) {
                 db.execSQL(createSQL);
             }
         } catch (Throwable t) {
 
+        }finally {
+            db.close();
         }
     }
 }

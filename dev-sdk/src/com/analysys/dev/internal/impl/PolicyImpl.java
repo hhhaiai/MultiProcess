@@ -308,7 +308,12 @@ public class PolicyImpl {
         }
         return false;
     }
-
+    public void setLastLocation(String location){
+        getEditor().putString(EGContext.LASTLOCATION, location).apply();
     }
+    public String getLastLocation(){
+        return getSP().getString(EGContext.LASTLOCATION,"");
+    }
+}
 
 

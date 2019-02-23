@@ -264,18 +264,21 @@ public class TableOCCount {
             Cursor cursor = db.query(DBConfig.OCCount.TABLE_NAME,
                     null, null, null,
                     null, null, null);
+            String act = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.ACT));
+            JSONObject jsonObject,etdm;
             while (cursor.moveToNext()) {
-                JSONObject jsonObject = new JSONObject();
+                if(TextUtils.isEmpty(act) || "0".equals(act))continue;
+                jsonObject = new JSONObject();
                 String insertTime = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.IT));
                 String encryptAn = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AN));
                 String an = Base64Utils.decrypt(encryptAn, Long.valueOf(insertTime));
                 jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationOpenTime, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AOT)));
-                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.ACT)));
+                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime, act);
                 jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.APN)));
                 jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationName, an);
                 jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AVC)));
                 jsonObject.put(DeviceKeyContacts.OCInfo.NetworkType, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.NT)));
-                JSONObject etdm = new JSONObject();
+                etdm = new JSONObject();
                 etdm.put(DeviceKeyContacts.OCInfo.SwitchType, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AST)));
                 etdm.put(DeviceKeyContacts.OCInfo.ApplicationType, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AT)));
                 etdm.put(DeviceKeyContacts.OCInfo.CollectionType, cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.CT)));

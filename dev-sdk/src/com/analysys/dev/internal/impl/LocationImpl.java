@@ -1,16 +1,16 @@
 package com.analysys.dev.internal.impl;
 
-import static android.content.Context.WIFI_SERVICE;
 
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.analysys.dev.database.DBConfig;
 import com.analysys.dev.database.TableLocation;
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
+import com.analysys.dev.model.DevInfo;
+import com.analysys.dev.utils.AndroidManifestHelper;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.EThreadPool;
 import com.analysys.dev.utils.PermissionUtils;
@@ -20,44 +20,19 @@ import com.analysys.dev.internal.work.MessageDispatcher;
 
 import android.Manifest;
 import android.content.Context;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiManager;
-import android.os.Build;
-import android.os.Bundle;
-import android.telephony.CellIdentityCdma;
-import android.telephony.CellIdentityGsm;
-import android.telephony.CellIdentityLte;
-import android.telephony.CellIdentityWcdma;
-import android.telephony.CellInfo;
-import android.telephony.CellInfoCdma;
-import android.telephony.CellInfoGsm;
-import android.telephony.CellInfoLte;
-import android.telephony.CellInfoWcdma;
-import android.telephony.CellLocation;
-import android.telephony.CellSignalStrength;
-import android.telephony.CellSignalStrengthLte;
-import android.telephony.CellSignalStrengthWcdma;
+
 import android.telephony.NeighboringCellInfo;
 import android.telephony.TelephonyManager;
-import android.telephony.cdma.CdmaCellLocation;
+
 import android.telephony.gsm.GsmCellLocation;
 import android.text.TextUtils;
 
-/**
- * @Copyright © 2018 EGuan Inc. All rights reserved.
- * @Description: TODO
- * @Version: 1.0
- * @Create: 2018/10/15 15:01
- * @Author: Wang-X-C
- */
 public class LocationImpl {
 
     Context mContext;
-
+    private LocationManager locationManager;
     private static class Holder {
         private static final LocationImpl INSTANCE = new LocationImpl();
     }
@@ -66,22 +41,32 @@ public class LocationImpl {
         if (Holder.INSTANCE.mContext == null) {
             Holder.INSTANCE.mContext = EContextHelper.getContext(context);
         }
+        if (LocationImpl.Holder.INSTANCE.locationManager == null) {
+            if (LocationImpl.Holder.INSTANCE.mContext != null) {
+                LocationImpl.Holder.INSTANCE.locationManager =
+                        (LocationManager) LocationImpl.Holder.INSTANCE.mContext.getApplicationContext()
+                                .getSystemService(Context.LOCATION_SERVICE);
+            }
 
-        return Holder.INSTANCE;
+        }
+        return LocationImpl.Holder.INSTANCE;
     }
 
     public void location() {
         EThreadPool.execute(new Runnable() {
             @Override
             public void run() {
-                if (!isGetLocation()) {
-                    return;
-                }
-                JSONObject location = getLocation();
-                if (location != null) {
-                    TableLocation.getInstance(mContext).insert(String.valueOf(location));
-                    SPHelper.getDefault(mContext).edit().putLong(EGContext.SP_LOCATION_TIME, System.currentTimeMillis())
-                        .commit();
+                try {
+                    if (!isGetLocation()) {
+                        return;
+                    }
+                    getLocationInfo();
+                    JSONObject location = getLocation();
+                    if (location != null) {
+                        TableLocation.getInstance(mContext).insert(location);
+                        SPHelper.getDefault(mContext).edit().putLong(EGContext.SP_LOCATION_TIME, Long.parseLong(location.getString(DeviceKeyContacts.LocationInfo.CollectionTime))).apply();
+                    }
+                }catch (Throwable t){
                 }
                 MessageDispatcher.getInstance(mContext).locationInfo(EGContext.LOCATION_CYCLE);
             }
@@ -100,143 +85,210 @@ public class LocationImpl {
             }
         }
     }
-    private Location getLocationInfo(){
-        //TODO 获取6.0以上的location对象信息并返回
-        if (Build.VERSION.SDK_INT > 22) {
-            if (!PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
-                    && !PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                ELOG.e("has no permission");
-                return null;
-            }
+    private void getLocationInfo() {
+        /**
+         * 没有声明权限
+         */
+        if (AndroidManifestHelper.isPermissionDefineInManifest(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
+                && AndroidManifestHelper.isPermissionDefineInManifest(mContext,
+                Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            return ;
         }
-        LocationManager lm =
-                (LocationManager)mContext.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
 
-        if (lm == null) {
-            return null;
+        if (!PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
+                && !PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            ELOG.e("has no permission");
+            return ;
         }
-        ELOG.i("是否包含GPS: " + lm.isProviderEnabled(LocationManager.GPS_PROVIDER));
+        List<String> pStrings = this.locationManager.getProviders(true);
+        String provider;
+        if (pStrings.contains(LocationManager.GPS_PROVIDER)) {
+            provider = LocationManager.GPS_PROVIDER;
+        } else if (pStrings.contains(LocationManager.NETWORK_PROVIDER)) {
+            provider = LocationManager.NETWORK_PROVIDER;
+        } else {
 
+            return ;
+        }
+        Location location = locationManager.getLastKnownLocation(provider);
+
+        if (needSaveLocation(location)) {
+            resetLocaiton(location);
+        }
+    }
         // lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
         // location = locationManager .getLastKnownLocation(LocationManager.GPS_PROVIDER);
         // if (location != null) {
         // //支持
         // }
+//
+//
+//        //监听地理位置变化，地理位置变化时，能够重置location
+//        LocationListener locationListener = new LocationListener() {
+//            @Override
+//            public void onStatusChanged(String provider, int status, Bundle extras) {
+//            }
+//            @Override
+//            public void onProviderEnabled(String provider) {
+//            }
+//
+//            @Override
+//            public void onProviderDisabled(String provider) {
+//
+//            }
+//
+//            @Override
+//            public void onLocationChanged(Location loc) {
+//                if (loc != null) {
+//                    //TODO
+////         location = loc;
+////         showLocation(location);
+//                }
+//            }
+//        };
+//
+//        ELOG.i("是否包含网络: " + lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
+//        // lm.requestLocationUpdates( LocationManager.NETWORK_PROVIDER, 1000, 0, locationListener);
+//        // location = lm .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+//        // if (location != null) {
+//        // //支持
+//        // }
+//        // // 谷歌网站可以请求对应地域
+//        // url.append("http://maps.googleapis.com/maps/api/geocode/json?latlng=");
+//        // url.append(loc.getLatitude()).append(",");
+//        // url.append(loc.getLongitude());
+//
+//        // 特殊的位置提供
+//        Location loc = lm.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+//        if (loc == null) {
+//            ELOG.e("getLastKnownLocation is null!");
+//            return null;
+//        }
+////        ELOG.i("getLatitude:" + loc.getLatitude());
+////        ELOG.i("getLongitude:" + loc.getLongitude());
+////        ELOG.i("getSpeed:" + loc.getSpeed());
+////        ELOG.i("getTime:" + loc.getTime());
+//
+//        ELOG.i("===================");
+//        // 查找到服务信息
+//        Criteria criteria = new Criteria();
+//        criteria.setAccuracy(Criteria.ACCURACY_FINE); // 高精度
+//        criteria.setAltitudeRequired(false);
+//        criteria.setBearingRequired(false);
+//        criteria.setCostAllowed(true);
+//        criteria.setPowerRequirement(Criteria.POWER_LOW); // 低功耗
+//        String provider = lm.getBestProvider(criteria, true); // 获取GPS信息
+//        ELOG.i("provider: " + provider);
+//        Location location = lm.getLastKnownLocation(provider); // 通过GPS获取位置
+//        if (location == null) {
+//            ELOG.e("获取异常  location is null! ");
+//            return null;
+//        }
+////        ELOG.i("===getLatitude===>" + location.getLatitude());
+////        ELOG.i("===getLongitude===>" + location.getLongitude());
+//        return location;
+//    }
 
-
-        //监听地理位置变化，地理位置变化时，能够重置location
-        LocationListener locationListener = new LocationListener() {
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
+    /**
+     * 缓存地理位置信息数据
+     *
+     * @param location
+     */
+    public void resetLocaiton(Location location) {
+        if (location != null) {
+            String gl = location.getLongitude() + "-" + location.getLatitude();
+            if (TextUtils.isEmpty(gl)) {
+                return;
             }
-            @Override
-            public void onProviderEnabled(String provider) {
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-
-            @Override
-            public void onLocationChanged(Location loc) {
-                if (loc != null) {
-                    //TODO
-//         location = loc;
-//         showLocation(location);
-                }
-            }
-        };
-
-        ELOG.i("是否包含网络: " + lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
-        // lm.requestLocationUpdates( LocationManager.NETWORK_PROVIDER, 1000, 0, locationListener);
-        // location = lm .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        // if (location != null) {
-        // //支持
-        // }
-        // // 谷歌网站可以请求对应地域
-        // url.append("http://maps.googleapis.com/maps/api/geocode/json?latlng=");
-        // url.append(loc.getLatitude()).append(",");
-        // url.append(loc.getLongitude());
-
-        // 特殊的位置提供
-        Location loc = lm.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-        if (loc == null) {
-            ELOG.e("getLastKnownLocation is null!");
-            return null;
+            PolicyImpl.getInstance(mContext).setLastLocation(gl);
         }
-//        ELOG.i("getLatitude:" + loc.getLatitude());
-//        ELOG.i("getLongitude:" + loc.getLongitude());
-//        ELOG.i("getSpeed:" + loc.getSpeed());
-//        ELOG.i("getTime:" + loc.getTime());
-
-        ELOG.i("===================");
-        // 查找到服务信息
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_FINE); // 高精度
-        criteria.setAltitudeRequired(false);
-        criteria.setBearingRequired(false);
-        criteria.setCostAllowed(true);
-        criteria.setPowerRequirement(Criteria.POWER_LOW); // 低功耗
-        String provider = lm.getBestProvider(criteria, true); // 获取GPS信息
-        ELOG.i("provider: " + provider);
-        Location location = lm.getLastKnownLocation(provider); // 通过GPS获取位置
-        if (location == null) {
-            ELOG.e("获取异常  location is null! ");
-            return null;
-        }
-//        ELOG.i("===getLatitude===>" + location.getLatitude());
-//        ELOG.i("===getLongitude===>" + location.getLongitude());
-        return location;
     }
-    private String getGeographyLocation(){
-        try{
-            Location l = getLocationInfo();
-            return l.getLatitude()+"-"+l.getLongitude();
-        }catch (Throwable t){
-            return getCoordinate();
-        }
+
+    /**
+     * 计算两个坐标之间的距离
+     *
+     * @param longitude1
+     * @param latitude1
+     * @param longitude2
+     * @param latitude2
+     * @return
+     */
+    private double getDistance(double longitude1, double latitude1, double longitude2, double latitude2) {
+        double EARTH_RADIUS = 6378137.0;
+        double Lat1 = rad(latitude1);
+        double Lat2 = rad(latitude2);
+        double a = Lat1 - Lat2;
+        double b = rad(longitude1) - rad(longitude2);
+        double s = 2 * Math.asin(
+                Math.sqrt(Math.pow(Math.sin(a / 2), 2) + Math.cos(Lat1) * Math.cos(Lat2) * Math.pow(Math.sin(b / 2), 2)));
+        s = s * EARTH_RADIUS;
+        s = Math.round(s * 10000) / 10000;
+        return s;
     }
+
+    private double rad(double d) {
+        return d * Math.PI / 180.0;
+    }
+
+    /**
+     * 判断距离是否可以存储信息
+     *
+     * @param location
+     * @return
+     */
+    private boolean needSaveLocation(Location location) {
+
+        try {
+            if (location == null) {
+                return false;
+            }
+            String lastLocation = PolicyImpl.getInstance(mContext).getLastLocation();
+            if (TextUtils.isEmpty(lastLocation)) {
+                return true;
+            }
+
+            String[] ary = lastLocation.split("-");
+            if (ary.length != 2) {
+                return true;
+            }
+            double longitude1 = Double.parseDouble(ary[1]);
+            double latitude1 = Double.parseDouble(ary[0]);
+            double distance = getDistance(longitude1, latitude1, location.getLongitude(), location.getLatitude());
+
+            if (EGContext.MINDISTANCE <= distance) {
+                return true;
+                // } else {
+                // ELog.e(PubConfigInfo.DEVICE_TAG, "---- 距离没有变化 ----");
+            }
+        } catch (Throwable e) {
+        }
+        return false;
+    }
+
     private JSONObject getLocation() {
         JSONObject locationJson = null;
         try {
             locationJson = new JSONObject();
             locationJson.put(DeviceKeyContacts.LocationInfo.CollectionTime, String.valueOf(System.currentTimeMillis()));
 
-            String locationInfo = getGeographyLocation();
-//            int location = SPHelper.getDefault(mContext).getInt(EGContext.SP_LOCATION, 1);
-            if (!TextUtils.isEmpty(locationInfo)
-//                    && location == 1
-                    ) {
+            String locationInfo = PolicyImpl.getInstance(mContext).getLastLocation();
+            if (!TextUtils.isEmpty(locationInfo)) {
                 locationJson.put(DeviceKeyContacts.LocationInfo.GeographyLocation, locationInfo);
             }
 
             JSONArray wifiInfo = WifiImpl.getInstance(mContext).getWifiInfo();
-//            int wifi = SPHelper.getDefault(mContext).getInt(EGContext.SP_WIFI, 1);
-            if (wifiInfo != null && wifiInfo.length() != 0
-//                    && wifi == 1
-                    ) {
+            if (wifiInfo != null && wifiInfo.length() != 0) {
                 locationJson.put(DeviceKeyContacts.LocationInfo.WifiInfo.NAME, wifiInfo);
             }
 
             JSONArray baseStation = getBaseStationInfo();
-//            int base = SPHelper.getDefault(mContext).getInt(EGContext.SP_BASE_STATION, 1);
-            if (baseStation != null && baseStation.length() != 0
-//                    && base == 1
-                    ) {
+            if (baseStation != null && baseStation.length() != 0) {
                 locationJson.put(DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME, baseStation);
             }
         } catch (Throwable e) {
             e.printStackTrace();
         }
         return locationJson;
-    }
-
-    /**
-     * 经纬度坐标
-     */
-    private String getCoordinate() {
-        return "2.00000" + "-" + "6.233232323";
     }
 
 
@@ -253,7 +305,7 @@ public class LocationImpl {
                  baseStationSort(list);
                 JSONObject locationJson = null;
                  for (int i = 0; i < list.size(); i++) {
-                     if (i < 5) {//TODO 只要小于5个的？
+                     if (i < 5) {
                          locationJson = new JSONObject();
                          locationJson.put(DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, list.get(i).getLac());
                          locationJson.put(DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, list.get(i).getCid());

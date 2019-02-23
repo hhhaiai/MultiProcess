@@ -56,8 +56,8 @@ public class EGContext {
 
     public static final String SP_SNAPSHOT_TIME = "getSnapshotTime";
 
-    public static final String SP_WIFI = "wifi";
-    public static final String SP_WIFI_DETAIL = "wifiDetail";
+//    public static final String SP_WIFI = "wifi";
+//    public static final String SP_WIFI_DETAIL = "wifiDetail";
 
 //    public static final String SP_BASE_STATION = "baseStation";
     public static final String SP_LOCATION = "location";
@@ -145,6 +145,7 @@ public class EGContext {
     public static String NETWORK_TYPE_NO_NET ="无网络";
 
     public static final String SP_NAME = "eg_policy";
+    public static final String LASTLOCATION = "LastLocation";
     public static final String POLICY_VER_DEFALUT = "";
     public static final long SERVER_DELAY_DEFAULT = 0L;
     public static final int FAIL_COUNT_DEFALUT = 5;
@@ -162,6 +163,7 @@ public class EGContext {
     public static final int DOMAIN_UPDATE_TIMES = 1;//TODO 需确认
     public static final long PERMIT_FOR_FAIL_TIME_DEFALUT = 0;
     private static final int PERMIT_FOR_SERVER_TIME_DEFALUT = 0;
+    public static final long MINDISTANCE = 1000;// 地理位置信息获取距离/米
 
     public static String APP_URL = null;
     public static String DEVIER_URL = null;
@@ -207,6 +209,8 @@ public class EGContext {
             "ait405.analysys.cn", "urd405.analysys.cn",// 8
             "ait025.analysys.cn", "urd025.analysys.cn",// 9
             "ait339.analysys.cn", "urd339.analysys.cn"// 头部应用 用作测试
+
+            //TODO  ait不用
     };
     /**
      * 实时计算接口

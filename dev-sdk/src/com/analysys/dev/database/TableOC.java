@@ -59,10 +59,11 @@ public class TableOC {
 
     public JSONArray select() {
         JSONArray jar = null;
+        Cursor cursor = null;
         try {
             jar = new JSONArray();
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            Cursor cursor = db.query(DBConfig.OC.TABLE_NAME,
+            cursor = db.query(DBConfig.OC.TABLE_NAME,
                     new String[]{DBConfig.OC.Column.OCI, DBConfig.OC.Column.IT},
                     null, null, null,
                     null, null, null);
@@ -76,6 +77,8 @@ public class TableOC {
             }
         } catch (Throwable e) {
             ELOG.e(e);
+        }finally {
+            if(cursor != null) cursor.close();
         }
         DBManager.getInstance(mContext).closeDB();
         return jar;

@@ -84,15 +84,19 @@ public class TableAppSnapshot {
      */
     public Map<String, String> mSelect() {
         Map<String, String> map = null;
+        Cursor cursor = null;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            Cursor cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null, null, null);
-            map = new HashMap<String, String>();
+            cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null, null, null);
+            map = new HashMap();
             while (cursor.moveToNext()) {
                 String apn = cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN));
                 map.put(apn, String.valueOf(getCursor(cursor)));
             }
         } catch (Throwable e) {
+        }finally {
+            if(cursor!= null) cursor.close();
+            DBManager.getInstance(mContext).closeDB();
         }
         return map;
     }
@@ -142,15 +146,17 @@ public class TableAppSnapshot {
             cv.put(DBConfig.AppSnapshot.Column.AT, appTag);
             db.update(DBConfig.AppSnapshot.TABLE_NAME, cv, DBConfig.AppSnapshot.Column.APN + "= ? ",
                 new String[] {pkgName});
-            DBManager.getInstance(mContext).closeDB();
         } catch (Throwable e) {
+        }finally {
+            DBManager.getInstance(mContext).closeDB();
         }
     }
 
     public boolean isHasPkgName(String pkgName) {
+        Cursor cursor = null;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            Cursor cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, new String[] {DBConfig.AppSnapshot.Column.APN},
+            cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, new String[] {DBConfig.AppSnapshot.Column.APN},
                 DBConfig.AppSnapshot.Column.APN + "=?", new String[] {pkgName}, null, null, null);
             if (cursor.getCount() == 0) {
                 return false;
@@ -158,6 +164,9 @@ public class TableAppSnapshot {
                 return true;
             }
         } catch (Throwable e) {
+        }finally {
+            if(cursor != null) cursor.close();
+            DBManager.getInstance(mContext).closeDB();
         }
         return false;
     }
@@ -167,15 +176,20 @@ public class TableAppSnapshot {
      */
     public JSONArray select() {
         JSONArray array = null;
+        Cursor cursor = null;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             array = new JSONArray();
-            Cursor cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null, null, null);
+            cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null, null, null);
             while (cursor.moveToNext()) {
+                if(cursor == null) continue;
                 array.put(getCursor(cursor));
             }
         } catch (Throwable e) {
             ELOG.e(e);
+        }finally {
+            if(cursor != null) cursor.close();
+            DBManager.getInstance(mContext).closeDB();
         }
         return array;
     }
