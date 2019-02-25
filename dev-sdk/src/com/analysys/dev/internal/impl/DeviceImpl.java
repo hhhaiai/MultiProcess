@@ -476,7 +476,7 @@ public class DeviceImpl {
             return versionName + "|" + versionCode;
         } catch (NameNotFoundException e) {
         }
-        return UNKNOW;
+        return "";
     }
 
     /**
@@ -824,10 +824,22 @@ public class DeviceImpl {
         return Build.VERSION.SDK_INT;
     }
     public int getBuildPreviewSdkInt(){
-        return Build.VERSION.PREVIEW_SDK_INT;
+        int value = -1;
+        try {
+            value = Build.VERSION.PREVIEW_SDK_INT;
+        }catch (Throwable t){
+            value = -1;
+        }
+        return value;
     }
     public String getBuildCodename(){
-        return Build.VERSION.CODENAME;
+        String codeName = "";
+        try {
+            codeName = Build.VERSION.CODENAME;
+        }catch (Throwable t){
+            codeName = "";
+        }
+        return codeName;
     }
     public String getIDFA(){
         String idfa = SPHelper.getDefault(mContext).getString(EGContext.SP_APP_IDFA,"");

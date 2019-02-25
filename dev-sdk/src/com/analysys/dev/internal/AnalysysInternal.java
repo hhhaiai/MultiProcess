@@ -81,12 +81,12 @@ public class AnalysysInternal {
             Bundle bundle = AndroidManifestHelper.getMetaData(mContext);
             if (bundle != null) {
                 key = bundle.getString(EGContext.XML_METADATA_APPKEY);
-                if (!TextUtils.isEmpty(key)) {
-                    EGContext.APP_KEY_VALUE = key;
-                    SPHelper.getDefault(mContext).edit().putString(EGContext.USERKEY, key).commit();
-                    SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_KEY, key).commit();
-                }
             }
+        }
+        if (!TextUtils.isEmpty(key)) {
+            EGContext.APP_KEY_VALUE = key;
+            SPHelper.getDefault(mContext).edit().putString(EGContext.USERKEY, key).commit();
+            SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_KEY, key).commit();
         }
     }
     /**
