@@ -121,28 +121,13 @@ public class DataPackaging {
 
             if (PolicyImpl.getInstance(mContext).getValueFromSp(EGContext.BATTERY_SWITCH,EGContext.SWITCH_OF_BATTERY)) {
                 BatteryModuleNameInfo battery = BatteryModuleNameInfo.getInstance();
-                if(TextUtils.isEmpty(battery.getBatteryStatus()) && TextUtils.isEmpty(battery.getBatteryHealth()) &&
-                        TextUtils.isEmpty(battery.getBatteryTechnology())){
-                    String batteryInfo = PolicyImpl.getInstance(mContext).getSP().getString(DeviceKeyContacts.DevInfo.BatteryModuleName,"");
-                    if(!TextUtils.isEmpty(batteryInfo)){
-                        batteryJson = new JSONObject(batteryInfo);
-                    }
-                }else{
-                if (!TextUtils.isEmpty(battery.getBatteryStatus()))
-                    batteryJson.put(DeviceKeyContacts.DevInfo.BatteryStatus, battery.getBatteryStatus());
-                if (!TextUtils.isEmpty(battery.getBatteryHealth()))
-                    batteryJson.put(DeviceKeyContacts.DevInfo.BatteryHealth, battery.getBatteryHealth());
-                if (!TextUtils.isEmpty(battery.getBatteryLevel()))
-                    batteryJson.put(DeviceKeyContacts.DevInfo.BatteryLevel, battery.getBatteryLevel());
-                if (!TextUtils.isEmpty(battery.getBatteryScale()))
-                    batteryJson.put(DeviceKeyContacts.DevInfo.BatteryScale, battery.getBatteryScale());
-                if (!TextUtils.isEmpty(battery.getBatteryPlugged()))
-                    batteryJson.put(DeviceKeyContacts.DevInfo.BatteryPlugged, battery.getBatteryPlugged());
-                if (!TextUtils.isEmpty(battery.getBatteryTechnology()))
-                    batteryJson.put(DeviceKeyContacts.DevInfo.BatteryTechnology, battery.getBatteryTechnology());
-                if (!TextUtils.isEmpty(battery.getBatteryTemperature()))
-                    batteryJson.put(DeviceKeyContacts.DevInfo.BatteryTemperature, battery.getBatteryTemperature());
-                }
+                if (!TextUtils.isEmpty(battery.getBatteryStatus())) batteryJson.put(DeviceKeyContacts.DevInfo.BatteryStatus, battery.getBatteryStatus());
+                if (!TextUtils.isEmpty(battery.getBatteryHealth())) batteryJson.put(DeviceKeyContacts.DevInfo.BatteryHealth, battery.getBatteryHealth());
+                if (!TextUtils.isEmpty(battery.getBatteryLevel())) batteryJson.put(DeviceKeyContacts.DevInfo.BatteryLevel, battery.getBatteryLevel());
+                if (!TextUtils.isEmpty(battery.getBatteryScale())) batteryJson.put(DeviceKeyContacts.DevInfo.BatteryScale, battery.getBatteryScale());
+                if (!TextUtils.isEmpty(battery.getBatteryPlugged())) batteryJson.put(DeviceKeyContacts.DevInfo.BatteryPlugged, battery.getBatteryPlugged());
+                if (!TextUtils.isEmpty(battery.getBatteryTechnology())) batteryJson.put(DeviceKeyContacts.DevInfo.BatteryTechnology, battery.getBatteryTechnology());
+                if (!TextUtils.isEmpty(battery.getBatteryTemperature())) batteryJson.put(DeviceKeyContacts.DevInfo.BatteryTemperature, battery.getBatteryTemperature());
             }
             if (PolicyImpl.getInstance(mContext).getValueFromSp(EGContext.DEV_FURTHER_DETAIL_SWITCH,EGContext.SWITCH_OF_DEV_FURTHER_DETAIL)) {
                 if(!TextUtils.isEmpty(devImpl.getCPUModel()))

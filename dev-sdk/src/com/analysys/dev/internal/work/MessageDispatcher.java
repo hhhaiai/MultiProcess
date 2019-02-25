@@ -11,6 +11,7 @@ import com.analysys.dev.internal.impl.LocationImpl;
 import com.analysys.dev.internal.impl.OCImpl;
 import com.analysys.dev.internal.impl.UploadImpl;
 
+import com.analysys.dev.receiver.AnalysysReceiver;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 

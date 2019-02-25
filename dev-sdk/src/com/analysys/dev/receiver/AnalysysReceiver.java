@@ -14,7 +14,12 @@ public class AnalysysReceiver extends BroadcastReceiver {
     String PACKAGE_ADDED = "android.intent.action.PACKAGE_ADDED";
     String PACKAGE_REMOVED = "android.intent.action.PACKAGE_REMOVED";
     String PACKAGE_REPLACED = "android.intent.action.PACKAGE_REPLACED";
-
+    public static AnalysysReceiver getInstance() {
+        return AnalysysReceiver.Holder.INSTANCE;
+    }
+    private static class Holder {
+        private static final AnalysysReceiver INSTANCE = new AnalysysReceiver();
+    }
     @Override
     public void onReceive(Context context, Intent intent) {
         Reflecer.init();

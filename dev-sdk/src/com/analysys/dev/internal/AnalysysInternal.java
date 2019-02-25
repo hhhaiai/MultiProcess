@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.os.Process;
 import android.text.TextUtils;
 
@@ -11,6 +12,7 @@ import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.work.ServiceHelper;
 import com.analysys.dev.utils.AndroidManifestHelper;
 import com.analysys.dev.utils.ELOG;
+import com.analysys.dev.utils.ReceiverUtils;
 import com.analysys.dev.utils.Streamer;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 import com.analysys.dev.utils.reflectinon.Reflecer;
@@ -57,12 +59,21 @@ public class AnalysysInternal {
         Reflecer.init();
         ELOG.d("初始化，进程Id：< " + Process.myPid() + " >");
         initSupportMultiProcess();
+        ReceiverUtils.getInstance().setWork(true);
         updateAppkey(key);
         updateChannel(mContext, channel);
         EGContext.FLAG_DEBUG_USER = isDebug;
         //JobService
+        ReceiverUtils.getInstance().registAllReceiver(mContext);
+        PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+        boolean isScreenOn = pm.isScreenOn();
+        // 如果为true，则表示屏幕正在使用，false则屏幕关闭。
+        if (!isScreenOn) {
+            ReceiverUtils.getInstance().setWork(false);
+        }
         ServiceHelper.getInstance(mContext).startJobService(mContext);
         MessageDispatcher.getInstance(mContext).startService(0);
+
 
     }
     private void updateAppkey(String key){

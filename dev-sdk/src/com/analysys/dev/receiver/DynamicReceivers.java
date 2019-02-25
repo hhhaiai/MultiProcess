@@ -9,6 +9,7 @@ import com.analysys.dev.internal.impl.DeviceImpl;
 import com.analysys.dev.internal.impl.WifiImpl;
 import com.analysys.dev.internal.impl.proc.ProcessManager;
 import com.analysys.dev.utils.ELOG;
+import com.analysys.dev.utils.ReceiverUtils;
 import com.analysys.dev.utils.reflectinon.Reflecer;
 import com.analysys.dev.internal.work.MessageDispatcher;
 
@@ -20,6 +21,12 @@ public class DynamicReceivers extends BroadcastReceiver {
     String BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED";
 
     Context mContext;
+    public static DynamicReceivers getInstance() {
+        return Holder.INSTANCE;
+    }
+    private static class Holder {
+        private static final DynamicReceivers INSTANCE = new DynamicReceivers();
+    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -36,6 +43,7 @@ public class DynamicReceivers extends BroadcastReceiver {
         }
         if (SCREEN_OFF.equals(intent.getAction())) {
             ProcessManager.setIsCollected(false);
+            ReceiverUtils.getInstance().unRegistAllReceiver(mContext);
             MessageDispatcher.getInstance(mContext).killWorker();
             ELOG.e("接收关闭屏幕广播");
         }

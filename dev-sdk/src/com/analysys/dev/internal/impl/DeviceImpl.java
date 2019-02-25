@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
 
+import com.analysys.dev.model.BatteryModuleNameInfo;
 import com.analysys.dev.model.SoftwareInfo;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.FileUtils;
@@ -691,23 +692,20 @@ public class DeviceImpl {
             int plugged = intent.getIntExtra("plugged", 0);
             String technology = intent.getStringExtra("technology");
             int temperature = intent.getIntExtra("temperature",0);
-            //电源当前状态
-            JSONObject info = new JSONObject();
-            info.put(DeviceKeyContacts.DevInfo.BatteryStatus,String.valueOf(status));
+            BatteryModuleNameInfo info = BatteryModuleNameInfo.getInstance();
+            info.setBatteryStatus(String.valueOf(status));
             //电源健康状态
-            info.put(DeviceKeyContacts.DevInfo.BatteryHealth,String.valueOf(health));
+            info.setBatteryHealth(String.valueOf(health));
             //电源发前电量
-            info.put(DeviceKeyContacts.DevInfo.BatteryLevel,String.valueOf(level));
+            info.setBatteryLevel(String.valueOf(level));
             //电源总电量
-            info.put(DeviceKeyContacts.DevInfo.BatteryScale,String.valueOf(scale));
+            info.setBatteryScale(String.valueOf(scale));
             //电源充电状态
-            info.put (DeviceKeyContacts.DevInfo.BatteryPlugged,String.valueOf(plugged));
+            info.setBatteryPlugged (String.valueOf(plugged));
             //电源类型
-            info.put(DeviceKeyContacts.DevInfo.BatteryTechnology,technology);
+            info.setBatteryTechnology(technology);
             //电池温度
-            info.put(DeviceKeyContacts.DevInfo.BatteryTemperature,String.valueOf(temperature));
-            ELOG.i(info+  "  ::::::: getInfo  ");
-            PolicyImpl.getInstance(mContext).getSP().edit().putString(DeviceKeyContacts.DevInfo.BatteryModuleName,info.toString());
+            info.setBatteryTemperature(String.valueOf(temperature));
         } catch (Throwable e) {
 
         }
