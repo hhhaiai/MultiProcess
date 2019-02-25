@@ -1,5 +1,8 @@
 apply plugin: 'com.android.library'
 
+def version = "4.3.0"
+def date = "20190225"
+
 android {
     compileSdkVersion 26
     buildToolsVersion '26.0.2'
@@ -39,6 +42,7 @@ android {
         disable "UnusedResources"
         textOutput "stdout"
         textReport true
+        ignoreWarnings true
     }
 }
 tasks.withType(Javadoc) {
@@ -50,3 +54,32 @@ tasks.withType(Javadoc) {
 //dependencies {
 //    implementation fileTree(dir: 'libs', include: ['*.jar'])
 //}
+
+task generateJar(type: Copy) {
+    from("build/intermediates/bundles/release")
+    into "../releasebak"
+    include("classes.jar")
+    rename("classes.jar", "analysys_track_v" + version + "_" + date + ".jar")
+}
+
+task copyDoc(type: Copy) {
+    from("../doc")
+    into "../releasebak"
+    include("*.pdf")
+}
+
+//https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Zip.html
+task packageZip(type: Zip) {
+    from "../releasebak/"
+//    destinationDir: 来指定生成zip文件的目录，类型是file(dir,但是不要包含/)
+    destinationDir = file("../release")
+//    archiveName: 压缩包名字，注意此处不会自动添加后缀
+    archiveName = "analysys_track_v" + version + "_" + date + ".zip"
+}
+task zip(type: Delete) {
+    delete "../releasebak"
+}
+generateJar.dependsOn build
+copyDoc.dependsOn generateJar
+packageZip.dependsOn copyDoc
+zip.dependsOn packageZip

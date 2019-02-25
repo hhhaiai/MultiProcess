@@ -25,7 +25,7 @@ public class EGContext {
     /**
      * SDK版本
      */
-    public static final String SDK_VERSION = "4.0.1";
+    public static final String SDK_VERSION = "4.3.0|20190225";
 
     public static final String LOGTAG_DEBUG = "xxx";
 

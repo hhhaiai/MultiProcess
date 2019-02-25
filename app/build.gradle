@@ -39,6 +39,7 @@ android {
         disable "UnusedResources"
         textOutput "stdout"
         textReport true
+        ignoreWarnings true
     }
 }
 tasks.withType(Javadoc) {
