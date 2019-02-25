@@ -274,19 +274,18 @@ public class DeviceImpl {
      * 设备序列号,SerialNumber
      */
     public String getSerialNumber() {
-        String serialNumber = "";
-        try {
-            if (PermissionUtils.checkPermission(mContext, permission.READ_PHONE_STATE)) {
-                TelephonyManager tm = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
-                serialNumber = tm.getSimSerialNumber();
-                if(TextUtils.isEmpty(serialNumber)){
-                    serialNumber = "";
-                }
-                return serialNumber;
+        if (Build.VERSION.SDK_INT > 26) {
+            try {
+                Class<?> clazz = Class.forName("android.os");
+                Method method = clazz.getMethod("getSerial");
+                String result = (String) method.invoke(null);
+                return result;
+            } catch (Throwable e) {
+                return "";
             }
-        } catch (Throwable e) {
+        } else {
+            return Build.SERIAL;
         }
-        return serialNumber;
     }
         private DisplayMetrics getDisplayMetrics(){
             DisplayMetrics displayMetrics = new DisplayMetrics();

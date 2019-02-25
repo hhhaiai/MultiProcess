@@ -56,10 +56,9 @@ public class EGContext {
 
     public static final String SP_SNAPSHOT_TIME = "getSnapshotTime";
 
-//    public static final String SP_WIFI = "wifi";
-//    public static final String SP_WIFI_DETAIL = "wifiDetail";
-
-//    public static final String SP_BASE_STATION = "baseStation";
+    public static String APP_KEY_VALUE = "";
+    public static String APP_CHANNEL_VALUE = "";
+    public static String EGUAN_CHANNEL_PREFIX = "EGUAN_CHANNEL_";
     public static final String SP_LOCATION = "location";
 
     public static final String SP_LOCATION_TIME = "getLocationTime";

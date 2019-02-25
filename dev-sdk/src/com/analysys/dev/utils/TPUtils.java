@@ -71,17 +71,21 @@ public class TPUtils {
      */
     public static String getAppKey(Context context) {
         Context cxt = EContextHelper.getContext(context);
+        String appkey = EGContext.APP_KEY_VALUE;
+        if (!TextUtils.isEmpty(appkey)) {
+            return appkey;
+        }
         if (cxt == null) {
             return "";
         }
-        String appkey = SPHelper.getDefault(context).getString(EGContext.SP_APP_KEY,"");
+        appkey = SPHelper.getDefault(context).getString(EGContext.SP_APP_KEY,"");
         if (!TextUtils.isEmpty(appkey)) {
             return appkey;
         }
         try {
             ApplicationInfo appInfo = cxt.getApplicationContext().getPackageManager()
                     .getApplicationInfo(cxt.getPackageName(), PackageManager.GET_META_DATA);
-            appkey = appInfo.metaData.getString(EGContext.SP_APP_KEY);
+            appkey = appInfo.metaData.getString(EGContext.XML_METADATA_APPKEY);
             if (!TextUtils.isEmpty(appkey)) {
                 return appkey;
             }
@@ -107,11 +111,14 @@ public class TPUtils {
         try {
             ApplicationInfo appInfo = context.getApplicationContext().getPackageManager()
                     .getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
-            channel = appInfo.metaData.getString(EGContext.SP_APP_CHANNEL);
+            channel = appInfo.metaData.getString(EGContext.XML_METADATA_CHANNEL);
             if (!TextUtils.isEmpty(channel)) {
                 return channel;
             }
         } catch (Throwable e) {
+        }
+        if (!TextUtils.isEmpty(EGContext.APP_CHANNEL_VALUE)) {
+            return EGContext.APP_CHANNEL_VALUE;
         }
         channel = SPHelper.getDefault(context).getString(EGContext.SP_APP_CHANNEL,"");
         if (!TextUtils.isEmpty(channel)) {
