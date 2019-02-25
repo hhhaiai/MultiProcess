@@ -4,11 +4,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabaseCorruptException;
-import android.util.Log;
+
 
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
-import com.analysys.dev.internal.impl.AppSnapshotImpl;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 import java.util.HashMap;

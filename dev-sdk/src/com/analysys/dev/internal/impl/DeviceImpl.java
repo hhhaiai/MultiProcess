@@ -28,6 +28,7 @@ import com.analysys.dev.utils.FileUtils;
 import com.analysys.dev.utils.HiJack;
 import com.analysys.dev.utils.NetworkUtils;
 import com.analysys.dev.utils.PermissionUtils;
+import com.analysys.dev.utils.TPUtils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 import com.analysys.dev.utils.simulator.SimulatorUtils;
 import com.analysys.dev.utils.sp.SPHelper;
@@ -411,14 +412,14 @@ public class DeviceImpl {
      * 推广渠道
      */
     public String getApplicationChannel() {
-        return SPHelper.getDefault(mContext).getString(EGContext.SP_APP_CHANNEL, "");
+        return TPUtils.getAppChannel(mContext);
     }
 
     /**
      * 样本应用key
      */
     public String getApplicationKey() {
-        return SPHelper.getDefault(mContext).getString(EGContext.SP_APP_KEY, "");
+        return TPUtils.getAppKey(mContext);
     }
 
 //应用信息SoftwareInfoImpl

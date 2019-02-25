@@ -3,14 +3,9 @@ package com.analysys.dev.utils.reflectinon;
 import android.os.Build;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
-/**
- * @Copyright © 2018 Analysys Inc. All rights reserved.
- * @Version 1.0
- * @Create 2018/12/18 16:17
- * @Author sanbo
- */
+
+
 public class Reflecer {
     /**
      * make sure hook getApplication success

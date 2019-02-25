@@ -4,11 +4,6 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import java.lang.reflect.Method;
 
-/**
- * Common functions used for detection of system fingerprints.
- * 
- * @author tstrazzere
- */
 public class Utilities {
 
     /**

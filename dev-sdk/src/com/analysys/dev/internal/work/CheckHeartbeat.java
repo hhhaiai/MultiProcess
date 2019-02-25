@@ -10,13 +10,7 @@ import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 
-/**
- * @Copyright © 2018 EGuan Inc. All rights reserved.
- * @Description: TODO
- * @Version: 1.0
- * @Create: 2018/10/22 18:34
- * @Author: Wang-X-C
- */
+
 public class CheckHeartbeat {
     Context mContext;
     Handler mHandler;

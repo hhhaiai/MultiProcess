@@ -1,10 +1,6 @@
 package com.analysys.dev.utils.simulator;
 
-/**
- * Simple class used for the systems properties checked in later places of the application.
- * 
- * @author tstrazzere
- */
+
 public class Property {
     public String name;
     public String seek_value;

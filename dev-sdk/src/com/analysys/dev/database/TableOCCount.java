@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
-import com.analysys.dev.internal.impl.OCImpl;
 import com.analysys.dev.utils.Base64Utils;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.Utils;
@@ -290,5 +289,15 @@ public class TableOCCount {
         }
         DBManager.getInstance(mContext).closeDB();
         return ocCountJar;
+    }
+    public void delete() {
+        try {
+            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            if(db == null) return;
+            db.delete(DBConfig.OCCount.TABLE_NAME, DBConfig.OCCount.Column.ST + "=?", new String[]{"1"});
+        } catch (Throwable e) {
+        }finally {
+            DBManager.getInstance(mContext).closeDB();
+        }
     }
 }

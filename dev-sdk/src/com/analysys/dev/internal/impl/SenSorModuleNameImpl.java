@@ -5,14 +5,12 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
-import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SenSorModuleNameImpl{
@@ -46,7 +44,7 @@ public class SenSorModuleNameImpl{
                 info.put(DeviceKeyContacts.DevInfo.SenSorName,s.getName());
 //                ELOG.i("SenSorName :::::::"+s.getName());
                 // 传感器版本
-                info.put(DeviceKeyContacts.DevInfo.SenSorVersion,s.getVersion());
+                info.put(DeviceKeyContacts.DevInfo.SenSorVersion,String.valueOf(s.getVersion()));
                 // 传感器厂商
                 info.put(DeviceKeyContacts.DevInfo.SenSorManufacturer,s.getVendor());
                 try{

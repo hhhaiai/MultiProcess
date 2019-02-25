@@ -52,7 +52,7 @@ public class EGContext {
     public static final int CHECK_HEARTBEAT_CYCLE = 15 * 1000;
 
     public static final String SP_APP_KEY = "appKey";
-    public static final String SP_APP_CHANNEL = "appKey";
+    public static final String SP_APP_CHANNEL = "appChannel";
 
     public static final String SP_SNAPSHOT_TIME = "getSnapshotTime";
 
@@ -66,7 +66,8 @@ public class EGContext {
     public static final String SP_MAC_ADDRESS = "MACAddress";
 
     public static final String SP_DAEMON_TIME = "getDaemonTime";
-
+    // 设备内SDK发送 进程同步文件。首次SDK初始化时创建
+    public static final String DEV_UPLOAD_PROC_NAME = "tmp";
     public class LOGINFO {
         public static final String LOG_NOT_APPKEY = "please check you appkey!";
     }

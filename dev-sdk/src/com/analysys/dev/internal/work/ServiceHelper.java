@@ -8,13 +8,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
-import android.util.Log;
+
 
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.service.AnalysysJobService;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.PermissionUtils;
-import com.analysys.dev.utils.TPUtils;
+
 import com.analysys.dev.utils.Utils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 import com.analysys.dev.receiver.DynamicReceivers;
@@ -22,13 +22,7 @@ import com.analysys.dev.service.AnalysysService;
 
 import java.lang.reflect.Method;
 
-/**
- * @Copyright © 2018 Analysys Inc. All rights reserved.
- * @Description: 服务启动
- * @Version: 1.0
- * @Create: 2018年9月12日 下午2:26:29
- * @Author: sanbo
- */
+
 public class ServiceHelper {
     Context mContext;
     private static DynamicReceivers dynamicReceivers = null;

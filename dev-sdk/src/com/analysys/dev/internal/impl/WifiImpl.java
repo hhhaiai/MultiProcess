@@ -7,7 +7,6 @@ import android.net.wifi.WifiManager;
 
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 
-import com.analysys.dev.utils.AndroidManifestHelper;
 import com.analysys.dev.utils.PermissionUtils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 

@@ -8,7 +8,6 @@ import android.text.TextUtils;
 
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.utils.Base64Utils;
-import com.analysys.dev.utils.Utils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;

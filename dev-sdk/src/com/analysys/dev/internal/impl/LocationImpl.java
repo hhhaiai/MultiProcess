@@ -9,7 +9,7 @@ import org.json.JSONObject;
 import com.analysys.dev.database.TableLocation;
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
-import com.analysys.dev.model.DevInfo;
+
 import com.analysys.dev.utils.AndroidManifestHelper;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.EThreadPool;

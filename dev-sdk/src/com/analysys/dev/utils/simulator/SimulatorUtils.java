@@ -17,14 +17,7 @@ import android.content.Context;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 
-/**
- * @Copyright © 2018 Analysys Inc. All rights reserved.
- * @Description: github.com/strazzere/anti-emulator/
- * @Version: 1.0
- * @Create: Dec 18, 2018 5:04:57 PM
- * @Author: sanbo
- * @Email: sanbo.xyz@gmail.com
- */
+
 public class SimulatorUtils {
     // 15555215554,Default emulator phone numbers + VirusTotal
     private static String[] known_numbers = {"15555215554", "15555215556", "15555215558", "15555215560", "15555215562",

@@ -8,7 +8,6 @@ import android.text.TextUtils;
 
 import com.analysys.dev.utils.Base64Utils;
 import com.analysys.dev.utils.ELOG;
-import com.analysys.dev.utils.Utils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
@@ -82,5 +81,15 @@ public class TableOC {
         }
         DBManager.getInstance(mContext).closeDB();
         return jar;
+    }
+    public void delete() {
+        try {
+            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            if(db == null) return;
+            db.delete(DBConfig.OC.TABLE_NAME, DBConfig.OC.Column.ST + "=?", new String[]{"1"});
+        } catch (Throwable e) {
+        }finally {
+            DBManager.getInstance(mContext).closeDB();
+        }
     }
 }

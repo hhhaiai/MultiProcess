@@ -1,10 +1,5 @@
 package com.analysys.dev.utils;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class HiJack {
     //检测xposed相关文件

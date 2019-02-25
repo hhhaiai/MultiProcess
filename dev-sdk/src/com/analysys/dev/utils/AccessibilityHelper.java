@@ -9,13 +9,7 @@ import android.text.TextUtils;
 import com.analysys.dev.internal.Content.EGContext;
 import java.util.Arrays;
 
-/**
- * @Copyright © 2018 sanbo Inc. All rights reserved.
- * @Description: 辅助功能基础功能类
- * @Version: 1.0
- * @Create: 2018年3月8日 上午11:34:04
- * @Author: sanbo
- */
+
 public class AccessibilityHelper {
     /**
      * 检测辅助功能是否开启<br>

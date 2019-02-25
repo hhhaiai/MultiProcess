@@ -6,12 +6,13 @@ import android.util.Base64;
 
 import com.analysys.dev.database.TableAppSnapshot;
 import com.analysys.dev.database.TableLocation;
+import com.analysys.dev.database.TableOC;
 import com.analysys.dev.database.TableOCCount;
 import com.analysys.dev.database.TableXXXInfo;
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.impl.proc.DataPackaging;
-import com.analysys.dev.internal.impl.proc.ProcessManager;
+
 import com.analysys.dev.model.PolicyInfo;
 import com.analysys.dev.utils.AESUtils;
 import com.analysys.dev.utils.DeflterCompressUtils;
@@ -19,6 +20,7 @@ import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.EThreadPool;
 import com.analysys.dev.utils.NetworkUtils;
 import com.analysys.dev.utils.RequestUtils;
+import com.analysys.dev.utils.TPUtils;
 import com.analysys.dev.utils.Utils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 import com.analysys.dev.internal.work.MessageDispatcher;
@@ -150,7 +152,7 @@ public class UploadImpl {
 //                    }
 //                }
 //            }).start();
-            String key_inner = SPHelper.getDefault(mContext).getString(EGContext.USERKEY,"");
+            String key_inner = TPUtils.getAppKey(mContext);
             if (null == key_inner) {
                 key_inner = EGContext.ORIGINKEY_STRING;
             }
@@ -251,7 +253,10 @@ public class UploadImpl {
         }
     }
     private void cleanData(){
-      TableAppSnapshot.getInstance(mContext).delete();
+//      TableAppSnapshot.getInstance(mContext).delete();
       TableLocation.getInstance(mContext).delete();
+      TableXXXInfo.getInstance(mContext).delete();
+      TableOC.getInstance(mContext).delete();
+      TableOCCount.getInstance(mContext).delete();
     }
 }

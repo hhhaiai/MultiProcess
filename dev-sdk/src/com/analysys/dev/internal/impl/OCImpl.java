@@ -2,7 +2,6 @@ package com.analysys.dev.internal.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -12,11 +11,9 @@ import com.analysys.dev.database.TableOCCount;
 import com.analysys.dev.database.TableXXXInfo;
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
-import com.analysys.dev.internal.impl.proc.AppProcess;
 import com.analysys.dev.internal.impl.proc.ProcParser;
 import com.analysys.dev.internal.impl.proc.Process;
 import com.analysys.dev.internal.impl.proc.ProcessManager;
-import com.analysys.dev.model.AppSnapshotInfo;
 import com.analysys.dev.service.AnalysysAccessibilityService;
 import com.analysys.dev.utils.AccessibilityHelper;
 import com.analysys.dev.utils.ELOG;

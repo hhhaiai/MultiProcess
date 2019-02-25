@@ -2,8 +2,7 @@ package com.analysys.dev.database;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.text.TextUtils;
-import java.io.File;
+
 
 public class DBUtils {
 

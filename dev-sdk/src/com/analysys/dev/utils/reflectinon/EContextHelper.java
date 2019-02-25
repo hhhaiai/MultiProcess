@@ -3,13 +3,7 @@ package com.analysys.dev.utils.reflectinon;
 import android.app.Application;
 import android.content.Context;
 
-/**
- * @Copyright © 2018 Analysys Inc. All rights reserved.
- * @Description: 部分变量的获取方法
- * @Version: 1.0
- * @Create: 2018年8月30日 上午11:49:23
- * @Author: sanbo
- */
+
 public class EContextHelper {
 
     public static Context getContext(Context context) {

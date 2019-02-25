@@ -21,7 +21,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.List;
+
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -58,12 +58,12 @@ public class RequestUtils {
         // 添加头信息
         connection.setRequestProperty(EGContext.SDKV, SPHelper.getDefault(ctx).getString(EGContext.SDKV,""));
         connection.setRequestProperty(EGContext.DEBUG, DeviceImpl.getInstance(ctx).getDebug());
-        connection.setRequestProperty(EGContext.APPKEY, SPHelper.getDefault(ctx).getString(EGContext.APPKEY ,""));
+        connection.setRequestProperty(EGContext.APPKEY, TPUtils.getAppKey(ctx));
         connection.setRequestProperty(EGContext.TIME, SPHelper.getDefault(ctx).getString(EGContext.TIME , ""));
         connection.setRequestProperty(EGContext.POLICYVER, "0");//策略覆盖
         connection.setRequestProperty(EGContext.PRO, "QF4");//写死
         ELOG.i("头文件字段：：：：：："+SPHelper.getDefault(ctx).getString(EGContext.SDKV,"")+"  debug::: "+ DeviceImpl.getInstance(ctx).getDebug()
-        +"APPKEY::: "+SPHelper.getDefault(ctx).getString(EGContext.APPKEY ,"")+"   TIME:::   "+SPHelper.getDefault(ctx).getString(EGContext.TIME , ""));
+        +"APPKEY::: "+TPUtils.getAppKey(ctx)+"   TIME:::   "+SPHelper.getDefault(ctx).getString(EGContext.TIME , ""));
         // 发送数据
         pw = new PrintWriter(connection.getOutputStream());
         pw.print("facility4="+URLEncoder.encode(value,"UTF-8"));

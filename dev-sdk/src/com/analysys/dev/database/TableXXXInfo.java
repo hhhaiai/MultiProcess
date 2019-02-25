@@ -6,11 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Base64;
 
-import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.impl.PolicyImpl;
 import com.analysys.dev.internal.impl.proc.ProcParser;
-import com.analysys.dev.utils.Base64Utils;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 
@@ -139,6 +137,20 @@ public class TableXXXInfo {
         }
         return array;
     }
-
+    public void delete() {
+        SQLiteDatabase db = null;
+        try {
+            db = DBManager.getInstance(mContext).openDB();
+            if(db == null) return;
+            db.beginTransaction();
+            db.delete(DBConfig.XXXInfo.TABLE_NAME, null, null);
+            db.delete(DBConfig.PROCInfo.TABLE_NAME,null,null);
+            db.setTransactionSuccessful();
+        } catch (Throwable e) {
+        }finally {
+            db.endTransaction();
+            DBManager.getInstance(mContext).closeDB();
+        }
+    }
 }
 

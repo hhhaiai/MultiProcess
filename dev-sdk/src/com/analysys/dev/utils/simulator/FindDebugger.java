@@ -7,11 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-/**
- * Class used to determine functionality specific to the Android debuggers
- * 
- * @author tstrazzere
- */
+
 public class FindDebugger {
 
     private static String tracerpid = "TracerPid";

@@ -12,13 +12,6 @@ import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.reflectinon.Reflecer;
 import com.analysys.dev.internal.work.MessageDispatcher;
 
-/**
- * @Copyright © 2018 Analysys Inc. All rights reserved.
- * @Description: 动态注册的广播
- * @Version: 1.0
- * @Create: 2018年10月8日 下午5:54:14
- * @Author: sanbo
- */
 public class DynamicReceivers extends BroadcastReceiver {
     String SCREEN_ON = "android.intent.action.SCREEN_ON";
     String SCREEN_OFF = "android.intent.action.SCREEN_OFF";

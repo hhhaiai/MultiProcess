@@ -10,13 +10,6 @@ import android.annotation.TargetApi;
 import android.os.Build;
 import android.view.accessibility.AccessibilityEvent;
 
-/**
- * @Copyright © 2018 Analysys Inc. All rights reserved.
- * @Description: TODO
- * @Version: 1.0
- * @Create: 2018年9月6日 上午11:01:46
- * @Author: sanbo
- */
 public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onCreate() {

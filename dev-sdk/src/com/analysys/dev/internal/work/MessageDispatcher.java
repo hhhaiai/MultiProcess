@@ -10,18 +10,10 @@ import com.analysys.dev.internal.impl.AppSnapshotImpl;
 import com.analysys.dev.internal.impl.LocationImpl;
 import com.analysys.dev.internal.impl.OCImpl;
 import com.analysys.dev.internal.impl.UploadImpl;
-import com.analysys.dev.service.AnalysysAccessibilityService;
-import com.analysys.dev.utils.AccessibilityHelper;
+
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 
-/**
- * @Copyright © 2018 Analysys Inc. All rights reserved.
- * @Description: 消息分发包装类和消息分发Handler
- * @Version: 1.0
- * @Create: 2018年9月12日 下午3:01:58
- * @Author: sanbo
- */
 public class MessageDispatcher {
 
     private MessageDispatcher() {

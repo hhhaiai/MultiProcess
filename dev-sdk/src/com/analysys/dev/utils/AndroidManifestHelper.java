@@ -17,13 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * @Copyright © 2018 sanbo Inc. All rights reserved.
- * @Description: android AndroidManifest检查类
- * @Version: 1.0
- * @Create: 2018年3月8日 下午2:11:00
- * @Author: sanbo
- */
+
 public class AndroidManifestHelper {
     /**
      * 判断AndroidManifest中是否声明Activity
