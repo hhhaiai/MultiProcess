@@ -391,7 +391,8 @@ public class DeviceImpl {
             Object imsi1 = m2.invoke(telephony, 0);
             Object imsi2 = m2.invoke(telephony, 1);
             if (imsi1 != null && imsi2 != null) {
-                return imsi1 + "|" + imsi2;
+                if(!imsi1.equals(imsi2)) return imsi1 + "|" + imsi2;
+                else return imsi1+"";
             } else if (imsi1 == null && imsi2 == null) {
                 return "";
             } else {
