@@ -41,7 +41,7 @@ public class EGContext {
     public static final int SNAPSHOT_CYCLE = 30 * 60 * 1000;
     public static final String SNAPSHOT_LAST_TIME = "SNAP_SHOT";
     // 位置获取周期时间
-    public static final int LOCATION_CYCLE = 30 * 1000;
+    public static final int LOCATION_CYCLE = 30 * 60 * 1000;
     public static final String LOCATION_LAST_TIME = "LOCATION";
     // 应用打开关闭获取周期时间
     public static final int OC_CYCLE = 5 * 1000;
@@ -56,6 +56,9 @@ public class EGContext {
     // 心跳检查
     public static final int CHECK_HEARTBEAT_CYCLE = 15 * 1000;
     public static final String HEARTBEAT_LAST_TIME = "HEART_BETA";
+
+    //delay时常
+    public static final int DELAY_TIME_CHECK = 20 * 1000;
 
 
     public static final String SP_APP_KEY = "appKey";

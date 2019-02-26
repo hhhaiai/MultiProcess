@@ -19,8 +19,8 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public static DBHelper getInstance(Context context) {
-        if (mContext != null) {
-            mContext = EContextHelper.getContext(context);
+        if (Holder.INSTANCE.mContext == null) {
+            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
         }
         return Holder.INSTANCE;
     }

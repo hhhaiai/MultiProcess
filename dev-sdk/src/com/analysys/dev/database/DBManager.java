@@ -18,7 +18,9 @@ public class DBManager {
     }
 
     public static synchronized DBManager getInstance(Context context) {
-        mContext = EContextHelper.getContext(context);
+        if (Holder.INSTANCE.mContext == null) {
+            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
+        }
         if (dbHelper == null) {
             dbHelper = DBHelper.getInstance(mContext);
         }

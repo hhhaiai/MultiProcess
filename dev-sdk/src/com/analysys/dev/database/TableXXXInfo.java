@@ -117,7 +117,6 @@ public class TableXXXInfo {
 //                ELOG.i(curProc1+"    :::::::::::curProc1   "+ curProc1.getCount());
                 curProc = db.query(DBConfig.PROCInfo.TABLE_NAME, new String[] {DBConfig.PROCInfo.Column.CONTENT},
                         DBConfig.PROCInfo.Column.PARENT_ID_TIME + "=?", new String[] {time}, null, null, null);
-                ELOG.i(curProc+"    :::::::::::curProc   "+ curProc.getCount());
                 while (curProc.moveToNext()) {
 //                    ELOG.i("content :::::::::::::::::::::     "+curProc.getColumnIndex(DBConfig.PROCInfo.Column.CONTENT));
                     procArray.put(new JSONObject(curProc.getString(curProc.getColumnIndex(DBConfig.PROCInfo.Column.CONTENT))));

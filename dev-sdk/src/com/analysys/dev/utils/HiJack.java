@@ -47,7 +47,6 @@ public class HiJack {
             // 如果加载类失败 则表示当前环境没有xposed
             return localObject != null;
         }catch (Throwable localThrowable) {
-            ELOG.i(localThrowable.getMessage()+"  byLoadXposedClass");
             return false;
         }
     }

@@ -5,7 +5,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
-import android.os.SystemClock;
 
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.impl.AppSnapshotImpl;
@@ -89,7 +88,16 @@ public class MessageDispatcher {
         Message msg = new Message();
         msg.what = MessageDispatcher.MSG_SNAPSHOT;
         if(delayTime!= 0){
-            delay = delayTime - (System.currentTimeMillis()- SPHelper.getDefault(mContext).getLong(EGContext.SNAPSHOT_LAST_TIME,-1));
+//            long currentTime = System.currentTimeMillis();
+//            while (delayTime > (currentTime - SPHelper.getDefault(mContext).getLong(EGContext.SNAPSHOT_LAST_TIME, -1))){
+//                currentTime =  System.currentTimeMillis();
+//                try {
+//                    Thread.sleep(EGContext.DELAY_TIME_CHECK);
+//                }catch (Throwable t){
+//                    ELOG.e(t.getMessage()+ "   snapshotInfo");
+//                }
+//            }
+            delay = delayTime - (System.currentTimeMillis() - SPHelper.getDefault(mContext).getLong(EGContext.SNAPSHOT_LAST_TIME, -1));
             sendMessage(msg, delay);
         }else {
             sendMessage(msg, delayTime);
@@ -114,18 +122,35 @@ public class MessageDispatcher {
     public void ocInfo(long delayTime) {
         Message msg = new Message();
         msg.what = MessageDispatcher.MSG_OC_INFO;
+//        String currentCycle  = "";
         switch ((int)delayTime){
             case EGContext.OC_CYCLE:
+//                currentCycle = EGContext.OC_LAST_TIME;
                 if(delayTime != 0) delay = delayTime - (System.currentTimeMillis()- SPHelper.getDefault(mContext).getLong(EGContext.OC_LAST_TIME,-1));
                 break;
             case EGContext.OC_CYCLE_OVER_5:
+//                currentCycle = EGContext.OC_LAST_TIME_OVER_5;
                 if(delayTime != 0) delay = delayTime - (System.currentTimeMillis()- SPHelper.getDefault(mContext).getLong(EGContext.OC_LAST_TIME_OVER_5,-1));
                 break;
-            default:
-                delay = delayTime;
+            case 0:
+                delay = 0;
                 break;
         }
+//        if(delayTime == EGContext.OC_CYCLE || delayTime == EGContext.OC_CYCLE_OVER_5) {
+//            long currentTime = System.currentTimeMillis();
+//            while (delayTime > (currentTime - SPHelper.getDefault(mContext).getLong(currentCycle, -1))){
+//                currentTime =  System.currentTimeMillis();
+//                try {
+//                    Thread.sleep(EGContext.DELAY_TIME_CHECK);
+//                }catch (Throwable t){
+//                    ELOG.e(t.getMessage()+ "   ocInfo");
+//                }
+//            }
+//            delay = delayTime - (currentTime - SPHelper.getDefault(mContext).getLong(currentCycle, -1));
+//
+//        }
         sendMessage(msg, delay);
+
     }
 
     // 数据上传
@@ -139,11 +164,10 @@ public class MessageDispatcher {
             while (delayTime > (currentTime - SPHelper.getDefault(mContext).getLong(EGContext.UPLOAD_LAST_TIME, -1))){
                 currentTime =  System.currentTimeMillis();
                 try {
-                    Thread.sleep(30*1000);
+                    Thread.sleep(EGContext.DELAY_TIME_CHECK);
                 }catch (Throwable t){
                    ELOG.e(t.getMessage()+ "   uploadInfo");
                 }
-
             }
             delay = delayTime - (currentTime - SPHelper.getDefault(mContext).getLong(EGContext.UPLOAD_LAST_TIME, -1));
             sendMessage(msg, delay);
