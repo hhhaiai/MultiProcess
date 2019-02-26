@@ -56,6 +56,7 @@ public class UploadImpl {
 
     // 上传数据
     public void upload() {
+        // 策略处理
         EThreadPool.execute(new Runnable() {
             @Override
             public void run() {
@@ -83,7 +84,7 @@ public class UploadImpl {
                 }
             }
         });
-        // 策略处理
+        SPHelper.getDefault(mContext).edit().putLong(EGContext.UPLOAD_LAST_TIME,System.currentTimeMillis()).commit();
         MessageDispatcher.getInstance(mContext).uploadInfo(EGContext.UPLOAD_CYCLE);
     }
 

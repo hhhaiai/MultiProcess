@@ -64,10 +64,11 @@ public class LocationImpl {
                     JSONObject location = getLocation();
                     if (location != null) {
                         TableLocation.getInstance(mContext).insert(location);
-                        SPHelper.getDefault(mContext).edit().putLong(EGContext.SP_LOCATION_TIME, Long.parseLong(location.getString(DeviceKeyContacts.LocationInfo.CollectionTime))).apply();
+                        SPHelper.getDefault(mContext).edit().putLong(EGContext.SP_LOCATION_TIME, Long.parseLong(location.getString(DeviceKeyContacts.LocationInfo.CollectionTime))).commit();
                     }
                 }catch (Throwable t){
                 }
+                SPHelper.getDefault(mContext).edit().putLong(EGContext.LOCATION_LAST_TIME,System.currentTimeMillis()).commit();
                 MessageDispatcher.getInstance(mContext).locationInfo(EGContext.LOCATION_CYCLE);
             }
         });
@@ -296,6 +297,7 @@ public class LocationImpl {
        /**
      * 基站信息
      */
+       @Deprecated
     public JSONArray getBaseStationInfo() {
         JSONArray jar = new JSONArray();
         try {

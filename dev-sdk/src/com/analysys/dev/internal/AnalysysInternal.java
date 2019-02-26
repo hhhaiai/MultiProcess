@@ -26,7 +26,7 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-
+@SuppressWarnings("all")
 public class AnalysysInternal {
     private SoftReference<Context> mContextRef = null;
     private Context mContext = null;
@@ -72,7 +72,7 @@ public class AnalysysInternal {
             ReceiverUtils.getInstance().setWork(false);
         }
         ServiceHelper.getInstance(mContext).startJobService(mContext);
-        MessageDispatcher.getInstance(mContext).startService(0);
+        MessageDispatcher.getInstance(mContext).startService();
 
 
     }

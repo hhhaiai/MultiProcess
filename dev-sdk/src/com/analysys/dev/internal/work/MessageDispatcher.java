@@ -5,18 +5,20 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 
+import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.impl.AppSnapshotImpl;
 import com.analysys.dev.internal.impl.LocationImpl;
 import com.analysys.dev.internal.impl.OCImpl;
 import com.analysys.dev.internal.impl.UploadImpl;
 
-import com.analysys.dev.receiver.AnalysysReceiver;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
+import com.analysys.dev.utils.sp.SPHelper;
 
 public class MessageDispatcher {
-
+    private long delay = 0;
     private MessageDispatcher() {
         mHandler = startWorkHandler();
     }
@@ -40,17 +42,23 @@ public class MessageDispatcher {
     }
 
     // 心跳检查
-    public void checkHeartbeat() {
+    public void checkHeartbeat(long delayTime) {
         Message msg = new Message();
         msg.what = MessageDispatcher.MSG_CHECK_HEARTBEAT;
-        sendMessage(msg, 0);
+        if(delayTime != 0) {
+            delay = delayTime - (System.currentTimeMillis()- SPHelper.getDefault(mContext).getLong(EGContext.HEARTBEAT_LAST_TIME,-1));
+            sendMessage(msg, delay);
+        }else {
+            sendMessage(msg,delayTime);
+        }
+
     }
 
     // 启动服务任务接入
-    public void startService(int delay) {
+    public void startService() {
         Message msg = new Message();
         msg.what = MessageDispatcher.MSG_START_SERVICE_SELF;
-        sendMessage(msg, delay);
+        sendMessage(msg, 0);
     }
 
     // 停止工作
@@ -77,36 +85,77 @@ public class MessageDispatcher {
     }
 
     // 应用列表
-    public void snapshotInfo(int delay) {
+    public void snapshotInfo(long delayTime) {
         Message msg = new Message();
         msg.what = MessageDispatcher.MSG_SNAPSHOT;
-        sendMessage(msg, delay);
+        if(delayTime!= 0){
+            delay = delayTime - (System.currentTimeMillis()- SPHelper.getDefault(mContext).getLong(EGContext.SNAPSHOT_LAST_TIME,-1));
+            sendMessage(msg, delay);
+        }else {
+            sendMessage(msg, delayTime);
+        }
+
     }
 
     // 位置信息
-    public void locationInfo(int delay) {
+    public void locationInfo(long delayTime) {
         Message msg = new Message();
         msg.what = MessageDispatcher.MSG_LOCATION;
-        sendMessage(msg, delay);
+        if(delayTime!= 0) {
+            delay = delayTime - (System.currentTimeMillis()- SPHelper.getDefault(mContext).getLong(EGContext.LOCATION_LAST_TIME,-1));
+            sendMessage(msg, delay);
+        }else {
+            sendMessage(msg, delayTime);
+        }
+
     }
 
     // 应用打开关闭信息
-    public void ocInfo(int delay) {
+    public void ocInfo(long delayTime) {
         Message msg = new Message();
         msg.what = MessageDispatcher.MSG_OC_INFO;
+        switch ((int)delayTime){
+            case EGContext.OC_CYCLE:
+                if(delayTime != 0) delay = delayTime - (System.currentTimeMillis()- SPHelper.getDefault(mContext).getLong(EGContext.OC_LAST_TIME,-1));
+                break;
+            case EGContext.OC_CYCLE_OVER_5:
+                if(delayTime != 0) delay = delayTime - (System.currentTimeMillis()- SPHelper.getDefault(mContext).getLong(EGContext.OC_LAST_TIME_OVER_5,-1));
+                break;
+            default:
+                delay = delayTime;
+                break;
+        }
         sendMessage(msg, delay);
     }
 
     // 数据上传
-    public void uploadInfo(int delay) {
+    public void uploadInfo(long delayTime) {
         Message msg = new Message();
         msg.what = MessageDispatcher.MSG_UPLOAD;
-        sendMessage(msg, delay);
+        ELOG.i(SPHelper.getDefault(mContext).getLong(EGContext.UPLOAD_LAST_TIME,-1)+"    ::::::spspsps");
+        ELOG.i((System.currentTimeMillis()- SPHelper.getDefault(mContext).getLong(EGContext.UPLOAD_LAST_TIME,-1))+"    ::::::差值");
+        if(delayTime!= 0) {
+            long currentTime = System.currentTimeMillis();
+            while (delayTime > (currentTime - SPHelper.getDefault(mContext).getLong(EGContext.UPLOAD_LAST_TIME, -1))){
+                currentTime =  System.currentTimeMillis();
+                try {
+                    Thread.sleep(30*1000);
+                }catch (Throwable t){
+                   ELOG.e(t.getMessage()+ "   uploadInfo");
+                }
+
+            }
+            delay = delayTime - (currentTime - SPHelper.getDefault(mContext).getLong(EGContext.UPLOAD_LAST_TIME, -1));
+            sendMessage(msg, delay);
+        }else{
+            sendMessage(msg,delayTime);
+        }
     }
 
-    private void sendMessage(Message msg, int delay) {
+    private void sendMessage(Message msg, long delay) {
         synchronized (mHandlerLock) {
             if (mHandler != null) {
+
                 if (delay > 0) {
                     mHandler.sendMessageDelayed(msg, delay);
                 } else {
@@ -203,10 +252,17 @@ public class MessageDispatcher {
          * @param handler
          */
         public void isHasMessage(Handler handler) {
+            ELOG.i(handler.hasMessages(MSG_SNAPSHOT)
+                    +"  :  "+ handler.hasMessages(MSG_LOCATION)
+                    +"  :  "+ handler.hasMessages(MSG_OC_INFO)
+                    +"  :  "+ handler.hasMessages(MSG_UPLOAD));
             if (handler.hasMessages(MSG_SNAPSHOT)
                     || handler.hasMessages(MSG_LOCATION)
                     || handler.hasMessages(MSG_OC_INFO)
                     || handler.hasMessages(MSG_UPLOAD)) {
+                if(handler.hasMessages(MSG_UPLOAD)){
+
+                }
                 return;
             }
             MessageDispatcher.getInstance(mContext).initModule();

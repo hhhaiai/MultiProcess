@@ -39,17 +39,24 @@ public class EGContext {
 
     // 应用列表获取周期时间,30min
     public static final int SNAPSHOT_CYCLE = 30 * 60 * 1000;
+    public static final String SNAPSHOT_LAST_TIME = "SNAP_SHOT";
     // 位置获取周期时间
     public static final int LOCATION_CYCLE = 30 * 1000;
+    public static final String LOCATION_LAST_TIME = "LOCATION";
     // 应用打开关闭获取周期时间
     public static final int OC_CYCLE = 5 * 1000;
+    public static final String OC_LAST_TIME = "OC";
     // 5.0以上30s
     public static final int OC_CYCLE_OVER_5 = 30 * 1000;
+    public static final String OC_LAST_TIME_OVER_5 = "OC_OVER_5";
 
     // 应用打开关闭获取周期时间
     public static final int UPLOAD_CYCLE = 6 * 60 * 60 * 1000;
+    public static final String UPLOAD_LAST_TIME = "UPLOAD";
     // 心跳检查
     public static final int CHECK_HEARTBEAT_CYCLE = 15 * 1000;
+    public static final String HEARTBEAT_LAST_TIME = "HEART_BETA";
+
 
     public static final String SP_APP_KEY = "appKey";
     public static final String SP_APP_CHANNEL = "appChannel";

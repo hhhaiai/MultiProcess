@@ -9,6 +9,7 @@ import android.os.Message;
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.utils.ELOG;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
+import com.analysys.dev.utils.sp.SPHelper;
 
 
 public class CheckHeartbeat {
@@ -53,9 +54,9 @@ public class CheckHeartbeat {
             super.handleMessage(msg);
             switch (msg.what) {
                 case MSG_CHECK:
-
                     ELOG.i("心跳检查,进程：");
-                    MessageDispatcher.getInstance(mContext).checkHeartbeat();
+                    SPHelper.getDefault(mContext).edit().putLong(EGContext.HEARTBEAT_LAST_TIME,System.currentTimeMillis()).commit();
+                    MessageDispatcher.getInstance(mContext).checkHeartbeat(EGContext.CHECK_HEARTBEAT_CYCLE);
                     sendMessages();
                     break;
                 default:

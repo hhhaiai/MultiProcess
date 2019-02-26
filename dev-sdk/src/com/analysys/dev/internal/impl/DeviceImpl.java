@@ -17,8 +17,6 @@ import java.util.Enumeration;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.json.JSONObject;
-
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
 
@@ -56,6 +54,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 
+@SuppressWarnings("all")
 public class DeviceImpl {
 
     private Context mContext;
@@ -86,14 +85,26 @@ public class DeviceImpl {
      * 系统版本
      */
     public String getSystemVersion() {
-        return Build.VERSION.RELEASE;
+        String version = "";
+        try {
+            version = Build.VERSION.RELEASE;
+        }catch (Throwable t){
+           version = "";
+        }
+        return version;
     }
 
     /**
      * 设备品牌
      */
     public String getDeviceBrand() {
-        return Build.BRAND;
+        String brand = "";
+        try {
+           brand = Build.BRAND;
+        }catch (Throwable t){
+            brand = "";
+        }
+        return brand;
     }
 
     /**
@@ -101,19 +112,24 @@ public class DeviceImpl {
      */
     @SuppressWarnings("deprecation")
     public String getDeviceId() {
-        String deviceId = null;
-        if (mContext != null) {
-            String imei = null, imsi = null;
-            if (PermissionUtils.checkPermission(mContext, Manifest.permission.READ_PHONE_STATE)) {
-                TelephonyManager tm = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
-                imei = tm.getDeviceId();
-                imsi = tm.getSubscriberId();
+        String deviceId = "";
+        try {
+            if (mContext != null) {
+                String imei = "", imsi = "";
+                if (PermissionUtils.checkPermission(mContext, Manifest.permission.READ_PHONE_STATE)) {
+                    TelephonyManager tm = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
+                    imei = tm.getDeviceId();
+                    imsi = tm.getSubscriberId();
+                }
+                String androidId = android.provider.Settings.System.getString(mContext.getContentResolver(),
+                        Settings.Secure.ANDROID_ID);
+                deviceId = (TextUtils.isEmpty(imei) ? "null" : imei) + "-" + (TextUtils.isEmpty(imsi) ? "null" : imsi)
+                        + "-" + (TextUtils.isEmpty(androidId) ? "null" : androidId);
             }
-            String androidId = android.provider.Settings.System.getString(mContext.getContentResolver(),
-                Settings.Secure.ANDROID_ID);
-            deviceId = (TextUtils.isEmpty(imei) ? "null" : imei) + "-" + (TextUtils.isEmpty(imsi) ? "null" : imsi)
-                + "-" + (TextUtils.isEmpty(androidId) ? "null" : androidId);
+        }catch (Throwable t){
+            deviceId = "";
         }
+
         return deviceId;
     }
 
@@ -121,10 +137,16 @@ public class DeviceImpl {
      * 设备型号
      */
     public String getDeviceModel() {
-        return Build.MODEL;
+        String model = "";
+        try {
+            model = Build.MODEL;
+        }catch (Throwable t){
+           model = "";
+        }
+        return model;
     }
 
-    private final String DEFALT_MAC = "02:00:00:00:00:00";
+    private final String DEFALT_MAC = "";
     private final String[] FILE_LIST =
         {Base64.encodeToString("/sys/class/net/wlan0/address".getBytes(), Base64.DEFAULT),
             Base64.encodeToString("/sys/class/net/eth0/address".getBytes(), Base64.DEFAULT),
@@ -164,13 +186,20 @@ public class DeviceImpl {
      * MAC 地址
      */
     private String getMacByAndridAPI() {
-        WifiManager wifi = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
-        if (PermissionUtils.checkPermission(mContext, permission.ACCESS_WIFI_STATE)) {
-            WifiInfo info = wifi.getConnectionInfo();
-            return info.getMacAddress();
-        } else {
-            return DEFALT_MAC;
+        String macAddress = "";
+        try {
+            WifiManager wifi = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
+            if (PermissionUtils.checkPermission(mContext, permission.ACCESS_WIFI_STATE)) {
+                WifiInfo info = wifi.getConnectionInfo();
+                macAddress = info.getMacAddress();
+
+            } else {
+                macAddress = DEFALT_MAC;
+            }
+        }catch (Throwable t){
+            macAddress = DEFALT_MAC;
         }
+        return macAddress;
     }
 
     /**
@@ -180,25 +209,31 @@ public class DeviceImpl {
      */
     @TargetApi(9)
     private String getMacByJavaAPI() throws SocketException {
-        Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-        while (interfaces.hasMoreElements()) {
-            NetworkInterface netInterface = interfaces.nextElement();
-            if ("wlan0".equals(netInterface.getName()) || "eth0".equals(netInterface.getName())) {
-                byte[] addr = netInterface.getHardwareAddress();
-                if (addr == null || addr.length == 0) {
-                    return null;
+        String mac = "";
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface netInterface = interfaces.nextElement();
+                if ("wlan0".equals(netInterface.getName()) || "eth0".equals(netInterface.getName())) {
+                    byte[] addr = netInterface.getHardwareAddress();
+                    if (addr == null || addr.length == 0) {
+                        return "";
+                    }
+                    StringBuilder buf = new StringBuilder();
+                    for (byte b : addr) {
+                        buf.append(String.format("%02X:", b));
+                    }
+                    if (buf.length() > 0) {
+                        buf.deleteCharAt(buf.length() - 1);
+                    }
+                    mac =  buf.toString().toLowerCase(Locale.getDefault());
                 }
-                StringBuilder buf = new StringBuilder();
-                for (byte b : addr) {
-                    buf.append(String.format("%02X:", b));
-                }
-                if (buf.length() > 0) {
-                    buf.deleteCharAt(buf.length() - 1);
-                }
-                return buf.toString().toLowerCase(Locale.getDefault());
             }
+        }catch (Throwable t){
+            mac = DEFALT_MAC;
         }
-        return DEFALT_MAC;
+
+        return mac;
     }
 
     /**
@@ -235,8 +270,9 @@ public class DeviceImpl {
         Process proc = null;
         BufferedInputStream in = null;
         BufferedReader br = null;
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb ;
         try {
+            sb = new StringBuilder();
             for (int i = 0; i < FILE_LIST.length; i++) {
                 proc = getRuntime().exec("cat " + new String(Base64.decode(FILE_LIST[i], Base64.DEFAULT)));
                 in = new BufferedInputStream(proc.getInputStream());
@@ -275,35 +311,52 @@ public class DeviceImpl {
      * 设备序列号,SerialNumber
      */
     public String getSerialNumber() {
-        if (Build.VERSION.SDK_INT > 26) {
-            try {
+        String result = "";
+        try {
+            if (Build.VERSION.SDK_INT > 26) {
+
                 Class<?> clazz = Class.forName("android.os");
                 Method method = clazz.getMethod("getSerial");
-                String result = (String) method.invoke(null);
-                return result;
-            } catch (Throwable e) {
-                return "";
+                result = (String) method.invoke(null);
+            } else {
+                result = Build.SERIAL;
             }
-        } else {
-            return Build.SERIAL;
+        } catch (Throwable e) {
+            result = "";
         }
+        return result;
     }
-        private DisplayMetrics getDisplayMetrics(){
-            DisplayMetrics displayMetrics = new DisplayMetrics();
+    private DisplayMetrics getDisplayMetrics(){
+        DisplayMetrics displayMetrics;
+        try {
             displayMetrics = mContext.getApplicationContext().getResources().getDisplayMetrics();
-            return displayMetrics;
+        }catch (Throwable t){
+            displayMetrics = null;
         }
-        /**
-         * 分辨率
-         */
-        public String getResolution() {
+        return displayMetrics;
+    }
+    /**
+     * 分辨率
+     */
+    public String getResolution() {
+        String res = "";
+        try {
+            res = getDisplayMetrics().widthPixels + "-" + getDisplayMetrics().heightPixels;
+        }catch (Throwable t){
+            res = "";
+        }
+        return res;
+    }
 
-            return getDisplayMetrics().widthPixels + "-" + getDisplayMetrics().heightPixels;
+    public String getDotPerInch(){
+        String dpi = "";
+        try{
+            dpi = String.valueOf(getDisplayMetrics().densityDpi);
+        }catch (Throwable t){
+            dpi = "";
         }
-
-        public String getDotPerInch(){
-            return String.valueOf(getDisplayMetrics().densityDpi);
-        }
+        return dpi;
+    }
 
 
   //运营商信息
@@ -312,7 +365,7 @@ public class DeviceImpl {
      * 运营商名称（中文）,如:中国联通
      */
     public String getMobileOperator() {
-        String operatorName = null;
+        String operatorName = "";
         try {
             TelephonyManager tm = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
             operatorName = tm.getSimOperator();
@@ -325,11 +378,12 @@ public class DeviceImpl {
      * 运行商名称（英文）如:CHINA MOBILE
      */
     public String getMobileOperatorName() {
-        String operatorName = null;
+        String operatorName = "";
         try {
             TelephonyManager tm = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
             operatorName = tm.getSimOperatorName();
         } catch (Throwable e) {
+            operatorName = "";
         }
         return operatorName;
     }
@@ -338,9 +392,14 @@ public class DeviceImpl {
      * 运营商编码
      */
     public String getNetworkOperatorCode() {
-        String operatorCode = null;
-        TelephonyManager tm = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
-        operatorCode = tm.getNetworkOperator();
+        String operatorCode = "";
+        try {
+            TelephonyManager tm = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
+            operatorCode = tm.getNetworkOperator();
+
+        }catch (Throwable t){
+            operatorCode = "";
+        }
         return operatorCode;
     }
 
@@ -348,9 +407,13 @@ public class DeviceImpl {
      * 接入运营商名字
      */
     public String getNetworkOperatorName() {
-        String operatorCode = null;
-        TelephonyManager tm = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
-        operatorCode = tm.getNetworkOperatorName();
+        String operatorCode = "";
+        try {
+            TelephonyManager tm = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
+            operatorCode = tm.getNetworkOperatorName();
+        }catch (Throwable t){
+            operatorCode = "";
+        }
         return operatorCode;
     }
 
@@ -384,9 +447,10 @@ public class DeviceImpl {
      * 多卡IMSI
      */
     public String getIMSIS() {
-        TelephonyManager telephony = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
+        TelephonyManager telephony;
         Class<?> telephonyClass;
         try {
+            telephony = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
             telephonyClass = Class.forName(telephony.getClass().getName());
             Method m2 = telephonyClass.getMethod("getSubscriberId", new Class[] {int.class});
             Object imsi1 = m2.invoke(telephony, 0);
@@ -489,7 +553,7 @@ public class DeviceImpl {
             return md5Fingerprint;
         } catch (Throwable e) {
         }
-        return UNKNOW;
+        return "";
     }
 
     /**
@@ -765,7 +829,6 @@ public class DeviceImpl {
         builder.append(string);
     }
     //DevFurtherdetailImpl
-
     public String getCPUModel(){
         return Build.CPU_ABI + ":" + Build.CPU_ABI2;
     }

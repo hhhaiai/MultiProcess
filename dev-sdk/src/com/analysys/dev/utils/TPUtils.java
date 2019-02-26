@@ -101,14 +101,12 @@ public class TPUtils {
      * @return
      */
     public static String getAppChannel(Context context) {
-
-        Context cxt = EContextHelper.getContext(context);
         String channel = "";
-        if (cxt == null) {
-            return channel;
-        }
-
         try {
+            Context cxt = EContextHelper.getContext(context);
+            if (cxt == null) {
+                return channel;
+            }
             ApplicationInfo appInfo = context.getApplicationContext().getPackageManager()
                     .getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
             channel = appInfo.metaData.getString(EGContext.XML_METADATA_CHANNEL);

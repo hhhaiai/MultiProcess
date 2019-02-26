@@ -35,11 +35,11 @@ public class DynamicReceivers extends BroadcastReceiver {
         if (CONNECTIVITY_CHANGE.equals(intent.getAction())) {
             ELOG.d("接收网络变化广播");
             WifiImpl.getInstance(mContext).getWifiInfo();
-            MessageDispatcher.getInstance(mContext).startService(0);
+            MessageDispatcher.getInstance(mContext).startService();
         }
         if (SCREEN_ON.equals(intent.getAction())) {
             ELOG.e("接收开启屏幕广播");
-            MessageDispatcher.getInstance(mContext).startService(0);
+            MessageDispatcher.getInstance(mContext).startService();
         }
         if (SCREEN_OFF.equals(intent.getAction())) {
             ProcessManager.setIsCollected(false);
@@ -53,7 +53,7 @@ public class DynamicReceivers extends BroadcastReceiver {
         }
         if (BOOT_COMPLETED.equals(intent.getAction())) {
             ELOG.e("接收到开机广播");
-            MessageDispatcher.getInstance(mContext).startService(0);
+            MessageDispatcher.getInstance(mContext).startService();
         }
 
     }

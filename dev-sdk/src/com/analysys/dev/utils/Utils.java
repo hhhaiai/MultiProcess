@@ -35,6 +35,7 @@ public class Utils {
     /**
      * 判断服务是否启动
      */
+    @Deprecated
     public static boolean isServiceWork(Context mContext, String serviceName) {
         boolean isWork = false;
         try {

@@ -86,7 +86,7 @@ public class TableAppSnapshot {
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null, null, null);
-            map = new HashMap();
+            map = new HashMap<String,String>();
             while (cursor.moveToNext()) {
                 String apn = cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN));
                 map.put(apn, String.valueOf(getCursor(cursor)));

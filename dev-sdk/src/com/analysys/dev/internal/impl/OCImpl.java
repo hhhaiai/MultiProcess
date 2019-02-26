@@ -23,6 +23,7 @@ import com.analysys.dev.utils.PermissionUtils;
 import com.analysys.dev.utils.Utils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 import com.analysys.dev.internal.work.MessageDispatcher;
+import com.analysys.dev.utils.sp.SPHelper;
 
 import android.Manifest;
 import android.app.ActivityManager;
@@ -75,9 +76,11 @@ public class OCImpl {
             if(PermissionUtils.checkPermission(mContext, Manifest.permission.GET_TASKS)){
                 RunningApps(getRunningApp(), EGContext.OC_COLLECTION_TYPE_RUNNING_TASK);
             }
+            SPHelper.getDefault(mContext).edit().putLong(EGContext.OC_LAST_TIME,System.currentTimeMillis()).commit();
             MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE);
         }else if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24 ){
             getProcApps();
+            SPHelper.getDefault(mContext).edit().putLong(EGContext.OC_LAST_TIME_OVER_5,System.currentTimeMillis()).commit();
             MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE_OVER_5);
         }else{
             //TODO 7.0以上待调研

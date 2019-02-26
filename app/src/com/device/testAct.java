@@ -10,7 +10,7 @@ import com.analysys.dev.utils.ELOG;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
-
+@SuppressWarnings("all")
 public class testAct extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {

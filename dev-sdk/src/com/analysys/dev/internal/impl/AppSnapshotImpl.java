@@ -67,8 +67,8 @@ public class AppSnapshotImpl {
                         currentSnapshotsList = getDifference(currentSnapshotsList, dbSnapshotsMap);
                     }
                     TableAppSnapshot.getInstance(mContext).coverInsert(currentSnapshotsList);
-                    SPHelper.getDefault(mContext).edit().putLong(EGContext.SP_SNAPSHOT_TIME, System.currentTimeMillis())
-                        .commit();
+                    SPHelper.getDefault(mContext).edit().putLong(EGContext.SP_SNAPSHOT_TIME, System.currentTimeMillis()).commit();
+                    SPHelper.getDefault(mContext).edit().putLong(EGContext.SNAPSHOT_LAST_TIME,System.currentTimeMillis()).commit();
                     MessageDispatcher.getInstance(mContext).snapshotInfo(EGContext.SNAPSHOT_CYCLE);
                 }
             });

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
+@SuppressWarnings("all")
 public class PrivacyImpl {
     private static boolean isDebug = false;
 
@@ -48,7 +48,7 @@ public class PrivacyImpl {
     private static JSONObject processInfos(List<Process> infos) {
         JSONObject object = new JSONObject();
         Set temp = new HashSet<String>();
-        Set result = new HashSet<String>();
+        Set<String> result = new HashSet<String>();
         JSONObject jsonResult = null;
         JSONArray resultInfo = new JSONArray();
         PackageManager pm = EContextHelper.getContext(null).getPackageManager();

@@ -172,7 +172,7 @@ public class DataPackaging {
                 batteryJson.put(DeviceKeyContacts.DevInfo.BuildCodename, devImpl.getBuildCodename());
                 if(!TextUtils.isEmpty(devImpl.getIDFA()))
                 batteryJson.put(DeviceKeyContacts.DevInfo.IDFA, devImpl.getIDFA());
-                ELOG.i(batteryJson+"   ::::::::batteryJson batteryJson");
+//                ELOG.i(batteryJson+"   ::::::::batteryJson batteryJson");
             }
             deviceInfo.put("ETDM", batteryJson);
         }catch (Throwable t){
