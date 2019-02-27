@@ -97,6 +97,7 @@ public class AppSnapshotImpl {
      */
     private List<JSONObject> getDifference(List<JSONObject> currentSnapshotsList, Map<String, String> dbSnapshotsMap) {
         try {
+            if(currentSnapshotsList == null) currentSnapshotsList = new ArrayList<>();
             for (int i = 0; i < currentSnapshotsList.size(); i++) {
                 JSONObject item = currentSnapshotsList.get(i);
                 String apn = item.getString(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName);

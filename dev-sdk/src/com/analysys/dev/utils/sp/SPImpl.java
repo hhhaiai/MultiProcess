@@ -27,6 +27,8 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.util.Pair;
 
+import com.analysys.dev.utils.ELOG;
+
 
 /**
  * @Copyright © 2017 sanbo Inc. All rights reserved.
@@ -139,7 +141,6 @@ class SPImpl implements SharedPreferences {
                         bakFile.createNewFile();
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                 }
                 mFileMonitor = new FileMonitor(mBackupFilePath, FileObserver.MODIFY);
                 if (mListeners.size() > 0) {
@@ -482,7 +483,6 @@ class SPImpl implements SharedPreferences {
 
                     backup();
                 } catch (Throwable e) {
-                    e.printStackTrace();
                     if (mErrorListener != null) {
                         mErrorListener.onError(e.getMessage(), OTHER_EXCEPTION, -1);
                     }
@@ -490,7 +490,6 @@ class SPImpl implements SharedPreferences {
                     try {
                         fileLock.release();
                     } catch (IOException e) {
-                        e.printStackTrace();
                     }
                     mIsSaving = false;
                 }
@@ -650,7 +649,7 @@ class SPImpl implements SharedPreferences {
                     allocBuffer(contentLength + MIN_INCREASE_LENGTH);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                ELOG.e(e.getMessage()+" reallocBuffer has an exception");
             }
         }
     }

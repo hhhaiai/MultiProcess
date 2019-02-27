@@ -725,7 +725,7 @@ public class DeviceImpl {
                     return FileUtils.loadFileAsString("/sys/class/net/eth0/address")
                             .toUpperCase().substring(0, 17);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    return "";
                 }
             }
             return macSerial;
@@ -854,37 +854,93 @@ public class DeviceImpl {
         return Build.HARDWARE;
     }
     public String getBuildSupportedAbis(){
-        return stringArrayToString(Build.SUPPORTED_ABIS);
+        try{
+            return stringArrayToString(Build.SUPPORTED_ABIS);
+        }catch (Throwable t){
+            return "";
+        }
+
     }
     public String getBuildSupportedAbis32(){
-        return stringArrayToString(Build.SUPPORTED_32_BIT_ABIS);
+        try {
+            return stringArrayToString(Build.SUPPORTED_32_BIT_ABIS);
+        }catch (Throwable t){
+           return "";
+        }
+
     }
     public String getBuildSupportedAbis64(){
-        return stringArrayToString(Build.SUPPORTED_64_BIT_ABIS);
+        try {
+            return stringArrayToString(Build.SUPPORTED_64_BIT_ABIS);
+        }catch (Throwable t){
+            return "";
+        }
+
+
     }
     public String getBuildType(){
-        return Build.TYPE;
+        try {
+            return Build.TYPE;
+        }catch (Throwable t){
+            return "";
+        }
+
     }
     public String getBuildTags(){
-        return Build.TAGS;
+        try {
+            return Build.TAGS;
+        }catch (Throwable t){
+            return "";
+        }
+
     }
     public String getBuildFingerPrint(){
-        return Build.FINGERPRINT;
+        try {
+            return Build.FINGERPRINT;
+        }catch (Throwable t){
+           return "";
+        }
+
     }
     public String getBuildRadioVersion(){
-        return Build.getRadioVersion();
+        try {
+            return Build.getRadioVersion();
+        }catch (Throwable t){
+            return "";
+        }
+
     }
     public String getBuildIncremental(){
-        return Build.VERSION.INCREMENTAL;
+        try {
+            return Build.VERSION.INCREMENTAL;
+        }catch (Throwable t){
+            return "";
+        }
+
     }
     public String getBuildBaseOS(){
-        return Build.VERSION.BASE_OS;
+        try{
+            return Build.VERSION.BASE_OS;
+        }catch (Throwable t){
+            return "";
+        }
+
     }
     public String getBuildSecurityPatch(){
-        return Build.VERSION.SECURITY_PATCH;
+        try {
+            return Build.VERSION.SECURITY_PATCH;
+        }catch (Throwable t){
+            return "";
+        }
+
     }
     public int getBuildSdkInt(){
-        return Build.VERSION.SDK_INT;
+        try {
+            return Build.VERSION.SDK_INT;
+        }catch (Throwable t){
+            return -1;
+        }
+
     }
     public int getBuildPreviewSdkInt(){
         int value = -1;
@@ -905,20 +961,25 @@ public class DeviceImpl {
         return codeName;
     }
     public String getIDFA(){
-        String idfa = SPHelper.getDefault(mContext).getString(EGContext.SP_APP_IDFA,"");
-        if(!idfa.isEmpty()){
-            return idfa;
-        }
-        new Thread(new Runnable() {
-            public void  run() {
-               try{
-                   AdvertisingIdClient.AdInfo adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);//阻塞调用，需放在子线程处理
-                   String advertisingId = adInfo.getId();
-                   SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_IDFA, advertisingId).commit();
-               } catch(Exception e) {
+        String idfa = "";
+       try {
+           new Thread(new Runnable() {
+               public void  run() {
+                   try{
+                       AdvertisingIdClient.AdInfo adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);//阻塞调用，需放在子线程处理
+                       String advertisingId = adInfo.getId();
+                       SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_IDFA, advertisingId).commit();
+                   } catch(Exception e) {
+                   }
                }
+           }).start();
+           idfa = SPHelper.getDefault(mContext).getString(EGContext.SP_APP_IDFA,"");
+           if(!idfa.isEmpty()){
+               return idfa;
            }
-       }).start();
+       }catch (Throwable t){
+       }
+
         return idfa;
     }
 
@@ -941,18 +1002,21 @@ public class DeviceImpl {
     }
     private String stringArrayToString(String[] stringArray){
         StringBuilder sb = null;
+        String result = "";
         try{
             sb = new StringBuilder();
             for(int i = 0; i< stringArray.length;i++){
                 sb.append(stringArray[i]);
                 sb.append(",");
             }
+            result = sb.toString();
+            result = result.substring(0,result.length()-1);
         }catch (Throwable t){
             ELOG.e(t.getMessage()+" stringArrayToString has an exception.");
             return null;
         }
-        String result = sb.toString();
+
 //        ELOG.e(result.substring(0,result.length()-1)+" ::::::::::stringArrayToString");
-        return result.substring(0,result.length()-1);
+        return result;
     }
 }

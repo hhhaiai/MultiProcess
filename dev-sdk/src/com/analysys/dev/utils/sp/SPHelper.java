@@ -161,7 +161,6 @@ public class SPHelper {
             method.setAccessible(true);
             returnValue = method.invoke(o, args);
         } catch (Exception e) {
-            e.printStackTrace();
         }
 
         return returnValue;

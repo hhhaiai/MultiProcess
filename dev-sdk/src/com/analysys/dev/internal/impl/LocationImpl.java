@@ -111,11 +111,16 @@ public class LocationImpl {
 
             return ;
         }
-        Location location = locationManager.getLastKnownLocation(provider);
+        try {
+            Location location = locationManager.getLastKnownLocation(provider);
 
-        if (needSaveLocation(location)) {
-            resetLocaiton(location);
+            if (needSaveLocation(location)) {
+                resetLocaiton(location);
+            }
+        }catch (Throwable t){
+
         }
+
     }
         // lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
         // location = locationManager .getLastKnownLocation(LocationManager.GPS_PROVIDER);

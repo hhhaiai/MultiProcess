@@ -166,6 +166,7 @@ public class DataPackaging {
                 batteryJson.put(DeviceKeyContacts.DevInfo.BuildBaseOS, devImpl.getBuildBaseOS());
                 if(!TextUtils.isEmpty(devImpl.getBuildSecurityPatch()))
                 batteryJson.put(DeviceKeyContacts.DevInfo.BuildSecurityPatch, devImpl.getBuildSecurityPatch());
+                if(devImpl.getBuildSdkInt() != -1)
                 batteryJson.put(DeviceKeyContacts.DevInfo.BuildSdkInt, devImpl.getBuildSdkInt());
                 if(devImpl.getBuildPreviewSdkInt() != -1) batteryJson.put(DeviceKeyContacts.DevInfo.BuildPreviewSdkInt, devImpl.getBuildPreviewSdkInt());
                 if(!TextUtils.isEmpty(devImpl.getBuildCodename()))

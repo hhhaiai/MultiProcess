@@ -52,8 +52,13 @@ public class SenSorModuleNameImpl{
                     info.put(DeviceKeyContacts.DevInfo.SenSorId,s.getId());
                 }catch (Throwable t1){
                 }
-                //当传感器是唤醒状态返回true
-                info.put(DeviceKeyContacts.DevInfo.SenSorWakeUpSensor,s.isWakeUpSensor());
+                try {
+                    //当传感器是唤醒状态返回true
+                    info.put(DeviceKeyContacts.DevInfo.SenSorWakeUpSensor,s.isWakeUpSensor());
+                }catch (Throwable t){
+                    //当传感器是唤醒状态返回true
+                    info.put(DeviceKeyContacts.DevInfo.SenSorWakeUpSensor,false);
+                }
                 // 传感器耗电量
                 info.put(DeviceKeyContacts.DevInfo.SenSorPower,s.getPower());
 //                ELOG.i("传感器信息：：：：："+info);

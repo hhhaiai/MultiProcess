@@ -7,11 +7,14 @@ import android.content.Context;
 public class EContextHelper {
 
     public static Context getContext(Context context) {
-        if (context != null) {
-            return context.getApplicationContext();
-        } else {
-            return getApplication();
+        try {
+            if (context != null) {
+                return context.getApplicationContext();
+            }
+        }catch (Throwable t){
         }
+        return getApplication();
+
     }
 
     private static Application getApplication() {
@@ -23,7 +26,6 @@ public class EContextHelper {
                 return (Application) app;
             }
         } catch (Exception e) {
-            e.printStackTrace();
         }
         return null;
     }
