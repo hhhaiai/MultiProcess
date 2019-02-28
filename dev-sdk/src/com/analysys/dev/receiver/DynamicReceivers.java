@@ -3,13 +3,17 @@ package com.analysys.dev.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.impl.DeviceImpl;
+import com.analysys.dev.internal.impl.OCImpl;
 import com.analysys.dev.internal.impl.WifiImpl;
 import com.analysys.dev.internal.impl.proc.ProcessManager;
 import com.analysys.dev.utils.ELOG;
+import com.analysys.dev.utils.EThreadPool;
 import com.analysys.dev.utils.ReceiverUtils;
+import com.analysys.dev.utils.TPUtils;
 import com.analysys.dev.utils.reflectinon.Reflecer;
 import com.analysys.dev.internal.work.MessageDispatcher;
 
@@ -45,6 +49,8 @@ public class DynamicReceivers extends BroadcastReceiver {
             ProcessManager.setIsCollected(false);
             ReceiverUtils.getInstance().unRegistAllReceiver(mContext);
             MessageDispatcher.getInstance(mContext).killWorker();
+            processScreenOff(context);
+
             ELOG.e("接收关闭屏幕广播");
         }
         if (BATTERY_CHANGED.equals(intent.getAction())) {
@@ -56,5 +62,37 @@ public class DynamicReceivers extends BroadcastReceiver {
             MessageDispatcher.getInstance(mContext).startService();
         }
 
+    }
+    private void processScreenOff(final Context ctx) {
+        // L.e("--------processScreenOff");
+        try {
+            if (TPUtils.isMainThread()) {
+                EThreadPool.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        // AppProcessManager.resetCounter();
+                        /*注销广播*/
+                        ProcessManager.dealScreenOff(ctx);
+                        // ReceiverUtils.getInstance().unRegistAllReceiver(mContext, false);
+                        ReceiverUtils.getInstance().unRegistAllReceiver(mContext);
+
+                    }
+                });
+                EThreadPool.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.CLOSE_SCREEN, true);
+                    }
+                });
+
+            } else {
+                // AppProcessManager.resetCounter();
+                /*注销广播*/
+                ProcessManager.dealScreenOff(ctx);
+                ReceiverUtils.getInstance().unRegistAllReceiver(mContext);
+                OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.CLOSE_SCREEN, true);
+            }
+        } catch (Throwable e) {
+        }
     }
 }

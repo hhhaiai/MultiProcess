@@ -6,7 +6,6 @@ import android.util.Base64;
 
 import com.analysys.dev.database.TableAppSnapshot;
 import com.analysys.dev.database.TableLocation;
-import com.analysys.dev.database.TableOC;
 import com.analysys.dev.database.TableOCCount;
 import com.analysys.dev.database.TableXXXInfo;
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
@@ -257,7 +256,7 @@ public class UploadImpl {
 //      TableAppSnapshot.getInstance(mContext).delete();
       TableLocation.getInstance(mContext).delete();
       TableXXXInfo.getInstance(mContext).delete();
-      TableOC.getInstance(mContext).delete();
+//      TableOC.getInstance(mContext).delete();
       TableOCCount.getInstance(mContext).delete();
     }
 }

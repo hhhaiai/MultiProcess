@@ -33,7 +33,7 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        db.execSQL(DBConfig.OC.CREATE_TABLE);
+//        db.execSQL(DBConfig.OC.CREATE_TABLE);
         db.execSQL(DBConfig.OCCount.CREATE_TABLE);
         db.execSQL(DBConfig.Location.CREATE_TABLE);
         db.execSQL(DBConfig.AppSnapshot.CREATE_TABLE);
@@ -50,9 +50,9 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             db = getWritableDatabase();
             if( db == null) return;
-            if(!DBUtils.isTableExist(db ,DBConfig.OC.CREATE_TABLE)){
-                db.execSQL(DBConfig.OC.CREATE_TABLE);
-            }
+//            if(!DBUtils.isTableExist(db ,DBConfig.OC.CREATE_TABLE)){
+//                db.execSQL(DBConfig.OC.CREATE_TABLE);
+//            }
             if(DBUtils.isTableExist(db , DBConfig.OCCount.CREATE_TABLE)){
                 db.execSQL(DBConfig.OCCount.CREATE_TABLE);
             }

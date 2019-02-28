@@ -58,7 +58,7 @@ public class AnalysysInternal {
 
         Reflecer.init();
         ELOG.d("初始化，进程Id：< " + Process.myPid() + " >");
-        initSupportMultiProcess();
+//        initSupportMultiProcess();//TODO
         ReceiverUtils.getInstance().setWork(true);
         updateAppkey(key);
         updateChannel(mContext, channel);

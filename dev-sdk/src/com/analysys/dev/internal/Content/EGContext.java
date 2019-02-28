@@ -20,7 +20,7 @@ public class EGContext {
     /**
      * 是否展示广告通知。授权后，服务高版本可以切换成前台服务
      */
-    public static boolean FLAG_SHOW_NOTIFY = true;
+//    public static boolean FLAG_SHOW_NOTIFY = true;
 
     /**
      * SDK版本
@@ -267,4 +267,21 @@ public class EGContext {
     public static final String HTTP_RETRY = "500";
     //int default 值
     public static final int DEFAULT = 0;
+
+    //OCINFO
+    public static final String LASTAPPNAME = "lastAppName";
+    public static final String LASTPACKAGENAME = "lastPackageName";
+    public static final String ENDTIME = "ProcessEndTime";
+    public static final String LASTAPPVERSION = "lastAppVersion";
+    public static final String LASTOPENTIME = "lastOpenTime";
+    public static final String MIN_DURATION_TIME = "minDuration";
+    public static final String MAX_DURATION_TIME = "maxDuration";
+    public static final String APP_TYPE = "applicationType";
+    public static final int SHORT_TIME = 5 * 1000;// 计时器时间间隔毫秒数
+    public static final long LONGEST_TIME = 5 * 60 * 60 * 1000;
+    public static final String CLOSE_SCREEN = "2";
+    public static final String APP_SWITCH = "1";
+
+
+
 }

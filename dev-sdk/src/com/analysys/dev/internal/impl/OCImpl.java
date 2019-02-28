@@ -1,13 +1,18 @@
 package com.analysys.dev.internal.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.analysys.dev.database.TableOC;
+import com.analysys.dev.R;
+import com.analysys.dev.database.DBConfig;
 import com.analysys.dev.database.TableOCCount;
+import com.analysys.dev.database.TableOCTemp;
 import com.analysys.dev.database.TableXXXInfo;
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
 import com.analysys.dev.internal.Content.EGContext;
@@ -26,7 +31,10 @@ import com.analysys.dev.internal.work.MessageDispatcher;
 import com.analysys.dev.utils.sp.SPHelper;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
@@ -34,13 +42,19 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.text.TextUtils;
 
+
 public class OCImpl {
 
     Context mContext;
-    private final String SHELL_PM_LIST_PACKAGES = "pm list packages";//all
+//    private final String SHELL_PM_LIST_PACKAGES = "pm list packages";//all
     private final String SHELL_SYSTEM_LIST_PACKAGES = "pm list packages -s";//system
     private final String SHELL_THIRD_PARTY_LIST_PACKAGES = "pm list packages -3";//third party
-
+//    private boolean isSaveForScreenOff = false;
+//    private List<String> nowPackageNames = new ArrayList<String>();
+//    private List<String> prePackageNames = new ArrayList<String>();
+//    private List<OCInfo> ocList = new ArrayList<OCInfo>();
+//    private List<OCInfo> ocCache = new ArrayList<OCInfo>();
+//    private String endTime = null;
 
     private static class Holder {
         private static final OCImpl INSTANCE = new OCImpl();
@@ -53,6 +67,7 @@ public class OCImpl {
         return Holder.INSTANCE;
     }
 
+    private long mProcessTime = 0L;
     /**
      * OC 信息采集
      */
@@ -60,10 +75,28 @@ public class OCImpl {
         EThreadPool.execute(new Runnable() {
             @Override
             public void run() {
-                if (!AccessibilityHelper.isAccessibilitySettingsOn(mContext,AnalysysAccessibilityService.class)) {
-                    getInfoByVersion();
-                }else{
-                    //利用辅助功能获取当前app
+                try {
+                    //亮屏幕工作
+                    if (Utils.isScreenOn(mContext)) {
+                        // 锁屏.保存数据
+                        if (Utils.isScreenLocked(mContext)) {
+                            String openApp = SPHelper.getLastAppName(mContext);
+                            if (!TextUtils.isEmpty(openApp)) {
+                                //补充时间
+                                SPHelper.setEndTime(mContext, System.currentTimeMillis()-new Random(25).nextInt(1000));
+                                filterInsertOCInfo(EGContext.CLOSE_SCREEN, false);
+                            }
+                        } else {
+//                    L.e("开始判断OC..........");
+                            if (!AccessibilityHelper.isAccessibilitySettingsOn(mContext,AnalysysAccessibilityService.class)) {
+                                getInfoByVersion();
+                            }else{
+                                //利用辅助功能获取当前app
+                            }
+                        }
+                    }
+                }catch (Throwable t){
+
                 }
             }
         });
@@ -74,12 +107,27 @@ public class OCImpl {
         // 判断系统版本
         if (Build.VERSION.SDK_INT < 21) {
             if(PermissionUtils.checkPermission(mContext, Manifest.permission.GET_TASKS)){
-                RunningApps(getRunningApp(), EGContext.OC_COLLECTION_TYPE_RUNNING_TASK);
+//                RunningApps(getRunningApp(), EGContext.OC_COLLECTION_TYPE_RUNNING_TASK);
+                getRunningApp();
+            }else{
+                getProcApps();
             }
             SPHelper.getDefault(mContext).edit().putLong(EGContext.OC_LAST_TIME,System.currentTimeMillis()).commit();
             MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE);
         }else if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24 ){
-            getProcApps();
+        //确定5.0和以上版本30秒处理一次
+            if (isDurLThanThri()) {
+                //L.i("满足30秒间隔。。。");
+                if (Utils.canUseUsageStatsManager(mContext)) {
+                // L.i("开启了。UsageStatsManager功能");
+                    processOCByUsageStatsManager();
+                } else {
+                //  L.i(" proc... 方式采集。。。");
+                    getProcApps();
+                }
+            } else {
+                //  L.d("不到30秒。。。");
+            }
             SPHelper.getDefault(mContext).edit().putLong(EGContext.OC_LAST_TIME_OVER_5,System.currentTimeMillis()).commit();
             MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE_OVER_5);
         }else{
@@ -92,12 +140,15 @@ public class OCImpl {
     public void RunningApps(String pkgName, int collectionType) {
         try {
             this.pkgName = pkgName;
-            List<JSONObject> cacheApps = TableOCCount.getInstance(mContext).selectRunning();
-            if (cacheApps != null && !cacheApps.isEmpty()) {
+            JSONArray cacheApps = TableOCCount.getInstance(mContext).selectRunning();
+            ELOG.i("cacheApps::::::   "+cacheApps);
+            if (cacheApps != null && cacheApps.length()>0) {
                 removeRepeat(cacheApps);
-                if (!cacheApps.isEmpty()) {
+                if (cacheApps != null && cacheApps.length()>0) {
                     // 完成一次闭合，存储到OC表
-                    TableOC.getInstance(mContext).insert(cacheApps);
+                    TableOCTemp.getInstance(mContext).insert(cacheApps);
+                    ELOG.i("RunningApps:::::::"+cacheApps);
+                    TableOCCount.getInstance(mContext).insertArray(cacheApps);
                     // 一次应用操作闭合，更新OCCunt表，打开次数、应用运行状态
                     TableOCCount.getInstance(mContext).updateStopState(cacheApps);
                 }
@@ -115,24 +166,91 @@ public class OCImpl {
     /**
      * 获取正在运行的应用包名
      */
-    private String getRunningApp() {
-        String pkgName = null;
+    private void getRunningApp() {
+        String pkgName = "";
+        ActivityManager am = null;
         try {
-            ActivityManager am = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
-            @SuppressWarnings("deprecation")
+            am =  (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
             List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
+            if(tasks == null || tasks.size()<=0 ) return;
             pkgName = tasks.get(0).topActivity.getPackageName();
+            processPkgName(pkgName);
         } catch (Throwable e) {
-            ELOG.e(e);
+            try {
+                List<ActivityManager.RunningAppProcessInfo> processInfos = am.getRunningAppProcesses();
+                if (processInfos == null || processInfos.size() <= 0) {
+                    return ;
+                }
+                for (ActivityManager.RunningAppProcessInfo appProcess : processInfos) {
+                    if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                        processPkgName(appProcess.processName);
+                    }
+                }
+            } catch (Throwable tw) {
+            }
         }
-        return pkgName;
+    }
+    /**
+     * 根据包名进行一系列的处理
+     *
+     * @param packageName
+     */
+    private void processPkgName(String packageName) {
+//        L.i( "processPkgName:" + packageName);
+        String lastPkgName = SPHelper.getLastOpenPackgeName(mContext);
+
+        if (TextUtils.isEmpty(packageName)) {
+            return;
+        }
+        PackageManager pm = mContext.getPackageManager();
+        // 是否首次打开
+        if (TextUtils.isEmpty(lastPkgName)) {
+            SPHelper.setEndTime(mContext,System.currentTimeMillis()-new Random(25).nextInt(1000));
+            insertShared(pm, packageName);
+        } else {
+            // 如果打开的包名与缓存的包名不一致，存储数据并将包名做缓存
+            if (!packageName.equals(lastPkgName)) {
+//                L.i("=======切换包名。即将保存");
+                SPHelper.setEndTime(mContext,System.currentTimeMillis()-new Random(25).nextInt(1000));
+                filterInsertOCInfo(EGContext.APP_SWITCH, false);
+                insertShared(pm, packageName);
+            }
+        }
+    }
+    /**
+     * 缓存数据
+     *
+     * @param pm
+     * @param pkgName
+     */
+    private void insertShared(PackageManager pm, String pkgName) {
+
+        String appName = "", versionName = "", versionCode = "";
+        try {
+
+            if (pm == null || TextUtils.isEmpty(pkgName)) {
+                return;
+            }
+            appName = pm.getApplicationLabel(pm.getApplicationInfo(pkgName, PackageManager.GET_META_DATA)) + "";
+            versionName = pm.getPackageInfo(pkgName, 0).versionName;
+            versionCode = String.valueOf(pm.getPackageInfo(pkgName, 0).versionCode);
+
+        } catch (Throwable e) {
+        }
+        String nowTime = String.valueOf(System.currentTimeMillis());
+        SPHelper.setLastOpenPackgeName(mContext,pkgName);
+        SPHelper.setLastOpenTime(mContext,nowTime);
+        SPHelper.setLastAppName(mContext,appName);
+        SPHelper.setLastAppVerison(mContext,versionName == null || "null".equals(versionName) ? "1.0" : versionName + "|" + versionCode);
+        SPHelper.setAppType(mContext, appType(pkgName));
     }
 
     /**
      * 从Proc中读取数据
      */
     private void getProcApps() {
-        List<JSONObject> cacheApps = TableOCCount.getInstance(mContext).selectRunning();
+        JSONArray cacheApps = TableOCCount.getInstance(mContext).selectRunning();
+        ELOG.i(cacheApps+"   :::::::: cacheApps");
         JSONObject obj = ProcessManager.getRunningForegroundApps(mContext);
         List<Process> run = new ArrayList<Process>();
         JSONObject jsonObject = new JSONObject();
@@ -149,24 +267,54 @@ public class OCImpl {
                     run.add(ap);
                 }
             }
-            if (cacheApps == null || cacheApps.isEmpty()) {
-                List<JSONObject> ocList = new ArrayList<JSONObject>();
+            if (cacheApps == null || cacheApps.length()<1) {
+                JSONArray ocArray = new JSONArray();
+                JSONArray tempArray = new JSONArray();
+                JSONObject temp = new JSONObject();
+
                 for (int i = 0; i < run.size(); i++) {
                     String pkgName = run.get(i).getName();
                     if (!TextUtils.isEmpty(pkgName)) {
-                        ocList.add(getOCInfo(pkgName.replaceAll(" ",""), EGContext.OC_COLLECTION_TYPE_PROC));
+                        temp.put(DeviceKeyContacts.OCInfo.ApplicationPackageName,pkgName);
+                        temp.put(DeviceKeyContacts.OCInfo.ApplicationOpenTime,System.currentTimeMillis());
+                        tempArray.put(temp);
+                        ocArray.put(getOCInfo(pkgName.replaceAll(" ",""), EGContext.OC_COLLECTION_TYPE_PROC));
                     }
                 }
-                TableOCCount.getInstance(mContext).insertArray(ocList);
+                TableOCTemp.getInstance(mContext).insert(tempArray);
+                ELOG.i("getProcApps 280:::::"+ocArray);
+                TableOCCount.getInstance(mContext).insertArray(ocArray);
             } else {
                 // 去重
-                removeRepeat(cacheApps, run);
-                // 更新缓存表
-                updateCacheState(cacheApps);
-                // 存储关闭信息到OC表
-                TableOC.getInstance(mContext).insert(cacheApps);
-                // 新增该时段缓存信息
-                addCache(run);
+                JSONObject res = removeRepeat(cacheApps, run);
+                if(res != null && res.length()>0){
+                    try {
+                        cacheApps = new JSONArray(res.get("cache").toString());
+                        ELOG.i(cacheApps +"   ::::::::: cacheApps:::::");
+                    }catch (Throwable t){
+                        ELOG.i("   ::::::::: cacheApps 异常:::::");
+                        cacheApps = null;
+                    }
+                }
+                if(cacheApps != null && cacheApps.length()>0) {
+                    // 更新缓存表
+                    updateCacheState(cacheApps);
+                    TableOCTemp.getInstance(mContext).insert(cacheApps);
+                    // 存储关闭信息到OC表
+                    ELOG.i("getProcApps 289:::::" + cacheApps);
+                    TableOCCount.getInstance(mContext).insertArray(cacheApps);
+                }
+                try {
+                    run =(List<Process>)(res.get("run"));
+                }catch (Throwable t){
+                    ELOG.i("   ::::::::: run 异常:::::");
+                   run = null;
+                }
+                if(run != null && run.size()>0){
+                    // 新增该时段缓存信息
+                    addCache(run);
+                    ELOG.i("RUN   :"+run);
+                }
             }
         }catch (Throwable t){
             ELOG.i("getProcApps has an exception :::"+ t.getMessage());
@@ -176,40 +324,68 @@ public class OCImpl {
     /**
      * 缓存中应用列表与新获取应用列表去重
      */
-    private void removeRepeat(List<JSONObject> cacheApps, List<Process> runApps) {
-        JSONObject ocInfo = null;
-        for (int i = cacheApps.size() - 1; i >= 0; i--) {
-            ocInfo = cacheApps.get(i);
-            String apn = ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
-            for (int j = runApps.size() - 1; j >= 0; j--) {
-                String pkgName = runApps.get(j).getName();
-                if (!TextUtils.isEmpty(apn) && apn.equals(pkgName)) {
-                    cacheApps.remove(i);
-                    runApps.remove(j);
-                    continue;
+    private JSONObject removeRepeat(JSONArray cacheApps, List<Process> runApps) {
+
+        JSONObject ocInfo = null,result= new JSONObject();
+        try {
+            List list = Utils.getDiffNO(cacheApps.length());
+            int random ;
+            List oc = new ArrayList();
+            String apn ;
+            for (int i = 0;i < cacheApps.length() - 1; i++ ) {
+                random = (Integer) list.get(i);
+                ocInfo = (JSONObject) cacheApps.get(i);
+                if(ocInfo == null || ocInfo.length()<1) continue;
+                ELOG.i(i+"ocInfoocInfoocInfo  :::: "+ocInfo);
+                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime, String.valueOf(System.currentTimeMillis()-random));
+                oc.add(ocInfo);
+                apn = ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName).replaceAll(" ","");
+                for (int j = 0;j < runApps.size();j++) {
+                    ELOG.i(runApps.size()+"   :::runApps.size()  "+j);
+                    String pkgName = runApps.get(j).getName().replaceAll(" ","");
+                    ELOG.i(pkgName +"::::::::pkgName   ::"+apn+":::::"+ apn.equals(pkgName));
+                    if (!TextUtils.isEmpty(apn) && apn.equals(pkgName)) {
+                        oc.remove(oc.size()-1);
+                        runApps.remove(j);
+                        break;
+                    }
                 }
+//                ocInfo.put(DeviceKeyContacts.OCInfo.SwitchType, EGContext.SWITCH_TYPE_DEFAULT);
             }
+//            ELOG.i(oc+"   :::::: oc");
+            if(cacheApps != null && cacheApps.length()>0){
+                cacheApps = new JSONArray(oc);
+                result.put("cache",cacheApps);
+                ELOG.i(cacheApps+"   :::::: cacheApps");
+            }
+            if(runApps != null && runApps.size()>0) {
+                result.put("run",runApps);
+                ELOG.i(runApps+"   :::::: runApps");
+            }
+        }catch (Throwable t){
+            ELOG.e(t.getMessage()+"tttttttttttttttttttt");
         }
+        return result;
     }
 
     /**
      * 更新缓存表
      */
-    private void updateCacheState(List<JSONObject> cacheApps) {
+    private void updateCacheState(JSONArray cacheApps) {
         try {
-            if (!cacheApps.isEmpty()) {
+            if (cacheApps != null && cacheApps.length()>0) {
                 // 缓存数据列表与新获取数据列表去重，缓存列表剩余为已经关闭的应用，需要转存储到OC表，并更新运行状态为0
-                List<JSONObject> ocList = new ArrayList<JSONObject>();
+                JSONArray ocList = new JSONArray();
                 JSONObject oc = null;
-                for (int i = 0; i < cacheApps.size(); i++) {
-                    oc = cacheApps.get(i);
+                for (int i = 0; i < cacheApps.length(); i++) {
+                    oc = (JSONObject) cacheApps.get(i);
                     int numb = oc.optInt(DeviceKeyContacts.OCInfo.CU) + 1;
                     String apn = oc.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
                     oc.remove(DeviceKeyContacts.OCInfo.CU);
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, apn);
                     jsonObject.put(DeviceKeyContacts.OCInfo.CU, numb);
-                    ocList.add(jsonObject);
+                    ocList.put(jsonObject);
                 }
                 TableOCCount.getInstance(mContext).updateStopState(ocList);
             }
@@ -222,42 +398,53 @@ public class OCImpl {
      * 新增缓存
      */
     private void addCache(List<Process> runApps) {
-        if (!runApps.isEmpty()) {
-            // 缓存数据列表与新获取数据列表去重，新获取列表剩余未新打开的应用，需要缓存到OCCount中，
-            List<String> ocInfo = TableOCCount.getInstance(mContext).getIntervalApps();
-            List<JSONObject> runList = getOCArray(runApps);
-            List<JSONObject> updateOCInfo = new ArrayList<JSONObject>();
-            // 将新增列表拆开，该时段有应用打开记录的修改更新记录，该时段没有应用打开记录的新增记录
-            for (int i = runList.size() - 1; i >= 0; i--) {
-                String pkgName = runList.get(i).optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
-                if (!TextUtils.isEmpty(pkgName) && ocInfo.contains(pkgName)) {
-                    updateOCInfo.add(runList.get(i));
-                    runList.remove(i);
+        try {
+            List oc = new ArrayList();
+            if (!runApps.isEmpty()) {
+                // 缓存数据列表与新获取数据列表去重，新获取列表剩余未新打开的应用，需要缓存到OCCount中，
+                List<String> ocInfo = TableOCCount.getInstance(mContext).getIntervalApps();
+                JSONArray runList = getOCArray(runApps);
+
+                JSONArray updateOCInfo = new JSONArray();
+                // 将新增列表拆开，该时段有应用打开记录的修改更新记录，该时段没有应用打开记录的新增记录
+                for (int i = runList.length() - 1; i >= 0; i--) {
+                    oc.add(runList.get(i));
+                    String pkgName = new JSONObject(runList.get(i).toString()).optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
+                    if (!TextUtils.isEmpty(pkgName) && ocInfo.contains(pkgName)) {
+                        updateOCInfo.put(runList.get(i));
+//                        runList.remove(i);
+                        oc.remove(oc.size()-1);
+                    }
+                }
+                runList = new JSONArray(oc);
+                if (updateOCInfo != null && updateOCInfo.length() >0) {
+                    // 更新该时段有记录的应用信息，则更新缓存表中的运行状态为1
+                    TableOCCount.getInstance(mContext).updateRunState(updateOCInfo);
+                }
+                if (runList != null && runList.length()>0) {
+                    // 新增该时段没有记录的应用信息
+                    ELOG.i("addCache:::::"+runList);
+                    TableOCCount.getInstance(mContext).insertArray(runList);
                 }
             }
-            if (!updateOCInfo.isEmpty()) {
-                // 更新该时段有记录的应用信息，则更新缓存表中的运行状态为1
-                TableOCCount.getInstance(mContext).updateRunState(updateOCInfo);
-            }
-            if (runList != null && !runList.isEmpty()) {
-                // 新增该时段没有记录的应用信息
-                TableOCCount.getInstance(mContext).insertArray(runList);
-            }
+        }catch (Throwable t){
+
         }
+
     }
 
     /**
      * 根据读取出的包列表，获取应用信息并组成json格式添加到列表
      */
-    private List<JSONObject> getOCArray(List<Process> runApps) {
-        List<JSONObject> list = null;
+    private JSONArray getOCArray(List<Process> runApps) {
+        JSONArray list = null;
         try {
-            list = new ArrayList<JSONObject>();
+            list = new JSONArray();
             for (int i = 0; i < runApps.size(); i++) {
                 String pkgName = runApps.get(i).getName();
                 if (!TextUtils.isEmpty(pkgName)) {
                     JSONObject ocJson = getOCInfo(pkgName, EGContext.OC_COLLECTION_TYPE_PROC);
-                    list.add(ocJson);
+                    list.put(ocJson);
                 }
             }
         } catch (Throwable e) {
@@ -287,20 +474,24 @@ public class OCImpl {
     /**
      * 去除缓存中的重复，剩余为已经关闭的应用
      */
-    private void removeRepeat(List<JSONObject> cacheApps) {
+    private void removeRepeat(JSONArray cacheApps) {
         try {
             JSONObject json = null;
-            for (int i = cacheApps.size() - 1; i >= 0; i--) {
-                json = cacheApps.get(i);
+            List list = Utils.getDiffNO(cacheApps.length()-1);
+            int random ;
+            for (int i = cacheApps.length() - 1; i >= 0; i--) {
+                json = (JSONObject) cacheApps.get(i);
+                random = (Integer) list.get(i);
+
                 String apn = json.getString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
-                ELOG.i(apn +" -------apn");
+                ELOG.i(apn +" -------apn"+ "    random ::::::"+random);
                 if (!TextUtils.isEmpty(apn) && apn.equals(pkgName)) {
                     cacheApps.remove(i);
                     ELOG.i(" -------remove repeat ");
                     pkgName = null;
                     continue;
                 }
-                json.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime, String.valueOf(System.currentTimeMillis()));
+                json.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime, String.valueOf(System.currentTimeMillis()-random));
                 json.put(DeviceKeyContacts.OCInfo.SwitchType, EGContext.SWITCH_TYPE_DEFAULT);
             }
         } catch (Throwable e) {
@@ -351,7 +542,7 @@ public class OCImpl {
     /**
      * 判断应用为系统应用还是第三方应用
      */
-    private String appType(String pkgName) {
+    public String appType(String pkgName) {
         String type = "";
         try {
             PackageInfo pkgInfo = mContext.getPackageManager().getPackageInfo(pkgName, 0);
@@ -366,63 +557,102 @@ public class OCImpl {
         }
         return type;
     }
+    public void filterInsertOCInfo(String switchType, boolean createThread) {
+//        L.i("-------filterInsertOCInfo()----" + switchType);
+        String OldPkgName = SPHelper.getLastOpenPackgeName(mContext);
+        String appName = SPHelper.getLastAppName(mContext);
+        String appVersion = SPHelper.getLastAppVerison(mContext);
+        String openTime = SPHelper.getLastOpenTime(mContext);
+        Long closeTime = SPHelper.getEndTime(mContext);
+        String appType = SPHelper.getAppType(mContext);
+//        L.i("filterInsertOCInfo..... 1111");
+        if (TextUtils.isEmpty(OldPkgName) || TextUtils.isEmpty(appName) || TextUtils.isEmpty(appVersion)
+                || TextUtils.isEmpty(openTime)) {
+            return;
+        }
+        long time = closeTime;
+        long minDuration = SPHelper.getMinDuration(mContext);
+        long maxDuration = SPHelper.getMaxDuration(mContext);
 
-//    private List<AppSnapshotInfo> getAppsFromShell() {
-//        List<AppSnapshotInfo> appList = new ArrayList<AppSnapshotInfo>();
-//        try {
-//            AppSnapshotInfo info;
-//            PackageManager pm = mContext.getPackageManager();
-//            String result = Utils.shell(SHELL_PM_LIST_PACKAGES);
-//            if (!TextUtils.isEmpty(result) && result.contains("\n")) {
-//                String[] lines = result.split("\n");
-//                if (lines.length > 0) {
-//                    for (int i = 0; i < lines.length; i++) {
-//                        try {
-//                            String[] split = lines[i].split(":");
-//                            if (split.length >= 1) {
-//                                String packageName = split[1];
-//                                if (!TextUtils.isEmpty(packageName)
-//                                        && pm.getLaunchIntentForPackage(packageName) != null) {
-//                                    info = new AppSnapshotInfo();
-//                                    info.setApplicationPackageName(packageName);
-//                                    appList.add(info);
-//                                }
-//                            }
-//                        } catch (Throwable e) {
-//                        }
-//                    }
-//                }
-//            }
-//        } catch (Throwable e) {
-//            // igone
-//        }
-//        return appList;
-//    }
+        if (minDuration <= 0) {
+            minDuration = EGContext.SHORT_TIME;
+        }
+        if (maxDuration <= 0) {
+            maxDuration = EGContext.LONGEST_TIME;
+        }
+//        L.i("filterInsertOCInfo..... 2222  time:" +time);
+        JSONObject ocInfo  = null ;
+        if (minDuration / 2 <= time && time <= maxDuration) {
+//            L.i("filterInsertOCInfo..... 33333");
+            try {
+                ocInfo = new JSONObject();
+                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, OldPkgName);
+                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationOpenTime, openTime);
+                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime, closeTime);
 
-//    public class OC {
-//        // 应用包名
-//        public static final String APN = "APN";
-//        // 应用名称
-//        public static final String AN = "AN";
-//        // 开始时间
-//        public static final String AOT = "AOT";
-//        // 结束时间
-//        public static final String ACT = "ACT";
-//        // 应用打开关闭次数
-//        public static final String CU = "CU";
-//        // 应用版本信息
-//        public static final String AVC = "AVC";
-//        // 网络类型
-//        public static final String NT = "NT";
-//        // 应用切换类型，1-正常使用，2-开关屏幕切换，3-服务重启
-//        public static final String AST = "AST";
-//        // 应用类型
-//        public static final String AT = "AT";
-//        // OC采集来源，1-getRunningTask，2-读取proc，3-辅助功能，4-系统统计
-//        public static final String CT = "CT";
-//        // 快照次数所属的时段，1表示0～6小时，2表示6～12小时，3表示12～18小时，4表示18～24小时
-//        public static final String TI = "TI";
-//        // 发生日期
-//        public static final String DY = "DY";
-//    }
+                ocInfo.put(DeviceKeyContacts.OCInfo.NetworkType, NetworkUtils.getNetworkType(mContext));
+                ocInfo.put(DeviceKeyContacts.OCInfo.CollectionType, "1");
+                ocInfo.put(DeviceKeyContacts.OCInfo.SwitchType,switchType);
+                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationType,appType);
+                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode, appVersion);
+                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName, appName);
+                if (ocInfo != null && !"".equals(openTime) && !"".equals(closeTime)) {
+                    TableOCCount.getInstance(mContext).insert(ocInfo);// 保存上一个打开关闭记录信息
+                }
+            }catch (Throwable t){
+            }
+        }
+        SPHelper.setLastOpenPackgeName(mContext,"");
+        SPHelper.setLastOpenTime(mContext,"");
+        SPHelper.setLastAppName(mContext,"");
+        SPHelper.setLastAppVerison(mContext,"");
+    }
+    /**
+     * android 5/6需要间隔大于30秒
+     *
+     * @return
+     */
+    private boolean isDurLThanThri() {
+        long now = System.currentTimeMillis();
+        if (mProcessTime == 0 || (now - mProcessTime) >= 30 * 1000) {
+            mProcessTime = now;
+            return true;
+        }
+        return false;
+    }
+    /**
+     * android 5以上，有UsageStatsManager权限可以使用的
+     */
+    public void processOCByUsageStatsManager() {
+        class RecentUseComparator implements Comparator<UsageStats> {
+            @Override
+            public int compare(UsageStats lhs, UsageStats rhs) {
+                return (lhs.getLastTimeUsed() > rhs.getLastTimeUsed()) ? -1 : (lhs.getLastTimeUsed() == rhs.getLastTimeUsed()) ? 0 : 1;
+            }
+        }
+        try {
+
+            @SuppressLint("WrongConstant")
+            UsageStatsManager usm = (UsageStatsManager) mContext.getApplicationContext().getSystemService("usagestats");
+            if (usm == null) {
+                return;
+            }
+            long ts = System.currentTimeMillis();
+            List<UsageStats> usageStats = usm.queryUsageStats(UsageStatsManager.INTERVAL_BEST, ts - 1000 * 10, ts);
+            if (usageStats == null || usageStats.size() == 0) {
+                return;
+            }
+            Collections.sort(usageStats, new RecentUseComparator());
+            String usmPkg = usageStats.get(0).getPackageName();
+            if (!TextUtils.isEmpty(usmPkg)) {
+                processPkgName(usmPkg);
+            } else {
+                getProcApps();
+            }
+        } catch (Throwable e) {
+            getProcApps();
+        }
+    }
+
+
 }

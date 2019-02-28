@@ -47,7 +47,7 @@ public class PrivacyImpl {
      */
     private static JSONObject processInfos(List<Process> infos) {
         JSONObject object = new JSONObject();
-        Set temp = new HashSet<String>();
+        Set<String> temp = new HashSet<String>();
         Set<String> result = new HashSet<String>();
         JSONObject jsonResult = null;
         JSONArray resultInfo = new JSONArray();

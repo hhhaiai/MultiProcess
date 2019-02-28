@@ -11,6 +11,7 @@ import java.util.Set;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 
 import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.utils.ELOG;
@@ -19,6 +20,8 @@ import com.analysys.dev.utils.ELOG;
 public class SPHelper {
     private final static HashMap<String, Object> SP_CACHE = new HashMap<String, Object>();
     private static final String DEFAULT_PREFERENCE = "ana_sp_xml";
+    private static Editor editor = null;
+    private static SharedPreferences res = null;
 
     private SPHelper() {}
 
@@ -30,6 +33,12 @@ public class SPHelper {
      */
     public static SharedPreferences getDefault(Context context) {
         return getInstance(context, DEFAULT_PREFERENCE);
+    }
+    private static Editor getEditor(Context ctx){
+        if(editor == null){
+          editor = getDefault(ctx).edit();
+        }
+      return editor;
     }
 
     /**
@@ -43,7 +52,7 @@ public class SPHelper {
         if (context == null) {
             return null;
         } else {
-            SharedPreferences res = getSharedPreferences(context, name);
+            if(res == null) res= getSharedPreferences(context, name);
             File f = getSystemSharedPrefsFile(context, name);
             if (!f.exists()) {
                 try {
@@ -170,8 +179,83 @@ public class SPHelper {
     }
 
     public static void setDebugMode(Context ctx, boolean debug) {
-        SharedPreferences sp = getDefault(ctx);
-        sp.edit().putBoolean(EGContext.DEBUG, debug).commit();
+        getEditor(ctx).putBoolean(EGContext.DEBUG, debug).commit();
+    }
+    /**
+     * 打开的应用名称
+     *
+     * @return
+     */
+    public static String getLastAppName(Context ctx) {
+        return getDefault(ctx).getString(EGContext.LASTAPPNAME, "");
+    }
+    public static void setLastAppName(Context context,String lastAppName) {
+        getEditor(context).putString(EGContext.LASTAPPNAME, lastAppName).commit();
+    }
+    public static String getLastOpenPackgeName(Context ctx) {
+        return getDefault(ctx).getString(EGContext.LASTPACKAGENAME, "");
+    }
+    /**
+     * 最后打开的应用包名
+     */
+    public static void setLastOpenPackgeName(Context ctx,String packageName) {
+        getEditor(ctx).putString(EGContext.LASTPACKAGENAME, packageName).commit();
+    }
+    /**
+     * 打开的应用版本号
+     *
+     * @return
+     */
+    public static String getLastAppVerison(Context ctx) {
+        return getDefault(ctx).getString(EGContext.LASTAPPVERSION, "");
+    }
+    public static void setLastAppVerison(Context ctx,String lastAppVerison) {
+        getEditor(ctx).putString(EGContext.LASTAPPVERSION, lastAppVerison).commit();
     }
 
+    public static void setAppType(Context ctx,String appType) {
+        getEditor(ctx).putString(EGContext.APP_TYPE, appType).commit();
+    }
+    /**
+     * 应用的打开时间
+     *
+     * @return
+     */
+    public static String getLastOpenTime(Context ctx) {
+        return getDefault(ctx).getString(EGContext.LASTOPENTIME, "");
+    }
+    public static void setLastOpenTime(Context ctx,String lastOpenTime) {
+        getEditor(ctx).putString(EGContext.LASTOPENTIME, lastOpenTime).commit();
+    }
+    /**
+     * 进程关闭时间时间
+     */
+    public static long getEndTime(Context ctx) {
+        return getDefault(ctx).getLong(EGContext.ENDTIME, 0);
+    }
+    public static String getAppType(Context ctx) {
+        return getDefault(ctx).getString(EGContext.APP_TYPE, "");
+    }
+    public static long getMinDuration(Context ctx) {
+        return getDefault(ctx).getLong(EGContext.MIN_DURATION_TIME, 0);
+    }
+
+    public static void setMinDuration(Context ctx,long info) {
+        editor.putLong(EGContext.MIN_DURATION_TIME, info);
+        editor.commit();
+    }
+    public static long getMaxDuration(Context ctx) {
+        return getDefault(ctx).getLong(EGContext.MAX_DURATION_TIME, 0);
+    }
+
+    public static void setMaxDuration(Context ctx,long info) {
+        editor.putLong(EGContext.MAX_DURATION_TIME, info);
+        editor.commit();
+    }
+    /**
+     * 进程关闭时间时间
+     */
+    public static void setEndTime(Context ctx, long time) {
+        getDefault(ctx).edit().putLong(EGContext.ENDTIME, time).commit();
+    }
 }

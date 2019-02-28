@@ -7,10 +7,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 import java.util.Set;
 
 import com.analysys.dev.internal.Content.DeviceKeyContacts;
@@ -21,9 +23,16 @@ import com.analysys.dev.utils.reflectinon.EContextHelper;
 import com.analysys.dev.utils.sp.SPHelper;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.ActivityManager;
+import android.app.AppOpsManager;
+import android.app.KeyguardManager;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Environment;
+import android.os.PowerManager;
 import android.provider.Settings;
 
 import android.text.TextUtils;
@@ -35,7 +44,6 @@ public class Utils {
     /**
      * 判断服务是否启动
      */
-    @Deprecated
     public static boolean isServiceWork(Context mContext, String serviceName) {
         boolean isWork = false;
         try {
@@ -66,46 +74,6 @@ public class Utils {
         String time = simpleDateFormat.format(date);
         return time;
     }
-
-//    public static String shell(String cmd) {
-//        if (TextUtils.isEmpty(cmd)) {
-//            return null;
-//        }
-//        Process proc = null;
-//        BufferedInputStream in = null;
-//        BufferedReader br = null;
-//        StringBuilder sb = new StringBuilder();
-//        try {
-//            proc = Runtime.getRuntime().exec(cmd);
-//            in = new BufferedInputStream(proc.getInputStream());
-//            br = new BufferedReader(new InputStreamReader(in));
-//            String line = "";
-//            while ((line = br.readLine()) != null) {
-//                sb.append(line).append("\n");
-//            }
-//        } catch (Throwable e) {
-//        } finally {
-//            if (br != null) {
-//                try {
-//                    br.close();
-//                } catch (Throwable e) {
-//
-//                }
-//            }
-//            if (in != null) {
-//                try {
-//                    in.close();
-//                } catch (Throwable e) {
-//
-//                }
-//            }
-//            if (proc != null) {
-//                proc.destroy();
-//            }
-//        }
-//
-//        return sb.toString();
-//    }
     /**
      * 执行shell指令
      *
@@ -254,5 +222,122 @@ public class Utils {
             }
         }
         return set;
+    }
+    /**
+     * 是否点亮屏幕
+     *
+     * @param context
+     * @return true: 屏幕点亮 false: 屏幕熄灭
+     */
+    @SuppressWarnings("deprecation")
+    public static boolean isScreenOn(Context context) {
+        PowerManager powerManager =
+                (PowerManager) context.getApplicationContext().getSystemService(Context.POWER_SERVICE);
+        // 锁屏true 开屏false
+        return powerManager.isScreenOn();
+    }
+
+    /**
+     * 是否锁屏
+     *
+     * @param context
+     * @return true:锁屏,有输入密码解锁或者锁屏壁纸页面 false: 进入系统中的任何页面
+     */
+    public static boolean isScreenLocked(Context context) {
+
+        KeyguardManager manager =
+                (KeyguardManager) context.getApplicationContext().getSystemService(Context.KEYGUARD_SERVICE);
+        // 锁屏true 开屏false
+        boolean inKeyguardRestrictedInputMode = manager.inKeyguardRestrictedInputMode();
+        return inKeyguardRestrictedInputMode;
+    }
+
+    /**
+     * 是否可以使用UsageStatsManager。
+     * 判断思路:
+     * 0. xml中是否声明权限
+     * 1. 是否授权
+     *
+     * @param context
+     * @return
+     */
+    @TargetApi(21)
+    public static boolean canUseUsageStatsManager(Context context) {
+        if (context == null) {
+            return false;
+        }
+        if (!AndroidManifestHelper.isPermissionDefineInManifest(context, "android.permission.PACKAGE_USAGE_STATS")) {
+            return false;
+        }
+//        AppOpsManager.OPSTR_GET_USAGE_STATS 对应页面是 "有权查看使用情况的应用"
+        if (!hasPermission(context, AppOpsManager.OPSTR_GET_USAGE_STATS)) {
+            return false;
+        }
+
+        return false;
+    }
+    /**
+     * 是否授权
+     *
+     * @param context
+     * @param op
+     * @return
+     */
+    @SuppressLint("WrongConstant")
+    private static boolean hasPermission(Context context, String op) {
+        try {
+            if (context == null || TextUtils.isEmpty(op)) {
+                return false;
+            }
+            ApplicationInfo applicationInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(), 0);
+            AppOpsManager appOpsManager = (AppOpsManager) context.getApplicationContext().getSystemService("appops");
+            int mode = appOpsManager.checkOpNoThrow(op, applicationInfo.uid, applicationInfo.packageName);
+            return mode == AppOpsManager.MODE_ALLOWED;
+        } catch (Throwable e) {
+        }
+        return false;
+    }
+    public static String getApplicationName(Context ctx, String packageName) {
+        String appName = "";
+        try {
+            PackageManager pm = ctx.getPackageManager();
+            appName = (String) pm.getApplicationLabel(pm.getApplicationInfo(packageName, PackageManager.GET_META_DATA));
+        } catch (PackageManager.NameNotFoundException e) {
+        }
+        return appName;
+    }
+
+    public static String getApplicationVersion(Context ctx , String packageName) {
+        String appVer = "";
+        PackageManager pm = ctx.getPackageManager();
+        try {
+            appVer =
+                    pm.getPackageInfo(packageName, 0).versionName + "|" + pm.getPackageInfo(packageName, 0).versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+        }
+        return appVer;
+    }
+    /**
+     * 生成n个不同的随机数，且随机数区间为[0,10)
+     * @param n
+     * @return
+     */
+    public static ArrayList getDiffNO(int n){
+        // 生成 [0-n) 个不重复的随机数
+        // list 用来保存这些随机数
+        ArrayList list = new ArrayList();
+        Random rand = new Random(30);
+        boolean[] bool = new boolean[n];
+        int num = 0;
+        for (int i = 0; i < n; i++) {
+            do {
+                // 如果产生的数相同继续循环
+                num = rand.nextInt(n);
+            } while (bool[num]);
+            bool[num] = true;
+            ELOG.i(num+"     numnumnumnumnumnumnumnumnum");
+            list.add(num);
+        }
+        return list;
     }
 }

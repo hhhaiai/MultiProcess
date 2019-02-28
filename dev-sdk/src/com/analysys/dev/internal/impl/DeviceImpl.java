@@ -400,6 +400,7 @@ public class DeviceImpl {
         }catch (Throwable t){
             operatorCode = "";
         }
+        if("00000".equals(operatorCode)) operatorCode = "";
         return operatorCode;
     }
 

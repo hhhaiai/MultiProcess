@@ -90,7 +90,7 @@ public class ServiceHelper {
         if (Build.VERSION.SDK_INT < 26) {
             return true;
         }else{
-            if (EGContext.FLAG_SHOW_NOTIFY && PermissionUtils.checkPermission(mContext,
+            if (PermissionUtils.checkPermission(mContext,
                     "android.permission.FOREGROUND_SERVICE")){
                 return true;
             }
