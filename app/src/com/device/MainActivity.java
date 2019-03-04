@@ -1,7 +1,6 @@
 package com.device;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -10,14 +9,10 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Base64;
 import android.view.View;
 
-import com.analysys.dev.EguanMonitorAgent;
-import com.analysys.dev.internal.impl.LocationImpl;
-import com.analysys.dev.internal.impl.OCImpl;
-import com.analysys.dev.utils.ELOG;
-import com.analysys.dev.utils.PermissionUtils;
+import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.PermissionUtils;
 
 import java.util.List;
 
@@ -31,7 +26,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        EguanMonitorAgent.getInstance().initEguan(this,"qwertyuiop123","WanDouJia",false);
+//        AnalysysTracker.getInstance().initEguan(this,"qwertyuiop123","WanDouJia",false);
         registerPermission();
 //        Intent intent = new Intent(this, testAct.class);
 //        startActivity(intent);

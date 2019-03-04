@@ -47,7 +47,7 @@
         </intent-filter>
     </activity>
         -->
-        <!-- <receiver android:name="com.analysys.dev.receiver.AnalysysReceiver" > -->
+        <!-- <receiver android:name="AnalysysReceiver" > -->
         <!-- <intent-filter android:priority="9999" > -->
         <!-- <action android:name="android.intent.action.BOOT_COMPLETED" /> -->
         <!-- <action android:name="android.intent.action.USER_PRESENT" /> -->
@@ -58,17 +58,17 @@
 
 
         <!-- <service -->
-        <!-- android:name="com.analysys.dev.service.AnalysysService" -->
+        <!-- android:name="AnalysysService" -->
         <!-- android:enabled="true" -->
         <!-- android:exported="true" -->
         <!-- android:process=":AnalysysService" -->
         <!-- tools:ignore="ExportedService" /> -->
         <!-- <service -->
-        <!-- android:name="com.analysys.dev.service.AnalysysJobService" -->
+        <!-- android:name="AnalysysJobService" -->
         <!-- android:permission="android.permission.BIND_JOB_SERVICE" -->
         <!-- android:process=":AnalysysService" /> -->
         <service
-            android:name="com.analysys.dev.service.AnalysysAccessibilityService"
+            android:name="com.analysys.dev.com.analysys.track.dev.service.AnalysysAccessibilityService"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"

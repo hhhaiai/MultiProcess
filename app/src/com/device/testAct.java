@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Base64;
 
-import com.analysys.dev.utils.ELOG;
+import com.analysys.track.utils.ELOG;
 
 
 import java.net.URLDecoder;
