@@ -3,10 +3,8 @@ package com.analysys.dev.model;
 import com.analysys.dev.internal.Content.EGContext;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * 策略相关信息

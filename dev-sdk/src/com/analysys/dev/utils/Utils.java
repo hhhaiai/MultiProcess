@@ -335,7 +335,6 @@ public class Utils {
                 num = rand.nextInt(n);
             } while (bool[num]);
             bool[num] = true;
-            ELOG.i(num+"     numnumnumnumnumnumnumnumnum");
             list.add(num);
         }
         return list;

@@ -8,13 +8,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
+import android.os.PowerManager;
+import android.util.Log;
 
 
 import com.analysys.dev.internal.Content.EGContext;
+import com.analysys.dev.internal.impl.OCImpl;
 import com.analysys.dev.service.AnalysysJobService;
 import com.analysys.dev.utils.ELOG;
+import com.analysys.dev.utils.EThreadPool;
 import com.analysys.dev.utils.PermissionUtils;
 
+import com.analysys.dev.utils.ReceiverUtils;
+import com.analysys.dev.utils.TPUtils;
 import com.analysys.dev.utils.Utils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 import com.analysys.dev.receiver.DynamicReceivers;
@@ -59,6 +65,7 @@ public class ServiceHelper {
     /**
      * 官方api方式打开服务
      */
+    //TODO   所有的处理都是在这里操作，启动service之类的都在这里启动
     protected void startSelfService() {
         if (isStartService()) {
             boolean isWork = Utils.isServiceWork(mContext, EGContext.SERVICE_NAME);
@@ -113,14 +120,14 @@ public class ServiceHelper {
     }
     public void startJobService(Context context) {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {//5.0以上
             boolean runJobService = isJobPollServiceOn(context);
             ELOG.i(runJobService+ " ==runJobService");
             if (!runJobService) {
                 JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
                 JobInfo.Builder builder = new JobInfo.Builder(EGContext.JOB_ID, new ComponentName
                         (context, AnalysysJobService.class.getName()));  //指定哪个JobService执行操作
-                builder.setPeriodic(EGContext.JOB_SERVICE_TIME);
+                builder.setPeriodic(EGContext.JOB_SERVICE_TIME);//10s
                 builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
                 jobScheduler.schedule(builder.build());
             }
@@ -148,6 +155,16 @@ public class ServiceHelper {
         if (mContext == null) {
             return;
         }
+        if (TPUtils.isMainThread()) {
+            EThreadPool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    start();
+                }
+            });
+        } else {
+            start();
+        }
     }
 
 
@@ -159,17 +176,35 @@ public class ServiceHelper {
         try {
             if (Build.VERSION.SDK_INT >= 21) {
                 try {
-                    ServiceHelper.getInstance(mContext).startJobService(mContext);
+                    ServiceHelper.getInstance(mContext).stop(mContext);
                 } catch (Throwable e) {
                 }
             } else {
-                ComponentName cn = new ComponentName(mContext, AnalysysService.class);
-                Intent intent = new Intent();
-                intent.setComponent(cn);
-                mContext.startService(intent);
+
             }
         } catch (Throwable e) {
         }
     }
+    private void start() {
+        try {
+            if (mContext == null) {
+                return;
+            }
+            OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.SERVCICE_RESTART, true);
+            ReceiverUtils.getInstance().registAllReceiver(mContext);
+            PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+            boolean isScreenOn = pm.isScreenOn();
+            // 如果为true，则表示屏幕正在使用，false则屏幕关闭。
+            if (!isScreenOn) {
+                ReceiverUtils.getInstance().setWork(false);
+            }
+            ComponentName cn = new ComponentName(mContext, AnalysysService.class);
+            Intent intent = new Intent();
+            intent.setComponent(cn);
+            mContext.startService(intent);
+        } catch (Throwable e) {
 
+        }
+
+    }
 }

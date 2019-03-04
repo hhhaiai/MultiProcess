@@ -684,7 +684,6 @@ class SPImpl implements SharedPreferences {
                 try {
                     parseOK = parseBytesIntoMap(allBytes, true);
                 } catch (Exception e) {
-                    e.printStackTrace();
                 }
 
                 if (!parseOK) {
@@ -696,7 +695,6 @@ class SPImpl implements SharedPreferences {
                         lock.release();
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
         } else {
@@ -766,7 +764,6 @@ class SPImpl implements SharedPreferences {
                 try {
                     SPImpl.this.wait();
                 } catch (Throwable t) {
-                    t.printStackTrace();
                 }
             }
         }
@@ -797,7 +794,6 @@ class SPImpl implements SharedPreferences {
         try {
             mMappedByteBuffer = mFileChannel.map(FileChannel.MapMode.READ_WRITE, 0, length);
         } catch (Exception e) {
-            e.printStackTrace();
         }
 
         if (mMappedByteBuffer != null) {
@@ -842,7 +838,6 @@ class SPImpl implements SharedPreferences {
                 }
             } catch (Exception e) {
                 isFileExist = false;
-                e.printStackTrace();
 
                 if (mErrorListener != null) {
                     mErrorListener.onError(mFile.getAbsolutePath() + " " + e.getCause(), INIT_EXCEPTION, -1);
@@ -865,14 +860,12 @@ class SPImpl implements SharedPreferences {
                 try {
                     lock = mFileChannel.tryLock();
                 } catch (Exception e) {
-                    e.printStackTrace();
                 }
 
                 if (lock == null) {
                     try {
                         Thread.sleep(100);
                     } catch (Exception e) {
-                        e.printStackTrace();
                     }
                 }
 
@@ -884,7 +877,6 @@ class SPImpl implements SharedPreferences {
             try {
                 lock = mFileChannel.tryLock();
             } catch (Exception e) {
-                e.printStackTrace();
             }
         }
 
@@ -973,7 +965,6 @@ class SPImpl implements SharedPreferences {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                     if (mErrorListener != null) {
                         mErrorListener.onError((mFile != null ? mFile.getAbsolutePath() : null) + "#" + e.getCause(),
                             VALUE_LOST, totalBytes.length);
@@ -1143,7 +1134,6 @@ class SPImpl implements SharedPreferences {
                     return ByteLongUtils.bytesToLong(value);
                 }
             } catch (Throwable t) {
-                t.printStackTrace();
             }
         }
 
@@ -1166,7 +1156,6 @@ class SPImpl implements SharedPreferences {
                     return ByteLongUtils.longToBytes((Long)obj);
                 }
             } catch (Throwable t) {
-                t.printStackTrace();
             }
         }
 
@@ -1215,7 +1204,6 @@ class SPImpl implements SharedPreferences {
             osChannel = os.getChannel();
             mFileChannel.transferTo(0, mMappedByteBuffer.capacity(), osChannel);
         } catch (Throwable t) {
-            t.printStackTrace();
         } finally {
             safeClose(os);
             safeClose(osChannel);
@@ -1227,7 +1215,6 @@ class SPImpl implements SharedPreferences {
             try {
                 obj.close();
             } catch (IOException e) {
-                e.printStackTrace();
             }
         }
     }
@@ -1257,14 +1244,12 @@ class SPImpl implements SharedPreferences {
             is.read(allBytes);
         } catch (Throwable t) {
             throwable = t;
-            t.printStackTrace();
         } finally {
             safeClose(is);
 
             try {
                 parseOK = parseBytesIntoMap(allBytes, false);
             } catch (Exception e) {
-                e.printStackTrace();
             }
 
             if (allBytes != null || throwable != null) {

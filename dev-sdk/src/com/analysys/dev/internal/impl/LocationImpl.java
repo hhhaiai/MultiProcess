@@ -292,7 +292,6 @@ public class LocationImpl {
                 locationJson.put(DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME, baseStation);
             }
         } catch (Throwable e) {
-            e.printStackTrace();
         }
         return locationJson;
     }

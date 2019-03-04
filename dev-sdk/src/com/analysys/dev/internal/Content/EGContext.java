@@ -281,6 +281,7 @@ public class EGContext {
     public static final long LONGEST_TIME = 5 * 60 * 60 * 1000;
     public static final String CLOSE_SCREEN = "2";
     public static final String APP_SWITCH = "1";
+    public static final String SERVCICE_RESTART = "3";
 
 
 

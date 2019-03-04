@@ -31,7 +31,7 @@ public class TableLocation {
     public void insert(JSONObject locationInfo) {
         try {
             if (!TextUtils.isEmpty(locationInfo.toString())) {
-                long time = Long.parseLong(locationInfo.getString(DeviceKeyContacts.LocationInfo.CollectionTime));
+                long time = Long.parseLong(locationInfo.optString(DeviceKeyContacts.LocationInfo.CollectionTime));
                 String encryptLocation = Base64Utils.encrypt(locationInfo.toString(), time);
                 if (!TextUtils.isEmpty(encryptLocation)) {
                     ContentValues cv = new ContentValues();

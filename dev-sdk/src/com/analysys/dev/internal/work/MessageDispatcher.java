@@ -57,6 +57,7 @@ public class MessageDispatcher {
     public void startService() {
         Message msg = new Message();
         msg.what = MessageDispatcher.MSG_START_SERVICE_SELF;
+        //TODO ？是否需要判断是否可以执行？
         sendMessage(msg, 0);
     }
 
@@ -190,6 +191,7 @@ public class MessageDispatcher {
     }
 
     private Handler startWorkHandler() {
+        //TODO 字符串改常量，优先级考虑下
         final HandlerThread thread = new HandlerThread("com.eguan", android.os.Process.THREAD_PRIORITY_BACKGROUND);
         thread.start();
         final Handler ret = new AnalysyHandler(thread.getLooper());
@@ -305,7 +307,7 @@ public class MessageDispatcher {
             snapshotInfo(0);
             locationInfo(0);
             uploadInfo(0);
-            ServiceHelper.getInstance(mContext).registerReceiver();
+//            ServiceHelper.getInstance(mContext).registerReceiver();
             CheckHeartbeat.getInstance(mContext).sendMessages();
         }
     }

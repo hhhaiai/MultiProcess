@@ -40,7 +40,6 @@ public class DeflterCompressUtils {
             try {
                 bos.close();
             } catch (IOException e) {
-                e.printStackTrace();
             }
         }
         compresser.end();
@@ -95,12 +94,10 @@ public class DeflterCompressUtils {
             output = o.toByteArray();
         } catch (Exception e) {
             output = data;
-            e.printStackTrace();
         } finally {
             try {
                 o.close();
             } catch (IOException e) {
-                e.printStackTrace();
             }
         }
 

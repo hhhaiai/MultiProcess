@@ -55,23 +55,25 @@ public class AnalysysInternal {
      * @param isDebug 只保留日志控制
      */
     public void initEguan(String key, String channel, boolean isDebug) {
+        //TODO 防止重复注册
 
-        Reflecer.init();
+        Reflecer.init();//必须调用-----//TODO 其他入口进来都需要进来
         ELOG.d("初始化，进程Id：< " + Process.myPid() + " >");
 //        initSupportMultiProcess();//TODO
-        ReceiverUtils.getInstance().setWork(true);
-        updateAppkey(key);
+
+        updateAppkey(key);//updata sp
         updateChannel(mContext, channel);
         EGContext.FLAG_DEBUG_USER = isDebug;
-        //JobService
-        ReceiverUtils.getInstance().registAllReceiver(mContext);
+        ReceiverUtils.getInstance().setWork(true);//跟下一行重复，改到receiver里
+        ReceiverUtils.getInstance().registAllReceiver(mContext);//只能注册一次，不能注册多次
         PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
         boolean isScreenOn = pm.isScreenOn();
         // 如果为true，则表示屏幕正在使用，false则屏幕关闭。
         if (!isScreenOn) {
             ReceiverUtils.getInstance().setWork(false);
         }
-        ServiceHelper.getInstance(mContext).startJobService(mContext);
+        //JobService
+//        ServiceHelper.getInstance(mContext).startJobService(mContext);
         MessageDispatcher.getInstance(mContext).startService();
 
 

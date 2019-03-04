@@ -52,7 +52,6 @@ public class AESUtils {
             byte[] result = cipher.doFinal(content);
             return result;
         } catch (Throwable e) {
-            e.printStackTrace();
         }
 
         return null;

@@ -3,6 +3,7 @@ package com.analysys.dev.internal.impl;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 
 import com.analysys.dev.database.TableAppSnapshot;
 import com.analysys.dev.database.TableLocation;
@@ -55,6 +56,7 @@ public class UploadImpl {
 
     // 上传数据
     public void upload() {
+        //TODO 单独的自己上传，只能有一个，不能并行上传
         // 策略处理
         EThreadPool.execute(new Runnable() {
             @Override
@@ -127,7 +129,8 @@ public class UploadImpl {
 //                object.put(OCI, ocJar);
 //            }
         } catch (Throwable e) {
-            ELOG.e(e.getMessage()+" getInfo has an exception");
+//            Log.getStackTraceString(e);
+            ELOG.e(e);
         }
         return object.toString();
     }
@@ -201,7 +204,7 @@ public class UploadImpl {
                     return true;
                 }
                 JSONObject object = new JSONObject(json);
-                String code = object.get(DeviceKeyContacts.Response.RES_CODE).toString();
+                String code = object.opt(DeviceKeyContacts.Response.RES_CODE).toString();
                 if(code != null){
                     if(EGContext.HTTP_SUCCESS.equals(code)){
                         Utils.setId(json , mContext);
@@ -210,7 +213,7 @@ public class UploadImpl {
                         result = true;
                     }
                     if(EGContext.HTTP_RETRY.equals(code)){
-                        PolicyImpl.getInstance(mContext).saveRespParams(object.getJSONObject(DeviceKeyContacts.Response.RES_POLICY));
+                        PolicyImpl.getInstance(mContext).saveRespParams(object.optJSONObject(DeviceKeyContacts.Response.RES_POLICY));
                         result = false;
                     }
                 }

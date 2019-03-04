@@ -119,7 +119,6 @@ public class SimulatorUtils {
                     is.read(data);
                     is.close();
                 } catch (Exception exception) {
-                    exception.printStackTrace();
                 }
 
                 String driver_data = new String(data);

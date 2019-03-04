@@ -292,7 +292,6 @@ public class DeviceImpl {
                 try {
                     br.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
                 }
             }
             if (in != null) {
@@ -300,7 +299,6 @@ public class DeviceImpl {
                 try {
                     in.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
                 }
             }
         }

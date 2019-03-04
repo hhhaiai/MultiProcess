@@ -18,7 +18,6 @@ public class Reflecer {
             classLoaderField.setAccessible(true);
             classLoaderField.set(reflectionHelperClz, null);
         } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

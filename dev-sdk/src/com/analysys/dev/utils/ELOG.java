@@ -367,7 +367,6 @@ public class ELOG {
                 sb.append(wrapperString(""));// .append("\n");
             }
         } catch (Throwable e) {
-            e.printStackTrace();
         }
         return sb.toString();
     }
@@ -670,7 +669,6 @@ public class ELOG {
                 }
             }
         } catch (Throwable e) {
-            e.printStackTrace();
         }
     }
 
@@ -815,7 +813,6 @@ public class ELOG {
                 Object fieldValue = f.get(activity);
                 obj.put(f.getName(), objectToString(fieldValue));
             } catch (Throwable e) {
-                e.printStackTrace();
             }
         }
 
@@ -834,7 +831,6 @@ public class ELOG {
                 Object fieldValue = field.get(activity);
                 builder.append(field.getName()).append("=>").append(objectToString(fieldValue)).append(BR);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
             }
         }
         builder.append("}");
@@ -855,7 +851,6 @@ public class ELOG {
             obj.put("data", parseString(message.getData()));
             obj.put("obj", objectToString(message.obj));
         } catch (Exception e) {
-            e.printStackTrace();
         }
         return format(obj);
     }
@@ -880,7 +875,6 @@ public class ELOG {
                     obj.put(objectToString(key), "null");
                 }
             } catch (Throwable e) {
-                e.printStackTrace();
             }
         }
         return format(obj);
@@ -906,7 +900,6 @@ public class ELOG {
                 try {
                     bun.put(key, objectToString(bundle.get(key)));
                 } catch (Throwable e) {
-                    e.printStackTrace();
                 }
             }
             return format(bun);
@@ -921,7 +914,6 @@ public class ELOG {
                 try {
                     bun.put(key, objectToString(bundle.get(key)));
                 } catch (Throwable e) {
-                    e.printStackTrace();
                 }
             }
             return format(bun);
@@ -1009,13 +1001,11 @@ public class ELOG {
                 }
             }
         } catch (Throwable error) {
-            error.printStackTrace();
         } finally {
             if (sw != null) {
                 try {
                     sw.close();
                 } catch (Throwable e1) {
-                    e1.printStackTrace();
                 }
             }
             if (pw != null) {
@@ -1119,7 +1109,6 @@ public class ELOG {
             try {
                 return isFormat ? (arr.toString(JSON_INDENT)) : arr.toString();
             } catch (Exception e) {
-                e.printStackTrace();
             }
         }
         return "";
@@ -1137,7 +1126,6 @@ public class ELOG {
             try {
                 return isFormat ? obj.toString(JSON_INDENT) : obj.toString();
             } catch (Exception e) {
-                e.printStackTrace();
             }
         }
         return "";

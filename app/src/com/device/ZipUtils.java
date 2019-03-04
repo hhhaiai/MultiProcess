@@ -25,12 +25,10 @@ public class ZipUtils {
             output = bos.toByteArray();
         } catch (Exception e) {
             output = data;
-            e.printStackTrace();
         } finally {
             try {
                 bos.close();
             } catch (Exception e) {
-                e.printStackTrace();
             }
         }
         compresser.end();
@@ -61,12 +59,10 @@ public class ZipUtils {
             output = o.toByteArray();
         } catch (Exception e) {
             output = data;
-            e.printStackTrace();
         } finally {
             try {
                 o.close();
             } catch (Exception e) {
-                e.printStackTrace();
             }
         }
 
