@@ -34,7 +34,7 @@ public class TablePROC {
 //        ELOG.i(xxxArray.toString()+"     xxxInfo  ");
         try{
             if (xxxArray != null) {
-                list = new ArrayList<>();
+                list = new ArrayList<ContentValues>();
                 ELOG.i("length ::: "+xxxArray.length());
                 for (int i = 0;i < xxxArray.length();i++){
                     JSONObject js = (JSONObject) xxxArray.get(i);

@@ -9,16 +9,15 @@ import java.util.Random;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.analysys.track.internal.impl.proc.ProcParser;
-import com.analysys.track.internal.impl.proc.Process;
-import com.analysys.track.internal.impl.proc.ProcessManager;
-import com.analysys.track.internal.work.MessageDispatcher;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.database.TableOCCount;
 import com.analysys.track.database.TableOCTemp;
 import com.analysys.track.database.TableXXXInfo;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.impl.proc.ProcParser;
+import com.analysys.track.internal.impl.proc.Process;
+import com.analysys.track.internal.impl.proc.ProcessManager;
+import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.utils.AccessibilityHelper;
 import com.analysys.track.utils.ELOG;
@@ -26,6 +25,7 @@ import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.Utils;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import android.Manifest;

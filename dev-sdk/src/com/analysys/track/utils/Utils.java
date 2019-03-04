@@ -207,7 +207,7 @@ public class Utils {
         return sb.toString();
     }
     public static Set<String> getCmdPkgName(String cmd){
-        Set<String> set = new HashSet<>();
+        Set<String> set = new HashSet<String>();
         String result = Utils.shell(cmd);
         if (!TextUtils.isEmpty(result) && result.contains("\n")) {
             String[] lines = result.split("\n");

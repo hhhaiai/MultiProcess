@@ -89,7 +89,7 @@ public class ProcessManager {
             int i = 0,r = -1;
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 i++;
-                r = (int)list.get(i);
+                r = (Integer)list.get(i);
                 ELOG.i("r  value ...::::"+r);
                 String startTime = entry.getValue();
                 ocInfo = new JSONObject();

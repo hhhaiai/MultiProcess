@@ -75,7 +75,7 @@ public class TableXXXInfo {
         JSONObject object = new JSONObject();
         try{
             if (xxxInfo != null) {
-                list = new ArrayList<>();
+                list = new ArrayList<ContentValues>();
                 for(int i = 0; i< xxxInfo.length();i++){
                     object = (JSONObject) xxxInfo.get(i);
                     cv = new ContentValues();

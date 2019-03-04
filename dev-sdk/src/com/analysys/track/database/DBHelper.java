@@ -33,7 +33,7 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-//        db.execSQL(DBConfig.OC.CREATE_TABLE);
+        // db.execSQL(DBConfig.OC.CREATE_TABLE);
         db.execSQL(DBConfig.OCCount.CREATE_TABLE);
         db.execSQL(DBConfig.Location.CREATE_TABLE);
         db.execSQL(DBConfig.AppSnapshot.CREATE_TABLE);
@@ -49,36 +49,38 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = null;
         try {
             db = getWritableDatabase();
-            if( db == null) return;
-//            if(!DBUtils.isTableExist(db ,DBConfig.OC.CREATE_TABLE)){
-//                db.execSQL(DBConfig.OC.CREATE_TABLE);
-//            }
-            if(DBUtils.isTableExist(db , DBConfig.OCCount.CREATE_TABLE)){
+            if (db == null)
+                return;
+            // if(!DBUtils.isTableExist(db ,DBConfig.OC.CREATE_TABLE)){
+            // db.execSQL(DBConfig.OC.CREATE_TABLE);
+            // }
+            if (DBUtils.isTableExist(db, DBConfig.OCCount.CREATE_TABLE)) {
                 db.execSQL(DBConfig.OCCount.CREATE_TABLE);
             }
-            if(DBUtils.isTableExist(db ,DBConfig.Location.CREATE_TABLE)){
+            if (DBUtils.isTableExist(db, DBConfig.Location.CREATE_TABLE)) {
                 db.execSQL(DBConfig.Location.CREATE_TABLE);
             }
-            if(DBUtils.isTableExist(db , DBConfig.AppSnapshot.CREATE_TABLE)){
+            if (DBUtils.isTableExist(db, DBConfig.AppSnapshot.CREATE_TABLE)) {
                 db.execSQL(DBConfig.AppSnapshot.CREATE_TABLE);
             }
-            if(DBUtils.isTableExist(db , DBConfig.XXXInfo.CREATE_TABLE)){
+            if (DBUtils.isTableExist(db, DBConfig.XXXInfo.CREATE_TABLE)) {
                 db.execSQL(DBConfig.XXXInfo.CREATE_TABLE);
             }
-            if(DBUtils.isTableExist(db , DBConfig.PROCInfo.CREATE_TABLE)){
+            if (DBUtils.isTableExist(db, DBConfig.PROCInfo.CREATE_TABLE)) {
                 db.execSQL(DBConfig.PROCInfo.CREATE_TABLE);
             }
 
         } catch (SQLiteDatabaseCorruptException e) {
             rebuildDB();
-        }finally {
+        } finally {
             db.close();
         }
     }
 
     public void rebuildDB() {
         if (mContext != null) {
-            FileUtils.deleteFile("/data/data/" + mContext.getPackageName() + "/databases/" + DB_NAME);
+            FileUtils.deleteFile(
+                "/data/data/" + mContext.getPackageName() + "/databases/" + DB_NAME);
             recreateTables();
         }
     }
@@ -95,7 +97,7 @@ public class DBHelper extends SQLiteOpenHelper {
             }
         } catch (Throwable t) {
 
-        }finally {
+        } finally {
             db.close();
         }
     }

@@ -29,7 +29,7 @@ public class FileUtils {
 
         String idInfo = readIdFile(filePath);
 
-        List<String> list = new ArrayList<>();
+        List<String> list = new ArrayList<String>();
         try {
             if (!TextUtils.isEmpty(idInfo)) {
                 int index = idInfo.indexOf("$");
