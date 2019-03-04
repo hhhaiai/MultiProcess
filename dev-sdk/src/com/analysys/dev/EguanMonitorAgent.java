@@ -24,17 +24,7 @@ public class EguanMonitorAgent {
    * 初始化SDK
    */
   public void initEguan(final Context context, final String key, final String channel, final boolean isDebug) {
-    if (TPUtils.isMainThread()) {
-      EThreadPool.execute(new Runnable() {
-        @Override
-        public void run() {
-          AnalysysInternal.getInstance(context).initEguan(key, channel, isDebug);
-        }
-      });
-    } else {
       AnalysysInternal.getInstance(context).initEguan(key, channel, isDebug);
-    }
-
   }
   /**
    * 设置Debug模式

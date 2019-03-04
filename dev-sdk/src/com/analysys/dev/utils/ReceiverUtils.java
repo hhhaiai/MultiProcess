@@ -32,6 +32,7 @@ public class ReceiverUtils {
     public void registAllReceiver(Context context) {
         try {
             // L.i("[%s]----registAllReceiver...begin....", SystemUtils.getCurrentProcessName(mContext));
+            setWork(true);//TODO 跟下一行重复，改到receiver里
             if (mReceiver == null) {
                 mReceiver = DynamicReceivers.getInstance();
                 aReceiver = AnalysysReceiver.getInstance();

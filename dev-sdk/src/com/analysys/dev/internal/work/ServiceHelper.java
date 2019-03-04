@@ -6,10 +6,8 @@ import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Build;
 import android.os.PowerManager;
-import android.util.Log;
 
 
 import com.analysys.dev.internal.Content.EGContext;
@@ -25,6 +23,7 @@ import com.analysys.dev.utils.Utils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 import com.analysys.dev.receiver.DynamicReceivers;
 import com.analysys.dev.service.AnalysysService;
+import com.analysys.dev.utils.reflectinon.Reflecer;
 
 import java.lang.reflect.Method;
 
@@ -49,28 +48,16 @@ public class ServiceHelper {
     }
 
     /**
-     * 注册动态广播
-     */
-    public void registerReceiver() {
-        if (dynamicReceivers == null) {
-            dynamicReceivers = new DynamicReceivers();
-            IntentFilter intentFilter = new IntentFilter();
-            intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-            intentFilter.addAction(Intent.ACTION_SCREEN_ON);
-            intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
-            mContext.registerReceiver(dynamicReceivers, intentFilter);
-        }
-    }
-
-    /**
      * 官方api方式打开服务
      */
     //TODO   所有的处理都是在这里操作，启动service之类的都在这里启动
     protected void startSelfService() {
-        if (isStartService()) {
-            boolean isWork = Utils.isServiceWork(mContext, EGContext.SERVICE_NAME);
-            ELOG.i(isWork+"  is servicework");
-            if (!isWork) {
+        Reflecer.init();//必须调用-----//TODO 其他入口进来都需要进来
+        ReceiverUtils.getInstance().registAllReceiver(mContext);//只能注册一次，不能注册多次
+        if (canStartService()) {
+            boolean isWorking = Utils.isServiceWorking(mContext, EGContext.SERVICE_NAME);
+            ELOG.i(isWorking+"  is servicework");
+            if (!isWorking) {
                 try {
                     ComponentName cn = new ComponentName(mContext, AnalysysService.class);
                     Intent intent = new Intent();
@@ -93,7 +80,7 @@ public class ServiceHelper {
     /**
      * 判断是否可以启动服务
      */
-    private boolean isStartService() {
+    private boolean canStartService() {
         if (Build.VERSION.SDK_INT < 26) {
             return true;
         }else{

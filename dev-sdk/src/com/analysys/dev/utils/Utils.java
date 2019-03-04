@@ -44,7 +44,7 @@ public class Utils {
     /**
      * 判断服务是否启动
      */
-    public static boolean isServiceWork(Context mContext, String serviceName) {
+    public static boolean isServiceWorking(Context mContext, String serviceName) {
         boolean isWork = false;
         try {
             ActivityManager manager = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);

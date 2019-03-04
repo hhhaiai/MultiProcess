@@ -12,8 +12,10 @@ import com.analysys.dev.internal.Content.EGContext;
 import com.analysys.dev.internal.work.ServiceHelper;
 import com.analysys.dev.utils.AndroidManifestHelper;
 import com.analysys.dev.utils.ELOG;
+import com.analysys.dev.utils.EThreadPool;
 import com.analysys.dev.utils.ReceiverUtils;
 import com.analysys.dev.utils.Streamer;
+import com.analysys.dev.utils.TPUtils;
 import com.analysys.dev.utils.reflectinon.EContextHelper;
 import com.analysys.dev.utils.reflectinon.Reflecer;
 import com.analysys.dev.utils.sp.SPHelper;
@@ -29,7 +31,7 @@ import java.util.zip.ZipFile;
 @SuppressWarnings("all")
 public class AnalysysInternal {
     private SoftReference<Context> mContextRef = null;
-    private Context mContext = null;
+    private boolean hasInit = false;
     private AnalysysInternal() {
     }
 
@@ -38,57 +40,70 @@ public class AnalysysInternal {
     }
 
     public static AnalysysInternal getInstance(Context context) {
-        if(Holder.instance.mContext == null) Holder.instance.mContext= EContextHelper.getContext(context);
-        if (Holder.instance.mContextRef == null) {
-            Holder.instance.initContext(Holder.instance.mContext);
+        if(Holder.instance.mContextRef == null){
+            Holder.instance.mContextRef= new SoftReference<Context>(EContextHelper.getContext(context));
         }
         return Holder.instance;
     }
-    private void initContext(Context ctx){
-        if(mContextRef == null) mContextRef = new SoftReference<>(ctx);;
-    }
     /**
-     * 初始化函数
-     * key支持参数设置、XML文件设置，
-     * 参数设置优先级大于XML设置
-     *
-     * @param isDebug 只保留日志控制
-     */
-    public void initEguan(String key, String channel, boolean isDebug) {
-        //TODO 防止重复注册
+     * 初始化函数,可能为耗时操作的，判断是否主线程，需要开子线程做
+     * @param key appkey
+     * @param channel 渠道
+     * @param isDebug 是否debug模式
+     * */
+    public void initEguan(String key,String channel, boolean isDebug) {
+        try{
+            if(hasInit) return;//TODO 防止重复注册
+            EGContext.FLAG_DEBUG_USER = isDebug;
+            updateAppkey(key);//updata sp
+            updateChannel(mContextRef.get(), channel);
+            if (TPUtils.isMainThread()) {
+                EThreadPool.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        init();
+                    }
+                });
+            } else {
+                init();
+            }
+        }catch (Throwable t){
 
-        Reflecer.init();//必须调用-----//TODO 其他入口进来都需要进来
+        }
+
+    }
+
+    /**
+     *  key支持参数设置、XML文件设置，
+     *  参数设置优先级大于XML设置
+     * @param key
+     * @param channel
+     * @param isDebug
+     */
+    private void init(){
         ELOG.d("初始化，进程Id：< " + Process.myPid() + " >");
 //        initSupportMultiProcess();//TODO
-
-        updateAppkey(key);//updata sp
-        updateChannel(mContext, channel);
-        EGContext.FLAG_DEBUG_USER = isDebug;
-        ReceiverUtils.getInstance().setWork(true);//跟下一行重复，改到receiver里
-        ReceiverUtils.getInstance().registAllReceiver(mContext);//只能注册一次，不能注册多次
-        PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+        PowerManager pm = (PowerManager) mContextRef.get().getSystemService(Context.POWER_SERVICE);
         boolean isScreenOn = pm.isScreenOn();
         // 如果为true，则表示屏幕正在使用，false则屏幕关闭。
         if (!isScreenOn) {
             ReceiverUtils.getInstance().setWork(false);
         }
         //JobService
-//        ServiceHelper.getInstance(mContext).startJobService(mContext);
-        MessageDispatcher.getInstance(mContext).startService();
-
-
+//        ServiceHelper.getInstance(mContextRef.get()).startJobService(mContextRef.get());
+        MessageDispatcher.getInstance(mContextRef.get()).startService();
     }
     private void updateAppkey(String key){
         if (TextUtils.isEmpty(key)) {
-            Bundle bundle = AndroidManifestHelper.getMetaData(mContext);
+            Bundle bundle = AndroidManifestHelper.getMetaData(mContextRef.get());
             if (bundle != null) {
                 key = bundle.getString(EGContext.XML_METADATA_APPKEY);
             }
         }
         if (!TextUtils.isEmpty(key)) {
             EGContext.APP_KEY_VALUE = key;
-            SPHelper.getDefault(mContext).edit().putString(EGContext.USERKEY, key).commit();
-            SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_KEY, key).commit();
+            SPHelper.getDefault(mContextRef.get()).edit().putString(EGContext.USERKEY, key).commit();
+            SPHelper.getDefault(mContextRef.get()).edit().putString(EGContext.SP_APP_KEY, key).commit();
         }
     }
     /**
