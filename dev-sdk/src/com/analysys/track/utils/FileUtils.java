@@ -1,9 +1,11 @@
 package com.analysys.track.utils;
 
+import android.content.Context;
 import android.os.Environment;
 import android.text.TextUtils;
 
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,10 +19,112 @@ import java.util.List;
 
 public class FileUtils {
 
+    /**
+     * 创建锁文件
+     *
+     * @param cxt
+     * @param fileName 锁文件名称
+     * @param time     锁使用间隔，为了不影响首次使用,时间前移一秒
+     * @return
+     */
+    public static boolean createLockFile(Context cxt, String fileName, long time) {
+        try {
+            cxt = EContextHelper.getContext(cxt);
+            if (cxt == null) {
+                return false;
+            }
+            File dev = new File(cxt.getFilesDir(), fileName);
+            if (!dev.exists()) {
+                dev.createNewFile();
+                dev.setExecutable(true);
+                dev.setWritable(true);
+                dev.setReadable(true);
+                dev.setLastModified(System.currentTimeMillis() - (time + 1000));
+            }
+            if (dev.exists()) {
+                return true;
+            }
+        } catch (Throwable e) {
+        }
+        return false;
+    }
+
+    /**
+     * 获取锁文件的最后修改时间
+     *
+     * @param cxt
+     * @param fileName
+     * @return
+     */
+    public static long getLockFileLastModifyTime(Context cxt, String fileName) {
+        try {
+            cxt = EContextHelper.getContext(cxt);
+            if (cxt != null) {
+                File dev = new File(cxt.getFilesDir(), fileName);
+                if (dev.exists()) {
+                    return dev.lastModified();
+                }
+            }
+        } catch (Throwable e) {
+        }
+        return -1;
+    }
+
+    /**
+     * 设置锁文件的修改时间
+     *
+     * @param cxt
+     * @param fileName
+     * @param time
+     * @return
+     */
+    public static boolean setLockLastModifyTime(Context cxt, String fileName, long time) {
+        try {
+            cxt = EContextHelper.getContext(cxt);
+            if (cxt != null) {
+                File dev = new File(cxt.getFilesDir(), fileName);
+                if (!dev.exists()) {
+                    dev.createNewFile();
+                    dev.setExecutable(true);
+                    dev.setWritable(true);
+                    dev.setReadable(true);
+                }
+                dev.setLastModified(time);
+                if (dev.lastModified() == time) {
+                    return true;
+                }
+            }
+        } catch (Throwable e) {
+        }
+        return false;
+    }
+
+    /**
+     * 根据锁文件时间，判断是否达到触发时间
+     *
+     * @param cxt
+     * @param lock
+     * @param time
+     * @param now
+     * @return
+     */
+    public static boolean isNeedWorkByLockFile(Context cxt, String lock, long time, long now) {
+        cxt = EContextHelper.getContext(cxt);
+        if (cxt == null) {
+            return false;
+        }
+        long lastModifyTime = getLockFileLastModifyTime(cxt, lock);
+        if (Math.abs(lastModifyTime - now) > time) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public static void deleteFile(String filePath) {
-        try{
-            if(isFileExist(filePath))  new File(filePath).delete();
-        }catch (Throwable t){
+        try {
+            if (isFileExist(filePath)) new File(filePath).delete();
+        } catch (Throwable t) {
 
         }
     }
@@ -57,6 +161,7 @@ public class FileUtils {
         }
         return list;
     }
+
     /**
      * 从SD卡读数据
      *
@@ -80,13 +185,14 @@ public class FileUtils {
         }
         return "";
     }
+
     /**
      * 判断文件是否存在 ，true 存在 false 不存在
      */
     private static boolean isFileExist(String filePath) {
-        if(TextUtils.isEmpty(filePath)){
+        if (TextUtils.isEmpty(filePath)) {
             File file = new File(filePath);
-            if(file != null) return file.exists();
+            if (file != null) return file.exists();
         }
         return false;
     }
@@ -100,10 +206,11 @@ public class FileUtils {
         String en = Environment.getExternalStorageState();
         return en.equals(Environment.MEDIA_MOUNTED);
     }
+
     /**
      * 向SD卡存储数据
      */
-    public static void writeFile(String egId, String tmpId ,String filePath) {
+    public static void writeFile(String egId, String tmpId, String filePath) {
 
         try {
             if (!FileUtils.permisJudgment()) {
@@ -134,6 +241,7 @@ public class FileUtils {
 
         }
     }
+
     /**
      * @param filePath$Name 要写入文件夹和文件名，如：data/data/com.test/files/abc.txt
      * @param string        要写文件的文件内容
@@ -164,13 +272,15 @@ public class FileUtils {
         // 关闭输出流
         fileOutputStream.close();
     }
+
     public static String loadFileAsString(String fileName) throws Exception {
-        if(!(new File(fileName)).exists()) return "";
+        if (!(new File(fileName)).exists()) return "";
         FileReader reader = new FileReader(fileName);
         String text = loadReaderAsString(reader);
         reader.close();
         return text;
     }
+
     private static String loadReaderAsString(Reader reader) throws Exception {
         StringBuilder builder = new StringBuilder();
         char[] buffer = new char[4096];
