@@ -54,13 +54,42 @@ public class UploadImpl {
     // 上传数据
     public void upload() {
         //TODO 单独的自己上传，只能有一个，不能并行上传
-        // 策略处理
-        EThreadPool.execute(new Runnable() {
-            @Override
-            public void run() {
+        try {
+            if(TPUtils.isMainThread()){
+                // 策略处理
+                EThreadPool.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            String uploadInfo = getInfo();
+                            ELOG.i("uploadInfo ::::  "+uploadInfo);
+                            if (TextUtils.isEmpty(uploadInfo)) {
+                                return;
+                            }
+                            boolean isDebugMode = SPHelper.getDebugMode(mContext);
+                            boolean userRTP = PolicyInfo.getInstance().isUseRTP() == 0 ?true:false;
+                            String url = "";
+                            if (isDebugMode) {
+                                url  = EGContext.TEST_URL;
+                            } else {
+                                if (userRTP) {
+                                    url = EGContext.USERTP_URL;
+                                } else {
+                                    url = EGContext.RT_URL;//?哪个接口
+                                }
+                            }
+                            handleUpload(url, messageEncrypt(uploadInfo));
+                        }catch (Throwable t){
+                            ELOG.i("EThreadPool upload has an exception:::"+t.getMessage());
+                        }
+                        MessageDispatcher.getInstance(mContext).uploadInfo(EGContext.UPLOAD_CYCLE,false);
+                    }
+                });
+
+            }else{
                 try {
                     String uploadInfo = getInfo();
-                    ELOG.i("uploadInfo ::::  "+uploadInfo);
+                    ELOG.i("sub thread uploadInfo ::::  "+uploadInfo);
                     if (TextUtils.isEmpty(uploadInfo)) {
                         return;
                     }
@@ -78,12 +107,13 @@ public class UploadImpl {
                     }
                     handleUpload(url, messageEncrypt(uploadInfo));
                 }catch (Throwable t){
-                 ELOG.i("EThreadPool upload has an exception:::"+t.getMessage());
+                    ELOG.i("EThreadPool upload has an exception:::"+t.getMessage());
                 }
+                MessageDispatcher.getInstance(mContext).uploadInfo(EGContext.UPLOAD_CYCLE,false);
             }
-        });
-        SPHelper.getDefault(mContext).edit().putLong(EGContext.UPLOAD_LAST_TIME,System.currentTimeMillis()).commit();
-        MessageDispatcher.getInstance(mContext).uploadInfo(EGContext.UPLOAD_CYCLE);
+        }catch (Throwable t){
+        }
+
     }
 
 

@@ -24,6 +24,7 @@ import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PermissionUtils;
+import com.analysys.track.utils.TPUtils;
 import com.analysys.track.utils.Utils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
@@ -70,9 +71,36 @@ public class OCImpl {
      * OC 信息采集
      */
     public void ocInfo() {
-        EThreadPool.execute(new Runnable() {
-            @Override
-            public void run() {
+        try {
+            if (TPUtils.isMainThread()) {
+                EThreadPool.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            //亮屏幕工作
+                            if (Utils.isScreenOn(mContext)) {
+                                // 锁屏.保存数据
+                                if (Utils.isScreenLocked(mContext)) {
+                                    String openApp = SPHelper.getLastAppName(mContext);
+                                    if (!TextUtils.isEmpty(openApp)) {
+                                        //补充时间
+                                        SPHelper.setEndTime(mContext, System.currentTimeMillis()-new Random(25).nextInt(1000));
+                                        filterInsertOCInfo(EGContext.CLOSE_SCREEN, false);
+                                    }
+                                } else {
+//                    L.e("开始判断OC..........");
+                                    if (!AccessibilityHelper.isAccessibilitySettingsOn(mContext,AnalysysAccessibilityService.class)) {
+                                        getInfoByVersion();
+                                    }else{
+                                        //利用辅助功能获取当前app
+                                    }
+                                }
+                            }
+                        }catch (Throwable t){
+                        }
+                    }
+                });
+            }else {
                 try {
                     //亮屏幕工作
                     if (Utils.isScreenOn(mContext)) {
@@ -94,10 +122,13 @@ public class OCImpl {
                         }
                     }
                 }catch (Throwable t){
-
                 }
             }
-        });
+        }catch (Throwable t){
+
+        }
+
+
     }
 
     String pkgName = null;
@@ -110,8 +141,7 @@ public class OCImpl {
             }else{
                 getProcApps();
             }
-            SPHelper.getDefault(mContext).edit().putLong(EGContext.OC_LAST_TIME,System.currentTimeMillis()).commit();
-            MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE);
+            MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE,false);
         }else if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24 ){
         //确定5.0和以上版本30秒处理一次
             if (isDurLThanThri()) {
@@ -126,8 +156,7 @@ public class OCImpl {
             } else {
                 //  L.d("不到30秒。。。");
             }
-            SPHelper.getDefault(mContext).edit().putLong(EGContext.OC_LAST_TIME_OVER_5,System.currentTimeMillis()).commit();
-            MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE_OVER_5);
+            MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE_OVER_5,false);
         }else{
             //TODO 7.0以上待调研
         }
@@ -305,7 +334,7 @@ public class OCImpl {
                 try {
                     run =(List<Process>)(res.get("run"));
                 }catch (Throwable t){
-                    ELOG.i("   ::::::::: run 异常:::::");
+                    ELOG.i("   ::::::::: run 异常:::::"+t.getMessage());
                    run = null;
                 }
                 if(run != null && run.size()>0){
@@ -334,14 +363,14 @@ public class OCImpl {
                 random = (Integer) list.get(i);
                 ocInfo = (JSONObject) cacheApps.get(i);
                 if(ocInfo == null || ocInfo.length()<1) continue;
-                ELOG.i(i+"ocInfoocInfoocInfo  :::: "+ocInfo);
+//                ELOG.i(i+"ocInfoocInfoocInfo  :::: "+ocInfo);
                 ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime, String.valueOf(System.currentTimeMillis()-random));
                 oc.add(ocInfo);
                 apn = ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName).replaceAll(" ","");
                 for (int j = 0;j < runApps.size();j++) {
-                    ELOG.i(runApps.size()+"   :::runApps.size()  "+j);
+//                    ELOG.i(runApps.size()+"   :::runApps.size()  "+j);
                     String pkgName = runApps.get(j).getName().replaceAll(" ","");
-                    ELOG.i(pkgName +"::::::::pkgName   ::"+apn+":::::"+ apn.equals(pkgName));
+//                    ELOG.i(pkgName +"::::::::pkgName   ::"+apn+":::::"+ apn.equals(pkgName));
                     if (!TextUtils.isEmpty(apn) && apn.equals(pkgName)) {
                         oc.remove(oc.size()-1);
                         runApps.remove(j);
@@ -354,11 +383,11 @@ public class OCImpl {
             if(cacheApps != null && cacheApps.length()>0){
                 cacheApps = new JSONArray(oc);
                 result.put("cache",cacheApps);
-                ELOG.i(cacheApps+"   :::::: cacheApps");
+//                ELOG.i(cacheApps+"   :::::: cacheApps");
             }
             if(runApps != null && runApps.size()>0) {
                 result.put("run",runApps);
-                ELOG.i(runApps+"   :::::: runApps");
+//                ELOG.i(runApps+"   :::::: runApps");
             }
         }catch (Throwable t){
             ELOG.e(t.getMessage()+"tttttttttttttttttttt");

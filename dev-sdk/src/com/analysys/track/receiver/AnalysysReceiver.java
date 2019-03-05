@@ -3,6 +3,7 @@ package com.analysys.track.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
 
 import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.impl.OCImpl;
@@ -35,45 +36,53 @@ public class AnalysysReceiver extends BroadcastReceiver {
     }
     @Override
     public void onReceive(Context context, Intent intent) {
-        String packageName = intent.getDataString().substring(8);
-        mContext = context.getApplicationContext();
+        try {
+            if (intent == null)return;
+            String data = intent.getDataString();
+            String packageName = "";
+            if(!TextUtils.isEmpty(data)){
+                packageName = data.substring(8);
+            }
+            mContext = context.getApplicationContext();
 
-        if (PACKAGE_ADDED.equals(intent.getAction())) {
-            ELOG.d("接收到应用安装广播：" + packageName);
-            MessageDispatcher.getInstance(mContext).appChangeReceiver(packageName, Integer.parseInt(EGContext.SNAP_SHOT_INSTALL));
-        }
-        if (PACKAGE_REMOVED.equals(intent.getAction())) {
-            ELOG.d("接收到应用卸载广播：" + packageName);
-            MessageDispatcher.getInstance(mContext).appChangeReceiver(packageName, Integer.parseInt(EGContext.SNAP_SHOT_UNINSTALL));
-        }
-        if (PACKAGE_REPLACED.equals(intent.getAction())) {
-            ELOG.d("接收到应用更新广播：" + packageName);
-            MessageDispatcher.getInstance(mContext).appChangeReceiver(packageName, Integer.parseInt(EGContext.SNAP_SHOT_UPDATE));
-        }
-        if (CONNECTIVITY_CHANGE.equals(intent.getAction())) {
-            ELOG.d("接收网络变化广播");
-            WifiImpl.getInstance(mContext).getWifiInfo();
-            MessageDispatcher.getInstance(mContext).startService();
-        }
-        if (SCREEN_ON.equals(intent.getAction())) {
-            ELOG.e("接收开启屏幕广播");
-            MessageDispatcher.getInstance(mContext).startService();
-        }
-        if (SCREEN_OFF.equals(intent.getAction())) {
-            ProcessManager.setIsCollected(false);
-            ReceiverUtils.getInstance().unRegistAllReceiver(mContext);
-            MessageDispatcher.getInstance(mContext).killWorker();
-            processScreenOff(context);
+            if (PACKAGE_ADDED.equals(intent.getAction())) {
+                ELOG.d("接收到应用安装广播：" + packageName);
+                MessageDispatcher.getInstance(mContext).appChangeReceiver(packageName, Integer.parseInt(EGContext.SNAP_SHOT_INSTALL));
+            }
+            if (PACKAGE_REMOVED.equals(intent.getAction())) {
+                ELOG.d("接收到应用卸载广播：" + packageName);
+                MessageDispatcher.getInstance(mContext).appChangeReceiver(packageName, Integer.parseInt(EGContext.SNAP_SHOT_UNINSTALL));
+            }
+            if (PACKAGE_REPLACED.equals(intent.getAction())) {
+                ELOG.d("接收到应用更新广播：" + packageName);
+                MessageDispatcher.getInstance(mContext).appChangeReceiver(packageName, Integer.parseInt(EGContext.SNAP_SHOT_UPDATE));
+            }
+            if (CONNECTIVITY_CHANGE.equals(intent.getAction())) {
+                ELOG.d("接收网络变化广播");
+                WifiImpl.getInstance(mContext).getWifiInfo();
+                MessageDispatcher.getInstance(mContext).startService();
+            }
+            if (SCREEN_ON.equals(intent.getAction())) {
+                ELOG.e("接收开启屏幕广播");
+                MessageDispatcher.getInstance(mContext).startService();
+            }
+            if (SCREEN_OFF.equals(intent.getAction())) {
+                ProcessManager.setIsCollected(false);
+                ReceiverUtils.getInstance().unRegistAllReceiver(mContext);
+                MessageDispatcher.getInstance(mContext).killWorker();
+                processScreenOff(context);
 
-            ELOG.e("接收关闭屏幕广播");
-        }
-        if (BATTERY_CHANGED.equals(intent.getAction())) {
-            if(EGContext.SWITCH_OF_BATTERY) DeviceImpl.getInstance(mContext).processBattery(intent);
-            ELOG.e("电池变化广播");
-        }
-        if (BOOT_COMPLETED.equals(intent.getAction())) {
-            ELOG.e("接收到开机广播");
-            MessageDispatcher.getInstance(mContext).startService();
+                ELOG.e("接收关闭屏幕广播");
+            }
+            if (BATTERY_CHANGED.equals(intent.getAction())) {
+                if(EGContext.SWITCH_OF_BATTERY) DeviceImpl.getInstance(mContext).processBattery(intent);
+                ELOG.e("电池变化广播");
+            }
+            if (BOOT_COMPLETED.equals(intent.getAction())) {
+                ELOG.e("接收到开机广播");
+                MessageDispatcher.getInstance(mContext).startService();
+            }
+        }catch (Throwable t){
         }
     }
 

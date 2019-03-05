@@ -13,8 +13,8 @@ import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
+import com.analysys.track.utils.TPUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
-import com.analysys.track.utils.sp.SPHelper;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -59,46 +59,60 @@ public class AppSnapshotImpl {
      * 应用列表
      */
     public void snapshotsInfo() {
-        if (isGetSnapshots()) {
-            EThreadPool.execute(new Runnable() {
-                @Override
-                public void run() {
-                    Map<String, String> dbSnapshotsMap =
-                        TableAppSnapshot.getInstance(mContext).mSelect();
-                    List<JSONObject> currentSnapshotsList = getCurrentSnapshots();
-                    if (dbSnapshotsMap != null && !dbSnapshotsMap.isEmpty()) {
-                        currentSnapshotsList =
-                            getDifference(currentSnapshotsList, dbSnapshotsMap);
+        try {
+            if(TPUtils.isMainThread()){
+                EThreadPool.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        Map<String, String> dbSnapshotsMap =
+                                TableAppSnapshot.getInstance(mContext).mSelect();
+                        List<JSONObject> currentSnapshotsList = getCurrentSnapshots();
+                        if (dbSnapshotsMap != null && !dbSnapshotsMap.isEmpty()) {
+                            currentSnapshotsList =
+                                    getDifference(currentSnapshotsList, dbSnapshotsMap);
+                        }
+                        TableAppSnapshot.getInstance(mContext)
+                                .coverInsert(currentSnapshotsList);
+                        MessageDispatcher.getInstance(mContext)
+                                .snapshotInfo(EGContext.SNAPSHOT_CYCLE,false);
                     }
-                    TableAppSnapshot.getInstance(mContext)
-                        .coverInsert(currentSnapshotsList);
-                    SPHelper.getDefault(mContext).edit()
-                        .putLong(EGContext.SP_SNAPSHOT_TIME, System.currentTimeMillis())
-                        .commit();
-                    SPHelper.getDefault(mContext).edit()
-                        .putLong(EGContext.SNAPSHOT_LAST_TIME, System.currentTimeMillis())
-                        .commit();
-                    MessageDispatcher.getInstance(mContext)
-                        .snapshotInfo(EGContext.SNAPSHOT_CYCLE);
+                });
+            }else {
+                Map<String, String> dbSnapshotsMap =
+                        TableAppSnapshot.getInstance(mContext).mSelect();
+                List<JSONObject> currentSnapshotsList = getCurrentSnapshots();
+                if (dbSnapshotsMap != null && !dbSnapshotsMap.isEmpty()) {
+                    currentSnapshotsList =
+                            getDifference(currentSnapshotsList, dbSnapshotsMap);
                 }
-            });
+                TableAppSnapshot.getInstance(mContext)
+                        .coverInsert(currentSnapshotsList);
+
+                MessageDispatcher.getInstance(mContext)
+                        .snapshotInfo(EGContext.SNAPSHOT_CYCLE,false);
+            }
+        }catch (Throwable t){
+
         }
+
     }
 
     /**
      * 判断是否到达获取快照时间
      */
-    private boolean isGetSnapshots() {
-        Long time = SPHelper.getDefault(mContext).getLong(EGContext.SP_SNAPSHOT_TIME, 0);
-        if (time == 0) {
-            return true;
-        } else {
-            if (EGContext.SNAPSHOT_CYCLE <= (System.currentTimeMillis() - time)) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    private boolean isGetSnapshots() {
+//        if(EGContext.SNAPSHOT_LAST_TIME_STMP == -1){
+//            EGContext.SNAPSHOT_LAST_TIME_STMP = SPHelper.getDefault(mContext).getLong(EGContext.SNAPSHOT_LAST_TIME, -1);
+//        }
+//        if (EGContext.SNAPSHOT_LAST_TIME_STMP == -1) {
+//            return true;
+//        } else {
+//            if (EGContext.SNAPSHOT_CYCLE <= (System.currentTimeMillis() - EGContext.SNAPSHOT_LAST_TIME_STMP)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     /**
      * 数据库与新获取的当前列表list做对比合并成新的list 存储
@@ -200,39 +214,44 @@ public class AppSnapshotImpl {
      * 处理应用安装卸载更新广播改变状态
      */
     public void changeActionType(final String pkgName, final int type) {
-        if (TextUtils.isEmpty(pkgName)) {
-            return;
-        }
-        // 数据库操作修改包名和类型
-        EThreadPool.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (type == 0) {
-                        PackageInfo pi =
-                            mContext.getPackageManager().getPackageInfo(pkgName, 0);
-                        JSONObject jsonObject =
-                            getAppInfo(pi, EGContext.SNAP_SHOT_INSTALL);
-                        if (jsonObject != null) {
-                            // 判断数据表中是否有该应用的存在，如果有标识此次安装是应用更新所导致
-                            boolean isHas = TableAppSnapshot.getInstance(mContext)
-                                .isHasPkgName(pkgName);
-                            if (!isHas) {
-                                TableAppSnapshot.getInstance(mContext).insert(jsonObject);
-                            }
-                        }
-                    } else if (type == 1) {
-                        TableAppSnapshot.getInstance(mContext).update(pkgName,
-                            EGContext.SNAP_SHOT_UNINSTALL);
-                    } else if (type == 2) {
-                        TableAppSnapshot.getInstance(mContext).update(pkgName,
-                            EGContext.SNAP_SHOT_UPDATE);
-                    }
-                    ELOG.i(type + "   type");
-                } catch (Throwable e) {
-                    ELOG.e(e);
-                }
+        try {
+            if (TextUtils.isEmpty(pkgName)) {
+                return;
             }
-        });
+            // 数据库操作修改包名和类型
+            EThreadPool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (type == 0) {
+                            PackageInfo pi =
+                                    mContext.getPackageManager().getPackageInfo(pkgName, 0);
+                            JSONObject jsonObject =
+                                    getAppInfo(pi, EGContext.SNAP_SHOT_INSTALL);
+                            if (jsonObject != null) {
+                                // 判断数据表中是否有该应用的存在，如果有标识此次安装是应用更新所导致
+                                boolean isHas = TableAppSnapshot.getInstance(mContext)
+                                        .isHasPkgName(pkgName);
+                                if (!isHas) {
+                                    TableAppSnapshot.getInstance(mContext).insert(jsonObject);
+                                }
+                            }
+                        } else if (type == 1) {
+                            TableAppSnapshot.getInstance(mContext).update(pkgName,
+                                    EGContext.SNAP_SHOT_UNINSTALL);
+                        } else if (type == 2) {
+                            TableAppSnapshot.getInstance(mContext).update(pkgName,
+                                    EGContext.SNAP_SHOT_UPDATE);
+                        }
+                        ELOG.i(type + "   type");
+                    } catch (Throwable e) {
+                        ELOG.e(e);
+                    }
+                }
+            });
+        }catch (Throwable t){
+
+        }
+
     }
 }

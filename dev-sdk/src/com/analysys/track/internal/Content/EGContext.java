@@ -64,8 +64,6 @@ public class EGContext {
     public static final String SP_APP_KEY = "appKey";
     public static final String SP_APP_CHANNEL = "appChannel";
 
-    public static final String SP_SNAPSHOT_TIME = "getSnapshotTime";
-
     public static String APP_KEY_VALUE = "";
     public static String APP_CHANNEL_VALUE = "";
     public static String EGUAN_CHANNEL_PREFIX = "EGUAN_CHANNEL_";
@@ -258,6 +256,7 @@ public class EGContext {
     public static final String TIME = "TIME";
     public static final String  POLICYVER= "policyVer";
     public static final String  PRO= "PRO";
+    public static final String  PRO_KEY_WORDS= "QF4";
 
     // HTTP Status-Code 413: Request Entity Too Large
     public static final String HTTP_DATA_OVERLOAD = "413";
@@ -282,6 +281,14 @@ public class EGContext {
     public static final String CLOSE_SCREEN = "2";
     public static final String APP_SWITCH = "1";
     public static final String SERVCICE_RESTART = "3";
+    public static final String THREAD_NAME = "com.eguan";
+    public static long HEARTBEAT_LAST_TIME_STMP = -1;
+    public static long SNAPSHOT_LAST_TIME_STMP = -1;
+    public static long LOCATION_LAST_TIME_STMP = -1;
+    public static long OC_LAST_TIME_STMP = -1;
+    public static long OC_LAST_TIME_OVER_5_STMP = -1;
+    public static long UPLOAD_LAST_TIME_STMP = -1;
+    public static String UPLOAD_KEY_WORDS = "facility4";
 
 
 

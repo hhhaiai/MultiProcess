@@ -4,12 +4,18 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.os.Looper;
 import android.text.TextUtils;
 
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.sp.SPHelper;
+
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * @Copyright © 2018 Analysys Inc. All rights reserved.
@@ -21,44 +27,89 @@ import com.analysys.track.utils.sp.SPHelper;
 public class TPUtils {
 
     public static boolean isMainThread() {
-        return Looper.getMainLooper().getThread() == Thread.currentThread();
-    }
-
-    public static boolean isMainThreadA() {
-        return Looper.getMainLooper() == Looper.myLooper();
-    }
-
-
-    public static boolean isMainThreadB() {
-        return Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId();
-    }
-
-    public static boolean isMainProcess(Context context) {
+        boolean result = false;
         try {
-            context = EContextHelper.getContext(context);
-            if (context != null) {
-                return context.getPackageName().equals(getCurrentProcessName(context));
-            }
-        } catch (Throwable e) {
+            result = Looper.getMainLooper().getThread() == Thread.currentThread();
+        }catch (Throwable t){
         }
-        return false;
+        return result;
     }
-
-    public static String getCurrentProcessName(Context context) {
+    /**
+     *
+     * @param key
+     * @param channel 多渠道打包==>代码==>XML
+     */
+    public static void updateAppkeyAndChannel(Context mContext,String key,String channel){
+        if (TextUtils.isEmpty(key)) {
+            Bundle bundle = AndroidManifestHelper.getMetaData(mContext);
+            if (bundle != null) {
+                key = bundle.getString(EGContext.XML_METADATA_APPKEY);
+            }
+        }
+        if (!TextUtils.isEmpty(key)) {
+            EGContext.APP_KEY_VALUE = key;
+            SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_KEY, key).commit();
+        }
+        // 此处需要进行channel优先级处理,优先处理多渠道打包过来的channel,而后次之,接口传入的channel
+        String channelFromApk = getChannelFromApk(mContext);
+        if (TextUtils.isEmpty(channelFromApk)) {
+            try {
+                ApplicationInfo appInfo = mContext.getApplicationContext().getPackageManager()
+                        .getApplicationInfo(mContext.getPackageName(), PackageManager.GET_META_DATA);
+                String xmlChannel = appInfo.metaData.getString(EGContext.XML_METADATA_CHANNEL);
+                if (!TextUtils.isEmpty(xmlChannel)) {
+                    // 赋值为空
+                    EGContext.APP_CHANNEL_VALUE = xmlChannel;
+                    SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_CHANNEL, channel).commit();
+                    return;
+                }
+            } catch (Throwable e) {
+            }
+            if (!TextUtils.isEmpty(channel)) {
+                // 赋值接口传入的channel
+                EGContext.APP_CHANNEL_VALUE = channel;
+                SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_CHANNEL, channel).commit();
+            }
+        } else {
+            // 赋值多渠道打包的channel
+            EGContext.APP_CHANNEL_VALUE = channelFromApk;
+            SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_CHANNEL, channel).commit();
+        }
+    }
+    /**
+     * 仅用作多渠道打包,获取apk文件中的渠道信息
+     *
+     * @param context
+     * @return
+     */
+    public static String getChannelFromApk(Context context) {
+        ApplicationInfo appinfo = context.getApplicationInfo();
+        String sourceDir = appinfo.sourceDir;
+        // 注意这里：默认放在meta-inf/里， 所以需要再拼接一下
+        String channel_pre = "META-INF/" + EGContext.EGUAN_CHANNEL_PREFIX;
+        String channelName = "";
+        ZipFile apkZip = null;
         try {
-            context = EContextHelper.getContext(context);
-            if (context != null) {
-                int pid = android.os.Process.myPid();
-                ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-                for (ActivityManager.RunningAppProcessInfo info : am.getRunningAppProcesses()) {
-                    if (info.pid == pid) {
-                        return info.processName;
-                    }
+            apkZip = new ZipFile(sourceDir);
+            Enumeration<?> entries = apkZip.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = ((ZipEntry) entries.nextElement());
+                String entryName = entry.getName();
+                if (entryName.startsWith(channel_pre)) {
+                    channelName = entryName;
+                    break;
                 }
             }
-        } catch (Throwable e) {
+            // 假如没有在apk文件中找到相关渠道信息,则返回空串,表示没有调用易观多渠道打包方式
+            if (TextUtils.isEmpty(channelName)) {
+                return "";
+            }
+        } catch (IOException e) {
+        } finally {
+            Streamer.safeClose(apkZip);
         }
-        return "";
+        // Eg的渠道文件以EGUAN_CHANNEL_XXX为例,其XXX为最终的渠道信息
+        return channelName.substring(23);
     }
     /**
      * 获取Appkey. 优先级：内存==>SP==>XML
@@ -121,6 +172,7 @@ public class TPUtils {
         }
         return channel;
     }
+
 
     /**
      * 判断是否需要上传数据

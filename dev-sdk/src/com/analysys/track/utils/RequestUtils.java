@@ -61,12 +61,12 @@ public class RequestUtils {
         connection.setRequestProperty(EGContext.APPKEY, TPUtils.getAppKey(ctx));
         connection.setRequestProperty(EGContext.TIME, SPHelper.getDefault(ctx).getString(EGContext.TIME , ""));
         connection.setRequestProperty(EGContext.POLICYVER, "0");//策略覆盖
-        connection.setRequestProperty(EGContext.PRO, "QF4");//写死
+        connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);//写死
         ELOG.i("头文件字段：：：：：："+SPHelper.getDefault(ctx).getString(EGContext.SDKV,"")+"  debug::: "+ DeviceImpl.getInstance(ctx).getDebug()
         +"APPKEY::: "+TPUtils.getAppKey(ctx)+"   TIME:::   "+SPHelper.getDefault(ctx).getString(EGContext.TIME , ""));
         // 发送数据
         pw = new PrintWriter(connection.getOutputStream());
-        pw.print("facility4="+URLEncoder.encode(value,"UTF-8"));
+        pw.print(EGContext.UPLOAD_KEY_WORDS + "="+URLEncoder.encode(value,"UTF-8"));
         pw.flush();
         pw.close();
 

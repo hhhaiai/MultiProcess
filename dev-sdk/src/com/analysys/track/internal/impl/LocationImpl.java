@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.analysys.track.internal.work.MessageDispatcher;
+import com.analysys.track.utils.TPUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.database.TableLocation;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
@@ -53,13 +54,31 @@ public class LocationImpl {
     }
 
     public void location() {
-        EThreadPool.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (!isGetLocation()) {
-                        return;
+        try {
+            if(TPUtils.isMainThread()){
+                EThreadPool.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+//                        if (!isGetLocation()) {
+//                            return;
+//                        }
+                            getLocationInfo();
+                            JSONObject location = getLocation();
+                            if (location != null) {
+                                TableLocation.getInstance(mContext).insert(location);
+                                SPHelper.getDefault(mContext).edit().putLong(EGContext.SP_LOCATION_TIME, Long.parseLong(location.getString(DeviceKeyContacts.LocationInfo.CollectionTime))).commit();
+                            }
+                        }catch (Throwable t){
+                        }
+                        MessageDispatcher.getInstance(mContext).locationInfo(EGContext.LOCATION_CYCLE,false);
                     }
+                });
+            }else {
+                try {
+//                if (!isGetLocation()) {
+//                    return;
+//                }
                     getLocationInfo();
                     JSONObject location = getLocation();
                     if (location != null) {
@@ -68,24 +87,27 @@ public class LocationImpl {
                     }
                 }catch (Throwable t){
                 }
-                SPHelper.getDefault(mContext).edit().putLong(EGContext.LOCATION_LAST_TIME,System.currentTimeMillis()).commit();
-                MessageDispatcher.getInstance(mContext).locationInfo(EGContext.LOCATION_CYCLE);
+                MessageDispatcher.getInstance(mContext).locationInfo(EGContext.LOCATION_CYCLE,false);
             }
-        });
+        }catch (Throwable t){
+
+        }
+
+
     }
 
-    private boolean isGetLocation() {
-        long time = SPHelper.getDefault(mContext).getLong(EGContext.SP_LOCATION_TIME, 0);
-        if (time == 0) {
-            return true;
-        } else {
-            if (System.currentTimeMillis() - time >= EGContext.LOCATION_CYCLE) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
+//    private boolean isGetLocation() {
+//        long time = SPHelper.getDefault(mContext).getLong(EGContext.SP_LOCATION_TIME, -1);
+//        if (time == 0) {
+//            return true;
+//        } else {
+//            if (System.currentTimeMillis() - time >= EGContext.LOCATION_CYCLE) {
+//                return true;
+//            } else {
+//                return false;
+//            }
+//        }
+//    }
     private void getLocationInfo() {
         /**
          * 没有声明权限

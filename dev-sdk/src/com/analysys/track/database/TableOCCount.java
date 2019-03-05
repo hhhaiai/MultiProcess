@@ -376,7 +376,7 @@ public class TableOCCount {
             }
             // db.setTransactionSuccessful();
         } catch (Exception e) {
-            ELOG.e(e.getStackTrace() + "    :::::::exception ");
+            ELOG.e(e.getMessage() + "    :::::::exception ");
         } finally {
             if (cursor != null)
                 cursor.close();

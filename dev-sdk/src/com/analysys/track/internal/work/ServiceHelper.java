@@ -52,29 +52,33 @@ public class ServiceHelper {
      */
     //TODO   所有的处理都是在这里操作，启动service之类的都在这里启动
     protected void startSelfService() {
-        Reflecer.init();//必须调用-----//TODO 其他入口进来都需要进来
-        ReceiverUtils.getInstance().registAllReceiver(mContext);//只能注册一次，不能注册多次
-        if (canStartService()) {
-            boolean isWorking = Utils.isServiceWorking(mContext, EGContext.SERVICE_NAME);
-            ELOG.i(isWorking+"  is servicework");
-            if (!isWorking) {
-                try {
-                    ComponentName cn = new ComponentName(mContext, AnalysysService.class);
-                    Intent intent = new Intent();
-                    intent.setComponent(cn);
-                    if (Build.VERSION.SDK_INT >= 26) {
-                        Class<?> clazz = Class.forName("android.content.Context");
-                        Method startForegroundService = clazz.getMethod("startForegroundService", Intent.class);
-                        startForegroundService.invoke(mContext, intent);
-                    } else {
-                        mContext.startService(intent);
+        try {
+            Reflecer.init();//必须调用-----//TODO 其他入口进来都需要进来
+            ReceiverUtils.getInstance().registAllReceiver(mContext);//只能注册一次，不能注册多次
+            if (canStartService()) {
+                boolean isWorking = Utils.isServiceWorking(mContext, EGContext.SERVICE_NAME);
+                ELOG.i(isWorking+"  is servicework");
+                if (!isWorking) {
+                    try {
+                        ComponentName cn = new ComponentName(mContext, AnalysysService.class);
+                        Intent intent = new Intent();
+                        intent.setComponent(cn);
+                        if (Build.VERSION.SDK_INT >= 26) {
+                            Class<?> clazz = Class.forName("android.content.Context");
+                            Method startForegroundService = clazz.getMethod("startForegroundService", Intent.class);
+                            startForegroundService.invoke(mContext, intent);
+                        } else {
+                            mContext.startService(intent);
+                        }
+                    } catch (Throwable e) {
                     }
-                } catch (Throwable e) {
                 }
+            } else {
+                MessageDispatcher.getInstance(mContext).initModule();
             }
-        } else {
-            MessageDispatcher.getInstance(mContext).initModule();
+        }catch (Throwable t){
         }
+
     }
 
     /**

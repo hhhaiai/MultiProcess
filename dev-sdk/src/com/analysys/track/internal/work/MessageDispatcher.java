@@ -1,10 +1,12 @@
 package com.analysys.track.internal.work;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.widget.TableRow;
 
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.internal.Content.EGContext;
@@ -35,149 +37,224 @@ public class MessageDispatcher {
 
     // 初始化各模块
     public void initModule() {
-        Message msg = new Message();
-        msg.what = MessageDispatcher.MSG_INIT_MODULE;
-        sendMessage(msg, 0);
+        try {
+            Message msg = new Message();
+            msg.what = MessageDispatcher.MSG_INIT_MODULE;
+            sendMessage(msg, 0);
+        }catch (Throwable t){
+        }
+
     }
 
     // 心跳检查
     public void checkHeartbeat(long delayTime) {
-        Message msg = new Message();
-        msg.what = MessageDispatcher.MSG_CHECK_HEARTBEAT;
-        if(delayTime != 0) {
-            delay = delayTime - (System.currentTimeMillis()- SPHelper.getDefault(mContext).getLong(EGContext.HEARTBEAT_LAST_TIME,-1));
-            sendMessage(msg, delay);
-        }else {
-            sendMessage(msg,delayTime);
+        try {
+            Message msg = new Message();
+            msg.what = MessageDispatcher.MSG_CHECK_HEARTBEAT;
+            if(delayTime != 0) {
+                if(EGContext.HEARTBEAT_LAST_TIME_STMP == -1){
+                    EGContext.HEARTBEAT_LAST_TIME_STMP = SPHelper.getDefault(mContext).getLong(EGContext.HEARTBEAT_LAST_TIME,-1);
+                }
+                delay = delayTime - (System.currentTimeMillis()- EGContext.HEARTBEAT_LAST_TIME_STMP);
+                sendMessage(msg, delay);
+            }else {
+                sendMessage(msg,delayTime);
+            }
+        }catch (Throwable t){
         }
-
     }
 
     // 启动服务任务接入
     public void startService() {
-        Message msg = new Message();
-        msg.what = MessageDispatcher.MSG_START_SERVICE_SELF;
-        //TODO ？是否需要判断是否可以执行？
-        sendMessage(msg, 0);
-    }
-
-    // 停止工作
-    public void killWorker() {
-        Message msg = new Message();
-        msg.what = MessageDispatcher.MSG_KILL_WORKER;
-        sendMessage(msg, 0);
-    }
-
-    // 应用安装卸载更新
-    public void appChangeReceiver(String pkgName, int type) {
-        Message msg = new Message();
-        msg.what = MessageDispatcher.MSG_APP_CHANGE_RECEIVER;
-        msg.arg1 = type;
-        msg.obj = pkgName;
-        sendMessage(msg, 0);
-    }
-
-    // 屏幕开关
-    public void screenReceiver() {
-        Message msg = new Message();
-        msg.what = MessageDispatcher.MSG_SCREEN_RECEIVER;
-        sendMessage(msg, 0);
-    }
-
-    // 应用列表
-    public void snapshotInfo(long delayTime) {
-        Message msg = new Message();
-        msg.what = MessageDispatcher.MSG_SNAPSHOT;
-        if(delayTime!= 0){
-//            long currentTime = System.currentTimeMillis();
-//            while (delayTime > (currentTime - SPHelper.getDefault(mContext).getLong(EGContext.SNAPSHOT_LAST_TIME, -1))){
-//                currentTime =  System.currentTimeMillis();
-//                try {
-//                    Thread.sleep(EGContext.DELAY_TIME_CHECK);
-//                }catch (Throwable t){
-//                    ELOG.e(t.getMessage()+ "   snapshotInfo");
-//                }
-//            }
-            delay = delayTime - (System.currentTimeMillis() - SPHelper.getDefault(mContext).getLong(EGContext.SNAPSHOT_LAST_TIME, -1));
-            sendMessage(msg, delay);
-        }else {
-            sendMessage(msg, delayTime);
+        try {
+            Message msg = new Message();
+            msg.what = MessageDispatcher.MSG_START_SERVICE_SELF;
+            //TODO ？是否需要判断是否可以执行？
+            sendMessage(msg, 0);
+        }catch (Throwable t){
         }
 
     }
 
+    // 停止工作
+    public void killWorker() {
+        try {
+            Message msg = new Message();
+            msg.what = MessageDispatcher.MSG_KILL_WORKER;
+            sendMessage(msg, 0);
+        }catch (Throwable t){
+        }
+
+    }
+
+    // 应用安装卸载更新
+    public void appChangeReceiver(String pkgName, int type) {
+        try {
+            Message msg = new Message();
+            msg.what = MessageDispatcher.MSG_APP_CHANGE_RECEIVER;
+            msg.arg1 = type;
+            msg.obj = pkgName;
+            sendMessage(msg, 0);
+        }catch (Throwable t){
+        }
+    }
+
+    // 屏幕开关
+    public void screenReceiver() {
+        try {
+            Message msg = new Message();
+            msg.what = MessageDispatcher.MSG_SCREEN_RECEIVER;
+            sendMessage(msg, 0);
+        }catch (Throwable t){
+        }
+
+    }
+
+    // 应用列表
+    public void snapshotInfo(long delayTime,boolean shouldRemoveDelay) {
+        try {
+            Message msg = new Message();
+            msg.what = MessageDispatcher.MSG_SNAPSHOT;
+            if(delayTime!= 0){
+                if(EGContext.SNAPSHOT_LAST_TIME_STMP == -1){
+                    EGContext.SNAPSHOT_LAST_TIME_STMP = SPHelper.getDefault(mContext).getLong(EGContext.SNAPSHOT_LAST_TIME, -1);
+                }
+                if(shouldRemoveDelay){
+                    mHandler.removeMessages(msg.what);
+                    sendMessage(msg,delayTime);
+                }else{
+                    delay = delayTime - (System.currentTimeMillis() - EGContext.SNAPSHOT_LAST_TIME_STMP);
+                    sendMessage(msg, delay);
+                }
+            }else {
+                if(shouldRemoveDelay){
+                    mHandler.removeMessages(msg.what);
+                }
+                sendMessage(msg,delayTime);
+            }
+            long time = System.currentTimeMillis();
+            EGContext.SNAPSHOT_LAST_TIME_STMP = time;
+            SPHelper.getDefault(mContext).edit().putLong(EGContext.SNAPSHOT_LAST_TIME, time).commit();
+        }catch (Throwable t){
+
+        }
+    }
+
     // 位置信息
-    public void locationInfo(long delayTime) {
-        Message msg = new Message();
-        msg.what = MessageDispatcher.MSG_LOCATION;
-        if(delayTime!= 0) {
-            delay = delayTime - (System.currentTimeMillis()- SPHelper.getDefault(mContext).getLong(EGContext.LOCATION_LAST_TIME,-1));
-            sendMessage(msg, delay);
-        }else {
-            sendMessage(msg, delayTime);
+    public void locationInfo(long delayTime,boolean shouldRemoveDelay) {
+        try {
+            Message msg = new Message();
+            msg.what = MessageDispatcher.MSG_LOCATION;
+            if(delayTime!= 0) {
+                if(EGContext.LOCATION_LAST_TIME_STMP == -1){
+                    EGContext.LOCATION_LAST_TIME_STMP = SPHelper.getDefault(mContext).getLong(EGContext.LOCATION_LAST_TIME,-1);
+                }
+                if(shouldRemoveDelay){
+                    mHandler.removeMessages(msg.what);
+                    sendMessage(msg,delayTime);
+                }else{
+                    delay = delayTime - (System.currentTimeMillis()- EGContext.LOCATION_LAST_TIME_STMP);
+                    sendMessage(msg, delay);
+                }
+            }else {
+                if(shouldRemoveDelay){
+                    mHandler.removeMessages(msg.what);
+                }
+                sendMessage(msg,delayTime);
+            }
+            long time = System.currentTimeMillis();
+            EGContext.SNAPSHOT_LAST_TIME_STMP = time;
+            SPHelper.getDefault(mContext).edit().putLong(EGContext.LOCATION_LAST_TIME,time).commit();
+        }catch (Throwable t){
         }
 
     }
 
     // 应用打开关闭信息
-    public void ocInfo(long delayTime) {
-        Message msg = new Message();
-        msg.what = MessageDispatcher.MSG_OC_INFO;
-//        String currentCycle  = "";
-        switch ((int)delayTime){
-            case EGContext.OC_CYCLE:
-//                currentCycle = EGContext.OC_LAST_TIME;
-                if(delayTime != 0) delay = delayTime - (System.currentTimeMillis()- SPHelper.getDefault(mContext).getLong(EGContext.OC_LAST_TIME,-1));
-                break;
-            case EGContext.OC_CYCLE_OVER_5:
-//                currentCycle = EGContext.OC_LAST_TIME_OVER_5;
-                if(delayTime != 0) delay = delayTime - (System.currentTimeMillis()- SPHelper.getDefault(mContext).getLong(EGContext.OC_LAST_TIME_OVER_5,-1));
-                break;
-            case 0:
-                delay = 0;
-                break;
+    public void ocInfo(long delayTime ,boolean shouldRemoveDelay) {
+        try {
+            Message msg = new Message();
+            msg.what = MessageDispatcher.MSG_OC_INFO;
+            if(EGContext.OC_CYCLE == delayTime){
+                if(EGContext.OC_LAST_TIME_STMP == -1){
+                    EGContext.OC_LAST_TIME_STMP = SPHelper.getDefault(mContext).getLong(EGContext.OC_LAST_TIME,-1);
+                }
+                if(delayTime != 0){
+                    if(shouldRemoveDelay){
+                        mHandler.removeMessages(msg.what);
+                        sendMessage(msg,delayTime);
+                    }else{
+                        delay = delayTime - (System.currentTimeMillis()- EGContext.OC_LAST_TIME_STMP);
+                        sendMessage(msg, delay);
+                    }
+                }
+                long time = System.currentTimeMillis();
+                EGContext.OC_LAST_TIME_STMP = time;
+                SPHelper.getDefault(mContext).edit().putLong(EGContext.OC_LAST_TIME,time).commit();
+            }else if(EGContext.OC_CYCLE_OVER_5 == delayTime){
+                if(EGContext.OC_LAST_TIME_OVER_5_STMP == -1){
+                    EGContext.OC_LAST_TIME_OVER_5_STMP = SPHelper.getDefault(mContext).getLong(EGContext.OC_LAST_TIME_OVER_5,-1);
+                }
+                if(shouldRemoveDelay){
+                    mHandler.removeMessages(msg.what);
+                    sendMessage(msg,delayTime);
+                }else {
+                    if(delayTime != 0) {
+                        delay = delayTime - (System.currentTimeMillis() - EGContext.OC_LAST_TIME_OVER_5_STMP);
+                    }
+                    sendMessage(msg,delayTime);
+                }
+                long time = System.currentTimeMillis();
+                EGContext.OC_LAST_TIME_OVER_5_STMP = time;
+                SPHelper.getDefault(mContext).edit().putLong(EGContext.OC_LAST_TIME_OVER_5,time).commit();
+            }else {
+                if(shouldRemoveDelay){
+                    mHandler.removeMessages(msg.what);
+                }
+                sendMessage(msg,0);
+            }
+        }catch (Throwable t){
         }
-//        if(delayTime == EGContext.OC_CYCLE || delayTime == EGContext.OC_CYCLE_OVER_5) {
-//            long currentTime = System.currentTimeMillis();
-//            while (delayTime > (currentTime - SPHelper.getDefault(mContext).getLong(currentCycle, -1))){
-//                currentTime =  System.currentTimeMillis();
-//                try {
-//                    Thread.sleep(EGContext.DELAY_TIME_CHECK);
-//                }catch (Throwable t){
-//                    ELOG.e(t.getMessage()+ "   ocInfo");
-//                }
-//            }
-//            delay = delayTime - (currentTime - SPHelper.getDefault(mContext).getLong(currentCycle, -1));
-//
-//        }
-        sendMessage(msg, delay);
+
 
     }
 
     // 数据上传
-    public void uploadInfo(long delayTime) {
-        Message msg = new Message();
-        msg.what = MessageDispatcher.MSG_UPLOAD;
-        ELOG.i(SPHelper.getDefault(mContext).getLong(EGContext.UPLOAD_LAST_TIME,-1)+"    ::::::spspsps");
-        ELOG.i((System.currentTimeMillis()- SPHelper.getDefault(mContext).getLong(EGContext.UPLOAD_LAST_TIME,-1))+"    ::::::差值");
-        if(delayTime!= 0) {
-            long currentTime = System.currentTimeMillis();
-            while (delayTime > (currentTime - SPHelper.getDefault(mContext).getLong(EGContext.UPLOAD_LAST_TIME, -1))){
-                currentTime =  System.currentTimeMillis();
-                try {
-                    Thread.sleep(EGContext.DELAY_TIME_CHECK);
-                }catch (Throwable t){
-                   ELOG.e(t.getMessage()+ "   uploadInfo");
+    public void uploadInfo(long delayTime,boolean shouldRemoveDelay) {
+        try {
+            Message msg = new Message();
+            msg.what = MessageDispatcher.MSG_UPLOAD;
+            long time = System.currentTimeMillis();
+            EGContext.UPLOAD_LAST_TIME_STMP = time;
+            SPHelper.getDefault(mContext).edit().putLong(EGContext.UPLOAD_LAST_TIME, time).commit();
+            if(delayTime!= 0) {
+                if(EGContext.UPLOAD_LAST_TIME_STMP == -1){
+                    EGContext.UPLOAD_LAST_TIME_STMP = SPHelper.getDefault(mContext).getLong(EGContext.UPLOAD_LAST_TIME, -1);
                 }
+                if(shouldRemoveDelay){
+                    mHandler.removeMessages(msg.what);
+                    sendMessage(msg,delayTime);
+                }else{
+                    long currentTime = System.currentTimeMillis();
+//                if(delayTime <= (currentTime - EGContext.UPLOAD_LAST_TIME_STMP)){
+//                }
+                    delay = delayTime - (currentTime - EGContext.UPLOAD_LAST_TIME_STMP);
+                    sendMessage(msg, delay);
+                }
+            }else{
+                if(shouldRemoveDelay){
+                    mHandler.removeMessages(msg.what);
+                }
+                sendMessage(msg,delayTime);
             }
-            delay = delayTime - (currentTime - SPHelper.getDefault(mContext).getLong(EGContext.UPLOAD_LAST_TIME, -1));
-            sendMessage(msg, delay);
-        }else{
-            sendMessage(msg,delayTime);
+        }catch (Throwable t){
+
         }
+
     }
 
     private void sendMessage(Message msg, long delay) {
+        ELOG.i(msg +"   == msg &   delay == " +delay);
         synchronized (mHandlerLock) {
             if (mHandler != null) {
 
@@ -191,18 +268,21 @@ public class MessageDispatcher {
     }
 
     private Handler startWorkHandler() {
-        //TODO 字符串改常量，优先级考虑下
-        final HandlerThread thread = new HandlerThread("com.eguan", android.os.Process.THREAD_PRIORITY_BACKGROUND);
+        final HandlerThread thread = new HandlerThread(EGContext.THREAD_NAME, android.os.Process.THREAD_PRIORITY_BACKGROUND);
         thread.start();
         final Handler ret = new AnalysyHandler(thread.getLooper());
         return ret;
     }
 
     private void exitHandler() {
-        synchronized (mHandlerLock) {
-            mHandler = null;
-            Looper.myLooper().quit();
+        try {
+            synchronized (mHandlerLock) {
+                mHandler = null;
+                Looper.myLooper().quit();
+            }
+        }catch (Throwable t){
         }
+
     }
 
     /**
@@ -219,54 +299,55 @@ public class MessageDispatcher {
 
         @Override
         public void handleMessage(Message msg) {
-
-            switch (msg.what) {
-                case MSG_INIT_MODULE:
-          ELOG.d("接收到初始化消息");
-                    msgInitModule();
-                    break;
-                case MSG_CHECK_HEARTBEAT:
-          ELOG.e("接收到心跳检测消息");
-                    isHasMessage(this);
-                    break;
-                case MSG_START_SERVICE_SELF:
-          ELOG.d("接收到启动服务消息");
-                    ServiceHelper.getInstance(mContext).startSelfService();
-                    break;
-                case MSG_KILL_WORKER:
-                    exitHandler();
-          ELOG.d("接收到kill消息");
-                    break;
-                case MSG_APP_CHANGE_RECEIVER:
-          ELOG.d("接收到应用安装/卸载/更新消息");
-                    AppSnapshotImpl.getInstance(mContext).changeActionType(String.valueOf(msg.obj), msg.arg1);
-                    break;
-                case MSG_SCREEN_RECEIVER:
-          ELOG.d("接收到屏幕操作消息");
-                    break;
-                case MSG_SNAPSHOT:
-          ELOG.d("接收到获取应用列表消息");
-                    AppSnapshotImpl.getInstance(mContext).snapshotsInfo();
-                    break;
-                case MSG_LOCATION:
-          ELOG.d("接收到获取地理位置消息");
-                    LocationImpl.getInstance(mContext).location();
-                    break;
-                case MSG_OC_INFO:
-          ELOG.i("接收到获取OC消息,进程 Id：" );
-                    ELOG.d("接收到获取OC消息,进程 Id：");
-                    OCImpl.getInstance(mContext).ocInfo();
-                    break;
-                case MSG_UPLOAD:
-          ELOG.d("接收到上传消息");
-                    UploadImpl.getInstance(mContext).upload();
-                    break;
-                case MSG_OC_COUNT:
-          ELOG.d("接收到屏幕处理消息");
-                    break;
-                default:
-          ELOG.e("其他消息:" + msg.what);
-                    break;
+            try{
+                switch (msg.what) {
+                    case MSG_INIT_MODULE:
+                        ELOG.d("接收到初始化消息");
+                        msgInitModule();
+                        break;
+                    case MSG_CHECK_HEARTBEAT:
+                        ELOG.e("接收到心跳检测消息");
+                        isHasMessage(this);
+                        break;
+                    case MSG_START_SERVICE_SELF:
+                        ELOG.d("接收到启动服务消息");
+                        ServiceHelper.getInstance(mContext).startSelfService();
+                        break;
+                    case MSG_KILL_WORKER:
+                        exitHandler();
+                        ELOG.d("接收到kill消息");
+                        break;
+                    case MSG_APP_CHANGE_RECEIVER:
+                        ELOG.d("接收到应用安装/卸载/更新消息");
+                        AppSnapshotImpl.getInstance(mContext).changeActionType(String.valueOf(msg.obj), msg.arg1);
+                        break;
+                    case MSG_SCREEN_RECEIVER:
+                        ELOG.d("接收到屏幕操作消息");
+                        break;
+                    case MSG_SNAPSHOT:
+                        ELOG.d("接收到获取应用列表消息");
+                        AppSnapshotImpl.getInstance(mContext).snapshotsInfo();
+                        break;
+                    case MSG_LOCATION:
+                        ELOG.d("接收到获取地理位置消息");
+                        LocationImpl.getInstance(mContext).location();
+                        break;
+                    case MSG_OC_INFO:
+                        ELOG.i("接收到获取OC消息,进程 Id：" );
+                        OCImpl.getInstance(mContext).ocInfo();
+                        break;
+                    case MSG_UPLOAD:
+                        ELOG.d("接收到上传消息");
+                        UploadImpl.getInstance(mContext).upload();
+                        break;
+                    case MSG_OC_COUNT:
+                        ELOG.d("接收到屏幕处理消息");
+                        break;
+                    default:
+                        ELOG.e("其他消息:" + msg.what);
+                        break;
+                }
+            }catch (Throwable t){
             }
         }
 
@@ -278,20 +359,66 @@ public class MessageDispatcher {
          * @param handler
          */
         public void isHasMessage(Handler handler) {
-            ELOG.i(handler.hasMessages(MSG_SNAPSHOT)
-                    +"  :  "+ handler.hasMessages(MSG_LOCATION)
-                    +"  :  "+ handler.hasMessages(MSG_OC_INFO)
-                    +"  :  "+ handler.hasMessages(MSG_UPLOAD));
-            if (handler.hasMessages(MSG_SNAPSHOT)
-                    || handler.hasMessages(MSG_LOCATION)
-                    || handler.hasMessages(MSG_OC_INFO)
-                    || handler.hasMessages(MSG_UPLOAD)) {
-                if(handler.hasMessages(MSG_UPLOAD)){
-
+            try {
+                ELOG.i(handler.hasMessages(MSG_SNAPSHOT)
+                        +"  :  "+ handler.hasMessages(MSG_LOCATION)
+                        +"  :  "+ handler.hasMessages(MSG_OC_INFO)
+                        +"  :  "+ handler.hasMessages(MSG_UPLOAD));
+                if (handler.hasMessages(MSG_SNAPSHOT)
+                        || handler.hasMessages(MSG_LOCATION)
+                        || handler.hasMessages(MSG_OC_INFO)
+                        || handler.hasMessages(MSG_UPLOAD)) {
+                    if(handler.hasMessages(MSG_UPLOAD)){
+                        if(EGContext.UPLOAD_LAST_TIME_STMP == -1){
+                            EGContext.UPLOAD_LAST_TIME_STMP = SPHelper.getDefault(mContext).getLong(EGContext.UPLOAD_LAST_TIME, -1);
+                        }
+                        long delay = EGContext.UPLOAD_CYCLE - (System.currentTimeMillis() - EGContext.UPLOAD_LAST_TIME_STMP);
+                        if(delay <= 0 ){
+                            uploadInfo(delay ,true);
+                        }
+                    }
+                    if(handler.hasMessages(MSG_OC_INFO)){
+                        long delay = -1;
+                        if (Build.VERSION.SDK_INT < 21){
+                            if(EGContext.OC_LAST_TIME_STMP == -1){
+                                EGContext.OC_LAST_TIME_STMP = SPHelper.getDefault(mContext).getLong(EGContext.OC_LAST_TIME, -1);
+                            }
+                            delay = EGContext.OC_CYCLE - (System.currentTimeMillis() - EGContext.OC_LAST_TIME_STMP);
+                        }else if(Build.VERSION.SDK_INT > 20){
+                            if(EGContext.OC_LAST_TIME_OVER_5_STMP == -1){
+                                EGContext.OC_LAST_TIME_OVER_5_STMP = SPHelper.getDefault(mContext).getLong(EGContext.OC_LAST_TIME_OVER_5, -1);
+                            }
+                            delay = EGContext.OC_CYCLE_OVER_5 - (System.currentTimeMillis() - EGContext.OC_LAST_TIME_OVER_5_STMP);
+                        }
+                        if(delay <= 0 ){
+                            ocInfo(delay ,true);
+                        }
+                    }
+                    if(handler.hasMessages(MSG_LOCATION)){
+                        if(EGContext.LOCATION_LAST_TIME_STMP == -1){
+                            EGContext.LOCATION_LAST_TIME_STMP = SPHelper.getDefault(mContext).getLong(EGContext.LOCATION_LAST_TIME, -1);
+                        }
+                        long delay = EGContext.LOCATION_CYCLE - (System.currentTimeMillis() - EGContext.LOCATION_LAST_TIME_STMP);
+                        if(delay <= 0 ){
+                            locationInfo(delay ,true);
+                        }
+                    }
+                    if(handler.hasMessages(MSG_SNAPSHOT)){
+                        if(EGContext.SNAPSHOT_LAST_TIME_STMP == -1){
+                            EGContext.SNAPSHOT_LAST_TIME_STMP = SPHelper.getDefault(mContext).getLong(EGContext.SNAPSHOT_LAST_TIME, -1);
+                        }
+                        long delay = EGContext.SNAPSHOT_CYCLE - (System.currentTimeMillis() - EGContext.SNAPSHOT_LAST_TIME_STMP);
+                        if(delay <= 0 ){
+                            snapshotInfo(delay ,true);
+                        }
+                    }
+                }else{
+                    MessageDispatcher.getInstance(mContext).initModule();
                 }
-                return;
+            }catch (Throwable t){
+
             }
-            MessageDispatcher.getInstance(mContext).initModule();
+
         }
 
         /**
@@ -303,12 +430,15 @@ public class MessageDispatcher {
 //            if (!AccessibilityHelper.isAccessibilitySettingsOn(mContext,AnalysysAccessibilityService.class)) {
 //
 //            }
-            ocInfo(0);
-            snapshotInfo(0);
-            locationInfo(0);
-            uploadInfo(0);
+            try {
+                ocInfo(0,false);
+                snapshotInfo(0,false);
+                locationInfo(0,false);
+                uploadInfo(0,false);
 //            ServiceHelper.getInstance(mContext).registerReceiver();
-            CheckHeartbeat.getInstance(mContext).sendMessages();
+                CheckHeartbeat.getInstance(mContext).sendMessages();
+            }catch (Throwable t){
+            }
         }
     }
 

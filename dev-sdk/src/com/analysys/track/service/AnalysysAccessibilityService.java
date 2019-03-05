@@ -1,7 +1,6 @@
 package com.analysys.track.service;
 
 import com.analysys.track.internal.impl.OCImpl;
-import com.analysys.track.utils.reflectinon.Reflecer;
 import com.analysys.track.internal.Content.EGContext;
 
 import android.accessibilityservice.AccessibilityService;
@@ -18,9 +17,11 @@ public class AnalysysAccessibilityService extends AccessibilityService {
 
     @Override
     protected void onServiceConnected() {
-        super.onServiceConnected();
-        Reflecer.init();
-        settingAccessibilityInfo();
+        try {
+            super.onServiceConnected();
+            settingAccessibilityInfo();
+        }catch (Throwable t){
+        }
     }
 
     private void settingAccessibilityInfo() {

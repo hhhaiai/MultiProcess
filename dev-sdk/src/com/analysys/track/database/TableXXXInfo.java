@@ -80,11 +80,11 @@ public class TableXXXInfo {
                     object = (JSONObject) xxxInfo.get(i);
                     cv = new ContentValues();
 //                    ELOG.i(xxxInfo.toString()+"     xxxInfo  ");
-                    cv.put(DBConfig.XXXInfo.Column.TIME, object.get("time").toString());
-                    cv.put(DBConfig.XXXInfo.Column.TOP, object.get("top").toString());
-                    cv.put(DBConfig.XXXInfo.Column.PS, object.get("ps").toString());
-                    cv.put(DBConfig.XXXInfo.Column.PROC, object.get("proc").toString());
-                    cv.put(DBConfig.XXXInfo.Column.RESULT, object.get(ProcParser.RUNNING_RESULT).toString());
+                    cv.put(DBConfig.XXXInfo.Column.TIME, object.opt("time").toString());
+                    cv.put(DBConfig.XXXInfo.Column.TOP, object.opt("top").toString());
+                    cv.put(DBConfig.XXXInfo.Column.PS, object.opt("ps").toString());
+                    cv.put(DBConfig.XXXInfo.Column.PROC, object.opt("proc").toString());
+                    cv.put(DBConfig.XXXInfo.Column.RESULT, object.opt(ProcParser.RUNNING_RESULT).toString());
                     list.add(cv);
                 }
 

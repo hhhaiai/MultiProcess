@@ -14,17 +14,12 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final int DB_VERSION = 1;
     private static Context mContext = null;
 
-    private static class Holder {
-        private static final DBHelper INSTANCE = new DBHelper(mContext);
-    }
-
     public static DBHelper getInstance(Context context) {
-        if (Holder.INSTANCE.mContext == null) {
-            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
+        if (mContext == null) {
+            mContext = EContextHelper.getContext(context);
         }
-        return Holder.INSTANCE;
+        return new DBHelper(mContext);
     }
-
     public DBHelper(Context context) {
         super(EContextHelper.getContext(context), DB_NAME, null, DB_VERSION);
         recreateTables();
