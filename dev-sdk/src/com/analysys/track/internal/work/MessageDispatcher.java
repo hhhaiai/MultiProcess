@@ -6,20 +6,20 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
-import android.widget.TableRow;
 
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.OCImpl;
 import com.analysys.track.internal.impl.UploadImpl;
-
 import com.analysys.track.utils.ELOG;
+
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 public class MessageDispatcher {
     private long delay = 0;
+
     private MessageDispatcher() {
         mHandler = startWorkHandler();
     }
@@ -136,7 +136,6 @@ public class MessageDispatcher {
             EGContext.SNAPSHOT_LAST_TIME_STMP = time;
             SPHelper.getDefault(mContext).edit().putLong(EGContext.SNAPSHOT_LAST_TIME, time).commit();
         }catch (Throwable t){
-
         }
     }
 
@@ -248,7 +247,6 @@ public class MessageDispatcher {
                 sendMessage(msg,delayTime);
             }
         }catch (Throwable t){
-
         }
 
     }

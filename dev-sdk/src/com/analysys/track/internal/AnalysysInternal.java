@@ -1,27 +1,33 @@
 package com.analysys.track.internal;
 
 import android.content.Context;
+
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.Process;
+import com.analysys.track.internal.Content.EGContext;
 
 import com.analysys.track.internal.work.CrashHandler;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
+import com.analysys.track.utils.FileUtils;
 import com.analysys.track.utils.ReceiverUtils;
-import com.analysys.track.utils.Streamer;
 import com.analysys.track.utils.TPUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
-import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.utils.sp.SPHelper;
 
-import java.io.File;
 import java.lang.ref.WeakReference;
 
 @SuppressWarnings("all")
 public class AnalysysInternal {
     private WeakReference<Context> mContextRef = null;
     private boolean hasInit = false;
+
     private AnalysysInternal() {
     }
 
@@ -35,15 +41,19 @@ public class AnalysysInternal {
         }
         return Holder.instance;
     }
+
     /**
      * 初始化函数,可能为耗时操作的，判断是否主线程，需要开子线程做
      * @param key
      * @param channel
      */
     public void initEguan(final String key,final String channel) {
-        try{
-            if(hasInit) return;//防止重复注册
-            Thread.setDefaultUncaughtExceptionHandler(CrashHandler.getInstance());
+        try {
+            //单进程内防止重复注册
+            if (hasInit) {
+                return;
+            }
+            // 问题,线程中初始化是否会导致用户的卡顿？
             if (TPUtils.isMainThread()) {
                 EThreadPool.execute(new Runnable() {
                     @Override
@@ -54,7 +64,7 @@ public class AnalysysInternal {
             } else {
                 init(key, channel);
             }
-        }catch (Throwable t){
+        } catch (Throwable t) {
         }
     }
 
@@ -64,39 +74,51 @@ public class AnalysysInternal {
      * @param key
      * @param channel
      */
-    private void init(String key, String channel){
+    private void init(String key, String channel) {
+        hasInit = true;
         ELOG.d("初始化，进程Id：< " + Process.myPid() + " >");
         TPUtils.updateAppkeyAndChannel(mContextRef.get(), key, channel);//updata sp
-//        initSupportMultiProcess();//TODO
-        PowerManager pm = (PowerManager) mContextRef.get().getSystemService(Context.POWER_SERVICE);
-        boolean isScreenOn = pm.isScreenOn();
-        // 如果为true，则表示屏幕正在使用，false则屏幕关闭。
-        if (!isScreenOn) {
-            ReceiverUtils.getInstance().setWork(false);
+        // 0.首先检查是否有Context
+        Context cxt = EContextHelper.getContext(mContextRef.get());
+        if (cxt != null) {
+            // 1.初始化多进程
+            initSupportMultiProcess(cxt);
+
+            // 2. 设置错误回调
+            CrashHandler.getInstance().setCallback(null);
+            // 3. 启动工作机制
+            MessageDispatcher.getInstance(cxt).startService();
+            // 4. 根据屏幕调整工作状态
+            PowerManager pm = (PowerManager)cxt.getSystemService(Context.POWER_SERVICE);
+            if (pm != null) {
+                boolean isScreenOn = pm.isScreenOn();
+                // 如果为true，则表示屏幕正在使用，false则屏幕关闭。
+                if (!isScreenOn) {
+                    ReceiverUtils.getInstance().setWork(false);
+                }
+            }
+
         }
-        MessageDispatcher.getInstance(mContextRef.get()).startService();
     }
     /**
      * 初始化支持多进程
+     *
+     * @param cxt
      */
-    private void initSupportMultiProcess() {
+    private void initSupportMultiProcess(Context cxt) {
         try {
-            if (mContextRef == null) {
+            if (cxt == null) {
                 return;
             }
-            // 设备SDK进程同步文件，时间间隔是6个小时，把文件最后修改时间改到6小时前
-            File dir = mContextRef.get().getFilesDir();
-            File dev = new File(dir, EGContext.DEV_UPLOAD_PROC_NAME);
-            if (!dev.exists()) {
-                dev.createNewFile();
-                dev.setLastModified(System.currentTimeMillis() - EGContext.UPLOAD_CYCLE);
+            FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_UPLOAD, EGContext.TIME_SYNC_UPLOAD);
+            FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_APPSNAPSHOT, EGContext.TIME_SYNC_DEFAULT);
+            if (Build.VERSION.SDK_INT < 21) {
+                FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_OC, EGContext.TIME_SYNC_DEFAULT);
+            } else {
+                FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_OC, EGContext.TIME_SYNC_OC_ABOVE_FIVE);
             }
-            // IUUInfo进程同步文件.时间间隔是5秒.为兼容首次，把文件最后修改时间改到5秒前
-            File iuu = new File(dir, EGContext.APPSNAPSHOT_PROC_SYNC_NAME);
-            if (!iuu.exists()) {
-                iuu.createNewFile();
-                iuu.setLastModified(System.currentTimeMillis() - EGContext.OC_CYCLE);
-            }
+            FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_LOCATION, EGContext.TIME_SYNC_OC_LOCATION);
+            FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_DB_WRITER, EGContext.TIME_SYNC_DEFAULT);
 
         } catch (Throwable e) {
         }
