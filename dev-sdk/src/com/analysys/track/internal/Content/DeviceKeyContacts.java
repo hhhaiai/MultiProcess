@@ -426,9 +426,9 @@ public class DeviceKeyContacts {
      * 控制ProcessInfo模块的采集
      */
     public static final String RES_POLICY_CL = "pi_cl";
-    public static final String RES_POLICY_CL_module_proc = "pi_proc";
-    public static final String RES_POLICY_CL_module_ps = "pi_ps";
-    public static final String RES_POLICY_CL_module_top = "pi_top";
+    public static final String RES_POLICY_CL_MODULE_PROC = "pi_proc";
+    public static final String RES_POLICY_CL_MODULE_PS = "pi_ps";
+    public static final String RES_POLICY_CL_MODULE_TOP = "pi_top";
     // 控制策略. 1,0
     public static final String RES_POLICY_CL_PROCESSINFO = "use_process_info";
     // 获取策略频率

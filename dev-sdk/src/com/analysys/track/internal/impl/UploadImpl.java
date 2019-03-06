@@ -122,6 +122,7 @@ public class UploadImpl {
         JSONObject object = null;
         try {
             object = new JSONObject();
+
             JSONObject devJson = DataPackaging.getDevInfo(mContext);
             if (devJson != null) {
                 object.put(DI, devJson);
