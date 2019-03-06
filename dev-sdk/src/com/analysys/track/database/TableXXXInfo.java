@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Base64;
 
+import com.analysys.track.internal.Content.DataController;
+import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.impl.PolicyImpl;
 import com.analysys.track.internal.impl.proc.ProcParser;
@@ -109,9 +111,9 @@ public class TableXXXInfo {
                 jsonObject = new JSONObject();
                 String time = cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TIME));
                 jsonObject.put(ProcParser.RUNNING_TIME,time);
-                if(PolicyImpl.getInstance(mContext).getValueFromSp(EGContext.TOP_SWITCH,EGContext.SWITCH_OF_TOP))
+                if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_CL_MODULE_TOP,DataController.SWITCH_OF_CL_MODULE_TOP))
                 jsonObject.put(ProcParser.RUNNING_TOP,new String(Base64.encode(cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TOP)).getBytes(),Base64.DEFAULT)));
-                if(PolicyImpl.getInstance(mContext).getValueFromSp(EGContext.PS_SWITCH,EGContext.SWITCH_OF_PS))
+                if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_CL_MODULE_PS,DataController.SWITCH_OF_CL_MODULE_PS))
                 jsonObject.put(ProcParser.RUNNING_PS,new String(Base64.encode(cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PS)).getBytes(),Base64.DEFAULT)));
 //                curProc1 = db.query(DBConfig.PROCInfo.TABLE_NAME,null,null,null,null,null,null);
 //                ELOG.i(curProc1+"    :::::::::::curProc1   "+ curProc1.getCount());
@@ -121,7 +123,7 @@ public class TableXXXInfo {
 //                    ELOG.i("content :::::::::::::::::::::     "+curProc.getColumnIndex(DBConfig.PROCInfo.Column.CONTENT));
                     procArray.put(new JSONObject(curProc.getString(curProc.getColumnIndex(DBConfig.PROCInfo.Column.CONTENT))));
                 }
-                if(PolicyImpl.getInstance(mContext).getValueFromSp(EGContext.PROC_SWITCH,EGContext.SWITCH_OF_PROC))
+                if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_CL_MODULE_PROC,DataController.SWITCH_OF_CL_MODULE_PROC))
                 jsonObject.put(ProcParser.RUNNING_PROC,new String(Base64.encode(procArray.toString().getBytes(),Base64.DEFAULT)));
                 jsonObject.put(ProcParser.RUNNING_RESULT,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.RESULT)));
                 array.put(jsonObject);

@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
+import com.analysys.track.internal.Content.DataController;
+import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.impl.OCImpl;
 import com.analysys.track.internal.impl.WifiImpl;
@@ -75,7 +77,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
                 ELOG.e("接收关闭屏幕广播");
             }
             if (BATTERY_CHANGED.equals(intent.getAction())) {
-                if(EGContext.SWITCH_OF_BATTERY) DeviceImpl.getInstance(mContext).processBattery(intent);
+                if(DataController.SWITCH_OF_MODULE_CL_BATTERY) DeviceImpl.getInstance(mContext).processBattery(intent);
                 ELOG.e("电池变化广播");
             }
             if (BOOT_COMPLETED.equals(intent.getAction())) {

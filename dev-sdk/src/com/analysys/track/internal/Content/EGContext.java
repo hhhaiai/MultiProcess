@@ -76,58 +76,22 @@ public class EGContext {
     public static final String SP_APP_IDFA = "appIDFA";
     public static final String SWITCH_TYPE_DEFAULT = "1";
 
-    // 蓝牙信息，默认不上传，需要根据服务器控制
-    public static boolean SWITCH_OF_BLUETOOTH = true;
-    // 蓝牙信息
-    public static String BLUETOOTH_SWITCH = "BLUETOOTH";
     // 蓝牙
     public static final String BLUETOOTH = "0";
-    // 电量信息，默认不上传，需要根据服务器控制
-    public static boolean SWITCH_OF_BATTERY = true;
-    // 电量信息
-    public static String BATTERY_SWITCH = "BATTERY";
     // 电量
     public static final String BATTERY = "1";
-    // 传感器，默认不上传，可控制上传
-    public static boolean SWITCH_OF_SENSOR = true;
-    // 传感器开关
-    public static String SENSOR_SWITCH = "SENSOR";
     // 传感器
     public static final String SENSOR = "2";
-    // 系统阶段保持信息，默认可不上传，根据服务器控制来上传
-    public static boolean SWITCH_OF_SYSTEM_INFO = true;
-    // 系统阶段保持信息
-    public static String SYSTEM_INFO_SWITCH = "SYSTEM_INFO";
     // 系统阶段保持信息
     public static final String SYSTEM_INFO = "3";
-    // 更加详细的设备详情信息，默认可不上传，可用于确定设备信息
-    public static boolean SWITCH_OF_DEV_FURTHER_DETAIL = true;
-    // 更加详细的设备详情信息
-    public static String DEV_FURTHER_DETAIL_SWITCH = "DEV_FURTHER_DETAIL";
     // 更加详细的设备详情信息
     public static final String DEV_FURTHER_DETAIL = "4";
-    // 防作弊相关信息开关，默认不上传，可控制上传
-    public static boolean SWITCH_OF_PREVENT_CHEATING = true;
-    // 防作弊相关信息开关
-    public static String PREVENT_CHEATING_SWITCH = "PREVENT_CHEATING";
     // 防作弊相关信息开关
     public static final String PREVENT_CHEATING = "5";
-    // TOP，默认上传，需要根据服务器控制
-    public static boolean SWITCH_OF_TOP = true;
-    // TOP信息
-    public static String TOP_SWITCH = "TOP";
     // TOP信息
     public static final String TOP = "6";
-    // PS，默认上传，需要根据服务器控制
-    public static boolean SWITCH_OF_PS = true;
-    // PS信息
-    public static String PS_SWITCH = "PS";
     // PS信息
     public static final String PS = "7";
-    // PROC，默认上传，可用于确定设备信息
-    public static boolean SWITCH_OF_PROC = true;
-    // PROC信息
-    public static String PROC_SWITCH = "PROC";
     // PROC信息
     public static final String PROC = "8";
 

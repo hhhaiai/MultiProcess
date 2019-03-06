@@ -3,6 +3,7 @@ package com.analysys.track.internal.impl.proc;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.impl.DeviceImpl;
@@ -11,6 +12,7 @@ import com.analysys.track.internal.impl.PolicyImpl;
 import com.analysys.track.internal.impl.SenSorModuleNameImpl;
 import com.analysys.track.model.BatteryModuleNameInfo;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -30,9 +32,9 @@ public class DataPackaging {
         JSONObject deviceInfo = new JSONObject();
         try {
             DeviceImpl devImpl = DeviceImpl.getInstance(mContext);
-            if(!TextUtils.isEmpty(devImpl.getSystemName()))
+            if(SPHelper.getDefault(mContext).getBoolean(DeviceKeyContacts.DevInfo.SystemName,DataController.SWITCH_OF_SYSTEM_NAME) && !TextUtils.isEmpty(devImpl.getSystemName()))
             deviceInfo.put(DeviceKeyContacts.DevInfo.SystemName, devImpl.getSystemName());
-            if(!TextUtils.isEmpty(devImpl.getSystemVersion()))
+            if(SPHelper.getDefault(mContext).getBoolean(DeviceKeyContacts.DevInfo.SystemVersion,DataController.SWITCH_OF_SYSTEM_VERSION) && !TextUtils.isEmpty(devImpl.getSystemVersion()))
             deviceInfo.put(DeviceKeyContacts.DevInfo.SystemVersion, devImpl.getSystemVersion());
             if(!TextUtils.isEmpty(devImpl.getDeviceBrand()))
             deviceInfo.put(DeviceKeyContacts.DevInfo.DeviceBrand, devImpl.getDeviceBrand());
@@ -82,7 +84,7 @@ public class DataPackaging {
             deviceInfo.put(DeviceKeyContacts.DevInfo.TempID, devImpl.getTempID());
 //            ELOG.i("deviceInfo ::::::"+deviceInfo);
 
-            if (PolicyImpl.getInstance(mContext).getValueFromSp(EGContext.PREVENT_CHEATING_SWITCH,EGContext.SWITCH_OF_PREVENT_CHEATING)) {
+            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_DEV_CHECK,DataController.SWITCH_OF_MODULE_CL_DEV_CHECK)) {
                 if(!TextUtils.isEmpty(devImpl.isSimulator()))
                 deviceInfo.put(DeviceKeyContacts.DevInfo.Simulator, devImpl.isSimulator());
                 if(!TextUtils.isEmpty(devImpl.getDebug()))
@@ -93,13 +95,13 @@ public class DataPackaging {
                 deviceInfo.put(DeviceKeyContacts.DevInfo.IsRoot, devImpl.IsRoot());
             }
 
-            if (PolicyImpl.getInstance(mContext).getValueFromSp(EGContext.BLUETOOTH_SWITCH,EGContext.SWITCH_OF_BLUETOOTH)) {
+            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BLUETOOTH,DataController.SWITCH_OF_MODULE_CL_BLUETOOTH)) {
                 if(!TextUtils.isEmpty(devImpl.getBluetoothMac()))
                 deviceInfo.put(DeviceKeyContacts.DevInfo.BluetoothMac, devImpl.getBluetoothMac());
                 if(!TextUtils.isEmpty(devImpl.getBluetoothName()))
                 deviceInfo.put(DeviceKeyContacts.DevInfo.BluetoothName, devImpl.getBluetoothName());
             }
-            if (PolicyImpl.getInstance(mContext).getValueFromSp(EGContext.SYSTEM_INFO_SWITCH,EGContext.SWITCH_OF_SYSTEM_INFO)) {
+            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_KEEP_INFO,DataController.SWITCH_OF_MODULE_CL_KEEP_INFO)) {
                 if(!TextUtils.isEmpty(devImpl.getSystemFontSize()))
                 deviceInfo.put(DeviceKeyContacts.DevInfo.SystemFontSize, devImpl.getSystemFontSize());
                 if(!TextUtils.isEmpty(devImpl.getSystemHour()))
@@ -111,7 +113,7 @@ public class DataPackaging {
                 if(!TextUtils.isEmpty(devImpl.getTimeZone()))
                 deviceInfo.put(DeviceKeyContacts.DevInfo.TimeZone, devImpl.getTimeZone());
             }
-            if(PolicyImpl.getInstance(mContext).getValueFromSp(EGContext.SENSOR_SWITCH,EGContext.SWITCH_OF_SENSOR)){
+            if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SENSOR,DataController.SWITCH_OF_MODULE_CL_SENSOR)){
                 JSONArray senSorArray = SenSorModuleNameImpl.getInstance(mContext).getSensorInfo();
                 if(senSorArray != null && senSorArray.length()>0){
                     deviceInfo.put(DeviceKeyContacts.DevInfo.SenSorModuleName,senSorArray);
@@ -119,7 +121,7 @@ public class DataPackaging {
             }
             JSONObject batteryJson = new JSONObject();
 
-            if (PolicyImpl.getInstance(mContext).getValueFromSp(EGContext.BATTERY_SWITCH,EGContext.SWITCH_OF_BATTERY)) {
+            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BATTERY,DataController.SWITCH_OF_MODULE_CL_BATTERY)) {
                 BatteryModuleNameInfo battery = BatteryModuleNameInfo.getInstance();
                 if (!TextUtils.isEmpty(battery.getBatteryStatus())) batteryJson.put(DeviceKeyContacts.DevInfo.BatteryStatus, battery.getBatteryStatus());
                 if (!TextUtils.isEmpty(battery.getBatteryHealth())) batteryJson.put(DeviceKeyContacts.DevInfo.BatteryHealth, battery.getBatteryHealth());
@@ -129,7 +131,7 @@ public class DataPackaging {
                 if (!TextUtils.isEmpty(battery.getBatteryTechnology())) batteryJson.put(DeviceKeyContacts.DevInfo.BatteryTechnology, battery.getBatteryTechnology());
                 if (!TextUtils.isEmpty(battery.getBatteryTemperature())) batteryJson.put(DeviceKeyContacts.DevInfo.BatteryTemperature, battery.getBatteryTemperature());
             }
-            if (PolicyImpl.getInstance(mContext).getValueFromSp(EGContext.DEV_FURTHER_DETAIL_SWITCH,EGContext.SWITCH_OF_DEV_FURTHER_DETAIL)) {
+            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_MORE_INFO,DataController.SWITCH_OF_MODULE_CL_MORE_INFO)) {
                 if(!TextUtils.isEmpty(devImpl.getCPUModel()))
                 batteryJson.put(DeviceKeyContacts.DevInfo.CPUModel, devImpl.getCPUModel());
                 if(!TextUtils.isEmpty(devImpl.getBuildId()))

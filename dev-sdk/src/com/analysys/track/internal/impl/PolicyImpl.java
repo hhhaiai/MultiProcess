@@ -331,23 +331,23 @@ public class PolicyImpl {
                         .optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUBMODULE);
                     if (!TextUtils.isEmpty(sub_module)) {
                         if (EGContext.BLUETOOTH.equals(sub_module)) {
-                            setSp(EGContext.BLUETOOTH_SWITCH, true);
+                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BLUETOOTH, true);
                         } else if (EGContext.BATTERY.equals(sub_module)) {
-                            setSp(EGContext.BATTERY_SWITCH, true);
+                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BATTERY, true);
                         } else if (EGContext.SENSOR.equals(sub_module)) {
-                            setSp(EGContext.SENSOR_SWITCH, true);
+                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SENSOR, true);
                         } else if (EGContext.SYSTEM_INFO.equals(sub_module)) {
-                            setSp(EGContext.SYSTEM_INFO_SWITCH, true);
+                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_KEEP_INFO, true);
                         } else if (EGContext.DEV_FURTHER_DETAIL.equals(sub_module)) {
-                            setSp(EGContext.DEV_FURTHER_DETAIL_SWITCH, true);
+                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_MORE_INFO, true);
                         } else if (EGContext.PREVENT_CHEATING.equals(sub_module)) {
-                            setSp(EGContext.PREVENT_CHEATING_SWITCH, true);
+                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_DEV_CHECK, true);
                         } else if (EGContext.TOP.equals(sub_module)) {
-                            setSp(EGContext.TOP_SWITCH, true);
+                            setSp(DeviceKeyContacts.Response.RES_POLICY_CL_MODULE_TOP, true);
                         } else if (EGContext.PS.equals(sub_module)) {
-                            setSp(EGContext.PS_SWITCH, true);
+                            setSp(DeviceKeyContacts.Response.RES_POLICY_CL_MODULE_PS, true);
                         } else if (EGContext.PROC.equals(sub_module)) {
-                            setSp(EGContext.PROC_SWITCH, true);
+                            setSp(DeviceKeyContacts.Response.RES_POLICY_CL_MODULE_PROC, true);
                         }
                         // switch (sub_module){
                         // case EGContext.BLUETOOTH:
