@@ -17,11 +17,8 @@ import java.util.Enumeration;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import com.analysys.track.utils.reflectinon.EContextHelper;
-import com.analysys.track.utils.simulator.SimulatorUtils;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
-
 import com.analysys.track.model.BatteryModuleNameInfo;
 import com.analysys.track.model.SoftwareInfo;
 import com.analysys.track.utils.ELOG;
@@ -30,6 +27,7 @@ import com.analysys.track.utils.HiJack;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.TPUtils;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import android.Manifest;
@@ -59,8 +57,8 @@ public class DeviceImpl {
 
     private Context mContext;
 
-    final String ZERO = "0";
-    final String ONE = "1";
+    private final String ZERO = "0";
+    private final String ONE = "1";
 
     private static class Holder {
         private static final DeviceImpl INSTANCE = new DeviceImpl();
@@ -72,9 +70,8 @@ public class DeviceImpl {
         }
         return Holder.INSTANCE;
     }
-    //设备硬件信息DevInfoImpl
 
-       /**
+    /**
      * 系统名称
      */
     public String getSystemName() {
@@ -88,8 +85,8 @@ public class DeviceImpl {
         String version = "";
         try {
             version = Build.VERSION.RELEASE;
-        }catch (Throwable t){
-           version = "";
+        } catch (Throwable t) {
+            version = "";
         }
         return version;
     }
@@ -100,8 +97,8 @@ public class DeviceImpl {
     public String getDeviceBrand() {
         String brand = "";
         try {
-           brand = Build.BRAND;
-        }catch (Throwable t){
+            brand = Build.BRAND;
+        } catch (Throwable t) {
             brand = "";
         }
         return brand;
@@ -122,11 +119,11 @@ public class DeviceImpl {
                     imsi = tm.getSubscriberId();
                 }
                 String androidId = android.provider.Settings.System.getString(mContext.getContentResolver(),
-                        Settings.Secure.ANDROID_ID);
+                    Settings.Secure.ANDROID_ID);
                 deviceId = (TextUtils.isEmpty(imei) ? "null" : imei) + "-" + (TextUtils.isEmpty(imsi) ? "null" : imsi)
-                        + "-" + (TextUtils.isEmpty(androidId) ? "null" : androidId);
+                    + "-" + (TextUtils.isEmpty(androidId) ? "null" : androidId);
             }
-        }catch (Throwable t){
+        } catch (Throwable t) {
             deviceId = "";
         }
 
@@ -140,8 +137,8 @@ public class DeviceImpl {
         String model = "";
         try {
             model = Build.MODEL;
-        }catch (Throwable t){
-           model = "";
+        } catch (Throwable t) {
+            model = "";
         }
         return model;
     }
@@ -196,7 +193,7 @@ public class DeviceImpl {
             } else {
                 macAddress = DEFALT_MAC;
             }
-        }catch (Throwable t){
+        } catch (Throwable t) {
             macAddress = DEFALT_MAC;
         }
         return macAddress;
@@ -226,10 +223,10 @@ public class DeviceImpl {
                     if (buf.length() > 0) {
                         buf.deleteCharAt(buf.length() - 1);
                     }
-                    mac =  buf.toString().toLowerCase(Locale.getDefault());
+                    mac = buf.toString().toLowerCase(Locale.getDefault());
                 }
             }
-        }catch (Throwable t){
+        } catch (Throwable t) {
             mac = DEFALT_MAC;
         }
 
@@ -270,7 +267,7 @@ public class DeviceImpl {
         Process proc = null;
         BufferedInputStream in = null;
         BufferedReader br = null;
-        StringBuilder sb ;
+        StringBuilder sb;
         try {
             sb = new StringBuilder();
             for (int i = 0; i < FILE_LIST.length; i++) {
@@ -315,7 +312,7 @@ public class DeviceImpl {
 
                 Class<?> clazz = Class.forName("android.os");
                 Method method = clazz.getMethod("getSerial");
-                result = (String) method.invoke(null);
+                result = (String)method.invoke(null);
             } else {
                 result = Build.SERIAL;
             }
@@ -324,15 +321,17 @@ public class DeviceImpl {
         }
         return result;
     }
-    private DisplayMetrics getDisplayMetrics(){
+
+    private DisplayMetrics getDisplayMetrics() {
         DisplayMetrics displayMetrics;
         try {
             displayMetrics = mContext.getApplicationContext().getResources().getDisplayMetrics();
-        }catch (Throwable t){
+        } catch (Throwable t) {
             displayMetrics = null;
         }
         return displayMetrics;
     }
+
     /**
      * 分辨率
      */
@@ -340,24 +339,23 @@ public class DeviceImpl {
         String res = "";
         try {
             res = getDisplayMetrics().widthPixels + "-" + getDisplayMetrics().heightPixels;
-        }catch (Throwable t){
+        } catch (Throwable t) {
             res = "";
         }
         return res;
     }
 
-    public String getDotPerInch(){
+    public String getDotPerInch() {
         String dpi = "";
-        try{
+        try {
             dpi = String.valueOf(getDisplayMetrics().densityDpi);
-        }catch (Throwable t){
+        } catch (Throwable t) {
             dpi = "";
         }
         return dpi;
     }
 
-
-  //运营商信息
+    // 运营商信息
 
     /**
      * 运营商名称（中文）,如:中国联通
@@ -395,10 +393,11 @@ public class DeviceImpl {
             TelephonyManager tm = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
             operatorCode = tm.getNetworkOperator();
 
-        }catch (Throwable t){
+        } catch (Throwable t) {
             operatorCode = "";
         }
-        if("00000".equals(operatorCode)) operatorCode = "";
+        if ("00000".equals(operatorCode))
+            operatorCode = "";
         return operatorCode;
     }
 
@@ -410,7 +409,7 @@ public class DeviceImpl {
         try {
             TelephonyManager tm = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
             operatorCode = tm.getNetworkOperatorName();
-        }catch (Throwable t){
+        } catch (Throwable t) {
             operatorCode = "";
         }
         return operatorCode;
@@ -455,8 +454,10 @@ public class DeviceImpl {
             Object imsi1 = m2.invoke(telephony, 0);
             Object imsi2 = m2.invoke(telephony, 1);
             if (imsi1 != null && imsi2 != null) {
-                if(!imsi1.equals(imsi2)) return imsi1 + "|" + imsi2;
-                else return imsi1+"";
+                if (!imsi1.equals(imsi2))
+                    return imsi1 + "|" + imsi2;
+                else
+                    return imsi1 + "";
             } else if (imsi1 == null && imsi2 == null) {
                 return "";
             } else {
@@ -470,7 +471,7 @@ public class DeviceImpl {
         }
         return "";
     }
-//SettingInfoImpl
+    // SettingInfoImpl
 
     /**
      * 推广渠道
@@ -486,7 +487,7 @@ public class DeviceImpl {
         return TPUtils.getAppKey(mContext);
     }
 
-//应用信息SoftwareInfoImpl
+    // 应用信息SoftwareInfoImpl
     private static final String UNKNOW = "";
 
     /**
@@ -596,78 +597,37 @@ public class DeviceImpl {
         }
         return null;
     }
-    //    /**
-//     * 获取eguan id
-//     */
-//    public String getEguanID() {
-//
-//        return null;
-//    }
+    // /**
+    // * 获取eguan id
+    // */
+    // public String getEguanID() {
+    //
+    // return null;
+    // }
 
     /**
      * 获取临时id
      */
     public String getTempID() {
         String id = SoftwareInfo.getInstance().getTempID();
-        if(TextUtils.isEmpty(id)){
-            id = SPHelper.getDefault(mContext).getString(DeviceKeyContacts.DevInfo.TempID,"");
+        if (TextUtils.isEmpty(id)) {
+            id = SPHelper.getDefault(mContext).getString(DeviceKeyContacts.DevInfo.TempID, "");
         }
         return id;
-    }
-
-
-
-
-    // 防止刷量作弊信息PreventCheatImpl
-        /**
-     * 判断是否是模拟器，"0”= 不是模拟器“1”= 是模拟器
-     */
-    public String isSimulator() {
-        try {
-            // 检查设备的设备ID与常见的模拟器ID是否相同,如果相同,则为模拟器
-            if (SimulatorUtils.hasKnownDeviceId(mContext)
-                    // 检查设备的IMSI号与常见的模拟器IMSI是否相同,如果相同,则为模拟器
-                    || SimulatorUtils.hasKnownImsi(mContext)
-                    // 检查设备的板载,品牌,工业设计,硬件等信息是否匹配模拟器的信息,如果相同,则为模拟器
-                    || SimulatorUtils.hasEmulatorBuild(mContext)
-                    // 检查设备的手机号,是否与常见的模拟器加载的手机号相同,如果相同,则为模拟器
-                    || SimulatorUtils.hasKnownPhoneNumber(mContext)
-                    // 检查设备是否有模拟器特有的pipe目录,如果有,则为模拟器
-                    || SimulatorUtils.hasPipes()
-                    // 同上,检查设备是否有模拟器特有的QEmu目录,如果有,则为模拟器
-                    || SimulatorUtils.hasQEmuFiles()
-                    // 同上,检查设备是否有模拟器特有对应的QEmu设备对应的目录,如果有则为模拟器
-                    || SimulatorUtils.hasQEmuDrivers()
-                    // 通过读取proc/net/tcp查看adb是否对应模拟器,如果对应,则为模拟器
-                    || SimulatorUtils.hasEmulatorAdb()
-                    // 检查设备上是否有模拟器目录,如果有,则为模拟器
-                    || SimulatorUtils.hasGenyFiles()
-                    // 检查设备上否有模拟器相关的属性,如果有,且超过5个,则表示为模拟器
-                    || SimulatorUtils.hasQEmuProps(mContext)
-                    // 检查设备上的网络连接状态是否为eth0,如果是,则为模拟器
-                    || SimulatorUtils.hasEmulatorWifi()
-                    // 通过cpu的类型来判断是否为模拟器,如果满足,其中一种类型,则为模拟器
-                    || SimulatorUtils.checkEmulatorByCpuInfo()) {
-                return ONE;
-            }
-        }catch (Throwable t){
-           return ZERO;
-        }
-
-        return ZERO;
     }
 
     /**
      * 判断设备本身、APP、以及工作环境是否是被调试状态，“0”= 不在调试状态“1”= 在调试状态
      */
     public String getDebug() {
-        try{
-            PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(),0);
+        try {
+            PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0);
             ApplicationInfo appinfo = packageInfo.applicationInfo;
-            if(0 != (appinfo.flags & ApplicationInfo.FLAG_DEBUGGABLE)) return ZERO;
-        }catch(Exception e){
-            ELOG.i(e.getMessage()+"  getDebug  ");
-          return ONE;
+            if (0 != (appinfo.flags & ApplicationInfo.FLAG_DEBUGGABLE))
+                return ZERO;
+        } catch (Exception e) {
+            ELOG.i(e.getMessage() + "  getDebug  ");
+            return ONE;
         }
         return ONE;
     }
@@ -676,8 +636,8 @@ public class DeviceImpl {
      * 判断设备的OS是否被劫持，"0”= 没有被劫持“1”= 被劫持
      */
     public String isHijack() {
-        //是否装xpose等
-        return HiJack.byLoadXposedClass() == true ?"1":"0";
+        // 是否装xpose等
+        return HiJack.byLoadXposedClass() == true ? "1" : "0";
     }
 
     /**
@@ -694,25 +654,23 @@ public class DeviceImpl {
         return ONE;
     }
 
-
-   //蓝牙信息BluetoothModuleNameImpl
+    // 蓝牙信息BluetoothModuleNameImpl
 
     /**
      * 蓝牙MAC，如“6c:5c:14:25:be:ba”
      */
     public String getBluetoothMac() {
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-        if(Build.VERSION.SDK_INT < 23){
+        if (Build.VERSION.SDK_INT < 23) {
             return adapter.getAddress();
-        }else{
+        } else {
             String macSerial = "";
             try {
-                Process pp = Runtime.getRuntime().exec(
-                        "cat /sys/class/net/wlan0/address ");
+                Process pp = Runtime.getRuntime().exec("cat /sys/class/net/wlan0/address ");
                 InputStreamReader ir = new InputStreamReader(pp.getInputStream());
                 LineNumberReader input = new LineNumberReader(ir);
                 String str = "";
-                while((str = input.readLine()) !=null ) {
+                while ((str = input.readLine()) != null) {
                     macSerial = str.trim();// 去空格
                     break;
                 }
@@ -721,8 +679,7 @@ public class DeviceImpl {
             }
             if ("".equals(macSerial)) {
                 try {
-                    return FileUtils.loadFileAsString("/sys/class/net/eth0/address")
-                            .toUpperCase().substring(0, 17);
+                    return FileUtils.loadFileAsString("/sys/class/net/eth0/address").toUpperCase(Locale.getDefault()).substring(0, 17);
                 } catch (Exception e) {
                     return "";
                 }
@@ -738,13 +695,12 @@ public class DeviceImpl {
         try {
             BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
             return adapter.getName();
-        }catch (Throwable t){
+        } catch (Throwable t) {
             return "";
         }
     }
 
-    //电池相关信息BatteryModuleNameImpl
-
+    // 电池相关信息BatteryModuleNameImpl
 
     public void processBattery(final Intent intent) {
         try {
@@ -754,20 +710,20 @@ public class DeviceImpl {
             int scale = intent.getIntExtra("scale", 0);
             int plugged = intent.getIntExtra("plugged", 0);
             String technology = intent.getStringExtra("technology");
-            int temperature = intent.getIntExtra("temperature",0);
+            int temperature = intent.getIntExtra("temperature", 0);
             BatteryModuleNameInfo info = BatteryModuleNameInfo.getInstance();
             info.setBatteryStatus(String.valueOf(status));
-            //电源健康状态
+            // 电源健康状态
             info.setBatteryHealth(String.valueOf(health));
-            //电源发前电量
+            // 电源发前电量
             info.setBatteryLevel(String.valueOf(level));
-            //电源总电量
+            // 电源总电量
             info.setBatteryScale(String.valueOf(scale));
-            //电源充电状态
-            info.setBatteryPlugged (String.valueOf(plugged));
-            //电源类型
+            // 电源充电状态
+            info.setBatteryPlugged(String.valueOf(plugged));
+            // 电源类型
             info.setBatteryTechnology(technology);
-            //电池温度
+            // 电池温度
             info.setBatteryTemperature(String.valueOf(temperature));
         } catch (Throwable e) {
 
@@ -776,6 +732,7 @@ public class DeviceImpl {
 
     /**
      * 系统字体大小
+     * 
      * @return
      */
     public String getSystemFontSize() {
@@ -784,12 +741,13 @@ public class DeviceImpl {
             Class<?> activityManagerNative = Class.forName("android.app.ActivityManagerNative");
             Object obj = activityManagerNative.getMethod("getDefault").invoke(activityManagerNative);
             Method method = obj.getClass().getMethod("getConfiguration");
-            mCurConfig = (Configuration) method.invoke(obj);
+            mCurConfig = (Configuration)method.invoke(obj);
             return mCurConfig.fontScale + "";
         } catch (Throwable e) {
             return "0";
         }
     }
+
     public String getSystemHour() {
         ContentResolver cv = mContext.getContentResolver();
         String timeFormat = android.provider.Settings.System.getString(cv, Settings.System.TIME_12_24);
@@ -820,6 +778,7 @@ public class DeviceImpl {
         appendNumber(builder, 2, offsetMinutes % 60);
         return builder.toString();
     }
+
     private void appendNumber(StringBuilder builder, int count, int value) {
         String string = Integer.toString(value);
         for (int i = 0; i < count - string.length(); i++) {
@@ -827,157 +786,178 @@ public class DeviceImpl {
         }
         builder.append(string);
     }
-    //DevFurtherdetailImpl
-    public String getCPUModel(){
+
+    // DevFurtherdetailImpl
+    public String getCPUModel() {
         return Build.CPU_ABI + ":" + Build.CPU_ABI2;
     }
-    public String getBuildId(){
+
+    public String getBuildId() {
         return Build.ID;
     }
-    public String getBuildDisplay(){
+
+    public String getBuildDisplay() {
         return Build.DISPLAY;
     }
-    public String getBuildProduct(){
+
+    public String getBuildProduct() {
         return Build.PRODUCT;
     }
-    public String getBuildDevice(){
+
+    public String getBuildDevice() {
         return Build.DEVICE;
     }
-    public String getBuildBoard(){
+
+    public String getBuildBoard() {
         return Build.BOARD;
     }
-    public String getBuildBootloader(){
+
+    public String getBuildBootloader() {
         return Build.BOOTLOADER;
     }
-    public String getBuildHardware(){
+
+    public String getBuildHardware() {
         return Build.HARDWARE;
     }
-    public String getBuildSupportedAbis(){
-        try{
+
+    public String getBuildSupportedAbis() {
+        try {
             return stringArrayToString(Build.SUPPORTED_ABIS);
-        }catch (Throwable t){
+        } catch (Throwable t) {
             return "";
         }
 
     }
-    public String getBuildSupportedAbis32(){
+
+    public String getBuildSupportedAbis32() {
         try {
             return stringArrayToString(Build.SUPPORTED_32_BIT_ABIS);
-        }catch (Throwable t){
-           return "";
+        } catch (Throwable t) {
+            return "";
         }
 
     }
-    public String getBuildSupportedAbis64(){
+
+    public String getBuildSupportedAbis64() {
         try {
             return stringArrayToString(Build.SUPPORTED_64_BIT_ABIS);
-        }catch (Throwable t){
+        } catch (Throwable t) {
             return "";
         }
 
-
     }
-    public String getBuildType(){
+
+    public String getBuildType() {
         try {
             return Build.TYPE;
-        }catch (Throwable t){
+        } catch (Throwable t) {
             return "";
         }
 
     }
-    public String getBuildTags(){
+
+    public String getBuildTags() {
         try {
             return Build.TAGS;
-        }catch (Throwable t){
+        } catch (Throwable t) {
             return "";
         }
 
     }
-    public String getBuildFingerPrint(){
+
+    public String getBuildFingerPrint() {
         try {
             return Build.FINGERPRINT;
-        }catch (Throwable t){
-           return "";
+        } catch (Throwable t) {
+            return "";
         }
 
     }
-    public String getBuildRadioVersion(){
+
+    public String getBuildRadioVersion() {
         try {
             return Build.getRadioVersion();
-        }catch (Throwable t){
+        } catch (Throwable t) {
             return "";
         }
 
     }
-    public String getBuildIncremental(){
+
+    public String getBuildIncremental() {
         try {
             return Build.VERSION.INCREMENTAL;
-        }catch (Throwable t){
+        } catch (Throwable t) {
             return "";
         }
 
     }
-    public String getBuildBaseOS(){
-        try{
+
+    public String getBuildBaseOS() {
+        try {
             return Build.VERSION.BASE_OS;
-        }catch (Throwable t){
+        } catch (Throwable t) {
             return "";
         }
 
     }
-    public String getBuildSecurityPatch(){
+
+    public String getBuildSecurityPatch() {
         try {
             return Build.VERSION.SECURITY_PATCH;
-        }catch (Throwable t){
+        } catch (Throwable t) {
             return "";
         }
 
     }
-    public int getBuildSdkInt(){
+
+    public int getBuildSdkInt() {
         try {
             return Build.VERSION.SDK_INT;
-        }catch (Throwable t){
+        } catch (Throwable t) {
             return -1;
         }
 
     }
-    public int getBuildPreviewSdkInt(){
+
+    public int getBuildPreviewSdkInt() {
         int value = -1;
         try {
             value = Build.VERSION.PREVIEW_SDK_INT;
-        }catch (Throwable t){
+        } catch (Throwable t) {
             value = -1;
         }
         return value;
     }
-    public String getBuildCodename(){
+
+    public String getBuildCodename() {
         String codeName = "";
         try {
             codeName = Build.VERSION.CODENAME;
-        }catch (Throwable t){
+        } catch (Throwable t) {
             codeName = "";
         }
         return codeName;
     }
-    public String getIDFA(){
+
+    public String getIDFA() {
         String idfa = "";
-       try {
-           new Thread(new Runnable() {
-               public void  run() {
-                   try{
-                       AdvertisingIdClient.AdInfo adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);//阻塞调用，需放在子线程处理
-                       String advertisingId = adInfo.getId();
-                       SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_IDFA, advertisingId).commit();
-                   } catch(Exception e) {
-                   }
-               }
-           }).start();
-           idfa = SPHelper.getDefault(mContext).getString(EGContext.SP_APP_IDFA,"");
-           if(!idfa.isEmpty()){
-               return idfa;
-           }
-       }catch (Throwable t){
-       }
+        try {
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        AdvertisingIdClient.AdInfo adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);// 阻塞调用，需放在子线程处理
+                        String advertisingId = adInfo.getId();
+                        SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_IDFA, advertisingId).commit();
+                    } catch (Exception e) {
+                    }
+                }
+            }).start();
+            idfa = SPHelper.getDefault(mContext).getString(EGContext.SP_APP_IDFA, "");
+            if (!idfa.isEmpty()) {
+                return idfa;
+            }
+        } catch (Throwable t) {
+        }
 
         return idfa;
     }
@@ -999,23 +979,24 @@ public class DeviceImpl {
         }
         return sb.toString();
     }
-    private String stringArrayToString(String[] stringArray){
+
+    private String stringArrayToString(String[] stringArray) {
         StringBuilder sb = null;
         String result = "";
-        try{
+        try {
             sb = new StringBuilder();
-            for(int i = 0; i< stringArray.length;i++){
+            for (int i = 0; i < stringArray.length; i++) {
                 sb.append(stringArray[i]);
                 sb.append(",");
             }
             result = sb.toString();
-            result = result.substring(0,result.length()-1);
-        }catch (Throwable t){
-            ELOG.e(t.getMessage()+" stringArrayToString has an exception.");
+            result = result.substring(0, result.length() - 1);
+        } catch (Throwable t) {
+            ELOG.e(t.getMessage() + " stringArrayToString has an exception.");
             return null;
         }
 
-//        ELOG.e(result.substring(0,result.length()-1)+" ::::::::::stringArrayToString");
+        // ELOG.e(result.substring(0,result.length()-1)+" ::::::::::stringArrayToString");
         return result;
     }
 }

@@ -1,34 +1,33 @@
 package com.analysys.track.internal.impl;
 
-import android.content.Context;
-import android.text.TextUtils;
-import android.util.Base64;
+import java.net.URLEncoder;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.analysys.track.database.TableAppSnapshot;
 import com.analysys.track.database.TableLocation;
 import com.analysys.track.database.TableOCCount;
+import com.analysys.track.database.TableXXXInfo;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
+import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.impl.proc.DataPackaging;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.model.PolicyInfo;
 import com.analysys.track.utils.AESUtils;
 import com.analysys.track.utils.DeflterCompressUtils;
+import com.analysys.track.utils.EGProcesser;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
+import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.RequestUtils;
 import com.analysys.track.utils.TPUtils;
-import com.analysys.track.utils.Utils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
-import com.analysys.track.database.TableXXXInfo;
-import com.analysys.track.internal.Content.EGContext;
 
-import com.analysys.track.utils.NetworkUtils;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.net.URLEncoder;
+import android.content.Context;
+import android.text.TextUtils;
+import android.util.Base64;
 
 public class UploadImpl {
     Context mContext;
@@ -53,43 +52,43 @@ public class UploadImpl {
 
     // 上传数据
     public void upload() {
-        //TODO 单独的自己上传，只能有一个，不能并行上传
+        // TODO 单独的自己上传，只能有一个，不能并行上传
         try {
-            if(TPUtils.isMainThread()){
+            if (TPUtils.isMainThread()) {
                 // 策略处理
                 EThreadPool.execute(new Runnable() {
                     @Override
                     public void run() {
                         try {
                             String uploadInfo = getInfo();
-                            ELOG.i("uploadInfo ::::  "+uploadInfo);
+                            ELOG.i("uploadInfo ::::  " + uploadInfo);
                             if (TextUtils.isEmpty(uploadInfo)) {
                                 return;
                             }
                             boolean isDebugMode = SPHelper.getDebugMode(mContext);
-                            boolean userRTP = PolicyInfo.getInstance().isUseRTP() == 0 ?true:false;
+                            boolean userRTP = PolicyInfo.getInstance().isUseRTP() == 0 ? true : false;
                             String url = "";
                             if (isDebugMode) {
-                                url  = EGContext.TEST_URL;
+                                url = EGContext.TEST_URL;
                             } else {
                                 if (userRTP) {
                                     url = EGContext.USERTP_URL;
                                 } else {
-                                    url = EGContext.RT_URL;//?哪个接口
+                                    url = EGContext.RT_URL;// ?哪个接口
                                 }
                             }
                             handleUpload(url, messageEncrypt(uploadInfo));
-                        }catch (Throwable t){
-                            ELOG.i("EThreadPool upload has an exception:::"+t.getMessage());
+                        } catch (Throwable t) {
+                            ELOG.i("EThreadPool upload has an exception:::" + t.getMessage());
                         }
-                        MessageDispatcher.getInstance(mContext).uploadInfo(EGContext.UPLOAD_CYCLE,false);
+                        MessageDispatcher.getInstance(mContext).uploadInfo(EGContext.UPLOAD_CYCLE, false);
                     }
                 });
 
-            }else{
+            } else {
                 try {
                     String uploadInfo = getInfo();
-                    ELOG.i("sub thread uploadInfo ::::  "+uploadInfo);
+                    ELOG.i("sub thread uploadInfo ::::  " + uploadInfo);
                     if (TextUtils.isEmpty(uploadInfo)) {
                         return;
                     }
@@ -106,12 +105,12 @@ public class UploadImpl {
                         }
                     }
                     handleUpload(url, messageEncrypt(uploadInfo));
-                }catch (Throwable t){
-                    ELOG.i("EThreadPool upload has an exception:::"+t.getMessage());
+                } catch (Throwable t) {
+                    ELOG.i("EThreadPool upload has an exception:::" + t.getMessage());
                 }
-                MessageDispatcher.getInstance(mContext).uploadInfo(EGContext.UPLOAD_CYCLE,false);
+                MessageDispatcher.getInstance(mContext).uploadInfo(EGContext.UPLOAD_CYCLE, false);
             }
-        }catch (Throwable t){
+        } catch (Throwable t) {
         }
 
     }
@@ -236,7 +235,7 @@ public class UploadImpl {
                 String code = object.opt(DeviceKeyContacts.Response.RES_CODE).toString();
                 if (code != null) {
                     if (EGContext.HTTP_SUCCESS.equals(code)) {
-                        Utils.setId(json, mContext);
+                        EGProcesser.setId(json, mContext);
                         // 清除本地数据
                         cleanData();
                         result = true;

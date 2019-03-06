@@ -1,23 +1,23 @@
 package com.analysys.track.internal.impl.proc;
 
-import android.content.Context;
-import android.util.Log;
+import java.util.List;
+import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.analysys.track.database.TableOCCount;
 import com.analysys.track.database.TableOCTemp;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.internal.impl.OCImpl;
+import com.analysys.track.utils.Applist;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.NetworkUtils;
-import com.analysys.track.utils.Utils;
+import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.List;
-import java.util.Map;
+import android.content.Context;
+import android.util.Log;
 
 public class ProcessManager {
     // 是否开启工作
@@ -26,6 +26,7 @@ public class ProcessManager {
 
     private static JSONArray ocList = new JSONArray();
     private static boolean isSaveForScreenOff = false;
+
     public static void setIsCollected(boolean isCollected) {
         ProcessManager.isCollected = isCollected;
     }
@@ -33,7 +34,7 @@ public class ProcessManager {
     public static JSONObject getRunningForegroundApps(Context ctx) {
         isSaveForScreenOff = false;
         JSONArray uploadArray = new JSONArray();
-        while(true) {
+        while (true) {
             if (isCollected) {
                 ELOG.i("start===>" + isCollected);
                 try {
@@ -41,9 +42,9 @@ public class ProcessManager {
                     uploadArray.put(obj);
                     XXXInfo.put("XXXInfo", uploadArray);
                     Log.i("ALL", XXXInfo.toString());
-                   return XXXInfo;
-                }catch (Exception e){
-                    ELOG.i(e.getMessage()+"   getRunningForegroundApps()");
+                    return XXXInfo;
+                } catch (Exception e) {
+                    ELOG.i(e.getMessage() + "   getRunningForegroundApps()");
                 }
             }
             try {
@@ -63,19 +64,20 @@ public class ProcessManager {
         // 保存ProcTemp表中数据至OCInfo表中
         Map<String, String> map = TableOCTemp.getInstance(ctx).queryProcTemp();
         ocList = getOCInfoProcTemp(ctx, map, 0);
-        ELOG.i("dealScreenOff:::::"+ocList);
+        ELOG.i("dealScreenOff:::::" + ocList);
         TableOCCount.getInstance(ctx).insertArray(ocList);
         // 需要对ocList清空
         ocList = null;
         // 清除ProcTemp表
         TableOCTemp.getInstance(ctx).delete();
     }
+
     /**
      * @param map
      * @param type 0 表示锁屏，1表示服务重启
      * @return
      */
-    private static JSONArray getOCInfoProcTemp(Context ctx,Map<String, String> map, int type) {
+    private static JSONArray getOCInfoProcTemp(Context ctx, Map<String, String> map, int type) {
         String endTime = "";
         if (type == 0) {
             endTime = System.currentTimeMillis() + "";
@@ -85,29 +87,32 @@ public class ProcessManager {
         JSONArray ocArray = new JSONArray();
         JSONObject ocInfo;
         try {
-            List list = Utils.getDiffNO(map.size());
-            int i = 0,r = -1;
+            List list = SystemUtils.getDiffNO(map.size());
+            int i = 0, r = -1;
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 i++;
                 r = (Integer)list.get(i);
-                ELOG.i("r  value ...::::"+r);
+                ELOG.i("r  value ...::::" + r);
                 String startTime = entry.getValue();
                 ocInfo = new JSONObject();
                 ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, entry.getKey());
                 ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationOpenTime, startTime);
-                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime, Integer.parseInt(endTime)-r);
+                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime, Integer.parseInt(endTime) - r);
                 ocInfo.put(DeviceKeyContacts.OCInfo.NetworkType, NetworkUtils.getNetworkType(ctx));
                 ocInfo.put(DeviceKeyContacts.OCInfo.CollectionType, "2");
-                ocInfo.put(DeviceKeyContacts.OCInfo.SwitchType,type == 0 ? "2" : "3");
-                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationType,OCImpl.getInstance(ctx).appType(entry.getKey()));
-                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode, Utils.getApplicationVersion(ctx, entry.getKey()));
-                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName, Utils.getApplicationName(ctx,entry.getKey()));
+                ocInfo.put(DeviceKeyContacts.OCInfo.SwitchType, type == 0 ? "2" : "3");
+                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationType,
+                    Applist.getInstance(ctx).getAppType(entry.getKey()));
+                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode,
+                    SystemUtils.getApplicationVersion(ctx, entry.getKey()));
+                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName,
+                    SystemUtils.getApplicationName(ctx, entry.getKey()));
                 // bugfix:上传OC中,关闭时间与开始时间相同,与关闭时间小于开始时间的问题
                 if (startTime != null && endTime != null && Long.valueOf(endTime) > Long.valueOf(startTime)) {
                     ocArray.put(ocInfo);
                 }
             }
-        }catch (Throwable t){
+        } catch (Throwable t) {
 
         }
 

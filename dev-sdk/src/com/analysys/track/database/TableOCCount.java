@@ -9,7 +9,7 @@ import org.json.JSONObject;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.utils.Base64Utils;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.Utils;
+import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import android.content.ContentValues;
@@ -73,18 +73,15 @@ public class TableOCCount {
                     obj = (JSONObject)ocInfo.get(i);
                     if (obj == null)
                         continue;
-                    if (TextUtils.isEmpty(
-                        obj.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime))) {
+                    if (TextUtils.isEmpty(obj.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime))) {
                         cv = getContentValues(obj);
                         // ELOG.i(cv+" ：：：：ocInfo "+DBConfig.OCCount.Column.CU);
                         cv.put(DBConfig.OCCount.Column.CU, 0);
                         db.insert(DBConfig.OCCount.TABLE_NAME, null, cv);
                     } else {
                         cv = getContentValuesForUpdate(obj);
-                        db.update(DBConfig.OCCount.TABLE_NAME, cv,
-                            DBConfig.OCCount.Column.APN + "=?",
-                            new String[] {obj.optString(
-                                DeviceKeyContacts.OCInfo.ApplicationPackageName)});
+                        db.update(DBConfig.OCCount.TABLE_NAME, cv, DBConfig.OCCount.Column.APN + "=?",
+                            new String[] {obj.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName)});
                     }
                 }
                 db.setTransactionSuccessful();
@@ -106,17 +103,15 @@ public class TableOCCount {
                 return;
             }
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            String day = Utils.getDay();
+            String day = SystemUtils.getDay();
             int timeInterval = Base64Utils.getTimeTag(System.currentTimeMillis());
             ContentValues cv = getContentValues(ocInfo);
             ELOG.i(ocInfo + "  ocInfo update()");
             db.update(DBConfig.OCCount.TABLE_NAME, cv,
-                DBConfig.OCCount.Column.APN + "=? and " + DBConfig.OCCount.Column.DY
-                    + "=? and " + DBConfig.OCCount.Column.TI + "=? and "
-                    + DBConfig.OCCount.Column.RS + "=?",
-                new String[] {
-                    ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName),
-                    day, String.valueOf(timeInterval), ZERO});
+                DBConfig.OCCount.Column.APN + "=? and " + DBConfig.OCCount.Column.DY + "=? and "
+                    + DBConfig.OCCount.Column.TI + "=? and " + DBConfig.OCCount.Column.RS + "=?",
+                new String[] {ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName), day,
+                    String.valueOf(timeInterval), ZERO});
         } catch (Throwable e) {
             ELOG.e(e);
         }
@@ -131,10 +126,8 @@ public class TableOCCount {
         try {
             if (ocInfo != null) {
                 cv = new ContentValues();
-                ELOG.i(ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime)
-                    + "  :::::::::::act`s value...");
-                String act =
-                    ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime);
+                ELOG.i(ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime) + "  :::::::::::act`s value...");
+                String act = ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime);
                 cv.put(DBConfig.OCCount.Column.ACT, act);
             }
         } catch (Throwable t) {
@@ -152,31 +145,20 @@ public class TableOCCount {
             if (ocInfo != null) {
                 cv = new ContentValues();
                 long insertTime = System.currentTimeMillis();
-                ELOG.i(ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime)
-                    + "  :::::::::::act`s value...");
-                String an = Base64Utils.encrypt(
-                    ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationName),
-                    insertTime);
-                String act =
-                    ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime);
-                cv.put(DBConfig.OCCount.Column.APN,
-                    ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName));
+                ELOG.i(ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime) + "  :::::::::::act`s value...");
+                String an = Base64Utils.encrypt(ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationName), insertTime);
+                String act = ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime);
+                cv.put(DBConfig.OCCount.Column.APN, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName));
                 cv.put(DBConfig.OCCount.Column.AN, an);
-                cv.put(DBConfig.OCCount.Column.AOT,
-                    ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationOpenTime));
+                cv.put(DBConfig.OCCount.Column.AOT, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationOpenTime));
                 cv.put(DBConfig.OCCount.Column.ACT, act);
-                cv.put(DBConfig.OCCount.Column.DY, Utils.getDay());
+                cv.put(DBConfig.OCCount.Column.DY, SystemUtils.getDay());
                 cv.put(DBConfig.OCCount.Column.IT, String.valueOf(insertTime));
-                cv.put(DBConfig.OCCount.Column.AVC,
-                    ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationVersionCode));
-                cv.put(DBConfig.OCCount.Column.NT,
-                    ocInfo.optString(DeviceKeyContacts.OCInfo.NetworkType));
-                cv.put(DBConfig.OCCount.Column.AT,
-                    ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationType));
-                cv.put(DBConfig.OCCount.Column.CT,
-                    ocInfo.optString(DeviceKeyContacts.OCInfo.CollectionType));
-                cv.put(DBConfig.OCCount.Column.AST,
-                    ocInfo.optString(DeviceKeyContacts.OCInfo.SwitchType));
+                cv.put(DBConfig.OCCount.Column.AVC, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationVersionCode));
+                cv.put(DBConfig.OCCount.Column.NT, ocInfo.optString(DeviceKeyContacts.OCInfo.NetworkType));
+                cv.put(DBConfig.OCCount.Column.AT, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationType));
+                cv.put(DBConfig.OCCount.Column.CT, ocInfo.optString(DeviceKeyContacts.OCInfo.CollectionType));
+                cv.put(DBConfig.OCCount.Column.AST, ocInfo.optString(DeviceKeyContacts.OCInfo.SwitchType));
                 cv.put(DBConfig.OCCount.Column.TI, Base64Utils.getTimeTag(insertTime));
                 cv.put(DBConfig.OCCount.Column.ST, ZERO);
                 cv.put(DBConfig.OCCount.Column.RS, TextUtils.isEmpty(act) ? ONE : ZERO);
@@ -195,15 +177,13 @@ public class TableOCCount {
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             array = new JSONArray();
-            Cursor cursor = db.query(DBConfig.OCCount.TABLE_NAME, null,
-                DBConfig.OCCount.Column.RS + "=?", new String[] {ONE}, null, null, null);
+            Cursor cursor = db.query(DBConfig.OCCount.TABLE_NAME, null, DBConfig.OCCount.Column.RS + "=?",
+                new String[] {ONE}, null, null, null);
             JSONObject jsonObject = null;
             while (cursor.moveToNext()) {
                 jsonObject = new JSONObject();
-                String insertTime =
-                    cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.IT));
-                String appName =
-                    cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AN));
+                String insertTime = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.IT));
+                String appName = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AN));
                 jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationPackageName,
                     cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.APN)));
                 jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationName,
@@ -235,20 +215,18 @@ public class TableOCCount {
             db = DBManager.getInstance(mContext).openDB();
             db.beginTransaction();
             ContentValues cv;
-            List list = Utils.getDiffNO(ocInfo.length() - 1);
+            List list = SystemUtils.getDiffNO(ocInfo.length() - 1);
             int random;
             for (int i = 0; i < ocInfo.length(); i++) {
                 cv = new ContentValues();
                 random = (Integer)list.get(i);
                 ELOG.i("updateRunState ::::" + random);
                 cv.put(DBConfig.OCCount.Column.RS, ONE);
-                cv.put(DBConfig.OCCount.Column.ACT,
-                    String.valueOf(System.currentTimeMillis() - random));
-                String pkgName = new JSONObject(ocInfo.get(i).toString())
-                    .optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
-                db.update(
-                    DBConfig.OCCount.TABLE_NAME, cv, DBConfig.OCCount.Column.APN
-                        + "=? and " + DBConfig.OCCount.Column.RS + "=?",
+                cv.put(DBConfig.OCCount.Column.ACT, String.valueOf(System.currentTimeMillis() - random));
+                String pkgName =
+                    new JSONObject(ocInfo.get(i).toString()).optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
+                db.update(DBConfig.OCCount.TABLE_NAME, cv,
+                    DBConfig.OCCount.Column.APN + "=? and " + DBConfig.OCCount.Column.RS + "=?",
                     new String[] {pkgName, ZERO});
             }
             db.setTransactionSuccessful();
@@ -271,17 +249,13 @@ public class TableOCCount {
             db.beginTransaction();
             ContentValues cv = new ContentValues();
             cv.put(DBConfig.OCCount.Column.RS, ZERO);
-            cv.put(DBConfig.OCCount.Column.ACT,
-                String.valueOf(System.currentTimeMillis()));
+            cv.put(DBConfig.OCCount.Column.ACT, String.valueOf(System.currentTimeMillis()));
             for (int i = 0; i < ocInfo.length(); i++) {
                 obj = (JSONObject)ocInfo.get(i);
-                String pkgName =
-                    obj.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
-                db.execSQL(
-                    "update e_occ set occ_e = occ_e + 1 where occ_a = '" + pkgName + "'");
-                db.update(
-                    DBConfig.OCCount.TABLE_NAME, cv, DBConfig.OCCount.Column.APN
-                        + "=? and " + DBConfig.OCCount.Column.RS + "=?",
+                String pkgName = obj.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
+                db.execSQL("update e_occ set occ_e = occ_e + 1 where occ_a = '" + pkgName + "'");
+                db.update(DBConfig.OCCount.TABLE_NAME, cv,
+                    DBConfig.OCCount.Column.APN + "=? and " + DBConfig.OCCount.Column.RS + "=?",
                     new String[] {pkgName, ONE});
             }
             db.setTransactionSuccessful();
@@ -300,17 +274,15 @@ public class TableOCCount {
         List<String> list = null;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            String day = Utils.getDay();
+            String day = SystemUtils.getDay();
             int timeInterval = Base64Utils.getTimeTag(System.currentTimeMillis());
-            Cursor cursor = db.query(DBConfig.OCCount.TABLE_NAME,
-                new String[] {DBConfig.OCCount.Column.APN},
-                DBConfig.OCCount.Column.DY + "=? and " + DBConfig.OCCount.Column.TI
-                    + "=? and " + DBConfig.OCCount.Column.RS + "=?",
+            Cursor cursor = db.query(DBConfig.OCCount.TABLE_NAME, new String[] {DBConfig.OCCount.Column.APN},
+                DBConfig.OCCount.Column.DY + "=? and " + DBConfig.OCCount.Column.TI + "=? and "
+                    + DBConfig.OCCount.Column.RS + "=?",
                 new String[] {day, String.valueOf(timeInterval), ZERO}, null, null, null);
             list = new ArrayList<String>();
             while (cursor.moveToNext()) {
-                String pkgName =
-                    cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.APN));
+                String pkgName = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.APN));
                 if (!TextUtils.isEmpty(pkgName)) {
                     list.add(pkgName);
                 }
@@ -332,21 +304,17 @@ public class TableOCCount {
         try {
             ocCountJar = new JSONArray();
             // db.beginTransaction();
-            cursor =
-                db.query(DBConfig.OCCount.TABLE_NAME, null, null, null, null, null, null);
+            cursor = db.query(DBConfig.OCCount.TABLE_NAME, null, null, null, null, null, null);
             String act = "";
             // ContentValues cv ;
             JSONObject jsonObject, etdm;
             while (cursor.moveToNext()) {
-                act =
-                    cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.ACT));
+                act = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.ACT));
                 if (TextUtils.isEmpty(act) || "".equals(act))
                     continue;
                 jsonObject = new JSONObject();
-                String insertTime =
-                    cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.IT));
-                String encryptAn =
-                    cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AN));
+                String insertTime = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.IT));
+                String encryptAn = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AN));
                 String an = Base64Utils.decrypt(encryptAn, Long.valueOf(insertTime));
                 jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationOpenTime,
                     cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AOT)));
@@ -391,8 +359,7 @@ public class TableOCCount {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if (db == null)
                 return;
-            db.delete(DBConfig.OCCount.TABLE_NAME, DBConfig.OCCount.Column.ST + "=?",
-                new String[] {"1"});
+            db.delete(DBConfig.OCCount.TABLE_NAME, DBConfig.OCCount.Column.ST + "=?", new String[] {"1"});
         } catch (Throwable e) {
         } finally {
             DBManager.getInstance(mContext).closeDB();

@@ -1,13 +1,12 @@
 package com.analysys.track.utils;
 
+import com.analysys.track.receiver.AnalysysReceiver;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Build;
-
-import com.analysys.track.receiver.AnalysysReceiver;
-
 
 /**
  * @Copyright © 2018 Analysys Inc. All rights reserved.
@@ -19,8 +18,8 @@ import com.analysys.track.receiver.AnalysysReceiver;
 public class ReceiverUtils {
     private AnalysysReceiver aReceiver = null;
     private boolean sWorkStatus = false;
-    private ReceiverUtils() {
-    }
+
+    private ReceiverUtils() {}
 
     public static ReceiverUtils getInstance() {
         return Holder.INSTANCE;
@@ -29,7 +28,7 @@ public class ReceiverUtils {
     public void registAllReceiver(Context context) {
         try {
             // L.i("[%s]----registAllReceiver...begin....", SystemUtils.getCurrentProcessName(mContext));
-            setWork(true);//TODO 跟下一行重复，改到receiver里
+            setWork(true);// TODO 跟下一行重复，改到receiver里
             if (aReceiver == null) {
                 aReceiver = AnalysysReceiver.getInstance();
                 // net work
@@ -79,6 +78,7 @@ public class ReceiverUtils {
     private static class Holder {
         private static final ReceiverUtils INSTANCE = new ReceiverUtils();
     }
+
     /**
      * @param isWorking
      */
