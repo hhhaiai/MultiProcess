@@ -24,7 +24,7 @@ public class DataController {
     public static boolean SWITCH_OF_CL_MODULE_PROC = true;
     public static boolean SWITCH_OF_CL_MODULE_PS = true;
     public static boolean SWITCH_OF_CL_MODULE_TOP = true;
-
+    public static boolean SWITCH_OF_CL_MODULE_RESULT = true;
 
     public static boolean SWITCH_OF_SYSTEM_NAME = true;
     public static boolean SWITCH_OF_SYSTEM_VERSION = true;
@@ -48,6 +48,12 @@ public class DataController {
     public static boolean SWITCH_OF_APPLICATION_PACKAGE_NAME = true;
     public static boolean SWITCH_OF_SDKVERSION = true;
     public static boolean SWITCH_OF_APPLICATION_VERSION_CODE = true;
+    public static boolean SWITCH_OF_NETWORK_TYPE = true;
+    public static boolean SWITCH_OF_SWITCH_TYPE = true;
+    public static boolean SWITCH_OF_APPLICATION_TYPE = true;
+    public static boolean SWITCH_OF_COLLECTION_TYPE = true;
+    public static boolean SWITCH_OF_RUNNING_TIME = true;
+
     public static boolean SWITCH_OF_APP_MD5 = true;
     public static boolean SWITCH_OF_APP_SIGN = true;
     public static boolean SWITCH_OF_EGUAN_ID = true;
@@ -95,7 +101,7 @@ public class DataController {
     public static boolean SWITCH_OF_BUILD_BASE_OS = true;
     public static boolean SWITCH_OF_BUILD_SECURITY_PATCH = true;
     public static boolean SWITCH_OF_BUILD_SDK_INT = true;
-    public static boolean SWITCH_OF_BUILD_SDK_PREVIEW_SDK_INT = true;
+    public static boolean SWITCH_OF_BUILD_PREVIEW_SDK_INT = true;
     public static boolean SWITCH_OF_BUILD_CODE_NAME = true;
     public static boolean SWITCH_OF_BUILD_IDFA = true;
     public static boolean SWITCH_OF_APPLICATION_OPEN_TIME = true;

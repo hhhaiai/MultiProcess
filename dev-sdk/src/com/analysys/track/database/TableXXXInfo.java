@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 import android.util.Base64;
 
 import com.analysys.track.internal.Content.DataController;
@@ -12,6 +13,7 @@ import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.impl.PolicyImpl;
 import com.analysys.track.internal.impl.proc.ProcParser;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.Utils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
@@ -99,6 +101,7 @@ public class TableXXXInfo {
     public JSONArray select(){
         JSONArray procArray, array;
         Cursor cursor = null,curProc = null;
+        int blankCount = 0;
         try {
             procArray = new JSONArray();
             array = new JSONArray();
@@ -108,13 +111,17 @@ public class TableXXXInfo {
                     null, null, null);
             JSONObject jsonObject = null;
             while (cursor.moveToNext()) {
+                if(blankCount >= EGContext.BLANK_COUNT_MAX){
+                    return array;
+                }
                 jsonObject = new JSONObject();
                 String time = cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TIME));
-                jsonObject.put(ProcParser.RUNNING_TIME,time);
-                if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_CL_MODULE_TOP,DataController.SWITCH_OF_CL_MODULE_TOP))
-                jsonObject.put(ProcParser.RUNNING_TOP,new String(Base64.encode(cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TOP)).getBytes(),Base64.DEFAULT)));
-                if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_CL_MODULE_PS,DataController.SWITCH_OF_CL_MODULE_PS))
-                jsonObject.put(ProcParser.RUNNING_PS,new String(Base64.encode(cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PS)).getBytes(),Base64.DEFAULT)));
+                if(TextUtils.isEmpty(time)){
+                    blankCount++;
+                }
+                Utils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_TIME,time,DataController.SWITCH_OF_RUNNING_TIME);
+                Utils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_TOP,new String(Base64.encode(cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TOP)).getBytes(),Base64.DEFAULT)),DataController.SWITCH_OF_CL_MODULE_TOP);
+                Utils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_PS,new String(Base64.encode(cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PS)).getBytes(),Base64.DEFAULT)),DataController.SWITCH_OF_CL_MODULE_PS);
 //                curProc1 = db.query(DBConfig.PROCInfo.TABLE_NAME,null,null,null,null,null,null);
 //                ELOG.i(curProc1+"    :::::::::::curProc1   "+ curProc1.getCount());
                 curProc = db.query(DBConfig.PROCInfo.TABLE_NAME, new String[] {DBConfig.PROCInfo.Column.CONTENT},
@@ -123,17 +130,20 @@ public class TableXXXInfo {
 //                    ELOG.i("content :::::::::::::::::::::     "+curProc.getColumnIndex(DBConfig.PROCInfo.Column.CONTENT));
                     procArray.put(new JSONObject(curProc.getString(curProc.getColumnIndex(DBConfig.PROCInfo.Column.CONTENT))));
                 }
-                if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_CL_MODULE_PROC,DataController.SWITCH_OF_CL_MODULE_PROC))
-                jsonObject.put(ProcParser.RUNNING_PROC,new String(Base64.encode(procArray.toString().getBytes(),Base64.DEFAULT)));
-                jsonObject.put(ProcParser.RUNNING_RESULT,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.RESULT)));
+                Utils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_PROC,new String(Base64.encode(procArray.toString().getBytes(),Base64.DEFAULT)),DataController.SWITCH_OF_CL_MODULE_PROC);
+                Utils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_RESULT,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.RESULT)),DataController.SWITCH_OF_CL_MODULE_RESULT);
                 array.put(jsonObject);
             }
         } catch (Exception e) {
             ELOG.e(e.getMessage()+"  TableXXXInfo select() has an exception... ");
             array = null;
         }finally {
-            if(curProc != null) curProc.close();
-            if(cursor != null) cursor.close();
+            if(curProc != null){
+                curProc.close();
+            }
+            if(cursor != null){
+                cursor.close();
+            }
             DBManager.getInstance(mContext).closeDB();
         }
         return array;

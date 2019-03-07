@@ -12,9 +12,11 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
@@ -339,4 +341,48 @@ public class Utils {
         }
         return list;
     }
+
+    /**
+     * 过滤掉value为空的数据
+     * @param json
+     * @param key
+     * @param value
+     * @param SPDefaultValue
+     */
+    public static void pushToJSON(Context mContext, JSONObject json, String key, Object value,boolean SPDefaultValue) {
+        try {
+            if (SPHelper.getDefault(mContext).getBoolean(key ,SPDefaultValue) && !TextUtils.isEmpty(value.toString()) && !"unknown".equalsIgnoreCase(value.toString())) {
+                if (!json.has(key)) {
+                    json.put(key, value);
+                }
+            }
+        } catch (Throwable e) {
+        }
+    }
+
+//    /**
+//     * 过滤掉value为空的数据
+//     */
+//    public static void pushToMap(Map<String, Object> map, String key, String value) {
+//        try {
+//            if (!Utils.isEmpty(key) && !Utils.isEmpty(value)) {
+//                map.put(key, value);
+//            }
+//        } catch (Throwable e) {
+//        }
+//    }
+
+//    /**
+//     * 过滤掉value为-1的数据
+//     */
+//    public static void pushToJSON(JSONObject json, String key, int value) {
+//        try {
+//            if (value != -1) {
+//                if (!json.has(key)) {
+//                    json.put(key, value);
+//                }
+//            }
+//        } catch (Throwable e) {
+//        }
+//    }
 }

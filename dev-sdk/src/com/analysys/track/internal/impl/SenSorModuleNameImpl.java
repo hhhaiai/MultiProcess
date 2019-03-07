@@ -3,10 +3,13 @@ package com.analysys.track.internal.impl;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.text.TextUtils;
 
+import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -40,27 +43,47 @@ public class SenSorModuleNameImpl{
             for (int i = 0; i < sensorList.size(); i++) {
                 Sensor s = sensorList.get(i);
                 info = new JSONObject();
-                // 传感器名称
-                info.put(DeviceKeyContacts.DevInfo.SenSorName,s.getName());
+                if(SPHelper.getDefault(mContext).getBoolean(DeviceKeyContacts.DevInfo.SenSorName ,DataController.SWITCH_OF_SENSOR_NAME) && !TextUtils.isEmpty(s.getName())){
+                    // 传感器名称
+                    info.put(DeviceKeyContacts.DevInfo.SenSorName,s.getName());
+                }
+
 //                ELOG.i("SenSorName :::::::"+s.getName());
                 // 传感器版本
-                info.put(DeviceKeyContacts.DevInfo.SenSorVersion,String.valueOf(s.getVersion()));
+                if(SPHelper.getDefault(mContext).getBoolean(DeviceKeyContacts.DevInfo.SenSorVersion ,DataController.SWITCH_OF_SENSOR_VERSION) && !TextUtils.isEmpty(String.valueOf(s.getVersion()))){
+                    // 传感器名称
+                    info.put(DeviceKeyContacts.DevInfo.SenSorVersion,String.valueOf(s.getVersion()));
+                }
+
                 // 传感器厂商
-                info.put(DeviceKeyContacts.DevInfo.SenSorManufacturer,s.getVendor());
+                if(SPHelper.getDefault(mContext).getBoolean(DeviceKeyContacts.DevInfo.SenSorManufacturer ,DataController.SWITCH_OF_SENSOR_MANUFACTURER) && !TextUtils.isEmpty(s.getVendor())){
+                    // 传感器名称
+                    info.put(DeviceKeyContacts.DevInfo.SenSorManufacturer,s.getVendor());
+                }
                 try{
                     // 传感器id
-                    info.put(DeviceKeyContacts.DevInfo.SenSorId,s.getId());
+                    if(SPHelper.getDefault(mContext).getBoolean(DeviceKeyContacts.DevInfo.SenSorId ,DataController.SWITCH_OF_SENSOR_ID)){
+                        // 传感器名称
+                        info.put(DeviceKeyContacts.DevInfo.SenSorId,s.getId());
+                    }
                 }catch (Throwable t1){
                 }
                 try {
                     //当传感器是唤醒状态返回true
-                    info.put(DeviceKeyContacts.DevInfo.SenSorWakeUpSensor,s.isWakeUpSensor());
+                    if(SPHelper.getDefault(mContext).getBoolean(DeviceKeyContacts.DevInfo.SenSorWakeUpSensor ,DataController.SWITCH_OF_SENSOR_WAKEUPSENSOR)){
+                        // 传感器名称
+                        info.put(DeviceKeyContacts.DevInfo.SenSorWakeUpSensor,s.isWakeUpSensor());
+                    }
                 }catch (Throwable t){
                     //当传感器是唤醒状态返回true
-                    info.put(DeviceKeyContacts.DevInfo.SenSorWakeUpSensor,false);
+                    if(SPHelper.getDefault(mContext).getBoolean(DeviceKeyContacts.DevInfo.SenSorWakeUpSensor ,DataController.SWITCH_OF_SENSOR_WAKEUPSENSOR)){
+                        info.put(DeviceKeyContacts.DevInfo.SenSorWakeUpSensor,false);
+                    }
                 }
                 // 传感器耗电量
-                info.put(DeviceKeyContacts.DevInfo.SenSorPower,s.getPower());
+                if(SPHelper.getDefault(mContext).getBoolean(DeviceKeyContacts.DevInfo.SenSorPower ,DataController.SWITCH_OF_SENSOR_POWER)) {
+                    info.put(DeviceKeyContacts.DevInfo.SenSorPower, s.getPower());
+                }
 //                ELOG.i("传感器信息：：：：："+info);
                 senSorArray.put(info);
             }

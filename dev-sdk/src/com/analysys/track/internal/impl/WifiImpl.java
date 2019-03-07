@@ -5,6 +5,8 @@ import android.content.Context;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 
+import com.analysys.track.internal.Content.DataController;
+import com.analysys.track.utils.Utils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 
@@ -53,18 +55,17 @@ public class WifiImpl {
                         if (i < 5) {
                             ScanResult s = list.get(i);
                             JSONObject jsonObject = new JSONObject();
-                            jsonObject.put(DeviceKeyContacts.LocationInfo.WifiInfo.SSID, s.SSID);
-                            jsonObject.put(DeviceKeyContacts.LocationInfo.WifiInfo.BSSID, s.BSSID);
-                            jsonObject.put(DeviceKeyContacts.LocationInfo.WifiInfo.Level, s.level);
-                            jsonObject.put(DeviceKeyContacts.LocationInfo.WifiInfo.Capabilities, s.capabilities);
-                            jsonObject.put(DeviceKeyContacts.LocationInfo.WifiInfo.Frequency, s.frequency);
-
+                            Utils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.WifiInfo.SSID, s.SSID,DataController.SWITCH_OF_SSID);
+                            Utils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.WifiInfo.BSSID, s.BSSID,DataController.SWITCH_OF_BSSID);
+                            Utils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.WifiInfo.Level, s.level,DataController.SWITCH_OF_LEVEL);
+                            Utils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.WifiInfo.Capabilities, s.capabilities,DataController.SWITCH_OF_CAPABILITIES);
+                            Utils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.WifiInfo.Frequency, s.frequency,DataController.SWITCH_OF_FREQUENCY);
                             jar.put(jsonObject);
                         }
                     }
                 }
             }
-        } catch (JSONException e) {
+        } catch (Throwable e) {
         }
         return jar;
     }

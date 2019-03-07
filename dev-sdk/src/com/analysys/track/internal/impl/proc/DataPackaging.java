@@ -12,6 +12,7 @@ import com.analysys.track.internal.impl.PolicyImpl;
 import com.analysys.track.internal.impl.SenSorModuleNameImpl;
 import com.analysys.track.model.BatteryModuleNameInfo;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.Utils;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -32,86 +33,50 @@ public class DataPackaging {
         JSONObject deviceInfo = new JSONObject();
         try {
             DeviceImpl devImpl = DeviceImpl.getInstance(mContext);
-            if(SPHelper.getDefault(mContext).getBoolean(DeviceKeyContacts.DevInfo.SystemName,DataController.SWITCH_OF_SYSTEM_NAME) && !TextUtils.isEmpty(devImpl.getSystemName()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.SystemName, devImpl.getSystemName());
-            if(SPHelper.getDefault(mContext).getBoolean(DeviceKeyContacts.DevInfo.SystemVersion,DataController.SWITCH_OF_SYSTEM_VERSION) && !TextUtils.isEmpty(devImpl.getSystemVersion()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.SystemVersion, devImpl.getSystemVersion());
-            if(!TextUtils.isEmpty(devImpl.getDeviceBrand()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.DeviceBrand, devImpl.getDeviceBrand());
-            if(!TextUtils.isEmpty(devImpl.getDeviceId()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.DeviceId, devImpl.getDeviceId());
-            if(!TextUtils.isEmpty(devImpl.getDeviceModel()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.DeviceModel, devImpl.getDeviceModel());
-            if(!TextUtils.isEmpty(devImpl.getMac()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.MAC, devImpl.getMac());
-            if(!TextUtils.isEmpty(devImpl.getSerialNumber()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.SerialNumber, devImpl.getSerialNumber());
-            if(!TextUtils.isEmpty(devImpl.getResolution()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.Resolution, devImpl.getResolution());//系统分辨率
-            if(!TextUtils.isEmpty(devImpl.getDotPerInch()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.DotPerInch, devImpl.getDotPerInch());
-            if(!TextUtils.isEmpty(devImpl.getMobileOperator()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.MobileOperator, devImpl.getMobileOperator());
-            if(!TextUtils.isEmpty(devImpl.getMobileOperatorName()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.MobileOperatorName, devImpl.getMobileOperatorName());
-            if(!TextUtils.isEmpty(devImpl.getNetworkOperatorCode()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.NetworkOperatorCode, devImpl.getNetworkOperatorCode());
-            if(!TextUtils.isEmpty(devImpl.getNetworkOperatorName()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.NetworkOperatorName, devImpl.getNetworkOperatorName());
-            if(!TextUtils.isEmpty(devImpl.getIMEIS()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.Imeis, devImpl.getIMEIS());//获取IMEI,一个或者两个?是否有三卡的?
-            if(!TextUtils.isEmpty(devImpl.getIMSIS()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.Imsis, devImpl.getIMSIS());
-            if(!TextUtils.isEmpty(devImpl.getApplicationChannel()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.ApplicationChannel, devImpl.getApplicationChannel());
-            if(!TextUtils.isEmpty(devImpl.getApplicationKey()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.ApplicationKey, devImpl.getApplicationKey());
-            if(!TextUtils.isEmpty(devImpl.getApplicationName()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.ApplicationName, devImpl.getApplicationName());
-            if(!TextUtils.isEmpty(devImpl.getAPILevel()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.APILevel, devImpl.getAPILevel());
-            if(!TextUtils.isEmpty(devImpl.getApplicationPackageName()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.ApplicationPackageName, devImpl.getApplicationPackageName());
-            if(!TextUtils.isEmpty(devImpl.getSdkVersion()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.SDKVersion, devImpl.getSdkVersion());
-            if(!TextUtils.isEmpty(devImpl.getApplicationVersionCode()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.ApplicationVersionCode, devImpl.getApplicationVersionCode());
-            if(!TextUtils.isEmpty(devImpl.getAppMD5()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.AppMD5, devImpl.getAppMD5());
-            if(!TextUtils.isEmpty(devImpl.getAppSign()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.AppSign, devImpl.getAppSign());
-            if(!TextUtils.isEmpty(devImpl.getTempID()))
-            deviceInfo.put(DeviceKeyContacts.DevInfo.TempID, devImpl.getTempID());
-//            ELOG.i("deviceInfo ::::::"+deviceInfo);
+            //JSONObject json, String key, String value,String SPKey
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.SystemName, devImpl.getSystemName(),DataController.SWITCH_OF_SYSTEM_NAME);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.SystemVersion, devImpl.getSystemVersion(),DataController.SWITCH_OF_SYSTEM_VERSION);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.DeviceBrand, devImpl.getDeviceBrand(),DataController.SWITCH_OF_DEVICE_BRAND);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.DeviceId, devImpl.getDeviceId(),DataController.SWITCH_OF_DEVICE_ID);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.DeviceModel, devImpl.getDeviceModel(),DataController.SWITCH_OF_DEVICE_MODEL);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.MAC, devImpl.getMac(),DataController.SWITCH_OF_MAC);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.SerialNumber, devImpl.getSerialNumber(),DataController.SWITCH_OF_SERIALNUMBER);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Resolution, devImpl.getResolution(),DataController.SWITCH_OF_RESOLUTION);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.DotPerInch, devImpl.getDotPerInch(),DataController.SWITCH_OF_DOTPERINCH);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.MobileOperator, devImpl.getMobileOperator(),DataController.SWITCH_OF_MOBILE_OPERATOR);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.MobileOperatorName, devImpl.getMobileOperatorName(),DataController.SWITCH_OF_MOBILE_OPERATOR_NAME);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.NetworkOperatorCode, devImpl.getNetworkOperatorCode(),DataController.SWITCH_OF_NETWORK_OPERATOR_CODE);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.NetworkOperatorName, devImpl.getNetworkOperatorName(),DataController.SWITCH_OF_NETWORK_OPERATOR_NAME);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Imeis, devImpl.getIMEIS(),DataController.SWITCH_OF_IMEIS);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Imsis, devImpl.getIMSIS(),DataController.SWITCH_OF_IMSIS);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationChannel, devImpl.getApplicationChannel(),DataController.SWITCH_OF_APPLICATION_CHANNEL);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationKey, devImpl.getApplicationKey(),DataController.SWITCH_OF_APPLICATION_KEY);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationName, devImpl.getApplicationName(),DataController.SWITCH_OF_APPLICATION_NAME);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.APILevel, devImpl.getAPILevel(),DataController.SWITCH_OF_APILEVEL);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationPackageName, devImpl.getApplicationPackageName(),DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.SDKVersion, devImpl.getSdkVersion(),DataController.SWITCH_OF_SDKVERSION);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationVersionCode, devImpl.getApplicationVersionCode(),DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.AppMD5, devImpl.getAppMD5(),DataController.SWITCH_OF_APP_MD5);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.AppSign, devImpl.getAppSign(),DataController.SWITCH_OF_APP_SIGN);
+            Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.TempID, devImpl.getTempID(),DataController.SWITCH_OF_TEMP_ID);
 
             if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_DEV_CHECK,DataController.SWITCH_OF_MODULE_CL_DEV_CHECK)) {
-                if(!TextUtils.isEmpty(devImpl.isSimulator()))
-                deviceInfo.put(DeviceKeyContacts.DevInfo.Simulator, devImpl.isSimulator());
-                if(!TextUtils.isEmpty(devImpl.getDebug()))
-                deviceInfo.put(DeviceKeyContacts.DevInfo.Debug, devImpl.getDebug());
-                if(!TextUtils.isEmpty(devImpl.isHijack()))
-                deviceInfo.put(DeviceKeyContacts.DevInfo.Hijack, devImpl.isHijack());//0表示没有被劫持,1表示被劫持
-                if(!TextUtils.isEmpty(devImpl.IsRoot()))
-                deviceInfo.put(DeviceKeyContacts.DevInfo.IsRoot, devImpl.IsRoot());
+                Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Simulator, devImpl.isSimulator(),DataController.SWITCH_OF_SIMULATOR);
+                Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Debug, devImpl.getDebug(),DataController.SWITCH_OF_DEBUG);
+                Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Hijack, devImpl.isHijack(),DataController.SWITCH_OF_HIJACK);
+                Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.IsRoot, devImpl.IsRoot(),DataController.SWITCH_OF_IS_ROOT);
             }
 
             if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BLUETOOTH,DataController.SWITCH_OF_MODULE_CL_BLUETOOTH)) {
-                if(!TextUtils.isEmpty(devImpl.getBluetoothMac()))
-                deviceInfo.put(DeviceKeyContacts.DevInfo.BluetoothMac, devImpl.getBluetoothMac());
-                if(!TextUtils.isEmpty(devImpl.getBluetoothName()))
-                deviceInfo.put(DeviceKeyContacts.DevInfo.BluetoothName, devImpl.getBluetoothName());
+                Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.BluetoothMac, devImpl.getBluetoothMac(),DataController.SWITCH_OF_BLUETOOTH_MAC);
+                Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.BluetoothName, devImpl.getBluetoothName(),DataController.SWITCH_OF_BLUETOOTH_NAME);
             }
             if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_KEEP_INFO,DataController.SWITCH_OF_MODULE_CL_KEEP_INFO)) {
-                if(!TextUtils.isEmpty(devImpl.getSystemFontSize()))
-                deviceInfo.put(DeviceKeyContacts.DevInfo.SystemFontSize, devImpl.getSystemFontSize());
-                if(!TextUtils.isEmpty(devImpl.getSystemHour()))
-                deviceInfo.put(DeviceKeyContacts.DevInfo.SystemHour, devImpl.getSystemHour());
-                if(!TextUtils.isEmpty(devImpl.getSystemLanguage()))
-                deviceInfo.put(DeviceKeyContacts.DevInfo.SystemLanguage, devImpl.getSystemLanguage());
-                if(!TextUtils.isEmpty(devImpl.getSystemArea()))
-                deviceInfo.put(DeviceKeyContacts.DevInfo.SystemArea, devImpl.getSystemArea());
-                if(!TextUtils.isEmpty(devImpl.getTimeZone()))
-                deviceInfo.put(DeviceKeyContacts.DevInfo.TimeZone, devImpl.getTimeZone());
+                Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.SystemFontSize, devImpl.getSystemFontSize(),DataController.SWITCH_OF_SYSTEM_FONT_SIZE);
+                Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.SystemHour, devImpl.getSystemHour(),DataController.SWITCH_OF_SYSTEM_HOUR);
+                Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.SystemLanguage, devImpl.getSystemLanguage(),DataController.SWITCH_OF_SYSTEM_LANGUAGE);
+                Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.SystemArea, devImpl.getSystemArea(),DataController.SWITCH_OF_SYSTEM_AREA);
+                Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.TimeZone, devImpl.getTimeZone(),DataController.SWITCH_OF_TIMEZONE);
             }
             if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SENSOR,DataController.SWITCH_OF_MODULE_CL_SENSOR)){
                 JSONArray senSorArray = SenSorModuleNameImpl.getInstance(mContext).getSensorInfo();
@@ -123,61 +88,40 @@ public class DataPackaging {
 
             if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BATTERY,DataController.SWITCH_OF_MODULE_CL_BATTERY)) {
                 BatteryModuleNameInfo battery = BatteryModuleNameInfo.getInstance();
-                if (!TextUtils.isEmpty(battery.getBatteryStatus())) batteryJson.put(DeviceKeyContacts.DevInfo.BatteryStatus, battery.getBatteryStatus());
-                if (!TextUtils.isEmpty(battery.getBatteryHealth())) batteryJson.put(DeviceKeyContacts.DevInfo.BatteryHealth, battery.getBatteryHealth());
-                if (!TextUtils.isEmpty(battery.getBatteryLevel())) batteryJson.put(DeviceKeyContacts.DevInfo.BatteryLevel, battery.getBatteryLevel());
-                if (!TextUtils.isEmpty(battery.getBatteryScale())) batteryJson.put(DeviceKeyContacts.DevInfo.BatteryScale, battery.getBatteryScale());
-                if (!TextUtils.isEmpty(battery.getBatteryPlugged())) batteryJson.put(DeviceKeyContacts.DevInfo.BatteryPlugged, battery.getBatteryPlugged());
-                if (!TextUtils.isEmpty(battery.getBatteryTechnology())) batteryJson.put(DeviceKeyContacts.DevInfo.BatteryTechnology, battery.getBatteryTechnology());
-                if (!TextUtils.isEmpty(battery.getBatteryTemperature())) batteryJson.put(DeviceKeyContacts.DevInfo.BatteryTemperature, battery.getBatteryTemperature());
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BatteryStatus, battery.getBatteryStatus(),DataController.SWITCH_OF_BATTERY_STATUS);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BatteryHealth, battery.getBatteryHealth(),DataController.SWITCH_OF_BATTERY_HEALTH);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BatteryLevel, battery.getBatteryLevel(),DataController.SWITCH_OF_BATTERY_LEVEL);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BatteryScale, battery.getBatteryScale(),DataController.SWITCH_OF_BATTERY_SCALE);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BatteryPlugged, battery.getBatteryPlugged(),DataController.SWITCH_OF_BATTERY_PLUGGED);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BatteryTechnology, battery.getBatteryTechnology(),DataController.SWITCH_OF_BATTERY_TECHNOLOGY);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BatteryTemperature, battery.getBatteryTemperature(),DataController.SWITCH_OF_BATTERY_TEMPERATURE);
             }
             if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_MORE_INFO,DataController.SWITCH_OF_MODULE_CL_MORE_INFO)) {
-                if(!TextUtils.isEmpty(devImpl.getCPUModel()))
-                batteryJson.put(DeviceKeyContacts.DevInfo.CPUModel, devImpl.getCPUModel());
-                if(!TextUtils.isEmpty(devImpl.getBuildId()))
-                batteryJson.put(DeviceKeyContacts.DevInfo.BuildId, devImpl.getBuildId());
-                if(!TextUtils.isEmpty(devImpl.getBuildDisplay()))
-                batteryJson.put(DeviceKeyContacts.DevInfo.BuildDisplay, devImpl.getBuildDisplay());
-                if(!TextUtils.isEmpty(devImpl.getBuildProduct()))
-                batteryJson.put(DeviceKeyContacts.DevInfo.BuildProduct, devImpl.getBuildProduct());
-                if(!TextUtils.isEmpty(devImpl.getBuildDevice()))
-                batteryJson.put(DeviceKeyContacts.DevInfo.BuildDevice, devImpl.getBuildDevice());
-                if(!TextUtils.isEmpty(devImpl.getBuildBoard()))
-                batteryJson.put(DeviceKeyContacts.DevInfo.BuildBoard, devImpl.getBuildBoard());
-                if(!TextUtils.isEmpty(devImpl.getBuildBootloader()))
-                batteryJson.put(DeviceKeyContacts.DevInfo.BuildBootloader, devImpl.getBuildBootloader());
-                if(!TextUtils.isEmpty(devImpl.getBuildHardware()))
-                batteryJson.put(DeviceKeyContacts.DevInfo.BuildHardware, devImpl.getBuildHardware());
-                if(!TextUtils.isEmpty(devImpl.getBuildSupportedAbis()))
-                batteryJson.put(DeviceKeyContacts.DevInfo.BuildSupportedAbis, devImpl.getBuildSupportedAbis());
-                if(!TextUtils.isEmpty(devImpl.getBuildSupportedAbis32()))
-                batteryJson.put(DeviceKeyContacts.DevInfo.BuildSupportedAbis32, devImpl.getBuildSupportedAbis32());
-                if(!TextUtils.isEmpty(devImpl.getBuildSupportedAbis64()))
-                batteryJson.put(DeviceKeyContacts.DevInfo.BuildSupportedAbis64, devImpl.getBuildSupportedAbis64());
-                if(!TextUtils.isEmpty(devImpl.getBuildType()))
-                batteryJson.put(DeviceKeyContacts.DevInfo.BuildType, devImpl.getBuildType());
-                if(!TextUtils.isEmpty(devImpl.getBuildTags()))
-                batteryJson.put(DeviceKeyContacts.DevInfo.BuildTags, devImpl.getBuildTags());
-                if(!TextUtils.isEmpty(devImpl.getBuildFingerPrint()))
-                batteryJson.put(DeviceKeyContacts.DevInfo.BuildFingerPrint, devImpl.getBuildFingerPrint());
-                if(!TextUtils.isEmpty(devImpl.getBuildRadioVersion()))
-                batteryJson.put(DeviceKeyContacts.DevInfo.BuildRadioVersion, devImpl.getBuildRadioVersion());
-                if(!TextUtils.isEmpty(devImpl.getBuildIncremental()))
-                batteryJson.put(DeviceKeyContacts.DevInfo.BuildIncremental, devImpl.getBuildIncremental());
-                if(!TextUtils.isEmpty(devImpl.getBuildBaseOS()))
-                batteryJson.put(DeviceKeyContacts.DevInfo.BuildBaseOS, devImpl.getBuildBaseOS());
-                if(!TextUtils.isEmpty(devImpl.getBuildSecurityPatch()))
-                batteryJson.put(DeviceKeyContacts.DevInfo.BuildSecurityPatch, devImpl.getBuildSecurityPatch());
-                if(devImpl.getBuildSdkInt() != -1)
-                batteryJson.put(DeviceKeyContacts.DevInfo.BuildSdkInt, devImpl.getBuildSdkInt());
-                if(devImpl.getBuildPreviewSdkInt() != -1) batteryJson.put(DeviceKeyContacts.DevInfo.BuildPreviewSdkInt, devImpl.getBuildPreviewSdkInt());
-                if(!TextUtils.isEmpty(devImpl.getBuildCodename()))
-                batteryJson.put(DeviceKeyContacts.DevInfo.BuildCodename, devImpl.getBuildCodename());
-                if(!TextUtils.isEmpty(devImpl.getIDFA()))
-                batteryJson.put(DeviceKeyContacts.DevInfo.IDFA, devImpl.getIDFA());
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.CPUModel, devImpl.getCPUModel(),DataController.SWITCH_OF_CPU_MODEL);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildId, devImpl.getBuildId(),DataController.SWITCH_OF_BUILD_ID);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildDisplay, devImpl.getBuildDisplay(),DataController.SWITCH_OF_BUILD_DISPLAY);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildProduct, devImpl.getBuildProduct(),DataController.SWITCH_OF_BUILD_PRODUCT);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildDevice, devImpl.getBuildDevice(),DataController.SWITCH_OF_BUILD_DEVICE);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildBoard, devImpl.getBuildBoard(),DataController.SWITCH_OF_BUILD_BOARD);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildBootloader, devImpl.getBuildBootloader(),DataController.SWITCH_OF_BUILD_BOOT_LOADER);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildHardware, devImpl.getBuildHardware(),DataController.SWITCH_OF_BUILD_HARDWARE);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildSupportedAbis, devImpl.getBuildSupportedAbis(),DataController.SWITCH_OF_BUILD_SUPPORTED_ABIS);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildSupportedAbis32, devImpl.getBuildSupportedAbis32(),DataController.SWITCH_OF_BUILD_SUPPORTED_ABIS_32);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildSupportedAbis64, devImpl.getBuildSupportedAbis64(),DataController.SWITCH_OF_BUILD_SUPPORTED_ABIS_64);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildType, devImpl.getBuildType(),DataController.SWITCH_OF_BUILD_TYPE);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildTags, devImpl.getBuildTags(),DataController.SWITCH_OF_BUILD_TAGS);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildFingerPrint, devImpl.getBuildFingerPrint(),DataController.SWITCH_OF_BUILD_FINGER_PRINT);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildRadioVersion, devImpl.getBuildRadioVersion(),DataController.SWITCH_OF_BUILD_RADIO_VERSION);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildIncremental, devImpl.getBuildIncremental(),DataController.SWITCH_OF_BUILD_INCREMENTAL);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildBaseOS, devImpl.getBuildBaseOS(),DataController.SWITCH_OF_BUILD_BASE_OS);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildSecurityPatch, devImpl.getBuildSecurityPatch(),DataController.SWITCH_OF_BUILD_SECURITY_PATCH);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildSdkInt, devImpl.getBuildSdkInt(),DataController.SWITCH_OF_BUILD_SDK_INT);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildPreviewSdkInt, devImpl.getBuildPreviewSdkInt(),DataController.SWITCH_OF_BUILD_PREVIEW_SDK_INT);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildCodename, devImpl.getBuildCodename(),DataController.SWITCH_OF_BUILD_CODE_NAME);
+                Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.IDFA, devImpl.getIDFA(),DataController.SWITCH_OF_BUILD_IDFA);
 //                ELOG.i(batteryJson+"   ::::::::batteryJson batteryJson");
             }
-            deviceInfo.put("ETDM", batteryJson);
+            deviceInfo.put(EGContext.EXTRA_DATA, batteryJson);
         }catch (Throwable t){
             ELOG.e(t.getMessage()+" datapackaging has an exception.....");
         }

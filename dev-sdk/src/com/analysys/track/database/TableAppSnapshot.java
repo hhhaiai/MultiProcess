@@ -7,14 +7,18 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
+import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.Utils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 
 public class TableAppSnapshot {
 
@@ -91,15 +95,19 @@ public class TableAppSnapshot {
     public Map<String, String> mSelect() {
         Map<String, String> map = null;
         Cursor cursor = null;
+        int blankCount = 0;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null,
                 null, null);
             map = new HashMap<String, String>();
             while (cursor.moveToNext()) {
+                if(blankCount >= EGContext.BLANK_COUNT_MAX){
+                    return map;
+                }
                 String apn = cursor
                     .getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN));
-                map.put(apn, String.valueOf(getCursor(cursor)));
+                map.put(apn, String.valueOf(getCursor(cursor , blankCount)));
             }
         } catch (Throwable e) {
         } finally {
@@ -110,20 +118,24 @@ public class TableAppSnapshot {
         return map;
     }
 
-    private JSONObject getCursor(Cursor cursor) {
+    private JSONObject getCursor(Cursor cursor,int blankCount) {
         JSONObject jsonObj = null;
+        String pkgName = "";
         try {
             jsonObj = new JSONObject();
-            jsonObj.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,
-                cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN)));
-            jsonObj.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationName,
-                cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AN)));
-            jsonObj.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode,
-                cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AVC)));
-            jsonObj.put(DeviceKeyContacts.AppSnapshotInfo.ActionType,
-                cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AT)));
-            jsonObj.put(DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
-                cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AHT)));
+            pkgName = cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN));
+            if(TextUtils.isEmpty(pkgName)){
+                blankCount++;
+            }
+            Utils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,pkgName,DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
+            Utils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ApplicationName,
+                    cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AN)),DataController.SWITCH_OF_APPLICATION_NAME);
+            Utils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode,
+                    cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AVC)),DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
+            Utils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ActionType,
+                    cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AT)),DataController.SWITCH_OF_ACTION_TYPE);
+            Utils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
+                    cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AHT)),DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
         } catch (Throwable e) {
         }
         return jsonObj;
@@ -190,21 +202,28 @@ public class TableAppSnapshot {
     public JSONArray select() {
         JSONArray array = null;
         Cursor cursor = null;
+        int blankCount = 0;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             array = new JSONArray();
             cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null,
                 null, null);
             while (cursor.moveToNext()) {
-                if (cursor == null)
+                if(blankCount >= EGContext.BLANK_COUNT_MAX){
+                    return array;
+                }
+                if (cursor == null){
+                    blankCount++;
                     continue;
-                array.put(getCursor(cursor));
+                }
+                array.put(getCursor(cursor,blankCount));
             }
         } catch (Throwable e) {
             ELOG.e(e);
         } finally {
-            if (cursor != null)
+            if (cursor != null){
                 cursor.close();
+            }
             DBManager.getInstance(mContext).closeDB();
         }
         return array;

@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
 import com.analysys.track.internal.Content.DeviceKeyContacts;
+import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.Base64Utils;
 
@@ -49,13 +50,17 @@ public class TableLocation {
     }
 
     public JSONArray select() {
-        JSONArray jar = null;
+        JSONArray array = null;
+        int blankCount = 0;
         try {
-            jar = new JSONArray();
+            array = new JSONArray();
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             Cursor cursor = db.query(DBConfig.Location.TABLE_NAME, null,
                     null, null, null, null, null);
             while (cursor.moveToNext()) {
+                if(blankCount >= EGContext.BLANK_COUNT_MAX){
+                    return array;
+                }
                 String id = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.ID));
                 String encryptLocation = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.LI));
                 String time = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.IT));
@@ -63,11 +68,15 @@ public class TableLocation {
                 cv.put(DBConfig.Location.Column.ST, "1");
                 db.update(DBConfig.Location.TABLE_NAME, cv, DBConfig.Location.Column.ID + "=?", new String[]{id});
                 String decryptLocation = Base64Utils.decrypt(encryptLocation, Long.valueOf(time));
-                if(!TextUtils.isEmpty(decryptLocation)) jar.put(new JSONObject(decryptLocation));
+                if(!TextUtils.isEmpty(decryptLocation)){
+                    array.put(new JSONObject(decryptLocation));
+                } else {
+                    blankCount++;
+                }
             }
         } catch (Throwable e) {
         }
-        return jar;
+        return array;
     }
 
     public void delete() {

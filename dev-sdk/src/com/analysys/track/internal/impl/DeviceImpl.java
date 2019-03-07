@@ -933,20 +933,20 @@ public class DeviceImpl {
         }
 
     }
-    public int getBuildSdkInt(){
+    public String getBuildSdkInt(){
         try {
-            return Build.VERSION.SDK_INT;
+            return String.valueOf(Build.VERSION.SDK_INT);
         }catch (Throwable t){
-            return -1;
+            return "";
         }
 
     }
-    public int getBuildPreviewSdkInt(){
-        int value = -1;
+    public String getBuildPreviewSdkInt(){
+        String value = "";
         try {
-            value = Build.VERSION.PREVIEW_SDK_INT;
+            value = String.valueOf(Build.VERSION.PREVIEW_SDK_INT);
         }catch (Throwable t){
-            value = -1;
+            value = "";
         }
         return value;
     }

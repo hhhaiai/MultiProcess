@@ -245,6 +245,9 @@ public class EGContext {
     public static long OC_LAST_TIME_OVER_5_STMP = -1;
     public static long UPLOAD_LAST_TIME_STMP = -1;
     public static String UPLOAD_KEY_WORDS = "facility4";
+    public static String EXTRA_DATA = "ETDM";
+    public static int BLANK_COUNT_MAX = 10;
+
 
     /**
      * @Copyright © 2019 analysys Inc. All rights reserved.

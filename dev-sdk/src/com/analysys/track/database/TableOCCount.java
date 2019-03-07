@@ -6,7 +6,9 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
+import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.Base64Utils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.Utils;
@@ -298,27 +300,39 @@ public class TableOCCount {
      */
     public List<String> getIntervalApps() {
         List<String> list = null;
+        int blankCount = 0;
+        Cursor cursor = null;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             String day = Utils.getDay();
             int timeInterval = Base64Utils.getTimeTag(System.currentTimeMillis());
-            Cursor cursor = db.query(DBConfig.OCCount.TABLE_NAME,
+            cursor = db.query(DBConfig.OCCount.TABLE_NAME,
                 new String[] {DBConfig.OCCount.Column.APN},
                 DBConfig.OCCount.Column.DY + "=? and " + DBConfig.OCCount.Column.TI
                     + "=? and " + DBConfig.OCCount.Column.RS + "=?",
                 new String[] {day, String.valueOf(timeInterval), ZERO}, null, null, null);
             list = new ArrayList<String>();
             while (cursor.moveToNext()) {
+                if(blankCount >= EGContext.BLANK_COUNT_MAX){//防止空数据导致死循环
+                    return list;
+                }
                 String pkgName =
                     cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.APN));
                 if (!TextUtils.isEmpty(pkgName)) {
                     list.add(pkgName);
+                }else{
+                    blankCount ++;
                 }
             }
         } catch (Exception e) {
             ELOG.e(e);
+        }finally {
+            if (cursor != null){
+                cursor.close();
+            }
+            DBManager.getInstance(mContext).closeDB();
         }
-        DBManager.getInstance(mContext).closeDB();
+
         return list;
     }
 
@@ -329,6 +343,8 @@ public class TableOCCount {
         JSONArray ocCountJar = null;
         SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
         Cursor cursor = null;
+        int blankCount = 0;
+        String pkgName = "";
         try {
             ocCountJar = new JSONArray();
             // db.beginTransaction();
@@ -338,6 +354,9 @@ public class TableOCCount {
             // ContentValues cv ;
             JSONObject jsonObject, etdm;
             while (cursor.moveToNext()) {
+                if(blankCount >= EGContext.BLANK_COUNT_MAX){
+                    return ocCountJar;
+                }
                 act =
                     cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.ACT));
                 if (TextUtils.isEmpty(act) || "".equals(act))
@@ -348,24 +367,27 @@ public class TableOCCount {
                 String encryptAn =
                     cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AN));
                 String an = Base64Utils.decrypt(encryptAn, Long.valueOf(insertTime));
-                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationOpenTime,
-                    cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AOT)));
-                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime, act);
-                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationPackageName,
-                    cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.APN)));
-                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationName, an);
-                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode,
-                    cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AVC)));
-                jsonObject.put(DeviceKeyContacts.OCInfo.NetworkType,
-                    cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.NT)));
+                Utils.pushToJSON(mContext,jsonObject ,DeviceKeyContacts.OCInfo.ApplicationOpenTime,
+                        cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AOT)),DataController.SWITCH_OF_APPLICATION_OPEN_TIME);
+                Utils.pushToJSON(mContext,jsonObject ,DeviceKeyContacts.OCInfo.ApplicationCloseTime, act,DataController.SWITCH_OF_APPLICATION_CLOSE_TIME);
+                pkgName = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.APN));
+                if(TextUtils.isEmpty(pkgName)){
+                    blankCount++;
+                }
+                Utils.pushToJSON(mContext,jsonObject ,DeviceKeyContacts.OCInfo.ApplicationPackageName,pkgName,DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
+                Utils.pushToJSON(mContext,jsonObject ,DeviceKeyContacts.OCInfo.ApplicationName, an,DataController.SWITCH_OF_APPLICATION_NAME);
+                Utils.pushToJSON(mContext,jsonObject ,DeviceKeyContacts.OCInfo.ApplicationVersionCode,
+                        cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AVC)),DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
+                Utils.pushToJSON(mContext,jsonObject ,DeviceKeyContacts.OCInfo.NetworkType,
+                        cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.NT)),DataController.SWITCH_OF_NETWORK_TYPE);
                 etdm = new JSONObject();
-                etdm.put(DeviceKeyContacts.OCInfo.SwitchType,
-                    cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AST)));
-                etdm.put(DeviceKeyContacts.OCInfo.ApplicationType,
-                    cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AT)));
-                etdm.put(DeviceKeyContacts.OCInfo.CollectionType,
-                    cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.CT)));
-                jsonObject.put("ETDM", etdm);
+                Utils.pushToJSON(mContext,etdm ,DeviceKeyContacts.OCInfo.SwitchType,
+                        cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AST)),DataController.SWITCH_OF_SWITCH_TYPE);
+                Utils.pushToJSON(mContext,etdm ,DeviceKeyContacts.OCInfo.ApplicationType,
+                        cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AT)),DataController.SWITCH_OF_APPLICATION_TYPE);
+                Utils.pushToJSON(mContext,etdm ,DeviceKeyContacts.OCInfo.CollectionType,
+                        cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.CT)),DataController.SWITCH_OF_COLLECTION_TYPE);
+                jsonObject.put(EGContext.EXTRA_DATA, etdm);
                 ocCountJar.put(jsonObject);
                 // cv = new ContentValues();
                 // cv.put(DBConfig.OCCount.Column.RS, ONE);
@@ -378,8 +400,9 @@ public class TableOCCount {
         } catch (Exception e) {
             ELOG.e(e.getMessage() + "    :::::::exception ");
         } finally {
-            if (cursor != null)
+            if (cursor != null){
                 cursor.close();
+            }
             // db.endTransaction();
             DBManager.getInstance(mContext).closeDB();
         }
