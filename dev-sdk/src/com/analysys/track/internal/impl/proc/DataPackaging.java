@@ -1,7 +1,6 @@
 package com.analysys.track.internal.impl.proc;
 
 import android.content.Context;
-import android.text.TextUtils;
 
 import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
@@ -12,20 +11,19 @@ import com.analysys.track.internal.impl.PolicyImpl;
 import com.analysys.track.internal.impl.SenSorModuleNameImpl;
 import com.analysys.track.model.BatteryModuleNameInfo;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.SimulatorUtils;
 import com.analysys.track.utils.Utils;
-import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 
 /**
  * 存储、上传数据组装
  */
 public class DataPackaging {
     /**
-     * 基础信息,公用接口,应用设备都使用
-     *  上行字段,DevInfo
+     * 基础信息,公用接口,应用设备都使用 上行字段,DevInfo
+     * 
      * @return
      */
     public static JSONObject getDevInfo(Context mContext) {
@@ -61,7 +59,7 @@ public class DataPackaging {
             Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.TempID, devImpl.getTempID(),DataController.SWITCH_OF_TEMP_ID);
 
             if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_DEV_CHECK,DataController.SWITCH_OF_MODULE_CL_DEV_CHECK)) {
-                Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Simulator, devImpl.isSimulator(),DataController.SWITCH_OF_SIMULATOR);
+                Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Simulator, SimulatorUtils.getSimulatorStatus(mContext),DataController.SWITCH_OF_SIMULATOR);
                 Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Debug, devImpl.getDebug(),DataController.SWITCH_OF_DEBUG);
                 Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Hijack, devImpl.isHijack(),DataController.SWITCH_OF_HIJACK);
                 Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.IsRoot, devImpl.IsRoot(),DataController.SWITCH_OF_IS_ROOT);
@@ -78,15 +76,17 @@ public class DataPackaging {
                 Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.SystemArea, devImpl.getSystemArea(),DataController.SWITCH_OF_SYSTEM_AREA);
                 Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.TimeZone, devImpl.getTimeZone(),DataController.SWITCH_OF_TIMEZONE);
             }
-            if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SENSOR,DataController.SWITCH_OF_MODULE_CL_SENSOR)){
+            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SENSOR,
+                DataController.SWITCH_OF_MODULE_CL_SENSOR)) {
                 JSONArray senSorArray = SenSorModuleNameImpl.getInstance(mContext).getSensorInfo();
-                if(senSorArray != null && senSorArray.length()>0){
-                    deviceInfo.put(DeviceKeyContacts.DevInfo.SenSorModuleName,senSorArray);
+                if (senSorArray != null && senSorArray.length() > 0) {
+                    deviceInfo.put(DeviceKeyContacts.DevInfo.SenSorModuleName, senSorArray);
                 }
             }
             JSONObject batteryJson = new JSONObject();
 
-            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BATTERY,DataController.SWITCH_OF_MODULE_CL_BATTERY)) {
+            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BATTERY,
+                DataController.SWITCH_OF_MODULE_CL_BATTERY)) {
                 BatteryModuleNameInfo battery = BatteryModuleNameInfo.getInstance();
                 Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BatteryStatus, battery.getBatteryStatus(),DataController.SWITCH_OF_BATTERY_STATUS);
                 Utils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BatteryHealth, battery.getBatteryHealth(),DataController.SWITCH_OF_BATTERY_HEALTH);
@@ -130,37 +130,41 @@ public class DataPackaging {
 
     /**
      * OCCount
+     * 
      * @return
      */
-    public static JSONArray getOCInfo(Context ctx){
-//         OCImpl.getInstance(ctx).getInfoByVersion();
-         //TODO
+    public static JSONArray getOCInfo(Context ctx) {
+        // OCImpl.getInstance(ctx).getInfoByVersion();
+        // TODO
         return null;
     }
 
     /**
      * Processinfo
+     * 
      * @return
      */
-    public static JSONObject getProcessinfo(){
-        //这版暂时预留接口
+    public static JSONObject getProcessinfo() {
+        // 这版暂时预留接口
         return null;
     }
 
     /**
      * AppSnapshotInfo
+     * 
      * @return
      */
-    public static JSONArray getAppSnapshotInfo(){
+    public static JSONArray getAppSnapshotInfo() {
 
         return null;
     }
 
     /**
      * LocationInfo
+     * 
      * @return
      */
-    public static JSONArray getLocationInfo(){
+    public static JSONArray getLocationInfo() {
         return null;
     }
 }

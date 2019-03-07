@@ -1,17 +1,12 @@
 package com.analysys.track.utils;
 
-import java.security.SecureRandom;
-
 import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 public class AESUtils {
     static final String CIPHER_ALGORITHM_ECB = "AES/ECB/PKCS5Padding";
 
     public static String checkKey(String rawpassword) {
-
         int strLen = rawpassword.length();
         if (strLen > 16) {
             rawpassword = rawpassword.substring(0, 16);
@@ -51,7 +46,7 @@ public class AESUtils {
             byte[] result = cipher.doFinal(content);
             return result;
         } catch (Throwable e) {
-            ELOG.e(e.getMessage()+"   encrypt has an exception");
+            ELOG.e(e.getMessage() + "   encrypt has an exception");
         }
 
         return null;
@@ -68,8 +63,8 @@ public class AESUtils {
     public static byte[] decrypt(byte[] content, byte[] rawpassword) {
 
         try {
-//             byte[] rawkey = getRawKey(rawpassword);
-//            // 应该使用RAWKEY;
+            // byte[] rawkey = getRawKey(rawpassword);
+            // // 应该使用RAWKEY;
             SecretKeySpec secretKeySpec = new SecretKeySpec(rawpassword, "AES");
 
             Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM_ECB);
@@ -78,26 +73,26 @@ public class AESUtils {
             byte[] result = cipher.doFinal(content);
             return result;
         } catch (Throwable e) {
-         ELOG.i(e.getMessage()+"  decrypt has an exception");
+            ELOG.i(e.getMessage() + "  decrypt has an exception");
         }
 
         return null;
     }
 
-    /**
-     * 通过最初的rawKey获得子key
-     */
-    private static byte[] getRawKey(byte[] rawpassword) {
-        try {
-            KeyGenerator keygen = KeyGenerator.getInstance("AES");
-            SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
-            sr.setSeed(rawpassword);
-            keygen.init(128, sr);
-            SecretKey secretKey = keygen.generateKey();
-            byte[] result = secretKey.getEncoded();
-            return result;
-        } catch (Throwable e) {
-        }
-        return null;
-    }
+    // /**
+    // * 通过最初的rawKey获得子key
+    // */
+    // private static byte[] getRawKey(byte[] rawpassword) {
+    // try {
+    // KeyGenerator keygen = KeyGenerator.getInstance("AES");
+    // SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
+    // sr.setSeed(rawpassword);
+    // keygen.init(128, sr);
+    // SecretKey secretKey = keygen.generateKey();
+    // byte[] result = secretKey.getEncoded();
+    // return result;
+    // } catch (Throwable e) {
+    // }
+    // return null;
+    //   }
 }
