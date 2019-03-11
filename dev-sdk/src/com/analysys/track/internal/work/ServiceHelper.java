@@ -176,7 +176,7 @@ public class ServiceHelper {
             if (mContext == null) {
                 return;
             }
-            OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.SERVCICE_RESTART, true);
+            OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.SERVICE_RESTART);
             ReceiverUtils.getInstance().registAllReceiver(mContext);
             PowerManager pm = (PowerManager)mContext.getSystemService(Context.POWER_SERVICE);
             boolean isScreenOn = pm.isScreenOn();

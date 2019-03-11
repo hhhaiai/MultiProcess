@@ -114,8 +114,8 @@ public class LocationImpl {
         /**
          * 没有声明权限
          */
-        if (AndroidManifestHelper.isPermissionDefineInManifest(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
-                && AndroidManifestHelper.isPermissionDefineInManifest(mContext,
+        if (!AndroidManifestHelper.isPermissionDefineInManifest(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
+                && !AndroidManifestHelper.isPermissionDefineInManifest(mContext,
                 Manifest.permission.ACCESS_COARSE_LOCATION)) {
             return ;
         }
@@ -305,12 +305,10 @@ public class LocationImpl {
             Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.GeographyLocation, locationInfo,DataController.SWITCH_OF_GEOGRAPHY_LOCATION);
 
             JSONArray wifiInfo = WifiImpl.getInstance(mContext).getWifiInfo();
-            Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.WifiInfo.NAME, wifiInfo,DataController.SWITCH_OF_NAME);
+            Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.WifiInfo.NAME, wifiInfo,DataController.SWITCH_OF_WIFI_NAME);
 
             JSONArray baseStation = getBaseStationInfo();
-            if (baseStation != null && baseStation.length() != 0) {
-                locationJson.put(DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME, baseStation);
-            }
+            Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME,baseStation,DataController.SWITCH_OF_BS_NAME);
         } catch (Throwable e) {
         }
         return locationJson;
@@ -318,33 +316,44 @@ public class LocationImpl {
 
 
 
-       /**
+    /**
      * 基站信息
+     * @return
      */
-       @Deprecated
+    @Deprecated
     public JSONArray getBaseStationInfo() {
-        JSONArray jsonArray = new JSONArray();
+        JSONArray jsonArray = null;
+        JSONObject locationJson = null;
         try {
             TelephonyManager mTelephonyManager = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                 List<NeighboringCellInfo> list = mTelephonyManager.getNeighboringCellInfo();
-                 baseStationSort(list);
-                JSONObject locationJson = null;
-                 for (int i = 0; i < list.size(); i++) {
-                     if (i < 5) {
-                         locationJson = new JSONObject();
-                         Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, list.get(i).getLac(),DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                         Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, list.get(i).getCid(),DataController.SWITCH_OF_CELL_ID);
-                         Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, list.get(i).getRssi(),DataController.SWITCH_OF_BS_LEVEL);
-                         jsonArray.put(locationJson);
-                     }
-                 }
-                GsmCellLocation location = (GsmCellLocation)mTelephonyManager.getCellLocation();
                 locationJson = new JSONObject();
-                Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, location.getLac(),DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, location.getCid(),DataController.SWITCH_OF_CELL_ID);
-                Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, location.getPsc(),DataController.SWITCH_OF_BS_LEVEL);
-                jsonArray.put(locationJson);
+                jsonArray = new JSONArray();
+                try {
+                    List<NeighboringCellInfo> list = mTelephonyManager.getNeighboringCellInfo();
+                    if(list != null && list.size()>0) {
+                        baseStationSort(list);
+                        for (int i = 0; i < list.size(); i++) {
+                            if (i < 5) {
+                                Utils.pushToJSON(mContext, locationJson, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, list.get(i).getLac(), DataController.SWITCH_OF_LOCATION_AREA_CODE);
+                                Utils.pushToJSON(mContext, locationJson, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, list.get(i).getCid(), DataController.SWITCH_OF_CELL_ID);
+                                Utils.pushToJSON(mContext, locationJson, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, list.get(i).getRssi(), DataController.SWITCH_OF_BS_LEVEL);
+                                jsonArray.put(locationJson);
+                            }
+                        }
+                    }
+                }catch (Throwable t){
+                }
+                try {
+                    GsmCellLocation location = (GsmCellLocation)mTelephonyManager.getCellLocation();
+                    if(location != null){
+                        Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, location.getLac(),DataController.SWITCH_OF_LOCATION_AREA_CODE);
+                        Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, location.getCid(),DataController.SWITCH_OF_CELL_ID);
+                        Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, location.getPsc(),DataController.SWITCH_OF_BS_LEVEL);
+                        jsonArray.put(locationJson);
+                    }
+                }catch (Throwable t){
+                }
             }
         } catch (Exception e) {
         }

@@ -1,5 +1,7 @@
 package com.analysys.track.database;
 
+import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.utils.FileUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import android.content.Context;
@@ -28,8 +30,23 @@ public class DBManager {
     }
 
     public synchronized SQLiteDatabase openDB() {
-        db = dbHelper.getWritableDatabase();
-        return db;
+        if(EGContext.isLocked){
+            long currentTime = System.currentTimeMillis();
+            if(currentTime - FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_DB_WRITER) >EGContext.TIME_SYNC_DEFAULT){
+                db = dbHelper.getWritableDatabase();
+                FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_DB_WRITER,currentTime);
+                return db;
+            }else {
+                try {
+                    Thread.sleep(EGContext.TIME_SYNC_DEFAULT);
+                }catch (Throwable t){
+                }
+            }
+        }else {
+            db = dbHelper.getWritableDatabase();
+            return db;
+        }
+        return null;
     }
 
     public synchronized void closeDB() {

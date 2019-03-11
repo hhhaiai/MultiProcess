@@ -40,9 +40,6 @@ public class WifiImpl {
     public JSONArray getWifiInfo() {
         JSONArray jar = new JSONArray();
         try {
-//            if (!AndroidManifestHelper.isPermissionDefineInManifest(mContext, Manifest.permission.CHANGE_WIFI_STATE)) {
-//                return null;
-//            }
             if (!PermissionUtils.checkPermission(mContext, Manifest.permission.CHANGE_WIFI_STATE)) {
                 return null;
             }

@@ -61,9 +61,12 @@ public class ProcessManager {
             // 确保在每个l轮循之间，只有一次的锁屏saveDB。
             return;
         }
+        saveDB(ctx,EGContext.CLOSE_SCREEN);
+    }
+    public static void saveDB(Context ctx,String type){
         // 保存ProcTemp表中数据至OCInfo表中
         Map<String, String> map = TableOCTemp.getInstance(ctx).queryProcTemp();
-        ocList = getOCInfoProcTemp(ctx, map, 0);
+        ocList = getOCInfoProcTemp(ctx, map, type);
         ELOG.i("dealScreenOff:::::" + ocList);
         TableOCCount.getInstance(ctx).insertArray(ocList);
         // 需要对ocList清空
@@ -74,18 +77,18 @@ public class ProcessManager {
 
     /**
      * @param map
-     * @param type 0 表示锁屏，1表示服务重启
+     * @param type CLOSE_SCREEN表示锁屏，SERVICE_RESTART表示服务重启
      * @return
      */
-    private static JSONArray getOCInfoProcTemp(Context ctx, Map<String, String> map, int type) {
+    private static JSONArray getOCInfoProcTemp(Context ctx, Map<String, String> map, String type) {
         String endTime = "";
-        if (type == 0) {
-            endTime = System.currentTimeMillis() + "";
-        } else if (type == 1) {
+       if (EGContext.SERVICE_RESTART.equals(type)) {
             endTime = SPHelper.getEndTime(ctx) + "";
-        }
-        JSONArray ocArray = new JSONArray();
-        JSONObject ocInfo;
+       }else{
+           endTime = System.currentTimeMillis() + "";
+       }
+       JSONArray ocArray = new JSONArray();
+       JSONObject ocInfo;
         try {
             List list = SystemUtils.getDiffNO(map.size());
             int i = 0, r = -1;
@@ -100,7 +103,7 @@ public class ProcessManager {
                 ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime, Integer.parseInt(endTime) - r);
                 ocInfo.put(DeviceKeyContacts.OCInfo.NetworkType, NetworkUtils.getNetworkType(ctx));
                 ocInfo.put(DeviceKeyContacts.OCInfo.CollectionType, "2");
-                ocInfo.put(DeviceKeyContacts.OCInfo.SwitchType, type == 0 ? "2" : "3");
+                ocInfo.put(DeviceKeyContacts.OCInfo.SwitchType, type);
                 ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationType,
                     Applist.getInstance(ctx).getAppType(entry.getKey()));
                 ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode,

@@ -40,11 +40,11 @@ public class TableXXXInfo {
     public void insert(JSONArray xxxInfo) {
         SQLiteDatabase db = null;
         try {
-             db = DBManager.getInstance(mContext).openDB();
+            EGContext.isLocked = true;
+            db = DBManager.getInstance(mContext).openDB();
             if (xxxInfo == null) {
                 return;
             }
-
             db.beginTransaction();
             List<ContentValues> listCv = getContentValues(xxxInfo);
             for (ContentValues cv:listCv) {
@@ -67,8 +67,10 @@ public class TableXXXInfo {
             ELOG.e(e+"  insert XXX");
         }finally {
             db.endTransaction();
+            EGContext.isLocked = false;
+            DBManager.getInstance(mContext).closeDB();
         }
-        DBManager.getInstance(mContext).closeDB();
+
     }
     /**
      * json数据转成ContentValues
@@ -91,7 +93,6 @@ public class TableXXXInfo {
                     cv.put(DBConfig.XXXInfo.Column.RESULT, object.opt(ProcParser.RUNNING_RESULT).toString());
                     list.add(cv);
                 }
-
             }
         }catch (Throwable t){
         }
@@ -151,6 +152,7 @@ public class TableXXXInfo {
     public void delete() {
         SQLiteDatabase db = null;
         try {
+            EGContext.isLocked = true;
             db = DBManager.getInstance(mContext).openDB();
             if(db == null) return;
             db.beginTransaction();
@@ -160,6 +162,7 @@ public class TableXXXInfo {
         } catch (Throwable e) {
         }finally {
             db.endTransaction();
+            EGContext.isLocked = false;
             DBManager.getInstance(mContext).closeDB();
         }
     }

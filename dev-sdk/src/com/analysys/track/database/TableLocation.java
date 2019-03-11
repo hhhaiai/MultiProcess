@@ -39,23 +39,30 @@ public class TableLocation {
                     cv.put(DBConfig.Location.Column.LI, encryptLocation);
                     cv.put(DBConfig.Location.Column.IT, String.valueOf(time));
                     cv.put(DBConfig.Location.Column.ST, "0");
+                    EGContext.isLocked = true;
                     SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+                    if(db == null){
+                        return;
+                    }
                     db.insert(DBConfig.Location.TABLE_NAME, null, cv);
-                    DBManager.getInstance(mContext).closeDB();
                 }
             }
         } catch (Throwable e) {
-
+        }finally {
+            EGContext.isLocked = false;
+            DBManager.getInstance(mContext).closeDB();
         }
     }
 
     public JSONArray select() {
         JSONArray array = null;
         int blankCount = 0;
+        Cursor cursor = null;
         try {
             array = new JSONArray();
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            Cursor cursor = db.query(DBConfig.Location.TABLE_NAME, null,
+            db.beginTransaction();
+            cursor = db.query(DBConfig.Location.TABLE_NAME, null,
                     null, null, null, null, null);
             while (cursor.moveToNext()) {
                 if(blankCount >= EGContext.BLANK_COUNT_MAX){
@@ -74,18 +81,29 @@ public class TableLocation {
                     blankCount++;
                 }
             }
+            db.setTransactionSuccessful();
+            db.endTransaction();
         } catch (Throwable e) {
+        }finally {
+            if(cursor != null){
+                cursor.close();
+            }
+            DBManager.getInstance(mContext).closeDB();
         }
         return array;
     }
 
     public void delete() {
         try {
+            EGContext.isLocked = true;
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if(db == null) return;
+            if(db == null) {
+                return;
+            }
             db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?", new String[]{"1"});
         } catch (Throwable e) {
         }finally {
+            EGContext.isLocked = false;
             DBManager.getInstance(mContext).closeDB();
         }
     }

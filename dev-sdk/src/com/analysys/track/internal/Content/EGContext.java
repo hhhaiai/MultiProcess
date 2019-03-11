@@ -39,20 +39,15 @@ public class EGContext {
 
     // 应用列表获取周期时间,30min
     public static final int SNAPSHOT_CYCLE = 30 * 60 * 1000;
-    public static final String SNAPSHOT_LAST_TIME = "SNAP_SHOT";
     // 位置获取周期时间
-    public static final int LOCATION_CYCLE = 30 * 60 * 1000;
-    public static final String LOCATION_LAST_TIME = "LOCATION";
+    public static final int LOCATION_CYCLE = 30 * 1000;
     // 应用打开关闭获取周期时间
     public static final int OC_CYCLE = 5 * 1000;
-    public static final String OC_LAST_TIME = "OC";
     // 5.0以上30s
     public static final int OC_CYCLE_OVER_5 = 30 * 1000;
-    public static final String OC_LAST_TIME_OVER_5 = "OC_OVER_5";
 
     // 应用打开关闭获取周期时间
     public static final int UPLOAD_CYCLE = 6 * 60 * 60 * 1000;
-    public static final String UPLOAD_LAST_TIME = "UPLOAD";
     // 心跳检查
     public static final int CHECK_HEARTBEAT_CYCLE = 15 * 1000;
     public static final String HEARTBEAT_LAST_TIME = "HEART_BETA";
@@ -161,19 +156,17 @@ public class EGContext {
      * 非实时上传是,使用的域名池,以ait开始的为应用上传接口;以urd开始的为设备上传接口
      */
     public final static String[] NORMAL_UPLOAD_URL =
-            {"ait103.analysys.cn", "urd103.analysys.cn", // 0
-                    "ait240.analysys.cn", "urd240.analysys.cn", // 1
-                    "ait183.analysys.cn", "urd183.analysys.cn", // 2
-                    "ait409.analysys.cn", "urd409.analysys.cn", // 3
-                    "ait203.analysys.cn", "urd203.analysys.cn", // 4
-                    "ait490.analysys.cn", "urd490.analysys.cn", // 5
-                    "ait609.analysys.cn", "urd609.analysys.cn", // 6
-                    "ait301.analysys.cn", "urd301.analysys.cn", // 7
-                    "ait405.analysys.cn", "urd405.analysys.cn", // 8
-                    "ait025.analysys.cn", "urd025.analysys.cn", // 9
-                    "ait339.analysys.cn", "urd339.analysys.cn"// 头部应用 用作测试
-
-                    // TODO ait不用
+            { "urd103.analysys.cn", // 0
+                     "urd240.analysys.cn", // 1
+                     "urd183.analysys.cn", // 2
+                     "urd409.analysys.cn", // 3
+                     "urd203.analysys.cn", // 4
+                     "urd490.analysys.cn", // 5
+                     "urd609.analysys.cn", // 6
+                     "urd301.analysys.cn", // 7
+                     "urd405.analysys.cn", // 8
+                     "urd025.analysys.cn", // 9
+                     "urd339.analysys.cn"// 头部应用 用作测试
             };
     /**
      * 实时计算接口
@@ -236,13 +229,14 @@ public class EGContext {
     public static final long LONGEST_TIME = 5 * 60 * 60 * 1000;
     public static final String CLOSE_SCREEN = "2";
     public static final String APP_SWITCH = "1";
-    public static final String SERVCICE_RESTART = "3";
+    public static final String SERVICE_RESTART = "3";
+    public static final String NORMAL = "0";
     public static final String THREAD_NAME = "com.eguan";
     public static long HEARTBEAT_LAST_TIME_STMP = -1;
     public static long SNAPSHOT_LAST_TIME_STMP = -1;
     public static long LOCATION_LAST_TIME_STMP = -1;
     public static long OC_LAST_TIME_STMP = -1;
-    public static long OC_LAST_TIME_OVER_5_STMP = -1;
+//    public static long OC_LAST_TIME_OVER_5_STMP = -1;
     public static long UPLOAD_LAST_TIME_STMP = -1;
     public static String UPLOAD_KEY_WORDS = "facility4";
     public static String EXTRA_DATA = "ETDM";
@@ -271,7 +265,7 @@ public class EGContext {
     public static final String FILES_SYNC_APPSNAPSHOT = "SAP.TAG";
     public static final String FILES_SYNC_OC = "OCS.TAG";
     // OC 5+同步时间,同时只有一个进程工作
-    public static final long TIME_SYNC_OC_ABOVE_FIVE = 25 * 1000;
+    public static final long TIME_SYNC_OC_OVER_5 = 25 * 1000;
     // 位置信息,通进程只有一个工作,两次间隔29分钟
     public static final String FILES_SYNC_LOCATION = "LCT.TAG";
     public static final long TIME_SYNC_OC_LOCATION = 29 * 60 * 1000;
@@ -280,5 +274,6 @@ public class EGContext {
 
     // 默认同步写入时间，5秒内能写入一次。 间隔范围: APP列表(多进程广播方面)、 OC 5.x以下、DB写入
     public static final long TIME_SYNC_DEFAULT = 5 * 1000;
+    public static boolean isLocked = false;
 
 }

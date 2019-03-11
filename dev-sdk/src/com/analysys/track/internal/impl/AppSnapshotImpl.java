@@ -14,6 +14,7 @@ import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.TPUtils;
+import com.analysys.track.utils.Utils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import android.content.Context;
@@ -218,37 +219,66 @@ public class AppSnapshotImpl {
             if (TextUtils.isEmpty(pkgName)) {
                 return;
             }
-            // 数据库操作修改包名和类型
-            EThreadPool.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        if (type == 0) {
-                            PackageInfo pi =
-                                    mContext.getPackageManager().getPackageInfo(pkgName, 0);
-                            JSONObject jsonObject =
-                                    getAppInfo(pi, EGContext.SNAP_SHOT_INSTALL);
-                            if (jsonObject != null) {
-                                // 判断数据表中是否有该应用的存在，如果有标识此次安装是应用更新所导致
-                                boolean isHas = TableAppSnapshot.getInstance(mContext)
-                                        .isHasPkgName(pkgName);
-                                if (!isHas) {
-                                    TableAppSnapshot.getInstance(mContext).insert(jsonObject);
+            if(TPUtils.isMainThread()){
+                // 数据库操作修改包名和类型
+                EThreadPool.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            if (type == 0) {
+                                PackageInfo pi =
+                                        mContext.getPackageManager().getPackageInfo(pkgName, 0);
+                                JSONObject jsonObject =
+                                        getAppInfo(pi, EGContext.SNAP_SHOT_INSTALL);
+                                if (jsonObject != null) {
+                                    // 判断数据表中是否有该应用的存在，如果有标识此次安装是应用更新所导致
+                                    boolean isHas = TableAppSnapshot.getInstance(mContext)
+                                            .isHasPkgName(pkgName);
+                                    if (!isHas) {
+                                        TableAppSnapshot.getInstance(mContext).insert(jsonObject);
+                                    }
                                 }
+                            } else if (type == 1) {
+                                TableAppSnapshot.getInstance(mContext).update(pkgName,
+                                        EGContext.SNAP_SHOT_UNINSTALL);
+                            } else if (type == 2) {
+                                TableAppSnapshot.getInstance(mContext).update(pkgName,
+                                        EGContext.SNAP_SHOT_UPDATE);
                             }
-                        } else if (type == 1) {
-                            TableAppSnapshot.getInstance(mContext).update(pkgName,
-                                    EGContext.SNAP_SHOT_UNINSTALL);
-                        } else if (type == 2) {
-                            TableAppSnapshot.getInstance(mContext).update(pkgName,
-                                    EGContext.SNAP_SHOT_UPDATE);
+                            ELOG.i(type + "   type");
+                        } catch (Throwable e) {
+                            ELOG.e(e);
                         }
-                        ELOG.i(type + "   type");
-                    } catch (Throwable e) {
-                        ELOG.e(e);
                     }
+                });
+            }else{
+                try {
+                    if (type == 0) {
+                        PackageInfo pi =
+                                mContext.getPackageManager().getPackageInfo(pkgName, 0);
+                        JSONObject jsonObject =
+                                getAppInfo(pi, EGContext.SNAP_SHOT_INSTALL);
+                        if (jsonObject != null) {
+                            // 判断数据表中是否有该应用的存在，如果有标识此次安装是应用更新所导致
+                            boolean isHas = TableAppSnapshot.getInstance(mContext)
+                                    .isHasPkgName(pkgName);
+                            if (!isHas) {
+                                TableAppSnapshot.getInstance(mContext).insert(jsonObject);
+                            }
+                        }
+                    } else if (type == 1) {
+                        TableAppSnapshot.getInstance(mContext).update(pkgName,
+                                EGContext.SNAP_SHOT_UNINSTALL);
+                    } else if (type == 2) {
+                        TableAppSnapshot.getInstance(mContext).update(pkgName,
+                                EGContext.SNAP_SHOT_UPDATE);
+                    }
+                    ELOG.i(type + "   type");
+                } catch (Throwable e) {
+                    ELOG.e(e);
                 }
-            });
+            }
+
         }catch (Throwable t){
 
         }

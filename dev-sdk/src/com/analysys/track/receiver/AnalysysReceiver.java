@@ -11,6 +11,7 @@ import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.impl.OCImpl;
 import com.analysys.track.internal.impl.WifiImpl;
 import com.analysys.track.internal.impl.proc.ProcessManager;
+import com.analysys.track.internal.work.CheckHeartbeat;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
@@ -66,12 +67,13 @@ public class AnalysysReceiver extends BroadcastReceiver {
             }
             if (SCREEN_ON.equals(intent.getAction())) {
                 ELOG.e("接收开启屏幕广播");
-                MessageDispatcher.getInstance(mContext).startService();
+                ProcessManager.setIsCollected(true);
+//                ReceiverUtils.getInstance().registAllReceiver(mContext);
+                CheckHeartbeat.getInstance(mContext).sendMessages();
             }
             if (SCREEN_OFF.equals(intent.getAction())) {
                 ProcessManager.setIsCollected(false);
-                ReceiverUtils.getInstance().unRegistAllReceiver(mContext);
-                MessageDispatcher.getInstance(mContext).killWorker();
+//                ReceiverUtils.getInstance().unRegistAllReceiver(mContext);
                 processScreenOff(context);
 
                 ELOG.e("接收关闭屏幕广播");
@@ -106,7 +108,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
                 EThreadPool.execute(new Runnable() {
                     @Override
                     public void run() {
-                        OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.CLOSE_SCREEN, true);
+                        OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.CLOSE_SCREEN);
                     }
                 });
 
@@ -115,7 +117,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
                 /*注销广播*/
                 ProcessManager.dealScreenOff(ctx);
                 ReceiverUtils.getInstance().unRegistAllReceiver(mContext);
-                OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.CLOSE_SCREEN, true);
+                OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.CLOSE_SCREEN);
             }
         } catch (Throwable e) {
         }

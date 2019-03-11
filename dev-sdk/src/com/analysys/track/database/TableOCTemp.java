@@ -6,8 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.analysys.track.internal.Content.DeviceKeyContacts;
+import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.Base64Utils;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.FileUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
@@ -71,7 +73,11 @@ public class TableOCTemp {
             if (ocInfo == null) {
                 return;
             }
+            EGContext.isLocked = true;
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            if(db == null){
+                return;
+            }
             JSONObject obj = new JSONObject();
             for(int i = 0;i <ocInfo.length();i++){
                 obj = (JSONObject)ocInfo.get(i);
@@ -83,8 +89,10 @@ public class TableOCTemp {
 
         } catch (Exception e) {
             ELOG.e(e.getMessage()+" ::::::insert()");
+        }finally {
+            EGContext.isLocked = false;
+            DBManager.getInstance(mContext).closeDB();
         }
-        DBManager.getInstance(mContext).closeDB();
     }
     /**
      * json数据转成ContentValues
@@ -107,11 +115,13 @@ public class TableOCTemp {
     }
     public void delete() {
         try {
+            EGContext.isLocked = true;
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if(db == null) return;
             db.delete(DBConfig.OCTemp.TABLE_NAME, null, null);
         } catch (Throwable e) {
         }finally {
+            EGContext.isLocked = false;
             DBManager.getInstance(mContext).closeDB();
         }
     }

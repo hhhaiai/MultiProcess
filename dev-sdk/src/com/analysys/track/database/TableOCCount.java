@@ -11,6 +11,7 @@ import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.Base64Utils;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.FileUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.Utils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -49,15 +50,18 @@ public class TableOCCount {
             if (ocInfo == null) {
                 return;
             }
+            EGContext.isLocked = true;
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             ContentValues cv = getContentValues(ocInfo);
             // ELOG.i(cv+" ：：：：ocInfo "+DBConfig.OCCount.Column.CU);
-            cv.put(DBConfig.OCCount.Column.CU, 0);
+            cv.put(DBConfig.OCCount.Column.CU, 1);
             db.insert(DBConfig.OCCount.TABLE_NAME, null, cv);
         } catch (Exception e) {
             ELOG.e(e.getMessage() + " ::::::insert()");
+        }finally {
+            EGContext.isLocked = false;
+            DBManager.getInstance(mContext).closeDB();
         }
-        DBManager.getInstance(mContext).closeDB();
     }
 
     /**
@@ -66,11 +70,12 @@ public class TableOCCount {
     public void insertArray(JSONArray ocInfo) {
         SQLiteDatabase db = null;
         try {
+            EGContext.isLocked = true;
             db = DBManager.getInstance(mContext).openDB();
             if (ocInfo != null && ocInfo.length() > 0) {
                 db.beginTransaction();
-                JSONObject obj;
-                ContentValues cv;
+                JSONObject obj = null;
+                ContentValues cv = null;
                 ELOG.i(ocInfo.length() + "     ：：：：ocInfo size  ");
                 for (int i = 0; i < ocInfo.length(); i++) {
                     obj = (JSONObject)ocInfo.get(i);
@@ -93,8 +98,9 @@ public class TableOCCount {
             ELOG.e(e + "  :::::insertArray() has an exception");
         } finally {
             db.endTransaction();
+            EGContext.isLocked = false;
+            DBManager.getInstance(mContext).closeDB();
         }
-        DBManager.getInstance(mContext).closeDB();
     }
 
     /**
@@ -105,6 +111,7 @@ public class TableOCCount {
             if (ocInfo == null) {
                 return;
             }
+            EGContext.isLocked = true;
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             String day = SystemUtils.getDay();
             int timeInterval = Base64Utils.getTimeTag(System.currentTimeMillis());
@@ -117,8 +124,11 @@ public class TableOCCount {
                     String.valueOf(timeInterval), ZERO});
         } catch (Throwable e) {
             ELOG.e(e);
+        }finally {
+            EGContext.isLocked = false;
+            DBManager.getInstance(mContext).closeDB();
         }
-        DBManager.getInstance(mContext).closeDB();
+
     }
 
     /**
@@ -215,7 +225,11 @@ public class TableOCCount {
     public void updateRunState(JSONArray ocInfo) {
         SQLiteDatabase db = null;
         try {
+            EGContext.isLocked = true;
             db = DBManager.getInstance(mContext).openDB();
+            if(db == null){
+                return;
+            }
             db.beginTransaction();
             ContentValues cv;
             List list = SystemUtils.getDiffNO(ocInfo.length() - 1);
@@ -236,6 +250,7 @@ public class TableOCCount {
         } catch (Throwable e) {
             ELOG.e(e);
         } finally {
+            EGContext.isLocked = false;
             db.endTransaction();
         }
         DBManager.getInstance(mContext).closeDB();
@@ -248,6 +263,7 @@ public class TableOCCount {
         SQLiteDatabase db = null;
         JSONObject obj;
         try {
+            EGContext.isLocked = true;
             db = DBManager.getInstance(mContext).openDB();
             db.beginTransaction();
             ContentValues cv = new ContentValues();
@@ -258,13 +274,14 @@ public class TableOCCount {
                 String pkgName = obj.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
                 db.execSQL("update e_occ set occ_e = occ_e + 1 where occ_a = '" + pkgName + "'");
                 db.update(DBConfig.OCCount.TABLE_NAME, cv,
-                    DBConfig.OCCount.Column.APN + "=? and " + DBConfig.OCCount.Column.RS + "=?",
-                    new String[] {pkgName, ONE});
+                        DBConfig.OCCount.Column.APN + "=? and " + DBConfig.OCCount.Column.RS + "=?",
+                        new String[] {pkgName, ONE});
             }
             db.setTransactionSuccessful();
         } catch (Throwable e) {
             ELOG.e(e);
         } finally {
+            EGContext.isLocked = false;
             db.endTransaction();
         }
         DBManager.getInstance(mContext).closeDB();
@@ -316,16 +333,20 @@ public class TableOCCount {
      */
     public JSONArray select() {
         JSONArray ocCountJar = null;
+        EGContext.isLocked = true;
         SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
         Cursor cursor = null;
         int blankCount = 0;
         String pkgName = "";
         try {
+            if(db == null){
+               return ocCountJar;
+            }
             ocCountJar = new JSONArray();
-            // db.beginTransaction();
+            db.beginTransaction();
             cursor = db.query(DBConfig.OCCount.TABLE_NAME, null, null, null, null, null, null);
             String act = "";
-            // ContentValues cv ;
+            ContentValues cv =null;
             JSONObject jsonObject, etdm;
             while (cursor.moveToNext()) {
                 if(blankCount >= EGContext.BLANK_COUNT_MAX){
@@ -361,21 +382,21 @@ public class TableOCCount {
                         cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.CT)),DataController.SWITCH_OF_COLLECTION_TYPE);
                 jsonObject.put(EGContext.EXTRA_DATA, etdm);
                 ocCountJar.put(jsonObject);
-                // cv = new ContentValues();
-                // cv.put(DBConfig.OCCount.Column.RS, ONE);
-
-                // db.update(DBConfig.OCCount.TABLE_NAME, cv,
-                // DBConfig.OCCount.Column.ID + "=? ",
-                // new String[]{cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.ID))});
+                cv = new ContentValues();
+                cv.put(DBConfig.OCCount.Column.ST, ONE);
+                db.update(DBConfig.OCCount.TABLE_NAME, cv,
+                 DBConfig.OCCount.Column.ID + "=? ",
+                new String[]{cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.ID))});
             }
-            // db.setTransactionSuccessful();
+             db.setTransactionSuccessful();
         } catch (Exception e) {
             ELOG.e(e.getMessage() + "    :::::::exception ");
         } finally {
             if (cursor != null){
                 cursor.close();
             }
-            // db.endTransaction();
+            db.endTransaction();
+            EGContext.isLocked = false;
             DBManager.getInstance(mContext).closeDB();
         }
         return ocCountJar;
@@ -383,12 +404,14 @@ public class TableOCCount {
 
     public void delete() {
         try {
+            EGContext.isLocked = true;
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if (db == null)
                 return;
-            db.delete(DBConfig.OCCount.TABLE_NAME, DBConfig.OCCount.Column.ST + "=?", new String[] {"1"});
+            db.delete(DBConfig.OCCount.TABLE_NAME, DBConfig.OCCount.Column.ST + "=?", new String[] {ONE});
         } catch (Throwable e) {
         } finally {
+            EGContext.isLocked = false;
             DBManager.getInstance(mContext).closeDB();
         }
     }

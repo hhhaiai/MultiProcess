@@ -2,24 +2,19 @@ package com.analysys.track.internal;
 
 import android.content.Context;
 
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.Process;
 import com.analysys.track.internal.Content.EGContext;
 
 import com.analysys.track.internal.work.CrashHandler;
 import com.analysys.track.internal.work.MessageDispatcher;
-import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.FileUtils;
 import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.TPUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
-import com.analysys.track.utils.sp.SPHelper;
 
 import java.lang.ref.WeakReference;
 
@@ -77,13 +72,12 @@ public class AnalysysInternal {
     private void init(String key, String channel) {
         hasInit = true;
         ELOG.d("初始化，进程Id：< " + Process.myPid() + " >");
-        TPUtils.updateAppkeyAndChannel(mContextRef.get(), key, channel);//updata sp
+        TPUtils.updateAppkeyAndChannel(mContextRef.get(), key, channel);//update sp
         // 0.首先检查是否有Context
         Context cxt = EContextHelper.getContext(mContextRef.get());
         if (cxt != null) {
             // 1.初始化多进程
             initSupportMultiProcess(cxt);
-
             // 2. 设置错误回调
             CrashHandler.getInstance().setCallback(null);
             // 3. 启动工作机制
@@ -115,7 +109,7 @@ public class AnalysysInternal {
             if (Build.VERSION.SDK_INT < 21) {
                 FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_OC, EGContext.TIME_SYNC_DEFAULT);
             } else {
-                FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_OC, EGContext.TIME_SYNC_OC_ABOVE_FIVE);
+                FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_OC, EGContext.TIME_SYNC_OC_OVER_5);
             }
             FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_LOCATION, EGContext.TIME_SYNC_OC_LOCATION);
             FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_DB_WRITER, EGContext.TIME_SYNC_DEFAULT);

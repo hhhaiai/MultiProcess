@@ -91,7 +91,7 @@ public class OCImpl {
                     if (!TextUtils.isEmpty(openApp)) {
                         // 补充时间
                         SPHelper.setEndTime(mContext, System.currentTimeMillis() - new Random(25).nextInt(1000));
-                        filterInsertOCInfo(EGContext.CLOSE_SCREEN, false);
+                        filterInsertOCInfo(EGContext.CLOSE_SCREEN);
                     }
                     // 亮屏&&解锁,工作
                 } else {
@@ -240,7 +240,7 @@ public class OCImpl {
             if (!packageName.equals(lastPkgName)) {
                 // L.i("=======切换包名。即将保存");
                 SPHelper.setEndTime(mContext, System.currentTimeMillis() - new Random(25).nextInt(1000));
-                filterInsertOCInfo(EGContext.APP_SWITCH, false);
+                filterInsertOCInfo(EGContext.APP_SWITCH);
                 insertShared(pm, packageName);
             }
         }
@@ -271,7 +271,7 @@ public class OCImpl {
         SPHelper.setLastOpenTime(mContext, nowTime);
         SPHelper.setLastAppName(mContext, appName);
         SPHelper.setLastAppVerison(mContext,
-            versionName == null || "null".equals(versionName) ? "1.0" : versionName + "|" + versionCode);
+                (versionName == null || "null".equals(versionName)) ? "1.0" : versionName + "|" + versionCode);
         SPHelper.setAppType(mContext, Applist.getInstance(mContext).getAppType(pkgName));
     }
 
@@ -282,6 +282,9 @@ public class OCImpl {
         JSONArray cacheApps = TableOCCount.getInstance(mContext).selectRunning();
         ELOG.i(cacheApps + "   :::::::: cacheApps");
         JSONObject obj = ProcessManager.getRunningForegroundApps(mContext);
+        if(obj == null){
+            return;
+        }
         List<Process> run = new ArrayList<Process>();
         JSONObject jsonObject = new JSONObject();
         try {
@@ -575,7 +578,7 @@ public class OCImpl {
         return ocInfo;
     }
 
-    public void filterInsertOCInfo(String switchType, boolean createThread) {
+    public void filterInsertOCInfo(String switchType) {
         // L.i("-------filterInsertOCInfo()----" + switchType);
         String OldPkgName = SPHelper.getLastOpenPackgeName(mContext);
         String appName = SPHelper.getLastAppName(mContext);

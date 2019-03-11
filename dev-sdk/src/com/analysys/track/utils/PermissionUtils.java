@@ -13,6 +13,7 @@ import java.lang.reflect.Method;
  * @Author: sanbo
  */
 public class PermissionUtils {
+    private static int permissionAskCount = 0;
     /**
      * 检查权限
      * 权限申请被拒绝检测返回false，权限申请通过检测返回true
@@ -22,6 +23,9 @@ public class PermissionUtils {
      */
     public static boolean checkPermission(Context context, String permission) {
         boolean result = false;
+        if(permissionAskCount > 5){
+            return false;
+        }
         if (Build.VERSION.SDK_INT >= 23) {
             try {
                 Class<?> clazz = Class.forName("android.content.Context");
@@ -36,6 +40,9 @@ public class PermissionUtils {
             if (pm.checkPermission(permission, context.getPackageName()) == PackageManager.PERMISSION_GRANTED) {
                 result = true;
             }
+        }
+        if(!result){
+            permissionAskCount = permissionAskCount+1;
         }
         return result;
     }

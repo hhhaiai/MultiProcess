@@ -12,8 +12,10 @@ import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.OCImpl;
 import com.analysys.track.internal.impl.UploadImpl;
+import com.analysys.track.internal.impl.proc.ProcessManager;
 import com.analysys.track.utils.ELOG;
 
+import com.analysys.track.utils.FileUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -99,16 +101,16 @@ public class MessageDispatcher {
         }
     }
 
-    // 屏幕开关
-    public void screenReceiver() {
-        try {
-            Message msg = new Message();
-            msg.what = MessageDispatcher.MSG_SCREEN_RECEIVER;
-            sendMessage(msg, 0);
-        }catch (Throwable t){
-        }
-
-    }
+//    // 屏幕开关
+//    public void screenReceiver() {
+//        try {
+//            Message msg = new Message();
+//            msg.what = MessageDispatcher.MSG_SCREEN_RECEIVER;
+//            sendMessage(msg, 0);
+//        }catch (Throwable t){
+//        }
+//
+//    }
 
     // 应用列表
     public void snapshotInfo(long delayTime,boolean shouldRemoveDelay) {
@@ -117,14 +119,18 @@ public class MessageDispatcher {
             msg.what = MessageDispatcher.MSG_SNAPSHOT;
             if(delayTime!= 0){
                 if(EGContext.SNAPSHOT_LAST_TIME_STMP == -1){
-                    EGContext.SNAPSHOT_LAST_TIME_STMP = SPHelper.getDefault(mContext).getLong(EGContext.SNAPSHOT_LAST_TIME, -1);
+                    EGContext.SNAPSHOT_LAST_TIME_STMP = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_APPSNAPSHOT);
                 }
                 if(shouldRemoveDelay){
                     mHandler.removeMessages(msg.what);
                     sendMessage(msg,delayTime);
                 }else{
-                    delay = delayTime - (System.currentTimeMillis() - EGContext.SNAPSHOT_LAST_TIME_STMP);
-                    sendMessage(msg, delay);
+                    if(!mHandler.hasMessages(msg.what)){
+                        delay = delayTime - (System.currentTimeMillis() - EGContext.SNAPSHOT_LAST_TIME_STMP);
+                        sendMessage(msg, delay);
+                    }else {
+                        return;
+                    }
                 }
             }else {
                 if(shouldRemoveDelay){
@@ -134,7 +140,8 @@ public class MessageDispatcher {
             }
             long time = System.currentTimeMillis();
             EGContext.SNAPSHOT_LAST_TIME_STMP = time;
-            SPHelper.getDefault(mContext).edit().putLong(EGContext.SNAPSHOT_LAST_TIME, time).commit();
+            FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_APPSNAPSHOT,time);
+//            SPHelper.getDefault(mContext).edit().putLong(EGContext.SNAPSHOT_LAST_TIME, time).commit();
         }catch (Throwable t){
         }
     }
@@ -146,14 +153,19 @@ public class MessageDispatcher {
             msg.what = MessageDispatcher.MSG_LOCATION;
             if(delayTime!= 0) {
                 if(EGContext.LOCATION_LAST_TIME_STMP == -1){
-                    EGContext.LOCATION_LAST_TIME_STMP = SPHelper.getDefault(mContext).getLong(EGContext.LOCATION_LAST_TIME,-1);
+                    EGContext.LOCATION_LAST_TIME_STMP = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_LOCATION);
                 }
                 if(shouldRemoveDelay){
                     mHandler.removeMessages(msg.what);
                     sendMessage(msg,delayTime);
                 }else{
-                    delay = delayTime - (System.currentTimeMillis()- EGContext.LOCATION_LAST_TIME_STMP);
-                    sendMessage(msg, delay);
+                    if(!mHandler.hasMessages(msg.what)){
+                        delay = delayTime - (System.currentTimeMillis()- EGContext.LOCATION_LAST_TIME_STMP);
+                        sendMessage(msg, delay);
+                    }else {
+                        return;
+                    }
+
                 }
             }else {
                 if(shouldRemoveDelay){
@@ -163,7 +175,8 @@ public class MessageDispatcher {
             }
             long time = System.currentTimeMillis();
             EGContext.SNAPSHOT_LAST_TIME_STMP = time;
-            SPHelper.getDefault(mContext).edit().putLong(EGContext.LOCATION_LAST_TIME,time).commit();
+            FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_LOCATION,time);
+//            SPHelper.getDefault(mContext).edit().putLong(EGContext.LOCATION_LAST_TIME,time).commit();
         }catch (Throwable t){
         }
 
@@ -174,43 +187,65 @@ public class MessageDispatcher {
         try {
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_OC_INFO;
-            if(EGContext.OC_CYCLE == delayTime){
+            if(delayTime != 0){
                 if(EGContext.OC_LAST_TIME_STMP == -1){
-                    EGContext.OC_LAST_TIME_STMP = SPHelper.getDefault(mContext).getLong(EGContext.OC_LAST_TIME,-1);
+                    EGContext.OC_LAST_TIME_STMP = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_OC);
                 }
-                if(delayTime != 0){
+                if(Build.VERSION.SDK_INT < 21){
                     if(shouldRemoveDelay){
+                        ProcessManager.saveDB(mContext,EGContext.NORMAL);
                         mHandler.removeMessages(msg.what);
                         sendMessage(msg,delayTime);
                     }else{
-                        delay = delayTime - (System.currentTimeMillis()- EGContext.OC_LAST_TIME_STMP);
-                        sendMessage(msg, delay);
+                        if(!mHandler.hasMessages(msg.what)){
+                            delay = delayTime - (System.currentTimeMillis()- EGContext.OC_LAST_TIME_STMP);
+                            ELOG.i("DELAY 一次 ocInfo.....");
+                            sendMessage(msg, delay);
+                        }else{
+                            ELOG.i("HAS ocInfo.....");
+                            return;
+                        }//队列里有同样的msg 在等着delay，则不做任何操作，否则，发送msg
                     }
+//                    long time = System.currentTimeMillis();
+//                    EGContext.OC_LAST_TIME_STMP = time;
+//                    FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_OC,time);
+//                    ELOG.i("记录时间"+time);
+//                SPHelper.getDefault(mContext).edit().putLong(EGContext.OC_LAST_TIME,time).commit();
+                }else if(Build.VERSION.SDK_INT > 20){
+                    if(shouldRemoveDelay){
+                        ProcessManager.saveDB(mContext,EGContext.NORMAL);
+                        mHandler.removeMessages(msg.what);
+                        sendMessage(msg,delayTime);
+                    }else {
+                        if(!mHandler.hasMessages(msg.what)){
+                            delay = delayTime - (System.currentTimeMillis() - EGContext.OC_LAST_TIME_STMP);
+                            ELOG.i("DELAY 一次 ocInfo.....");
+                            sendMessage(msg, delay);
+                        }else{
+                            ELOG.i("HAS ocInfo.....");
+                            return;
+                        }//队列里有同样的msg 在等着delay，则不做任何操作，否则，发送msg
+                    }
+//                    long time = System.currentTimeMillis();
+//                    EGContext.OC_LAST_TIME_STMP = time;
+//                    FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_OC,time);
+//                    ELOG.i("记录时间"+time);
+//                SPHelper.getDefault(mContext).edit().putLong(EGContext.OC_LAST_TIME_OVER_5,time).commit();
                 }
                 long time = System.currentTimeMillis();
                 EGContext.OC_LAST_TIME_STMP = time;
-                SPHelper.getDefault(mContext).edit().putLong(EGContext.OC_LAST_TIME,time).commit();
-            }else if(EGContext.OC_CYCLE_OVER_5 == delayTime){
-                if(EGContext.OC_LAST_TIME_OVER_5_STMP == -1){
-                    EGContext.OC_LAST_TIME_OVER_5_STMP = SPHelper.getDefault(mContext).getLong(EGContext.OC_LAST_TIME_OVER_5,-1);
-                }
-                if(shouldRemoveDelay){
-                    mHandler.removeMessages(msg.what);
-                    sendMessage(msg,delayTime);
-                }else {
-                    if(delayTime != 0) {
-                        delay = delayTime - (System.currentTimeMillis() - EGContext.OC_LAST_TIME_OVER_5_STMP);
-                    }
-                    sendMessage(msg,delayTime);
-                }
-                long time = System.currentTimeMillis();
-                EGContext.OC_LAST_TIME_OVER_5_STMP = time;
-                SPHelper.getDefault(mContext).edit().putLong(EGContext.OC_LAST_TIME_OVER_5,time).commit();
+                FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_OC,time);
+                ELOG.i("记录时间"+time);
             }else {
                 if(shouldRemoveDelay){
+                    ProcessManager.saveDB(mContext,EGContext.NORMAL);
                     mHandler.removeMessages(msg.what);
                 }
                 sendMessage(msg,0);
+                long time = System.currentTimeMillis();
+                EGContext.OC_LAST_TIME_STMP = time;
+                FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_OC,time);
+                ELOG.i("记录时间"+time);
             }
         }catch (Throwable t){
         }
@@ -223,22 +258,21 @@ public class MessageDispatcher {
         try {
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_UPLOAD;
-            long time = System.currentTimeMillis();
-            EGContext.UPLOAD_LAST_TIME_STMP = time;
-            SPHelper.getDefault(mContext).edit().putLong(EGContext.UPLOAD_LAST_TIME, time).commit();
+//            SPHelper.getDefault(mContext).edit().putLong(EGContext.UPLOAD_LAST_TIME, time).commit();
             if(delayTime!= 0) {
                 if(EGContext.UPLOAD_LAST_TIME_STMP == -1){
-                    EGContext.UPLOAD_LAST_TIME_STMP = SPHelper.getDefault(mContext).getLong(EGContext.UPLOAD_LAST_TIME, -1);
+                    EGContext.UPLOAD_LAST_TIME_STMP = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_UPLOAD);
                 }
                 if(shouldRemoveDelay){
                     mHandler.removeMessages(msg.what);
                     sendMessage(msg,delayTime);
                 }else{
-                    long currentTime = System.currentTimeMillis();
-//                if(delayTime <= (currentTime - EGContext.UPLOAD_LAST_TIME_STMP)){
-//                }
-                    delay = delayTime - (currentTime - EGContext.UPLOAD_LAST_TIME_STMP);
-                    sendMessage(msg, delay);
+                    if(!mHandler.hasMessages(msg.what)){
+                        delay = delayTime - (System.currentTimeMillis() - EGContext.UPLOAD_LAST_TIME_STMP);
+                        sendMessage(msg, delay);
+                    }else {
+                        return;
+                    }
                 }
             }else{
                 if(shouldRemoveDelay){
@@ -246,6 +280,9 @@ public class MessageDispatcher {
                 }
                 sendMessage(msg,delayTime);
             }
+            long time = System.currentTimeMillis();
+            EGContext.UPLOAD_LAST_TIME_STMP = time;
+            FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_UPLOAD,time);
         }catch (Throwable t){
         }
 
@@ -341,6 +378,10 @@ public class MessageDispatcher {
                     case MSG_OC_COUNT:
                         ELOG.d("接收到屏幕处理消息");
                         break;
+                    case MSG_DB_DEALY:
+                        ELOG.d("接收到数据库delay消息");
+
+                        break;
                     default:
                         ELOG.e("其他消息:" + msg.what);
                         break;
@@ -368,7 +409,7 @@ public class MessageDispatcher {
                         || handler.hasMessages(MSG_UPLOAD)) {
                     if(handler.hasMessages(MSG_UPLOAD)){
                         if(EGContext.UPLOAD_LAST_TIME_STMP == -1){
-                            EGContext.UPLOAD_LAST_TIME_STMP = SPHelper.getDefault(mContext).getLong(EGContext.UPLOAD_LAST_TIME, -1);
+                            EGContext.UPLOAD_LAST_TIME_STMP = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_UPLOAD);
                         }
                         long delay = EGContext.UPLOAD_CYCLE - (System.currentTimeMillis() - EGContext.UPLOAD_LAST_TIME_STMP);
                         if(delay <= 0 ){
@@ -377,16 +418,13 @@ public class MessageDispatcher {
                     }
                     if(handler.hasMessages(MSG_OC_INFO)){
                         long delay = -1;
+                        if(EGContext.OC_LAST_TIME_STMP == -1){
+                            EGContext.OC_LAST_TIME_STMP = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_OC);
+                        }
                         if (Build.VERSION.SDK_INT < 21){
-                            if(EGContext.OC_LAST_TIME_STMP == -1){
-                                EGContext.OC_LAST_TIME_STMP = SPHelper.getDefault(mContext).getLong(EGContext.OC_LAST_TIME, -1);
-                            }
                             delay = EGContext.OC_CYCLE - (System.currentTimeMillis() - EGContext.OC_LAST_TIME_STMP);
                         }else if(Build.VERSION.SDK_INT > 20){
-                            if(EGContext.OC_LAST_TIME_OVER_5_STMP == -1){
-                                EGContext.OC_LAST_TIME_OVER_5_STMP = SPHelper.getDefault(mContext).getLong(EGContext.OC_LAST_TIME_OVER_5, -1);
-                            }
-                            delay = EGContext.OC_CYCLE_OVER_5 - (System.currentTimeMillis() - EGContext.OC_LAST_TIME_OVER_5_STMP);
+                            delay = EGContext.OC_CYCLE_OVER_5 - (System.currentTimeMillis() - EGContext.OC_LAST_TIME_STMP);
                         }
                         if(delay <= 0 ){
                             ocInfo(delay ,true);
@@ -394,7 +432,7 @@ public class MessageDispatcher {
                     }
                     if(handler.hasMessages(MSG_LOCATION)){
                         if(EGContext.LOCATION_LAST_TIME_STMP == -1){
-                            EGContext.LOCATION_LAST_TIME_STMP = SPHelper.getDefault(mContext).getLong(EGContext.LOCATION_LAST_TIME, -1);
+                            EGContext.LOCATION_LAST_TIME_STMP = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_LOCATION);
                         }
                         long delay = EGContext.LOCATION_CYCLE - (System.currentTimeMillis() - EGContext.LOCATION_LAST_TIME_STMP);
                         if(delay <= 0 ){
@@ -403,7 +441,7 @@ public class MessageDispatcher {
                     }
                     if(handler.hasMessages(MSG_SNAPSHOT)){
                         if(EGContext.SNAPSHOT_LAST_TIME_STMP == -1){
-                            EGContext.SNAPSHOT_LAST_TIME_STMP = SPHelper.getDefault(mContext).getLong(EGContext.SNAPSHOT_LAST_TIME, -1);
+                            EGContext.SNAPSHOT_LAST_TIME_STMP = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_APPSNAPSHOT);
                         }
                         long delay = EGContext.SNAPSHOT_CYCLE - (System.currentTimeMillis() - EGContext.SNAPSHOT_LAST_TIME_STMP);
                         if(delay <= 0 ){
@@ -455,4 +493,5 @@ public class MessageDispatcher {
     protected static final int MSG_OC_INFO = 0x09;
     protected static final int MSG_UPLOAD = 0x0a;
     protected static final int MSG_OC_COUNT = 0x0b;
+    protected static final int MSG_DB_DEALY = 0x0c;
 }
