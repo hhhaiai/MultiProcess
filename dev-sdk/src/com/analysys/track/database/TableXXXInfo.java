@@ -40,7 +40,6 @@ public class TableXXXInfo {
     public void insert(JSONArray xxxInfo) {
         SQLiteDatabase db = null;
         try {
-            EGContext.isLocked = true;
             db = DBManager.getInstance(mContext).openDB();
             if (xxxInfo == null) {
                 return;
@@ -67,7 +66,6 @@ public class TableXXXInfo {
             ELOG.e(e+"  insert XXX");
         }finally {
             db.endTransaction();
-            EGContext.isLocked = false;
             DBManager.getInstance(mContext).closeDB();
         }
 
@@ -152,7 +150,6 @@ public class TableXXXInfo {
     public void delete() {
         SQLiteDatabase db = null;
         try {
-            EGContext.isLocked = true;
             db = DBManager.getInstance(mContext).openDB();
             if(db == null) return;
             db.beginTransaction();
@@ -162,7 +159,6 @@ public class TableXXXInfo {
         } catch (Throwable e) {
         }finally {
             db.endTransaction();
-            EGContext.isLocked = false;
             DBManager.getInstance(mContext).closeDB();
         }
     }

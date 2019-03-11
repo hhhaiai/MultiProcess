@@ -7,11 +7,14 @@ import com.analysys.track.utils.reflectinon.EContextHelper;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class DBManager {
 
     private static Context mContext = null;
     private static DBHelper dbHelper = null;
     private SQLiteDatabase db = null;
+    private AtomicInteger mOpenWriteCounter = new AtomicInteger();
 
     public DBManager() {}
 
@@ -30,28 +33,17 @@ public class DBManager {
     }
 
     public synchronized SQLiteDatabase openDB() {
-        if(EGContext.isLocked){
-            long currentTime = System.currentTimeMillis();
-            if(currentTime - FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_DB_WRITER) >EGContext.TIME_SYNC_DEFAULT){
-                db = dbHelper.getWritableDatabase();
-                FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_DB_WRITER,currentTime);
-                return db;
-            }else {
-                try {
-                    Thread.sleep(EGContext.TIME_SYNC_DEFAULT);
-                }catch (Throwable t){
-                }
-            }
-        }else {
+        if (mOpenWriteCounter.incrementAndGet() == 1) {
+            // Opening new database
             db = dbHelper.getWritableDatabase();
-            return db;
         }
-        return null;
+        return db;
     }
 
     public synchronized void closeDB() {
         try {
-            if (db != null) {
+            if (mOpenWriteCounter.decrementAndGet() == 0) {
+                // Closing database
                 db.close();
             }
         } finally {

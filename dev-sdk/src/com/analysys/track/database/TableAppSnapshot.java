@@ -43,7 +43,6 @@ public class TableAppSnapshot {
         SQLiteDatabase db = null;
         try {
             if (snapshots.size() > 0) {
-                EGContext.isLocked = true;
                 db = DBManager.getInstance(mContext).openDB();
                 db.beginTransaction();
                 db.execSQL("delete from " + DBConfig.AppSnapshot.TABLE_NAME);
@@ -57,7 +56,6 @@ public class TableAppSnapshot {
         } catch (Throwable e) {
         } finally {
             db.endTransaction();
-            EGContext.isLocked = false;
             DBManager.getInstance(mContext).closeDB();
         }
     }
@@ -68,13 +66,11 @@ public class TableAppSnapshot {
     public void insert(JSONObject snapshots) {
         SQLiteDatabase db = null;
         try {
-            EGContext.isLocked = true;
             db = DBManager.getInstance(mContext).openDB();
             db.insert(DBConfig.AppSnapshot.TABLE_NAME, null, getContentValues(snapshots));
             db.setTransactionSuccessful();
         } catch (Throwable e) {
         }finally {
-            EGContext.isLocked = false;
             DBManager.getInstance(mContext).closeDB();
         }
     }
@@ -168,7 +164,6 @@ public class TableAppSnapshot {
      */
     public void update(String pkgName, String appTag) {
         try {
-            EGContext.isLocked = true;
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             ContentValues cv = new ContentValues();
             cv.put(DBConfig.AppSnapshot.Column.AT, appTag);
@@ -176,7 +171,6 @@ public class TableAppSnapshot {
                 DBConfig.AppSnapshot.Column.APN + "= ? ", new String[] {pkgName});
         } catch (Throwable e) {
         } finally {
-            EGContext.isLocked = false;
             DBManager.getInstance(mContext).closeDB();
         }
     }
@@ -238,7 +232,6 @@ public class TableAppSnapshot {
 
     public void delete() {
         try {
-            EGContext.isLocked = true;
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if (db == null) {
                 return;
@@ -246,7 +239,6 @@ public class TableAppSnapshot {
             db.delete(DBConfig.AppSnapshot.TABLE_NAME, null, null);
         } catch (Throwable e) {
         } finally {
-            EGContext.isLocked = false;
             DBManager.getInstance(mContext).closeDB();
         }
     }

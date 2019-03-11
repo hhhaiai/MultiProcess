@@ -39,7 +39,6 @@ public class TableLocation {
                     cv.put(DBConfig.Location.Column.LI, encryptLocation);
                     cv.put(DBConfig.Location.Column.IT, String.valueOf(time));
                     cv.put(DBConfig.Location.Column.ST, "0");
-                    EGContext.isLocked = true;
                     SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
                     if(db == null){
                         return;
@@ -49,7 +48,6 @@ public class TableLocation {
             }
         } catch (Throwable e) {
         }finally {
-            EGContext.isLocked = false;
             DBManager.getInstance(mContext).closeDB();
         }
     }
@@ -95,7 +93,6 @@ public class TableLocation {
 
     public void delete() {
         try {
-            EGContext.isLocked = true;
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if(db == null) {
                 return;
@@ -103,7 +100,6 @@ public class TableLocation {
             db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?", new String[]{"1"});
         } catch (Throwable e) {
         }finally {
-            EGContext.isLocked = false;
             DBManager.getInstance(mContext).closeDB();
         }
     }

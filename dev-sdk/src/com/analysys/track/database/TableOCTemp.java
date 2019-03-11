@@ -73,7 +73,6 @@ public class TableOCTemp {
             if (ocInfo == null) {
                 return;
             }
-            EGContext.isLocked = true;
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if(db == null){
                 return;
@@ -90,7 +89,6 @@ public class TableOCTemp {
         } catch (Exception e) {
             ELOG.e(e.getMessage()+" ::::::insert()");
         }finally {
-            EGContext.isLocked = false;
             DBManager.getInstance(mContext).closeDB();
         }
     }
@@ -115,13 +113,11 @@ public class TableOCTemp {
     }
     public void delete() {
         try {
-            EGContext.isLocked = true;
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if(db == null) return;
             db.delete(DBConfig.OCTemp.TABLE_NAME, null, null);
         } catch (Throwable e) {
         }finally {
-            EGContext.isLocked = false;
             DBManager.getInstance(mContext).closeDB();
         }
     }

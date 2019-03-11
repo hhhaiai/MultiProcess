@@ -50,7 +50,6 @@ public class TableOCCount {
             if (ocInfo == null) {
                 return;
             }
-            EGContext.isLocked = true;
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             ContentValues cv = getContentValues(ocInfo);
             // ELOG.i(cv+" ：：：：ocInfo "+DBConfig.OCCount.Column.CU);
@@ -59,7 +58,6 @@ public class TableOCCount {
         } catch (Exception e) {
             ELOG.e(e.getMessage() + " ::::::insert()");
         }finally {
-            EGContext.isLocked = false;
             DBManager.getInstance(mContext).closeDB();
         }
     }
@@ -70,7 +68,6 @@ public class TableOCCount {
     public void insertArray(JSONArray ocInfo) {
         SQLiteDatabase db = null;
         try {
-            EGContext.isLocked = true;
             db = DBManager.getInstance(mContext).openDB();
             if (ocInfo != null && ocInfo.length() > 0) {
                 db.beginTransaction();
@@ -98,7 +95,6 @@ public class TableOCCount {
             ELOG.e(e + "  :::::insertArray() has an exception");
         } finally {
             db.endTransaction();
-            EGContext.isLocked = false;
             DBManager.getInstance(mContext).closeDB();
         }
     }
@@ -111,7 +107,6 @@ public class TableOCCount {
             if (ocInfo == null) {
                 return;
             }
-            EGContext.isLocked = true;
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             String day = SystemUtils.getDay();
             int timeInterval = Base64Utils.getTimeTag(System.currentTimeMillis());
@@ -125,7 +120,6 @@ public class TableOCCount {
         } catch (Throwable e) {
             ELOG.e(e);
         }finally {
-            EGContext.isLocked = false;
             DBManager.getInstance(mContext).closeDB();
         }
 
@@ -225,7 +219,6 @@ public class TableOCCount {
     public void updateRunState(JSONArray ocInfo) {
         SQLiteDatabase db = null;
         try {
-            EGContext.isLocked = true;
             db = DBManager.getInstance(mContext).openDB();
             if(db == null){
                 return;
@@ -250,7 +243,6 @@ public class TableOCCount {
         } catch (Throwable e) {
             ELOG.e(e);
         } finally {
-            EGContext.isLocked = false;
             db.endTransaction();
         }
         DBManager.getInstance(mContext).closeDB();
@@ -263,7 +255,6 @@ public class TableOCCount {
         SQLiteDatabase db = null;
         JSONObject obj;
         try {
-            EGContext.isLocked = true;
             db = DBManager.getInstance(mContext).openDB();
             db.beginTransaction();
             ContentValues cv = new ContentValues();
@@ -281,7 +272,6 @@ public class TableOCCount {
         } catch (Throwable e) {
             ELOG.e(e);
         } finally {
-            EGContext.isLocked = false;
             db.endTransaction();
         }
         DBManager.getInstance(mContext).closeDB();
@@ -333,7 +323,6 @@ public class TableOCCount {
      */
     public JSONArray select() {
         JSONArray ocCountJar = null;
-        EGContext.isLocked = true;
         SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
         Cursor cursor = null;
         int blankCount = 0;
@@ -396,7 +385,6 @@ public class TableOCCount {
                 cursor.close();
             }
             db.endTransaction();
-            EGContext.isLocked = false;
             DBManager.getInstance(mContext).closeDB();
         }
         return ocCountJar;
@@ -404,14 +392,12 @@ public class TableOCCount {
 
     public void delete() {
         try {
-            EGContext.isLocked = true;
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if (db == null)
                 return;
             db.delete(DBConfig.OCCount.TABLE_NAME, DBConfig.OCCount.Column.ST + "=?", new String[] {ONE});
         } catch (Throwable e) {
         } finally {
-            EGContext.isLocked = false;
             DBManager.getInstance(mContext).closeDB();
         }
     }
