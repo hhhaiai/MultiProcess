@@ -16,6 +16,11 @@ import android.content.pm.PackageManager;
 import android.os.PowerManager;
 import android.text.TextUtils;
 
+import com.analysys.track.internal.Content.DeviceKeyContacts;
+import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.impl.PolicyImpl;
+import com.analysys.track.model.PolicyInfo;
+
 /**
  * @Copyright © 2019 analysys Inc. All rights reserved.
  * @Description: 系统工具方法: 屏幕状态判断/是否授权/用户权限判断/应用版本获取/日期获取/随机数获取
@@ -153,4 +158,19 @@ public class SystemUtils {
         }
         return appVer;
     }
+    /**
+     * 获取上传间隔时间
+     *
+     * @return
+     */
+    public static long intervalTime(Context ctx) {
+        String reTryTime = PolicyImpl.getInstance(ctx).getSP().getString(DeviceKeyContacts.Response.RES_POLICY_FAIL_TRY_DELAY,String.valueOf(EGContext.FAIL_TRY_DELAY_DEFALUT));
+        if(TextUtils.isEmpty(reTryTime)||reTryTime.equals("0")){
+            reTryTime = String.valueOf(EGContext.FAIL_TRY_DELAY_DEFALUT);
+        }
+        //10s间隔
+        long time = ((int) (Math.random() * 10) * 1000)  + Integer.parseInt(reTryTime);
+        return time;
+    }
+
 }

@@ -345,62 +345,49 @@ public class DeviceKeyContacts {
     // 策略版本
     public static final String RES_POLICY_VERSION = "policyVer";
     // 策略--失败
-    public static final String RES_POLICY_FAIL = "policyVer";
-    // 服务器延迟上传时间
-    public static final String RES_POLICY_SERVERDELAY = "serverDelay";
-    // 上传失败次数
-    public static final String RES_POLICY_FAILCOUNT = "failCount";
+    public static final String RES_POLICY_FAIL = "fail";
+    // 服务器延迟上传时间，只用于第一次上传时延时
+    public static final String RES_POLICY_SERVER_DELAY = "serverDelay";
+    // 上传最大失败次数
+    public static final String RES_POLICY_FAIL_COUNT = "failCount";
     // 上传失败后延迟时间
-    public static final String RES_POLICY_FAILTRYDELAY = "failTryDelay";
+    public static final String RES_POLICY_FAIL_TRY_DELAY = "failTryDelay";
     // 客户端上传时间间隔
-    public static final String RES_POLICY_TIMERINTERVAL = "timerInterval";
-    // 客户端上传时数据条数
-    public static final String RES_POLICY_EVENTCOUNT = "eventCount";
+    public static final String RES_POLICY_TIMER_INTERVAL = "timerInterval";
     // 是否使用实时策略， 1不使用 0使用
-    public static final String RES_POLICY_USERTP = "useRTP";
+    public static final String RES_POLICY_USE_RTP = "useRTP";
     // 是否实时上传[非实时分析策略下，是否实时上传] 0不实时上传，1实时上传
-    public static final String RES_POLICY_USERTL = "useRTL";
-    // 是否采集公网IP
-    public static final String RES_POLICY_REMOTEIP = "remoteIp";
-    // 是否上传敏感数据, 0,1
-    public static final String RES_POLICY_UPLOADSD = "uploadSD";
-    // 数据合并间隔
-    public static final String RES_POLICY_MERGEINTERVAL = "mergeInterval";
-    // 最小使用时长
-    public static final String RES_POLICY_MINDURATION = "minDuration";
-    // 最长使用时长
-    public static final String RES_POLICY_MAXDURATION = "maxDuration";
-    // 域名更新次数
-    public static final String RES_POLICY_DOMAINUPDATETIMES = "domainUpdateTimes";
+    public static final String RES_POLICY_USE_RTL = "useRTL";
+
     //动态采集模块
     public static final String RES_POLICY_CTRL_LIST = "ctrlList";
 
 
-    //动态采集模块
+    //某个Info名称，伴随SDK更新
     public static final String RES_POLICY_CTRL_MODULE = "module";
-    //动态采集模块
+    //状态
     public static final String RES_POLICY_CTRL_STATUS = "status";
-    //动态采集模块
+    //默认
     public static final String RES_POLICY_CTRL_DEUFREQ = "deuFreq";
-    //动态采集模块
-    public static final String RES_POLICY_CTRL_MINFREQ= "minFreq";
-    //动态采集模块
-    public static final String RES_POLICY_CTRL_MAXFREQ = "maxFreq";
-    //动态采集模块
-    public static final String RES_POLICY_CTRL_MAXCOUNT = "maxCount";
-    //动态采集模块
-    public static final String RES_POLICY_CTRL_SUBCONTROL = "subControl";
-    //动态采集模块
-    public static final String RES_POLICY_CTRL_SUBMODULE = "submodule";
-    //动态采集模块
-    public static final String RES_POLICY_CTRL_SUBSTATUS = "sub_status";
-    //动态采集模块
+    //最小采集频率
+    public static final String RES_POLICY_CTRL_MIN_FREQ = "minFreq";
+    //最大采集频率
+    public static final String RES_POLICY_CTRL_MAX_FREQ = "maxFreq";
+    //
+    public static final String RES_POLICY_CTRL_MAX_COUNT = "maxCount";
+    //
+    public static final String RES_POLICY_CTRL_SUB_CONTROL = "subControl";
+    //子模块名称(需要SDK内置):0(蓝牙),1(电量),2(语言、时区、输入法),3(VPN),4(账号)，5(传感器)
+    public static final String RES_POLICY_CTRL_SUB_MODULE = "submodule";
+    //
+    public static final String RES_POLICY_CTRL_SUB_STATUS = "sub_status";
+    //
     public static final String RES_POLICY_CTRL_SUB_DEUFREQ = "sub_deuFreq";
-    //动态采集模块
-    public static final String RES_POLICY_CTRL_SUB_MINFREQ = "sub_minFreq";
-    //动态采集模块
-    public static final String RES_POLICY_CTRL_SUB_MAXFREQ = "sub_maxFreq";
-    //动态采集模块
+    //
+    public static final String RES_POLICY_CTRL_SUB_MIN_FREQ = "sub_minFreq";
+    //
+    public static final String RES_POLICY_CTRL_SUB_MAX_FREQ = "sub_maxFreq";
+    //
     public static final String RES_POLICY_CTRL_COUNT= "count";
 
 

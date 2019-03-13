@@ -7,10 +7,12 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 
+import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.OCImpl;
+import com.analysys.track.internal.impl.PolicyImpl;
 import com.analysys.track.internal.impl.UploadImpl;
 import com.analysys.track.internal.impl.proc.ProcessManager;
 import com.analysys.track.utils.ELOG;
@@ -61,6 +63,29 @@ public class MessageDispatcher {
                 sendMessage(msg, delay);
             }else {
                 sendMessage(msg,delayTime);
+            }
+        }catch (Throwable t){
+        }
+    }
+
+    /**
+     * 重发数据轮询检查
+     * 确保Handler有任务，
+     * 如果没有进行初始化各个模块
+     *
+     */
+    public void isNeedRetry(long delayTime) {
+        try {
+            Message msg = new Message();
+            msg.what = MessageDispatcher.MSG_CHECK_RETRY;
+            sendMessage(msg,delayTime);
+        }catch (Throwable t){
+        }
+    }
+    private void reTryUpload(){
+        try {
+            if(SPHelper.getRetryTime(mContext) > 0 ){
+                UploadImpl.getInstance(mContext).reTryAndUpload(false);
             }
         }catch (Throwable t){
         }
@@ -128,9 +153,10 @@ public class MessageDispatcher {
                     if(!mHandler.hasMessages(msg.what)){
                         delay = delayTime - (System.currentTimeMillis() - EGContext.SNAPSHOT_LAST_TIME_STMP);
                         sendMessage(msg, delay);
-                    }else {
-                        return;
                     }
+//                    else {
+//                        return;
+//                    }
                 }
             }else {
                 if(shouldRemoveDelay){
@@ -380,7 +406,10 @@ public class MessageDispatcher {
                         break;
                     case MSG_DB_DEALY:
                         ELOG.d("接收到数据库delay消息");
-
+                        break;
+                    case MSG_CHECK_RETRY:
+                        ELOG.e("接收到重试检测消息");
+                        reTryUpload();
                         break;
                     default:
                         ELOG.e("其他消息:" + msg.what);
@@ -411,7 +440,7 @@ public class MessageDispatcher {
                         if(EGContext.UPLOAD_LAST_TIME_STMP == -1){
                             EGContext.UPLOAD_LAST_TIME_STMP = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_UPLOAD);
                         }
-                        long delay = EGContext.UPLOAD_CYCLE - (System.currentTimeMillis() - EGContext.UPLOAD_LAST_TIME_STMP);
+                        long delay = PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE) - (System.currentTimeMillis() - EGContext.UPLOAD_LAST_TIME_STMP);
                         if(delay <= 0 ){
                             uploadInfo(delay ,true);
                         }
@@ -456,7 +485,6 @@ public class MessageDispatcher {
             }
 
         }
-
         /**
          * 用于启动各个模块，
          * OC模块，snapshot模块，Location模块，
@@ -473,6 +501,7 @@ public class MessageDispatcher {
                 uploadInfo(0,false);
 //            ServiceHelper.getInstance(mContext).registerReceiver();
                 CheckHeartbeat.getInstance(mContext).sendMessages();
+                CheckHeartbeat.getInstance(mContext).checkRetry();
             }catch (Throwable t){
             }
         }
@@ -493,5 +522,7 @@ public class MessageDispatcher {
     protected static final int MSG_OC_INFO = 0x09;
     protected static final int MSG_UPLOAD = 0x0a;
     protected static final int MSG_OC_COUNT = 0x0b;
-    protected static final int MSG_DB_DEALY = 0x0c;
+    protected static final int MSG_DB_DEALY = 0x0e;
+    protected static final int MSG_CHECK_RETRY = 0x0d;
+
 }

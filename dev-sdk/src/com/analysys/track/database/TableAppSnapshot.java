@@ -42,6 +42,9 @@ public class TableAppSnapshot {
     public void coverInsert(List<JSONObject> snapshots) {
         SQLiteDatabase db = null;
         try {
+            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_APPSNAPSHOT)){
+                return;
+            }
             if (snapshots.size() > 0) {
                 db = DBManager.getInstance(mContext).openDB();
                 db.beginTransaction();
@@ -66,6 +69,9 @@ public class TableAppSnapshot {
     public void insert(JSONObject snapshots) {
         SQLiteDatabase db = null;
         try {
+            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_APPSNAPSHOT)){
+                return;
+            }
             db = DBManager.getInstance(mContext).openDB();
             db.insert(DBConfig.AppSnapshot.TABLE_NAME, null, getContentValues(snapshots));
             db.setTransactionSuccessful();
@@ -236,7 +242,7 @@ public class TableAppSnapshot {
             if (db == null) {
                 return;
             }
-            db.delete(DBConfig.AppSnapshot.TABLE_NAME, null, null);
+            db.delete(DBConfig.AppSnapshot.TABLE_NAME, DBConfig.AppSnapshot.Column.AT + "=?", new String[] {EGContext.SNAP_SHOT_UNINSTALL});
         } catch (Throwable e) {
         } finally {
             DBManager.getInstance(mContext).closeDB();

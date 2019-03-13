@@ -16,6 +16,8 @@ import android.content.SharedPreferences.Editor;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.internal.Content.EGContext;
 
+import org.xml.sax.ErrorHandler;
+
 
 public class SPHelper {
     private final static HashMap<String, Object> SP_CACHE = new HashMap<String, Object>();
@@ -179,7 +181,7 @@ public class SPHelper {
     }
 
     public static void setDebugMode(Context ctx, boolean debug) {
-        getEditor(ctx).putBoolean(EGContext.DEBUG, debug).commit();
+        getEditor(ctx).putBoolean(EGContext.DEBUG, debug).apply();
     }
     /**
      * 打开的应用名称
@@ -258,4 +260,63 @@ public class SPHelper {
     public static void setEndTime(Context ctx, long time) {
         getDefault(ctx).edit().putLong(EGContext.ENDTIME, time).commit();
     }
+    public static void setIntervalTime(Context ctx, long time){
+        getDefault(ctx).edit().putLong(EGContext.INTERVALTIME, time).commit();
+    }
+    public static long getIntervalTime(Context ctx) {
+        return getDefault(ctx).getLong(EGContext.INTERVALTIME, 0);
+    }
+    public static void setLastQuestTime(Context ctx, long time){
+        getDefault(ctx).edit().putLong(EGContext.LASTQUESTTIME, time).commit();
+    }
+    public static long getLastQuestTime(Context ctx) {
+        return getDefault(ctx).getLong(EGContext.LASTQUESTTIME, 0);
+    }
+    public static void setRetryTime(Context ctx, long time){
+        getDefault(ctx).edit().putLong(EGContext.RETRYTIME, time).commit();
+    }
+    public static long getRetryTime(Context ctx) {
+        return getDefault(ctx).getLong(EGContext.RETRYTIME, 0);
+    }
+    //获取发送失败次数
+    public static int getFailedNumb(Context ctx) {
+        return getDefault(ctx).getInt(EGContext.FAILEDNUMBER, 0);
+    }
+    /**
+     * 上传失败次数
+     */
+    public static void setFailedNumb(Context ctx, int numb) {
+        getDefault(ctx).edit().putInt(EGContext.FAILEDNUMBER, numb).apply();
+    }
+    //fail失败时间
+    public static long getFailedTime(Context ctx) {
+        return getDefault(ctx).getLong(EGContext.FAILEDTIME, 0);
+    }
+
+    /**
+     * 上传失败时间
+     */
+    public static void setFailedTime(Context ctx, long time) {
+        getDefault(ctx).edit().putLong(EGContext.FAILEDTIME, time).apply();
+    }
+    public static int getRequestState(Context ctx) {
+        return getDefault(ctx).getInt(EGContext.REQUEST_STATE, 0);
+    }
+
+    public static void setRequestState(Context ctx, int requestState) {
+        getDefault(ctx).edit().putInt(EGContext.REQUEST_STATE, requestState).apply();
+    }
+
+    public static void setLastLocation(Context ctx, String location) {
+        getDefault(ctx).edit().putString(EGContext.LAST_LOCATION, location).apply();
+    }
+    public static String getLastLocation(Context ctx) {
+        return getDefault(ctx).getString(EGContext.LAST_LOCATION, "");
+    }
+//    public static void setUploadCycleTime(Context ctx, int time){
+//        getDefault(ctx).edit().putInt(EGContext.UPLOAD_CLCLE_TIME, time).apply();
+//    }
+//    public static int getUploadCycleTime(Context ctx){
+//        return getDefault(ctx).getInt(EGContext.UPLOAD_CLCLE_TIME, EGContext.UPLOAD_CYCLE);
+//    }
 }

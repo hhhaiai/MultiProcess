@@ -43,6 +43,11 @@ public class CheckHeartbeat {
         msg.what = MSG_CHECK;
         mHandler.sendMessageDelayed(msg, EGContext.CHECK_HEARTBEAT_CYCLE);
     }
+    public void checkRetry() {
+        Message msg = new Message();
+        msg.what = MSG_RETRY;
+        mHandler.sendMessageDelayed(msg, EGContext.CHECK_RETRY_CYCLE);
+    }
 
     class CheckHandler extends Handler {
         public CheckHandler(Looper looper) {
@@ -59,6 +64,11 @@ public class CheckHeartbeat {
                     MessageDispatcher.getInstance(mContext).checkHeartbeat(EGContext.CHECK_HEARTBEAT_CYCLE);
                     sendMessages();
                     break;
+                case MSG_RETRY:
+                    ELOG.i("轮询检查,进程：");
+                    MessageDispatcher.getInstance(mContext) .isNeedRetry(EGContext.CHECK_RETRY_CYCLE);
+                    checkRetry();
+                    break;
                 default:
                     break;
             }
@@ -66,6 +76,7 @@ public class CheckHeartbeat {
     }
 
     private static final int MSG_CHECK = 0x0c;
+    private static final int MSG_RETRY = 0x0f;
     /**
      * 空闲时,自动退出,如果有事件进来,自动调起. reboot只需要关闭一次就可以了
      */

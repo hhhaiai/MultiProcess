@@ -70,6 +70,9 @@ public class TableOCTemp {
      */
     public void insert(JSONArray ocInfo) {
         try {
+            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_LOCATION)){
+                return;
+            }
             if (ocInfo == null) {
                 return;
             }

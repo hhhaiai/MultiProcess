@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.text.TextUtils;
 
 import com.analysys.track.internal.Content.DataController;
-import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.impl.OCImpl;
 import com.analysys.track.internal.impl.WifiImpl;
@@ -17,7 +16,6 @@ import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.TPUtils;
-import com.analysys.track.utils.reflectinon.Reflecer;
 import com.analysys.track.internal.Content.EGContext;
 
 public class AnalysysReceiver extends BroadcastReceiver {

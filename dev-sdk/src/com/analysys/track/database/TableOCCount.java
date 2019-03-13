@@ -47,6 +47,9 @@ public class TableOCCount {
      */
     public void insert(JSONObject ocInfo) {
         try {
+            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_OC)){
+                return;
+            }
             if (ocInfo == null) {
                 return;
             }
@@ -68,6 +71,9 @@ public class TableOCCount {
     public void insertArray(JSONArray ocInfo) {
         SQLiteDatabase db = null;
         try {
+            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_OC)){
+                return;
+            }
             db = DBManager.getInstance(mContext).openDB();
             if (ocInfo != null && ocInfo.length() > 0) {
                 db.beginTransaction();
@@ -401,4 +407,5 @@ public class TableOCCount {
             DBManager.getInstance(mContext).closeDB();
         }
     }
+
 }

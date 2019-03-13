@@ -230,7 +230,7 @@ public class LocationImpl {
             if (TextUtils.isEmpty(gl)) {
                 return;
             }
-            PolicyImpl.getInstance(mContext).setLastLocation(gl);
+            SPHelper.setLastLocation(mContext,gl);
         }
     }
 
@@ -272,7 +272,7 @@ public class LocationImpl {
             if (location == null) {
                 return false;
             }
-            String lastLocation = PolicyImpl.getInstance(mContext).getLastLocation();
+            String lastLocation = SPHelper.getLastLocation(mContext);
             if (TextUtils.isEmpty(lastLocation)) {
                 return true;
             }
@@ -301,7 +301,7 @@ public class LocationImpl {
             locationJson = new JSONObject();
             Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.CollectionTime, String.valueOf(System.currentTimeMillis()),DataController.SWITCH_OF_COLLECTION_TIME);
 
-            String locationInfo = PolicyImpl.getInstance(mContext).getLastLocation();
+            String locationInfo = SPHelper.getLastLocation(mContext);
             Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.GeographyLocation, locationInfo,DataController.SWITCH_OF_GEOGRAPHY_LOCATION);
 
             JSONArray wifiInfo = WifiImpl.getInstance(mContext).getWifiInfo();
@@ -320,7 +320,6 @@ public class LocationImpl {
      * 基站信息
      * @return
      */
-    @Deprecated
     public JSONArray getBaseStationInfo() {
         JSONArray jsonArray = null;
         JSONObject locationJson = null;

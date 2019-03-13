@@ -1,7 +1,12 @@
 package com.analysys.track.database;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.utils.FileUtils;
+import com.analysys.track.utils.SystemUtils;
 
 
 public class DBUtils {
@@ -28,6 +33,31 @@ public class DBUtils {
       }
     }
     return result;
+  }
+
+  /**
+   * 保证同一时间间隔内只操作一次数据库，防止重复操作
+   * @param ctx
+   * @param fileName
+   * @return
+   */
+  public static boolean isValidData(Context ctx,String fileName){
+    boolean isValid = false;
+    long time = System.currentTimeMillis();
+    if(EGContext.FILES_SYNC_APPSNAPSHOT.equals(fileName)){
+      if(time - FileUtils.getLockFileLastModifyTime(ctx,fileName) > EGContext.SNAPSHOT_CYCLE){
+          isValid = true;
+      }
+    }else if(EGContext.FILES_SYNC_LOCATION.equals(fileName)){
+      if(time - FileUtils.getLockFileLastModifyTime(ctx,fileName) > EGContext.LOCATION_CYCLE){
+        isValid = true;
+      }
+    }else if(EGContext.FILES_SYNC_OC.equals(fileName)){
+      if((time - FileUtils.getLockFileLastModifyTime(ctx,fileName) > EGContext.LOCATION_CYCLE)||SystemUtils.isScreenLocked(ctx)){
+        isValid = true;
+      }
+    }
+  return isValid;
   }
 
 }

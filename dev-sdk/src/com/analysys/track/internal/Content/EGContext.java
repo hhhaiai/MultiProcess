@@ -1,12 +1,5 @@
 package com.analysys.track.internal.Content;
 
-/**
- * @Copyright © 2018 Analysys Inc. All rights reserved.
- * @Description: 变量持有类
- * @Version: 1.0
- * @Create: 2018年9月3日 下午2:40:40
- * @Author: sanbo
- */
 public class EGContext {
 
     /**
@@ -17,10 +10,6 @@ public class EGContext {
      * 用户debug控制
      */
     public static boolean FLAG_DEBUG_USER = true;
-    /**
-     * 是否展示广告通知。授权后，服务高版本可以切换成前台服务
-     */
-    // public static boolean FLAG_SHOW_NOTIFY = true;
 
     /**
      * SDK版本
@@ -51,7 +40,8 @@ public class EGContext {
     // 心跳检查
     public static final int CHECK_HEARTBEAT_CYCLE = 15 * 1000;
     public static final String HEARTBEAT_LAST_TIME = "HEART_BETA";
-
+    // 发送失败后重复发送的心跳检查
+    public static final int CHECK_RETRY_CYCLE = 5 * 1000;
     // delay时常
     public static final int DELAY_TIME_CHECK = 20 * 1000;
 
@@ -106,24 +96,16 @@ public class EGContext {
     public static String NETWORK_TYPE_NO_NET = "无网络";
 
     public static final String SP_NAME = "eg_policy";
-    public static final String LASTLOCATION = "LastLocation";
+    public static final String LAST_LOCATION = "last_location";
+//    public static final String UPLOAD_CLCLE_TIME = "upload_time";
     public static final String POLICY_VER_DEFALUT = "";
-    public static final long SERVER_DELAY_DEFAULT = 0L;
-    public static final int FAIL_COUNT_DEFALUT = 5;
-    public static final long FAIL_TRY_DELAY_DEFALUT = 60 * 60 * 1000;
+    public static final int SERVER_DELAY_DEFAULT = 0;
+    public static final int FAIL_COUNT_DEFALUT = 3;//上传重试次数，默认3次
+    public static final long FAIL_TRY_DELAY_DEFALUT = 60 * 1000;// 上传重试时间间隔默认60-70s
     public static final int TIMER_INTERVAL_DEFALUT = 5 * 1000;
     public static final int TIMER_INTERVAL_DEFALUT_60 = 60 * 1000;
-    public static final int EVENT_COUNT_DEFALUT = 10;
     public static final int USER_RTP_DEFALUT = 1;
     public static final int USER_RTL_DEFAULT = 1;
-    public static final int UPLOAD_SD_DEFALUT = 1;
-    public static final int REMOTE_IP = 0;
-    public static final int MERGE_INTERVAL = 30 * 60 * 60 * 1000;// TODO 需确认
-    public static final int MIN_DURATION = 60 * 1000;// TODO 需确认
-    public static final int MAX_DURATION = 5 * 60 * 1000;// TODO 需确认
-    public static final int DOMAIN_UPDATE_TIMES = 1;// TODO 需确认
-    public static final long PERMIT_FOR_FAIL_TIME_DEFALUT = 0;
-    private static final int PERMIT_FOR_SERVER_TIME_DEFALUT = 0;
     public static final long MINDISTANCE = 1000;// 地理位置信息获取距离/米
 
     public static String APP_URL = null;
@@ -139,6 +121,10 @@ public class EGContext {
      */
     public final static String RT_PORT = ":8099";
     /**
+     * 非实时上传端口
+     */
+    public final static String ORI_PORT = ":8089";
+    /**
      * 测试回传接口.Debug模式
      */
     public final static String TEST_CALLBACK_PORT = ":8089";
@@ -153,20 +139,20 @@ public class EGContext {
     // public static final String TEST_CALLBACK_DOMAIN_NAME = "192.168.220.167";
     public static final String TEST_CALLBACK_DOMAIN_NAME = "192.168.8.150";
     /**
-     * 非实时上传是,使用的域名池,以ait开始的为应用上传接口;以urd开始的为设备上传接口
+     * 非实时上传是,使用的域名池,以urd开始的为设备上传接口
      */
     public final static String[] NORMAL_UPLOAD_URL =
             { "urd103.analysys.cn", // 0
-                     "urd240.analysys.cn", // 1
-                     "urd183.analysys.cn", // 2
-                     "urd409.analysys.cn", // 3
-                     "urd203.analysys.cn", // 4
-                     "urd490.analysys.cn", // 5
-                     "urd609.analysys.cn", // 6
-                     "urd301.analysys.cn", // 7
-                     "urd405.analysys.cn", // 8
-                     "urd025.analysys.cn", // 9
-                     "urd339.analysys.cn"// 头部应用 用作测试
+              "urd240.analysys.cn", // 1
+               "urd183.analysys.cn", // 2
+               "urd409.analysys.cn", // 3
+               "urd203.analysys.cn", // 4
+               "urd490.analysys.cn", // 5
+               "urd609.analysys.cn", // 6
+               "urd301.analysys.cn", // 7
+               "urd405.analysys.cn", // 8
+               "urd025.analysys.cn", // 9
+               "urd339.analysys.cn"// 头部应用 用作测试
             };
     /**
      * 实时计算接口
@@ -187,7 +173,6 @@ public class EGContext {
     public static String PERMIT_FOR_FAIL_TIME = "policy_fail_time";
 
     public static String POLICY_SERVICE_PULL_VER = "servicePullVer";
-    public static String USERKEY = "keyValue";
     public static final String ORIGINKEY_STRING = "analysys";
     public static final String EGUANFILE = "eg.a";
     public static final String EGIDKEY = "egid";
@@ -236,23 +221,11 @@ public class EGContext {
     public static long SNAPSHOT_LAST_TIME_STMP = -1;
     public static long LOCATION_LAST_TIME_STMP = -1;
     public static long OC_LAST_TIME_STMP = -1;
-//    public static long OC_LAST_TIME_OVER_5_STMP = -1;
     public static long UPLOAD_LAST_TIME_STMP = -1;
     public static String UPLOAD_KEY_WORDS = "facility4";
     public static String EXTRA_DATA = "ETDM";
     public static int BLANK_COUNT_MAX = 10;
 
-
-    /**
-     * @Copyright © 2019 analysys Inc. All rights reserved.
-     * @Description: 日志详情类
-     * @Version: 1.0
-     * @Create: Mar 4, 2019 9:52:15 PM
-     * @Author: sanbo
-     */
-    public class LOGINFO {
-        public static final String LOG_NOT_APPKEY = "please check you appkey!";
-    }
 
     /************************************************************************************/
     /*********************************** 多进程同步 *****************************************/
@@ -273,6 +246,18 @@ public class EGContext {
 //    public static final String FILES_SYNC_DB_WRITER = "WDB.TAG";
 
     // 默认同步写入时间，5秒内能写入一次。 间隔范围: APP列表(多进程广播方面)、 OC 5.x以下、DB写入
-    public static final long TIME_SYNC_DEFAULT = 5 * 1000;
-
+    public static final long TIME_SYNC_DEFAULT = 10 * 1000;
+    public static final String PERMISSION_TIME = "LOCATION_PERMISSION";
+    public static final String PERMISSION_COUNT = "LOCATION_COUNT";
+    public static final long LEN_MAX_UPDATE_SIZE = 1 * 1024 * 1024;
+    public static final String INTERVALTIME = "TimerIntervalTime";
+    public static final String LASTQUESTTIME = "lastQuestTime";
+    public static final String RETRYTIME = "RetryIntervalTime";//重试间隔时间
+    public static final String FAILEDNUMBER = "uploadFailedNumber";//本地已经重试并失败，次数
+    public static final String FAILEDTIME = "uploadFailedTime";
+    public static final String REQUEST_STATE = "request_state";
+    // 设备内SDK发送 进程同步文件。首次SDK初始化时创建
+    public static final String DEV_UPLOAD_PROC_NAME = "tmp";
+    public static final int sPrepare = 0;
+    public static final int sBeginResuest = 1;
 }

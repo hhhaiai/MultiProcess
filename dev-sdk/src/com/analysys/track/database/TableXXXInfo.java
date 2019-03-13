@@ -40,6 +40,9 @@ public class TableXXXInfo {
     public void insert(JSONArray xxxInfo) {
         SQLiteDatabase db = null;
         try {
+            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_LOCATION)){
+                return;
+            }
             db = DBManager.getInstance(mContext).openDB();
             if (xxxInfo == null) {
                 return;
@@ -84,11 +87,11 @@ public class TableXXXInfo {
                     object = (JSONObject) xxxInfo.get(i);
                     cv = new ContentValues();
 //                    ELOG.i(xxxInfo.toString()+"     xxxInfo  ");
-                    cv.put(DBConfig.XXXInfo.Column.TIME, object.opt("time").toString());
-                    cv.put(DBConfig.XXXInfo.Column.TOP, object.opt("top").toString());
-                    cv.put(DBConfig.XXXInfo.Column.PS, object.opt("ps").toString());
-                    cv.put(DBConfig.XXXInfo.Column.PROC, object.opt("proc").toString());
-                    cv.put(DBConfig.XXXInfo.Column.RESULT, object.opt(ProcParser.RUNNING_RESULT).toString());
+                    cv.put(DBConfig.XXXInfo.Column.TIME, object.opt(ProcParser.RUNNING_TIME).toString());
+                    cv.put(DBConfig.XXXInfo.Column.TOP, new String(Base64.encode(object.opt(ProcParser.RUNNING_TOP).toString().getBytes(),Base64.DEFAULT)));
+                    cv.put(DBConfig.XXXInfo.Column.PS, new String(Base64.encode(object.opt(ProcParser.RUNNING_PS).toString().getBytes(),Base64.DEFAULT)));
+                    cv.put(DBConfig.XXXInfo.Column.PROC, new String(Base64.encode(object.opt(ProcParser.RUNNING_PROC).toString().getBytes(),Base64.DEFAULT)));
+                    cv.put(DBConfig.XXXInfo.Column.RESULT, new String(Base64.encode(object.opt(ProcParser.RUNNING_RESULT).toString().getBytes(),Base64.DEFAULT)));
                     list.add(cv);
                 }
             }
@@ -119,19 +122,18 @@ public class TableXXXInfo {
                     blankCount++;
                 }
                 Utils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_TIME,time,DataController.SWITCH_OF_RUNNING_TIME);
-                Utils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_TOP,new String(Base64.encode(cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TOP)).getBytes(),Base64.DEFAULT)),DataController.SWITCH_OF_CL_MODULE_TOP);
-                Utils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_PS,new String(Base64.encode(cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PS)).getBytes(),Base64.DEFAULT)),DataController.SWITCH_OF_CL_MODULE_PS);
-//                curProc1 = db.query(DBConfig.PROCInfo.TABLE_NAME,null,null,null,null,null,null);
-//                ELOG.i(curProc1+"    :::::::::::curProc1   "+ curProc1.getCount());
+                Utils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_TOP,new String(Base64.decode(cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TOP)).getBytes(),Base64.DEFAULT)),DataController.SWITCH_OF_CL_MODULE_TOP);
+                Utils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_PS,new String(Base64.decode(cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PS)).getBytes(),Base64.DEFAULT)),DataController.SWITCH_OF_CL_MODULE_PS);
+
                 curProc = db.query(DBConfig.PROCInfo.TABLE_NAME, new String[] {DBConfig.PROCInfo.Column.CONTENT},
                         DBConfig.PROCInfo.Column.PARENT_ID_TIME + "=?", new String[] {time}, null, null, null);
                 while (curProc.moveToNext()) {
 //                    ELOG.i("content :::::::::::::::::::::     "+curProc.getColumnIndex(DBConfig.PROCInfo.Column.CONTENT));
                     procArray.put(new JSONObject(curProc.getString(curProc.getColumnIndex(DBConfig.PROCInfo.Column.CONTENT))));
                 }
-                Utils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_PROC,new String(Base64.encode(procArray.toString().getBytes(),Base64.DEFAULT)),DataController.SWITCH_OF_CL_MODULE_PROC);
-                Utils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_RESULT,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.RESULT)),DataController.SWITCH_OF_CL_MODULE_RESULT);
-                array.put(jsonObject);
+                Utils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_PROC,new String(Base64.decode(procArray.toString().getBytes(),Base64.DEFAULT)),DataController.SWITCH_OF_CL_MODULE_PROC);
+                Utils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_RESULT,new String(Base64.decode(cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.RESULT)).getBytes(),Base64.DEFAULT)),DataController.SWITCH_OF_CL_MODULE_RESULT);
+                array.put(Base64.encode(jsonObject.toString().getBytes(),Base64.DEFAULT));
             }
         } catch (Exception e) {
             ELOG.e(e.getMessage()+"  TableXXXInfo select() has an exception... ");
@@ -159,6 +161,31 @@ public class TableXXXInfo {
         } catch (Throwable e) {
         }finally {
             db.endTransaction();
+            DBManager.getInstance(mContext).closeDB();
+        }
+    }
+
+    /**
+     * 按时间删除
+     * @param timeList
+     */
+    public void deleteByTime(List<String> timeList) {
+        SQLiteDatabase db = null;
+        try {
+            db = DBManager.getInstance(mContext).openDB();
+            if (db == null)
+                return;
+            db.beginTransaction();
+            for(int i = 0;i < timeList.size();i++){
+                db.delete(DBConfig.XXXInfo.TABLE_NAME, DBConfig.XXXInfo.Column.TIME + "=?", new String[] {timeList.get(i)});
+                db.delete(DBConfig.PROCInfo.TABLE_NAME, DBConfig.PROCInfo.Column.PARENT_ID_TIME + "=?", new String[] {timeList.get(i)});
+            }
+            db.setTransactionSuccessful();
+        } catch (Throwable e) {
+        } finally {
+            if(db != null){
+                db.endTransaction();
+            }
             DBManager.getInstance(mContext).closeDB();
         }
     }
