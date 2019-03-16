@@ -2,6 +2,8 @@ package com.analysys.track.service;
 
 import com.analysys.track.internal.impl.OCImpl;
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.utils.EThreadPool;
+import com.analysys.track.utils.TPUtils;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
@@ -25,32 +27,31 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     }
 
     private void settingAccessibilityInfo() {
-        AccessibilityServiceInfo mASInfo = new AccessibilityServiceInfo();
+        AccessibilityServiceInfo mAccessibilityServiceInfo = new AccessibilityServiceInfo();
         // 响应事件的类型，这里是窗口发生改变时
-        mASInfo.eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED;
+        mAccessibilityServiceInfo.eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED;
         // 反馈给用户的类型，这里是通用类型
-        mASInfo.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC;
-
+        mAccessibilityServiceInfo.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC;
         // 设置flag
-        if (Build.VERSION.SDK_INT >= 16) {
-            updateFlags(mASInfo);
-        }
-        // 相应时间
-        mASInfo.notificationTimeout = 1;
-        // 设置描述
-        setServiceInfo(mASInfo);
+        mAccessibilityServiceInfo.flags |= AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS;
+        setServiceInfo(mAccessibilityServiceInfo);
     }
 
-    @TargetApi(16)
-    private void updateFlags(AccessibilityServiceInfo mASInfo) {
-
-        mASInfo.flags = AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS;
-    }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        String pkgName = String.valueOf(event.getPackageName());
-        OCImpl.getInstance(this).RunningApps(pkgName, EGContext.OC_COLLECTION_TYPE_AUX);
+        final String pkgName = event.getPackageName().toString();
+        if(TPUtils.isMainThread()){
+            OCImpl.getInstance(this).RunningApps(pkgName, EGContext.OC_COLLECTION_TYPE_AUX);
+        }else{
+            EThreadPool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    OCImpl.getInstance(AnalysysAccessibilityService.this).RunningApps(pkgName, EGContext.OC_COLLECTION_TYPE_AUX);
+                }
+            });
+        }
+
     }
 
     @Override

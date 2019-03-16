@@ -28,10 +28,13 @@ public class EGContext {
 
     // 应用列表获取周期时间,30min
     public static final int SNAPSHOT_CYCLE = 30 * 60 * 1000;
+    public static final String SP_SNAPSHOT_CYCLE = "SP_SNAPSHOT_CYCLE";
     // 位置获取周期时间
     public static final int LOCATION_CYCLE = 30 * 1000;
+    public static final String SP_LOCATION_CYCLE = "SP_LOCATION_CYCLE";
     // 应用打开关闭获取周期时间
     public static final int OC_CYCLE = 5 * 1000;
+    public static final String SP_OC_CYCLE = "SP_OC_CYCLE";
     // 5.0以上30s
     public static final int OC_CYCLE_OVER_5 = 30 * 1000;
 
@@ -42,8 +45,6 @@ public class EGContext {
     public static final String HEARTBEAT_LAST_TIME = "HEART_BETA";
     // 发送失败后重复发送的心跳检查
     public static final int CHECK_RETRY_CYCLE = 5 * 1000;
-    // delay时常
-    public static final int DELAY_TIME_CHECK = 20 * 1000;
 
     public static final String SP_APP_KEY = "appKey";
     public static final String SP_APP_CHANNEL = "appChannel";
@@ -51,12 +52,10 @@ public class EGContext {
     public static String APP_KEY_VALUE = "";
     public static String APP_CHANNEL_VALUE = "";
     public static String EGUAN_CHANNEL_PREFIX = "EGUAN_CHANNEL_";
-    public static final String SP_LOCATION = "location";
 
     public static final String SP_LOCATION_TIME = "getLocationTime";
     public static final String SP_MAC_ADDRESS = "MACAddress";
 
-    public static final String SP_DAEMON_TIME = "getDaemonTime";
 
     public static final String SP_APP_IDFA = "appIDFA";
     public static final String SWITCH_TYPE_DEFAULT = "1";
@@ -80,41 +79,33 @@ public class EGContext {
     // PROC信息
     public static final String PROC = "8";
 
-    public static int OC_COLLECTION_TYPE_RUNNING_TASK = 1;// getRunningTask
-    public static int OC_COLLECTION_TYPE_PROC = 2;// 读取proc
-    public static int OC_COLLECTION_TYPE_AUX = 3;// 辅助功能
-    public static int OC_COLLECTION_TYPE_SYSTEM = 4;// 系统统计
+    public static final int OC_COLLECTION_TYPE_RUNNING_TASK = 1;// getRunningTask
+    public static final int OC_COLLECTION_TYPE_PROC = 2;// 读取proc
+    public static final int OC_COLLECTION_TYPE_AUX = 3;// 辅助功能
+    public static final int OC_COLLECTION_TYPE_SYSTEM = 4;// 系统统计
 
-    public static String SNAP_SHOT_INSTALL = "0";
-    public static String SNAP_SHOT_UNINSTALL = "1";
-    public static String SNAP_SHOT_UPDATE = "2";
+    public static final String SNAP_SHOT_INSTALL = "0";
+    public static final String SNAP_SHOT_UNINSTALL = "1";
+    public static final String SNAP_SHOT_UPDATE = "2";
 
-    public static String NETWORK_TYPE_2G = "2G";
-    public static String NETWORK_TYPE_3G = "3G";
-    public static String NETWORK_TYPE_4G = "4G";
-    public static String NETWORK_TYPE_WIFI = "WIFI";
-    public static String NETWORK_TYPE_NO_NET = "无网络";
+    public static final String NETWORK_TYPE_2G = "2G";
+    public static final String NETWORK_TYPE_3G = "3G";
+    public static final String NETWORK_TYPE_4G = "4G";
+    public static final String NETWORK_TYPE_WIFI = "WIFI";
+    public static final String NETWORK_TYPE_NO_NET = "无网络";
 
     public static final String SP_NAME = "eg_policy";
     public static final String LAST_LOCATION = "last_location";
-//    public static final String UPLOAD_CLCLE_TIME = "upload_time";
     public static final String POLICY_VER_DEFALUT = "";
     public static final int SERVER_DELAY_DEFAULT = 0;
     public static final int FAIL_COUNT_DEFALUT = 3;//上传重试次数，默认3次
     public static final long FAIL_TRY_DELAY_DEFALUT = 60 * 1000;// 上传重试时间间隔默认60-70s
     public static final int TIMER_INTERVAL_DEFALUT = 5 * 1000;
-    public static final int TIMER_INTERVAL_DEFALUT_60 = 60 * 1000;
-    public static final int USER_RTP_DEFALUT = 1;
-    public static final int USER_RTL_DEFAULT = 1;
+
     public static final long MINDISTANCE = 1000;// 地理位置信息获取距离/米
 
-    public static String APP_URL = null;
-    public static String DEVIER_URL = null;
+    public static String APP_URL = "";
 
-    // /**
-    // * 运营统计分析与用户画像内部版本与发版日期 及整体版本号
-    // */
-    // public static final String SDK_VERSION = "3.7.9.3|20181228";
     public final static String URL_SCHEME = "http://";
     /**
      * 实时上传端口
@@ -165,14 +156,9 @@ public class EGContext {
             URL_SCHEME + TEST_CALLBACK_DOMAIN_NAME + TEST_CALLBACK_PORT;
     public static final String TEST_URL =
             URL_SCHEME + TEST_CALLBACK_DOMAIN_NAME + TEST_CALLBACK_PORT;
-    public static String RT_APP_URL = "";
-    public static String RT_DEVIER_URL = "";
-    public static String NORMAL_APP_URL = "";
-    public static String NORMAL_DEVIER_URL = "";
+    public static String NORMAL_APP_URL = EGContext.URL_SCHEME + EGContext.NORMAL_UPLOAD_URL[0] + EGContext.ORI_PORT;
+    public static final String APP_URL_SP = "app_url_sp";
 
-    public static String PERMIT_FOR_FAIL_TIME = "policy_fail_time";
-
-    public static String POLICY_SERVICE_PULL_VER = "servicePullVer";
     public static final String ORIGINKEY_STRING = "analysys";
     public static final String EGUANFILE = "eg.a";
     public static final String EGIDKEY = "egid";
@@ -222,9 +208,9 @@ public class EGContext {
     public static long LOCATION_LAST_TIME_STMP = -1;
     public static long OC_LAST_TIME_STMP = -1;
     public static long UPLOAD_LAST_TIME_STMP = -1;
-    public static String UPLOAD_KEY_WORDS = "facility4";
-    public static String EXTRA_DATA = "ETDM";
-    public static int BLANK_COUNT_MAX = 10;
+    public static final String UPLOAD_KEY_WORDS = "facility4";
+    public static final String EXTRA_DATA = "ETDM";
+    public static final int BLANK_COUNT_MAX = 10;
 
 
     /************************************************************************************/
@@ -260,4 +246,12 @@ public class EGContext {
     public static final String DEV_UPLOAD_PROC_NAME = "tmp";
     public static final int sPrepare = 0;
     public static final int sBeginResuest = 1;
+
+    //上传模块
+    public static final String MODULE_OCCOUNT = "M_OC";
+    public static final String MODULE_SNAPSHOT = "M_SNAP";
+    public static final String MODULE_LOCATION = "M_LOC";
+    public static final String MODULE_WIFI = "M_WIFI";
+    public static final String MODULE_BASE = "M_BASE";
+    public static final String MODULE_DEV = "M_DEV";
 }

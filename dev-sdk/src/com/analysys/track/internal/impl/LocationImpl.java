@@ -26,9 +26,11 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 
+import android.telephony.CellLocation;
 import android.telephony.NeighboringCellInfo;
 import android.telephony.TelephonyManager;
 
+import android.telephony.cdma.CdmaCellLocation;
 import android.telephony.gsm.GsmCellLocation;
 import android.text.TextUtils;
 
@@ -304,11 +306,16 @@ public class LocationImpl {
             String locationInfo = SPHelper.getLastLocation(mContext);
             Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.GeographyLocation, locationInfo,DataController.SWITCH_OF_GEOGRAPHY_LOCATION);
 
-            JSONArray wifiInfo = WifiImpl.getInstance(mContext).getWifiInfo();
-            Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.WifiInfo.NAME, wifiInfo,DataController.SWITCH_OF_WIFI_NAME);
+            if(PolicyImpl.getInstance(mContext).getSP().getBoolean(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_WIFI,true)){
+                JSONArray wifiInfo = WifiImpl.getInstance(mContext).getWifiInfo();
+                Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.WifiInfo.NAME, wifiInfo,DataController.SWITCH_OF_WIFI_NAME);
+            }
 
-            JSONArray baseStation = getBaseStationInfo();
-            Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME,baseStation,DataController.SWITCH_OF_BS_NAME);
+            if(PolicyImpl.getInstance(mContext).getSP().getBoolean(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BASE,true)){
+                JSONArray baseStation = getBaseStationInfo();
+                Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME,baseStation,DataController.SWITCH_OF_BS_NAME);
+            }
+
         } catch (Throwable e) {
         }
         return locationJson;
@@ -325,6 +332,9 @@ public class LocationImpl {
         JSONObject locationJson = null;
         try {
             TelephonyManager mTelephonyManager = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
+            if(mTelephonyManager == null){
+                return jsonArray;
+            }
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 locationJson = new JSONObject();
                 jsonArray = new JSONArray();
@@ -344,13 +354,22 @@ public class LocationImpl {
                 }catch (Throwable t){
                 }
                 try {
-                    GsmCellLocation location = (GsmCellLocation)mTelephonyManager.getCellLocation();
-                    if(location != null){
-                        Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, location.getLac(),DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                        Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, location.getCid(),DataController.SWITCH_OF_CELL_ID);
-                        Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, location.getPsc(),DataController.SWITCH_OF_BS_LEVEL);
-                        jsonArray.put(locationJson);
+                    CellLocation cellLocation = mTelephonyManager.getCellLocation();
+                    if(cellLocation != null){
+                        if(cellLocation instanceof GsmCellLocation){//gsm网络
+                            GsmCellLocation location = (GsmCellLocation)cellLocation;
+                            if(location != null){
+                                Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, location.getLac(),DataController.SWITCH_OF_LOCATION_AREA_CODE);
+                                Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, location.getCid(),DataController.SWITCH_OF_CELL_ID);
+                                Utils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, location.getPsc(),DataController.SWITCH_OF_BS_LEVEL);
+                                jsonArray.put(locationJson);
+                            }
+                        }
+                    }else {
+                        return jsonArray;
                     }
+
+
                 }catch (Throwable t){
                 }
             }

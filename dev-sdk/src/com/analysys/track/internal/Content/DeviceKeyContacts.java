@@ -375,6 +375,8 @@ public class DeviceKeyContacts {
     public static final String RES_POLICY_CTRL_MAX_FREQ = "maxFreq";
     //
     public static final String RES_POLICY_CTRL_MAX_COUNT = "maxCount";
+    //不要的字段
+    public static final String RES_POLICY_CTRL_UNWANTED = "exclude";
     //
     public static final String RES_POLICY_CTRL_SUB_CONTROL = "subControl";
     //子模块名称(需要SDK内置):0(蓝牙),1(电量),2(语言、时区、输入法),3(VPN),4(账号)，5(传感器)
@@ -390,24 +392,6 @@ public class DeviceKeyContacts {
     //
     public static final String RES_POLICY_CTRL_COUNT= "count";
 
-
-
-    /*
-     * oc打开应用次数限制.暂时没用
-     */
-    public static final String RES_POLICY_OCRULE = "ocRule";
-    public static final String RES_POLICY_OCRULE_MERGEINTERVAL = "mergeInterval";
-    public static final String RES_POLICY_OCRULE_MINDURATION = "minDuration";
-
-
-    /*
-     * 是否同意隐私权限
-     */
-    public static final String RES_POLICY_UE = "ue";
-    // 应用SDK控制 0,1
-    public static final String RES_POLICY_UE_AVALID = "aValid";
-    // 设备SDK控制 0,1
-    public static final String RES_POLICY_UE_DVALID = "dValid";
 
     /*
      * 控制ProcessInfo模块的采集
@@ -439,5 +423,20 @@ public class DeviceKeyContacts {
     public static final String RES_POLICY_MODULE_CL_KEEP_INFO = "module_cl_keep_info";
     // 更多设备信息控制，手机中一些系统信息.默认不上传，可控制上传
     public static final String RES_POLICY_MODULE_CL_MORE_INFO = "module_cl_more_info";
+    /**
+     * 模块整体控制
+     */
+    //OC
+    public static final String RES_POLICY_MODULE_CL_OC = "module_cl_oc";
+    //SNAPSHOT
+    public static final String RES_POLICY_MODULE_CL_SNAPSHOT = "module_cl_snapshot";
+    //LOCATION
+    public static final String RES_POLICY_MODULE_CL_LOCATION = "module_cl_location";
+    //WIFI
+    public static final String RES_POLICY_MODULE_CL_WIFI = "module_cl_wifi";
+    //BASE_STATION
+    public static final String RES_POLICY_MODULE_CL_BASE = "module_cl_base";
+    //BASE_STATION
+    public static final String RES_POLICY_MODULE_CL_DEV = "module_cl_dev";
   }
 }

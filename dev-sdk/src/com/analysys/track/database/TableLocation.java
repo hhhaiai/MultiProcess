@@ -59,9 +59,13 @@ public class TableLocation {
         JSONArray array = null;
         int blankCount = 0;
         Cursor cursor = null;
+        SQLiteDatabase db = null;
         try {
             array = new JSONArray();
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            db = DBManager.getInstance(mContext).openDB();
+            if(db == null){
+               return array;
+            }
             db.beginTransaction();
             cursor = db.query(DBConfig.Location.TABLE_NAME, null,
                     null, null, null, null, null);
@@ -83,11 +87,13 @@ public class TableLocation {
                 }
             }
             db.setTransactionSuccessful();
-            db.endTransaction();
         } catch (Throwable e) {
         }finally {
             if(cursor != null){
                 cursor.close();
+            }
+            if(db != null){
+                db.endTransaction();
             }
             DBManager.getInstance(mContext).closeDB();
         }

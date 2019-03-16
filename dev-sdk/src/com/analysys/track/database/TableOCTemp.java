@@ -9,7 +9,6 @@ import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.Base64Utils;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.FileUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;

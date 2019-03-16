@@ -66,8 +66,6 @@ public class testAct extends Activity {
 
         byte[] unZip = ZipUtils.decompressForDeflater(aesDecrypt);
         ELOG.i(TAG + " unZip：" + URLDecoder.decode(URLDecoder.decode(new String(unZip))));
-
-
         ELOG.i(TAG + " -----------解密结束 ！-----------"); 
     }
     /**

@@ -27,9 +27,11 @@ public class DataPackaging {
      * @return
      */
     public static JSONObject getDevInfo(Context mContext) {
-
         JSONObject deviceInfo = new JSONObject();
         try {
+            if(!PolicyImpl.getInstance(mContext).getSP().getBoolean(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_DEV,true)){
+                return null;
+            }
             DeviceImpl devImpl = DeviceImpl.getInstance(mContext);
             //JSONObject json, String key, String value,String SPKey
             Utils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.SystemName, devImpl.getSystemName(),DataController.SWITCH_OF_SYSTEM_NAME);

@@ -58,7 +58,9 @@ public class TableAppSnapshot {
             }
         } catch (Throwable e) {
         } finally {
-            db.endTransaction();
+            if(db != null){
+                db.endTransaction();
+            }
             DBManager.getInstance(mContext).closeDB();
         }
     }

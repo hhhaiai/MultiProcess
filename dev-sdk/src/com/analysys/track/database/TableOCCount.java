@@ -100,7 +100,9 @@ public class TableOCCount {
         } catch (Throwable e) {
             ELOG.e(e + "  :::::insertArray() has an exception");
         } finally {
-            db.endTransaction();
+            if(db != null){
+                db.endTransaction();
+            }
             DBManager.getInstance(mContext).closeDB();
         }
     }
@@ -189,6 +191,9 @@ public class TableOCCount {
         JSONArray array = null;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            if(db == null){
+               return null;
+            }
             array = new JSONArray();
             Cursor cursor = db.query(DBConfig.OCCount.TABLE_NAME, null, DBConfig.OCCount.Column.RS + "=?",
                 new String[] {ONE}, null, null, null);
@@ -249,7 +254,9 @@ public class TableOCCount {
         } catch (Throwable e) {
             ELOG.e(e);
         } finally {
-            db.endTransaction();
+            if(db != null){
+                db.endTransaction();
+            }
         }
         DBManager.getInstance(mContext).closeDB();
     }
@@ -278,7 +285,9 @@ public class TableOCCount {
         } catch (Throwable e) {
             ELOG.e(e);
         } finally {
-            db.endTransaction();
+            if(db != null){
+                db.endTransaction();
+            }
         }
         DBManager.getInstance(mContext).closeDB();
     }
@@ -390,7 +399,9 @@ public class TableOCCount {
             if (cursor != null){
                 cursor.close();
             }
-            db.endTransaction();
+            if(db != null){
+                db.endTransaction();
+            }
             DBManager.getInstance(mContext).closeDB();
         }
         return ocCountJar;

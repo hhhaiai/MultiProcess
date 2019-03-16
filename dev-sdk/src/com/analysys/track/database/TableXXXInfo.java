@@ -68,7 +68,9 @@ public class TableXXXInfo {
         } catch (Exception e) {
             ELOG.e(e+"  insert XXX");
         }finally {
-            db.endTransaction();
+            if(db != null){
+                db.endTransaction();
+            }
             DBManager.getInstance(mContext).closeDB();
         }
 
@@ -160,7 +162,9 @@ public class TableXXXInfo {
             db.setTransactionSuccessful();
         } catch (Throwable e) {
         }finally {
-            db.endTransaction();
+            if(db != null){
+                db.endTransaction();
+            }
             DBManager.getInstance(mContext).closeDB();
         }
     }

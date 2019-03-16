@@ -156,6 +156,9 @@ public class OCImpl {
     public void RunningApps(String pkgName, int collectionType) {
         try {
             this.pkgName = pkgName;
+            if(TextUtils.isEmpty(pkgName)){
+                return;
+            }
             JSONArray cacheApps = TableOCCount.getInstance(mContext).selectRunning();
             ELOG.i("cacheApps::::::   " + cacheApps);
             if (cacheApps != null && cacheApps.length() > 0) {

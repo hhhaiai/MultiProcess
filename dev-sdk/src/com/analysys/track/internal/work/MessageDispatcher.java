@@ -140,6 +140,9 @@ public class MessageDispatcher {
     // 应用列表
     public void snapshotInfo(long delayTime,boolean shouldRemoveDelay) {
         try {
+            if(!PolicyImpl.getInstance(mContext).getSP().getBoolean(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT,true)){
+                return;
+            }
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_SNAPSHOT;
             if(delayTime!= 0){
@@ -175,6 +178,9 @@ public class MessageDispatcher {
     // 位置信息
     public void locationInfo(long delayTime,boolean shouldRemoveDelay) {
         try {
+            if(!PolicyImpl.getInstance(mContext).getSP().getBoolean(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LOCATION,true)){
+                return;
+            }
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_LOCATION;
             if(delayTime!= 0) {
@@ -211,6 +217,9 @@ public class MessageDispatcher {
     // 应用打开关闭信息
     public void ocInfo(long delayTime ,boolean shouldRemoveDelay) {
         try {
+            if(!PolicyImpl.getInstance(mContext).getSP().getBoolean(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC,true)){
+                return;
+            }
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_OC_INFO;
             if(delayTime != 0){

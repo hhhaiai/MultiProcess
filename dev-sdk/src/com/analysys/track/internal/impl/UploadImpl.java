@@ -45,7 +45,7 @@ public class UploadImpl {
     private boolean isChunkUpload = false;
     // 本条记录的时间
     private static List<String> timeList = new ArrayList<String>();
-    private static String NORMAL_APP_URL = "";
+
     private static class Holder {
         private static final UploadImpl INSTANCE = new UploadImpl();
     }
@@ -107,7 +107,6 @@ public class UploadImpl {
     private void doUpload(){
         isChunkUpload = false;
         try {
-
             // 如果时间超过一天，并且当前是可网络请求状态，则先上传开发者配置请求，然后上传数据
             SPHelper.setRequestState(mContext,EGContext.sBeginResuest);
             final int serverDelayTime = PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_SERVER_DELAY,EGContext.SERVER_DELAY_DEFAULT);
@@ -168,8 +167,7 @@ public class UploadImpl {
                     }
                     boolean isDebugMode = SPHelper.getDebugMode(mContext);
                     boolean userRTP = PolicyInfo.getInstance().isUseRTP() == 0 ? true : false;
-                    setNormalUploadUrl(mContext);
-                    String url = NORMAL_APP_URL;
+                    String url = PolicyImpl.getInstance(mContext).getSP().getString(EGContext.APP_URL_SP,EGContext.NORMAL_APP_URL);
                     if (isDebugMode) {
                         url = EGContext.TEST_URL;
                     } else {
@@ -198,7 +196,6 @@ public class UploadImpl {
         JSONObject object = null;
         try {
             object = new JSONObject();
-
             JSONObject devJson = DataPackaging.getDevInfo(mContext);
             if (devJson != null) {
                 object.put(DI, devJson);
@@ -523,14 +520,5 @@ public class UploadImpl {
                 break;
         }
         return time;
-    }
-    public static void setNormalUploadUrl(Context context) {
-        int sum = 0;
-        String key = SPHelper.getDefault(context).getString(EGContext.SP_APP_KEY,"");
-        for (int i = 0; i <key.length(); i++) {
-            sum = sum + key.charAt(i);
-        }
-        int index = sum % 10;
-        NORMAL_APP_URL = EGContext.URL_SCHEME + EGContext.NORMAL_UPLOAD_URL[index * 2] + EGContext.ORI_PORT;
     }
 }

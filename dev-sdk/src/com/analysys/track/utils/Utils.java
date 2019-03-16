@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.analysys.track.internal.Content.DeviceKeyContacts;
+import com.analysys.track.internal.impl.PolicyImpl;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 import com.analysys.track.internal.Content.EGContext;
@@ -96,7 +97,8 @@ public class Utils {
      */
     public static void pushToJSON(Context mContext, JSONObject json, String key, Object value,boolean SPDefaultValue) {
         try {
-            if (SPHelper.getDefault(mContext).getBoolean(key ,SPDefaultValue) && !TextUtils.isEmpty(value.toString()) && !"unknown".equalsIgnoreCase(value.toString())) {
+            //(PolicyImpl.getInstance(mContext).getSP().getBoolean(key,SPDefaultValue) || SPHelper.getDefault(mContext).getBoolean(key ,SPDefaultValue))
+            if (PolicyImpl.getInstance(mContext).getSP().getBoolean(key,SPDefaultValue) && !TextUtils.isEmpty(value.toString()) && !"unknown".equalsIgnoreCase(value.toString())) {
                 if (!json.has(key)) {
                     json.put(key, value);
                 }
