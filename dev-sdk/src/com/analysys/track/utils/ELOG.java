@@ -118,8 +118,8 @@ public class ELOG {
     private static String CONTENT_D = " ╔";
     private static String CONTENT_E = " ╚";
 
-    private static String CONTENT_WARNNING_SHELL =
-            "Wranning....不够打印级别,请在命令行设置指令后重新尝试打印,命令行指令: adb shell setprop log.tag." + DEFAULT_TAG + " ";
+    private static String CONTENT_WARNNING_SHELL = DEFAULT_TAG;
+//            "Wranning....不够打印级别,请在命令行设置指令后重新尝试打印,命令行指令: adb shell setprop log.tag." + DEFAULT_TAG + " ";
 
     public static final class MLEVEL {
         public static final int VERBOSE = 0x1;
@@ -161,7 +161,7 @@ public class ELOG {
     public static void v(Object... args) {
         if (isShellControl) {
             if (!Log.isLoggable(DEFAULT_TAG, Log.VERBOSE)) {
-                Log.v(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "VERBOSE");
+//                Log.v(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "VERBOSE");
                 return;
             }
         }
@@ -171,7 +171,7 @@ public class ELOG {
     public static void d(Object... args) {
         if (isShellControl) {
             if (!Log.isLoggable(DEFAULT_TAG, Log.DEBUG)) {
-                Log.d(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "DEBUG");
+//                Log.d(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "DEBUG");
                 return;
             }
         }
@@ -181,7 +181,7 @@ public class ELOG {
     public static void i(Object... args) {
         if (isShellControl) {
             if (!Log.isLoggable(DEFAULT_TAG, Log.INFO)) {
-                Log.i(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "INFO");
+//                Log.i(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "INFO");
                 return;
             }
         }
@@ -191,7 +191,7 @@ public class ELOG {
     public static void w(Object... args) {
         if (isShellControl) {
             if (!Log.isLoggable(DEFAULT_TAG, Log.WARN)) {
-                Log.w(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "WARN");
+//                Log.w(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "WARN");
                 return;
             }
         }
@@ -201,7 +201,7 @@ public class ELOG {
     public static void e(Object... args) {
         if (isShellControl) {
             if (!Log.isLoggable(DEFAULT_TAG, Log.ERROR)) {
-                Log.e(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "ERROR");
+//                Log.e(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "ERROR");
                 return;
             }
         }

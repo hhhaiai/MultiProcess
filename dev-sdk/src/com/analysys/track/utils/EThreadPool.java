@@ -10,13 +10,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @Copyright © 2018 EGuan Inc. All rights reserved.
- * @Description: TODO
- * @Version: 1.0
- * @Create: 2018/10/23 10:53
- * @Author: Wang-X-C
- */
 public class EThreadPool {
 
     private static ExecutorService executor = Executors.newSingleThreadExecutor();

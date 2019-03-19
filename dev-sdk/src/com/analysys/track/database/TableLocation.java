@@ -31,9 +31,10 @@ public class TableLocation {
 
     public void insert(JSONObject locationInfo) {
         try {
-            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_LOCATION)){
-                return;
-            }
+            //TODO
+//            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_LOCATION)){
+//                return;
+//            }
             if (!TextUtils.isEmpty(locationInfo.toString())) {
                 long time = Long.parseLong(locationInfo.optString(DeviceKeyContacts.LocationInfo.CollectionTime));
                 String encryptLocation = Base64Utils.encrypt(locationInfo.toString(), time);
@@ -83,7 +84,7 @@ public class TableLocation {
                 if(!TextUtils.isEmpty(decryptLocation)){
                     array.put(new JSONObject(decryptLocation));
                 } else {
-                    blankCount++;
+                    blankCount += 1;
                 }
             }
             db.setTransactionSuccessful();

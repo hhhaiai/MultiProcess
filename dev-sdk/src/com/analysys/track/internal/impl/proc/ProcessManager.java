@@ -6,14 +6,10 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.analysys.track.database.TableOCCount;
-import com.analysys.track.database.TableOCTemp;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.utils.Applist;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.NetworkUtils;
-import com.analysys.track.utils.SystemUtils;
+
 import com.analysys.track.utils.sp.SPHelper;
 
 import android.content.Context;
@@ -25,14 +21,14 @@ public class ProcessManager {
     private static JSONObject XXXInfo = new JSONObject();;
 
     private static JSONArray ocList = new JSONArray();
-    private static boolean isSaveForScreenOff = false;
+//    private static boolean isSaveForScreenOff = false;
 
     public static void setIsCollected(boolean isCollected) {
         ProcessManager.isCollected = isCollected;
     }
 
     public static JSONObject getRunningForegroundApps(Context ctx) {
-        isSaveForScreenOff = false;
+//        isSaveForScreenOff = false;
         JSONArray uploadArray = new JSONArray();
         while (true) {
             if (isCollected) {
@@ -54,72 +50,75 @@ public class ProcessManager {
         }
     }
 
-    public static void dealScreenOff(Context ctx) {
-        if (!isSaveForScreenOff) {
-            isSaveForScreenOff = true;
-        } else {
-            // 确保在每个l轮循之间，只有一次的锁屏saveDB。
-            return;
-        }
-        saveDB(ctx,EGContext.CLOSE_SCREEN);
-    }
-    public static void saveDB(Context ctx,String type){
-        // 保存ProcTemp表中数据至OCInfo表中
-        Map<String, String> map = TableOCTemp.getInstance(ctx).queryProcTemp();
-        ocList = getOCInfoProcTemp(ctx, map, type);
-        ELOG.i("dealScreenOff:::::" + ocList);
-        TableOCCount.getInstance(ctx).insertArray(ocList);
-        // 需要对ocList清空
-        ocList = null;
-        // 清除ProcTemp表
-        TableOCTemp.getInstance(ctx).delete();
+//    public static void dealScreenOff(Context ctx) {
+//        if (!isSaveForScreenOff) {
+//            isSaveForScreenOff = true;
+//        } else {
+//            // 确保在每个l轮循之间，只有一次的锁屏saveDB。
+//            return;
+//        }
+//        saveDB(ctx,EGContext.CLOSE_SCREEN);
+//    }
+    public static void saveDB(Context ctx,JSONObject ocInfo){
+//        // 保存ProcTemp表中数据至OCInfo表中
+////        Map<String, String> map = TableOCTemp.getInstance(ctx).queryProcTemp();
+////        ocList = getOCInfoProcTemp(ctx, map, type);
+////        ELOG.i("dealScreenOff:::::" + ocList);
+////        TableOCCount.getInstance(ctx).insertArray(ocList);
+////        // 需要对ocList清空
+////        ocList = null;
+        SPHelper.setLastOpenPackgeName(ctx, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName));
+        SPHelper.setLastOpenTime(ctx, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationOpenTime));
+        SPHelper.setLastAppName(ctx, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationName));
+        SPHelper.setLastAppVerison(ctx, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationVersionCode));
+        SPHelper.setAppType(ctx,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationType));
     }
 
-    /**
-     * @param map
-     * @param type CLOSE_SCREEN表示锁屏，SERVICE_RESTART表示服务重启
-     * @return
-     */
-    private static JSONArray getOCInfoProcTemp(Context ctx, Map<String, String> map, String type) {
-        String endTime = "";
-       if (EGContext.SERVICE_RESTART.equals(type)) {
-            endTime = SPHelper.getEndTime(ctx) + "";
-       }else{
-           endTime = System.currentTimeMillis() + "";
-       }
-       JSONArray ocArray = new JSONArray();
-       JSONObject ocInfo;
-        try {
-            List list = SystemUtils.getDiffNO(map.size());
-            int i = 0, r = -1;
-            for (Map.Entry<String, String> entry : map.entrySet()) {
-                i++;
-                r = (Integer)list.get(i);
-                ELOG.i("r  value ...::::" + r);
-                String startTime = entry.getValue();
-                ocInfo = new JSONObject();
-                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, entry.getKey());
-                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationOpenTime, startTime);
-                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime, Integer.parseInt(endTime) - r);
-                ocInfo.put(DeviceKeyContacts.OCInfo.NetworkType, NetworkUtils.getNetworkType(ctx));
-                ocInfo.put(DeviceKeyContacts.OCInfo.CollectionType, "2");
-                ocInfo.put(DeviceKeyContacts.OCInfo.SwitchType, type);
-                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationType,
-                    Applist.getInstance(ctx).getAppType(entry.getKey()));
-                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode,
-                    SystemUtils.getApplicationVersion(ctx, entry.getKey()));
-                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName,
-                    SystemUtils.getApplicationName(ctx, entry.getKey()));
-                // bugfix:上传OC中,关闭时间与开始时间相同,与关闭时间小于开始时间的问题
-                if (startTime != null && endTime != null && Long.valueOf(endTime) > Long.valueOf(startTime)) {
-                    ocArray.put(ocInfo);
-                }
-            }
-        } catch (Throwable t) {
-
-        }
-
-        return ocArray;
-    }
+//    /**
+//     * @param map
+//     * @param type CLOSE_SCREEN表示锁屏，SERVICE_RESTART表示服务重启
+//     * @return
+//     */
+//    private static JSONArray getOCInfoProcTemp(Context ctx, Map<String, String> map, String type) {
+//        String endTime = "";
+//       if (EGContext.SERVICE_RESTART.equals(type)) {
+//            endTime = SPHelper.getEndTime(ctx) + "";
+//       }else{
+//           endTime = System.currentTimeMillis() + "";
+//       }
+//       JSONArray ocArray = new JSONArray();
+//       JSONObject ocInfo;
+//        try {
+//            List list = SystemUtils.getDiffNO(map.size());
+//            int i = 0, r = -1;
+//            for (Map.Entry<String, String> entry : map.entrySet()) {
+//                i++;
+//                r = (Integer)list.get(i);
+//                ELOG.i("r  value ...::::" + r);
+//                String startTime = entry.getValue();
+//                ocInfo = new JSONObject();
+//                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, entry.getKey());
+//                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationOpenTime, startTime);
+//                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime, Integer.parseInt(endTime) - r);
+//                ocInfo.put(DeviceKeyContacts.OCInfo.NetworkType, NetworkUtils.getNetworkType(ctx));
+//                ocInfo.put(DeviceKeyContacts.OCInfo.CollectionType, "2");
+//                ocInfo.put(DeviceKeyContacts.OCInfo.SwitchType, type);
+//                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationType,
+//                    Applist.getInstance(ctx).getAppType(entry.getKey()));
+//                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode,
+//                    SystemUtils.getApplicationVersion(ctx, entry.getKey()));
+//                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName,
+//                    SystemUtils.getApplicationName(ctx, entry.getKey()));
+//                // bugfix:上传OC中,关闭时间与开始时间相同,与关闭时间小于开始时间的问题
+//                if (startTime != null && endTime != null && Long.valueOf(endTime) > Long.valueOf(startTime)) {
+//                    ocArray.put(ocInfo);
+//                }
+//            }
+//        } catch (Throwable t) {
+//
+//        }
+//
+//        return ocArray;
+//    }
 
 }

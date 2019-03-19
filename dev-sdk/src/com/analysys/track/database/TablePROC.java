@@ -2,6 +2,7 @@ package com.analysys.track.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.util.Base64;
 
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -30,8 +31,6 @@ public class TablePROC {
     public List<ContentValues> getContentValues(String time , JSONArray xxxArray) {
         List<ContentValues> list = null;
         ContentValues cv = null;
-//        ELOG.i(time+"     ：：：：：time  ");
-//        ELOG.i(xxxArray.toString()+"     xxxInfo  ");
         try{
             if (xxxArray != null) {
                 list = new ArrayList<ContentValues>();
@@ -42,7 +41,7 @@ public class TablePROC {
                     if(js == null) continue;
                     cv = new ContentValues();
                     cv.put(DBConfig.PROCInfo.Column.PARENT_ID_TIME, time);
-                    cv.put(DBConfig.PROCInfo.Column.CONTENT,js.toString());
+                    cv.put(DBConfig.PROCInfo.Column.CONTENT,new String(Base64.encode(js.toString().getBytes(),Base64.DEFAULT)));
                     list.add(cv);
                 }
             }

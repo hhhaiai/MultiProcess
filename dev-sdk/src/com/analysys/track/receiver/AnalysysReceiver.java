@@ -61,13 +61,14 @@ public class AnalysysReceiver extends BroadcastReceiver {
             if (CONNECTIVITY_CHANGE.equals(intent.getAction())) {
                 ELOG.d("接收网络变化广播");
                 WifiImpl.getInstance(mContext).getWifiInfo();
-                MessageDispatcher.getInstance(mContext).startService();
+//                MessageDispatcher.getInstance(mContext).startService();
             }
             if (SCREEN_ON.equals(intent.getAction())) {
                 ELOG.e("接收开启屏幕广播");
                 ProcessManager.setIsCollected(true);
 //                ReceiverUtils.getInstance().registAllReceiver(mContext);
                 CheckHeartbeat.getInstance(mContext).sendMessages();
+//                CheckHeartbeat.getInstance(mContext).checkRetry();
             }
             if (SCREEN_OFF.equals(intent.getAction())) {
                 ProcessManager.setIsCollected(false);
@@ -97,7 +98,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
                     public void run() {
                         // AppProcessManager.resetCounter();
                         /*注销广播*/
-                        ProcessManager.dealScreenOff(ctx);
+//                        ProcessManager.dealScreenOff(ctx);
                         // ReceiverUtils.getInstance().unRegistAllReceiver(mContext, false);
                         ReceiverUtils.getInstance().unRegistAllReceiver(mContext);
 
@@ -113,7 +114,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
             } else {
                 // AppProcessManager.resetCounter();
                 /*注销广播*/
-                ProcessManager.dealScreenOff(ctx);
+//                ProcessManager.dealScreenOff(ctx);
                 ReceiverUtils.getInstance().unRegistAllReceiver(mContext);
                 OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.CLOSE_SCREEN);
             }

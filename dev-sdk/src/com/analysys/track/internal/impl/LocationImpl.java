@@ -114,32 +114,31 @@ public class LocationImpl {
 //    }
     private void getLocationInfo() {
         /**
-         * 没有声明权限
+         * Manifest是否声明权限
          */
         if (!AndroidManifestHelper.isPermissionDefineInManifest(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
                 && !AndroidManifestHelper.isPermissionDefineInManifest(mContext,
                 Manifest.permission.ACCESS_COARSE_LOCATION)) {
             return ;
         }
-
+        //是否可以去获取权限
         if (!PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
                 && !PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
             ELOG.e("has no permission");
             return ;
         }
         List<String> pStrings = this.locationManager.getProviders(true);
+        ELOG.i(pStrings+"  类型的PROVIDER");
         String provider;
         if (pStrings.contains(LocationManager.GPS_PROVIDER)) {
             provider = LocationManager.GPS_PROVIDER;
         } else if (pStrings.contains(LocationManager.NETWORK_PROVIDER)) {
             provider = LocationManager.NETWORK_PROVIDER;
         } else {
-
             return ;
         }
         try {
-            Location location = locationManager.getLastKnownLocation(provider);
-
+            Location location = this.locationManager.getLastKnownLocation(provider);
             if (needSaveLocation(location)) {
                 resetLocaiton(location);
             }

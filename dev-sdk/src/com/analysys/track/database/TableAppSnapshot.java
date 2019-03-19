@@ -42,13 +42,14 @@ public class TableAppSnapshot {
     public void coverInsert(List<JSONObject> snapshots) {
         SQLiteDatabase db = null;
         try {
-            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_APPSNAPSHOT)){
-                return;
-            }
+            //TODO
+//            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_APPSNAPSHOT)){
+//                return;
+//            }
             if (snapshots.size() > 0) {
                 db = DBManager.getInstance(mContext).openDB();
                 db.beginTransaction();
-                db.execSQL("delete from " + DBConfig.AppSnapshot.TABLE_NAME);
+                db.delete(DBConfig.AppSnapshot.TABLE_NAME,null,null);
                 for (int i = 0; i < snapshots.size(); i++) {
                     JSONObject snapshot = snapshots.get(i);
                     db.insert(DBConfig.AppSnapshot.TABLE_NAME, null,
@@ -71,12 +72,15 @@ public class TableAppSnapshot {
     public void insert(JSONObject snapshots) {
         SQLiteDatabase db = null;
         try {
-            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_APPSNAPSHOT)){
+            //TODO
+//            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_APPSNAPSHOT)){
+//                return;
+//            }
+            db = DBManager.getInstance(mContext).openDB();
+            if (db == null){
                 return;
             }
-            db = DBManager.getInstance(mContext).openDB();
             db.insert(DBConfig.AppSnapshot.TABLE_NAME, null, getContentValues(snapshots));
-            db.setTransactionSuccessful();
         } catch (Throwable e) {
         }finally {
             DBManager.getInstance(mContext).closeDB();
@@ -107,6 +111,9 @@ public class TableAppSnapshot {
         int blankCount = 0;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            if(db == null){
+                return map;
+            }
             cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null,
                 null, null);
             map = new HashMap<String, String>();
@@ -115,8 +122,12 @@ public class TableAppSnapshot {
                     return map;
                 }
                 String apn = cursor
-                    .getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN));
-                map.put(apn, String.valueOf(getCursor(cursor , blankCount)));
+                        .getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN));
+                if(!TextUtils.isEmpty(apn)){
+                    map.put(apn, String.valueOf(getCursor(cursor)));
+                }else {
+                    blankCount += 1;
+                }
             }
         } catch (Throwable e) {
         } finally {
@@ -127,15 +138,13 @@ public class TableAppSnapshot {
         return map;
     }
 
-    private JSONObject getCursor(Cursor cursor,int blankCount) {
+    private JSONObject getCursor(Cursor cursor) {
         JSONObject jsonObj = null;
         String pkgName = "";
         try {
             jsonObj = new JSONObject();
             pkgName = cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN));
-            if(TextUtils.isEmpty(pkgName)){
-                blankCount++;
-            }
+
             Utils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,pkgName,DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
             Utils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ApplicationName,
                     cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AN)),DataController.SWITCH_OF_APPLICATION_NAME);
@@ -151,28 +160,14 @@ public class TableAppSnapshot {
     }
 
     /**
-     * 重置应用状态标识
-     */
-    public void resetAppType() {
-        try {
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            db.delete(DBConfig.AppSnapshot.TABLE_NAME,
-                DBConfig.AppSnapshot.Column.AT + "=?", new String[] {"1"});
-            ContentValues cv = new ContentValues();
-            cv.put(DBConfig.AppSnapshot.Column.AT, "-1");
-            db.update(DBConfig.AppSnapshot.TABLE_NAME, cv,
-                DBConfig.AppSnapshot.Column.AT + "!=? ", new String[] {"-1"});
-        } catch (Throwable e) {
-        }
-        DBManager.getInstance(mContext).closeDB();
-    }
-
-    /**
      * 更新应用标识状态
      */
     public void update(String pkgName, String appTag) {
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            if(db == null){
+                return;
+            }
             ContentValues cv = new ContentValues();
             cv.put(DBConfig.AppSnapshot.Column.AT, appTag);
             db.update(DBConfig.AppSnapshot.TABLE_NAME, cv,
@@ -187,11 +182,17 @@ public class TableAppSnapshot {
         Cursor cursor = null;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME,
-                new String[] {DBConfig.AppSnapshot.Column.APN},
-                DBConfig.AppSnapshot.Column.APN + "=?", new String[] {pkgName}, null,
-                null, null);
+            if(db == null){
+                return false;
+            }
+            cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME,null,DBConfig.AppSnapshot.Column.APN + "=?",
+                    new String[] {pkgName},null,null,null);
+//            cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME,
+//                new String[] {DBConfig.AppSnapshot.Column.APN},
+//                DBConfig.AppSnapshot.Column.APN + "=?", new String[] {pkgName}, null,
+//                null, null);
             if (cursor.getCount() == 0) {
+                ELOG.i(cursor.getCount()+" cursor.getCount() ");
                 return false;
             } else {
                 return true;
@@ -214,6 +215,9 @@ public class TableAppSnapshot {
         int blankCount = 0;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            if(db == null){
+                return array;
+            }
             array = new JSONArray();
             cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null,
                 null, null);
@@ -222,13 +226,20 @@ public class TableAppSnapshot {
                     return array;
                 }
                 if (cursor == null){
-                    blankCount++;
+                    blankCount += 1;
                     continue;
                 }
-                array.put(getCursor(cursor,blankCount));
+                String pkgName = cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN));
+                if(!TextUtils.isEmpty(pkgName)){
+                    array.put(getCursor(cursor));
+                }else {
+                    blankCount += 1;
+                    continue;
+                }
+
             }
         } catch (Throwable e) {
-            ELOG.e(e);
+            ELOG.e(e+" select() ");
         } finally {
             if (cursor != null){
                 cursor.close();

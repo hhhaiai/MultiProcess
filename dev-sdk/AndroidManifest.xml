@@ -68,7 +68,7 @@
         <!-- android:permission="android.permission.BIND_JOB_SERVICE" -->
         <!-- android:process=":AnalysysService" /> -->
         <service
-            android:name="com.analysys.dev.com.analysys.track.dev.service.AnalysysAccessibilityService"
+            android:name="com.analysys.track.service.AnalysysAccessibilityService"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"

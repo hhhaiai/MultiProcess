@@ -1,13 +1,5 @@
 package com.analysys.track.utils;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-
-import java.io.InputStreamReader;
-
-import java.util.HashSet;
-import java.util.Set;
-
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.impl.PolicyImpl;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -97,13 +89,18 @@ public class Utils {
      */
     public static void pushToJSON(Context mContext, JSONObject json, String key, Object value,boolean SPDefaultValue) {
         try {
+//            ELOG.i("come in pushToJSON ");
+//            ELOG.i("1 pushToJSON "+key +"  =====   " + value);
             //(PolicyImpl.getInstance(mContext).getSP().getBoolean(key,SPDefaultValue) || SPHelper.getDefault(mContext).getBoolean(key ,SPDefaultValue))
-            if (PolicyImpl.getInstance(mContext).getSP().getBoolean(key,SPDefaultValue) && !TextUtils.isEmpty(value.toString()) && !"unknown".equalsIgnoreCase(value.toString())) {
+            if ((PolicyImpl.getInstance(mContext).getSP().getBoolean(key,SPDefaultValue) || SPHelper.getDefault(mContext).getBoolean(key ,SPDefaultValue))&& !TextUtils.isEmpty(value.toString()) && !"unknown".equalsIgnoreCase(value.toString())) {
+//                ELOG.i("2 pushToJSON "+key+"  =====   " +value);
                 if (!json.has(key)) {
+//                    ELOG.i("3 pushToJSON "+key+"  =====   " +value);
                     json.put(key, value);
                 }
             }
         } catch (Throwable e) {
+            ELOG.e("pushToJSON has an exception... =" + e.getMessage());
         }
     }
 

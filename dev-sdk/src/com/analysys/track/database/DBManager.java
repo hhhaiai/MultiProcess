@@ -1,7 +1,5 @@
 package com.analysys.track.database;
 
-import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.utils.FileUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import android.content.Context;
@@ -37,6 +35,7 @@ public class DBManager {
             // Opening new database
             db = dbHelper.getWritableDatabase();
         }
+
         return db;
     }
 

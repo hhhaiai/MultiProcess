@@ -43,12 +43,11 @@ public class ServiceHelper {
     }
 
     /**
-     * 官方api方式打开服务
+     * 官方api方式打开服务,所有的处理都是在这里操作，启动service之类的都在这里启动
      */
-    // TODO 所有的处理都是在这里操作，启动service之类的都在这里启动
     protected void startSelfService() {
         try {
-            Reflecer.init();// 必须调用-----//TODO 其他入口进来都需要进来
+            Reflecer.init();// 必须调用-----
             ReceiverUtils.getInstance().registAllReceiver(mContext);// 只能注册一次，不能注册多次
             if (canStartService()) {
                 boolean isWorking = isServiceWorking(mContext, EGContext.SERVICE_NAME);
@@ -80,7 +79,7 @@ public class ServiceHelper {
      * 判断是否可以启动服务
      */
     private boolean canStartService() {
-        if (Build.VERSION.SDK_INT < 26) {
+        if (Build.VERSION.SDK_INT < 26) {//8以下
             return true;
         } else {
             if (PermissionUtils.checkPermission(mContext, "android.permission.FOREGROUND_SERVICE")) {

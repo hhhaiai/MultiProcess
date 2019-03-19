@@ -32,18 +32,25 @@ public class ProcParser {
      * @return
      */
     public static JSONObject getRunningInfo(Context context) {
+        ELOG.i("getRunningInfo 1");
         JSONObject uploadInfo = null;
         try {
             if (context == null) {
                 return null;
             }
+            ELOG.i("getRunningInfo 2");
             uploadInfo = new JSONObject();
             uploadInfo.put(RUNNING_TIME, System.currentTimeMillis());
             String top = ShellUtils.shell("top -n 1");
+//            ELOG.i("top  :::: " + top);
             uploadInfo.put(RUNNING_TOP, top);
             String ps = ShellUtils.shell("ps -P -p -x -c");
+//            ELOG.i("ps  :::: " + ps);
             uploadInfo.put(RUNNING_PS, ps);
-            JSONObject jsonObject = PrivacyImpl.getInfo(PrivacyImpl.getTopPkg(top, ps));
+            List<Process> tempValue = PrivacyImpl.getTopPkg(top, ps);
+//            ELOG.i("tempValue  :::: " + tempValue);
+            JSONObject jsonObject = PrivacyImpl.getInfo(tempValue);
+//            ELOG.i("PROC :::"+ jsonObject.get("proc").toString());
             JSONArray proc = new JSONArray(jsonObject.get("proc").toString());
             Log.i("PROC", "  proc后的结果==>" + proc);
             uploadInfo.put(RUNNING_PROC, proc);

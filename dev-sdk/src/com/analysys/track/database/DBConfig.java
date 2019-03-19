@@ -1,30 +1,7 @@
 package com.analysys.track.database;
 
 public class DBConfig {
-//  public static class OC {
-//    // 表名
-//    public static final String TABLE_NAME = "e_oci";
-//    /**
-//     * 列名
-//     */
-//    public static class Column {
-//      public static final String ID = "id";
-//      // 存储单条完整信息
-//      public static final String OCI = "oci_a";
-//      // 存储时间
-//      public static final String IT = "oci_b";
-//      // 存储标记，默认为0，读取成功设置1
-//      public static final String ST = "oci_c";
-//      // 备用字段 text 类型
-//      public static final String OCIRA = "oci_ra";
-//      public static final String OCIRB = "oci_rb";
-//      public static final String OCIRC = "oci_rc";
-//    }
-//    //建表
-//    public static final String CREATE_TABLE  = String.format("create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)",
-//            TABLE_NAME,Column.ID ,DBType.AUTOINCREMENT ,Column.OCI , DBType.TEXT ,Column.IT ,DBType.VARCHAR_TWENTY ,
-//            Column.ST,DBType.INT_NOT_NULL,Column.OCIRA , DBType.TEXT ,Column.OCIRB , DBType.TEXT ,Column.OCIRC ,DBType.TEXT );
-//  }
+
 
   public static class OCCount {
     // 表名

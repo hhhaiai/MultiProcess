@@ -16,6 +16,7 @@ import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.impl.proc.DataPackaging;
 import com.analysys.track.internal.impl.proc.ProcParser;
+import com.analysys.track.internal.work.CheckHeartbeat;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.model.PolicyInfo;
 import com.analysys.track.utils.AESUtils;
@@ -196,10 +197,12 @@ public class UploadImpl {
         JSONObject object = null;
         try {
             object = new JSONObject();
+            //发送的时候，临时组装devInfo,有大模块控制的优先控制大模块，大模块收集，针对字段级别进行控制
             JSONObject devJson = DataPackaging.getDevInfo(mContext);
             if (devJson != null) {
                 object.put(DI, devJson);
             }
+            //从oc表查询closeTime不为空的整条信息，组装上传
             JSONArray ocJson = TableOCCount.getInstance(mContext).select();
             if (ocJson != null) {
                 object.put(OCI, ocJson);
@@ -220,7 +223,7 @@ public class UploadImpl {
 
         } catch (Throwable e) {
             // Log.getStackTraceString(e);
-            ELOG.e(e);
+            ELOG.e(e+"getInfo()");
         }
         return object.toString();
     }
@@ -307,6 +310,7 @@ public class UploadImpl {
                         PolicyImpl.getInstance(mContext)
                             .saveRespParams(object.optJSONObject(DeviceKeyContacts.Response.RES_POLICY));
                         uploadFailure(mContext);
+                        CheckHeartbeat.getInstance(mContext).checkRetry();
                     }else {
                         uploadFailure(mContext);
                     }

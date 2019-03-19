@@ -48,14 +48,6 @@ public class AppSnapshotImpl {
         return Holder.INSTANCE;
     }
 
-    // public class Snapshot {
-    // public final static String APN = "APN";
-    // public final static String AN = "AN";
-    // public final static String AVC = "AVC";
-    // public final static String AT = "AT";
-    // public final static String AHT = "AHT";
-    // }
-
     /**
      * 应用列表
      */
@@ -88,14 +80,11 @@ public class AppSnapshotImpl {
                 }
                 TableAppSnapshot.getInstance(mContext)
                         .coverInsert(currentSnapshotsList);
-
                 MessageDispatcher.getInstance(mContext)
                         .snapshotInfo(EGContext.SNAPSHOT_CYCLE,false);
             }
         }catch (Throwable t){
-
         }
-
     }
 
     /**
@@ -191,7 +180,6 @@ public class AppSnapshotImpl {
      * @param tag
      * @return
      */
-    @SuppressWarnings("deprecation")
     private JSONObject getAppInfo(PackageInfo pkgInfo, String tag) {
         JSONObject appInfo = null;
         try {

@@ -75,11 +75,11 @@ public class AnalysysInternal {
         TPUtils.updateAppkeyAndChannel(mContextRef.get(), key, channel);//update sp
         // 0.首先检查是否有Context
         Context cxt = EContextHelper.getContext(mContextRef.get());
+        // 2. 设置错误回调
+        CrashHandler.getInstance().setCallback(null);//不依赖ctx
         if (cxt != null) {
             // 1.初始化多进程
             initSupportMultiProcess(cxt);
-            // 2. 设置错误回调
-            CrashHandler.getInstance().setCallback(null);
             // 3. 启动工作机制
             MessageDispatcher.getInstance(cxt).startService();
             // 4. 根据屏幕调整工作状态

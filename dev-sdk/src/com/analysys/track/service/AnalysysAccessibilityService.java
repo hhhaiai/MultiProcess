@@ -1,5 +1,6 @@
 package com.analysys.track.service;
 
+import com.analysys.track.database.DBConfig;
 import com.analysys.track.internal.impl.OCImpl;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.EThreadPool;
@@ -40,16 +41,17 @@ public class AnalysysAccessibilityService extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        final String pkgName = event.getPackageName().toString();
+        final String pkgName = event.getPackageName().toString().replaceAll(" ","");
         if(TPUtils.isMainThread()){
-            OCImpl.getInstance(this).RunningApps(pkgName, EGContext.OC_COLLECTION_TYPE_AUX);
-        }else{
             EThreadPool.execute(new Runnable() {
                 @Override
                 public void run() {
                     OCImpl.getInstance(AnalysysAccessibilityService.this).RunningApps(pkgName, EGContext.OC_COLLECTION_TYPE_AUX);
                 }
             });
+
+        }else{
+            OCImpl.getInstance(this).RunningApps(pkgName, EGContext.OC_COLLECTION_TYPE_AUX);
         }
 
     }

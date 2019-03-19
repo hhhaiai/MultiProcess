@@ -35,7 +35,7 @@ public class TPUtils {
     }
     /**
      *
-     * @param key
+     * @param key  优先级 传入==>metaData==>XML
      * @param channel 多渠道打包==>代码==>XML
      */
     public static void updateAppkeyAndChannel(Context mContext,String key,String channel){

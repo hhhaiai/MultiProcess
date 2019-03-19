@@ -14,12 +14,13 @@ import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.OCImpl;
 import com.analysys.track.internal.impl.PolicyImpl;
 import com.analysys.track.internal.impl.UploadImpl;
-import com.analysys.track.internal.impl.proc.ProcessManager;
 import com.analysys.track.utils.ELOG;
 
 import com.analysys.track.utils.FileUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
+
+import java.util.Random;
 
 public class MessageDispatcher {
     private long delay = 0;
@@ -228,7 +229,8 @@ public class MessageDispatcher {
                 }
                 if(Build.VERSION.SDK_INT < 21){
                     if(shouldRemoveDelay){
-                        ProcessManager.saveDB(mContext,EGContext.NORMAL);
+                        SPHelper.setEndTime(mContext, System.currentTimeMillis() - new Random(25).nextInt(1000));
+                        OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.NORMAL);
                         mHandler.removeMessages(msg.what);
                         sendMessage(msg,delayTime);
                     }else{
@@ -248,7 +250,9 @@ public class MessageDispatcher {
 //                SPHelper.getDefault(mContext).edit().putLong(EGContext.OC_LAST_TIME,time).commit();
                 }else if(Build.VERSION.SDK_INT > 20){
                     if(shouldRemoveDelay){
-                        ProcessManager.saveDB(mContext,EGContext.NORMAL);
+                        // 补充时间
+                        SPHelper.setEndTime(mContext, System.currentTimeMillis() - new Random(25).nextInt(1000));
+                        OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.NORMAL);
                         mHandler.removeMessages(msg.what);
                         sendMessage(msg,delayTime);
                     }else {
@@ -273,7 +277,8 @@ public class MessageDispatcher {
                 ELOG.i("记录时间"+time);
             }else {
                 if(shouldRemoveDelay){
-                    ProcessManager.saveDB(mContext,EGContext.NORMAL);
+                    SPHelper.setEndTime(mContext, System.currentTimeMillis() - new Random(25).nextInt(1000));
+                    OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.NORMAL);
                     mHandler.removeMessages(msg.what);
                 }
                 sendMessage(msg,0);
@@ -324,7 +329,7 @@ public class MessageDispatcher {
     }
 
     private void sendMessage(Message msg, long delay) {
-        ELOG.i(msg +"   == msg &   delay == " +delay);
+//        ELOG.i(msg +"   == msg &   delay == " +delay);
         synchronized (mHandlerLock) {
             if (mHandler != null) {
 
@@ -410,12 +415,12 @@ public class MessageDispatcher {
                         ELOG.d("接收到上传消息");
                         UploadImpl.getInstance(mContext).upload();
                         break;
-                    case MSG_OC_COUNT:
-                        ELOG.d("接收到屏幕处理消息");
-                        break;
-                    case MSG_DB_DEALY:
-                        ELOG.d("接收到数据库delay消息");
-                        break;
+//                    case MSG_OC_COUNT:
+//                        ELOG.d("接收到屏幕处理消息");
+//                        break;
+//                    case MSG_DB_DEALY:
+//                        ELOG.d("接收到数据库delay消息");
+//                        break;
                     case MSG_CHECK_RETRY:
                         ELOG.e("接收到重试检测消息");
                         reTryUpload();
@@ -510,7 +515,7 @@ public class MessageDispatcher {
                 uploadInfo(0,false);
 //            ServiceHelper.getInstance(mContext).registerReceiver();
                 CheckHeartbeat.getInstance(mContext).sendMessages();
-                CheckHeartbeat.getInstance(mContext).checkRetry();
+//                CheckHeartbeat.getInstance(mContext).checkRetry();
             }catch (Throwable t){
             }
         }
@@ -530,8 +535,8 @@ public class MessageDispatcher {
     protected static final int MSG_LOCATION = 0x08;
     protected static final int MSG_OC_INFO = 0x09;
     protected static final int MSG_UPLOAD = 0x0a;
-    protected static final int MSG_OC_COUNT = 0x0b;
-    protected static final int MSG_DB_DEALY = 0x0e;
+//    protected static final int MSG_OC_COUNT = 0x0b;
+//    protected static final int MSG_DB_DEALY = 0x0e;
     protected static final int MSG_CHECK_RETRY = 0x0d;
 
 }

@@ -11,7 +11,6 @@ import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.Base64Utils;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.FileUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.Utils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -23,9 +22,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
 public class TableOCCount {
-    // sv 查询的值selectValue，iv写入的值insertValue
-    // private final String sv = "0";
-    // private final String iv = "1";
 
     private final String ZERO = "0";
     private final String ONE = "1";
@@ -47,16 +43,16 @@ public class TableOCCount {
      */
     public void insert(JSONObject ocInfo) {
         try {
-            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_OC)){
-                return;
-            }
-            if (ocInfo == null) {
-                return;
-            }
+            //TODO
+//            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_OC) || ocInfo == null){
+//                return;
+//            }
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            if(db == null){
+                return;
+            }
             ContentValues cv = getContentValues(ocInfo);
-            // ELOG.i(cv+" ：：：：ocInfo "+DBConfig.OCCount.Column.CU);
-            cv.put(DBConfig.OCCount.Column.CU, 1);
+            cv.put(DBConfig.OCCount.Column.CU, 1);//可有可无，暂时赋值
             db.insert(DBConfig.OCCount.TABLE_NAME, null, cv);
         } catch (Exception e) {
             ELOG.e(e.getMessage() + " ::::::insert()");
@@ -71,10 +67,14 @@ public class TableOCCount {
     public void insertArray(JSONArray ocInfo) {
         SQLiteDatabase db = null;
         try {
-            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_OC)){
+            //TODO
+//            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_OC) || ocInfo == null){
+//                return;
+//            }
+            db = DBManager.getInstance(mContext).openDB();
+            if(db == null){
                 return;
             }
-            db = DBManager.getInstance(mContext).openDB();
             if (ocInfo != null && ocInfo.length() > 0) {
                 db.beginTransaction();
                 JSONObject obj = null;
@@ -82,14 +82,15 @@ public class TableOCCount {
                 ELOG.i(ocInfo.length() + "     ：：：：ocInfo size  ");
                 for (int i = 0; i < ocInfo.length(); i++) {
                     obj = (JSONObject)ocInfo.get(i);
-                    if (obj == null)
+                    if (obj == null){//为空则过滤
                         continue;
-                    if (TextUtils.isEmpty(obj.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime))) {
+                    }
+                    if (TextUtils.isEmpty(obj.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime))) {//一条新打开的app信息,执行插入操作
                         cv = getContentValues(obj);
                         // ELOG.i(cv+" ：：：：ocInfo "+DBConfig.OCCount.Column.CU);
-                        cv.put(DBConfig.OCCount.Column.CU, 0);
+                        cv.put(DBConfig.OCCount.Column.CU, 1);
                         db.insert(DBConfig.OCCount.TABLE_NAME, null, cv);
-                    } else {
+                    } else {//包含closeTime,修改个别字段
                         cv = getContentValuesForUpdate(obj);
                         db.update(DBConfig.OCCount.TABLE_NAME, cv, DBConfig.OCCount.Column.APN + "=?",
                             new String[] {obj.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName)});
@@ -116,17 +117,20 @@ public class TableOCCount {
                 return;
             }
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            if(db == null){
+                return;
+            }
             String day = SystemUtils.getDay();
             int timeInterval = Base64Utils.getTimeTag(System.currentTimeMillis());
             ContentValues cv = getContentValues(ocInfo);
-            ELOG.i(ocInfo + "  ocInfo update()");
+//            ELOG.i(ocInfo + "  ocInfo update()");
             db.update(DBConfig.OCCount.TABLE_NAME, cv,
                 DBConfig.OCCount.Column.APN + "=? and " + DBConfig.OCCount.Column.DY + "=? and "
                     + DBConfig.OCCount.Column.TI + "=? and " + DBConfig.OCCount.Column.RS + "=?",
                 new String[] {ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName), day,
                     String.valueOf(timeInterval), ZERO});
         } catch (Throwable e) {
-            ELOG.e(e);
+            ELOG.e(e+ "update() ..");
         }finally {
             DBManager.getInstance(mContext).closeDB();
         }
@@ -160,9 +164,9 @@ public class TableOCCount {
             if (ocInfo != null) {
                 cv = new ContentValues();
                 long insertTime = System.currentTimeMillis();
-                ELOG.i(ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime) + "  :::::::::::act`s value...");
-                String an = Base64Utils.encrypt(ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationName), insertTime);
                 String act = ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime);
+                ELOG.i(act + "  :::::::::::act`s value...");
+                String an = Base64Utils.encrypt(ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationName), insertTime);
                 cv.put(DBConfig.OCCount.Column.APN, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName));
                 cv.put(DBConfig.OCCount.Column.AN, an);
                 cv.put(DBConfig.OCCount.Column.AOT, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationOpenTime));
@@ -176,7 +180,7 @@ public class TableOCCount {
                 cv.put(DBConfig.OCCount.Column.AST, ocInfo.optString(DeviceKeyContacts.OCInfo.SwitchType));
                 cv.put(DBConfig.OCCount.Column.TI, Base64Utils.getTimeTag(insertTime));
                 cv.put(DBConfig.OCCount.Column.ST, ZERO);
-                cv.put(DBConfig.OCCount.Column.RS, TextUtils.isEmpty(act) ? ONE : ZERO);
+                cv.put(DBConfig.OCCount.Column.RS, TextUtils.isEmpty(act) ? ZERO:ONE );//正在运行为1
             }
         } catch (Throwable t) {
             ELOG.e(t.getMessage() + "   ::::getContentValues");
@@ -189,23 +193,30 @@ public class TableOCCount {
      */
     public JSONArray selectRunning() {
         JSONArray array = null;
+        int blankCount = 0;
+        Cursor cursor = null;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if(db == null){
                return null;
             }
             array = new JSONArray();
-            Cursor cursor = db.query(DBConfig.OCCount.TABLE_NAME, null, DBConfig.OCCount.Column.RS + "=?",
-                new String[] {ONE}, null, null, null);
+            cursor = db.query(DBConfig.OCCount.TABLE_NAME, null, DBConfig.OCCount.Column.ACT + "=?",
+                new String[] {""}, null, null, null);//closeTime为空的信息
             JSONObject jsonObject = null;
             while (cursor.moveToNext()) {
+                if(blankCount >= EGContext.BLANK_COUNT_MAX){//防止空数据导致死循环
+                    return array;
+                }
                 jsonObject = new JSONObject();
                 String insertTime = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.IT));
-                String appName = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AN));
-                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationPackageName,
-                    cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.APN)));
-                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationName,
-                    Base64Utils.decrypt(appName, Long.valueOf(insertTime)));
+                String appName = Base64Utils.decrypt(cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AN)), Long.parseLong(insertTime));
+                String apn = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.APN));
+                if(TextUtils.isEmpty(apn)){
+                    blankCount += 1;
+                }
+                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, apn);
+                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationName, appName);
                 jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationOpenTime,
                     cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AOT)));
                 jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode,
@@ -219,7 +230,12 @@ public class TableOCCount {
                 array.put(jsonObject);
             }
         } catch (Throwable e) {
-            ELOG.e(e);
+            ELOG.e(e+"  selectRunning ..");
+        }finally {
+            if(cursor != null){
+                cursor.close();
+            }
+            DBManager.getInstance(mContext).closeDB();
         }
         return array;
     }
@@ -241,7 +257,7 @@ public class TableOCCount {
             for (int i = 0; i < ocInfo.length(); i++) {
                 cv = new ContentValues();
                 random = (Integer)list.get(i);
-                ELOG.i("updateRunState ::::" + random);
+//                ELOG.i("updateRunState ::::" + random);
                 cv.put(DBConfig.OCCount.Column.RS, ONE);
                 cv.put(DBConfig.OCCount.Column.ACT, String.valueOf(System.currentTimeMillis() - random));
                 String pkgName =
@@ -252,7 +268,7 @@ public class TableOCCount {
             }
             db.setTransactionSuccessful();
         } catch (Throwable e) {
-            ELOG.e(e);
+            ELOG.e(e+"  updateRunState ");
         } finally {
             if(db != null){
                 db.endTransaction();
@@ -269,21 +285,26 @@ public class TableOCCount {
         JSONObject obj;
         try {
             db = DBManager.getInstance(mContext).openDB();
+            if(db == null){
+                return;
+            }
             db.beginTransaction();
             ContentValues cv = new ContentValues();
             cv.put(DBConfig.OCCount.Column.RS, ZERO);
-            cv.put(DBConfig.OCCount.Column.ACT, String.valueOf(System.currentTimeMillis()));
+
             for (int i = 0; i < ocInfo.length(); i++) {
                 obj = (JSONObject)ocInfo.get(i);
                 String pkgName = obj.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
-                db.execSQL("update e_occ set occ_e = occ_e + 1 where occ_a = '" + pkgName + "'");
+                String act = obj.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime);
+                cv.put(DBConfig.OCCount.Column.ACT, act);
+//                db.execSQL("update e_occ set occ_e = occ_e + 1 where occ_a = '" + pkgName + "'");不做打开关闭次数统计，可忽略
                 db.update(DBConfig.OCCount.TABLE_NAME, cv,
-                        DBConfig.OCCount.Column.APN + "=? and " + DBConfig.OCCount.Column.RS + "=?",
-                        new String[] {pkgName, ONE});
+                        DBConfig.OCCount.Column.APN + "=?",
+                        new String[] {pkgName});
             }
             db.setTransactionSuccessful();
         } catch (Throwable e) {
-            ELOG.e(e);
+            ELOG.e(e+"  updateStopState ..");
         } finally {
             if(db != null){
                 db.endTransaction();
@@ -301,13 +322,16 @@ public class TableOCCount {
         Cursor cursor = null;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            if(db == null){
+                return list;
+            }
             String day = SystemUtils.getDay();
             int timeInterval = Base64Utils.getTimeTag(System.currentTimeMillis());
             cursor = db.query(DBConfig.OCCount.TABLE_NAME,
                 new String[] {DBConfig.OCCount.Column.APN},
                 DBConfig.OCCount.Column.DY + "=? and " + DBConfig.OCCount.Column.TI
-                    + "=? and " + DBConfig.OCCount.Column.RS + "=?",
-                new String[] {day, String.valueOf(timeInterval), ZERO}, null, null, null);
+                    + "=?",// and " + DBConfig.OCCount.Column.RS + "=? , ZERO}, null
+                new String[] {day, String.valueOf(timeInterval)}, null, null,null);
             list = new ArrayList<String>();
             while (cursor.moveToNext()) {
                 if(blankCount >= EGContext.BLANK_COUNT_MAX){//防止空数据导致死循环
@@ -318,11 +342,11 @@ public class TableOCCount {
                 if (!TextUtils.isEmpty(pkgName)) {
                     list.add(pkgName);
                 }else{
-                    blankCount ++;
+                    blankCount +=1;
                 }
             }
         } catch (Exception e) {
-            ELOG.e(e);
+            ELOG.e(e+" getIntervalApps ");
         }finally {
             if (cursor != null){
                 cursor.close();
@@ -341,7 +365,9 @@ public class TableOCCount {
         SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
         Cursor cursor = null;
         int blankCount = 0;
-        String pkgName = "";
+        String pkgName = "",act = "";
+        ContentValues cv =null;
+        JSONObject jsonObject, etdm;
         try {
             if(db == null){
                return ocCountJar;
@@ -349,17 +375,14 @@ public class TableOCCount {
             ocCountJar = new JSONArray();
             db.beginTransaction();
             cursor = db.query(DBConfig.OCCount.TABLE_NAME, null, null, null, null, null, null);
-            String act = "";
-            ContentValues cv =null;
-            JSONObject jsonObject, etdm;
             while (cursor.moveToNext()) {
                 if(blankCount >= EGContext.BLANK_COUNT_MAX){
                     return ocCountJar;
                 }
-                act =
-                    cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.ACT));
-                if (TextUtils.isEmpty(act) || "".equals(act))
+                act = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.ACT));
+                if (TextUtils.isEmpty(act) || "".equals(act)){//closeTime为空，则继续循环，只取closeTime有值的信息
                     continue;
+                }
                 jsonObject = new JSONObject();
                 String insertTime = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.IT));
                 String encryptAn = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.AN));
@@ -369,7 +392,7 @@ public class TableOCCount {
                 Utils.pushToJSON(mContext,jsonObject ,DeviceKeyContacts.OCInfo.ApplicationCloseTime, act,DataController.SWITCH_OF_APPLICATION_CLOSE_TIME);
                 pkgName = cursor.getString(cursor.getColumnIndex(DBConfig.OCCount.Column.APN));
                 if(TextUtils.isEmpty(pkgName)){
-                    blankCount++;
+                    blankCount +=1;
                 }
                 Utils.pushToJSON(mContext,jsonObject ,DeviceKeyContacts.OCInfo.ApplicationPackageName,pkgName,DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
                 Utils.pushToJSON(mContext,jsonObject ,DeviceKeyContacts.OCInfo.ApplicationName, an,DataController.SWITCH_OF_APPLICATION_NAME);

@@ -28,7 +28,7 @@ public class PermissionUtils {
     public static boolean checkPermission(Context context, String permission) {
         boolean result = false;
         String day = SystemUtils.getDay();
-        if(SPHelper.getDefault(context).getString(EGContext.PERMISSION_TIME,"-1").equals(day)&& permissionAskCount > 5){
+        if(SPHelper.getDefault(context).getString(EGContext.PERMISSION_TIME,"-1").equals(day) && permissionAskCount > 5){
             return false;
         }
         if (Build.VERSION.SDK_INT >= 23) {
@@ -49,10 +49,10 @@ public class PermissionUtils {
         if(!result){
             //如果是当天，则累加，并将当前count存sp；否则，则置零，重新累加。即，一天只能有5次申请授权
             if(SPHelper.getDefault(context).getString(EGContext.PERMISSION_TIME,"-1").equals(day)){
-                permissionAskCount = permissionAskCount+1;
+                permissionAskCount += 1;
                 SPHelper.getDefault(context).edit().putInt(EGContext.PERMISSION_COUNT,permissionAskCount).apply();
             }else{
-                permissionAskCount = 0;
+                permissionAskCount += 1;
                 permissionAskCount = permissionAskCount+1;
                 SPHelper.getDefault(context).edit().putString(EGContext.PERMISSION_TIME,day).apply();
                 SPHelper.getDefault(context).edit().putInt(EGContext.PERMISSION_COUNT,permissionAskCount).apply();
