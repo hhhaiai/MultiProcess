@@ -1,15 +1,12 @@
 package com.analysys.track.service;
 
-import com.analysys.track.database.DBConfig;
-import com.analysys.track.internal.impl.OCImpl;
+import com.analysys.track.impl.OCImpl;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.EThreadPool;
-import com.analysys.track.utils.TPUtils;
+import com.analysys.track.utils.SystemUtils;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.view.accessibility.AccessibilityEvent;
 
 public class AnalysysAccessibilityService extends AccessibilityService {
@@ -42,7 +39,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         final String pkgName = event.getPackageName().toString().replaceAll(" ","");
-        if(TPUtils.isMainThread()){
+        if(SystemUtils.isMainThread()){
             EThreadPool.execute(new Runnable() {
                 @Override
                 public void run() {

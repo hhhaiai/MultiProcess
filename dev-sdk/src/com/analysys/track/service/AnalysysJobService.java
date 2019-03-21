@@ -4,7 +4,7 @@ import android.annotation.TargetApi;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 
-import com.analysys.track.internal.work.ServiceHelper;
+import com.analysys.track.work.ServiceHelper;
 
 @TargetApi(21)
 public class AnalysysJobService extends JobService {

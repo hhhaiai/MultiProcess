@@ -5,9 +5,8 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.Process;
 
-import com.analysys.track.internal.work.MessageDispatcher;
+import com.analysys.track.work.MessageDispatcher;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.reflectinon.Reflecer;
 
 public class AnalysysService extends Service {
 
@@ -21,5 +20,10 @@ public class AnalysysService extends Service {
         super.onCreate();
         ELOG.d("服务启动 进程ID：< " + Process.myPid() + " >");
         MessageDispatcher.getInstance(this).initModule();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return START_STICKY;
     }
 }

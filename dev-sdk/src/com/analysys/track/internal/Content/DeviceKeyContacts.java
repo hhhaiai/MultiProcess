@@ -229,26 +229,6 @@ public class DeviceKeyContacts {
 
   /**
    * @Copyright © 2018 Analysys Inc. All rights reserved.
-   * @Description: 某个日期内应用的Open、Close次数
-   * @Version: 1.0
-   * @Create: 2018年10月8日 下午2:13:36
-   * @Author: sanbo
-   */
-  public static class OCCount {
-    public static final String NAME = "OCTimes";
-    // 应用包名，如: "com.test"
-    public static final String ApplicationPackageName = "APN";
-    public static final String ApplicationName = "AN";
-    // 在进程列表中快照的次数，如:200
-    public static final String Count = "CU";
-    // 快照次数所属的时段，1表示0～6小时，2表示6～12小时，3表示12～18小时，4表示18～24小时
-    public static final String TimeInterval = "TI";
-    // 发生的日期
-    public static final String Day = "DY";
-  }
-
-  /**
-   * @Copyright © 2018 Analysys Inc. All rights reserved.
    * @Description: 进程信息, 几种方式获取
    * @Version: 1.0
    * @Create: 2018年10月8日 下午1:38:24
@@ -294,7 +274,7 @@ public class DeviceKeyContacts {
    */
   public static class LocationInfo {
     public static final String NAME = "LocationImpl";
-
+    //时间
     public static final String CollectionTime = "CT";
     // 地理位置，由经度和纬度组成，用减号-连接
     public static final String GeographyLocation = "GL";

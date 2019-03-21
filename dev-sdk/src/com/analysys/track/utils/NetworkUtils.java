@@ -8,7 +8,6 @@ import android.telephony.TelephonyManager;
 
 import com.analysys.track.internal.Content.EGContext;
 
-@SuppressWarnings("all")
 public class NetworkUtils {
     private static ConnectivityManager connManager = null;
     private static ConnectivityManager getConnectivityManager(Context ctx){

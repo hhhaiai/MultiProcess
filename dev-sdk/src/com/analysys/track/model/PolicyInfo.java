@@ -1,9 +1,7 @@
 package com.analysys.track.model;
 
 import com.analysys.track.internal.Content.EGContext;
-
 import org.json.JSONArray;
-
 import java.io.Serializable;
 
 /**

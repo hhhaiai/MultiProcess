@@ -9,13 +9,6 @@ import com.analysys.track.utils.sp.SPHelper;
 
 import java.lang.reflect.Method;
 
-/**
- * @Copyright © 2018 Analysys Inc. All rights reserved.
- * @Description: 权限检查/权限申请
- * @Version: 1.0
- * @Create: 2018年9月13日 上午11:04:47
- * @Author: sanbo
- */
 public class PermissionUtils {
     private static int permissionAskCount = 0;
     /**

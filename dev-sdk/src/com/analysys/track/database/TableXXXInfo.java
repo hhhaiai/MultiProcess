@@ -9,9 +9,9 @@ import android.util.Base64;
 
 import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.internal.impl.proc.ProcParser;
+import com.analysys.track.impl.proc.ProcParser;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.Utils;
+import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
@@ -38,7 +38,6 @@ public class TableXXXInfo {
     public void insert(JSONArray xxxInfo) {
         SQLiteDatabase db = null;
         try {
-            //TODO
 //            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_OC)){
 //                return;
 //            }
@@ -55,9 +54,7 @@ public class TableXXXInfo {
                 cv.put(DBConfig.XXXInfo.Column.PROC, "0");
                 db.insert(DBConfig.XXXInfo.TABLE_NAME, null, cv);
 
-//                ELOG.i("procCV.size()::::::  "+procCV.size());
                 for(int i = 0;i<procCV.size();i++){
-//                    contentValues = new ContentValues();
                     contentValues = procCV.get(i);
 //                    ELOG.i("每一个子cv::::::  "+contentValues);
                     db.insert(DBConfig.PROCInfo.TABLE_NAME,null,contentValues);
@@ -127,9 +124,9 @@ public class TableXXXInfo {
                 if(TextUtils.isEmpty(time)){
                     blankCount += 1;
                 }
-                Utils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_TIME,time,DataController.SWITCH_OF_RUNNING_TIME);
-                Utils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_TOP,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TOP)),DataController.SWITCH_OF_CL_MODULE_TOP);
-                Utils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_PS,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PS)),DataController.SWITCH_OF_CL_MODULE_PS);
+                JsonUtils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_TIME,time,DataController.SWITCH_OF_RUNNING_TIME);
+                JsonUtils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_TOP,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TOP)),DataController.SWITCH_OF_CL_MODULE_TOP);
+                JsonUtils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_PS,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PS)),DataController.SWITCH_OF_CL_MODULE_PS);
 
                 curProc = db.query(DBConfig.PROCInfo.TABLE_NAME, new String[] {DBConfig.PROCInfo.Column.CONTENT},
                         DBConfig.PROCInfo.Column.PARENT_ID_TIME + "=?", new String[] {time}, null, null, null);
@@ -138,7 +135,6 @@ public class TableXXXInfo {
                         return array;
                     }
                     String content = curProc.getString(curProc.getColumnIndex(DBConfig.PROCInfo.Column.CONTENT));
-//                    ELOG.i("content :::::::::::::::::::::     "+content);
                     if(!TextUtils.isEmpty(content)){
                         procArray.put(new JSONObject(new String(Base64.decode(content.getBytes(),Base64.DEFAULT))));
 //                        ELOG.i("procArray :::::::::::::::::::::     "+procArray.toString());
@@ -147,8 +143,8 @@ public class TableXXXInfo {
                     }
 
                 }
-                Utils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_PROC,new String(Base64.encode(procArray.toString().getBytes(),Base64.DEFAULT)),DataController.SWITCH_OF_CL_MODULE_PROC);
-                Utils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_RESULT,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.RESULT)),DataController.SWITCH_OF_CL_MODULE_RESULT);
+                JsonUtils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_PROC,new String(Base64.encode(procArray.toString().getBytes(),Base64.DEFAULT)),DataController.SWITCH_OF_CL_MODULE_PROC);
+                JsonUtils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_RESULT,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.RESULT)),DataController.SWITCH_OF_CL_MODULE_RESULT);
                 array.put(jsonObject);
 //                ELOG.i("array :::::::::" +array);
             }

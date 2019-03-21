@@ -11,7 +11,7 @@ import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.Utils;
+import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import android.content.ContentValues;
@@ -42,7 +42,6 @@ public class TableAppSnapshot {
     public void coverInsert(List<JSONObject> snapshots) {
         SQLiteDatabase db = null;
         try {
-            //TODO
 //            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_APPSNAPSHOT)){
 //                return;
 //            }
@@ -72,7 +71,6 @@ public class TableAppSnapshot {
     public void insert(JSONObject snapshots) {
         SQLiteDatabase db = null;
         try {
-            //TODO
 //            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_APPSNAPSHOT)){
 //                return;
 //            }
@@ -105,7 +103,7 @@ public class TableAppSnapshot {
     /**
      * 数据查询，格式：<pkgName,JSONObject>
      */
-    public Map<String, String> mSelect() {
+    public Map<String, String> snapShotSelect() {
         Map<String, String> map = null;
         Cursor cursor = null;
         int blankCount = 0;
@@ -145,14 +143,14 @@ public class TableAppSnapshot {
             jsonObj = new JSONObject();
             pkgName = cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN));
 
-            Utils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,pkgName,DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
-            Utils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ApplicationName,
+            JsonUtils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,pkgName,DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
+            JsonUtils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ApplicationName,
                     cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AN)),DataController.SWITCH_OF_APPLICATION_NAME);
-            Utils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode,
+            JsonUtils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode,
                     cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AVC)),DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
-            Utils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ActionType,
+            JsonUtils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ActionType,
                     cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AT)),DataController.SWITCH_OF_ACTION_TYPE);
-            Utils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
+            JsonUtils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
                     cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AHT)),DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
         } catch (Throwable e) {
         }
@@ -256,6 +254,25 @@ public class TableAppSnapshot {
                 return;
             }
             db.delete(DBConfig.AppSnapshot.TABLE_NAME, DBConfig.AppSnapshot.Column.AT + "=?", new String[] {EGContext.SNAP_SHOT_UNINSTALL});
+
+        } catch (Throwable e) {
+        } finally {
+            DBManager.getInstance(mContext).closeDB();
+        }
+    }
+    /**
+     * 更新应用标识状态
+     */
+    public void update() {
+        try {
+            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            if(db == null){
+                return;
+            }
+            ContentValues cv = new ContentValues();
+            cv.put(DBConfig.AppSnapshot.Column.AT, EGContext.SNAP_SHOT_INSTALL);
+            db.update(DBConfig.AppSnapshot.TABLE_NAME, cv,
+                    null, null);
         } catch (Throwable e) {
         } finally {
             DBManager.getInstance(mContext).closeDB();

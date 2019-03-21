@@ -7,23 +7,24 @@ import android.os.PowerManager;
 import android.os.Process;
 import com.analysys.track.internal.Content.EGContext;
 
-import com.analysys.track.internal.work.CrashHandler;
-import com.analysys.track.internal.work.MessageDispatcher;
+import com.analysys.track.work.CrashHandler;
+import com.analysys.track.work.MessageDispatcher;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.FileUtils;
 import com.analysys.track.utils.ReceiverUtils;
-import com.analysys.track.utils.TPUtils;
+import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
+import com.analysys.track.utils.reflectinon.Reflecer;
 
 import java.lang.ref.WeakReference;
 
-@SuppressWarnings("all")
 public class AnalysysInternal {
     private WeakReference<Context> mContextRef = null;
-    private boolean hasInit = false;
+    private boolean hasInit = false;//TODO onkillProcess hasInit置为false
 
     private AnalysysInternal() {
+        Reflecer.init();// 必须调用-----
     }
 
     private static class Holder {
@@ -48,17 +49,13 @@ public class AnalysysInternal {
             if (hasInit) {
                 return;
             }
-            // 问题,线程中初始化是否会导致用户的卡顿？
-            if (TPUtils.isMainThread()) {
-                EThreadPool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        init(key, channel);
-                    }
-                });
-            } else {
-                init(key, channel);
-            }
+            //防止影响宿主线程中的任务
+            EThreadPool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    init(key, channel);
+                }
+            });
         } catch (Throwable t) {
         }
     }
@@ -72,26 +69,30 @@ public class AnalysysInternal {
     private void init(String key, String channel) {
         hasInit = true;
         ELOG.d("初始化，进程Id：< " + Process.myPid() + " >");
-        TPUtils.updateAppkeyAndChannel(mContextRef.get(), key, channel);//update sp
         // 0.首先检查是否有Context
         Context cxt = EContextHelper.getContext(mContextRef.get());
-        // 2. 设置错误回调
-        CrashHandler.getInstance().setCallback(null);//不依赖ctx
-        if (cxt != null) {
-            // 1.初始化多进程
-            initSupportMultiProcess(cxt);
-            // 3. 启动工作机制
-            MessageDispatcher.getInstance(cxt).startService();
-            // 4. 根据屏幕调整工作状态
-            PowerManager pm = (PowerManager)cxt.getSystemService(Context.POWER_SERVICE);
-            if (pm != null) {
-                boolean isScreenOn = pm.isScreenOn();
-                // 如果为true，则表示屏幕正在使用，false则屏幕关闭。
-                if (!isScreenOn) {
-                    ReceiverUtils.getInstance().setWork(false);
-                }
-            }
+        if(cxt == null){
+            return;
+        }
+        if(mContextRef == null){
+            mContextRef = new WeakReference<Context>(cxt);
+        }
+        SystemUtils.updateAppkeyAndChannel(cxt, key, channel);//update sp
 
+        // 1. 设置错误回调
+        CrashHandler.getInstance().setCallback(null);//不依赖ctx
+        // 2.初始化多进程
+        initSupportMultiProcess(cxt);
+        // 3. 启动工作机制
+        MessageDispatcher.getInstance(cxt).startService();
+        // 4. 根据屏幕调整工作状态
+        PowerManager pm = (PowerManager)cxt.getSystemService(Context.POWER_SERVICE);
+        if (pm != null) {
+            boolean isScreenOn = pm.isScreenOn();
+            // 如果为true，则表示屏幕正在使用，false则屏幕关闭。
+            if (!isScreenOn) {
+                ReceiverUtils.getInstance().setWork(false);
+            }
         }
     }
     /**
@@ -112,7 +113,6 @@ public class AnalysysInternal {
                 FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_OC, EGContext.TIME_SYNC_OC_OVER_5);
             }
             FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_LOCATION, EGContext.TIME_SYNC_OC_LOCATION);
-//            FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_DB_WRITER, EGContext.TIME_SYNC_DEFAULT);
 
         } catch (Throwable e) {
         }

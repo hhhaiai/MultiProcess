@@ -16,7 +16,6 @@ import android.content.SharedPreferences.Editor;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.internal.Content.EGContext;
 
-import org.xml.sax.ErrorHandler;
 
 
 public class SPHelper {

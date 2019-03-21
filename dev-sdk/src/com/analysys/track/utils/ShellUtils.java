@@ -17,7 +17,7 @@ public class ShellUtils {
      */
     public static String shell(String cmd) {
 
-        // TODO : 如何防止卡死,需要增加超时机制
+        // TODO : 如何防止卡死,需要增加超时机制.待调研测试
         if (TextUtils.isEmpty(cmd)) {
             return null;
         }
@@ -35,9 +35,9 @@ public class ShellUtils {
             }
         } catch (Throwable e) {
         } finally {
-            Streamer.safeClose(br);
-            Streamer.safeClose(in);
-            Streamer.safeClose(proc);
+            StreamerUtils.safeClose(br);
+            StreamerUtils.safeClose(in);
+            StreamerUtils.safeClose(proc);
         }
 
         return sb.toString();
@@ -61,11 +61,11 @@ public class ShellUtils {
             }
         } catch (Throwable e) {
         } finally {
-            Streamer.safeClose(is);
-            Streamer.safeClose(isr);
-            Streamer.safeClose(bufferedReader);
-            Streamer.safeClose(processBuilder);
-            Streamer.safeClose(process);
+            StreamerUtils.safeClose(is);
+            StreamerUtils.safeClose(isr);
+            StreamerUtils.safeClose(bufferedReader);
+            StreamerUtils.safeClose(processBuilder);
+            StreamerUtils.safeClose(process);
         }
         return sb.toString();
     }

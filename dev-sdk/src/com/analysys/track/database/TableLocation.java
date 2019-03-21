@@ -8,6 +8,7 @@ import android.text.TextUtils;
 
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.Base64Utils;
 
@@ -31,7 +32,6 @@ public class TableLocation {
 
     public void insert(JSONObject locationInfo) {
         try {
-            //TODO
 //            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_LOCATION)){
 //                return;
 //            }
@@ -107,8 +107,14 @@ public class TableLocation {
             if(db == null) {
                 return;
             }
+//            String sql = "delete from " + DBConfig.Location.TABLE_NAME + " where "+DBConfig.Location.Column.ID +
+//                    "!=(select max(" + DBConfig.Location.Column.ID + ") from " + DBConfig.Location.TABLE_NAME + "" +
+//                    " where " + DBConfig.Location.Column.ST + "=1) and " + DBConfig.Location.Column.ST + "=1";
+//            ELOG.i("sql ::::::::  "+sql);
+//            db.execSQL(sql);
             db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?", new String[]{"1"});
         } catch (Throwable e) {
+            ELOG.e(e + "deletedeletedeletedeletedeletedelete");
         }finally {
             DBManager.getInstance(mContext).closeDB();
         }

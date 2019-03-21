@@ -3,7 +3,7 @@ package com.analysys.track.utils;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.analysys.track.internal.impl.DeviceImpl;
+import com.analysys.track.impl.DeviceImpl;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -58,12 +58,12 @@ public class RequestUtils {
         // 添加头信息
         connection.setRequestProperty(EGContext.SDKV, SPHelper.getDefault(ctx).getString(EGContext.SDKV,""));
         connection.setRequestProperty(EGContext.DEBUG, DeviceImpl.getInstance(ctx).getDebug());
-        connection.setRequestProperty(EGContext.APPKEY, TPUtils.getAppKey(ctx));
+        connection.setRequestProperty(EGContext.APPKEY, SystemUtils.getAppKey(ctx));
         connection.setRequestProperty(EGContext.TIME, SPHelper.getDefault(ctx).getString(EGContext.TIME , ""));
         connection.setRequestProperty(EGContext.POLICYVER, "0");//策略覆盖
         connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);//写死
         ELOG.i("头文件字段：：：：：："+SPHelper.getDefault(ctx).getString(EGContext.SDKV,"")+"  debug::: "+ DeviceImpl.getInstance(ctx).getDebug()
-        +"APPKEY::: "+TPUtils.getAppKey(ctx)+"   TIME:::   "+SPHelper.getDefault(ctx).getString(EGContext.TIME , ""));
+        +"APPKEY::: "+SystemUtils.getAppKey(ctx)+"   TIME:::   "+SPHelper.getDefault(ctx).getString(EGContext.TIME , ""));
         // 发送数据
         pw = new PrintWriter(connection.getOutputStream());
         pw.print(EGContext.UPLOAD_KEY_WORDS + "="+URLEncoder.encode(value,"UTF-8"));

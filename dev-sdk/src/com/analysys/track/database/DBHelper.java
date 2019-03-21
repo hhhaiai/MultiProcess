@@ -8,6 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteOpenHelper;
 
+/**
+ *
+ */
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "e.data";
@@ -27,16 +30,14 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-
-        // db.execSQL(DBConfig.OC.CREATE_TABLE);
-        db.execSQL(DBConfig.OCCount.CREATE_TABLE);
+        if(db == null){
+            return;
+        }
+        db.execSQL(DBConfig.OC.CREATE_TABLE);
         db.execSQL(DBConfig.Location.CREATE_TABLE);
         db.execSQL(DBConfig.AppSnapshot.CREATE_TABLE);
         db.execSQL(DBConfig.XXXInfo.CREATE_TABLE);
         db.execSQL(DBConfig.PROCInfo.CREATE_TABLE);
-        db.execSQL(DBConfig.OCTemp.CREATE_TABLE);
-
-
     }
 
     @Override
@@ -48,11 +49,8 @@ public class DBHelper extends SQLiteOpenHelper {
             db = getWritableDatabase();
             if (db == null)
                 return;
-            // if(!DBUtils.isTableExist(db ,DBConfig.OC.CREATE_TABLE)){
-            // db.execSQL(DBConfig.OC.CREATE_TABLE);
-            // }
-            if (DBUtils.isTableExist(db, DBConfig.OCCount.CREATE_TABLE)) {
-                db.execSQL(DBConfig.OCCount.CREATE_TABLE);
+            if (DBUtils.isTableExist(db, DBConfig.OC.CREATE_TABLE)) {
+                db.execSQL(DBConfig.OC.CREATE_TABLE);
             }
             if (DBUtils.isTableExist(db, DBConfig.Location.CREATE_TABLE)) {
                 db.execSQL(DBConfig.Location.CREATE_TABLE);
@@ -65,9 +63,6 @@ public class DBHelper extends SQLiteOpenHelper {
             }
             if (DBUtils.isTableExist(db, DBConfig.PROCInfo.CREATE_TABLE)) {
                 db.execSQL(DBConfig.PROCInfo.CREATE_TABLE);
-            }
-            if (DBUtils.isTableExist(db, DBConfig.OCTemp.CREATE_TABLE)) {
-                db.execSQL(DBConfig.OCTemp.CREATE_TABLE);
             }
 
         } catch (SQLiteDatabaseCorruptException e) {
@@ -85,20 +80,20 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    /**
-     * 建表
-     */
-    public void createTable(String createSQL, String tableName) {
-        SQLiteDatabase db = null;
-        try {
-            db = getWritableDatabase();
-            if (!DBUtils.isTableExist(db, tableName)) {
-                db.execSQL(createSQL);
-            }
-        } catch (Throwable t) {
-
-        } finally {
-            db.close();
-        }
-    }
+//    /**
+//     * 建表
+//     */
+//    public void createTable(String createSQL, String tableName) {
+//        SQLiteDatabase db = null;
+//        try {
+//            db = getWritableDatabase();
+//            if (!DBUtils.isTableExist(db, tableName)) {
+//                db.execSQL(createSQL);
+//            }
+//        } catch (Throwable t) {
+//
+//        } finally {
+//            db.close();
+//        }
+//    }
 }

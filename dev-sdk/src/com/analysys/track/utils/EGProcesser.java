@@ -37,8 +37,6 @@ public class EGProcesser {
                 FileUtils.writeFile(egid, tmpId, filePath);
                 writeShared(egid, tmpId);
                 writeSetting(egid, tmpId);
-                // writeDatabase(egid, tmpId);
-                // TODO
             }
         } catch (Throwable e) {
         }

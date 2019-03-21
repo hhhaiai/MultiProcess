@@ -10,13 +10,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-/**
- * @Copyright © 2018 Analysys Inc. All rights reserved.
- * @Description github.com/strazzere/anti-emulator/
- * @Version 1.0
- * @Create 2018年12月31日 下午3:28:49
- * @Author tstrazzere
- */
 public class SimulatorUtils {
 
     /**
@@ -103,7 +96,7 @@ public class SimulatorUtils {
                     is.read(data);
                 } catch (Exception exception) {
                 } finally {
-                    Streamer.safeClose(is);
+                    StreamerUtils.safeClose(is);
                 }
 
                 String driver_data = new String(data);

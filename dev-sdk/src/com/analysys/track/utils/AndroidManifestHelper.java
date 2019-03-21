@@ -124,9 +124,8 @@ public class AndroidManifestHelper {
      */
     public static boolean isPermissionDefineInManifest(Context context, String permission) {
         try {
-
             context = EContextHelper.getContext(context);
-            if (context != null && TextUtils.isEmpty(permission)) {
+            if (context != null && !TextUtils.isEmpty(permission)) {
                 PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(),
                         PackageManager.GET_PERMISSIONS);
                 if (packageInfo != null) {
@@ -141,7 +140,7 @@ public class AndroidManifestHelper {
             }
 
         } catch (Throwable e) {
-            ELOG.e(e);
+            ELOG.e(e.getMessage() + " isPermissionDefineInManifest has an exception ");
         }
         return false;
     }

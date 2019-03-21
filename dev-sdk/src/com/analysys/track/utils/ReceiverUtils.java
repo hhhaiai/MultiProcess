@@ -8,13 +8,6 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Build;
 
-/**
- * @Copyright © 2018 Analysys Inc. All rights reserved.
- * @Description: 动态广播注册器
- * @Version: 1.0
- * @Create: 2018/12/27 11:46:48
- * @Author: sanbo
- */
 public class ReceiverUtils {
     private AnalysysReceiver aReceiver = null;
     private boolean sWorkStatus = false;

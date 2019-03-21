@@ -6,16 +6,17 @@ import android.content.Intent;
 import android.text.TextUtils;
 
 import com.analysys.track.internal.Content.DataController;
-import com.analysys.track.internal.impl.DeviceImpl;
-import com.analysys.track.internal.impl.OCImpl;
-import com.analysys.track.internal.impl.WifiImpl;
-import com.analysys.track.internal.impl.proc.ProcessManager;
-import com.analysys.track.internal.work.CheckHeartbeat;
-import com.analysys.track.internal.work.MessageDispatcher;
+import com.analysys.track.impl.DeviceImpl;
+import com.analysys.track.impl.OCImpl;
+import com.analysys.track.impl.WifiImpl;
+import com.analysys.track.impl.proc.ProcessManager;
+import com.analysys.track.work.CheckHeartbeat;
+import com.analysys.track.work.MessageDispatcher;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.ReceiverUtils;
-import com.analysys.track.utils.TPUtils;
+import com.analysys.track.utils.SystemUtils;
+
 import com.analysys.track.internal.Content.EGContext;
 
 public class AnalysysReceiver extends BroadcastReceiver {
@@ -48,6 +49,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
 
             if (PACKAGE_ADDED.equals(intent.getAction())) {
                 ELOG.d("接收到应用安装广播：" + packageName);
+                //TODO 多测试
                 MessageDispatcher.getInstance(mContext).appChangeReceiver(packageName, Integer.parseInt(EGContext.SNAP_SHOT_INSTALL));
             }
             if (PACKAGE_REMOVED.equals(intent.getAction())) {
@@ -65,14 +67,14 @@ public class AnalysysReceiver extends BroadcastReceiver {
             }
             if (SCREEN_ON.equals(intent.getAction())) {
                 ELOG.e("接收开启屏幕广播");
+                //设置开锁屏的flag 用于补数逻辑
+                EGContext.SCREEN_ON = true;
                 ProcessManager.setIsCollected(true);
-//                ReceiverUtils.getInstance().registAllReceiver(mContext);
                 CheckHeartbeat.getInstance(mContext).sendMessages();
-//                CheckHeartbeat.getInstance(mContext).checkRetry();
             }
             if (SCREEN_OFF.equals(intent.getAction())) {
+                EGContext.SCREEN_ON = false;
                 ProcessManager.setIsCollected(false);
-//                ReceiverUtils.getInstance().unRegistAllReceiver(mContext);
                 processScreenOff(context);
 
                 ELOG.e("接收关闭屏幕广播");
@@ -92,7 +94,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
     private void processScreenOff(final Context ctx) {
         // L.e("--------processScreenOff");
         try {
-            if (TPUtils.isMainThread()) {
+            if (SystemUtils.isMainThread()) {
                 EThreadPool.execute(new Runnable() {
                     @Override
                     public void run() {

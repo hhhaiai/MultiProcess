@@ -1,10 +1,16 @@
 package com.analysys.track.utils;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Random;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -12,14 +18,18 @@ import android.app.AppOpsManager;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.os.Looper;
 import android.os.PowerManager;
 import android.text.TextUtils;
 
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.internal.impl.PolicyImpl;
-import com.analysys.track.model.PolicyInfo;
+import com.analysys.track.impl.PolicyImpl;
+import com.analysys.track.utils.reflectinon.EContextHelper;
+import com.analysys.track.utils.sp.SPHelper;
 
 /**
  * @Copyright © 2019 analysys Inc. All rights reserved.
@@ -39,7 +49,7 @@ public class SystemUtils {
         // 生成 [0-n) 个不重复的随机数
         // list 用来保存这些随机数
         ArrayList list = new ArrayList();
-        Random rand = new Random(30);
+        Random rand = new Random(System.nanoTime());
         boolean[] bool = new boolean[n];
         int num = 0;
         for (int i = 0; i < n; i++) {
@@ -138,26 +148,6 @@ public class SystemUtils {
         return false;
     }
 
-    public static String getApplicationName(Context ctx, String packageName) {
-        String appName = "";
-        try {
-            PackageManager pm = ctx.getPackageManager();
-            appName = (String)pm.getApplicationLabel(pm.getApplicationInfo(packageName, PackageManager.GET_META_DATA));
-        } catch (PackageManager.NameNotFoundException e) {
-        }
-        return appName;
-    }
-
-    public static String getApplicationVersion(Context ctx, String packageName) {
-        String appVer = "";
-        PackageManager pm = ctx.getPackageManager();
-        try {
-            appVer =
-                pm.getPackageInfo(packageName, 0).versionName + "|" + pm.getPackageInfo(packageName, 0).versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-        }
-        return appVer;
-    }
     /**
      * 获取上传间隔时间
      *
@@ -171,6 +161,263 @@ public class SystemUtils {
         //10s间隔
         long time = ((int) (Math.random() * 10) * 1000)  + Integer.parseInt(reTryTime);
         return time;
+    }
+    /**
+     * 获取APP类型
+     *
+     * @param pkg
+     * @return
+     */
+    public static String getAppType(Context ctx, String pkg) {
+        return isSystemApps(ctx ,pkg) ? "SA" : "OA";
+    }
+
+    /**
+     * 是否为系统应用:
+     * <p>
+     * 1. shell获取到三方列表判断
+     * <p>
+     * 2. 获取异常的使用其他方式判断
+     *
+     * @param pkg
+     * @return
+     */
+    private static boolean isSystemApps(Context mContext ,String pkg) {
+        if (TextUtils.isEmpty(pkg)) {
+            return false;
+        }
+        // 1. 没有获取应用列表则获取
+        if (!isGetAppList) {
+            getPkgList(mSystemAppSet, APP_LIST_SYSTEM);
+            isGetAppList = true;
+        }
+        // 2. 根据列表内容判断
+        if (mSystemAppSet.size() > 0) {
+            if (mSystemAppSet.contains(pkg)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            try {
+                // 3. 使用系统方法判断
+                mContext = EContextHelper.getContext(mContext);
+                if (mContext == null) {
+                    return false;
+                }
+                PackageManager pm = mContext.getPackageManager();
+                if (pm == null) {
+                    return false;
+                }
+                PackageInfo pInfo = pm.getPackageInfo(pkg, 0);
+                if ((pInfo.applicationInfo.flags & android.content.pm.ApplicationInfo.FLAG_SYSTEM) == 1) {
+                    return true;
+                }
+            } catch (Throwable e) {
+            }
+
+        }
+        return false;
+    }
+    /**
+     * 获取安装列表
+     *
+     * @param appSet
+     * @param shell
+     * @return
+     */
+    public static Set<String> getPkgList(Set<String> appSet, String shell) {
+        // Set<String> set = new HashSet<String>();
+        String result = ShellUtils.shell(shell);
+        if (!TextUtils.isEmpty(result) && result.contains("\n")) {
+            String[] lines = result.split("\n");
+            if (lines.length > 0) {
+                String line = null;
+                for (int i = 0; i < lines.length; i++) {
+                    line = lines[i];
+                    // 单行条件: 非空&&有点&&有冒号
+                    if (!TextUtils.isEmpty(line) && line.contains(".") && line.contains(":")) {
+                        // 分割. 样例数据:<code>package:com.android.launcher3</code>
+                        String[] split = line.split(":");
+                        if (split != null && split.length > 1) {
+                            String packageName = split[1];
+                            appSet.add(packageName);
+                        }
+                    }
+                }
+            }
+        }
+        return appSet;
+    }
+    // private final String SHELL_PM_LIST_PACKAGES = "pm list packages";//all
+    private static final String APP_LIST_SYSTEM = "pm list packages -s";// system
+    // private final String APP_LIST_USER = "pm list packages -3";// third party
+    // 获取系统应用列表
+    private static final Set<String> mSystemAppSet = new HashSet<String>();
+    // 已经获取应用列表
+    private static volatile boolean isGetAppList = false;
+
+
+    /**
+     * 检测xposed相关文件,尝试加载xposed的类,如果能加载则表示已经安装了
+     * @return
+     */
+    public static boolean byLoadXposedClass(){
+        try{
+            Object localObject = ClassLoader.getSystemClassLoader()
+                    .loadClass("de.robv.android.xposed.XposedHelpers").newInstance();
+            // 如果加载类失败 则表示当前环境没有xposed
+            return localObject != null;
+        }catch (Throwable localThrowable) {
+            return false;
+        }
+    }
+
+    public static boolean isMainThread() {
+        boolean result = false;
+        try {
+            result = Looper.getMainLooper().getThread() == Thread.currentThread();
+        }catch (Throwable t){
+        }
+        return result;
+    }
+    /**
+     *
+     * @param key  优先级 传入==>metaData==>XML
+     * @param channel 多渠道打包==>代码==>XML
+     */
+    public static void updateAppkeyAndChannel(Context mContext,String key,String channel){
+        if (TextUtils.isEmpty(key)) {
+            Bundle bundle = AndroidManifestHelper.getMetaData(mContext);
+            if (bundle != null) {
+                key = bundle.getString(EGContext.XML_METADATA_APPKEY);
+            }
+        }
+        if (!TextUtils.isEmpty(key)) {
+            EGContext.APP_KEY_VALUE = key;
+            SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_KEY, key).commit();
+        }
+        // 此处需要进行channel优先级处理,优先处理多渠道打包过来的channel,而后次之,接口传入的channel
+        String channelFromApk = getChannelFromApk(mContext);
+        if (TextUtils.isEmpty(channelFromApk)) {
+            try {
+                ApplicationInfo appInfo = mContext.getApplicationContext().getPackageManager()
+                        .getApplicationInfo(mContext.getPackageName(), PackageManager.GET_META_DATA);
+                String xmlChannel = appInfo.metaData.getString(EGContext.XML_METADATA_CHANNEL);
+                if (!TextUtils.isEmpty(xmlChannel)) {
+                    // 赋值为空
+                    EGContext.APP_CHANNEL_VALUE = xmlChannel;
+                    SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_CHANNEL, channel).commit();
+                    return;
+                }
+            } catch (Throwable e) {
+            }
+            if (!TextUtils.isEmpty(channel)) {
+                // 赋值接口传入的channel
+                EGContext.APP_CHANNEL_VALUE = channel;
+                SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_CHANNEL, channel).commit();
+            }
+        } else {
+            // 赋值多渠道打包的channel
+            EGContext.APP_CHANNEL_VALUE = channelFromApk;
+            SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_CHANNEL, channel).commit();
+        }
+    }
+    /**
+     * 仅用作多渠道打包,获取apk文件中的渠道信息
+     *
+     * @param context
+     * @return
+     */
+    public static String getChannelFromApk(Context context) {
+        ApplicationInfo appinfo = context.getApplicationInfo();
+        String sourceDir = appinfo.sourceDir;
+        // 注意这里：默认放在meta-inf/里， 所以需要再拼接一下
+        String channel_pre = "META-INF/" + EGContext.EGUAN_CHANNEL_PREFIX;
+        String channelName = "";
+        ZipFile apkZip = null;
+        try {
+            apkZip = new ZipFile(sourceDir);
+            Enumeration<?> entries = apkZip.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = ((ZipEntry) entries.nextElement());
+                String entryName = entry.getName();
+                if (entryName.startsWith(channel_pre)) {
+                    channelName = entryName;
+                    break;
+                }
+            }
+            // 假如没有在apk文件中找到相关渠道信息,则返回空串,表示没有调用易观多渠道打包方式
+            if (TextUtils.isEmpty(channelName)) {
+                return "";
+            }
+        } catch (IOException e) {
+        } finally {
+            StreamerUtils.safeClose(apkZip);
+        }
+        // Eg的渠道文件以EGUAN_CHANNEL_XXX为例,其XXX为最终的渠道信息
+        return channelName.substring(23);
+    }
+    /**
+     * 获取Appkey. 优先级：内存==>SP==>XML
+     *
+     * @param context
+     * @return
+     */
+    public static String getAppKey(Context context) {
+        Context cxt = EContextHelper.getContext(context);
+        String appkey = EGContext.APP_KEY_VALUE;
+        if (!TextUtils.isEmpty(appkey)) {
+            return appkey;
+        }
+        if (cxt == null) {
+            return "";
+        }
+        appkey = SPHelper.getDefault(context).getString(EGContext.SP_APP_KEY,"");
+        if (!TextUtils.isEmpty(appkey)) {
+            return appkey;
+        }
+        try {
+            ApplicationInfo appInfo = cxt.getApplicationContext().getPackageManager()
+                    .getApplicationInfo(cxt.getPackageName(), PackageManager.GET_META_DATA);
+            appkey = appInfo.metaData.getString(EGContext.XML_METADATA_APPKEY);
+            if (!TextUtils.isEmpty(appkey)) {
+                return appkey;
+            }
+        } catch (Throwable e) {
+        }
+        return appkey;
+    }
+
+    /**
+     * 渠道优先级: xml>内存>SP
+     *
+     * @param context
+     * @return
+     */
+    public static String getAppChannel(Context context) {
+        String channel = "";
+        try {
+            Context cxt = EContextHelper.getContext(context);
+            if (cxt == null) {
+                return channel;
+            }
+            ApplicationInfo appInfo = context.getApplicationContext().getPackageManager()
+                    .getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+            channel = appInfo.metaData.getString(EGContext.XML_METADATA_CHANNEL);
+            if (!TextUtils.isEmpty(channel)) {
+                return channel;
+            }
+        } catch (Throwable e) {
+        }
+        if (!TextUtils.isEmpty(EGContext.APP_CHANNEL_VALUE)) {
+            return EGContext.APP_CHANNEL_VALUE;
+        }
+        channel = SPHelper.getDefault(context).getString(EGContext.SP_APP_CHANNEL,"");
+        if (!TextUtils.isEmpty(channel)) {
+            return channel;
+        }
+        return channel;
     }
 
 }

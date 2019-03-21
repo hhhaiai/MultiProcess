@@ -26,8 +26,8 @@ public class EGContext {
 
     public static final String SERVICE_NAME = "AnalysysService";
 
-    // 应用列表获取周期时间,30min
-    public static final int SNAPSHOT_CYCLE = 30 * 60 * 1000;
+    // 应用列表获取周期时间,3个小时
+    public static final int SNAPSHOT_CYCLE = 3 * 60 * 60 * 1000;
     public static final String SP_SNAPSHOT_CYCLE = "SP_SNAPSHOT_CYCLE";
     // 位置获取周期时间
     public static final int LOCATION_CYCLE = 30 * 1000;
@@ -58,7 +58,6 @@ public class EGContext {
 
 
     public static final String SP_APP_IDFA = "appIDFA";
-    public static final String SWITCH_TYPE_DEFAULT = "1";
 
     // 蓝牙
     public static final String BLUETOOTH = "0";
@@ -198,6 +197,7 @@ public class EGContext {
     public static final String APP_TYPE = "applicationType";
     public static final int SHORT_TIME = 5 * 1000;// 计时器时间间隔毫秒数
     public static final long LONGEST_TIME = 5 * 60 * 60 * 1000;
+    public static final long DEFAULT_SPACE_TIME = 30 * 1000;//默认开关屏时间间隔在1分钟以上，才算一次有效的时间闭合事件
     public static final String CLOSE_SCREEN = "2";
     public static final String APP_SWITCH = "1";
     public static final String SERVICE_RESTART = "3";
@@ -248,10 +248,16 @@ public class EGContext {
     public static final int sBeginResuest = 1;
 
     //上传模块
-    public static final String MODULE_OCCOUNT = "M_OC";
+    public static final String MODULE_OC = "M_OC";
     public static final String MODULE_SNAPSHOT = "M_SNAP";
     public static final String MODULE_LOCATION = "M_LOC";
     public static final String MODULE_WIFI = "M_WIFI";
     public static final String MODULE_BASE = "M_BASE";
     public static final String MODULE_DEV = "M_DEV";
+    /**
+     * 控制android8以后是否后台启动服务。提示通知
+     */
+    public static boolean IS_SHOW_NOTIFITION = false;
+    public static boolean SCREEN_ON = true;
+
 }
