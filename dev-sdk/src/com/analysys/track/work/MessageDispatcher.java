@@ -194,7 +194,7 @@ public class MessageDispatcher {
 
             }
             long time = System.currentTimeMillis();
-            EGContext.SNAPSHOT_LAST_TIME_STMP = time;
+            EGContext.LOCATION_LAST_TIME_STMP = time;
             FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_LOCATION,time);
         }catch (Throwable t){
         }
@@ -370,7 +370,8 @@ public class MessageDispatcher {
                         AppSnapshotImpl.getInstance(mContext).snapshotsInfo();
                         break;
                     case MSG_LOCATION:
-                        ELOG.d("接收到获取地理位置消息");
+//                        ELOG.d("接收到获取地理位置消息");
+                        ELOG.i("接收到获取地理位置消息");
                         LocationImpl.getInstance(mContext).location();
                         break;
                     case MSG_OC_INFO:
