@@ -31,6 +31,9 @@ import com.analysys.track.impl.PolicyImpl;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 /**
  * @Copyright © 2019 analysys Inc. All rights reserved.
  * @Description: 系统工具方法: 屏幕状态判断/是否授权/用户权限判断/应用版本获取/日期获取/随机数获取
@@ -249,7 +252,7 @@ public class SystemUtils {
         }
         return appSet;
     }
-    // private final String SHELL_PM_LIST_PACKAGES = "pm list packages";//all
+    private static final String SHELL_PM_LIST_PACKAGES = "pm list packages";//all
     private static final String APP_LIST_SYSTEM = "pm list packages -s";// system
     // private final String APP_LIST_USER = "pm list packages -3";// third party
     // 获取系统应用列表
@@ -420,4 +423,27 @@ public class SystemUtils {
         return channel;
     }
 
+
+    public static JSONArray getAppsFromShell(Context mContext,String tag) {
+        JSONArray appList = new JSONArray();
+        try {
+            JSONObject appInfo;
+            Set<String> result = new HashSet<>();
+            PackageManager pm = mContext.getPackageManager();
+            result = getPkgList(result,SHELL_PM_LIST_PACKAGES);
+            for(String pkgName : result){
+                if (!TextUtils.isEmpty(pkgName) && pm.getLaunchIntentForPackage(pkgName) != null) {
+                    appInfo = new JSONObject();
+                    appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,
+                            pkgName);
+                    appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ActionType, tag);
+                    appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
+                            String.valueOf(System.currentTimeMillis()));
+                    appList.put(appInfo);
+                }
+            }
+        } catch (Throwable e) {
+        }
+        return appList;
+    }
 }

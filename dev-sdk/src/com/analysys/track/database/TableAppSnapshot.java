@@ -38,23 +38,21 @@ public class TableAppSnapshot {
     /**
      * 覆盖新增数据，多条
      */
-    public void coverInsert(List<JSONObject> snapshots) {
+    public void coverInsert(JSONArray snapshots) {
         SQLiteDatabase db = null;
         try {
 //            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_APPSNAPSHOT)){
 //                return;
 //            }
-            if (snapshots.size() > 0) {
                 db = DBManager.getInstance(mContext).openDB();
                 db.beginTransaction();
                 db.delete(DBConfig.AppSnapshot.TABLE_NAME,null,null);
-                for (int i = 0; i < snapshots.size(); i++) {
-                    JSONObject snapshot = snapshots.get(i);
+                for (int i = 0; i < snapshots.length(); i++) {
+                    JSONObject snapshot = (JSONObject) snapshots.get(i);
                     db.insert(DBConfig.AppSnapshot.TABLE_NAME, null,
                         getContentValues(snapshot));
                 }
                 db.setTransactionSuccessful();
-            }
         } catch (Throwable e) {
         } finally {
             if(db != null){

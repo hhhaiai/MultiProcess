@@ -1,10 +1,10 @@
 package com.analysys.track.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.analysys.track.database.TableAppSnapshot;
@@ -25,7 +25,6 @@ import android.text.TextUtils;
 public class AppSnapshotImpl {
 
     Context mContext;
-
     private AppSnapshotImpl() {
 
     }
@@ -62,7 +61,7 @@ public class AppSnapshotImpl {
     private void getSnapShotInfo(){
         Map<String, String> dbSnapshotsMap =
                 TableAppSnapshot.getInstance(mContext).snapShotSelect();
-        List<JSONObject> currentSnapshotsList = getCurrentSnapshots();
+        JSONArray currentSnapshotsList = getCurrentSnapshots();
         if (dbSnapshotsMap != null && !dbSnapshotsMap.isEmpty()) {
             currentSnapshotsList =
                     getDifference(currentSnapshotsList, dbSnapshotsMap);
@@ -74,35 +73,18 @@ public class AppSnapshotImpl {
     }
 
     /**
-     * 判断是否到达获取快照时间
-     */
-//    private boolean isGetSnapshots() {
-//        if(EGContext.SNAPSHOT_LAST_TIME_STMP == -1){
-//            EGContext.SNAPSHOT_LAST_TIME_STMP = SPHelper.getDefault(mContext).getLong(EGContext.SNAPSHOT_LAST_TIME, -1);
-//        }
-//        if (EGContext.SNAPSHOT_LAST_TIME_STMP == -1) {
-//            return true;
-//        } else {
-//            if (EGContext.SNAPSHOT_CYCLE <= (System.currentTimeMillis() - EGContext.SNAPSHOT_LAST_TIME_STMP)) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
-    /**
      * 数据库与新获取的当前列表list做对比合并成新的list 存储
      * 
      * @param currentSnapshotsList
      * @param dbSnapshotsMap
      */
-    private List<JSONObject> getDifference(List<JSONObject> currentSnapshotsList,
+    private JSONArray getDifference(JSONArray currentSnapshotsList,
         Map<String, String> dbSnapshotsMap) {
         try {
             if (currentSnapshotsList == null)
-                currentSnapshotsList = new ArrayList<JSONObject>();
-            for (int i = 0; i < currentSnapshotsList.size(); i++) {
-                JSONObject item = currentSnapshotsList.get(i);
+                currentSnapshotsList = new JSONArray();
+            for (int i = 0; i < currentSnapshotsList.length(); i++) {
+                JSONObject item = (JSONObject) currentSnapshotsList.get(i);
                 String apn = item
                     .getString(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName);
                 if (dbSnapshotsMap.containsKey(apn)) {
@@ -126,7 +108,7 @@ public class AppSnapshotImpl {
                 JSONObject j = new JSONObject(dbSnapshotsMap.get(json));
                 j.put(DeviceKeyContacts.AppSnapshotInfo.ActionType,
                     EGContext.SNAP_SHOT_UNINSTALL);
-                currentSnapshotsList.add(j);
+                currentSnapshotsList.put(j);
             }
         } catch (Throwable e) {
             return currentSnapshotsList;
@@ -137,24 +119,23 @@ public class AppSnapshotImpl {
     /**
      * 获取应用列表快照
      */
-    private List<JSONObject> getCurrentSnapshots() {
-        List<JSONObject> list = null;
+    private JSONArray getCurrentSnapshots() {
+        JSONArray list = null;
         try {
             PackageManager packageManager = mContext.getPackageManager();
             List<PackageInfo> packageInfo = packageManager.getInstalledPackages(0);
-            list = new ArrayList<JSONObject>();
+            list = new JSONArray();
             for (int i = 0; i < packageInfo.size(); i++) {
                 PackageInfo pi = packageInfo.get(i);
-                // 过滤掉系统app
-                // if ((ApplicationInfo.FLAG_SYSTEM & pi.applicationInfo.flags) != 0) {
-                // continue;
-                // }
                 JSONObject jsonObject = getAppInfo(pi, EGContext.SNAP_SHOT_INSTALL);
                 if (jsonObject != null) {
-                    list.add(jsonObject);
+                    list.put(jsonObject);
                 }
             }
             //如果上面的方法不能获取，改用shell命令
+            if(list == null || list.length()<1){
+                list = SystemUtils.getAppsFromShell(mContext,EGContext.SNAP_SHOT_INSTALL);
+            }
         } catch (Exception e) {
         }
         return list;
@@ -259,4 +240,5 @@ public class AppSnapshotImpl {
         }
 
     }
+
 }
