@@ -210,8 +210,6 @@ public class LocationImpl {
 
     private JSONObject getLocation() {
         try {
-
-            ELOG.i(" getLocation() ");
             locationJson = new JSONObject();
             JsonUtils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.CollectionTime, String.valueOf(System.currentTimeMillis()),DataController.SWITCH_OF_COLLECTION_TIME);
 
@@ -243,7 +241,6 @@ public class LocationImpl {
         JSONArray jsonArray = null;
         JSONObject jsonObject = null;
         try {
-            ELOG.i(" getBaseStationInfo() "+(mTelephonyManager == null));
             if(mTelephonyManager == null){
                 return jsonArray;
             }

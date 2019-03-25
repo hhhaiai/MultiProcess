@@ -32,7 +32,6 @@ public class TableAppSnapshot {
         if (Holder.INSTANCE.mContext == null) {
             Holder.INSTANCE.mContext = EContextHelper.getContext(context);
         }
-
         return Holder.INSTANCE;
     }
 
@@ -219,13 +218,12 @@ public class TableAppSnapshot {
             array = new JSONArray();
             cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null,
                 null, null);
+            if(cursor == null){
+                return array;
+            }
             while (cursor.moveToNext()) {
                 if(blankCount >= EGContext.BLANK_COUNT_MAX){
                     return array;
-                }
-                if (cursor == null){
-                    blankCount += 1;
-                    continue;
                 }
                 String pkgName = cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN));
                 if(!TextUtils.isEmpty(pkgName)){

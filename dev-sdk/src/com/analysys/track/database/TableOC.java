@@ -47,7 +47,7 @@ public class TableOC {
 //                return;
 //            }
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if(db == null){
+            if(db == null || ocInfo == null || ocInfo.length()<1){
                 return;
             }
             ContentValues cv = getContentValues(ocInfo);
@@ -250,7 +250,7 @@ public class TableOC {
             }
             db.beginTransaction();
             ContentValues cv;
-            List list = SystemUtils.getDiffNO(ocInfo.length() - 1);
+            List list = SystemUtils.getDiffNO(ocInfo.length());
             int random;
             for (int i = 0; i < ocInfo.length(); i++) {
                 cv = new ContentValues();
@@ -282,7 +282,7 @@ public class TableOC {
         JSONObject obj;
         try {
             db = DBManager.getInstance(mContext).openDB();
-            if(db == null){
+            if(db == null || ocInfo == null || ocInfo.length()<1){
                 return;
             }
             db.beginTransaction();

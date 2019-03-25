@@ -118,7 +118,7 @@ public class OCImpl {
         try {
             JSONArray runningApps = TableOC.getInstance(mContext).selectRunning();
             JSONObject json = null;
-            List list = SystemUtils.getDiffNO(runningApps.length() - 1);
+            List list = SystemUtils.getDiffNO(runningApps.length());
             int random;
             for (int i = 0;i < runningApps.length(); i++) {
                 if(blankCount >= 5){
@@ -551,7 +551,7 @@ public class OCImpl {
     private void removeRepeat(JSONArray cacheApps) {
         try {
             JSONObject json = null;
-            List list = SystemUtils.getDiffNO(cacheApps.length() - 1);
+            List list = SystemUtils.getDiffNO(cacheApps.length());
             int random;
             for (int i = cacheApps.length() - 1; i >= 0; i--) {
                 json = (JSONObject)cacheApps.get(i);

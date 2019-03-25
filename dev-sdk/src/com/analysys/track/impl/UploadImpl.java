@@ -205,19 +205,22 @@ public class UploadImpl {
             if (ocJson != null) {
                 object.put(OCI, ocJson);
             }
+
             JSONArray snapshotJar = TableAppSnapshot.getInstance(mContext).select();
             if (snapshotJar != null) {
                 object.put(ASI, snapshotJar);
+            }
+
+            JSONArray xxxInfo = getUploadXXXInfos(mContext,object,isChunkUpload);
+            ELOG.i(isChunkUpload+" :::::::isChunkUpload");
+            if (xxxInfo != null) {
+                object.put(XXXInfo, xxxInfo);
             }
             JSONArray locationJar = TableLocation.getInstance(mContext).select();
             if (locationJar != null) {
                 object.put(LI, locationJar);
             }
-            JSONArray xxxInfo = getUploadXXXInfos(mContext,object,isChunkUpload);
-             ELOG.i(isChunkUpload+" :::::::isChunkUpload");
-            if (xxxInfo != null) {
-                object.put(XXXInfo, xxxInfo);
-            }
+
 
         } catch (Throwable e) {
             // Log.getStackTraceString(e);

@@ -1,5 +1,6 @@
 package com.analysys.track.database;
 
+import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import android.content.Context;
@@ -31,11 +32,16 @@ public class DBManager {
     }
 
     public synchronized SQLiteDatabase openDB() {
-        if (mOpenWriteCounter.incrementAndGet() == 1) {
-            // Opening new database
-            db = dbHelper.getWritableDatabase();
+        try {
+            if (mOpenWriteCounter.incrementAndGet() == 1) {
+                // Opening new database
+                ELOG.i("Opening new database");
+                db = dbHelper.getWritableDatabase();
+            }
+            ELOG.i("Opening 一次");
+        }catch (Throwable t){
+            ELOG.i("openDB()   "+t.getMessage());
         }
-
         return db;
     }
 
@@ -43,10 +49,15 @@ public class DBManager {
         try {
             if (mOpenWriteCounter.decrementAndGet() == 0) {
                 // Closing database
+                ELOG.i("Closing database");
                 db.close();
             }
-        } finally {
-            db = null;
+
+        } catch (Throwable t){
+            ELOG.i("closeDB "+t.getMessage());
         }
+//        finally {
+//            db = null;
+//        }
     }
 }
