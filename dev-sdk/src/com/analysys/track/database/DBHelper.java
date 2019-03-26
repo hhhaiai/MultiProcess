@@ -38,6 +38,8 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(DBConfig.AppSnapshot.CREATE_TABLE);
         db.execSQL(DBConfig.XXXInfo.CREATE_TABLE);
         db.execSQL(DBConfig.PROCInfo.CREATE_TABLE);
+        db.execSQL(DBConfig.IDStorage.CREATE_TABLE);
+
     }
 
     @Override
@@ -64,6 +66,9 @@ public class DBHelper extends SQLiteOpenHelper {
             if (DBUtils.isTableExist(db, DBConfig.PROCInfo.CREATE_TABLE)) {
                 db.execSQL(DBConfig.PROCInfo.CREATE_TABLE);
             }
+            if (DBUtils.isTableExist(db, DBConfig.IDStorage.CREATE_TABLE)) {
+                db.execSQL(DBConfig.IDStorage.CREATE_TABLE);
+            }
 
         } catch (SQLiteDatabaseCorruptException e) {
             rebuildDB();
@@ -80,20 +85,4 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-//    /**
-//     * 建表
-//     */
-//    public void createTable(String createSQL, String tableName) {
-//        SQLiteDatabase db = null;
-//        try {
-//            db = getWritableDatabase();
-//            if (!DBUtils.isTableExist(db, tableName)) {
-//                db.execSQL(createSQL);
-//            }
-//        } catch (Throwable t) {
-//
-//        } finally {
-//            db.close();
-//        }
-//    }
 }

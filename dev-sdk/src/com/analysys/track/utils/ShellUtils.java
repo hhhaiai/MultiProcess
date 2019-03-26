@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import android.text.TextUtils;
 
 public class ShellUtils {
-
     /**
      * 执行shell指令
      *
@@ -16,7 +15,6 @@ public class ShellUtils {
      * @return
      */
     public static String shell(String cmd) {
-
         // TODO : 如何防止卡死,需要增加超时机制.待调研测试
         if (TextUtils.isEmpty(cmd)) {
             return null;

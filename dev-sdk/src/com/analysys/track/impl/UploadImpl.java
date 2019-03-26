@@ -16,12 +16,12 @@ import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.impl.proc.DataPackaging;
 import com.analysys.track.impl.proc.ProcParser;
+import com.analysys.track.utils.EguanIdUtils;
 import com.analysys.track.work.CheckHeartbeat;
 import com.analysys.track.work.MessageDispatcher;
 import com.analysys.track.model.PolicyInfo;
 import com.analysys.track.utils.AESUtils;
 import com.analysys.track.utils.DeflterCompressUtils;
-import com.analysys.track.utils.EGProcesser;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.NetworkUtils;
@@ -303,7 +303,7 @@ public class UploadImpl {
                 String code = object.opt(DeviceKeyContacts.Response.RES_CODE).toString();
                 if (code != null) {
                     if (EGContext.HTTP_SUCCESS.equals(code)) {
-                        EGProcesser.setId(json, mContext);
+                        EguanIdUtils.getInstance(mContext).setId(json);
                         // 清除本地数据
                         uploadSuccess(mContext,TimerTime(code));
                     }

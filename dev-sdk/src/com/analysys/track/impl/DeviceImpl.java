@@ -17,10 +17,8 @@ import java.util.Enumeration;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.model.BatteryModuleNameInfo;
-import com.analysys.track.model.SoftwareInfo;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.FileUtils;
 
@@ -596,24 +594,17 @@ public class DeviceImpl {
         }
         return null;
     }
-    // /**
-    // * 获取eguan id
-    // */
-    // public String getEguanID() {
-    //
-    // return null;
-    // }
 
-    /**
-     * 获取临时id
-     */
-    public String getTempID() {
-        String id = SoftwareInfo.getInstance().getTempID();
-        if (TextUtils.isEmpty(id)) {
-            id = SPHelper.getDefault(mContext).getString(DeviceKeyContacts.DevInfo.TempID, "");
-        }
-        return id;
-    }
+//    /**
+//     * 获取临时id
+//     */
+//    public String getTempID() {
+//        String id = SoftwareInfo.getInstance().getTempID();
+//        if (TextUtils.isEmpty(id)) {
+//            id = SPHelper.getDefault(mContext).getString(DeviceKeyContacts.DevInfo.TempID, "");
+//        }
+//        return id;
+//    }
 
     /**
      * 判断设备本身、APP、以及工作环境是否是被调试状态，“0”= 不在调试状态“1”= 在调试状态

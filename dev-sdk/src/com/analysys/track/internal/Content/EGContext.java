@@ -95,7 +95,7 @@ public class EGContext {
 
     public static final String SP_NAME = "eg_policy";
     public static final String LAST_LOCATION = "last_location";
-    public static final String POLICY_VER_DEFALUT = "";
+    public static final String TMPID = "tmp_id";
     public static final int SERVER_DELAY_DEFAULT = 0;
     public static final int FAIL_COUNT_DEFALUT = 3;//上传重试次数，默认3次
     public static final long FAIL_TRY_DELAY_DEFALUT = 60 * 1000;// 上传重试时间间隔默认60-70s

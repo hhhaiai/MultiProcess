@@ -11,6 +11,7 @@ import com.analysys.track.impl.PolicyImpl;
 import com.analysys.track.impl.SenSorModuleNameImpl;
 import com.analysys.track.model.BatteryModuleNameInfo;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.EguanIdUtils;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.SimulatorUtils;
 
@@ -58,7 +59,7 @@ public class DataPackaging {
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationVersionCode, devImpl.getApplicationVersionCode(),DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.AppMD5, devImpl.getAppMD5(),DataController.SWITCH_OF_APP_MD5);
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.AppSign, devImpl.getAppSign(),DataController.SWITCH_OF_APP_SIGN);
-            JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.TempID, devImpl.getTempID(),DataController.SWITCH_OF_TEMP_ID);
+            JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.TempID, EguanIdUtils.getInstance(mContext).getId(),DataController.SWITCH_OF_TEMP_ID);
 
             if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_DEV_CHECK,DataController.SWITCH_OF_MODULE_CL_DEV_CHECK)) {
                 JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Simulator, SimulatorUtils.getSimulatorStatus(mContext),DataController.SWITCH_OF_SIMULATOR);

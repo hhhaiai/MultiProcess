@@ -13,9 +13,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
+import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.internal.Content.EGContext;
-
+import com.analysys.track.utils.reflectinon.EContextHelper;
 
 
 public class SPHelper {
@@ -312,10 +313,11 @@ public class SPHelper {
     public static String getLastLocation(Context ctx) {
         return getDefault(ctx).getString(EGContext.LAST_LOCATION, "");
     }
-//    public static void setUploadCycleTime(Context ctx, int time){
-//        getDefault(ctx).edit().putInt(EGContext.UPLOAD_CLCLE_TIME, time).apply();
-//    }
-//    public static int getUploadCycleTime(Context ctx){
-//        return getDefault(ctx).getInt(EGContext.UPLOAD_CLCLE_TIME, EGContext.UPLOAD_CYCLE);
-//    }
+    public static String getTmpID(Context ctx) {
+        return getDefault(ctx).getString(EGContext.TMPID, "");
+    }
+    public static void setTmpID(Context ctx,String tmpID) {
+        getDefault(ctx).edit().putString(EGContext.TMPID, tmpID).apply();
+    }
+
 }
