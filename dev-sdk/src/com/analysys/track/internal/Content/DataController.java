@@ -111,12 +111,14 @@ public class DataController {
     public static boolean SWITCH_OF_COLLECTION_TIME = true;
     public static boolean SWITCH_OF_GEOGRAPHY_LOCATION = true;
     public static boolean SWITCH_OF_WIFI_NAME = true;
+    public static boolean SWITCH_OF_SST = true;
     public static boolean SWITCH_OF_SSID = true;
     public static boolean SWITCH_OF_BSSID = true;
     public static boolean SWITCH_OF_LEVEL = true;//wifi信号强度
     public static boolean SWITCH_OF_CAPABILITIES = true;
     public static boolean SWITCH_OF_FREQUENCY = true;
     public static boolean SWITCH_OF_BS_NAME = true;
+    public static boolean SWITCH_OF_LOCATION_TIME = true;
     public static boolean SWITCH_OF_LOCATION_AREA_CODE = true;
     public static boolean SWITCH_OF_CELL_ID = true;
     public static boolean SWITCH_OF_BS_LEVEL = true;//基站信号强度

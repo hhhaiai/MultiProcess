@@ -47,10 +47,13 @@ public class WifiImpl {
                 if (wm.getWifiState() == WifiManager.WIFI_STATE_ENABLED) {
                     List<ScanResult> list = wm.getScanResults();
                     wifiSort(list);
+                    ScanResult s = null;
+                    JSONObject jsonObject = null;
                     for (int i = 0; i < list.size(); i++) {
                         if (i < 5) {
-                            ScanResult s = list.get(i);
-                            JSONObject jsonObject = new JSONObject();
+                            s = list.get(i);
+                            jsonObject = new JSONObject();
+                            JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.WifiInfo.TIME, System.currentTimeMillis(),DataController.SWITCH_OF_SST);
                             JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.WifiInfo.SSID, s.SSID,DataController.SWITCH_OF_SSID);
                             JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.WifiInfo.BSSID, s.BSSID,DataController.SWITCH_OF_BSSID);
                             JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.WifiInfo.Level, s.level,DataController.SWITCH_OF_LEVEL);

@@ -63,9 +63,11 @@ public class UploadImpl {
         try {
             //TODO 测试下线程名字，判断子线程or主线程，应该子线程，测试是否会导致同级别的卡顿
             if(EGContext.NETWORK_TYPE_NO_NET.equals(NetworkUtils.getNetworkType(mContext))){
+                ELOG.i("第一次可能return的地方");
                 return;
             }
             if (SPHelper.getRequestState(mContext) != 0) {
+                ELOG.i("第2次可能return的地方");
                 return;
             }
             File dir = mContext.getFilesDir();
@@ -74,7 +76,9 @@ public class UploadImpl {
             if (f.exists()) {
                 long time = f.lastModified();
                 long dur = now - time;
-                if (Math.abs(dur) <= PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE)) {
+                //Math.abs(dur)
+                if ( dur <= PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE)) {
+                    ELOG.i("第3次可能return的地方");
                     return;
                 }
             } else {
@@ -82,7 +86,7 @@ public class UploadImpl {
                 f.setLastModified(now);
             }
             boolean isDurOK = (now - SPHelper.getLastQuestTime(mContext)) > PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE);
-            // L.i("---------即将发送数据isDurOK：" + isDurOK);
+             ELOG.i("---------即将发送数据isDurOK：" + isDurOK);
             if (isDurOK) {
                 f.setLastModified(now);
                 reTryAndUpload(true);
@@ -92,7 +96,9 @@ public class UploadImpl {
         }
     }
     public void reTryAndUpload(boolean isNormalUpload){
+        ELOG.i("进入reTryAndUpload");
         if (isNormalUpload) {
+            ELOG.i("正常上传");
             doUpload();
         }else if (!isNormalUpload && SPHelper.getFailedNumb(mContext) > 0 && (SPHelper.getFailedNumb(mContext) < PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT,EGContext.FAIL_COUNT_DEFALUT))
                 && (System.currentTimeMillis() - SPHelper.getFailedTime(mContext) > SPHelper.getRetryTime(mContext))) {
@@ -110,6 +116,7 @@ public class UploadImpl {
         isChunkUpload = false;
         try {
             // 如果时间超过一天，并且当前是可网络请求状态，则先上传开发者配置请求，然后上传数据
+            ELOG.i("进入doUpload");
             SPHelper.setRequestState(mContext,EGContext.sBeginResuest);
             final int serverDelayTime = PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_SERVER_DELAY,EGContext.SERVER_DELAY_DEFAULT);
             if (SystemUtils.isMainThread()) {
@@ -118,6 +125,7 @@ public class UploadImpl {
                     @Override
                     public void run() {
                         try {
+                            ELOG.i("serverDelayTime === "+serverDelayTime);
                             if(serverDelayTime > 0){
                                 Thread.sleep(serverDelayTime);
                             }
@@ -186,6 +194,7 @@ public class UploadImpl {
                 MessageDispatcher.getInstance(mContext).uploadInfo(PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE), false);
             }
         } catch (Throwable t) {
+            ELOG.e("发送逻辑问题"+t.getMessage());
         }
     }
     /**
@@ -211,14 +220,15 @@ public class UploadImpl {
                 object.put(ASI, snapshotJar);
             }
 
+            JSONArray locationInfo = TableLocation.getInstance(mContext).select();
+            if (locationInfo != null) {
+                object.put(LI, locationInfo);
+            }
+
             JSONArray xxxInfo = getUploadXXXInfos(mContext,object,isChunkUpload);
             ELOG.i(isChunkUpload+" :::::::isChunkUpload");
             if (xxxInfo != null) {
                 object.put(XXXInfo, xxxInfo);
-            }
-            JSONArray locationJar = TableLocation.getInstance(mContext).select();
-            if (locationJar != null) {
-                object.put(LI, locationJar);
             }
 
 

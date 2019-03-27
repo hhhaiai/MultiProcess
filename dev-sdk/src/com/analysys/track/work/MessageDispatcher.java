@@ -163,9 +163,11 @@ public class MessageDispatcher {
                     return;
                 }
             }
-            long time = System.currentTimeMillis();
-            EGContext.SNAPSHOT_LAST_TIME_STMP = time;
-            FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_APPSNAPSHOT,time);
+            if(delayTime <= 0 || delay <= 0) {
+                long time = System.currentTimeMillis();
+                EGContext.SNAPSHOT_LAST_TIME_STMP = time;
+                FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, time);
+            }
         }catch (Throwable t){
         }
     }
@@ -193,9 +195,11 @@ public class MessageDispatcher {
                 }
 
             }
-            long time = System.currentTimeMillis();
-            EGContext.LOCATION_LAST_TIME_STMP = time;
-            FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_LOCATION,time);
+            if(delayTime <= 0 || delay <= 0) {
+                long time = System.currentTimeMillis();
+                EGContext.LOCATION_LAST_TIME_STMP = time;
+                FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, time);
+            }
         }catch (Throwable t){
         }
 
@@ -221,7 +225,7 @@ public class MessageDispatcher {
                 }else{
                     if(!mHandler.hasMessages(msg.what)){
                         delay = delayTime - (System.currentTimeMillis()- EGContext.OC_LAST_TIME_STMP);
-                        ELOG.i("DELAY 一次 ocInfo.....");
+                        ELOG.i("DELAY 一次 ocInfo....."+delay);
                         sendMessage(msg, delay);
                     }else{
                         ELOG.i("HAS ocInfo.....");
@@ -243,7 +247,7 @@ public class MessageDispatcher {
                 }else {
                     if(!mHandler.hasMessages(msg.what)){
                         delay = delayTime - (System.currentTimeMillis() - EGContext.OC_LAST_TIME_STMP);
-                        ELOG.i("DELAY 一次 ocInfo.....");
+                        ELOG.i("DELAY 一次 ocInfo....."+delay);
                         sendMessage(msg, delay);
                     }else{
                         ELOG.i("HAS ocInfo.....");
@@ -256,12 +260,15 @@ public class MessageDispatcher {
 //                    ELOG.i("记录时间"+time);
 //                SPHelper.getDefault(mContext).edit().putLong(EGContext.OC_LAST_TIME_OVER_5,time).commit();
             }
-            long time = System.currentTimeMillis();
-            EGContext.OC_LAST_TIME_STMP = time;
-            FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_OC,time);
-            ELOG.i("记录时间"+time);
+            if(delayTime <= 0 || delay <= 0){
+                long time = System.currentTimeMillis();
+                EGContext.OC_LAST_TIME_STMP = time;
+                FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_OC,time);
+                ELOG.i("记录时间"+time);
+            }
 
         }catch (Throwable t){
+            ELOG.e(t.getMessage()+"  异常");
         }
 
 
@@ -286,9 +293,12 @@ public class MessageDispatcher {
                     return;
                 }
             }
-            long time = System.currentTimeMillis();
-            EGContext.UPLOAD_LAST_TIME_STMP = time;
-            FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_UPLOAD,time);
+            if(delayTime <= 0 || delay <= 0){
+                long time = System.currentTimeMillis();
+                EGContext.UPLOAD_LAST_TIME_STMP = time;
+                FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_UPLOAD,time);
+            }
+
         }catch (Throwable t){
         }
 

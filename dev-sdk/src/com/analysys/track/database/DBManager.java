@@ -38,7 +38,6 @@ public class DBManager {
                 ELOG.i("Opening new database");
                 db = dbHelper.getWritableDatabase();
             }
-            ELOG.i("Opening 一次");
         }catch (Throwable t){
             ELOG.i("openDB()   "+t.getMessage());
         }

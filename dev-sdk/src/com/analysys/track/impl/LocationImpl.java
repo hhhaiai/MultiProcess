@@ -80,13 +80,11 @@ public class LocationImpl {
     }
     private void LocationHandle(){
         try {
-            ELOG.i(" LocationHandle() ");
             //么有获取地理位置权限则不做处理
             if(!hasLocationPermission()){
                 return;
             }
             if(mTelephonyManager == null){
-//                mTelephonyManager = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
                 mTelephonyManager = AnalysysPhoneStateListener.getInstance(mContext).getTelephonyManager();
             }
             JSONObject location = getLocation();
@@ -253,6 +251,7 @@ public class LocationImpl {
                         baseStationSort(list);
                         for (int i = 0; i < list.size(); i++) {
                             if (i < 5) {
+                                JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.BSTIME, System.currentTimeMillis(), DataController.SWITCH_OF_LOCATION_TIME);
                                 JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, list.get(i).getLac(), DataController.SWITCH_OF_LOCATION_AREA_CODE);
                                 JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, list.get(i).getCid(), DataController.SWITCH_OF_CELL_ID);
                                 JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, list.get(i).getRssi(), DataController.SWITCH_OF_BS_LEVEL);
@@ -272,11 +271,12 @@ public class LocationImpl {
                             if(loc != null){
 //                                ELOG.i("获取当前基站信息:::::: "+loc.getLac()+ "  vs "+loc.getCid()+"  vs "+loc.getPsc());
                                 //获取当前基站信息
+                                JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.BSTIME, System.currentTimeMillis(), DataController.SWITCH_OF_LOCATION_TIME);
                                 JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, loc.getLac(),DataController.SWITCH_OF_LOCATION_AREA_CODE);
                                 JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, loc.getCid(),DataController.SWITCH_OF_CELL_ID);
                                 JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, loc.getPsc(),DataController.SWITCH_OF_BS_LEVEL);
                                 jsonArray.put(jsonObject);
-                                ELOG.i("获取当前基站信息。。。:::::: "+jsonArray);
+//                                ELOG.i("获取当前基站信息。。。:::::: "+jsonArray);
                             }
                         }
 //                        else if(location instanceof GsmCellLocation){
