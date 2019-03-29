@@ -21,7 +21,6 @@ import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
-import java.util.Random;
 
 public class MessageDispatcher {
     private long delay = 0;
@@ -417,7 +416,8 @@ public class MessageDispatcher {
                         if(EGContext.UPLOAD_LAST_TIME_STMP == -1){
                             EGContext.UPLOAD_LAST_TIME_STMP = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_UPLOAD);
                         }
-                        long delay = PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE) - (System.currentTimeMillis() - EGContext.UPLOAD_LAST_TIME_STMP);
+                        int cycleTime = PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE);
+                        long delay = cycleTime - (System.currentTimeMillis() - EGContext.UPLOAD_LAST_TIME_STMP);
                         if(delay <= 0 ){
                             uploadInfo(delay ,true);
                         }
