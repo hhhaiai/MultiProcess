@@ -51,7 +51,7 @@ public class TableXXXInfo {
             ContentValues contentValues;
             for (ContentValues cv:listCv) {
 //                ELOG.i("每一个cv::::::  "+cv);
-                List<ContentValues> procCV = TablePROC.getInstance(mContext).getContentValues(cv.get(DBConfig.XXXInfo.Column.TIME).toString(), new JSONArray(cv.get(DBConfig.XXXInfo.Column.PROC).toString()));
+                List<ContentValues> procCV = TablePROC.getInstance(mContext).getContentValues(cv.get(DBConfig.XXXInfo.Column.TIME).toString(), new JSONArray(EncryptUtils.decrypt(mContext,cv.get(DBConfig.XXXInfo.Column.PROC).toString())));
                 cv.put(DBConfig.XXXInfo.Column.PROC, EncryptUtils.encrypt(mContext,"0"));
                 db.insert(DBConfig.XXXInfo.TABLE_NAME, null, cv);
 
@@ -62,8 +62,8 @@ public class TableXXXInfo {
                 }
             }
             db.setTransactionSuccessful();
-        } catch (Exception e) {
-            ELOG.e(e+"  insert XXX");
+        } catch (Throwable e) {
+            ELOG.e(e.getMessage()+"  insert XXX");
         }finally {
             if(db != null){
                 db.endTransaction();
