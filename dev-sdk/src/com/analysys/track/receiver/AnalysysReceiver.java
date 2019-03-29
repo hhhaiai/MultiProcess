@@ -75,7 +75,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
             if (SCREEN_OFF.equals(intent.getAction())) {
                 EGContext.SCREEN_ON = false;
                 ProcessManager.setIsCollected(false);
-                processScreenOff(context);
+                processScreenOff();
 
                 ELOG.e("接收关闭屏幕广播");
             }
@@ -91,7 +91,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
         }
     }
 
-    private void processScreenOff(final Context ctx) {
+    private void processScreenOff() {
         // L.e("--------processScreenOff");
         try {
             if (SystemUtils.isMainThread()) {
@@ -106,19 +106,19 @@ public class AnalysysReceiver extends BroadcastReceiver {
 
                     }
                 });
-                EThreadPool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.CLOSE_SCREEN);
-                    }
-                });
+//                EThreadPool.execute(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.CLOSE_SCREEN);
+//                    }
+//                });
 
             } else {
                 // AppProcessManager.resetCounter();
                 /*注销广播*/
 //                ProcessManager.dealScreenOff(ctx);
                 ReceiverUtils.getInstance().unRegistAllReceiver(mContext);
-                OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.CLOSE_SCREEN);
+//                OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.CLOSE_SCREEN);
             }
         } catch (Throwable e) {
         }

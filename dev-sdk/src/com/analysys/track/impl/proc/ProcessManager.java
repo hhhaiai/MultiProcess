@@ -54,7 +54,7 @@ public class ProcessManager {
         return nameSet;
     }
 
-    public static void saveDB(Context ctx,JSONObject ocInfo){
+    public static void saveSP(Context ctx, JSONObject ocInfo){
         SPHelper.setLastOpenPackgeName(ctx, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName));
         SPHelper.setLastOpenTime(ctx, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationOpenTime));
         SPHelper.setLastAppName(ctx, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationName));

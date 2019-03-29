@@ -3,7 +3,6 @@ package com.analysys.track.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -12,11 +11,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.analysys.track.database.TableOC;
-import com.analysys.track.database.TableXXXInfo;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.impl.proc.ProcParser;
-import com.analysys.track.impl.proc.Process;
 import com.analysys.track.impl.proc.ProcessManager;
 import com.analysys.track.work.MessageDispatcher;
 import com.analysys.track.service.AnalysysAccessibilityService;
@@ -92,15 +88,15 @@ public class OCImpl {
                         getInfoByVersion();
                     }
                 }
-            }else{//TODO 待验证一下
+            }else{//TODO 黑屏补充数据，待验证
                 String openApp = SPHelper.getLastAppName(mContext);
                 if (!TextUtils.isEmpty(openApp)) {
                     // 补充时间
-                    SPHelper.setEndTime(mContext, System.currentTimeMillis() - new Random(25).nextInt(1000));
+                    long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(SPHelper.getLastOpenTime(mContext)));
+                    SPHelper.setEndTime(mContext, randomCloseTime);
                     filterInsertOCInfo(EGContext.CLOSE_SCREEN);
                 }
             }
-
         } catch (Throwable t) {
         }
     }
@@ -127,7 +123,7 @@ public class OCImpl {
                 json = (JSONObject)runningApps.get(i);
                 random = (Integer)list.get(i);
                 String openTime = json.optString(DeviceKeyContacts.OCInfo.ApplicationOpenTime);
-                long randomCloseTime = calculateCloseTime(Long.parseLong(openTime));
+                long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(openTime));
                 if(randomCloseTime == -1){//小于5min的频繁的开锁屏不做处理
                     continue;
                 }
@@ -151,14 +147,6 @@ public class OCImpl {
         }
 
     }
-    private long calculateCloseTime(long openTime ){
-       long currentTime = System.currentTimeMillis();
-       long closeTime = -1;
-        if(currentTime - openTime > EGContext.DEFAULT_SPACE_TIME){
-           closeTime =(long)(Math.random()*(currentTime - openTime) + openTime);
-        }
-        return closeTime;
-    }
     String pkgName = null;
 
     /**
@@ -174,7 +162,6 @@ public class OCImpl {
         // 4.x和以下版本判断,逻辑: 有权限申请系统API获取; 无权限直接使用5.x/6.x版本
         if (Build.VERSION.SDK_INT < 21) {
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.GET_TASKS)) {
-                // RunningApps(getRunningApp(), EGContext.OC_COLLECTION_TYPE_RUNNING_TASK);
                 getRunningTasks();
             } else {
                 getProcApps();
@@ -237,14 +224,18 @@ public class OCImpl {
         String pkgName = "";
         ActivityManager am = null;
         try {
-            mContext = EContextHelper.getContext(mContext);
+            if(mContext == null){
+                mContext = EContextHelper.getContext(mContext);
+            }
             if (mContext != null) {
                 am = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
                 List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
+                ELOG.i("tasks  :::::  " + tasks);
                 if (tasks == null || tasks.size() <= 0) {
                     getRunningProcess(am);
                     return;
                 }
+                //获取栈顶app的包名
                 pkgName = tasks.get(0).topActivity.getPackageName();
                 processPkgName(pkgName);
             }
@@ -258,6 +249,7 @@ public class OCImpl {
         try {
             List<ActivityManager.RunningAppProcessInfo> processInfos = am.getRunningAppProcesses();
             if (processInfos == null || processInfos.size() <= 0) {
+                ELOG.i("  processInfos is null 。。。");
                 return;
             }
             for (ActivityManager.RunningAppProcessInfo appProcess : processInfos) {
@@ -275,56 +267,60 @@ public class OCImpl {
      * @param packageName
      */
     private void processPkgName(String packageName) {
-        // L.i( "processPkgName:" + packageName);
+        ELOG.i( "processPkgName包名 :" + packageName);
         String lastPkgName = SPHelper.getLastOpenPackgeName(mContext);
-
+        ELOG.i( "lastPkgName :" + lastPkgName);
         if (TextUtils.isEmpty(packageName)) {
             return;
         }
-        PackageManager pm = mContext.getPackageManager();
+//        PackageManager pm = mContext.getPackageManager();
+        JSONObject ocJson = getOCInfo(pkgName, EGContext.OC_COLLECTION_TYPE_RUNNING_TASK);
         // 是否首次打开
         if (TextUtils.isEmpty(lastPkgName)) {
-            SPHelper.setEndTime(mContext, System.currentTimeMillis() - new Random(25).nextInt(1000));
-            insertShared(pm, packageName);
+//            SPHelper.setEndTime(mContext, System.currentTimeMillis() - new Random(25).nextInt(1000));
+            ProcessManager.saveSP(mContext,ocJson);
         } else {
-            // 如果打开的包名与缓存的包名不一致，存储数据并将包名做缓存
+            long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(SPHelper.getLastOpenTime(mContext)));
+            //1.非首次打开，之前有pkgName缓存,设置当前时间往前推一点为结束时间
+            SPHelper.setEndTime(mContext, randomCloseTime);
+            //2.入库当前的缓存appTime
+            filterInsertOCInfo(EGContext.APP_SWITCH);
+            // 3.如果打开的包名与缓存的包名不一致，更新新pkgName到sp
             if (!packageName.equals(lastPkgName)) {
                 // L.i("=======切换包名。即将保存");
-                SPHelper.setEndTime(mContext, System.currentTimeMillis() - new Random(25).nextInt(1000));
-                filterInsertOCInfo(EGContext.APP_SWITCH);
-                insertShared(pm, packageName);
+                ProcessManager.saveSP(mContext,ocJson);
             }
         }
     }
 
-    /**
-     * 缓存数据
-     *
-     * @param pm
-     * @param pkgName
-     */
-    private void insertShared(PackageManager pm, String pkgName) {
-
-        String appName = "", versionName = "", versionCode = "";
-        try {
-
-            if (pm == null || TextUtils.isEmpty(pkgName)) {
-                return;
-            }
-            appName = pm.getApplicationLabel(pm.getApplicationInfo(pkgName, PackageManager.GET_META_DATA)) + "";
-            versionName = pm.getPackageInfo(pkgName, 0).versionName;
-            versionCode = String.valueOf(pm.getPackageInfo(pkgName, 0).versionCode);
-
-        } catch (Throwable e) {
-        }
-        String nowTime = String.valueOf(System.currentTimeMillis());
-        SPHelper.setLastOpenPackgeName(mContext, pkgName);
-        SPHelper.setLastOpenTime(mContext, nowTime);
-        SPHelper.setLastAppName(mContext, appName);
-        SPHelper.setLastAppVerison(mContext,
-                (versionName == null || "null".equals(versionName)) ? "1.0" : versionName + "|" + versionCode);
-        SPHelper.setAppType(mContext, SystemUtils.getAppType(mContext, pkgName));
-    }
+//    /**
+//     * 缓存数据
+//     *
+//     * @param pm
+//     * @param pkgName
+//     */
+//    private void insertShared(PackageManager pm, String pkgName) {
+//
+//        String appName = "", versionName = "", versionCode = "";
+//        try {
+//
+//            if (pm == null || TextUtils.isEmpty(pkgName)) {
+//                return;
+//            }
+//            appName = pm.getApplicationLabel(pm.getApplicationInfo(pkgName, PackageManager.GET_META_DATA)) + "";
+//            versionName = pm.getPackageInfo(pkgName, 0).versionName;
+//            versionCode = String.valueOf(pm.getPackageInfo(pkgName, 0).versionCode);
+//        } catch (Throwable e) {
+//            ELOG.e(e.getMessage()+" :::::insertShared ");
+//        }
+//        String nowTime = String.valueOf(System.currentTimeMillis());
+//        SPHelper.setLastOpenPackgeName(mContext, pkgName);
+//        SPHelper.setLastOpenTime(mContext, nowTime);
+//        SPHelper.setLastAppName(mContext, appName);
+//        SPHelper.setLastAppVerison(mContext,
+//                (versionName == null || "null".equals(versionName)) ? "1.0" : versionName + "|" + versionCode);
+//        SPHelper.setAppType(mContext, SystemUtils.getAppType(mContext, pkgName));
+//    }
 
     /**
      * 从Proc中读取数据
@@ -389,7 +385,7 @@ public class OCImpl {
         try {
             List list = SystemUtils.getDiffNO(cacheApps.length());
             int random;
-            List oc = new ArrayList();
+            List<JSONObject> oc = new ArrayList();
             String apn;
             for (int i = 0; i < cacheApps.length() - 1; i++) {
                 random = (Integer)list.get(i);
@@ -533,7 +529,7 @@ public class OCImpl {
                     TableOC.getInstance(mContext).update(ocJson);
                 } else {
                     // 该时段没有数据，存储该时段的记录
-                    ProcessManager.saveDB(mContext,ocJson);
+                    ProcessManager.saveSP(mContext,ocJson);
                     TableOC.getInstance(mContext).insert(ocJson);
                 }
             }else {
@@ -617,32 +613,19 @@ public class OCImpl {
     }
 
     public void filterInsertOCInfo(String switchType) {
-        // L.i("-------filterInsertOCInfo()----" + switchType);
         String OldPkgName = SPHelper.getLastOpenPackgeName(mContext);
         String appName = SPHelper.getLastAppName(mContext);
         String appVersion = SPHelper.getLastAppVerison(mContext);
         String openTime = SPHelper.getLastOpenTime(mContext);
         Long closeTime = SPHelper.getEndTime(mContext);
         String appType = SPHelper.getAppType(mContext);
-        // L.i("filterInsertOCInfo..... 1111");
         if (TextUtils.isEmpty(OldPkgName) || TextUtils.isEmpty(appName) || TextUtils.isEmpty(appVersion)
             || TextUtils.isEmpty(openTime)) {
             return;
         }
-        long time = closeTime;
-        long minDuration = SPHelper.getMinDuration(mContext);
-        long maxDuration = SPHelper.getMaxDuration(mContext);
-
-        if (minDuration <= 0) {
-            minDuration = EGContext.SHORT_TIME;
-        }
-        if (maxDuration <= 0) {
-            maxDuration = EGContext.LONGEST_TIME;
-        }
-        // L.i("filterInsertOCInfo..... 2222 time:" +time);
         JSONObject ocInfo = null;
-        if (minDuration / 2 <= time && time <= maxDuration) {
-            // L.i("filterInsertOCInfo..... 33333");
+        ELOG.i(closeTime+"  closeTime vs  openTime "+Long.parseLong(openTime));
+        if (closeTime > Long.parseLong(openTime)) {
             try {
                 ocInfo = new JSONObject();
                 ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, OldPkgName);
@@ -656,16 +639,18 @@ public class OCImpl {
                 ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode, appVersion);
                 ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName, appName);
                 if (ocInfo != null && !"".equals(openTime) && !"".equals(closeTime)) {
-                    ProcessManager.saveDB(mContext,ocInfo);
+//                    ProcessManager.saveSP(mContext,ocInfo);
                     TableOC.getInstance(mContext).insert(ocInfo);// 保存上一个打开关闭记录信息
                 }
             } catch (Throwable t) {
+                ELOG.e(t.getMessage()+"  filterInsertOCInfo has an exc");
             }
         }
         SPHelper.setLastOpenPackgeName(mContext, "");
         SPHelper.setLastOpenTime(mContext, "");
         SPHelper.setLastAppName(mContext, "");
         SPHelper.setLastAppVerison(mContext, "");
+        SPHelper.setAppType(mContext,"");
     }
 
     /**

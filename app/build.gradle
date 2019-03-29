@@ -51,5 +51,7 @@ tasks.withType(Javadoc) {
 dependencies {
 //    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':dev-sdk')
-    implementation 'com.amitshekhar.android:debug-db:1.0.6'
+    implementation 'com.amitshekhar.android:debug-db:1.0.1'
+//    implementation 'com.amitshekhar.android:debug-db-base:1.0.6'
+//    implementation 'com.amitshekhar.android:debug-db-encrypt:1.0.6'
 }

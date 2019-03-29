@@ -9,6 +9,7 @@ import com.analysys.track.service.AnalysysJobService;
 import com.analysys.track.service.AnalysysService;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
+import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.SystemUtils;
@@ -48,6 +49,10 @@ public class ServiceHelper {
     protected void startSelfService() {
         try {
             ReceiverUtils.getInstance().registAllReceiver(mContext);// 只能注册一次，不能注册多次
+            // 检查加密模块是否正常，false重新初始化
+            if (!EncryptUtils.checkEncryptKey(mContext)) {
+                EncryptUtils.reInitKey(mContext);
+            }
             if (canStartService()) {
                 boolean isWorking = isServiceWorking(mContext, EGContext.SERVICE_NAME);
                 ELOG.i(isWorking + "  is servicework");

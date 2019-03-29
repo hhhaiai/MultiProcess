@@ -8,7 +8,7 @@ import android.text.TextUtils;
 
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.Base64Utils;
 
@@ -40,7 +40,7 @@ public class TableLocation {
                 String encryptLocation = Base64Utils.encrypt(locationInfo.toString(), time);
                 if (!TextUtils.isEmpty(encryptLocation)) {
                     ContentValues cv = new ContentValues();
-                    cv.put(DBConfig.Location.Column.LI, encryptLocation);
+                    cv.put(DBConfig.Location.Column.LI, EncryptUtils.encrypt(mContext,encryptLocation));
                     cv.put(DBConfig.Location.Column.IT, String.valueOf(time));
                     cv.put(DBConfig.Location.Column.ST, "0");
                     SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
@@ -80,7 +80,7 @@ public class TableLocation {
                 ContentValues cv = new ContentValues();
                 cv.put(DBConfig.Location.Column.ST, "1");
                 db.update(DBConfig.Location.TABLE_NAME, cv, DBConfig.Location.Column.ID + "=?", new String[]{id});
-                String decryptLocation = Base64Utils.decrypt(encryptLocation, Long.valueOf(time));
+                String decryptLocation = Base64Utils.decrypt(EncryptUtils.decrypt(mContext,encryptLocation), Long.valueOf(time));
                 if(!TextUtils.isEmpty(decryptLocation)){
                     array.put(new JSONObject(decryptLocation));
                 } else {
@@ -114,7 +114,6 @@ public class TableLocation {
 //            db.execSQL(sql);
             db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?", new String[]{"1"});
         } catch (Throwable e) {
-            ELOG.e(e + "deletedeletedeletedeletedeletedelete");
         }finally {
             DBManager.getInstance(mContext).closeDB();
         }

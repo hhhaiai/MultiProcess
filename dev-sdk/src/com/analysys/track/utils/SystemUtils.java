@@ -446,4 +446,13 @@ public class SystemUtils {
         }
         return appList;
     }
+
+    public static long calculateCloseTime(long openTime ){
+        long currentTime = System.currentTimeMillis();
+        long closeTime = -1;
+        if(currentTime - openTime > EGContext.DEFAULT_SPACE_TIME){
+            closeTime =(long)(Math.random()*(currentTime - openTime) + openTime);
+        }
+        return closeTime;
+    }
 }

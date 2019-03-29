@@ -11,6 +11,7 @@ import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.Base64Utils;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -125,7 +126,7 @@ public class TableOC {
             db.update(DBConfig.OC.TABLE_NAME, cv,
                 DBConfig.OC.Column.APN + "=? and " + DBConfig.OC.Column.DY + "=? and "
                     + DBConfig.OC.Column.TI + "=? and " + DBConfig.OC.Column.RS + "=?",
-                new String[] {ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName), day,
+                new String[] {EncryptUtils.encrypt(mContext,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName)), day,
                     String.valueOf(timeInterval), ZERO});
         } catch (Throwable e) {
             ELOG.e(e+ "update() ..");
@@ -143,8 +144,7 @@ public class TableOC {
         try {
             if (ocInfo != null) {
                 cv = new ContentValues();
-                ELOG.i(ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime) + "  :::::::::::act`s value...");
-                String act = ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime);
+                String act = EncryptUtils.encrypt(mContext,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime));
                 cv.put(DBConfig.OC.Column.ACT, act);
             }
         } catch (Throwable t) {
@@ -165,14 +165,14 @@ public class TableOC {
                 String act = ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime);
                 ELOG.i(act + "  :::::::::::act`s value...");
                 String an = Base64Utils.encrypt(ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationName), insertTime);
-                cv.put(DBConfig.OC.Column.APN, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName));
-                cv.put(DBConfig.OC.Column.AN, an);
-                cv.put(DBConfig.OC.Column.AOT, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationOpenTime));
-                cv.put(DBConfig.OC.Column.ACT, act);
+                cv.put(DBConfig.OC.Column.APN, EncryptUtils.encrypt(mContext,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName)));
+                cv.put(DBConfig.OC.Column.AN, EncryptUtils.encrypt(mContext,an));
+                cv.put(DBConfig.OC.Column.AOT, EncryptUtils.encrypt(mContext,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationOpenTime)));
+                cv.put(DBConfig.OC.Column.ACT, EncryptUtils.encrypt(mContext,act));
                 cv.put(DBConfig.OC.Column.DY, SystemUtils.getDay());
-                cv.put(DBConfig.OC.Column.IT, String.valueOf(insertTime));
-                cv.put(DBConfig.OC.Column.AVC, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationVersionCode));
-                cv.put(DBConfig.OC.Column.NT, ocInfo.optString(DeviceKeyContacts.OCInfo.NetworkType));
+                cv.put(DBConfig.OC.Column.IT, EncryptUtils.encrypt(mContext,String.valueOf(insertTime)));
+                cv.put(DBConfig.OC.Column.AVC, EncryptUtils.encrypt(mContext,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationVersionCode)));
+                cv.put(DBConfig.OC.Column.NT, EncryptUtils.encrypt(mContext,ocInfo.optString(DeviceKeyContacts.OCInfo.NetworkType)));
                 cv.put(DBConfig.OC.Column.AT, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationType));
                 cv.put(DBConfig.OC.Column.CT, ocInfo.optString(DeviceKeyContacts.OCInfo.CollectionType));
                 cv.put(DBConfig.OC.Column.AST, ocInfo.optString(DeviceKeyContacts.OCInfo.SwitchType));
@@ -207,20 +207,20 @@ public class TableOC {
                     return array;
                 }
                 jsonObject = new JSONObject();
-                String insertTime = cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.IT));
-                String appName = Base64Utils.decrypt(cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AN)), Long.parseLong(insertTime));
-                String apn = cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.APN));
+                String insertTime = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.IT)));
+                String appName = Base64Utils.decrypt(EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AN))), Long.parseLong(insertTime));
+                String apn = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.APN)));
                 if(TextUtils.isEmpty(apn)){
                     blankCount += 1;
                 }
                 jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, apn);
                 jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationName, appName);
                 jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationOpenTime,
-                    cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AOT)));
+                        EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AOT))));
                 jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode,
-                    cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AVC)));
+                        EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AVC))));
                 jsonObject.put(DeviceKeyContacts.OCInfo.NetworkType,
-                    cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.NT)));
+                        EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.NT))));
                 jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationType,
                     cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AT)));
                 jsonObject.put(DeviceKeyContacts.OCInfo.CollectionType,
@@ -256,9 +256,9 @@ public class TableOC {
                 cv = new ContentValues();
                 random = (Integer)list.get(i);
                 cv.put(DBConfig.OC.Column.RS, ONE);
-                cv.put(DBConfig.OC.Column.ACT, String.valueOf(System.currentTimeMillis() - random));
+                cv.put(DBConfig.OC.Column.ACT, EncryptUtils.encrypt(mContext,String.valueOf(System.currentTimeMillis() - random)));
                 String pkgName =
-                    new JSONObject(ocInfo.get(i).toString()).optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
+                    EncryptUtils.encrypt(mContext,new JSONObject(ocInfo.get(i).toString()).optString(DeviceKeyContacts.OCInfo.ApplicationPackageName));
                 db.update(DBConfig.OC.TABLE_NAME, cv,
                     DBConfig.OC.Column.APN + "=? and " + DBConfig.OC.Column.RS + "=?",
                     new String[] {pkgName, ZERO});
@@ -291,8 +291,8 @@ public class TableOC {
 
             for (int i = 0; i < ocInfo.length(); i++) {
                 obj = (JSONObject)ocInfo.get(i);
-                String pkgName = obj.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
-                String act = obj.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime);
+                String pkgName = EncryptUtils.encrypt(mContext,obj.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName));
+                String act = EncryptUtils.encrypt(mContext,obj.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime));
                 String switchType = obj.optString(DeviceKeyContacts.OCInfo.SwitchType);
                 if(TextUtils.isEmpty(switchType)){
                     switchType = EGContext.APP_SWITCH;
@@ -340,7 +340,7 @@ public class TableOC {
                     return list;
                 }
                 String pkgName =
-                    cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.APN));
+                        EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.APN)));
                 if (!TextUtils.isEmpty(pkgName)) {
                     list.add(pkgName);
                 }else{
@@ -381,27 +381,27 @@ public class TableOC {
                 if(blankCount >= EGContext.BLANK_COUNT_MAX){
                     return ocJar;
                 }
-                act = cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.ACT));
+                act = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.ACT)));
                 if (TextUtils.isEmpty(act) || "".equals(act)){//closeTime为空，则继续循环，只取closeTime有值的信息
                     continue;
                 }
                 jsonObject = new JSONObject();
-                String insertTime = cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.IT));
-                String encryptAn = cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AN));
+                String insertTime = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.IT)));
+                String encryptAn = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AN)));
                 String an = Base64Utils.decrypt(encryptAn, Long.valueOf(insertTime));
                 JsonUtils.pushToJSON(mContext,jsonObject ,DeviceKeyContacts.OCInfo.ApplicationOpenTime,
-                        cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AOT)),DataController.SWITCH_OF_APPLICATION_OPEN_TIME);
+                        EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AOT))),DataController.SWITCH_OF_APPLICATION_OPEN_TIME);
                 JsonUtils.pushToJSON(mContext,jsonObject ,DeviceKeyContacts.OCInfo.ApplicationCloseTime, act,DataController.SWITCH_OF_APPLICATION_CLOSE_TIME);
-                pkgName = cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.APN));
+                pkgName = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.APN)));
                 if(TextUtils.isEmpty(pkgName)){
                     blankCount +=1;
                 }
                 JsonUtils.pushToJSON(mContext,jsonObject ,DeviceKeyContacts.OCInfo.ApplicationPackageName,pkgName,DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
                 JsonUtils.pushToJSON(mContext,jsonObject ,DeviceKeyContacts.OCInfo.ApplicationName, an,DataController.SWITCH_OF_APPLICATION_NAME);
                 JsonUtils.pushToJSON(mContext,jsonObject ,DeviceKeyContacts.OCInfo.ApplicationVersionCode,
-                        cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AVC)),DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
+                        EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AVC))),DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
                 JsonUtils.pushToJSON(mContext,jsonObject ,DeviceKeyContacts.OCInfo.NetworkType,
-                        cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.NT)),DataController.SWITCH_OF_NETWORK_TYPE);
+                        EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.NT))),DataController.SWITCH_OF_NETWORK_TYPE);
                 etdm = new JSONObject();
                 JsonUtils.pushToJSON(mContext,etdm ,DeviceKeyContacts.OCInfo.SwitchType,
                         cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AST)),DataController.SWITCH_OF_SWITCH_TYPE);

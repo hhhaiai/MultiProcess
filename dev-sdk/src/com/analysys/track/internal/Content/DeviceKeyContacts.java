@@ -292,7 +292,6 @@ public class DeviceKeyContacts {
       public static final String Capabilities = "CBT";
       // 以MHz为单位的接入频率值
       public static final String Frequency = "FQC";
-      public static final String TIME = "WT";
 
     }
 
@@ -305,8 +304,6 @@ public class DeviceKeyContacts {
       public static final String CellId = "CI";
       // 信号强度
       public static final String Level = "LV";
-      //时间
-      public static final String BSTIME = "BSTime";
 
     }
   }

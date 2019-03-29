@@ -17,6 +17,7 @@ import com.analysys.track.impl.UploadImpl;
 import com.analysys.track.utils.ELOG;
 
 import com.analysys.track.utils.FileUtils;
+import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -52,7 +53,6 @@ public class MessageDispatcher {
             sendMessage(msg, 0);
         }catch (Throwable t){
         }
-
     }
 
     // 心跳检查
@@ -218,7 +218,8 @@ public class MessageDispatcher {
             }
             if(Build.VERSION.SDK_INT < 21){
                 if(shouldRemoveDelay){
-                    SPHelper.setEndTime(mContext, System.currentTimeMillis() - new Random(25).nextInt(1000));
+                    long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(SPHelper.getLastOpenTime(mContext)));
+                    SPHelper.setEndTime(mContext, randomCloseTime);
                     OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.NORMAL);
                     mHandler.removeMessages(msg.what);
                     sendMessage(msg,delayTime);
@@ -232,15 +233,11 @@ public class MessageDispatcher {
                         return;
                     }//队列里有同样的msg 在等着delay，则不做任何操作，否则，发送msg
                 }
-//                    long time = System.currentTimeMillis();
-//                    EGContext.OC_LAST_TIME_STMP = time;
-//                    FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_OC,time);
-//                    ELOG.i("记录时间"+time);
-//                SPHelper.getDefault(mContext).edit().putLong(EGContext.OC_LAST_TIME,time).commit();
             }else if(Build.VERSION.SDK_INT > 20){
                 if(shouldRemoveDelay){
                     // 补充时间
-                    SPHelper.setEndTime(mContext, System.currentTimeMillis() - new Random(25).nextInt(1000));
+                    long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(SPHelper.getLastOpenTime(mContext)));
+                    SPHelper.setEndTime(mContext, randomCloseTime);
                     OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.NORMAL);
                     mHandler.removeMessages(msg.what);
                     sendMessage(msg,delayTime);
@@ -254,11 +251,6 @@ public class MessageDispatcher {
                         return;
                     }//队列里有同样的msg 在等着delay，则不做任何操作，否则，发送msg
                 }
-//                    long time = System.currentTimeMillis();
-//                    EGContext.OC_LAST_TIME_STMP = time;
-//                    FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_OC,time);
-//                    ELOG.i("记录时间"+time);
-//                SPHelper.getDefault(mContext).edit().putLong(EGContext.OC_LAST_TIME_OVER_5,time).commit();
             }
             if(delayTime <= 0 || delay <= 0){
                 long time = System.currentTimeMillis();

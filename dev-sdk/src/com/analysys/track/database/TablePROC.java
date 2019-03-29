@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.Base64;
 
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
@@ -12,6 +13,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class TablePROC {
     Context mContext;
@@ -40,8 +42,8 @@ public class TablePROC {
 //                    ELOG.i(i+  " js ::::::   "+js);
                     if(js == null) continue;
                     cv = new ContentValues();
-                    cv.put(DBConfig.PROCInfo.Column.PARENT_ID_TIME, time);
-                    cv.put(DBConfig.PROCInfo.Column.CONTENT,new String(Base64.encode(js.toString().getBytes(),Base64.DEFAULT)));
+                    cv.put(DBConfig.PROCInfo.Column.PARENT_ID_TIME, EncryptUtils.encrypt(mContext,time));
+                    cv.put(DBConfig.PROCInfo.Column.CONTENT,EncryptUtils.encrypt(mContext,new String(Base64.encode(js.toString().getBytes(),Base64.DEFAULT))));
                     list.add(cv);
                 }
             }

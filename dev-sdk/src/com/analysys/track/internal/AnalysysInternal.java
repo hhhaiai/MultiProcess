@@ -7,6 +7,7 @@ import android.os.PowerManager;
 import android.os.Process;
 import com.analysys.track.internal.Content.EGContext;
 
+import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.work.CrashHandler;
 import com.analysys.track.work.MessageDispatcher;
 import com.analysys.track.utils.ELOG;
@@ -70,23 +71,25 @@ public class AnalysysInternal {
         hasInit = true;
         ELOG.d("初始化，进程Id：< " + Process.myPid() + " >");
         // 0.首先检查是否有Context
-        Context cxt = EContextHelper.getContext(mContextRef.get());
-        if(cxt == null){
+        Context ctx = EContextHelper.getContext(mContextRef.get());
+        if(ctx == null){
             return;
         }
         if(mContextRef == null){
-            mContextRef = new WeakReference<Context>(cxt);
+            mContextRef = new WeakReference<Context>(ctx);
         }
-        SystemUtils.updateAppkeyAndChannel(cxt, key, channel);//update sp
+        SystemUtils.updateAppkeyAndChannel(ctx, key, channel);//update sp
 
         // 1. 设置错误回调
         CrashHandler.getInstance().setCallback(null);//不依赖ctx
-        // 2.初始化多进程
-        initSupportMultiProcess(cxt);
-        // 3. 启动工作机制
-        MessageDispatcher.getInstance(cxt).startService();
+        //2.初始化加密
+        EncryptUtils.init(ctx);
+        // 3.初始化多进程
+        initSupportMultiProcess(ctx);
+        // 4. 启动工作机制
+        MessageDispatcher.getInstance(ctx).startService();
         // 4. 根据屏幕调整工作状态
-        PowerManager pm = (PowerManager)cxt.getSystemService(Context.POWER_SERVICE);
+        PowerManager pm = (PowerManager)ctx.getSystemService(Context.POWER_SERVICE);
         if (pm != null) {
             boolean isScreenOn = pm.isScreenOn();
             // 如果为true，则表示屏幕正在使用，false则屏幕关闭。

@@ -17,6 +17,7 @@ import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.impl.proc.DataPackaging;
 import com.analysys.track.impl.proc.ProcParser;
 import com.analysys.track.utils.EguanIdUtils;
+import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.work.CheckHeartbeat;
 import com.analysys.track.work.MessageDispatcher;
 import com.analysys.track.model.PolicyInfo;
@@ -150,6 +151,7 @@ public class UploadImpl {
                             handleUpload(url, messageEncrypt(uploadInfo));
                             // 3. 兼容多次分包的上传
                             while (isChunkUpload) {
+                                ELOG.i("isChunkUpload  " + isChunkUpload);
                                 uploadInfo = getInfo();
                                 handleUpload(url, messageEncrypt(uploadInfo));
                             }
@@ -185,6 +187,7 @@ public class UploadImpl {
                     handleUpload(url, messageEncrypt(uploadInfo));
                     // 3. 兼容多次分包的上传
                     while (isChunkUpload) {
+                        ELOG.i("isChunkUpload2  " + isChunkUpload);
                         uploadInfo = getInfo();
                         handleUpload(url, messageEncrypt(uploadInfo));
                     }
@@ -225,13 +228,10 @@ public class UploadImpl {
                 object.put(LI, locationInfo);
             }
 
-            JSONArray xxxInfo = getUploadXXXInfos(mContext,object,isChunkUpload);
-            ELOG.i(isChunkUpload+" :::::::isChunkUpload");
+            JSONArray xxxInfo = getUploadXXXInfos(mContext,object);
             if (xxxInfo != null) {
                 object.put(XXXInfo, xxxInfo);
             }
-
-
         } catch (Throwable e) {
             // Log.getStackTraceString(e);
             ELOG.e(e+"getInfo()");
@@ -249,17 +249,6 @@ public class UploadImpl {
             if (TextUtils.isEmpty(msg)) {
                 return null;
             }
-            // new Thread(new Runnable() {
-            // @Override
-            // public void run() {
-            // try{
-            // ELOG.i("==========================="+Environment.getExternalStorageDirectory()+"/origin.txt");
-            // FileUtils.write(Environment.getExternalStorageDirectory()+"/origin.txt",msg);
-            // }catch (Throwable t){
-            // ELOG.i("THREAD HAS AN EXCEPTION "+t.getMessage());
-            // }
-            // }
-            // }).start();
             String key_inner = SystemUtils.getAppKey(mContext);
             if (null == key_inner) {
                 key_inner = EGContext.ORIGINKEY_STRING;
@@ -271,19 +260,6 @@ public class UploadImpl {
             byte[] encryptMessage = AESUtils.encrypt(def, key.getBytes("UTF-8"));
             if (encryptMessage != null) {
                 byte[] returnData = Base64.encode(encryptMessage, Base64.DEFAULT);
-                // ELOG.i("returnData :::::::::::::"+ new String(returnData));
-                // new Thread(new Runnable() {
-                // @Override
-                // public void run() {
-                // try{
-                // ELOG.i("==========================="+Environment.getExternalStorageDirectory()+"/encode.txt");
-                // FileUtils.write(Environment.getExternalStorageDirectory()+"/encode.txt",new
-                // String(returnData).replace("\n",""));
-                // }catch (Throwable t){
-                // ELOG.i("THREAD HAS AN EXCEPTION "+t.getMessage());
-                // }
-                // }
-                // }).start();
                 return new String(returnData).replace("\n", "");
             }
         } catch (Throwable t) {
@@ -346,40 +322,29 @@ public class UploadImpl {
         analysysReturnJson(result);
     }
 
-//    private void cleanData() {
-//        TableAppSnapshot.getInstance(mContext).delete();
-//        TableLocation.getInstance(mContext).delete();
-//        TableXXXInfo.getInstance(mContext).delete();
-//        TableOC.getInstance(mContext).delete();
-//    }
-    private JSONArray getUploadXXXInfos(Context mContext,JSONObject obj,boolean isNeedMultiPackageUpload){
+    private JSONArray getUploadXXXInfos(Context mContext,JSONObject obj){
         // 结果存放的XXXInfo结构
         JSONArray arr = new JSONArray();
         JSONArray jsonArray = new JSONArray();
         try {
             jsonArray = TableXXXInfo.getInstance(mContext).select();
-            // L.i("获取XXXInfo数量。。。" + infos.size());
+            ELOG.i("条数 ：：：：： "+jsonArray.length());
             if (jsonArray == null ||jsonArray.length() <= 0) {
-                isNeedMultiPackageUpload = false;
+                isChunkUpload = false;
                 return arr;
             }
-            // L.i("getUploadXXXInfos -----------1111");
-
             // 计算离最大上线的差值
             long freeLen = EGContext.LEN_MAX_UPDATE_SIZE - obj.toString().getBytes().length;
             // 没有可以使用的大小，则需要重新发送
             if (freeLen <= 0) {
                 if (jsonArray.length() > 0) {
-                    isNeedMultiPackageUpload = true;
+                    isChunkUpload = true;
                 }
                 return arr;
             }
-            // L.i("getUploadXXXInfos -----------22222");
-
             int ss = jsonArray.length();
             if (jsonArray != null && ss > 0) {
                 // 测试大小是否超限的预览版XXXInfo
-                JSONArray test = new JSONArray();
                 // 挨个遍历,使用JSON如果不超限，则
                 /**
                  * 遍历逻辑:
@@ -390,40 +355,35 @@ public class UploadImpl {
                  * </p>
                  * 3. 测试JSON不超限, 则加入使用数据，id计入清除列表中
                  */
+                JSONObject info = null;
                 for (int i = 0; i < ss; i++) {
-                    JSONObject info = (JSONObject)jsonArray.get(i);
+                    info = (JSONObject)jsonArray.get(i);
                     // base64的值
                     String xx = info.toString();
                     // 判断单条大小是否超限,删除单条数据
                     if (xx.getBytes().length > freeLen) {
-                        // L.i("getUploadXXXInfos -----------3333");
                         timeList.add(new JSONObject(new String(Base64.decode(xx.getBytes(),Base64.DEFAULT))).getString(ProcParser.RUNNING_TIME));
                         // 最后一个消费，则不需要再次发送
                         if (i == ss - 1) {
-                            isNeedMultiPackageUpload = false;
+                            isChunkUpload = false;
                         } else {
                             continue;
                         }
                     }
                     // 先尝试是否超限.如果超限,则不在增加
-                    test.put(info);
-                    long size = test.toString().getBytes().length;
+                    long size = xx.getBytes().length + arr.toString().getBytes().length;
                     if (size >= freeLen) {
-                        // L.i("getUploadXXXInfos -----------4444");
-                        isNeedMultiPackageUpload = true;
+                        isChunkUpload = true;
                         break;
                     } else {
-                        // L.i("getUploadXXXInfos -----------5555");
                         arr.put(info);
                         timeList.add(new JSONObject(new String(Base64.decode(xx.getBytes(),Base64.DEFAULT))).getString(ProcParser.RUNNING_TIME));
                         // 最后一个消费，则不需要再次发送
                         if (i == ss - 1) {
-                            isNeedMultiPackageUpload = false;
+                            isChunkUpload = false;
                         }
                     }
                 }
-                test = null;
-                // L.i("getUploadXXXInfos ---------> " + arr.length());
                 if (arr.length() <= 0) {
                     // 兼容只有一条数据,但是数据量超级大. 清除DB中所有数据
                     TableXXXInfo.getInstance(mContext).delete();
@@ -453,7 +413,6 @@ public class UploadImpl {
         TableAppSnapshot.getInstance(mContext).update();
 
         //location全部删除已读的数据，最后一条无需保留，sp里有
-        //TODO SP里的数据和敏感数据 做加密处理  wifi的也加密
         TableLocation.getInstance(mContext).delete();
 
         //按time值delete xxxinfo表和proc表

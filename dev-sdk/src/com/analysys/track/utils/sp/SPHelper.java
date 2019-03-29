@@ -13,10 +13,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
-import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 
 
 public class SPHelper {
@@ -238,22 +236,22 @@ public class SPHelper {
     public static String getAppType(Context ctx) {
         return getDefault(ctx).getString(EGContext.APP_TYPE, "");
     }
-    public static long getMinDuration(Context ctx) {
-        return getDefault(ctx).getLong(EGContext.MIN_DURATION_TIME, 0);
-    }
+//    public static long getMinDuration(Context ctx) {
+//        return getDefault(ctx).getLong(EGContext.MIN_DURATION_TIME, 0);
+//    }
 
-    public static void setMinDuration(Context ctx,long info) {
-        editor.putLong(EGContext.MIN_DURATION_TIME, info);
-        editor.commit();
-    }
-    public static long getMaxDuration(Context ctx) {
-        return getDefault(ctx).getLong(EGContext.MAX_DURATION_TIME, 0);
-    }
+//    public static void setMinDuration(Context ctx,long info) {
+//        editor.putLong(EGContext.MIN_DURATION_TIME, info);
+//        editor.commit();
+//    }
+//    public static long getMaxDuration(Context ctx) {
+//        return getDefault(ctx).getLong(EGContext.MAX_DURATION_TIME, 0);
+//    }
 
-    public static void setMaxDuration(Context ctx,long info) {
-        editor.putLong(EGContext.MAX_DURATION_TIME, info);
-        editor.commit();
-    }
+//    public static void setMaxDuration(Context ctx,long info) {
+//        editor.putLong(EGContext.MAX_DURATION_TIME, info);
+//        editor.commit();
+//    }
     /**
      * 进程关闭时间时间
      */

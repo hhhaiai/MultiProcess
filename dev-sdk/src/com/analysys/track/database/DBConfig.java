@@ -65,9 +65,9 @@ public class DBConfig {
       // 应用版本号
       public static final String AVC = "asi_c";
       // 应用状态
-      public static final String AT = "asi_e";
+      public static final String AT = "asi_d";
       // 操作时间
-      public static final String AHT = "asi_f";
+      public static final String AHT = "asi_e";
 
       public static final String ASI_RA = "asi_ra";
       public static final String ASI_RB = "asi_rb";

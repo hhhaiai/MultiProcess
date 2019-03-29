@@ -81,8 +81,9 @@ public class AppSnapshotImpl {
     private JSONArray getDifference(JSONArray currentSnapshotsList,
         Map<String, String> dbSnapshotsMap) {
         try {
-            if (currentSnapshotsList == null)
+            if (currentSnapshotsList == null){
                 currentSnapshotsList = new JSONArray();
+            }
             for (int i = 0; i < currentSnapshotsList.length(); i++) {
                 JSONObject item = (JSONObject) currentSnapshotsList.get(i);
                 String apn = item

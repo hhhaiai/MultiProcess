@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 public class TableIDStorage {
@@ -36,7 +37,7 @@ public class TableIDStorage {
                 return;
             }
             ContentValues cv = new ContentValues();
-            cv.put(DBConfig.IDStorage.Column.TEMPID, tmpId);
+            cv.put(DBConfig.IDStorage.Column.TEMPID, EncryptUtils.encrypt(mContext,tmpId));
             db.insert(DBConfig.IDStorage.TABLE_NAME, null, cv);
         } catch (Throwable e) {
         }finally {
@@ -66,7 +67,7 @@ public class TableIDStorage {
                 if(blankCount >= EGContext.BLANK_COUNT_MAX){
                     return tmpid;
                 }
-                tmpid = cursor.getString(cursor.getColumnIndex(DBConfig.IDStorage.Column.TEMPID));
+                tmpid = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.IDStorage.Column.TEMPID)));
                if(TextUtils.isEmpty(tmpid)){
                     blankCount += 1;
                     continue;

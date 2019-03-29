@@ -49,7 +49,7 @@ public class ProcParser {
             String result = jsonObject.get("result").toString();
 //            Log.i("RESULT", "  result的结果==>" + result);
             uploadInfo.put(RUNNING_RESULT, result);
-
+            ELOG.i("XXXInfo ::::::: "+uploadInfo);
         } catch (Throwable t) {
             ELOG.i(t.getMessage() + "   =============exception");
         }
