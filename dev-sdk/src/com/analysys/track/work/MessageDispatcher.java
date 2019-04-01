@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.text.TextUtils;
 
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
@@ -217,7 +218,11 @@ public class MessageDispatcher {
             }
             if(Build.VERSION.SDK_INT < 21){
                 if(shouldRemoveDelay){
-                    long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(SPHelper.getLastOpenTime(mContext)));
+                    String lastOpenTime = SPHelper.getLastOpenTime(mContext);
+                    if(TextUtils.isEmpty(lastOpenTime)){
+                        lastOpenTime = "0";
+                    }
+                    long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
                     SPHelper.setEndTime(mContext, randomCloseTime);
                     OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.NORMAL);
                     mHandler.removeMessages(msg.what);
@@ -235,7 +240,11 @@ public class MessageDispatcher {
             }else if(Build.VERSION.SDK_INT > 20){
                 if(shouldRemoveDelay){
                     // 补充时间
-                    long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(SPHelper.getLastOpenTime(mContext)));
+                    String lastOpenTime = SPHelper.getLastOpenTime(mContext);
+                    if(TextUtils.isEmpty(lastOpenTime)){
+                        lastOpenTime = "0";
+                    }
+                    long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
                     SPHelper.setEndTime(mContext, randomCloseTime);
                     OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.NORMAL);
                     mHandler.removeMessages(msg.what);

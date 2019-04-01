@@ -13,6 +13,7 @@ public class AnalysysPhoneStateListener {
     private static Context mContext;
     private static TelephonyManager telephonyManager = null;
     private static PhoneStateListener phoneStateListener = null;
+//    public static int lastSignal = 0;
 
     private static class Holder {
         private static final AnalysysPhoneStateListener INSTANCE = new AnalysysPhoneStateListener();
@@ -49,6 +50,8 @@ public class AnalysysPhoneStateListener {
             }
             @Override
             public void onSignalStrengthsChanged(SignalStrength signalStrength) {
+//                int asu=signalStrength.getGsmSignalStrength();
+//                lastSignal=-113+2*asu; //信号强度
                 super.onSignalStrengthsChanged(signalStrength);
             }
         };

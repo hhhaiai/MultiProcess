@@ -355,14 +355,14 @@ public class UploadImpl {
                  * </p>
                  * 3. 测试JSON不超限, 则加入使用数据，id计入清除列表中
                  */
-                JSONObject info = null;
+                String info = null;
                 for (int i = 0; i < ss; i++) {
-                    info = (JSONObject)jsonArray.get(i);
+                    info = (String) jsonArray.get(i);
                     // base64的值
-                    String xx = info.toString();
+//                    String xx = info.toString();
                     // 判断单条大小是否超限,删除单条数据
-                    if (xx.getBytes().length > freeLen) {
-                        timeList.add(new JSONObject(new String(Base64.decode(xx.getBytes(),Base64.DEFAULT))).getString(ProcParser.RUNNING_TIME));
+                    if (info.getBytes().length > freeLen) {
+                        timeList.add(new JSONObject(new String(Base64.decode(info.getBytes(),Base64.DEFAULT))).getString(ProcParser.RUNNING_TIME));
                         // 最后一个消费，则不需要再次发送
                         if (i == ss - 1) {
                             isChunkUpload = false;
@@ -371,13 +371,13 @@ public class UploadImpl {
                         }
                     }
                     // 先尝试是否超限.如果超限,则不在增加
-                    long size = xx.getBytes().length + arr.toString().getBytes().length;
+                    long size = info.getBytes().length + arr.toString().getBytes().length;
                     if (size >= freeLen) {
                         isChunkUpload = true;
                         break;
                     } else {
                         arr.put(info);
-                        timeList.add(new JSONObject(new String(Base64.decode(xx.getBytes(),Base64.DEFAULT))).getString(ProcParser.RUNNING_TIME));
+                        timeList.add(new JSONObject(new String(Base64.decode(info.getBytes(),Base64.DEFAULT))).getString(ProcParser.RUNNING_TIME));
                         // 最后一个消费，则不需要再次发送
                         if (i == ss - 1) {
                             isChunkUpload = false;
@@ -392,6 +392,7 @@ public class UploadImpl {
 
             }
         } catch (Throwable e) {
+            ELOG.i("getUploadXXXInfos :::"+e.getMessage());
         }
         return arr;
     }

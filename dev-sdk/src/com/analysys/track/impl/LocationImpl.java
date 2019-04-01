@@ -31,6 +31,7 @@ import android.telephony.CellLocation;
 import android.telephony.NeighboringCellInfo;
 import android.telephony.TelephonyManager;
 
+import android.telephony.cdma.CdmaCellLocation;
 import android.telephony.gsm.GsmCellLocation;
 import android.text.TextUtils;
 
@@ -263,23 +264,35 @@ public class LocationImpl {
                 }
                 try {
                     CellLocation location = mTelephonyManager.getCellLocation();
-                    GsmCellLocation loc = null;
+                    GsmCellLocation gcl = null;
+                    CdmaCellLocation ccl = null;
                     if(location != null){
                         if(location instanceof GsmCellLocation) {
-                            loc = (GsmCellLocation)location;
-                            if(loc != null){
+                            gcl = (GsmCellLocation)location;
+                            if(gcl != null){
 //                                ELOG.i("获取当前基站信息:::::: "+loc.getLac()+ "  vs "+loc.getCid()+"  vs "+loc.getPsc());
                                 //获取当前基站信息
-                                JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, loc.getLac(),DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                                JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, loc.getCid(),DataController.SWITCH_OF_CELL_ID);
-                                JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, loc.getPsc(),DataController.SWITCH_OF_BS_LEVEL);
+                                JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, gcl.getLac(),DataController.SWITCH_OF_LOCATION_AREA_CODE);
+                                JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, gcl.getCid(),DataController.SWITCH_OF_CELL_ID);
+                                JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, gcl.getPsc(),DataController.SWITCH_OF_BS_LEVEL);
                                 jsonArray.put(jsonObject);
 //                                ELOG.i("获取当前基站信息。。。:::::: "+jsonArray);
                             }
+                        } else{
+                            if(mTelephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_CDMA){
+                                ccl = (CdmaCellLocation) mTelephonyManager.getCellLocation();
+                                if(ccl != null){
+//                                ELOG.i("获取当前基站信息:::::: "+loc.getLac()+ "  vs "+loc.getCid()+"  vs "+loc.getPsc());
+                                    //获取当前基站信息
+                                    JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, ccl.getNetworkId(),DataController.SWITCH_OF_LOCATION_AREA_CODE);
+                                    JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, ccl.getBaseStationId(),DataController.SWITCH_OF_CELL_ID);
+                                    JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, ccl.getBaseStationId() ,DataController.SWITCH_OF_BS_LEVEL);
+                                    jsonArray.put(jsonObject);
+//                                ELOG.i("获取当前基站信息。。。:::::: "+jsonArray);
+                                }
+                            }
+                            return jsonArray;
                         }
-//                        else if(location instanceof GsmCellLocation){
-//                            return jsonArray;
-//                        }
                     }else {
                         return jsonArray;
                     }

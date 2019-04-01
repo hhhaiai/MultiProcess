@@ -87,10 +87,10 @@ public class TableXXXInfo {
                     cv = new ContentValues();
 //                    ELOG.i(xxxInfo.toString()+"     xxxInfo  ");
                     cv.put(DBConfig.XXXInfo.Column.TIME, EncryptUtils.encrypt(mContext,object.opt(ProcParser.RUNNING_TIME).toString()));
-                    cv.put(DBConfig.XXXInfo.Column.TOP, EncryptUtils.encrypt(mContext,new String(Base64.encode(object.opt(ProcParser.RUNNING_TOP).toString().getBytes(),Base64.DEFAULT))));
-                    cv.put(DBConfig.XXXInfo.Column.PS, EncryptUtils.encrypt(mContext,new String(Base64.encode(object.opt(ProcParser.RUNNING_PS).toString().getBytes(),Base64.DEFAULT))));
+                    cv.put(DBConfig.XXXInfo.Column.TOP, EncryptUtils.encrypt(mContext,object.opt(ProcParser.RUNNING_TOP).toString()));
+                    cv.put(DBConfig.XXXInfo.Column.PS, EncryptUtils.encrypt(mContext,object.opt(ProcParser.RUNNING_PS).toString()));
                     cv.put(DBConfig.XXXInfo.Column.PROC, EncryptUtils.encrypt(mContext,object.opt(ProcParser.RUNNING_PROC).toString()));
-                    cv.put(DBConfig.XXXInfo.Column.RESULT, EncryptUtils.encrypt(mContext,new String(Base64.encode(object.opt(ProcParser.RUNNING_RESULT).toString().getBytes(),Base64.DEFAULT))));
+                    cv.put(DBConfig.XXXInfo.Column.RESULT, EncryptUtils.encrypt(mContext,object.opt(ProcParser.RUNNING_RESULT).toString()));
                     list.add(cv);
                 }
             }
@@ -144,10 +144,11 @@ public class TableXXXInfo {
                     }
 
                 }
-                JsonUtils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_PROC,new String(Base64.encode(procArray.toString().getBytes(),Base64.DEFAULT)),DataController.SWITCH_OF_CL_MODULE_PROC);
+                JsonUtils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_PROC,procArray,DataController.SWITCH_OF_CL_MODULE_PROC);
                 JsonUtils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_RESULT,EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.RESULT))),DataController.SWITCH_OF_CL_MODULE_RESULT);
-                array.put(jsonObject);
-//                ELOG.i("array :::::::::" +array);
+                array.put(new String(Base64.encode(jsonObject.toString().getBytes(),Base64.DEFAULT)));
+//                array.put(jsonObject);
+                ELOG.i("array :::::::::" +array);
             }
         } catch (Exception e) {
             ELOG.e(e+"  TableXXXInfo select() has an exception... ");
