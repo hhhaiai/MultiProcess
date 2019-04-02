@@ -19,9 +19,9 @@ public class ProcParser {
     public static final String RUNNING_PROC = "proc";
     public static final String RUNNING_RESULT = "result";
 
-    private static final String PID = "PID";
+//    private static final String PID = "PID";
 
-    public static boolean isDebug = false;
+//    public static boolean isDebug = false;
 
     /**
      * 获取详情

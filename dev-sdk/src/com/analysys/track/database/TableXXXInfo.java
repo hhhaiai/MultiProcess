@@ -196,12 +196,18 @@ public class TableXXXInfo {
                 return;
             }
             db.beginTransaction();
+            String time = "";
             for(int i = 0;i < timeList.size();i++){
-                db.delete(DBConfig.XXXInfo.TABLE_NAME, DBConfig.XXXInfo.Column.TIME + "=?", new String[] {EncryptUtils.encrypt(mContext,timeList.get(i))});
-                db.delete(DBConfig.PROCInfo.TABLE_NAME, DBConfig.PROCInfo.Column.PARENT_ID_TIME + "=?", new String[] {EncryptUtils.encrypt(mContext,timeList.get(i))});
+                time = timeList.get(i);
+                if(TextUtils.isEmpty(time)){
+                    return;
+                }
+                db.delete(DBConfig.XXXInfo.TABLE_NAME, DBConfig.XXXInfo.Column.TIME + "=?", new String[] {EncryptUtils.encrypt(mContext,time)});
+                db.delete(DBConfig.PROCInfo.TABLE_NAME, DBConfig.PROCInfo.Column.PARENT_ID_TIME + "=?", new String[] {EncryptUtils.encrypt(mContext,time)});
             }
             db.setTransactionSuccessful();
         } catch (Throwable e) {
+            ELOG.e(e.getMessage()+"  :::::deleteByTime ");
         } finally {
             if(db != null){
                 db.endTransaction();
