@@ -91,11 +91,13 @@ public class LocationImpl {
             JSONObject location = getLocation();
             if (location != null) {
                 TableLocation.getInstance(mContext).insert(location);
-                SPHelper.getDefault(mContext).edit().putLong(EGContext.SP_LOCATION_TIME, Long.parseLong(location.getString(DeviceKeyContacts.LocationInfo.CollectionTime))).commit();
+//                SPHelper.getDefault(mContext).edit().putLong(EGContext.SP_LOCATION_TIME, Long.parseLong(location.getString(DeviceKeyContacts.LocationInfo.CollectionTime))).commit();
             }
         }catch (Throwable t){
+            ELOG.e(t.getMessage()+"  :::LocationHandle");
+        }finally {
+            MessageDispatcher.getInstance(mContext).locationInfo(EGContext.LOCATION_CYCLE,false);
         }
-        MessageDispatcher.getInstance(mContext).locationInfo(EGContext.LOCATION_CYCLE,false);
     }
     private boolean hasLocationPermission() {
         /**
@@ -123,8 +125,11 @@ public class LocationImpl {
         }
         try {
             Location location = this.locationManager.getLastKnownLocation(provider);
-            if (needSaveLocation(location)) {
+            if (needSaveLocation(location)) {//距离超过1000米则存储，其他wifi等信息亦有效，存储
+//                ELOG.i("  new location ..."+location);
                 resetLocaiton(location);
+            }else{//距离不超过1000米则无需存储，其他数据也无需获取存储
+                return false;
             }
         }catch (Throwable t){
             ELOG.i(t.getMessage() + "hasLocationPermission has an exception ");
@@ -144,6 +149,7 @@ public class LocationImpl {
             if (TextUtils.isEmpty(gl)) {
                 return;
             }
+//            ELOG.i(gl+"   ：：：：：：：：：：有效经纬度");
             SPHelper.setLastLocation(mContext,gl);
         }
     }
@@ -203,6 +209,7 @@ public class LocationImpl {
                 return true;
             }
         } catch (Throwable e) {
+            ELOG.e(" needSaveLocation::::; "+ e.getMessage());
         }
         return false;
     }
@@ -256,7 +263,7 @@ public class LocationImpl {
                                 JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, list.get(i).getCid(), DataController.SWITCH_OF_CELL_ID);
                                 JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, list.get(i).getRssi(), DataController.SWITCH_OF_BS_LEVEL);
                                 jsonArray.put(jsonObject);
-                                ELOG.i("获取当前基站信息1。。。:::::: "+jsonArray);
+//                                ELOG.i("获取当前基站信息1。。。:::::: "+jsonArray);
                             }
                         }
                     }
@@ -297,9 +304,11 @@ public class LocationImpl {
                         return jsonArray;
                     }
                 }catch (Throwable t){
+                    ELOG.e(t.getMessage());
                 }
             }
         } catch (Exception e) {
+            ELOG.e(e.getMessage());
         }
         return jsonArray;
     }

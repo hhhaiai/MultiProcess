@@ -12,6 +12,7 @@ import java.util.Set;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.text.TextUtils;
 
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.internal.Content.EGContext;
@@ -190,7 +191,7 @@ public class SPHelper {
         return getDefault(ctx).getString(EGContext.LASTAPPNAME, "");
     }
     public static void setLastAppName(Context context,String lastAppName) {
-        getEditor(context).putString(EGContext.LASTAPPNAME, lastAppName).commit();
+        getEditor(context).putString(EGContext.LASTAPPNAME, lastAppName).apply();
     }
     public static String getLastOpenPackgeName(Context ctx) {
         return getDefault(ctx).getString(EGContext.LASTPACKAGENAME, "");
@@ -199,7 +200,10 @@ public class SPHelper {
      * 最后打开的应用包名
      */
     public static void setLastOpenPackgeName(Context ctx,String packageName) {
-        getEditor(ctx).putString(EGContext.LASTPACKAGENAME, packageName).commit();
+        if(TextUtils.isEmpty(packageName)){
+           return;
+        }
+        getEditor(ctx).putString(EGContext.LASTPACKAGENAME, packageName).apply();
     }
     /**
      * 打开的应用版本号
@@ -210,11 +214,17 @@ public class SPHelper {
         return getDefault(ctx).getString(EGContext.LASTAPPVERSION, "");
     }
     public static void setLastAppVerison(Context ctx,String lastAppVerison) {
-        getEditor(ctx).putString(EGContext.LASTAPPVERSION, lastAppVerison).commit();
+        if(TextUtils.isEmpty(lastAppVerison)){
+           return;
+        }
+        getEditor(ctx).putString(EGContext.LASTAPPVERSION, lastAppVerison).apply();
     }
 
     public static void setAppType(Context ctx,String appType) {
-        getEditor(ctx).putString(EGContext.APP_TYPE, appType).commit();
+        if(TextUtils.isEmpty(appType)){
+            return;
+        }
+        getEditor(ctx).putString(EGContext.APP_TYPE, appType).apply();
     }
     /**
      * 应用的打开时间
@@ -225,7 +235,10 @@ public class SPHelper {
         return getDefault(ctx).getString(EGContext.LASTOPENTIME, "");
     }
     public static void setLastOpenTime(Context ctx,String lastOpenTime) {
-        getEditor(ctx).putString(EGContext.LASTOPENTIME, lastOpenTime).commit();
+        if(TextUtils.isEmpty(lastOpenTime)){
+            return;
+        }
+        getEditor(ctx).putString(EGContext.LASTOPENTIME, lastOpenTime).apply();
     }
     /**
      * 进程关闭时间时间
@@ -242,7 +255,7 @@ public class SPHelper {
 
 //    public static void setMinDuration(Context ctx,long info) {
 //        editor.putLong(EGContext.MIN_DURATION_TIME, info);
-//        editor.commit();
+//        editor.apply();
 //    }
 //    public static long getMaxDuration(Context ctx) {
 //        return getDefault(ctx).getLong(EGContext.MAX_DURATION_TIME, 0);
@@ -250,28 +263,40 @@ public class SPHelper {
 
 //    public static void setMaxDuration(Context ctx,long info) {
 //        editor.putLong(EGContext.MAX_DURATION_TIME, info);
-//        editor.commit();
+//        editor.apply();
 //    }
     /**
      * 进程关闭时间时间
      */
     public static void setEndTime(Context ctx, long time) {
-        getDefault(ctx).edit().putLong(EGContext.ENDTIME, time).commit();
+        if(time == 0 || time == -1){
+            return;
+        }
+        getEditor(ctx).putLong(EGContext.ENDTIME, time).apply();
     }
     public static void setIntervalTime(Context ctx, long time){
-        getDefault(ctx).edit().putLong(EGContext.INTERVALTIME, time).commit();
+        if(time == 0 || time == -1){
+            return;
+        }
+        getEditor(ctx).putLong(EGContext.INTERVALTIME, time).apply();
     }
     public static long getIntervalTime(Context ctx) {
         return getDefault(ctx).getLong(EGContext.INTERVALTIME, 0);
     }
     public static void setLastQuestTime(Context ctx, long time){
-        getDefault(ctx).edit().putLong(EGContext.LASTQUESTTIME, time).commit();
+        if(time == 0 || time == -1){
+            return;
+        }
+        getEditor(ctx).putLong(EGContext.LASTQUESTTIME, time).apply();
     }
     public static long getLastQuestTime(Context ctx) {
         return getDefault(ctx).getLong(EGContext.LASTQUESTTIME, 0);
     }
     public static void setRetryTime(Context ctx, long time){
-        getDefault(ctx).edit().putLong(EGContext.RETRYTIME, time).commit();
+        if(time == 0 || time == -1){
+            return;
+        }
+        getEditor(ctx).putLong(EGContext.RETRYTIME, time).apply();
     }
     public static long getRetryTime(Context ctx) {
         return getDefault(ctx).getLong(EGContext.RETRYTIME, 0);
@@ -284,7 +309,10 @@ public class SPHelper {
      * 上传失败次数
      */
     public static void setFailedNumb(Context ctx, int numb) {
-        getDefault(ctx).edit().putInt(EGContext.FAILEDNUMBER, numb).apply();
+        if(numb == 0 || numb == -1){
+            return;
+        }
+        getEditor(ctx).putInt(EGContext.FAILEDNUMBER, numb).apply();
     }
     //fail失败时间
     public static long getFailedTime(Context ctx) {
@@ -295,18 +323,24 @@ public class SPHelper {
      * 上传失败时间
      */
     public static void setFailedTime(Context ctx, long time) {
-        getDefault(ctx).edit().putLong(EGContext.FAILEDTIME, time).apply();
+        if(time == 0 || time == -1){
+            return;
+        }
+        getEditor(ctx).putLong(EGContext.FAILEDTIME, time).apply();
     }
     public static int getRequestState(Context ctx) {
         return getDefault(ctx).getInt(EGContext.REQUEST_STATE, 0);
     }
 
     public static void setRequestState(Context ctx, int requestState) {
-        getDefault(ctx).edit().putInt(EGContext.REQUEST_STATE, requestState).apply();
+        getEditor(ctx).putInt(EGContext.REQUEST_STATE, requestState).apply();
     }
 
     public static void setLastLocation(Context ctx, String location) {
-        getDefault(ctx).edit().putString(EGContext.LAST_LOCATION, location).apply();
+        if(TextUtils.isEmpty(location)){
+            return;
+        }
+        getEditor(ctx).putString(EGContext.LAST_LOCATION, location).apply();
     }
     public static String getLastLocation(Context ctx) {
         return getDefault(ctx).getString(EGContext.LAST_LOCATION, "");
@@ -315,7 +349,10 @@ public class SPHelper {
         return getDefault(ctx).getString(EGContext.TMPID, "");
     }
     public static void setTmpID(Context ctx,String tmpID) {
-        getDefault(ctx).edit().putString(EGContext.TMPID, tmpID).apply();
+        if(TextUtils.isEmpty(tmpID)){
+            return;
+        }
+        getEditor(ctx).putString(EGContext.TMPID, tmpID).apply();
     }
 
 }

@@ -148,7 +148,7 @@ public class TableXXXInfo {
                 JsonUtils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_RESULT,EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.RESULT))),DataController.SWITCH_OF_CL_MODULE_RESULT);
                 array.put(new String(Base64.encode(jsonObject.toString().getBytes(),Base64.DEFAULT)));
 //                array.put(jsonObject);
-                ELOG.i("array :::::::::" +array);
+//                ELOG.i("array :::::::::" +array);
             }
         } catch (Exception e) {
             ELOG.e(e+"  TableXXXInfo select() has an exception... ");

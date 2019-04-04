@@ -30,7 +30,7 @@ public class EGContext {
     public static final int SNAPSHOT_CYCLE = 3 * 60 * 60 * 1000;
     public static final String SP_SNAPSHOT_CYCLE = "SP_SNAPSHOT_CYCLE";
     // 位置获取周期时间
-    public static final int LOCATION_CYCLE = 30 * 1000;
+    public static final int LOCATION_CYCLE = 30 * 60* 1000;
     public static final String SP_LOCATION_CYCLE = "SP_LOCATION_CYCLE";
     // 应用打开关闭获取周期时间
     public static final int OC_CYCLE = 5 * 1000;
@@ -53,7 +53,7 @@ public class EGContext {
     public static String APP_CHANNEL_VALUE = "";
     public static String EGUAN_CHANNEL_PREFIX = "EGUAN_CHANNEL_";
 
-    public static final String SP_LOCATION_TIME = "getLocationTime";
+//    public static final String SP_LOCATION_TIME = "getLocationTime";
     public static final String SP_MAC_ADDRESS = "MACAddress";
 
 
@@ -197,7 +197,7 @@ public class EGContext {
     public static final String APP_TYPE = "applicationType";
     public static final int SHORT_TIME = 5 * 1000;// 计时器时间间隔毫秒数
     public static final long LONGEST_TIME = 5 * 60 * 60 * 1000;
-    public static final long DEFAULT_SPACE_TIME = 30 * 1000;//默认开关屏时间间隔在1分钟以上，才算一次有效的时间闭合事件
+    public static final long DEFAULT_SPACE_TIME = 30 * 1000;//默认开关屏时间间隔在30s以上，才算一次有效的时间闭合事件
     public static final String CLOSE_SCREEN = "2";
     public static final String APP_SWITCH = "1";
     public static final String SERVICE_RESTART = "3";
@@ -219,7 +219,7 @@ public class EGContext {
     // SDK发送同步文件,首次SDK初始化时创建
     public static final String FILES_SYNC_UPLOAD = "SNET.TAG";
     // SDK发送同步文件两次间隔时间，同时只有一个进程工作,默认6个小时，两次间隔5小时58分
-    public static final long TIME_SYNC_UPLOAD = 5 * 60 * 1000 + 58 * 1000;
+    public static final long TIME_SYNC_UPLOAD = 5 * 60 * 60 * 1000 + 59 * 60 * 1000;
     // SDK应用列表更新间隔,同时只有一个进程工作,首次SDK初始化时创建,涉及广播，5秒监听就行
     public static final String FILES_SYNC_APPSNAPSHOT = "SAP.TAG";
     public static final String FILES_SYNC_OC = "OCS.TAG";

@@ -94,12 +94,13 @@ public class UploadImpl {
             }
         } catch (Throwable t) {
             ELOG.i("EThreadPool upload has an exception:::" + t.getMessage());
+        }finally {
+            MessageDispatcher.getInstance(mContext).uploadInfo(PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE), false);
         }
     }
     public void reTryAndUpload(boolean isNormalUpload){
         ELOG.i("进入reTryAndUpload");
         if (isNormalUpload) {
-            ELOG.i("正常上传");
             doUpload();
         }else if (!isNormalUpload && SPHelper.getFailedNumb(mContext) > 0 && (SPHelper.getFailedNumb(mContext) < PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT,EGContext.FAIL_COUNT_DEFALUT))
                 && (System.currentTimeMillis() - SPHelper.getFailedTime(mContext) > SPHelper.getRetryTime(mContext))) {
@@ -122,11 +123,10 @@ public class UploadImpl {
             final int serverDelayTime = PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_SERVER_DELAY,EGContext.SERVER_DELAY_DEFAULT);
             if (SystemUtils.isMainThread()) {
                 // 策略处理
-                EThreadPool.execute(new Runnable() {
+                EThreadPool.post(new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            ELOG.i("serverDelayTime === "+serverDelayTime);
                             if(serverDelayTime > 0){
                                 Thread.sleep(serverDelayTime);
                             }
@@ -158,7 +158,6 @@ public class UploadImpl {
                         } catch (Throwable t) {
                             ELOG.i("EThreadPool upload has an exception:::" + t.getMessage());
                         }
-                        MessageDispatcher.getInstance(mContext).uploadInfo(PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE), false);
                     }
                 });
             } else {
@@ -194,7 +193,6 @@ public class UploadImpl {
                 } catch (Throwable t) {
                     ELOG.i("EThreadPool upload has an exception:::" + t.getMessage());
                 }
-                MessageDispatcher.getInstance(mContext).uploadInfo(PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE), false);
             }
         } catch (Throwable t) {
             ELOG.e("发送逻辑问题"+t.getMessage());

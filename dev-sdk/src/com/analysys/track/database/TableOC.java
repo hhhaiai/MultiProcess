@@ -163,7 +163,7 @@ public class TableOC {
                 cv = new ContentValues();
                 long insertTime = System.currentTimeMillis();
                 String act = ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime);
-                ELOG.i(act + "  :::::::::::act`s value...");
+//                ELOG.i(act + "  :::::::::::act`s value...");
                 String an = Base64Utils.encrypt(ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationName), insertTime);
                 cv.put(DBConfig.OC.Column.APN, EncryptUtils.encrypt(mContext,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName)));
                 cv.put(DBConfig.OC.Column.AN, EncryptUtils.encrypt(mContext,an));
@@ -432,6 +432,75 @@ public class TableOC {
         return ocJar;
     }
 
+    /**
+     * 读取
+     */
+    public JSONArray selectAll() {
+        JSONArray ocJar = null;
+        SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+        Cursor cursor = null;
+        int blankCount = 0;
+        String pkgName = "",act = "";
+        ContentValues cv =null;
+        JSONObject jsonObject, etdm;
+        try {
+            if(db == null){
+                return ocJar;
+            }
+            ocJar = new JSONArray();
+            db.beginTransaction();
+            cursor = db.query(DBConfig.OC.TABLE_NAME, null, null, null, null, null, null);
+            while (cursor.moveToNext()) {
+                if(blankCount >= EGContext.BLANK_COUNT_MAX){
+                    return ocJar;
+                }
+                act = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.ACT)));
+                jsonObject = new JSONObject();
+                String insertTime = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.IT)));
+                String encryptAn = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AN)));
+                String an = Base64Utils.decrypt(encryptAn, Long.valueOf(insertTime));
+                JsonUtils.pushToJSON(mContext,jsonObject ,DeviceKeyContacts.OCInfo.ApplicationOpenTime,
+                        EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AOT))),DataController.SWITCH_OF_APPLICATION_OPEN_TIME);
+                JsonUtils.pushToJSON(mContext,jsonObject ,DeviceKeyContacts.OCInfo.ApplicationCloseTime, act,DataController.SWITCH_OF_APPLICATION_CLOSE_TIME);
+                pkgName = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.APN)));
+                if(TextUtils.isEmpty(pkgName)){
+                    blankCount +=1;
+                }
+                JsonUtils.pushToJSON(mContext,jsonObject ,DeviceKeyContacts.OCInfo.ApplicationPackageName,pkgName,DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
+                JsonUtils.pushToJSON(mContext,jsonObject ,DeviceKeyContacts.OCInfo.ApplicationName, an,DataController.SWITCH_OF_APPLICATION_NAME);
+                JsonUtils.pushToJSON(mContext,jsonObject ,DeviceKeyContacts.OCInfo.ApplicationVersionCode,
+                        EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AVC))),DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
+                JsonUtils.pushToJSON(mContext,jsonObject ,DeviceKeyContacts.OCInfo.NetworkType,
+                        EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.NT))),DataController.SWITCH_OF_NETWORK_TYPE);
+                etdm = new JSONObject();
+                JsonUtils.pushToJSON(mContext,etdm ,DeviceKeyContacts.OCInfo.SwitchType,
+                        cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AST)),DataController.SWITCH_OF_SWITCH_TYPE);
+                JsonUtils.pushToJSON(mContext,etdm ,DeviceKeyContacts.OCInfo.ApplicationType,
+                        cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AT)),DataController.SWITCH_OF_APPLICATION_TYPE);
+                JsonUtils.pushToJSON(mContext,etdm ,DeviceKeyContacts.OCInfo.CollectionType,
+                        cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.CT)),DataController.SWITCH_OF_COLLECTION_TYPE);
+                jsonObject.put(EGContext.EXTRA_DATA, etdm);
+                ocJar.put(jsonObject);
+                cv = new ContentValues();
+                cv.put(DBConfig.OC.Column.ST, ONE);
+                db.update(DBConfig.OC.TABLE_NAME, cv,
+                        DBConfig.OC.Column.ID + "=? ",
+                        new String[]{cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.ID))});
+            }
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            ELOG.e(e.getMessage() + "    :::::::exception ");
+        } finally {
+            if (cursor != null){
+                cursor.close();
+            }
+            if(db != null){
+                db.endTransaction();
+            }
+            DBManager.getInstance(mContext).closeDB();
+        }
+        return ocJar;
+    }
     public void delete() {
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();

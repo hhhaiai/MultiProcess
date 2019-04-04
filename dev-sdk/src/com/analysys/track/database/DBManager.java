@@ -35,7 +35,6 @@ public class DBManager {
         try {
             if (mOpenWriteCounter.incrementAndGet() == 1) {
                 // Opening new database
-                ELOG.i("Opening new database");
                 db = dbHelper.getWritableDatabase();
             }
         }catch (Throwable t){
@@ -48,7 +47,6 @@ public class DBManager {
         try {
             if (mOpenWriteCounter.decrementAndGet() == 0) {
                 // Closing database
-                ELOG.i("Closing database");
                 db.close();
             }
 

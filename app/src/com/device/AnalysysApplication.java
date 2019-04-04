@@ -2,6 +2,7 @@ package com.device;
 
 import android.app.Application;
 import com.analysys.track.AnalysysTracker;
+import com.analysys.track.utils.ELOG;
 
 
 public class AnalysysApplication extends Application {

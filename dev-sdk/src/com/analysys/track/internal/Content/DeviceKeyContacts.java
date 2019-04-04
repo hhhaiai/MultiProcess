@@ -418,7 +418,7 @@ public class DeviceKeyContacts {
     public static final String RES_POLICY_MODULE_CL_WIFI = "module_cl_wifi";
     //BASE_STATION
     public static final String RES_POLICY_MODULE_CL_BASE = "module_cl_base";
-    //BASE_STATION
+    //DEV
     public static final String RES_POLICY_MODULE_CL_DEV = "module_cl_dev";
   }
 }

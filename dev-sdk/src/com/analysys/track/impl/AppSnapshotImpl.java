@@ -202,7 +202,6 @@ public class AppSnapshotImpl {
                                 TableAppSnapshot.getInstance(mContext).update(pkgName,
                                         EGContext.SNAP_SHOT_UPDATE);
                             }
-                            ELOG.i(type + "   type");
                         } catch (Throwable e) {
                             ELOG.e(e);
                         }
@@ -230,7 +229,6 @@ public class AppSnapshotImpl {
                         TableAppSnapshot.getInstance(mContext).update(pkgName,
                                 EGContext.SNAP_SHOT_UPDATE);
                     }
-                    ELOG.i(type + "   type");
                 } catch (Throwable e) {
                     ELOG.e(e);
                 }

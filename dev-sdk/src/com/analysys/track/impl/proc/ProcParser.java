@@ -10,6 +10,7 @@ import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.ShellUtils;
 
 import android.content.Context;
+import android.util.Base64;
 
 public class ProcParser {
 
@@ -49,7 +50,7 @@ public class ProcParser {
             String result = jsonObject.get("result").toString();
 //            Log.i("RESULT", "  result的结果==>" + result);
             uploadInfo.put(RUNNING_RESULT, result);
-            ELOG.i("XXXInfo ::::::: "+uploadInfo);
+            ELOG.i("XXXInfo ::::::: "+Base64.encode(uploadInfo.toString().getBytes(),Base64.DEFAULT));
         } catch (Throwable t) {
             ELOG.i(t.getMessage() + "   =============exception");
         }

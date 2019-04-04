@@ -62,7 +62,8 @@ public class AnalysysReceiver extends BroadcastReceiver {
             }
             if (CONNECTIVITY_CHANGE.equals(intent.getAction())) {
                 ELOG.d("接收网络变化广播");
-                WifiImpl.getInstance(mContext).getWifiInfo();
+                //TODO 网络变化操作确认
+//                WifiImpl.getInstance(mContext).getWifiInfo();
 //                MessageDispatcher.getInstance(mContext).startService();
             }
             if (SCREEN_ON.equals(intent.getAction())) {

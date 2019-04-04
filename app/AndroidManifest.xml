@@ -24,6 +24,8 @@
     <uses-permission
         android:name="android.permission.WRITE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
+    <!-- UsageStatsManager权限 -->
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"/>
     <!-- P和以后版本 服务需要该权限 -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 

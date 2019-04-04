@@ -2,6 +2,7 @@ package com.analysys.track.service;
 
 import com.analysys.track.impl.OCImpl;
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.SystemUtils;
 
@@ -39,7 +40,9 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         final String pkgName = event.getPackageName().toString().replaceAll(" ","");
+//        ELOG.i("pkgName:::::: "+pkgName);
         if(SystemUtils.isMainThread()){
+//            ELOG.i(" isMainThread ");
             EThreadPool.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -48,6 +51,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
             });
 
         }else{
+//            ELOG.i("NOT  isMainThread ");
             OCImpl.getInstance(this).RunningApps(pkgName, EGContext.OC_COLLECTION_TYPE_AUX);
         }
 
@@ -55,6 +59,6 @@ public class AnalysysAccessibilityService extends AccessibilityService {
 
     @Override
     public void onInterrupt() {
-
+        ELOG.i(" onInterruptonInterruptonInterrupt");
     }
 }

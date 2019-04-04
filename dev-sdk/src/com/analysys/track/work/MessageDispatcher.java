@@ -189,18 +189,19 @@ public class MessageDispatcher {
             }else{
                 if(!mHandler.hasMessages(msg.what)){
                     delay = delayTime - (System.currentTimeMillis()- EGContext.LOCATION_LAST_TIME_STMP);
+                    if(delayTime <= 0 || delay <= 0) {
+                        long time = System.currentTimeMillis();
+                        EGContext.LOCATION_LAST_TIME_STMP = time;
+                        FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, time);
+                    }
                     sendMessage(msg, delay);
                 }else {
                     return;
                 }
 
             }
-            if(delayTime <= 0 || delay <= 0) {
-                long time = System.currentTimeMillis();
-                EGContext.LOCATION_LAST_TIME_STMP = time;
-                FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, time);
-            }
         }catch (Throwable t){
+            ELOG.e(" locationInfo :::: "+t.getMessage());
         }
 
     }
@@ -230,7 +231,7 @@ public class MessageDispatcher {
                 }else{
                     if(!mHandler.hasMessages(msg.what)){
                         delay = delayTime - (System.currentTimeMillis()- EGContext.OC_LAST_TIME_STMP);
-                        ELOG.i("DELAY 一次 ocInfo....."+delay);
+//                        ELOG.i("DELAY 一次 ocInfo....."+delay);
                         sendMessage(msg, delay);
                     }else{
                         ELOG.i("HAS ocInfo.....");
@@ -429,6 +430,8 @@ public class MessageDispatcher {
                         long delay = cycleTime - (System.currentTimeMillis() - EGContext.UPLOAD_LAST_TIME_STMP);
                         if(delay <= 0 ){
                             uploadInfo(delay ,true);
+                        }else {
+                            uploadInfo(delay ,false);
                         }
                     }
                     if(handler.hasMessages(MSG_OC_INFO)){
@@ -443,6 +446,8 @@ public class MessageDispatcher {
                         }
                         if(delay <= 0 ){
                             ocInfo(delay ,true);
+                        }else{
+                            ocInfo(delay ,false);
                         }
                     }
                     if(handler.hasMessages(MSG_LOCATION)){
@@ -451,7 +456,12 @@ public class MessageDispatcher {
                         }
                         long delay = EGContext.LOCATION_CYCLE - (System.currentTimeMillis() - EGContext.LOCATION_LAST_TIME_STMP);
                         if(delay <= 0 ){
+//                            long time = System.currentTimeMillis();
+//                            EGContext.LOCATION_LAST_TIME_STMP = time;
+//                            FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, time);
                             locationInfo(delay ,true);
+                        }else {
+                            locationInfo(delay ,false);
                         }
                     }
                     if(handler.hasMessages(MSG_SNAPSHOT)){
@@ -461,13 +471,15 @@ public class MessageDispatcher {
                         long delay = EGContext.SNAPSHOT_CYCLE - (System.currentTimeMillis() - EGContext.SNAPSHOT_LAST_TIME_STMP);
                         if(delay <= 0 ){
                             snapshotInfo(delay ,true);
+                        }else {
+                            snapshotInfo(delay ,false);
                         }
                     }
                 }else{
                     MessageDispatcher.getInstance(mContext).initModule();
                 }
             }catch (Throwable t){
-
+                ELOG.e(t.getMessage());
             }
 
         }

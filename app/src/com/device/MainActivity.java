@@ -69,7 +69,7 @@ public class MainActivity extends Activity {
 //                test();
                 break;
             case R.id.btnOC:
-                ELOG.i("btnOC ---------");
+//                ELOG.i("btnOC ---------");
 //                OCImpl.getInstance(this).ocInfo();
                 break;
             default:

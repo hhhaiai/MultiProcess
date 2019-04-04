@@ -6,6 +6,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 
 import com.analysys.track.internal.Content.DataController;
+import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
@@ -64,6 +65,7 @@ public class WifiImpl {
                 }
             }
         } catch (Throwable e) {
+            ELOG.e("getWifiInfo :::"+e.getMessage());
         }
         return jar;
     }
@@ -73,7 +75,7 @@ public class WifiImpl {
     private void wifiSort(List<ScanResult> list) {
         for (int i = 0; i < list.size() - 1; i++) {
             for (int j = i + 1; j < list.size(); j++) {
-                if (list.get(i).level > list.get(j).level) {
+                if (list.get(i).level < list.get(j).level) {
                     ScanResult scanResult = list.get(i);
                     list.set(i, list.get(j));
                     list.set(j, scanResult);

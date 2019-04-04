@@ -18,6 +18,9 @@ import org.json.JSONObject;
 public class TableLocation {
 
     Context mContext;
+    String INSERT_STATUS_DEFAULT = "0";
+    String INSERT_STATUS_READ_OVER = "1";
+
 
     private static class Holder {
         private static final TableLocation INSTANCE = new TableLocation();
@@ -36,13 +39,17 @@ public class TableLocation {
 //                return;
 //            }
             if (!TextUtils.isEmpty(locationInfo.toString())) {
-                long time = Long.parseLong(locationInfo.optString(DeviceKeyContacts.LocationInfo.CollectionTime));
+                String locationTime = locationInfo.optString(DeviceKeyContacts.LocationInfo.CollectionTime);
+                long time = 0;
+                if(!TextUtils.isEmpty(locationTime)){
+                   time = Long.parseLong(locationTime);
+                }
                 String encryptLocation = Base64Utils.encrypt(locationInfo.toString(), time);
                 if (!TextUtils.isEmpty(encryptLocation)) {
                     ContentValues cv = new ContentValues();
                     cv.put(DBConfig.Location.Column.LI, EncryptUtils.encrypt(mContext,encryptLocation));
-                    cv.put(DBConfig.Location.Column.IT, String.valueOf(time));
-                    cv.put(DBConfig.Location.Column.ST, "0");
+                    cv.put(DBConfig.Location.Column.IT, locationTime);
+                    cv.put(DBConfig.Location.Column.ST, INSERT_STATUS_DEFAULT);
                     SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
                     if(db == null){
                         return;
@@ -70,17 +77,22 @@ public class TableLocation {
             db.beginTransaction();
             cursor = db.query(DBConfig.Location.TABLE_NAME, null,
                     null, null, null, null, null);
+            String id = "",encryptLocation = "",time = "";
+            long timeStamp = 0;
             while (cursor.moveToNext()) {
                 if(blankCount >= EGContext.BLANK_COUNT_MAX){
                     return array;
                 }
-                String id = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.ID));
-                String encryptLocation = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.LI));
-                String time = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.IT));
+                id = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.ID));
+                encryptLocation = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.LI));
+                time = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.IT));
                 ContentValues cv = new ContentValues();
-                cv.put(DBConfig.Location.Column.ST, "1");
+                cv.put(DBConfig.Location.Column.ST, INSERT_STATUS_READ_OVER);
                 db.update(DBConfig.Location.TABLE_NAME, cv, DBConfig.Location.Column.ID + "=?", new String[]{id});
-                String decryptLocation = Base64Utils.decrypt(EncryptUtils.decrypt(mContext,encryptLocation), Long.valueOf(time));
+                if(!TextUtils.isEmpty(time)){
+                    timeStamp = Long.parseLong(time);
+                }
+                String decryptLocation = Base64Utils.decrypt(EncryptUtils.decrypt(mContext,encryptLocation), timeStamp);
                 if(!TextUtils.isEmpty(decryptLocation)){
                     array.put(new JSONObject(decryptLocation));
                 } else {
@@ -112,7 +124,7 @@ public class TableLocation {
 //                    " where " + DBConfig.Location.Column.ST + "=1) and " + DBConfig.Location.Column.ST + "=1";
 //            ELOG.i("sql ::::::::  "+sql);
 //            db.execSQL(sql);
-            db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?", new String[]{"1"});
+            db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?", new String[]{INSERT_STATUS_READ_OVER});
         } catch (Throwable e) {
         }finally {
             DBManager.getInstance(mContext).closeDB();
