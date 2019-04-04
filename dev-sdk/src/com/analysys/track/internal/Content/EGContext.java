@@ -98,7 +98,7 @@ public class EGContext {
     public static final String TMPID = "tmp_id";
     public static final int SERVER_DELAY_DEFAULT = 0;
     public static final int FAIL_COUNT_DEFALUT = 3;//上传重试次数，默认3次
-    public static final long FAIL_TRY_DELAY_DEFALUT = 60 * 1000;// 上传重试时间间隔默认60-70s
+    public static final long FAIL_TRY_DELAY_DEFALUT = 60000;// 上传重试时间间隔默认60-70s
     public static final int TIMER_INTERVAL_DEFALUT = 5 * 1000;
 
     public static final long MINDISTANCE = 1000;// 地理位置信息获取距离/米

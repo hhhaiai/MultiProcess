@@ -79,6 +79,9 @@ public class OCImpl {
      */
     private void processOC() {
         try {
+            if(!PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC,true)){
+                return;
+            }
             // 亮屏幕工作
             if (SystemUtils.isScreenOn(mContext)) {
                 fillData();

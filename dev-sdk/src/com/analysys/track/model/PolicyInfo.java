@@ -79,7 +79,7 @@ public class PolicyInfo implements Serializable {
         return PolicyVer;
     }
 
-    public long getServerDelay() {
+    public int getServerDelay() {
         return ServerDelay;
     }
 

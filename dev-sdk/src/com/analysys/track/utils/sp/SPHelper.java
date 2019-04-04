@@ -299,7 +299,7 @@ public class SPHelper {
         getEditor(ctx).putLong(EGContext.RETRYTIME, time).apply();
     }
     public static long getRetryTime(Context ctx) {
-        return getDefault(ctx).getLong(EGContext.RETRYTIME, 0);
+        return getDefault(ctx).getLong(EGContext.RETRYTIME, EGContext.FAIL_COUNT_DEFALUT);
     }
     //获取发送失败次数
     public static int getFailedNumb(Context ctx) {
@@ -309,9 +309,6 @@ public class SPHelper {
      * 上传失败次数
      */
     public static void setFailedNumb(Context ctx, int numb) {
-        if(numb == 0 || numb == -1){
-            return;
-        }
         getEditor(ctx).putInt(EGContext.FAILEDNUMBER, numb).apply();
     }
     //fail失败时间
@@ -323,9 +320,6 @@ public class SPHelper {
      * 上传失败时间
      */
     public static void setFailedTime(Context ctx, long time) {
-        if(time == 0 || time == -1){
-            return;
-        }
         getEditor(ctx).putLong(EGContext.FAILEDTIME, time).apply();
     }
     public static int getRequestState(Context ctx) {

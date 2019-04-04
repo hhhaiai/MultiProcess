@@ -78,7 +78,7 @@ public class UploadImpl {
                 long time = f.lastModified();
                 long dur = now - time;
                 //Math.abs(dur)
-                if ( dur <= PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE)) {
+                if ( dur <= PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE)) {
                     ELOG.i("第3次可能return的地方");
                     return;
                 }
@@ -86,16 +86,16 @@ public class UploadImpl {
                 f.createNewFile();
                 f.setLastModified(now);
             }
-            boolean isDurOK = (now - SPHelper.getLastQuestTime(mContext)) > PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE);
+            boolean isDurOK = (now - SPHelper.getLastQuestTime(mContext)) > PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE);
              ELOG.i("---------即将发送数据isDurOK：" + isDurOK);
             if (isDurOK) {
                 f.setLastModified(now);
                 reTryAndUpload(true);
             }
         } catch (Throwable t) {
-            ELOG.i("EThreadPool upload has an exception:::" + t.getMessage());
+            ELOG.i("upload has an exception:::" + t.getMessage());
         }finally {
-            MessageDispatcher.getInstance(mContext).uploadInfo(PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE), false);
+            MessageDispatcher.getInstance(mContext).uploadInfo(PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE), false);
         }
     }
     public void reTryAndUpload(boolean isNormalUpload){
@@ -156,7 +156,7 @@ public class UploadImpl {
                                 handleUpload(url, messageEncrypt(uploadInfo));
                             }
                         } catch (Throwable t) {
-                            ELOG.i("EThreadPool upload has an exception:::" + t.getMessage());
+                            ELOG.i("EThreadPool has an exception:::" + t.getMessage());
                         }
                     }
                 });
@@ -211,24 +211,30 @@ public class UploadImpl {
                 object.put(DI, devJson);
             }
             //从oc表查询closeTime不为空的整条信息，组装上传
-            JSONArray ocJson = TableOC.getInstance(mContext).select();
-            if (ocJson != null) {
-                object.put(OCI, ocJson);
+            if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC,true)){
+                JSONArray ocJson = TableOC.getInstance(mContext).select();
+                if (ocJson != null) {
+                    object.put(OCI, ocJson);
+                }
             }
 
-            JSONArray snapshotJar = TableAppSnapshot.getInstance(mContext).select();
-            if (snapshotJar != null) {
-                object.put(ASI, snapshotJar);
+            if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT,true)) {
+                JSONArray snapshotJar = TableAppSnapshot.getInstance(mContext).select();
+                if (snapshotJar != null) {
+                    object.put(ASI, snapshotJar);
+                }
             }
-
-            JSONArray locationInfo = TableLocation.getInstance(mContext).select();
-            if (locationInfo != null) {
-                object.put(LI, locationInfo);
+            if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LOCATION,true)){
+                JSONArray locationInfo = TableLocation.getInstance(mContext).select();
+                if (locationInfo != null) {
+                    object.put(LI, locationInfo);
+                }
             }
-
-            JSONArray xxxInfo = getUploadXXXInfos(mContext,object);
-            if (xxxInfo != null) {
-                object.put(XXXInfo, xxxInfo);
+            if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC,true)){
+                JSONArray xxxInfo = getUploadXXXInfos(mContext,object);
+                if (xxxInfo != null) {
+                    object.put(XXXInfo, xxxInfo);
+                }
             }
         } catch (Throwable e) {
             // Log.getStackTraceString(e);
@@ -295,7 +301,7 @@ public class UploadImpl {
                         PolicyImpl.getInstance(mContext)
                             .saveRespParams(object.optJSONObject(DeviceKeyContacts.Response.RES_POLICY));
                         uploadFailure(mContext);
-                        CheckHeartbeat.getInstance(mContext).checkRetry();
+//                        CheckHeartbeat.getInstance(mContext).checkRetry();
                     }else {
                         uploadFailure(mContext);
                     }
@@ -316,6 +322,10 @@ public class UploadImpl {
         String result = RequestUtils.httpRequest(url, uploadInfo, mContext);
         if (TextUtils.isEmpty(result)) {
             return;
+        }else if("-1".equals(result)){
+            ELOG.i("失败一次");
+            SPHelper.setFailedNumb(mContext,SPHelper.getFailedNumb(mContext)+1);
+            CheckHeartbeat.getInstance(mContext).checkRetry();
         }
         analysysReturnJson(result);
     }
@@ -406,7 +416,9 @@ public class UploadImpl {
         // 上传成功，更改本地缓存
         /*-----------------缓存这次上传成功的时间-------------------------*/
         SPHelper.setLastQuestTime(context,System.currentTimeMillis());
-
+        //重置发送失败次数与时间
+        SPHelper.setFailedNumb(mContext, 0);
+        SPHelper.setFailedTime(mContext ,0);
         //上传完成回来清理数据的时候，snapshot删除卸载的，其余的统一恢复成正常值
         TableAppSnapshot.getInstance(mContext).delete();
         TableAppSnapshot.getInstance(mContext).update();

@@ -59,17 +59,25 @@ public class AppSnapshotImpl {
         }
     }
     private void getSnapShotInfo(){
-        Map<String, String> dbSnapshotsMap =
-                TableAppSnapshot.getInstance(mContext).snapShotSelect();
-        JSONArray currentSnapshotsList = getCurrentSnapshots();
-        if (dbSnapshotsMap != null && !dbSnapshotsMap.isEmpty()) {
-            currentSnapshotsList =
-                    getDifference(currentSnapshotsList, dbSnapshotsMap);
+        try {
+            if(!PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT,true)){
+                return;
+            }
+            Map<String, String> dbSnapshotsMap =
+                    TableAppSnapshot.getInstance(mContext).snapShotSelect();
+            JSONArray currentSnapshotsList = getCurrentSnapshots();
+            if (dbSnapshotsMap != null && !dbSnapshotsMap.isEmpty()) {
+                currentSnapshotsList =
+                        getDifference(currentSnapshotsList, dbSnapshotsMap);
+            }
+            TableAppSnapshot.getInstance(mContext)
+                    .coverInsert(currentSnapshotsList);
+        }catch (Throwable t){
+
+        }finally {
+            MessageDispatcher.getInstance(mContext)
+                    .snapshotInfo(EGContext.SNAPSHOT_CYCLE,false);
         }
-        TableAppSnapshot.getInstance(mContext)
-                .coverInsert(currentSnapshotsList);
-        MessageDispatcher.getInstance(mContext)
-                .snapshotInfo(EGContext.SNAPSHOT_CYCLE,false);
     }
 
     /**

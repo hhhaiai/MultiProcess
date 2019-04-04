@@ -81,6 +81,9 @@ public class LocationImpl {
     }
     private void LocationHandle(){
         try {
+            if(!PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LOCATION,true)){
+                return;
+            }
             //么有获取地理位置权限则不做处理
             if(!hasLocationPermission()){
                 return;
@@ -222,12 +225,12 @@ public class LocationImpl {
             String locationInfo = SPHelper.getLastLocation(mContext);
             JsonUtils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.GeographyLocation, locationInfo,DataController.SWITCH_OF_GEOGRAPHY_LOCATION);
 
-            if(PolicyImpl.getInstance(mContext).getSP().getBoolean(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_WIFI,true)){
+            if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_WIFI,true)){
                 JSONArray wifiInfo = WifiImpl.getInstance(mContext).getWifiInfo();
                 JsonUtils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.WifiInfo.NAME, wifiInfo,DataController.SWITCH_OF_WIFI_NAME);
             }
 
-            if(PolicyImpl.getInstance(mContext).getSP().getBoolean(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BASE,true)){
+            if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BASE,true)){
                 JSONArray baseStation = getBaseStationInfo();
                 JsonUtils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME,baseStation,DataController.SWITCH_OF_BS_NAME);
             }

@@ -144,9 +144,6 @@ public class MessageDispatcher {
     // 应用列表
     public void snapshotInfo(long delayTime,boolean shouldRemoveDelay) {
         try {
-            if(!PolicyImpl.getInstance(mContext).getSP().getBoolean(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT,true)){
-                return;
-            }
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_SNAPSHOT;
             if(EGContext.SNAPSHOT_LAST_TIME_STMP == -1){
@@ -175,9 +172,6 @@ public class MessageDispatcher {
     // 位置信息
     public void locationInfo(long delayTime,boolean shouldRemoveDelay) {
         try {
-            if(!PolicyImpl.getInstance(mContext).getSP().getBoolean(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LOCATION,true)){
-                return;
-            }
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_LOCATION;
             if(EGContext.LOCATION_LAST_TIME_STMP == -1){
@@ -209,9 +203,6 @@ public class MessageDispatcher {
     // 应用打开关闭信息
     public void ocInfo(long delayTime ,boolean shouldRemoveDelay) {
         try {
-            if(!PolicyImpl.getInstance(mContext).getSP().getBoolean(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC,true)){
-                return;
-            }
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_OC_INFO;
             if(EGContext.OC_LAST_TIME_STMP == -1){
@@ -426,7 +417,7 @@ public class MessageDispatcher {
                         if(EGContext.UPLOAD_LAST_TIME_STMP == -1){
                             EGContext.UPLOAD_LAST_TIME_STMP = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_UPLOAD);
                         }
-                        int cycleTime = PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE);
+                        long cycleTime = PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE);
                         long delay = cycleTime - (System.currentTimeMillis() - EGContext.UPLOAD_LAST_TIME_STMP);
                         if(delay <= 0 ){
                             uploadInfo(delay ,true);

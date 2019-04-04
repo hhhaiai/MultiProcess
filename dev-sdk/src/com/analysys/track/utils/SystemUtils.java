@@ -157,12 +157,12 @@ public class SystemUtils {
      * @return
      */
     public static long intervalTime(Context ctx) {
-        String reTryTime = PolicyImpl.getInstance(ctx).getSP().getString(DeviceKeyContacts.Response.RES_POLICY_FAIL_TRY_DELAY,String.valueOf(EGContext.FAIL_TRY_DELAY_DEFALUT));
-        if(TextUtils.isEmpty(reTryTime)||reTryTime.equals("0")){
-            reTryTime = String.valueOf(EGContext.FAIL_TRY_DELAY_DEFALUT);
+        long reTryTime = PolicyImpl.getInstance(ctx).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_FAIL_TRY_DELAY,EGContext.FAIL_TRY_DELAY_DEFALUT);
+        if(reTryTime == 0){
+            reTryTime = EGContext.FAIL_TRY_DELAY_DEFALUT;
         }
         //10s间隔
-        long time = ((int) (Math.random() * 10) * 1000)  + Integer.parseInt(reTryTime);
+        long time = ((int) (Math.random() * 10) * 1000)  + reTryTime;
         return time;
     }
     /**

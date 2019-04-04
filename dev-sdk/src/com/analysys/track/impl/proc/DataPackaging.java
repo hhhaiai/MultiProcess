@@ -30,7 +30,7 @@ public class DataPackaging {
     public static JSONObject getDevInfo(Context mContext) {
         JSONObject deviceInfo = new JSONObject();
         try {
-            if(!PolicyImpl.getInstance(mContext).getSP().getBoolean(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_DEV,true)){
+            if(!PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_DEV,true)){
                 return null;
             }
             DeviceImpl devImpl = DeviceImpl.getInstance(mContext);

@@ -87,6 +87,7 @@ public class RequestUtils {
         }
     } catch (Throwable e) {
         ELOG.e(e.getMessage()+"  :::::::http has an exception.");
+        response = "-1";
     } finally {
       StreamerUtils.safeClose(is);
       StreamerUtils.safeClose(bos);
