@@ -19,7 +19,7 @@ public class JsonUtils {
 //            ELOG.i("come in pushToJSON ");
 //            ELOG.i("1 pushToJSON "+key +"  =====   " + value);
             //(PolicyImpl.getInstance(mContext).getSP().getBoolean(key,SPDefaultValue) || SPHelper.getDefault(mContext).getBoolean(key ,SPDefaultValue))
-            if ((PolicyImpl.getInstance(mContext).getSP().getBoolean(key,SPDefaultValue) || SPHelper.getDefault(mContext).getBoolean(key ,SPDefaultValue))&& !TextUtils.isEmpty(value.toString()) && !"unknown".equalsIgnoreCase(value.toString())) {
+            if (value != null && (PolicyImpl.getInstance(mContext).getSP().getBoolean(key,SPDefaultValue) || SPHelper.getDefault(mContext).getBoolean(key ,SPDefaultValue))&& !TextUtils.isEmpty(value.toString()) && !"unknown".equalsIgnoreCase(value.toString())) {
                 if (!json.has(key)) {
                     json.put(key, value);
                 }
