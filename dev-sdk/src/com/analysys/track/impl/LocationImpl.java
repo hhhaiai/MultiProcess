@@ -87,8 +87,9 @@ public class LocationImpl {
             }
             //么有获取地理位置权限则不做处理
             if(!hasLocationPermission()){
-//                ELOG.i("第二个可能性退出的地方");
-                return;
+//                ELOG.i("第二个可能性退出的地方location么有新值");
+//                return;
+
             }
             if(mTelephonyManager == null){
                 mTelephonyManager = AnalysysPhoneStateListener.getInstance(mContext).getTelephonyManager();
@@ -96,7 +97,6 @@ public class LocationImpl {
             JSONObject location = getLocation();
             if (location != null) {
                 TableLocation.getInstance(mContext).insert(location);
-//                SPHelper.getDefault(mContext).edit().putLong(EGContext.SP_LOCATION_TIME, Long.parseLong(location.getString(DeviceKeyContacts.LocationInfo.CollectionTime))).commit();
             }
         }catch (Throwable t){
             ELOG.e(t.getMessage()+"  :::LocationHandle");
@@ -160,7 +160,7 @@ public class LocationImpl {
                 return;
             }
 //            ELOG.i(gl+"   ：：：：：：：：：：有效经纬度");
-            SPHelper.setLastLocation(mContext,gl);
+            SPHelper.setStringValue2SP(mContext,EGContext.LAST_LOCATION,gl);
         }
     }
 
@@ -203,7 +203,7 @@ public class LocationImpl {
 //                ELOG.i("第五个可能性退出的地方");
                 return false;
             }
-            String lastLocation = SPHelper.getLastLocation(mContext);
+            String lastLocation = SPHelper.getStringValueFromSP(mContext,EGContext.LAST_LOCATION,"");
             if (TextUtils.isEmpty(lastLocation)) {
                 return true;
             }
@@ -229,19 +229,35 @@ public class LocationImpl {
     private JSONObject getLocation() {
         try {
             locationJson = new JSONObject();
-            JsonUtils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.CollectionTime, String.valueOf(System.currentTimeMillis()),DataController.SWITCH_OF_COLLECTION_TIME);
-
-            String locationInfo = SPHelper.getLastLocation(mContext);
-            JsonUtils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.GeographyLocation, locationInfo,DataController.SWITCH_OF_GEOGRAPHY_LOCATION);
+            try {
+                JsonUtils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.CollectionTime, String.valueOf(System.currentTimeMillis()),DataController.SWITCH_OF_COLLECTION_TIME);
+            }catch (Throwable t){
+//                ELOG.i("1111111111111111111111111111");
+            }
+            try {
+                String locationInfo = SPHelper.getStringValueFromSP(mContext,EGContext.LAST_LOCATION,"");
+                JsonUtils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.GeographyLocation, locationInfo,DataController.SWITCH_OF_GEOGRAPHY_LOCATION);
+            }catch (Throwable t){
+//                ELOG.i("22222222222222");
+            }
 
             if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_WIFI,true)){
-                JSONArray wifiInfo = WifiImpl.getInstance(mContext).getWifiInfo();
-                JsonUtils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.WifiInfo.NAME, wifiInfo,DataController.SWITCH_OF_WIFI_NAME);
+                try {
+                    JSONArray wifiInfo = WifiImpl.getInstance(mContext).getWifiInfo();
+                    JsonUtils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.WifiInfo.NAME, wifiInfo,DataController.SWITCH_OF_WIFI_NAME);
+                }catch (Throwable t){
+//                    ELOG.i("333333333333333");
+                }
             }
 
             if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BASE,true)){
-                JSONArray baseStation = getBaseStationInfo();
-                JsonUtils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME,baseStation,DataController.SWITCH_OF_BS_NAME);
+                try {
+                    JSONArray baseStation = getBaseStationInfo();
+                    JsonUtils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME,baseStation,DataController.SWITCH_OF_BS_NAME);
+                }catch (Throwable t){
+//                    ELOG.i("4444444444444444444");
+                }
+
             }
 
         } catch (Throwable e) {
@@ -288,12 +304,12 @@ public class LocationImpl {
                 }
                 try {
                     CellLocation location = mTelephonyManager.getCellLocation();
-                    ELOG.i(" CellLocation  "+location);
+//                    ELOG.i(" CellLocation  "+location);
                     GsmCellLocation gcl = null;
                     CdmaCellLocation ccl = null;
                     if(location != null){
                         if(location instanceof GsmCellLocation) {
-                            ELOG.i(" location instanceof GsmCellLocation ");
+//                            ELOG.i(" location instanceof GsmCellLocation ");
                             gcl = (GsmCellLocation)location;
                             if(gcl != null){
                                 ELOG.i("获取当前基站信息:::::: "+gcl.getLac()+ "  vs "+gcl.getCid()+"  vs "+gcl.getPsc());
@@ -312,7 +328,7 @@ public class LocationImpl {
                                     //获取当前基站信息
                                     JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, ccl.getNetworkId(),DataController.SWITCH_OF_LOCATION_AREA_CODE);
                                     JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, ccl.getBaseStationId(),DataController.SWITCH_OF_CELL_ID);
-                                    JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, ccl.getBaseStationId() ,DataController.SWITCH_OF_BS_LEVEL);
+                                    JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, ccl.getSystemId() ,DataController.SWITCH_OF_BS_LEVEL);
                                     jsonArray.put(jsonObject);
                                 ELOG.i("获取当前基站信息。。。:::::: "+jsonArray);
                                 }

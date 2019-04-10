@@ -180,7 +180,7 @@ public class FileUtils {
                 sb.append(readline);
             }
             br.close();
-            return sb.toString();
+            return String.valueOf(sb);
         } catch (Throwable e) {
         }
         return "";
@@ -289,6 +289,6 @@ public class FileUtils {
             builder.append(buffer, 0, readLength);
             readLength = reader.read(buffer);
         }
-        return builder.toString();
+        return String.valueOf(builder);
     }
 }

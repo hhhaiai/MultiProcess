@@ -44,7 +44,7 @@ import org.json.JSONObject;
 public class SystemUtils {
     /**
      * 生成n个不同的随机数，且随机数区间为[0,10)
-     * 
+     *
      * @param n
      * @return
      */
@@ -85,7 +85,7 @@ public class SystemUtils {
     @SuppressWarnings("deprecation")
     public static boolean isScreenOn(Context context) {
         PowerManager powerManager =
-            (PowerManager)context.getApplicationContext().getSystemService(Context.POWER_SERVICE);
+                (PowerManager) context.getApplicationContext().getSystemService(Context.POWER_SERVICE);
         // 锁屏true 开屏false
         return powerManager.isScreenOn();
     }
@@ -99,7 +99,7 @@ public class SystemUtils {
     public static boolean isScreenLocked(Context context) {
 
         KeyguardManager manager =
-            (KeyguardManager)context.getApplicationContext().getSystemService(Context.KEYGUARD_SERVICE);
+                (KeyguardManager) context.getApplicationContext().getSystemService(Context.KEYGUARD_SERVICE);
         // 锁屏true 开屏false
         boolean inKeyguardRestrictedInputMode = manager.inKeyguardRestrictedInputMode();
         return inKeyguardRestrictedInputMode;
@@ -141,8 +141,8 @@ public class SystemUtils {
                 return false;
             }
             ApplicationInfo applicationInfo =
-                context.getPackageManager().getApplicationInfo(context.getPackageName(), 0);
-            AppOpsManager appOpsManager = (AppOpsManager)context.getApplicationContext().getSystemService("appops");
+                    context.getPackageManager().getApplicationInfo(context.getPackageName(), 0);
+            AppOpsManager appOpsManager = (AppOpsManager) context.getApplicationContext().getSystemService("appops");
             int mode = appOpsManager.checkOpNoThrow(op, applicationInfo.uid, applicationInfo.packageName);
             // return mode == AppOpsManager.MODE_ALLOWED;
             return mode == 0;
@@ -157,12 +157,12 @@ public class SystemUtils {
      * @return
      */
     public static long intervalTime(Context ctx) {
-        long reTryTime = PolicyImpl.getInstance(ctx).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_FAIL_TRY_DELAY,EGContext.FAIL_TRY_DELAY_DEFALUT);
-        if(reTryTime == 0){
+        long reTryTime = PolicyImpl.getInstance(ctx).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_FAIL_TRY_DELAY, EGContext.FAIL_TRY_DELAY_DEFALUT);
+        if (reTryTime == 0) {
             reTryTime = EGContext.FAIL_TRY_DELAY_DEFALUT;
         }
         //10s间隔
-        long time = ((int) (Math.random() * 10) * 1000)  + reTryTime;
+        long time = ((int) (Math.random() * 10) * 1000) + reTryTime;
         return time;
     }
     /**
@@ -172,7 +172,7 @@ public class SystemUtils {
      * @return
      */
     public static String getAppType(Context ctx, String pkg) {
-        return isSystemApps(ctx ,pkg) ? "SA" : "OA";
+        return isSystemApps(ctx, pkg) ? "SA" : "OA";
     }
 
     /**
@@ -185,7 +185,7 @@ public class SystemUtils {
      * @param pkg
      * @return
      */
-    private static boolean isSystemApps(Context mContext ,String pkg) {
+    private static boolean isSystemApps(Context mContext, String pkg) {
         if (TextUtils.isEmpty(pkg)) {
             return false;
         }
@@ -263,15 +263,16 @@ public class SystemUtils {
 
     /**
      * 检测xposed相关文件,尝试加载xposed的类,如果能加载则表示已经安装了
+     *
      * @return
      */
-    public static boolean byLoadXposedClass(){
-        try{
+    public static boolean byLoadXposedClass() {
+        try {
             Object localObject = ClassLoader.getSystemClassLoader()
                     .loadClass("de.robv.android.xposed.XposedHelpers").newInstance();
             // 如果加载类失败 则表示当前环境没有xposed
             return localObject != null;
-        }catch (Throwable localThrowable) {
+        } catch (Throwable localThrowable) {
             return false;
         }
     }
@@ -280,16 +281,15 @@ public class SystemUtils {
         boolean result = false;
         try {
             result = Looper.getMainLooper().getThread() == Thread.currentThread();
-        }catch (Throwable t){
+        } catch (Throwable t) {
         }
         return result;
     }
     /**
-     *
-     * @param key  优先级 传入==>metaData==>XML
+     * @param key     优先级 传入==>metaData==>XML
      * @param channel 多渠道打包==>代码==>XML
      */
-    public static void updateAppkeyAndChannel(Context mContext,String key,String channel){
+    public static void updateAppkeyAndChannel(Context mContext, String key, String channel) {
         if (TextUtils.isEmpty(key)) {
             Bundle bundle = AndroidManifestHelper.getMetaData(mContext);
             if (bundle != null) {
@@ -298,9 +298,9 @@ public class SystemUtils {
         }
         if (!TextUtils.isEmpty(key)) {
             EGContext.APP_KEY_VALUE = key;
-            SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_KEY, key).commit();
+            SPHelper.setStringValue2SP(mContext,EGContext.SP_APP_KEY, key);
         }
-        // 此处需要进行channel优先级处理,优先处理多渠道打包过来的channel,而后次之,接口传入的channel
+        // 此处需要进行channel优先级处理,优先处理多渠道打包过来的channel,配置文件次之,接口传入的channel优先级最低
         String channelFromApk = getChannelFromApk(mContext);
         if (TextUtils.isEmpty(channelFromApk)) {
             try {
@@ -310,7 +310,7 @@ public class SystemUtils {
                 if (!TextUtils.isEmpty(xmlChannel)) {
                     // 赋值为空
                     EGContext.APP_CHANNEL_VALUE = xmlChannel;
-                    SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_CHANNEL, channel).commit();
+                    SPHelper.setStringValue2SP(mContext,EGContext.SP_APP_CHANNEL, xmlChannel);
                     return;
                 }
             } catch (Throwable e) {
@@ -318,12 +318,12 @@ public class SystemUtils {
             if (!TextUtils.isEmpty(channel)) {
                 // 赋值接口传入的channel
                 EGContext.APP_CHANNEL_VALUE = channel;
-                SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_CHANNEL, channel).commit();
+                SPHelper.setStringValue2SP(mContext,EGContext.SP_APP_CHANNEL, channel);
             }
         } else {
             // 赋值多渠道打包的channel
             EGContext.APP_CHANNEL_VALUE = channelFromApk;
-            SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_CHANNEL, channel).commit();
+            SPHelper.setStringValue2SP(mContext,EGContext.SP_APP_CHANNEL, channelFromApk);
         }
     }
     /**
@@ -376,7 +376,7 @@ public class SystemUtils {
         if (cxt == null) {
             return "";
         }
-        appkey = SPHelper.getDefault(context).getString(EGContext.SP_APP_KEY,"");
+        appkey = SPHelper.getStringValueFromSP(context,EGContext.SP_APP_KEY, "");
         if (!TextUtils.isEmpty(appkey)) {
             return appkey;
         }
@@ -416,7 +416,7 @@ public class SystemUtils {
         if (!TextUtils.isEmpty(EGContext.APP_CHANNEL_VALUE)) {
             return EGContext.APP_CHANNEL_VALUE;
         }
-        channel = SPHelper.getDefault(context).getString(EGContext.SP_APP_CHANNEL,"");
+        channel = SPHelper.getStringValueFromSP(context,EGContext.SP_APP_CHANNEL, "");
         if (!TextUtils.isEmpty(channel)) {
             return channel;
         }
@@ -424,14 +424,14 @@ public class SystemUtils {
     }
 
 
-    public static JSONArray getAppsFromShell(Context mContext,String tag) {
+    public static JSONArray getAppsFromShell(Context mContext, String tag) {
         JSONArray appList = new JSONArray();
         try {
             JSONObject appInfo;
             Set<String> result = new HashSet<>();
             PackageManager pm = mContext.getPackageManager();
-            result = getPkgList(result,SHELL_PM_LIST_PACKAGES);
-            for(String pkgName : result){
+            result = getPkgList(result, SHELL_PM_LIST_PACKAGES);
+            for (String pkgName : result) {
                 if (!TextUtils.isEmpty(pkgName) && pm.getLaunchIntentForPackage(pkgName) != null) {
                     appInfo = new JSONObject();
                     appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,
@@ -447,11 +447,11 @@ public class SystemUtils {
         return appList;
     }
 
-    public static long calculateCloseTime(long openTime ){
+    public static long calculateCloseTime(long openTime) {
         long currentTime = System.currentTimeMillis();
         long closeTime = -1;
-        if(currentTime - openTime > EGContext.DEFAULT_SPACE_TIME){
-            closeTime =(long)(Math.random()*(currentTime - openTime) + openTime);
+        if (currentTime - openTime > EGContext.DEFAULT_SPACE_TIME) {
+            closeTime = (long) (Math.random() * (currentTime - openTime) + openTime);
         }
         return closeTime;
     }

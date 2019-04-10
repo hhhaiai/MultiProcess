@@ -25,6 +25,6 @@ public class AnalysysTracker {
      */
   public static void setDebugMode(Context ctx ,boolean isDebug) {
     EGContext.FLAG_DEBUG_USER = isDebug;
-    SPHelper.setDebugMode( ctx, isDebug);
+    SPHelper.setBooleanValue2SP(ctx, EGContext.DEBUG, isDebug);
   }
 }

@@ -48,11 +48,11 @@ public class DeflterCompressUtils {
     public static String makeSercretKey(String value , Context ctx) {
         StringBuilder sb = new StringBuilder();
         if(value.length() > 3){
-            SPHelper.getDefault(ctx).edit().putString(EGContext.APPKEY ,value).commit();
+            SPHelper.setStringValue2SP(ctx,EGContext.APPKEY ,value);
             value = value.substring(0,3);
         }
         String sdkv = DeviceImpl.getInstance(ctx).getSdkVersion();
-        SPHelper.getDefault(ctx).edit().putString(EGContext.SDKV , sdkv).commit();
+        SPHelper.setStringValue2SP(ctx,EGContext.SDKV , sdkv);
         if(sdkv.contains("|")){
             sdkv = sdkv.substring(0,sdkv.indexOf("|")).replace(".", "");
         }else{
@@ -63,11 +63,11 @@ public class DeflterCompressUtils {
         sb.append(DeviceImpl.getInstance(ctx).getDebug());//是否debug模式，0/1值
         sb.append(value);//前三位
         long time = System.currentTimeMillis();
-        SPHelper.getDefault(ctx).edit().putString(EGContext.TIME , String.valueOf(time)).commit();
+        SPHelper.setStringValue2SP(ctx,EGContext.TIME , String.valueOf(time));
         //"1548155536157"
         sb.append(time);
         ELOG.i(sb.toString()+" ::::::::::::key");
-       return Md5Utils.getMD5(sb.toString());
+       return Md5Utils.getMD5(String.valueOf(sb));
     }
     /**
      * Deflater 解压数据

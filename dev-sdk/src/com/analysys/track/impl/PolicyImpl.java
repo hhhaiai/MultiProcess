@@ -21,7 +21,7 @@ import java.lang.reflect.Array;
 public class PolicyImpl {
     static Context mContext;
 //    private static PolicyInfo policyLocal;
-
+    private SharedPreferences sp = null;
     private static class Holder {
         private static final PolicyImpl INSTANCE = new PolicyImpl();
     }
@@ -81,7 +81,7 @@ public class PolicyImpl {
             .putInt(DeviceKeyContacts.Response.RES_POLICY_USE_RTP, newPolicy.isUseRTP())
             .putInt(DeviceKeyContacts.Response.RES_POLICY_USE_RTL, newPolicy.isUseRTL())
             .putString(DeviceKeyContacts.Response.RES_POLICY_CTRL_LIST,
-                    newPolicy.getCtrlList()== null ? "": newPolicy.getCtrlList().toString())
+                    newPolicy.getCtrlList()== null ? "": String.valueOf(newPolicy.getCtrlList()))
             .apply();
         // 重置url
         updateUpLoadUrl(newPolicy.isUseRTP() == 0 ? true : false,
@@ -91,7 +91,10 @@ public class PolicyImpl {
     }
 
     public SharedPreferences getSP() {
-        return mContext.getSharedPreferences(EGContext.SP_NAME, Context.MODE_PRIVATE);
+        if(sp == null){
+            sp = mContext.getSharedPreferences(EGContext.SP_NAME, Context.MODE_PRIVATE);
+        }
+        return sp;
     }
 
     private Editor getEditor() {
@@ -316,7 +319,7 @@ public class PolicyImpl {
     }
     private void setNormalUploadUrl(Context context) {
         int sum = 0;
-        String key = SPHelper.getDefault(context).getString(EGContext.SP_APP_KEY,"");
+        String key = SPHelper.getStringValueFromSP(context,EGContext.SP_APP_KEY,"");
         for (int i = 0; i <key.length(); i++) {
             sum = sum + key.charAt(i);
         }

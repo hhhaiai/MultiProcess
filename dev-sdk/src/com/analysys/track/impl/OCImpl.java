@@ -91,18 +91,22 @@ public class OCImpl {
                     }
                 }
             }else{//TODO 黑屏补充数据，待验证
-                String openApp = SPHelper.getLastAppName(mContext);
+                String openApp = SPHelper.getStringValueFromSP(mContext,EGContext.LASTAPPNAME, "");
                 if (!TextUtils.isEmpty(openApp)) {
                     // 补充时间
-                    long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(SPHelper.getLastOpenTime(mContext)));
-                    SPHelper.setEndTime(mContext, randomCloseTime);
+                    String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
+                    if(TextUtils.isEmpty(lastOpenTime)){
+                        lastOpenTime = "0";
+                    }
+                    long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
+                    SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME,randomCloseTime);
                     filterInsertOCInfo(EGContext.CLOSE_SCREEN);
                 }
             }
         } catch (Throwable t) {
             ELOG.i(t.getMessage()+"  processOCprocessOC");
         }finally {
-            MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE_OVER_5, false);
+            MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE, false);
         }
     }
 
@@ -273,22 +277,23 @@ public class OCImpl {
         if (TextUtils.isEmpty(packageName)) {
             return;
         }
-        String lastPkgName = SPHelper.getLastOpenPackgeName(mContext);
-//        ELOG.i( "lastPkgName :" + lastPkgName);
-//        PackageManager pm = mContext.getPackageManager();
+        String lastPkgName = SPHelper.getStringValueFromSP(mContext,EGContext.LASTPACKAGENAME,"");
         JSONObject ocJson = getOCInfo(packageName, EGContext.OC_COLLECTION_TYPE_RUNNING_TASK);
         // 是否首次打开
         if (TextUtils.isEmpty(lastPkgName)) {
-//            SPHelper.setEndTime(mContext, System.currentTimeMillis() - new Random(25).nextInt(1000));
             ProcessManager.saveSP(mContext,ocJson);
         } else {
-            long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(SPHelper.getLastOpenTime(mContext)));
+            String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
+            if(TextUtils.isEmpty(lastOpenTime)){
+                lastOpenTime = "0";
+            }
+            long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
 //            ELOG.i(randomCloseTime+"  = randomCloseTime");
             if(randomCloseTime == -1){
                 return;
             }
             //1.非首次打开，之前有pkgName缓存,设置当前时间往前推一点为结束时间
-            SPHelper.setEndTime(mContext, randomCloseTime);
+            SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME,randomCloseTime);
             //2.入库当前的缓存appTime
             filterInsertOCInfo(EGContext.APP_SWITCH);
             // 3.如果打开的包名与缓存的包名不一致，更新新pkgName到sp
@@ -327,7 +332,7 @@ public class OCImpl {
                 JSONObject res = removeRepeat(cacheApps, nameSet);
                 if (res != null && res.length() > 0) {
                     try {
-                        cacheApps = new JSONArray(res.get("cache").toString());
+                        cacheApps = new JSONArray(String.valueOf(res.get("cache")));
                         ELOG.i(cacheApps + "   ::::::::: cacheApps:::::");
                     } catch (Throwable t) {
                         ELOG.i("   ::::::::: cacheApps 异常:::::");
@@ -447,7 +452,7 @@ public class OCImpl {
                 // 将新增列表拆开，该时段有应用打开记录的修改更新记录，该时段没有应用打开记录的新增记录
                 for (int i = runList.length() - 1; i >= 0; i--) {
                     oc.add(runList.get(i));
-                    String pkgName = new JSONObject(runList.get(i).toString())
+                    String pkgName = new JSONObject(String.valueOf(runList.get(i)))
                         .optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
                     if (!TextUtils.isEmpty(pkgName) && ocInfo.contains(pkgName)) {
                         updateOCInfo.put(runList.get(i));
@@ -578,7 +583,7 @@ public class OCImpl {
                     // ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode, "");
                 }
                 try {
-                    ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName, appInfo.loadLabel(pm).toString());
+                    ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName, String.valueOf(appInfo.loadLabel(pm)));
                 } catch (Throwable t) {
                     // ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName, "unknown");
                 }
@@ -591,18 +596,17 @@ public class OCImpl {
     }
 
     public void filterInsertOCInfo(String switchType) {
-        String OldPkgName = SPHelper.getLastOpenPackgeName(mContext);
-        String appName = SPHelper.getLastAppName(mContext);
-        String appVersion = SPHelper.getLastAppVerison(mContext);
-        String openTime = SPHelper.getLastOpenTime(mContext);
-        Long closeTime = SPHelper.getEndTime(mContext);
-        String appType = SPHelper.getAppType(mContext);
+        String OldPkgName = SPHelper.getStringValueFromSP(mContext,EGContext.LASTPACKAGENAME,"");
+        String appName = SPHelper.getStringValueFromSP(mContext,EGContext.LASTAPPNAME, "");
+        String appVersion = SPHelper.getStringValueFromSP(mContext,EGContext.LASTAPPVERSION,"");
+        String openTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
+        Long closeTime = SPHelper.getLongValueFromSP(mContext,EGContext.ENDTIME, 0);
+        String appType = SPHelper.getStringValueFromSP(mContext,EGContext.APP_TYPE, "");
         if (TextUtils.isEmpty(OldPkgName) || TextUtils.isEmpty(appName) || TextUtils.isEmpty(appVersion)
             || TextUtils.isEmpty(openTime)) {
             return;
         }
         JSONObject ocInfo = null;
-//        ELOG.i(closeTime+"  closeTime vs  openTime "+Long.parseLong(openTime));
         if (closeTime > Long.parseLong(openTime)) {
             JSONArray updataData = new JSONArray();
             try {

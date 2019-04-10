@@ -594,7 +594,7 @@ public class ELOG {
                 return parseStringByObject(object, childLevel);
             } else {
                 // 若对象重写toString()方法默认走toString()
-                return object.toString();
+                return String.valueOf(object);
             }
         }
     }
@@ -834,7 +834,6 @@ public class ELOG {
             }
         }
         builder.append("}");
-        Log.d("www", builder.toString());
         return format(obj);
     }
 
@@ -1012,7 +1011,7 @@ public class ELOG {
                 pw.close();
             }
         }
-        return sb.toString();
+        return String.valueOf(sb);
     }
 
     private static String parseString(Intent intent) {
@@ -1033,11 +1032,11 @@ public class ELOG {
             if (!TextUtils.isEmpty(intent.getPackage())) {
                 obj.put("Package", intent.getPackage());
             }
-            if (!TextUtils.isEmpty(intent.getComponent().toString())) {
-                obj.put("ComponentInfo", intent.getComponent().toString());
+            if (!TextUtils.isEmpty(String.valueOf(intent.getComponent()))) {
+                obj.put("ComponentInfo", String.valueOf(intent.getComponent()));
             }
-            if (!TextUtils.isEmpty(intent.getCategories().toString())) {
-                obj.put("Categories", intent.getCategories().toString());
+            if (!TextUtils.isEmpty(String.valueOf(intent.getCategories()))) {
+                obj.put("Categories", String.valueOf(intent.getCategories()));
             }
             String extras = parseString(intent.getExtras());
             if (!TextUtils.isEmpty(extras)) {
@@ -1084,12 +1083,12 @@ public class ELOG {
                 builder.append(" | ");
             }
         }
-        if (TextUtils.isEmpty(builder.toString())) {
+        if (TextUtils.isEmpty(String.valueOf(builder))) {
             builder.append(flags);
         } else if (builder.indexOf("|") != -1) {
             builder.delete(builder.length() - 2, builder.length());
         }
-        return builder.toString();
+        return String.valueOf(builder);
     }
 
     /*********************************************************************************************************/
@@ -1107,7 +1106,7 @@ public class ELOG {
     private static String format(JSONArray arr) {
         if (arr != null) {
             try {
-                return isFormat ? (arr.toString(JSON_INDENT)) : arr.toString();
+                return isFormat ? (arr.toString(JSON_INDENT)) : String.valueOf(arr);
             } catch (Exception e) {
             }
         }
@@ -1124,7 +1123,7 @@ public class ELOG {
 
         if (obj != null) {
             try {
-                return isFormat ? obj.toString(JSON_INDENT) : obj.toString();
+                return isFormat ? obj.toString(JSON_INDENT) : String.valueOf(obj);
             } catch (Exception e) {
             }
         }
@@ -1150,7 +1149,7 @@ public class ELOG {
                 sb.append(CONTENT_LINE);
             }
             sb.append(CONTENT_LOG_EMPTY);
-            return sb.toString();
+            return String.valueOf(sb);
         }
         String ss[] = new String[]{};
         String temp = null;
@@ -1239,7 +1238,7 @@ public class ELOG {
             }
             sb.append(log);
         }
-        return sb.toString();
+        return String.valueOf(sb);
     }
 
     /*********************************************************************************************************/
@@ -1269,7 +1268,7 @@ public class ELOG {
                     sb = new StringBuilder();
                 }
                 if (sb.length() + line.length() >= LOG_MAXLENGTH) {
-                    realPrint(level, tag, wrapperString(sb.toString()));
+                    realPrint(level, tag, wrapperString(String.valueOf(sb)));
                     sb = new StringBuilder();
                     if (line.length() >= LOG_MAXLENGTH) {
                         realPrint(level, tag, wrapperString(line));
@@ -1287,7 +1286,7 @@ public class ELOG {
                 }
             }
             if (sb != null) {
-                realPrint(level, tag, wrapperString(sb.toString()));
+                realPrint(level, tag, wrapperString(String.valueOf(sb)));
                 sb = null;
             }
         } else {

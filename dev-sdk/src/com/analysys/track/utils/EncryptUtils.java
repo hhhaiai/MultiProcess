@@ -167,8 +167,7 @@ public class EncryptUtils {
 
                 // 确保preID非空
                 if (TextUtils.isEmpty(preID)) {
-
-                    String uuid = UUID.randomUUID().toString();
+                    String uuid = String.valueOf(UUID.randomUUID());
                     if (uuid.contains("-")) {
                         String[] s = uuid.split("-");
                         if (s.length > 0) {

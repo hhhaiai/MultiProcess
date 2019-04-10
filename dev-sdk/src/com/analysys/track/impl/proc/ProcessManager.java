@@ -5,6 +5,7 @@ import org.json.JSONObject;
 
 import com.analysys.track.database.TableXXXInfo;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
+import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.ELOG;
 
 import com.analysys.track.utils.sp.SPHelper;
@@ -40,7 +41,7 @@ public class ProcessManager {
                 JSONObject jsonObject = null;
                 for (int i = 0; i < uploadArray.length(); i++) {
                     jsonObject = (JSONObject)uploadArray.get(i);
-                    String res = jsonObject.get(ProcParser.RUNNING_RESULT).toString().replace("[", "").replace("]", "");
+                    String res = String.valueOf(jsonObject.get(ProcParser.RUNNING_RESULT)).replace("[", "").replace("]", "");
                     strArray = res.split(",");
                 }
                 for (int i = 0; i < strArray.length; i++) {
@@ -55,11 +56,11 @@ public class ProcessManager {
     }
 
     public static void saveSP(Context ctx, JSONObject ocInfo){
-        SPHelper.setLastOpenPackgeName(ctx, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName));
-        SPHelper.setLastOpenTime(ctx, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationOpenTime));
-        SPHelper.setLastAppName(ctx, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationName));
-        SPHelper.setLastAppVerison(ctx, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationVersionCode));
-        SPHelper.setAppType(ctx,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationType));
+        SPHelper.setStringValue2SP(ctx,EGContext.LASTPACKAGENAME,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName));
+        SPHelper.setStringValue2SP(ctx,EGContext.LASTOPENTIME,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationOpenTime));
+        SPHelper.setStringValue2SP(ctx,EGContext.LASTAPPNAME,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationName));
+        SPHelper.setStringValue2SP(ctx,EGContext.LASTAPPVERSION,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationVersionCode));
+        SPHelper.setStringValue2SP(ctx,EGContext.APP_TYPE,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationType));
     }
 
 

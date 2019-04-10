@@ -30,7 +30,7 @@ public class AESUtils {
             // byte数组的每个元素为8位，前四位right shift 4 后与 00001111与运算 ，后四位 直接与00001111与运算
             result.append(HEX.charAt((contentBytes[i] >> 4) & 0x0f)).append(HEX.charAt(contentBytes[i] & 0x0f));
         }
-        return result.toString();
+        return String.valueOf(result);
     }
 
     /**

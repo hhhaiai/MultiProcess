@@ -86,11 +86,11 @@ public class TableXXXInfo {
                     object = (JSONObject) xxxInfo.get(i);
                     cv = new ContentValues();
 //                    ELOG.i(xxxInfo.toString()+"     xxxInfo  ");
-                    cv.put(DBConfig.XXXInfo.Column.TIME, EncryptUtils.encrypt(mContext,object.opt(ProcParser.RUNNING_TIME).toString()));
-                    cv.put(DBConfig.XXXInfo.Column.TOP, EncryptUtils.encrypt(mContext,object.opt(ProcParser.RUNNING_TOP).toString()));
-                    cv.put(DBConfig.XXXInfo.Column.PS, EncryptUtils.encrypt(mContext,object.opt(ProcParser.RUNNING_PS).toString()));
-                    cv.put(DBConfig.XXXInfo.Column.PROC, EncryptUtils.encrypt(mContext,object.opt(ProcParser.RUNNING_PROC).toString()));
-                    cv.put(DBConfig.XXXInfo.Column.RESULT, EncryptUtils.encrypt(mContext,object.opt(ProcParser.RUNNING_RESULT).toString()));
+                    cv.put(DBConfig.XXXInfo.Column.TIME, EncryptUtils.encrypt(mContext,String.valueOf(object.opt(ProcParser.RUNNING_TIME))));
+                    cv.put(DBConfig.XXXInfo.Column.TOP, EncryptUtils.encrypt(mContext,String.valueOf(object.opt(ProcParser.RUNNING_TOP))));
+                    cv.put(DBConfig.XXXInfo.Column.PS, EncryptUtils.encrypt(mContext,String.valueOf(object.opt(ProcParser.RUNNING_PS))));
+                    cv.put(DBConfig.XXXInfo.Column.PROC, EncryptUtils.encrypt(mContext,String.valueOf(object.opt(ProcParser.RUNNING_PROC))));
+                    cv.put(DBConfig.XXXInfo.Column.RESULT, EncryptUtils.encrypt(mContext,String.valueOf(object.opt(ProcParser.RUNNING_RESULT))));
                     list.add(cv);
                 }
             }
@@ -138,7 +138,6 @@ public class TableXXXInfo {
                     String content = EncryptUtils.decrypt(mContext,curProc.getString(curProc.getColumnIndex(DBConfig.PROCInfo.Column.CONTENT)));
                     if(!TextUtils.isEmpty(content)){
                         procArray.put(new JSONObject(new String(Base64.decode(content.getBytes(),Base64.DEFAULT))));
-//                        ELOG.i("procArray :::::::::::::::::::::     "+procArray.toString());
                     }else {
                         subBlankCount += 1;
                     }
@@ -146,7 +145,7 @@ public class TableXXXInfo {
                 }
                 JsonUtils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_PROC,procArray,DataController.SWITCH_OF_CL_MODULE_PROC);
                 JsonUtils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_RESULT,EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.RESULT))),DataController.SWITCH_OF_CL_MODULE_RESULT);
-                array.put(new String(Base64.encode(jsonObject.toString().getBytes(),Base64.DEFAULT)));
+                array.put(new String(Base64.encode(String.valueOf(jsonObject).getBytes(),Base64.DEFAULT)));
 //                array.put(jsonObject);
 //                ELOG.i("array :::::::::" +array);
             }

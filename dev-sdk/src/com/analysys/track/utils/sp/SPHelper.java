@@ -15,7 +15,6 @@ import android.content.SharedPreferences.Editor;
 import android.text.TextUtils;
 
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.internal.Content.EGContext;
 
 
 public class SPHelper {
@@ -33,7 +32,11 @@ public class SPHelper {
      * @return
      */
     public static SharedPreferences getDefault(Context context) {
-        return getInstance(context, DEFAULT_PREFERENCE);
+        if(res == null){
+            //TODO
+            res = getInstance(context, DEFAULT_PREFERENCE);
+        }
+        return res;
     }
     private static Editor getEditor(Context ctx){
         if(editor == null){
@@ -53,15 +56,17 @@ public class SPHelper {
         if (context == null) {
             return null;
         } else {
-            if(res == null) res= getSharedPreferences(context, name);
-            File f = getSystemSharedPrefsFile(context, name);
-            if (!f.exists()) {
-                try {
-                    f.createNewFile();
-                } catch (IOException e) {
+            if(res == null){
+                res= getSharedPreferences(context, name);
+                File f = getSystemSharedPrefsFile(context, name);
+                if (!f.exists()) {
+                    try {
+                        f.createNewFile();
+                    } catch (IOException e) {
+                    }
                 }
+                ELOG.v("File[" + f.getAbsolutePath() + "]====>" + f.exists());
             }
-            ELOG.v("File[" + f.getAbsolutePath() + "]====>" + f.exists());
             return res;
         }
     }
@@ -175,178 +180,91 @@ public class SPHelper {
 
         return returnValue;
     }
-    public static boolean getDebugMode(Context ctx) {
-        return getDefault(ctx).getBoolean(EGContext.DEBUG, false);
+
+    /**
+     * 存int类型数据入sp
+     * @param ctx
+     * @param key
+     * @param value
+     */
+    public static void setIntValue2SP(Context ctx,String key,int value){
+        getEditor(ctx).putInt(key, value).apply();
     }
 
-    public static void setDebugMode(Context ctx, boolean debug) {
-        getEditor(ctx).putBoolean(EGContext.DEBUG, debug).apply();
-    }
     /**
-     * 打开的应用名称
-     *
+     * 从sp取值
+     * @param ctx
+     * @param key
+     * @param defaultValue
      * @return
      */
-    public static String getLastAppName(Context ctx) {
-        return getDefault(ctx).getString(EGContext.LASTAPPNAME, "");
+    public static int getIntValueFromSP(Context ctx,String key,int defaultValue){
+        return getDefault(ctx).getInt(key, defaultValue);
     }
-    public static void setLastAppName(Context context,String lastAppName) {
-        getEditor(context).putString(EGContext.LASTAPPNAME, lastAppName).apply();
-    }
-    public static String getLastOpenPackgeName(Context ctx) {
-        return getDefault(ctx).getString(EGContext.LASTPACKAGENAME, "");
-    }
+
     /**
-     * 最后打开的应用包名
-     */
-    public static void setLastOpenPackgeName(Context ctx,String packageName) {
-        if(TextUtils.isEmpty(packageName)){
-           return;
-        }
-        getEditor(ctx).putString(EGContext.LASTPACKAGENAME, packageName).apply();
-    }
-    /**
-     * 打开的应用版本号
      *
+     * @param ctx
+     * @param key
+     * @param value
+     */
+    public static void setStringValue2SP(Context ctx,String key,String value){
+        if(TextUtils.isEmpty(key) || TextUtils.isEmpty(value)){
+            return;
+        }
+        getEditor(ctx).putString(key, value).apply();
+    }
+
+    /**
+     *
+     * @param ctx
+     * @param key
+     * @param defaultValue
      * @return
      */
-    public static String getLastAppVerison(Context ctx) {
-        return getDefault(ctx).getString(EGContext.LASTAPPVERSION, "");
-    }
-    public static void setLastAppVerison(Context ctx,String lastAppVerison) {
-        if(TextUtils.isEmpty(lastAppVerison)){
-           return;
-        }
-        getEditor(ctx).putString(EGContext.LASTAPPVERSION, lastAppVerison).apply();
+    public static String getStringValueFromSP(Context ctx,String key,String defaultValue){
+        return getDefault(ctx).getString(key, defaultValue);
     }
 
-    public static void setAppType(Context ctx,String appType) {
-        if(TextUtils.isEmpty(appType)){
-            return;
-        }
-        getEditor(ctx).putString(EGContext.APP_TYPE, appType).apply();
-    }
     /**
-     * 应用的打开时间
      *
+     * @param ctx
+     * @param key
+     * @param value
+     */
+    public static void setBooleanValue2SP(Context ctx,String key,boolean value){
+        getEditor(ctx).putBoolean(key, value).apply();
+    }
+
+    /**
+     *
+     * @param ctx
+     * @param key
+     * @param defaultValue
      * @return
      */
-    public static String getLastOpenTime(Context ctx) {
-        return getDefault(ctx).getString(EGContext.LASTOPENTIME, "");
-    }
-    public static void setLastOpenTime(Context ctx,String lastOpenTime) {
-        if(TextUtils.isEmpty(lastOpenTime)){
-            return;
-        }
-        getEditor(ctx).putString(EGContext.LASTOPENTIME, lastOpenTime).apply();
-    }
-    /**
-     * 进程关闭时间时间
-     */
-    public static long getEndTime(Context ctx) {
-        return getDefault(ctx).getLong(EGContext.ENDTIME, 0);
-    }
-    public static String getAppType(Context ctx) {
-        return getDefault(ctx).getString(EGContext.APP_TYPE, "");
-    }
-//    public static long getMinDuration(Context ctx) {
-//        return getDefault(ctx).getLong(EGContext.MIN_DURATION_TIME, 0);
-//    }
-
-//    public static void setMinDuration(Context ctx,long info) {
-//        editor.putLong(EGContext.MIN_DURATION_TIME, info);
-//        editor.apply();
-//    }
-//    public static long getMaxDuration(Context ctx) {
-//        return getDefault(ctx).getLong(EGContext.MAX_DURATION_TIME, 0);
-//    }
-
-//    public static void setMaxDuration(Context ctx,long info) {
-//        editor.putLong(EGContext.MAX_DURATION_TIME, info);
-//        editor.apply();
-//    }
-    /**
-     * 进程关闭时间时间
-     */
-    public static void setEndTime(Context ctx, long time) {
-        if(time == 0 || time == -1){
-            return;
-        }
-        getEditor(ctx).putLong(EGContext.ENDTIME, time).apply();
-    }
-    public static void setIntervalTime(Context ctx, long time){
-        if(time == 0 || time == -1){
-            return;
-        }
-        getEditor(ctx).putLong(EGContext.INTERVALTIME, time).apply();
-    }
-    public static long getIntervalTime(Context ctx) {
-        return getDefault(ctx).getLong(EGContext.INTERVALTIME, 0);
-    }
-    public static void setLastQuestTime(Context ctx, long time){
-        if(time == 0 || time == -1){
-            return;
-        }
-        getEditor(ctx).putLong(EGContext.LASTQUESTTIME, time).apply();
-    }
-    public static long getLastQuestTime(Context ctx) {
-        return getDefault(ctx).getLong(EGContext.LASTQUESTTIME, 0);
-    }
-    public static void setRetryTime(Context ctx, long time){
-        if(time == 0 || time == -1){
-            return;
-        }
-        getEditor(ctx).putLong(EGContext.RETRYTIME, time).apply();
-    }
-    public static long getRetryTime(Context ctx) {
-        return getDefault(ctx).getLong(EGContext.RETRYTIME, EGContext.FAIL_COUNT_DEFALUT);
-    }
-    //获取发送失败次数
-    public static int getFailedNumb(Context ctx) {
-        return getDefault(ctx).getInt(EGContext.FAILEDNUMBER, 0);
-    }
-    /**
-     * 上传失败次数
-     */
-    public static void setFailedNumb(Context ctx, int numb) {
-        getEditor(ctx).putInt(EGContext.FAILEDNUMBER, numb).apply();
-    }
-    //fail失败时间
-    public static long getFailedTime(Context ctx) {
-        return getDefault(ctx).getLong(EGContext.FAILEDTIME, 0);
+    public static boolean getBooleanValueFromSP(Context ctx,String key,boolean defaultValue){
+        return getDefault(ctx).getBoolean(key, defaultValue);
     }
 
     /**
-     * 上传失败时间
+     *
+     * @param ctx
+     * @param key
+     * @param value
      */
-    public static void setFailedTime(Context ctx, long time) {
-        getEditor(ctx).putLong(EGContext.FAILEDTIME, time).apply();
-    }
-    public static int getRequestState(Context ctx) {
-        return getDefault(ctx).getInt(EGContext.REQUEST_STATE, 0);
+    public static void setLongValue2SP(Context ctx,String key,long value){
+        getEditor(ctx).putLong(key, value).apply();
     }
 
-    public static void setRequestState(Context ctx, int requestState) {
-        getEditor(ctx).putInt(EGContext.REQUEST_STATE, requestState).apply();
+    /**
+     *
+     * @param ctx
+     * @param key
+     * @param defaultValue
+     * @return
+     */
+    public static long getLongValueFromSP(Context ctx,String key,long defaultValue){
+        return getDefault(ctx).getLong(key, defaultValue);
     }
-
-    public static void setLastLocation(Context ctx, String location) {
-        if(TextUtils.isEmpty(location)){
-            return;
-        }
-        getEditor(ctx).putString(EGContext.LAST_LOCATION, location).apply();
-    }
-    public static String getLastLocation(Context ctx) {
-        return getDefault(ctx).getString(EGContext.LAST_LOCATION, "");
-    }
-    public static String getTmpID(Context ctx) {
-        return getDefault(ctx).getString(EGContext.TMPID, "");
-    }
-    public static void setTmpID(Context ctx,String tmpID) {
-        if(TextUtils.isEmpty(tmpID)){
-            return;
-        }
-        getEditor(ctx).putString(EGContext.TMPID, tmpID).apply();
-    }
-
 }

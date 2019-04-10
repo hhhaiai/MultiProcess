@@ -67,6 +67,7 @@ public class AppSnapshotImpl {
                     TableAppSnapshot.getInstance(mContext).snapShotSelect();
             JSONArray currentSnapshotsList = getCurrentSnapshots();
             if (dbSnapshotsMap != null && !dbSnapshotsMap.isEmpty()) {
+                //对比处理当前快照和db数据
                 currentSnapshotsList =
                         getDifference(currentSnapshotsList, dbSnapshotsMap);
             }

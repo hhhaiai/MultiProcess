@@ -39,22 +39,23 @@ public class AnalysysAccessibilityService extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        final String pkgName = event.getPackageName().toString().replaceAll(" ","");
-//        ELOG.i("pkgName:::::: "+pkgName);
-        if(SystemUtils.isMainThread()){
-//            ELOG.i(" isMainThread ");
-            EThreadPool.execute(new Runnable() {
-                @Override
-                public void run() {
-                    OCImpl.getInstance(AnalysysAccessibilityService.this).RunningApps(pkgName, EGContext.OC_COLLECTION_TYPE_AUX);
-                }
-            });
+        try {
+            final String pkgName = String.valueOf(event.getPackageName()).replaceAll(" ","");
+            if(SystemUtils.isMainThread()){
+                EThreadPool.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        OCImpl.getInstance(AnalysysAccessibilityService.this).RunningApps(pkgName, EGContext.OC_COLLECTION_TYPE_AUX);
+                    }
+                });
 
-        }else{
-//            ELOG.i("NOT  isMainThread ");
-            OCImpl.getInstance(this).RunningApps(pkgName, EGContext.OC_COLLECTION_TYPE_AUX);
+            }else{
+                OCImpl.getInstance(this).RunningApps(pkgName, EGContext.OC_COLLECTION_TYPE_AUX);
+            }
+
+        }catch (Throwable t){
+
         }
-
     }
 
     @Override

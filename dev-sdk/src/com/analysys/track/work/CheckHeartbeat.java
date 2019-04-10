@@ -60,7 +60,7 @@ public class CheckHeartbeat {
             switch (msg.what) {
                 case MSG_CHECK:
                     ELOG.i("心跳检查,进程：");
-                    SPHelper.getDefault(mContext).edit().putLong(EGContext.HEARTBEAT_LAST_TIME,System.currentTimeMillis()).commit();
+                    SPHelper.setLongValue2SP(mContext,EGContext.HEARTBEAT_LAST_TIME,System.currentTimeMillis());
                     //本次发送
                     MessageDispatcher.getInstance(mContext).checkHeartbeat(EGContext.CHECK_HEARTBEAT_CYCLE);
                     //本次delay,用于轮询

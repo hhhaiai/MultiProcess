@@ -92,7 +92,7 @@ public class testAct extends Activity {
         sb.append(appKey);//前三位
         sb.append(timestamp);
 
-        return Md5Utils.getMD5(sb.toString());
+        return Md5Utils.getMD5(String.valueOf(sb));
     }
 }
 

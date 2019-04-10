@@ -62,7 +62,7 @@ public class MessageDispatcher {
             msg.what = MessageDispatcher.MSG_CHECK_HEARTBEAT;
             if(delayTime != 0) {
                 if(EGContext.HEARTBEAT_LAST_TIME_STMP == -1){
-                    EGContext.HEARTBEAT_LAST_TIME_STMP = SPHelper.getDefault(mContext).getLong(EGContext.HEARTBEAT_LAST_TIME,-1);
+                    EGContext.HEARTBEAT_LAST_TIME_STMP = SPHelper.getLongValueFromSP(mContext,EGContext.HEARTBEAT_LAST_TIME,-1);
                 }
                 delay = delayTime - (System.currentTimeMillis()- EGContext.HEARTBEAT_LAST_TIME_STMP);
                 sendMessage(msg, delay);
@@ -89,7 +89,7 @@ public class MessageDispatcher {
     }
     private void reTryUpload(){
         try {
-            if(SPHelper.getRetryTime(mContext) > 0 ){
+            if(SPHelper.getLongValueFromSP(mContext,EGContext.RETRYTIME,EGContext.FAIL_COUNT_DEFALUT) > 0 ){
                 UploadImpl.getInstance(mContext).reTryAndUpload(false);
             }
         }catch (Throwable t){
@@ -210,12 +210,12 @@ public class MessageDispatcher {
             }
             if(Build.VERSION.SDK_INT < 21){
                 if(shouldRemoveDelay){
-                    String lastOpenTime = SPHelper.getLastOpenTime(mContext);
+                    String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
                     if(TextUtils.isEmpty(lastOpenTime)){
                         lastOpenTime = "0";
                     }
                     long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
-                    SPHelper.setEndTime(mContext, randomCloseTime);
+                    SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME,randomCloseTime);
                     OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.NORMAL);
                     mHandler.removeMessages(msg.what);
                     sendMessage(msg,delayTime);
@@ -232,12 +232,12 @@ public class MessageDispatcher {
             }else if(Build.VERSION.SDK_INT > 20){
                 if(shouldRemoveDelay){
                     // 补充时间
-                    String lastOpenTime = SPHelper.getLastOpenTime(mContext);
+                    String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
                     if(TextUtils.isEmpty(lastOpenTime)){
                         lastOpenTime = "0";
                     }
                     long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
-                    SPHelper.setEndTime(mContext, randomCloseTime);
+                    SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME,randomCloseTime);
                     OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.NORMAL);
                     mHandler.removeMessages(msg.what);
                     sendMessage(msg,delayTime);
@@ -424,6 +424,8 @@ public class MessageDispatcher {
                         }else {
                             uploadInfo(delay ,false);
                         }
+                    }else{
+                        MessageDispatcher.getInstance(mContext).uploadInfo(PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE), false);
                     }
                     if(handler.hasMessages(MSG_OC_INFO)){
                         long delay = -1;
@@ -440,6 +442,8 @@ public class MessageDispatcher {
                         }else{
                             ocInfo(delay ,false);
                         }
+                    }else {
+                        MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE, false);
                     }
                     if(handler.hasMessages(MSG_LOCATION)){
                         if(EGContext.LOCATION_LAST_TIME_STMP == -1){
@@ -454,6 +458,8 @@ public class MessageDispatcher {
                         }else {
                             locationInfo(delay ,false);
                         }
+                    }else {
+                        MessageDispatcher.getInstance(mContext).locationInfo(EGContext.LOCATION_CYCLE,false);
                     }
                     if(handler.hasMessages(MSG_SNAPSHOT)){
                         if(EGContext.SNAPSHOT_LAST_TIME_STMP == -1){
@@ -465,6 +471,9 @@ public class MessageDispatcher {
                         }else {
                             snapshotInfo(delay ,false);
                         }
+                    }else {
+                        MessageDispatcher.getInstance(mContext)
+                                .snapshotInfo(EGContext.SNAPSHOT_CYCLE,false);
                     }
                 }else{
                     MessageDispatcher.getInstance(mContext).initModule();

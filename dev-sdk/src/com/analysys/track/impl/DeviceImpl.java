@@ -171,7 +171,7 @@ public class DeviceImpl {
         }
 
         if (!mac.equals(DEFALT_MAC)) {
-            SPHelper.getDefault(mContext).edit().putString(EGContext.SP_MAC_ADDRESS, mac).commit();
+            SPHelper.setStringValue2SP(mContext,EGContext.SP_MAC_ADDRESS, mac);
         }
         return mac;
     }
@@ -220,7 +220,7 @@ public class DeviceImpl {
                     if (buf.length() > 0) {
                         buf.deleteCharAt(buf.length() - 1);
                     }
-                    mac = buf.toString().toLowerCase(Locale.getDefault());
+                    mac = String.valueOf(buf).toLowerCase(Locale.getDefault());
                 }
             }
         } catch (Throwable t) {
@@ -276,7 +276,7 @@ public class DeviceImpl {
                     sb.append(line);
                 }
                 if (sb.length() > 0) {
-                    return sb.toString();
+                    return String.valueOf(sb);
                 }
             }
         } catch (Exception e) {
@@ -595,17 +595,6 @@ public class DeviceImpl {
         return null;
     }
 
-//    /**
-//     * 获取临时id
-//     */
-//    public String getTempID() {
-//        String id = SoftwareInfo.getInstance().getTempID();
-//        if (TextUtils.isEmpty(id)) {
-//            id = SPHelper.getDefault(mContext).getString(DeviceKeyContacts.DevInfo.TempID, "");
-//        }
-//        return id;
-//    }
-
     /**
      * 判断设备本身、APP、以及工作环境是否是被调试状态，“0”= 不在调试状态“1”= 在调试状态
      */
@@ -766,7 +755,7 @@ public class DeviceImpl {
         appendNumber(builder, 2, offsetMinutes / 60);
         builder.append(':');
         appendNumber(builder, 2, offsetMinutes % 60);
-        return builder.toString();
+        return String.valueOf(builder);
     }
 
     private void appendNumber(StringBuilder builder, int count, int value) {
@@ -935,12 +924,12 @@ public class DeviceImpl {
                     try {
                         AdvertisingIdClient.AdInfo adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);// 阻塞调用，需放在子线程处理
                         String advertisingId = adInfo.getId();
-                        SPHelper.getDefault(mContext).edit().putString(EGContext.SP_APP_IDFA, advertisingId).commit();
+                        SPHelper.setStringValue2SP(mContext,EGContext.SP_APP_IDFA, advertisingId);
                     } catch (Exception e) {
                     }
                 }
             }).start();
-            idfa = SPHelper.getDefault(mContext).getString(EGContext.SP_APP_IDFA, "");
+            idfa = SPHelper.getStringValueFromSP(mContext,EGContext.SP_APP_IDFA, "");
             if (!idfa.isEmpty()) {
                 return idfa;
             }
@@ -965,7 +954,7 @@ public class DeviceImpl {
             }
             sb.append(hex);
         }
-        return sb.toString();
+        return String.valueOf(sb);
     }
 
     private String stringArrayToString(String[] stringArray) {
@@ -977,14 +966,12 @@ public class DeviceImpl {
                 sb.append(stringArray[i]);
                 sb.append(",");
             }
-            result = sb.toString();
+            result = String.valueOf(sb);
             result = result.substring(0, result.length() - 1);
         } catch (Throwable t) {
             ELOG.e(t.getMessage() + " stringArrayToString has an exception.");
             return null;
         }
-
-        // ELOG.e(result.substring(0,result.length()-1)+" ::::::::::stringArrayToString");
         return result;
     }
 }

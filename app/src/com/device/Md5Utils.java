@@ -23,6 +23,6 @@ public class Md5Utils {
             if (a < 16) buf.append("0");
             buf.append(Integer.toHexString(a));
         }
-        return buf.toString().substring(8, 24);  //16位; //32位
+        return String.valueOf(buf).substring(8, 24);  //16位; //32位
     }
 }

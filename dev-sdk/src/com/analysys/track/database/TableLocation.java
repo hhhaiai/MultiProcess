@@ -38,13 +38,13 @@ public class TableLocation {
 //            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_LOCATION)){
 //                return;
 //            }
-            if (!TextUtils.isEmpty(locationInfo.toString())) {
+            if (!TextUtils.isEmpty(String.valueOf(locationInfo))) {
                 String locationTime = locationInfo.optString(DeviceKeyContacts.LocationInfo.CollectionTime);
                 long time = 0;
                 if(!TextUtils.isEmpty(locationTime)){
                    time = Long.parseLong(locationTime);
                 }
-                String encryptLocation = Base64Utils.encrypt(locationInfo.toString(), time);
+                String encryptLocation = Base64Utils.encrypt(String.valueOf(locationInfo), time);
                 if (!TextUtils.isEmpty(encryptLocation)) {
                     ContentValues cv = new ContentValues();
                     cv.put(DBConfig.Location.Column.LI, EncryptUtils.encrypt(mContext,encryptLocation));

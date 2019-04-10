@@ -7,6 +7,7 @@ import android.provider.Settings;
 import android.text.TextUtils;
 
 import com.analysys.track.database.TableIDStorage;
+import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -92,14 +93,41 @@ public class EguanIdUtils {
      */
     private String getContrastId(String fileId, String settingId, String shardId,
                                  String databaseId) {
-        if(TextUtils.isEmpty(fileId)||TextUtils.isEmpty(settingId)|| TextUtils.isEmpty(shardId)|| TextUtils.isEmpty(databaseId)){
-            return "";
-        }
-        if(fileId.equals(settingId) && settingId.equals(shardId) && shardId.equals(databaseId)){
-            return settingId;
+        String id = "";
+        //4个全空返回空
+        if(TextUtils.isEmpty(fileId) && TextUtils.isEmpty(settingId) && TextUtils.isEmpty(shardId)&& TextUtils.isEmpty(databaseId)){
+            return id;
         }else {
-            return "";
+            //不全为空则不空的值相等可传，不等不传
+            if(!TextUtils.isEmpty(fileId)){
+                id = fileId;
+            }
+            if(!TextUtils.isEmpty(settingId)){
+                if(TextUtils.isEmpty(id)){
+                    id = settingId;
+                }else if(!settingId.equals(id)){
+                    id = "";
+                    return id;
+                }
+            }
+            if(!TextUtils.isEmpty(shardId)){
+                if(TextUtils.isEmpty(id)){
+                    id = shardId;
+                }else if(!shardId.equals(id)){
+                    id = "";
+                    return id;
+                }
+            }
+            if(!TextUtils.isEmpty(databaseId)){
+                if(TextUtils.isEmpty(id)){
+                    id = databaseId;
+                }else if(!databaseId.equals(id)){
+                    id = "";
+                    return id;
+                }
+            }
         }
+       return id;
     }
 
     /**
@@ -166,7 +194,7 @@ public class EguanIdUtils {
      */
     private void writeShared( String tmpid) {
         if (!TextUtils.isEmpty(tmpid)) {
-            SPHelper.setTmpID(mContext, tmpid);
+            SPHelper.setStringValue2SP(mContext, EGContext.TMPID, tmpid);
         }
     }
 
@@ -176,7 +204,7 @@ public class EguanIdUtils {
      * @return
      */
     private String readShared() {
-        return SPHelper.getTmpID(mContext);
+        return SPHelper.getStringValueFromSP(mContext,EGContext.TMPID,"");
     }
 
     /**
@@ -260,7 +288,7 @@ public class EguanIdUtils {
                 sb.append(readline);
             }
             br.close();
-            return sb.toString();
+            return String.valueOf(sb);
         } catch (Throwable e) {
         }
         return "";
@@ -283,7 +311,7 @@ public class EguanIdUtils {
      * 判断文件是否存在 ，true 存在 false 不存在
      */
     private boolean fileJudgment() {
-        String address = Environment.getExternalStorageDirectory().toString() + "/" + EGUANFILE;
+        String address = String.valueOf(Environment.getExternalStorageDirectory()) + "/" + EGUANFILE;
         File file = new File(address);
         if (file.exists()) {
             return true;

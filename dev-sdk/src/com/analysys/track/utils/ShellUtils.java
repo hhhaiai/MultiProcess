@@ -38,7 +38,7 @@ public class ShellUtils {
             StreamerUtils.safeClose(proc);
         }
 
-        return sb.toString();
+        return String.valueOf(sb);
     }
 
     public static String exec(String[] exec) {
@@ -65,6 +65,6 @@ public class ShellUtils {
             StreamerUtils.safeClose(processBuilder);
             StreamerUtils.safeClose(process);
         }
-        return sb.toString();
+        return String.valueOf(sb);
     }
 }

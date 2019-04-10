@@ -20,9 +20,7 @@ public class AnalysysService extends Service {
     public void onCreate() {
         super.onCreate();
         ELOG.d("服务启动 进程ID：< " + Process.myPid() + " >");
-//        MessageDispatcher.getInstance(this).initModule();
         AnalysysInternal.getInstance(this);
-//        ServiceHelper.getInstance(this).startWork(this);
         MessageDispatcher.getInstance(this).initModule();
     }
 

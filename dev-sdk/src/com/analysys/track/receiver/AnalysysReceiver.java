@@ -7,8 +7,6 @@ import android.text.TextUtils;
 
 import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.impl.DeviceImpl;
-import com.analysys.track.impl.OCImpl;
-import com.analysys.track.impl.WifiImpl;
 import com.analysys.track.impl.proc.ProcessManager;
 import com.analysys.track.work.CheckHeartbeat;
 import com.analysys.track.work.MessageDispatcher;

@@ -43,7 +43,7 @@ public class TablePROC {
                     if(js == null) continue;
                     cv = new ContentValues();
                     cv.put(DBConfig.PROCInfo.Column.PARENT_ID_TIME, time);
-                    cv.put(DBConfig.PROCInfo.Column.CONTENT,EncryptUtils.encrypt(mContext,new String(Base64.encode(js.toString().getBytes(),Base64.DEFAULT))));
+                    cv.put(DBConfig.PROCInfo.Column.CONTENT,EncryptUtils.encrypt(mContext,new String(Base64.encode(String.valueOf(js).getBytes(),Base64.DEFAULT))));
                     list.add(cv);
                 }
             }

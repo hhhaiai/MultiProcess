@@ -4,6 +4,8 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.analysys.track.impl.DeviceImpl;
+import com.analysys.track.impl.PolicyImpl;
+import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -48,6 +50,7 @@ public class RequestUtils {
     byte[] buffer = new byte[1024];
     try {
 //        ELOG.i("value::::::::::"+ URLEncoder.encode(value,"UTF-8"));
+        String pl = PolicyImpl.getInstance(ctx).getSP().getString(DeviceKeyContacts.Response.RES_POLICY_VERSION,"0");
         urlP = new URL(url);
         connection = (HttpURLConnection) urlP.openConnection();
         connection.setDoInput(true);
@@ -56,14 +59,14 @@ public class RequestUtils {
         connection.setReadTimeout(EGContext.TIME_OUT_TIME);
         connection.setRequestMethod("POST");
         // 添加头信息
-        connection.setRequestProperty(EGContext.SDKV, SPHelper.getDefault(ctx).getString(EGContext.SDKV,""));
+        connection.setRequestProperty(EGContext.SDKV, SPHelper.getStringValueFromSP(ctx,EGContext.SDKV,""));
         connection.setRequestProperty(EGContext.DEBUG, DeviceImpl.getInstance(ctx).getDebug());
         connection.setRequestProperty(EGContext.APPKEY, SystemUtils.getAppKey(ctx));
-        connection.setRequestProperty(EGContext.TIME, SPHelper.getDefault(ctx).getString(EGContext.TIME , ""));
-        connection.setRequestProperty(EGContext.POLICYVER, "0");//策略覆盖
+        connection.setRequestProperty(EGContext.TIME, SPHelper.getStringValueFromSP(ctx,EGContext.TIME , ""));
+        connection.setRequestProperty(EGContext.POLICYVER, pl);//策略覆盖
         connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);//写死
-        ELOG.i("头文件字段：：：：：："+SPHelper.getDefault(ctx).getString(EGContext.SDKV,"")+"  debug::: "+ DeviceImpl.getInstance(ctx).getDebug()
-        +"APPKEY::: "+SystemUtils.getAppKey(ctx)+"   TIME:::   "+SPHelper.getDefault(ctx).getString(EGContext.TIME , ""));
+        ELOG.i("头文件字段：：：：：："+SPHelper.getStringValueFromSP(ctx,EGContext.SDKV,"")+"  debug::: "+ DeviceImpl.getInstance(ctx).getDebug()
+        +"APPKEY::: "+SystemUtils.getAppKey(ctx)+"   TIME:::   "+SPHelper.getStringValueFromSP(ctx,EGContext.TIME , ""));
         // 发送数据
         pw = new PrintWriter(connection.getOutputStream());
         pw.print(EGContext.UPLOAD_KEY_WORDS + "="+URLEncoder.encode(value,"UTF-8"));
@@ -177,6 +180,6 @@ public class RequestUtils {
       sb.append(line);
     }
     reader.close();
-    return sb.toString();
+    return String.valueOf(sb);
   }
 }

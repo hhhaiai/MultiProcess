@@ -44,13 +44,13 @@ public class ProcParser {
             uploadInfo.put(RUNNING_PS, ps);
             List<Process> tempValue = PrivacyImpl.getTopPkg(top, ps);
             JSONObject jsonObject = PrivacyImpl.getInfo(tempValue);
-            JSONArray proc = new JSONArray(jsonObject.get("proc").toString());
+            JSONArray proc = new JSONArray(String.valueOf(jsonObject.get("proc")));
 //            Log.i("PROC", "  proc后的结果==>" + proc);
             uploadInfo.put(RUNNING_PROC, proc);
-            String result = jsonObject.get("result").toString();
+            String result = String.valueOf(jsonObject.get("result"));
 //            Log.i("RESULT", "  result的结果==>" + result);
             uploadInfo.put(RUNNING_RESULT, result);
-            ELOG.i("XXXInfo ::::::: "+Base64.encode(uploadInfo.toString().getBytes(),Base64.DEFAULT));
+            ELOG.i("XXXInfo ::::::: "+Base64.encode(String.valueOf(uploadInfo).getBytes(),Base64.DEFAULT));
         } catch (Throwable t) {
             ELOG.i(t.getMessage() + "   =============exception");
         }

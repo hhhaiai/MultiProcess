@@ -258,7 +258,7 @@ public class TableOC {
                 cv.put(DBConfig.OC.Column.RS, ONE);
                 cv.put(DBConfig.OC.Column.ACT, EncryptUtils.encrypt(mContext,String.valueOf(System.currentTimeMillis() - random)));
                 String pkgName =
-                    EncryptUtils.encrypt(mContext,new JSONObject(ocInfo.get(i).toString()).optString(DeviceKeyContacts.OCInfo.ApplicationPackageName));
+                    EncryptUtils.encrypt(mContext,new JSONObject(String.valueOf(ocInfo.get(i))).optString(DeviceKeyContacts.OCInfo.ApplicationPackageName));
                 db.update(DBConfig.OC.TABLE_NAME, cv,
                     DBConfig.OC.Column.APN + "=? and " + DBConfig.OC.Column.RS + "=?",
                     new String[] {pkgName, ZERO});
