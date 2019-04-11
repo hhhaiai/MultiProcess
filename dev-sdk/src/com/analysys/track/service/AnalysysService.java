@@ -8,6 +8,7 @@ import android.os.Process;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.work.MessageDispatcher;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.work.ServiceHelper;
 
 public class AnalysysService extends Service {
 
@@ -21,7 +22,7 @@ public class AnalysysService extends Service {
         super.onCreate();
         ELOG.d("服务启动 进程ID：< " + Process.myPid() + " >");
         AnalysysInternal.getInstance(this);
-        MessageDispatcher.getInstance(this).initModule();
+        MessageDispatcher.getInstance(this).startService();
     }
 
     @Override
@@ -29,9 +30,9 @@ public class AnalysysService extends Service {
         return START_STICKY;
     }
 
-//    @Override
-//    public void onDestroy() {
-//        ServiceHelper.getInstance(this).stopWork(this);
-//        super.onDestroy();
-//    }
+    @Override
+    public void onDestroy() {
+        ServiceHelper.getInstance(this).stopWork();
+        super.onDestroy();
+    }
 }

@@ -15,6 +15,7 @@ import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.SystemUtils;
 
 import com.analysys.track.utils.reflectinon.EContextHelper;
+import com.analysys.track.utils.sp.SPHelper;
 
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
@@ -25,6 +26,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.PowerManager;
+import android.text.TextUtils;
 
 public class ServiceHelper {
     private Context mContext;
@@ -153,19 +155,36 @@ public class ServiceHelper {
         }
     }
 
-    public void stopWork(final Context context) {
-        stop(context);
+    public void stopWork() {
+        try {
+            if (SystemUtils.isMainThread()) {
+                EThreadPool.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        stop();
+                    }
+                });
+            } else {
+                stop();
+            }
+        } catch (Throwable t) {
+        }
+
     }
 
-    private void stop(Context context) {
+    private void stop() {
         try {
             if (Build.VERSION.SDK_INT >= 21) {
+                // startService(new Intent(context, MonitorService.class));
                 try {
-                    ServiceHelper.getInstance(mContext).stop(mContext);
+                    startJobService(mContext);
                 } catch (Throwable e) {
                 }
             } else {
-
+                ComponentName cn = new ComponentName(mContext, AnalysysService.class);
+                Intent intent = new Intent();
+                intent.setComponent(cn);
+                mContext.startService(intent);
             }
         } catch (Throwable e) {
         }
@@ -176,6 +195,13 @@ public class ServiceHelper {
             if (mContext == null) {
                 return;
             }
+            // 补充时间
+            String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
+            if(TextUtils.isEmpty(lastOpenTime)){
+                lastOpenTime = "0";
+            }
+            long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
+            SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME,randomCloseTime);
             OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.SERVICE_RESTART);
             ReceiverUtils.getInstance().registAllReceiver(mContext);
             PowerManager pm = (PowerManager)mContext.getSystemService(Context.POWER_SERVICE);
@@ -184,10 +210,17 @@ public class ServiceHelper {
             if (!isScreenOn) {
                 ReceiverUtils.getInstance().setWork(false);
             }
-            ComponentName cn = new ComponentName(mContext, AnalysysService.class);
-            Intent intent = new Intent();
-            intent.setComponent(cn);
-            mContext.startService(intent);
+            if (Build.VERSION.SDK_INT >= 21) {
+                try {
+                    startJobService(mContext);
+                } catch (Throwable e) {
+                }
+            } else {
+                ComponentName cn = new ComponentName(mContext, AnalysysService.class);
+                Intent intent = new Intent();
+                intent.setComponent(cn);
+                mContext.startService(intent);
+            }
         } catch (Throwable e) {
 
         }
