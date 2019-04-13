@@ -52,6 +52,9 @@ public class MessageDispatcher {
             msg.what = MessageDispatcher.MSG_INIT_MODULE;
             sendMessage(msg, 0);
         }catch (Throwable t){
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(t.getMessage());
+            }
         }
     }
 
@@ -70,6 +73,9 @@ public class MessageDispatcher {
                 sendMessage(msg,delayTime);
             }
         }catch (Throwable t){
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(t.getMessage());
+            }
         }
     }
 
@@ -85,6 +91,9 @@ public class MessageDispatcher {
             msg.what = MessageDispatcher.MSG_CHECK_RETRY;
             sendMessage(msg,delayTime);
         }catch (Throwable t){
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(t.getMessage());
+            }
         }
     }
     private void reTryUpload(){
@@ -93,6 +102,9 @@ public class MessageDispatcher {
                 UploadImpl.getInstance(mContext).reTryAndUpload(false);
             }
         }catch (Throwable t){
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(t.getMessage());
+            }
         }
     }
 
@@ -103,6 +115,9 @@ public class MessageDispatcher {
             msg.what = MessageDispatcher.MSG_START_SERVICE_SELF;
             sendMessage(msg, 0);
         }catch (Throwable t){
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(t.getMessage());
+            }
         }
 
     }
@@ -166,6 +181,9 @@ public class MessageDispatcher {
                 FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, time);
             }
         }catch (Throwable t){
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(t.getMessage());
+            }
         }
     }
 
@@ -195,7 +213,9 @@ public class MessageDispatcher {
 
             }
         }catch (Throwable t){
-            ELOG.e(" locationInfo :::: "+t.getMessage());
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(" locationInfo :::: "+t.getMessage());
+            }
         }
 
     }
@@ -260,7 +280,9 @@ public class MessageDispatcher {
             }
 
         }catch (Throwable t){
-            ELOG.e(t.getMessage()+"  异常");
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(t.getMessage()+"  异常");
+            }
         }
 
 
@@ -292,6 +314,9 @@ public class MessageDispatcher {
             }
 
         }catch (Throwable t){
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(t.getMessage());
+            }
         }
 
     }
@@ -479,7 +504,9 @@ public class MessageDispatcher {
                     MessageDispatcher.getInstance(mContext).initModule();
                 }
             }catch (Throwable t){
-                ELOG.e(t.getMessage());
+                if(EGContext.FLAG_DEBUG_INNER){
+                    ELOG.e(t.getMessage());
+                }
             }
 
         }
@@ -498,6 +525,9 @@ public class MessageDispatcher {
                 CheckHeartbeat.getInstance(mContext).sendMessages();
 //                CheckHeartbeat.getInstance(mContext).checkRetry();
             }catch (Throwable t){
+                if(EGContext.FLAG_DEBUG_INNER){
+                    ELOG.e(t.getMessage());
+                }
             }
         }
     }

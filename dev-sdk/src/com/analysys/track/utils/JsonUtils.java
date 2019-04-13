@@ -1,6 +1,7 @@
 package com.analysys.track.utils;
 
 import com.analysys.track.impl.PolicyImpl;
+import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.sp.SPHelper;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -27,7 +28,9 @@ public class JsonUtils {
                 }
             }
         } catch (Throwable e) {
-            ELOG.e("pushToJSON has an exception... =" + e.getMessage());
+            if(EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e("pushToJSON has an exception... =" + e.getMessage());
+            }
         }
     }
 

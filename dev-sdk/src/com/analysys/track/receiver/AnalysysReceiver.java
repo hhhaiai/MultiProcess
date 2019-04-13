@@ -87,6 +87,9 @@ public class AnalysysReceiver extends BroadcastReceiver {
                 MessageDispatcher.getInstance(mContext).startService();
             }
         }catch (Throwable t){
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(t.getMessage());
+            }
         }
     }
 
@@ -120,6 +123,9 @@ public class AnalysysReceiver extends BroadcastReceiver {
 //                OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.CLOSE_SCREEN);
             }
         } catch (Throwable e) {
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e.getMessage());
+            }
         }
     }
 }

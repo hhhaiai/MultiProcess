@@ -8,6 +8,7 @@ import android.text.TextUtils;
 
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.Base64Utils;
@@ -58,6 +59,9 @@ public class TableLocation {
                 }
             }
         } catch (Throwable e) {
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e.getMessage());
+            }
         }finally {
             DBManager.getInstance(mContext).closeDB();
         }
@@ -101,6 +105,9 @@ public class TableLocation {
             }
             db.setTransactionSuccessful();
         } catch (Throwable e) {
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e.getMessage());
+            }
         }finally {
             if(cursor != null){
                 cursor.close();
@@ -126,6 +133,9 @@ public class TableLocation {
 //            db.execSQL(sql);
             db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?", new String[]{INSERT_STATUS_READ_OVER});
         } catch (Throwable e) {
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e.getMessage());
+            }
         }finally {
             DBManager.getInstance(mContext).closeDB();
         }

@@ -62,6 +62,9 @@ public class AnalysysInternal {
                 }
             });
         } catch (Throwable t) {
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(t.getMessage());
+            }
         }
     }
 
@@ -124,6 +127,9 @@ public class AnalysysInternal {
             FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_LOCATION, EGContext.TIME_SYNC_OC_LOCATION);
 
         } catch (Throwable e) {
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e.getMessage());
+            }
         }
     }
 }

@@ -9,15 +9,14 @@ public class EGContext {
     /**
      * 用户debug控制
      */
-    public static boolean FLAG_DEBUG_USER = true;
-
+    public static boolean FLAG_DEBUG_USER = false;
     /**
      * SDK版本
      */
     public static final String SDK_VERSION = "4.3.0|20190225";
 
     public static final String LOGTAG_DEBUG = "xxx";
-
+    public static final String USER_TAG_DEBUG = "analysys";
     /**
      * xml 中声明的 appid、channel
      */

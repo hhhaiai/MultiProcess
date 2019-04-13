@@ -77,6 +77,9 @@ public class TableAppSnapshot {
             }
             db.insert(DBConfig.AppSnapshot.TABLE_NAME, null, getContentValues(snapshots));
         } catch (Throwable e) {
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e.getMessage());
+            }
         }finally {
             DBManager.getInstance(mContext).closeDB();
         }
@@ -127,6 +130,9 @@ public class TableAppSnapshot {
                 }
             }
         } catch (Throwable e) {
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e.getMessage());
+            }
         } finally {
             if (cursor != null)
                 cursor.close();
@@ -153,6 +159,9 @@ public class TableAppSnapshot {
             JsonUtils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
                     cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AHT)),DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
         } catch (Throwable e) {
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e.getMessage());
+            }
         }
         return jsonObj;
     }
@@ -171,6 +180,10 @@ public class TableAppSnapshot {
             db.update(DBConfig.AppSnapshot.TABLE_NAME, cv,
                 DBConfig.AppSnapshot.Column.APN + "= ? ", new String[] {EncryptUtils.encrypt(mContext,pkgName)});
         } catch (Throwable e) {
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e.getMessage());
+            }
+
         } finally {
             DBManager.getInstance(mContext).closeDB();
         }
@@ -196,6 +209,9 @@ public class TableAppSnapshot {
                 return true;
             }
         } catch (Throwable e) {
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e.getMessage());
+            }
         } finally {
             if (cursor != null)
                 cursor.close();
@@ -236,7 +252,9 @@ public class TableAppSnapshot {
 
             }
         } catch (Throwable e) {
-            ELOG.e(e+" select() ");
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e.getMessage());
+            }
         } finally {
             if (cursor != null){
                 cursor.close();
@@ -255,6 +273,9 @@ public class TableAppSnapshot {
             db.delete(DBConfig.AppSnapshot.TABLE_NAME, DBConfig.AppSnapshot.Column.AT + "=?", new String[] {EncryptUtils.encrypt(mContext,EGContext.SNAP_SHOT_UNINSTALL)});
 
         } catch (Throwable e) {
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e.getMessage());
+            }
         } finally {
             DBManager.getInstance(mContext).closeDB();
         }
@@ -273,6 +294,9 @@ public class TableAppSnapshot {
             db.update(DBConfig.AppSnapshot.TABLE_NAME, cv,
                     null, null);
         } catch (Throwable e) {
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e.getMessage());
+            }
         } finally {
             DBManager.getInstance(mContext).closeDB();
         }

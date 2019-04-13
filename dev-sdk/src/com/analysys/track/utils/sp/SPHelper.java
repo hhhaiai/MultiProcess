@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.text.TextUtils;
 
+import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.ELOG;
 
 
@@ -63,6 +64,9 @@ public class SPHelper {
                     try {
                         f.createNewFile();
                     } catch (IOException e) {
+                        if(EGContext.FLAG_DEBUG_INNER){
+                            ELOG.e(e.getMessage());
+                        }
                     }
                 }
                 ELOG.v("File[" + f.getAbsolutePath() + "]====>" + f.exists());
@@ -176,6 +180,9 @@ public class SPHelper {
             method.setAccessible(true);
             returnValue = method.invoke(o, args);
         } catch (Exception e) {
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e.getMessage());
+            }
         }
 
         return returnValue;

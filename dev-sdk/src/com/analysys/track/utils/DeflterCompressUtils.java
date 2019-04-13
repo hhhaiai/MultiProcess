@@ -35,7 +35,9 @@ public class DeflterCompressUtils {
             output = bos.toByteArray();
         } catch (Exception e) {
             output = data;
-            ELOG.e(e.getMessage()+"  compress has an exception.");
+            if(EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e.getMessage() + "  compress has an exception.");
+            }
         } finally {
             try {
                 bos.close();

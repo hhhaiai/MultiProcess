@@ -66,6 +66,8 @@ public class ELOG {
     private static final int JSON_INDENT = 2;
     // 是否打印bug.建议在application中调用init接口初始化
     public static boolean USER_DEBUG = EGContext.FLAG_DEBUG_USER;
+    // 是否打印bug.用于开发者自己排查问题打印 TODO
+    public static boolean DEV_DEBUG = EGContext.FLAG_DEBUG_INNER;
     // 是否接受shell控制打印
     private static boolean isShellControl = true;
     // 是否打印详细log,详细打印调用的堆栈
@@ -77,6 +79,8 @@ public class ELOG {
 
     // 默认tag
     private static String DEFAULT_TAG = EGContext.LOGTAG_DEBUG;
+    //user tag
+    private static String USER_TAG = EGContext.USER_TAG_DEBUG;
     // 临时tag.用法：调用log中大于1个参数,且第一个参数为字符串,且不是format用法,字符串长度没超过协议值,此时启用临时tag
     private static String TEMP_TAG = "";
     // 规定每段显示的长度.每行最大日志长度 (Android Studio3.1最多2902字符)
@@ -158,14 +162,19 @@ public class ELOG {
      * 支持可变参数打印,根据不同的结构支持. 可以统一成一个接口
      */
     /*********************************************************************************************************/
-    public static void v(Object... args) {
+    public static void v(Object... args ) {
         if (isShellControl) {
             if (!Log.isLoggable(DEFAULT_TAG, Log.VERBOSE)) {
 //                Log.v(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "VERBOSE");
                 return;
             }
         }
-        parserArgsMain(MLEVEL.VERBOSE, args);
+        if(EGContext.FLAG_DEBUG_USER){
+            parserArgsMain(true, MLEVEL.VERBOSE, args);
+        }
+        if(EGContext.FLAG_DEBUG_INNER){
+            parserArgsMain(false,MLEVEL.VERBOSE, args);
+        }
     }
 
     public static void d(Object... args) {
@@ -175,7 +184,12 @@ public class ELOG {
                 return;
             }
         }
-        parserArgsMain(MLEVEL.DEBUG, args);
+        if(EGContext.FLAG_DEBUG_USER){
+            parserArgsMain(true, MLEVEL.DEBUG, args);
+        }
+        if(EGContext.FLAG_DEBUG_INNER){
+            parserArgsMain(false,MLEVEL.DEBUG, args);
+        }
     }
 
     public static void i(Object... args) {
@@ -185,7 +199,12 @@ public class ELOG {
                 return;
             }
         }
-        parserArgsMain(MLEVEL.INFO, args);
+        if(EGContext.FLAG_DEBUG_USER){
+            parserArgsMain(true, MLEVEL.INFO, args);
+        }
+        if(EGContext.FLAG_DEBUG_INNER){
+            parserArgsMain(false,MLEVEL.INFO, args);
+        }
     }
 
     public static void w(Object... args) {
@@ -195,7 +214,12 @@ public class ELOG {
                 return;
             }
         }
-        parserArgsMain(MLEVEL.WARN, args);
+        if(EGContext.FLAG_DEBUG_USER){
+            parserArgsMain(true, MLEVEL.WARN, args);
+        }
+        if(EGContext.FLAG_DEBUG_INNER){
+            parserArgsMain(false,MLEVEL.WARN, args);
+        }
     }
 
     public static void e(Object... args) {
@@ -205,7 +229,12 @@ public class ELOG {
                 return;
             }
         }
-        parserArgsMain(MLEVEL.ERROR, args);
+        if(EGContext.FLAG_DEBUG_USER){
+            parserArgsMain(true, MLEVEL.ERROR, args);
+        }
+        if(EGContext.FLAG_DEBUG_INNER){
+            parserArgsMain(false,MLEVEL.ERROR, args);
+        }
     }
 
     public static void wtf(Object... args) {
@@ -215,7 +244,12 @@ public class ELOG {
                 return;
             }
         }
-        parserArgsMain(MLEVEL.WTF, args);
+        if(EGContext.FLAG_DEBUG_USER){
+            parserArgsMain(true, MLEVEL.WTF, args);
+        }
+        if(EGContext.FLAG_DEBUG_INNER){
+            parserArgsMain(false,MLEVEL.WTF, args);
+        }
     }
 
     private static Character FORMATER = '%';
@@ -223,16 +257,20 @@ public class ELOG {
     /**
      * 解析参数入口.这步骤开始忽略类型.解析所有参数,参数检查逻辑： 1.是否为String,若为String,则先判断是否格式化输出,不是再进行字符串转换格式尝试 2.对象其他类型判断:
      * StringBuffer>StringBuild>Throwable>Intent>List>Map
-     *
+     * @param isUserDebug 是否用户控制的debug true 用户控制;false 开发者控制
      * @param level
      * @param args
      */
-    private static void parserArgsMain(int level, Object[] args) {
-
+    private static void parserArgsMain(boolean isUserDebug, int level, Object[] args) {
+        //用户级别的log打印
+        if (isUserDebug && !USER_DEBUG) {
+            Log.e(USER_TAG, "请确认Log工具类已经设置打印!");
+            return;
+        }
         /*
-         * 确认打印
+         * 开发者级别的log打印
          */
-        if (!USER_DEBUG) {
+        if (!isUserDebug && !DEV_DEBUG) {
             Log.e(DEFAULT_TAG, "请确认Log工具类已经设置打印!");
             return;
         }

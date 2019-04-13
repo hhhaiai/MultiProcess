@@ -1,5 +1,6 @@
 package com.analysys.track.database;
 
+import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
@@ -38,7 +39,9 @@ public class DBManager {
                 db = dbHelper.getWritableDatabase();
             }
         }catch (Throwable t){
-            ELOG.i("openDB()   "+t.getMessage());
+            if(EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i("openDB()   " + t.getMessage());
+            }
         }
         return db;
     }
@@ -51,7 +54,10 @@ public class DBManager {
             }
 
         } catch (Throwable t){
-            ELOG.i("closeDB "+t.getMessage());
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e("closeDB "+t.getMessage());
+            }
+
         }
 //        finally {
 //            db = null;

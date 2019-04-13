@@ -92,7 +92,10 @@ public class UploadImpl {
                 reTryAndUpload(true);
             }
         } catch (Throwable t) {
-            ELOG.i("upload has an exception:::" + t.getMessage());
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e("upload has an exception:::" + t.getMessage());
+            }
+
         }finally {
             MessageDispatcher.getInstance(mContext).uploadInfo(PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE), false);
         }
@@ -164,7 +167,9 @@ public class UploadImpl {
                                 handleUpload(url, messageEncrypt(uploadInfo));
                             }
                         } catch (Throwable t) {
-                            ELOG.i("EThreadPool has an exception:::" + t.getMessage());
+                            if(EGContext.FLAG_DEBUG_INNER) {
+                                ELOG.e("EThreadPool has an exception:::" + t.getMessage());
+                            }
                         }
                     }
                 });
@@ -203,11 +208,15 @@ public class UploadImpl {
                         handleUpload(url, messageEncrypt(uploadInfo));
                     }
                 } catch (Throwable t) {
-                    ELOG.i("EThreadPool upload has an exception:::" + t.getMessage());
+                    if(EGContext.FLAG_DEBUG_INNER) {
+                        ELOG.e("EThreadPool upload has an exception:::" + t.getMessage());
+                    }
                 }
             }
         } catch (Throwable t) {
-            ELOG.e("发送逻辑问题"+t.getMessage());
+            if(EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e("发送逻辑问题" + t.getMessage());
+            }
         }
     }
     /**
@@ -250,7 +259,9 @@ public class UploadImpl {
             }
         } catch (Throwable e) {
             // Log.getStackTraceString(e);
-            ELOG.e(e+"getInfo()");
+            if(EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e + "getInfo()");
+            }
         }
         return String.valueOf(object);
     }
@@ -279,7 +290,9 @@ public class UploadImpl {
                 return new String(returnData).replace("\n", "");
             }
         } catch (Throwable t) {
-            ELOG.i("messageEncrypt has an exception." + t.getMessage());
+            if(EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e("messageEncrypt has an exception." + t.getMessage());
+            }
         }
 
         return null;
@@ -330,6 +343,9 @@ public class UploadImpl {
                 return;
             }
         } catch (Throwable e) {
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e.getMessage());
+            }
         }
     }
 
@@ -423,7 +439,9 @@ public class UploadImpl {
 
             }
         } catch (Throwable e) {
-            ELOG.i("getUploadXXXInfos :::"+e.getMessage());
+            if(EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e("getUploadXXXInfos :::" + e.getMessage());
+            }
         }
         return arr;
     }
@@ -459,6 +477,9 @@ public class UploadImpl {
             }
             TableOC.getInstance(mContext).delete();
         }catch (Throwable t){
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(t.getMessage());
+            }
         }
     }
     /**
@@ -476,6 +497,9 @@ public class UploadImpl {
             long time = SystemUtils.intervalTime(mContext);//多久重试
             SPHelper.setLongValue2SP(mContext,EGContext.RETRYTIME,time);
         }catch (Throwable t){
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(t.getMessage());
+            }
         }
 
     }

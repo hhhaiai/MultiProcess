@@ -55,7 +55,9 @@ public class TableOC {
             cv.put(DBConfig.OC.Column.CU, 1);//可有可无，暂时赋值
             db.insert(DBConfig.OC.TABLE_NAME, null, cv);
         } catch (Exception e) {
-            ELOG.e(e.getMessage() + " ::::::insert()");
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e.getMessage() + " ::::::insert()");
+            }
         }finally {
             DBManager.getInstance(mContext).closeDB();
         }
@@ -98,7 +100,10 @@ public class TableOC {
                 db.setTransactionSuccessful();
             }
         } catch (Throwable e) {
-            ELOG.e(e + "  :::::insertArray() has an exception");
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e + "  :::::insertArray() has an exception");
+            }
+
         } finally {
             if(db != null){
                 db.endTransaction();
@@ -129,7 +134,10 @@ public class TableOC {
                 new String[] {EncryptUtils.encrypt(mContext,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName)), day,
                     String.valueOf(timeInterval), ZERO});
         } catch (Throwable e) {
-            ELOG.e(e+ "update() ..");
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e+ "update() ..");
+            }
+
         }finally {
             DBManager.getInstance(mContext).closeDB();
         }
@@ -148,7 +156,10 @@ public class TableOC {
                 cv.put(DBConfig.OC.Column.ACT, act);
             }
         } catch (Throwable t) {
-            ELOG.e(t.getMessage() + "   ::::getContentValuesForUpdate");
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(t.getMessage() + "   ::::getContentValuesForUpdate");
+            }
+
         }
         return cv;
     }
@@ -181,7 +192,9 @@ public class TableOC {
                 cv.put(DBConfig.OC.Column.RS, TextUtils.isEmpty(act) ? ZERO:ONE );//正在运行为1
             }
         } catch (Throwable t) {
-            ELOG.e(t.getMessage() + "   ::::getContentValues");
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(t.getMessage() + "   ::::getContentValues");
+            }
         }
         return cv;
     }
@@ -228,7 +241,9 @@ public class TableOC {
                 array.put(jsonObject);
             }
         } catch (Throwable e) {
-            ELOG.e(e+"  selectRunning ..");
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e+"  selectRunning ..");
+            }
         }finally {
             if(cursor != null){
                 cursor.close();
@@ -265,7 +280,10 @@ public class TableOC {
             }
             db.setTransactionSuccessful();
         } catch (Throwable e) {
-            ELOG.e(e+"  updateRunState ");
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e+"  updateRunState ");
+            }
+
         } finally {
             if(db != null){
                 db.endTransaction();
@@ -306,7 +324,10 @@ public class TableOC {
             }
             db.setTransactionSuccessful();
         } catch (Throwable e) {
-            ELOG.e(e+"  updateStopState ..");
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e+"  updateStopState ..");
+            }
+
         } finally {
             if(db != null){
                 db.endTransaction();
@@ -348,7 +369,9 @@ public class TableOC {
                 }
             }
         } catch (Exception e) {
-            ELOG.e(e+" getIntervalApps ");
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e+" getIntervalApps ");
+            }
         }finally {
             if (cursor != null){
                 cursor.close();
@@ -419,7 +442,9 @@ public class TableOC {
             }
              db.setTransactionSuccessful();
         } catch (Exception e) {
-            ELOG.e(e.getMessage() + "    :::::::exception ");
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e.getMessage() + "    :::::::exception ");
+            }
         } finally {
             if (cursor != null){
                 cursor.close();
@@ -489,7 +514,9 @@ public class TableOC {
             }
             db.setTransactionSuccessful();
         } catch (Exception e) {
-            ELOG.e(e.getMessage() + "    :::::::exception ");
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e.getMessage() + "    :::::::exception ");
+            }
         } finally {
             if (cursor != null){
                 cursor.close();
@@ -508,6 +535,9 @@ public class TableOC {
                 return;
             db.delete(DBConfig.OC.TABLE_NAME, DBConfig.OC.Column.ST + "=?", new String[] {ONE});
         } catch (Throwable e) {
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e.getMessage());
+            }
         } finally {
             DBManager.getInstance(mContext).closeDB();
         }
