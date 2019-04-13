@@ -13,10 +13,13 @@ import java.lang.reflect.Method;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import com.analysys.track.impl.proc.DoubleCardSupport;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.model.BatteryModuleNameInfo;
 import com.analysys.track.utils.ELOG;
@@ -413,25 +416,24 @@ public class DeviceImpl {
     }
 
     /**
-     * 多卡IMEI
+     * 获取IMEI,一个或者两个.需要优化完善.未兼容三卡
      */
-    public String getIMEIS() {
+    public String getIMEIS(Context context) {
         try {
-            TelephonyManager tm = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
-            Class<?> clazz = tm.getClass();
-            Method getImei = clazz.getDeclaredMethod("getImei", int.class);
-            Object imei1 = getImei.invoke(tm, 0);
-            Object imei2 = getImei.invoke(tm, 1);
-            if (imei1 != null && imei2 != null) {
-                return imei1 + "|" + imei2;
-            } else if (imei1 == null && imei2 == null) {
-                return "";
-            } else {
-                if (imei1 == null) {
-                    return String.valueOf(imei2);
-                } else {
-                    return String.valueOf(imei1);
+            List<String> imeis = new ArrayList<String>();
+            DoubleCardSupport.getIMEIS(context, imeis);
+            if (imeis.size() > 0) {
+                StringBuffer sb = new StringBuffer();
+                for (String ime : imeis) {
+                    // 防止电信MEID为空。 典型Lg
+                    if (!"00000000000000".equals(ime) && !"00000000".equals(ime) && !"000000000000000".equals(ime)) {
+                        sb.append(ime).append("|");
+                    }
                 }
+                if (sb.length() > 0) {
+                    sb.deleteCharAt(sb.length() - 1);
+                }
+                return String.valueOf(sb);
             }
         } catch (Throwable e) {
         }
@@ -441,28 +443,21 @@ public class DeviceImpl {
     /**
      * 多卡IMSI
      */
-    public String getIMSIS() {
-        TelephonyManager telephony;
-        Class<?> telephonyClass;
+    public String getIMSIS(Context context) {
         try {
-            telephony = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
-            telephonyClass = Class.forName(telephony.getClass().getName());
-            Method m2 = telephonyClass.getMethod("getSubscriberId", new Class[] {int.class});
-            Object imsi1 = m2.invoke(telephony, 0);
-            Object imsi2 = m2.invoke(telephony, 1);
-            if (imsi1 != null && imsi2 != null) {
-                if (!imsi1.equals(imsi2))
-                    return imsi1 + "|" + imsi2;
-                else
-                    return imsi1 + "";
-            } else if (imsi1 == null && imsi2 == null) {
-                return "";
-            } else {
-                if (imsi1 == null) {
-                    return String.valueOf(imsi2);
-                } else {
-                    return String.valueOf(imsi1);
+            List<String> imsis = new ArrayList<String>();
+            DoubleCardSupport.getIMSIS(context, imsis);
+            if (imsis.size() > 0) {
+                StringBuffer sb = new StringBuffer();
+                for (String ims : imsis) {
+                    if (!"00000000000000".equals(ims) && !"00000000".equals(ims) && !"000000000000000".equals(ims)) {
+                        sb.append(ims).append("|");
+                    }
                 }
+                if (sb.length() > 0) {
+                    sb.deleteCharAt(sb.length() - 1);
+                }
+                return String.valueOf(sb);
             }
         } catch (Throwable e) {
         }

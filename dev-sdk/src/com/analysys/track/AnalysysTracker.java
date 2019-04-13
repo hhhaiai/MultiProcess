@@ -11,11 +11,11 @@ public class AnalysysTracker {
     /**
      * 初始化SDK
      * @param context
-     * @param key
+     * @param appKey
      * @param channel
      */
-  public static void init(final Context context, final String key, final String channel) {
-      AnalysysInternal.getInstance(context).initEguan(key, channel);
+  public static void init(Context context, String appKey, String channel) {
+      AnalysysInternal.getInstance(context).initEguan(appKey, channel);
   }
 
     /**

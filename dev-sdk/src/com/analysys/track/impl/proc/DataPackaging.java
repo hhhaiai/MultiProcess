@@ -48,8 +48,8 @@ public class DataPackaging {
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.MobileOperatorName, devImpl.getMobileOperatorName(),DataController.SWITCH_OF_MOBILE_OPERATOR_NAME);
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.NetworkOperatorCode, devImpl.getNetworkOperatorCode(),DataController.SWITCH_OF_NETWORK_OPERATOR_CODE);
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.NetworkOperatorName, devImpl.getNetworkOperatorName(),DataController.SWITCH_OF_NETWORK_OPERATOR_NAME);
-            JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Imeis, devImpl.getIMEIS(),DataController.SWITCH_OF_IMEIS);
-            JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Imsis, devImpl.getIMSIS(),DataController.SWITCH_OF_IMSIS);
+            JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Imeis, devImpl.getIMEIS(mContext),DataController.SWITCH_OF_IMEIS);
+            JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Imsis, devImpl.getIMSIS(mContext),DataController.SWITCH_OF_IMSIS);
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationChannel, devImpl.getApplicationChannel(),DataController.SWITCH_OF_APPLICATION_CHANNEL);
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationKey, devImpl.getApplicationKey(),DataController.SWITCH_OF_APPLICATION_KEY);
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationName, devImpl.getApplicationName(),DataController.SWITCH_OF_APPLICATION_NAME);
