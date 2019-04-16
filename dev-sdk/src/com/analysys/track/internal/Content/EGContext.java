@@ -28,7 +28,7 @@ public class EGContext {
     // 应用列表获取周期时间,3个小时
     public static final int SNAPSHOT_CYCLE = 3 * 60 * 60 * 1000;
     public static final String SP_SNAPSHOT_CYCLE = "SP_SNAPSHOT_CYCLE";
-    // 位置获取周期时间
+    // 位置获取周期时间,30min
     public static final int LOCATION_CYCLE = 30 * 60* 1000;
     public static final String SP_LOCATION_CYCLE = "SP_LOCATION_CYCLE";
     // 应用打开关闭获取周期时间

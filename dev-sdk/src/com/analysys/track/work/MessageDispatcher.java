@@ -201,16 +201,15 @@ public class MessageDispatcher {
             }else{
                 if(!mHandler.hasMessages(msg.what)){
                     delay = delayTime - (System.currentTimeMillis()- EGContext.LOCATION_LAST_TIME_STMP);
-                    if(delayTime <= 0 || delay <= 0) {
-                        long time = System.currentTimeMillis();
-                        EGContext.LOCATION_LAST_TIME_STMP = time;
-                        FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, time);
-                    }
                     sendMessage(msg, delay);
                 }else {
                     return;
                 }
-
+            }
+            if(delayTime <= 0 || delay <= 0) {
+                long time = System.currentTimeMillis();
+                EGContext.LOCATION_LAST_TIME_STMP = time;
+                FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, time);
             }
         }catch (Throwable t){
             if(EGContext.FLAG_DEBUG_INNER){

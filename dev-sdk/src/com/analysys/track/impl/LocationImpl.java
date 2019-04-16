@@ -95,6 +95,8 @@ public class LocationImpl {
                 mTelephonyManager = AnalysysPhoneStateListener.getInstance(mContext).getTelephonyManager();
             }
             JSONObject location = getLocation();
+//            String log =Log.getStackTraceString(new Exception("采集完毕"));
+//            Log.i("xxx.log", SystemUtils.getCurrentProcessName(mContext)+ Thread.currentThread().getName()+log);
             if (location != null) {
                 TableLocation.getInstance(mContext).insert(location);
             }

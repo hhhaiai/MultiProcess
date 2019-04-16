@@ -14,6 +14,7 @@ import java.util.zip.ZipFile;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.ActivityManager;
 import android.app.AppOpsManager;
 import android.app.KeyguardManager;
 import android.content.Context;
@@ -454,5 +455,21 @@ public class SystemUtils {
             closeTime = (long) (Math.random() * (currentTime - openTime) + openTime);
         }
         return closeTime;
+    }
+    public static String getCurrentProcessName(Context context) {
+        try {
+            int pid = android.os.Process.myPid();
+            ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            for (ActivityManager.RunningAppProcessInfo info : am.getRunningAppProcesses()) {
+                if (info.pid == pid) {
+                    return info.processName;
+                }
+            }
+        } catch (Throwable e) {
+//            if (Config.EG_DEBUG) {
+//                ELog.e(PubConfigInfo.DEVICE_TAG, Log.getStackTraceString(e));
+//            }
+        }
+        return "";
     }
 }
