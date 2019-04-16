@@ -40,7 +40,7 @@ public class RequestUtils {
    * HTTP
    */
   public static String httpRequest(String url, String value , Context ctx) {
-    ELOG.i("URL ::::::::::"+ url);
+    ELOG.i("当前发送的URL ::::::::::"+url);
     String response = "";
     URL urlP;
     HttpURLConnection connection;
@@ -65,7 +65,7 @@ public class RequestUtils {
         connection.setRequestProperty(EGContext.TIME, SPHelper.getStringValueFromSP(ctx,EGContext.TIME , ""));
         connection.setRequestProperty(EGContext.POLICYVER, pl);//策略覆盖
         connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);//写死
-        ELOG.i("头文件字段：：：：：："+SPHelper.getStringValueFromSP(ctx,EGContext.SDKV,"")+"  debug::: "+ DeviceImpl.getInstance(ctx).getDebug()
+        ELOG.i("本次发送头文件字段：：：：：："+SPHelper.getStringValueFromSP(ctx,EGContext.SDKV,"")+"  debug::: "+ DeviceImpl.getInstance(ctx).getDebug()
         +"APPKEY::: "+SystemUtils.getAppKey(ctx)+"   TIME:::   "+SPHelper.getStringValueFromSP(ctx,EGContext.TIME , ""));
         // 发送数据
         pw = new PrintWriter(connection.getOutputStream());

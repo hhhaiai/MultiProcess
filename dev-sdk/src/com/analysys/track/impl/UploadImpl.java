@@ -32,6 +32,8 @@ import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Process;
 import android.text.TextUtils;
 import android.util.Base64;
 
@@ -63,11 +65,11 @@ public class UploadImpl {
         try {
             //TODO 测试下线程名字，判断子线程or主线程，应该子线程，测试是否会导致同级别的卡顿
             if(EGContext.NETWORK_TYPE_NO_NET.equals(NetworkUtils.getNetworkType(mContext))){
-//                ELOG.i("第一次可能return的地方");
+                ELOG.i("upload无网return，进程Id：< " + Process.myPid() + " >");
                 return;
             }
             if (SPHelper.getIntValueFromSP(mContext,EGContext.REQUEST_STATE,0) != 0) {
-//                ELOG.i("第2次可能return的地方");
+                ELOG.i("upload有正在发送的数据return，进程Id：< " + Process.myPid() + " >");
                 return;
             }
             File dir = mContext.getFilesDir();
@@ -78,7 +80,7 @@ public class UploadImpl {
                 long dur = now - time;
                 //Math.abs(dur)
                 if ( dur <= PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE)) {
-//                    ELOG.i("第3次可能return的地方");
+                    ELOG.i("upload时间轮询周期不到，return，进程Id：< " + Process.myPid() + " >");
                     return;
                 }
             } else {
@@ -86,7 +88,7 @@ public class UploadImpl {
                 f.setLastModified(now);
             }
             boolean isDurOK = (now - SPHelper.getLongValueFromSP(mContext,EGContext.LASTQUESTTIME,0)) > PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE);
-             ELOG.i("---------即将发送数据isDurOK：" + isDurOK);
+             ELOG.i("---------upload发送时机符合上传条件，即将发送数据isDurOK：" + isDurOK);
             if (isDurOK) {
                 f.setLastModified(now);
                 reTryAndUpload(true);
@@ -101,17 +103,16 @@ public class UploadImpl {
         }
     }
     public void reTryAndUpload(boolean isNormalUpload){
-        ELOG.i("进入reTryAndUpload");
         int failNum = SPHelper.getIntValueFromSP(mContext,EGContext.FAILEDNUMBER,0);
-//        ELOG.i(failNum+"  ：：：： failNum");
+        int maxFailCount = PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT,EGContext.FAIL_COUNT_DEFALUT);
+        long faildTime = SPHelper.getLongValueFromSP(mContext,EGContext.FAILEDTIME,0);
+        long retryTime = SPHelper.getLongValueFromSP(mContext,EGContext.RETRYTIME, EGContext.FAIL_COUNT_DEFALUT);
         if (isNormalUpload) {
             doUpload();
-        }else if (!isNormalUpload && failNum > 0 && (failNum < PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT,EGContext.FAIL_COUNT_DEFALUT))
-                && (System.currentTimeMillis() - SPHelper.getLongValueFromSP(mContext,EGContext.FAILEDTIME,0) > SPHelper.getLongValueFromSP(mContext,EGContext.RETRYTIME, EGContext.FAIL_COUNT_DEFALUT))) {
-//            ELOG.i(failNum+"  ：：：： failNum");
+        }else if (!isNormalUpload && failNum > 0 && (failNum < maxFailCount)
+                && (System.currentTimeMillis() - faildTime> retryTime)) {
             doUpload();
-        } else if(!isNormalUpload && failNum> 0 && (failNum == PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT,EGContext.FAIL_COUNT_DEFALUT))){
-//            ELOG.i(failNum+"  ：：：： failNum2");
+        } else if(!isNormalUpload && failNum> 0 && (failNum == maxFailCount)){
             doUpload();
             //上传失败次数
             SPHelper.setIntValue2SP(mContext,EGContext.FAILEDNUMBER,0);
@@ -125,97 +126,76 @@ public class UploadImpl {
         isChunkUpload = false;
         try {
             // 如果时间超过一天，并且当前是可网络请求状态，则先上传开发者配置请求，然后上传数据
-            ELOG.i("进入doUpload");
             SPHelper.setIntValue2SP(mContext,EGContext.REQUEST_STATE,EGContext.sBeginResuest);
             final int serverDelayTime = PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_SERVER_DELAY,EGContext.SERVER_DELAY_DEFAULT);
             if (SystemUtils.isMainThread()) {
-                // 策略处理
-                EThreadPool.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            if(serverDelayTime > 0){
-                                Thread.sleep(serverDelayTime);
-                            }
-                            String uploadInfo = getInfo();
-                            ELOG.i("uploadInfo111 ::::  " + uploadInfo);
-                            if (TextUtils.isEmpty(uploadInfo)) {
-                                return;
-                            }
-                            boolean isDebugMode = SPHelper.getBooleanValueFromSP(mContext,EGContext.DEBUG, false);
-                            boolean userRTP = PolicyInfo.getInstance().isUseRTP() == 0 ? true : false;
-                            String url = "";
-                            if (isDebugMode) {
-                                url = EGContext.TEST_URL;
-                            } else {
-                                if (userRTP) {
-                                    boolean userRTL = PolicyInfo.getInstance().isUseRTL() == 1 ? true : false;
-                                    if(userRTL){
-                                        url = EGContext.USERTP_URL;
-                                    }
-                                }
-                            }
-                            handleUpload(url, messageEncrypt(uploadInfo));
-                            // 3. 兼容多次分包的上传
-                            while (isChunkUpload) {
-                                ELOG.i("isChunkUpload  " + isChunkUpload);
-                                uploadInfo = getInfo();
-//                                if(!isChunkUpload){
-//                                    return;
-//                                }
-                                ELOG.i("uploadInfo分包 ::::  " + uploadInfo);
-                                handleUpload(url, messageEncrypt(uploadInfo));
-                            }
-                        } catch (Throwable t) {
-                            if(EGContext.FLAG_DEBUG_INNER) {
-                                ELOG.e("EThreadPool has an exception:::" + t.getMessage());
-                            }
+                if(serverDelayTime > 0){
+                    // 策略处理
+                    EThreadPool.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            doUploadImpl();
                         }
-                    }
-                });
+                    },serverDelayTime);
+                }else {
+                    // 策略处理
+                    EThreadPool.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            doUploadImpl();
+                        }
+                    });
+                }
             } else {
-                try {
-                    if(serverDelayTime > 0){
-                        Thread.sleep(serverDelayTime);
-                    }
-                    if(EGContext.NETWORK_TYPE_NO_NET.equals(NetworkUtils.getNetworkType(mContext))){
-                        return;
-                    }
-                    String uploadInfo = getInfo();
-                    ELOG.i("uploadInfo222 ::::  " + uploadInfo);
-                    if (TextUtils.isEmpty(uploadInfo)) {
-                        return;
-                    }
-                    boolean isDebugMode = SPHelper.getBooleanValueFromSP(mContext,EGContext.DEBUG, false);
-                    boolean userRTP = PolicyInfo.getInstance().isUseRTP() == 0 ? true : false;
-                    String url = PolicyImpl.getInstance(mContext).getSP().getString(EGContext.APP_URL_SP,EGContext.NORMAL_APP_URL);
-                    if (isDebugMode) {
-                        url = EGContext.TEST_URL;
-                    } else {
-                        if (userRTP) {
-                            url = EGContext.USERTP_URL;
+                if(serverDelayTime > 0){
+                    new Handler().postDelayed(new Runnable(){
+                        public void run() {
+                            doUploadImpl();
                         }
-                    }
-                    handleUpload(url, messageEncrypt(uploadInfo));
-                    // 3. 兼容多次分包的上传
-                    while (isChunkUpload) {
-                        ELOG.i("isChunkUpload2  " + isChunkUpload);
-                        uploadInfo = getInfo();
-//                        if(!isChunkUpload){
-//                            return;
-//                        }
-                        ELOG.i("uploadInfo2 ::::  " + uploadInfo);
-                        handleUpload(url, messageEncrypt(uploadInfo));
-                    }
-                } catch (Throwable t) {
-                    if(EGContext.FLAG_DEBUG_INNER) {
-                        ELOG.e("EThreadPool upload has an exception:::" + t.getMessage());
-                    }
+                    }, serverDelayTime);
+                }else{
+                    doUploadImpl();
                 }
             }
         } catch (Throwable t) {
             if(EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e("发送逻辑问题" + t.getMessage());
+            }
+        }
+    }
+    private void doUploadImpl(){
+        try {
+            String uploadInfo = getInfo();
+            ELOG.i("发送一次uploadInfo ::::"+uploadInfo);
+            if (TextUtils.isEmpty(uploadInfo)) {
+                return;
+            }
+            boolean isDebugMode = SPHelper.getBooleanValueFromSP(mContext,EGContext.DEBUG, false);
+            boolean userRTP = PolicyInfo.getInstance().isUseRTP() == 0 ? true : false;
+            String url = PolicyImpl.getInstance(mContext).getSP().getString(EGContext.APP_URL_SP,EGContext.NORMAL_APP_URL);;
+            if (isDebugMode) {
+                url = EGContext.TEST_URL;
+            } else {
+                if (userRTP) {
+                    boolean userRTL = PolicyInfo.getInstance().isUseRTL() == 1 ? true : false;
+                    if(userRTL){
+                        url = EGContext.USERTP_URL;
+                    }
+                }
+            }
+            handleUpload(url, messageEncrypt(uploadInfo));
+            int failNum = SPHelper.getIntValueFromSP(mContext,EGContext.FAILEDNUMBER,0);
+            int maxFailCount = PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT,EGContext.FAIL_COUNT_DEFALUT);
+            // 3. 兼容多次分包的上传
+            while (isChunkUpload && failNum < maxFailCount) {
+                ELOG.i("是否分包发送:::  " + isChunkUpload);
+                uploadInfo = getInfo();
+                ELOG.i("uploadInfo分包发送 ::::  "+uploadInfo);
+                handleUpload(url, messageEncrypt(uploadInfo));
+            }
+        } catch (Throwable t) {
+            if(EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e("EThreadPool has an exception:::" + t.getMessage());
             }
         }
     }
@@ -260,7 +240,7 @@ public class UploadImpl {
         } catch (Throwable e) {
             // Log.getStackTraceString(e);
             if(EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e + "getInfo()");
+                ELOG.e(e.getMessage() + "getInfo()");
             }
         }
         return String.valueOf(object);
@@ -281,7 +261,7 @@ public class UploadImpl {
                 key_inner = EGContext.ORIGINKEY_STRING;
             }
             key = DeflterCompressUtils.makeSercretKey(key_inner, mContext);
-            ELOG.i("key：：：：：：" + key);
+            ELOG.i("uploadInfo加密key::::" + key);
 
             byte[] def = DeflterCompressUtils.compress(URLEncoder.encode(URLEncoder.encode(msg)).getBytes("UTF-8"));
             byte[] encryptMessage = AESUtils.encrypt(def, key.getBytes("UTF-8"));
@@ -306,7 +286,7 @@ public class UploadImpl {
      */
     private void analysysReturnJson(String json) {
         try {
-            ELOG.i("json   :::::::::" + json);
+            ELOG.i("uploadInfo返回值json::::::::" + json);
             if (!TextUtils.isEmpty(json)) {
                 // 返回413，表示包太大，大于1M字节，本地直接删除
                 if (EGContext.HTTP_DATA_OVERLOAD.equals(json)) {
@@ -324,8 +304,11 @@ public class UploadImpl {
                         return;
                     }
                     if (EGContext.HTTP_RETRY.equals(code)) {
-                        PolicyImpl.getInstance(mContext)
-                            .saveRespParams(object.optJSONObject(DeviceKeyContacts.Response.RES_POLICY));
+                        int numb = SPHelper.getIntValueFromSP(mContext,EGContext.FAILEDNUMBER,0);
+                        if(numb == 0){
+                            PolicyImpl.getInstance(mContext)
+                                    .saveRespParams(object.optJSONObject(DeviceKeyContacts.Response.RES_POLICY));
+                        }
                         uploadFailure(mContext);
                         CheckHeartbeat.getInstance(mContext).checkRetry();
                         return;
@@ -355,10 +338,11 @@ public class UploadImpl {
         if (TextUtils.isEmpty(result)) {
             return;
         }else if("-1".equals(result)){
-            ELOG.i("失败一次");
+            ELOG.i("uploadInfo发生异常一次");
             //上传失败次数
             SPHelper.setIntValue2SP(mContext,EGContext.FAILEDNUMBER,SPHelper.getIntValueFromSP(mContext,EGContext.FAILEDNUMBER,0)+1);
             CheckHeartbeat.getInstance(mContext).checkRetry();
+            return;
         }
         analysysReturnJson(result);
     }
@@ -369,7 +353,7 @@ public class UploadImpl {
         JSONArray jsonArray = new JSONArray();
         try {
             jsonArray = TableXXXInfo.getInstance(mContext).select();
-            ELOG.i("条数 ：：：：： "+jsonArray.length());
+            ELOG.i("XXXInfo条数::::"+jsonArray.length());
             if (jsonArray == null ||jsonArray.length() <= 0) {
                 isChunkUpload = false;
                 return arr;
@@ -460,7 +444,7 @@ public class UploadImpl {
             SPHelper.setLongValue2SP(mContext,EGContext.LASTQUESTTIME, System.currentTimeMillis());
             //重置发送失败次数与时间
             SPHelper.setIntValue2SP(mContext,EGContext.FAILEDNUMBER,0);
-            ELOG.i("设置failnumber:::"+ SPHelper.getIntValueFromSP(mContext,EGContext.FAILEDNUMBER,0));
+            ELOG.i("uploadSuccess设置failnumber:::"+ SPHelper.getIntValueFromSP(mContext,EGContext.FAILEDNUMBER,0));
             SPHelper.setLongValue2SP(mContext,EGContext.FAILEDTIME,0);
             SPHelper.setLongValue2SP(mContext,EGContext.RETRYTIME,0);
             //上传完成回来清理数据的时候，snapshot删除卸载的，其余的统一恢复成正常值
@@ -486,7 +470,7 @@ public class UploadImpl {
      * 数据上传失败 记录信息
      */
     private void uploadFailure(Context mContext) {
-        ELOG.i("failure");
+        ELOG.i("uploadFailure");
         try {
             SPHelper.setIntValue2SP(mContext,EGContext.REQUEST_STATE,EGContext.sPrepare);
             //上传失败记录上传次数

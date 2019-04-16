@@ -22,7 +22,7 @@ public class AnalysysService extends Service {
         super.onCreate();
         ELOG.d("服务启动 进程ID：< " + Process.myPid() + " >");
         AnalysysInternal.getInstance(this);
-        MessageDispatcher.getInstance(this).startService();
+        MessageDispatcher.getInstance(this).initModule();
     }
 
     @Override

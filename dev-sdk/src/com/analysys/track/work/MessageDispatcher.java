@@ -523,6 +523,9 @@ public class MessageDispatcher {
                 uploadInfo(0,false);
 //            ServiceHelper.getInstance(mContext).registerReceiver();
                 CheckHeartbeat.getInstance(mContext).sendMessages();
+                if(ELOG.USER_DEBUG){
+                    ELOG.info("初始化完成");
+                }
 //                CheckHeartbeat.getInstance(mContext).checkRetry();
             }catch (Throwable t){
                 if(EGContext.FLAG_DEBUG_INNER){

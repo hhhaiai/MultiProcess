@@ -169,9 +169,6 @@ public class ELOG {
                 return;
             }
         }
-        if(EGContext.FLAG_DEBUG_USER){
-            parserArgsMain(true, MLEVEL.VERBOSE, args);
-        }
         if(EGContext.FLAG_DEBUG_INNER){
             parserArgsMain(false,MLEVEL.VERBOSE, args);
         }
@@ -183,9 +180,6 @@ public class ELOG {
 //                Log.d(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "DEBUG");
                 return;
             }
-        }
-        if(EGContext.FLAG_DEBUG_USER){
-            parserArgsMain(true, MLEVEL.DEBUG, args);
         }
         if(EGContext.FLAG_DEBUG_INNER){
             parserArgsMain(false,MLEVEL.DEBUG, args);
@@ -199,23 +193,27 @@ public class ELOG {
                 return;
             }
         }
-        if(EGContext.FLAG_DEBUG_USER){
-            parserArgsMain(true, MLEVEL.INFO, args);
-        }
         if(EGContext.FLAG_DEBUG_INNER){
             parserArgsMain(false,MLEVEL.INFO, args);
         }
     }
-
+    public static void info(Object... args) {
+        if (isShellControl) {
+            if (!Log.isLoggable(USER_TAG, Log.INFO)) {
+//                Log.i(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "INFO");
+                return;
+            }
+        }
+        if(EGContext.FLAG_DEBUG_USER){
+            parserArgsMain(true, MLEVEL.INFO, args);
+        }
+    }
     public static void w(Object... args) {
         if (isShellControl) {
             if (!Log.isLoggable(DEFAULT_TAG, Log.WARN)) {
 //                Log.w(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "WARN");
                 return;
             }
-        }
-        if(EGContext.FLAG_DEBUG_USER){
-            parserArgsMain(true, MLEVEL.WARN, args);
         }
         if(EGContext.FLAG_DEBUG_INNER){
             parserArgsMain(false,MLEVEL.WARN, args);
@@ -229,9 +227,6 @@ public class ELOG {
                 return;
             }
         }
-        if(EGContext.FLAG_DEBUG_USER){
-            parserArgsMain(true, MLEVEL.ERROR, args);
-        }
         if(EGContext.FLAG_DEBUG_INNER){
             parserArgsMain(false,MLEVEL.ERROR, args);
         }
@@ -243,9 +238,6 @@ public class ELOG {
                 Log.wtf(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "ASSERT");
                 return;
             }
-        }
-        if(EGContext.FLAG_DEBUG_USER){
-            parserArgsMain(true, MLEVEL.WTF, args);
         }
         if(EGContext.FLAG_DEBUG_INNER){
             parserArgsMain(false,MLEVEL.WTF, args);
@@ -262,19 +254,20 @@ public class ELOG {
      * @param args
      */
     private static void parserArgsMain(boolean isUserDebug, int level, Object[] args) {
+        String tag = DEFAULT_TAG;
         //用户级别的log打印
-        if (isUserDebug && !USER_DEBUG) {
-            Log.e(USER_TAG, "请确认Log工具类已经设置打印!");
-            return;
+        if (isUserDebug) {
+            tag = USER_TAG;
+            if(!USER_DEBUG){
+                Log.e(tag, "请确认Log工具类已经设置打印!");
+                return;
+            }
+        }else{
+            if(!DEV_DEBUG){
+                Log.e(DEFAULT_TAG, "请确认Log工具类已经设置打印!");
+                return;
+            }
         }
-        /*
-         * 开发者级别的log打印
-         */
-        if (!isUserDebug && !DEV_DEBUG) {
-            Log.e(DEFAULT_TAG, "请确认Log工具类已经设置打印!");
-            return;
-        }
-
         StringBuilder sb = new StringBuilder();
         // 开始
 
@@ -371,7 +364,7 @@ public class ELOG {
             sb.append(content_title_end);
         }
         // 打印字符
-        preparePrint(level, sb.toString());
+        preparePrint(tag,level, sb.toString());
 
     }
 
@@ -1291,10 +1284,10 @@ public class ELOG {
      * @param level
      * @param msg
      */
-    private static void preparePrint(int level, String msg) {
-        String tag = DEFAULT_TAG;
+    private static void preparePrint(String tag ,int level, String msg) {
+        String TAG = tag;
         if (!TextUtils.isEmpty(TEMP_TAG)) {
-            tag = TEMP_TAG;
+            TAG = TEMP_TAG;
         }
 
         if (msg.length() > LOG_MAXLENGTH) {
@@ -1306,10 +1299,10 @@ public class ELOG {
                     sb = new StringBuilder();
                 }
                 if (sb.length() + line.length() >= LOG_MAXLENGTH) {
-                    realPrint(level, tag, wrapperString(String.valueOf(sb)));
+                    realPrint(level, TAG, wrapperString(String.valueOf(sb)));
                     sb = new StringBuilder();
                     if (line.length() >= LOG_MAXLENGTH) {
-                        realPrint(level, tag, wrapperString(line));
+                        realPrint(level, TAG, wrapperString(line));
                     } else {
                         sb.append(line);
                     }
@@ -1324,11 +1317,11 @@ public class ELOG {
                 }
             }
             if (sb != null) {
-                realPrint(level, tag, wrapperString(String.valueOf(sb)));
+                realPrint(level, TAG, wrapperString(String.valueOf(sb)));
                 sb = null;
             }
         } else {
-            realPrint(level, tag, wrapperString(msg));
+            realPrint(level, TAG, wrapperString(msg));
         }
         TEMP_TAG = "";
     }
