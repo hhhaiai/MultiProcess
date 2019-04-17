@@ -79,28 +79,38 @@ public class OCImpl {
      */
     private void processOC() {
         try {
+            if(!ProcessManager.getIsCollected()){
+                ELOG.i("屏幕关闭，不收集");
+                return;
+            }
+            ELOG.i("屏幕开启，正常收集");
             if(!PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC,true)){
                 return;
             }
             // 亮屏幕工作
             if (SystemUtils.isScreenOn(mContext)) {
-                fillData();
+//                fillData();
                 if (!SystemUtils.isScreenLocked(mContext)) {
                     if (!AccessibilityHelper.isAccessibilitySettingsOn(mContext, AnalysysAccessibilityService.class)) {
                         getInfoByVersion();
                     }
                 }
-            }else{//TODO 黑屏补充数据，待验证
-                String openApp = SPHelper.getStringValueFromSP(mContext,EGContext.LASTAPPNAME, "");
-                if (!TextUtils.isEmpty(openApp)) {
-                    // 补充时间
-                    String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
-                    if(TextUtils.isEmpty(lastOpenTime)){
-                        lastOpenTime = "0";
+            }else{
+                if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24){
+                    //TODO 黑屏补充数据，待验证
+                    String openApp = SPHelper.getStringValueFromSP(mContext,EGContext.LASTAPPNAME, "");
+                    if (!TextUtils.isEmpty(openApp)) {
+                        // 补充时间
+                        String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
+                        if(TextUtils.isEmpty(lastOpenTime)){
+                            lastOpenTime = "0";
+                        }
+                        long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
+                        SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME,randomCloseTime);
+                        ELOG.i("黑屏补充数据系列");
+                        filterInsertOCInfo(EGContext.CLOSE_SCREEN);
+                        fillData();
                     }
-                    long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
-                    SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME,randomCloseTime);
-                    filterInsertOCInfo(EGContext.CLOSE_SCREEN);
                 }
             }
         } catch (Throwable t) {
@@ -116,13 +126,18 @@ public class OCImpl {
      * 为了保险起见，如果屏幕亮屏紧随解锁屏，则在正常状态下进行一批的补数操作
      *
      */
-    private void fillData(){
+    public void fillData(){
         //TODO 按逻辑注释
+        ELOG.i("ocInfo 5&6系统进入补数逻辑...");
         JSONArray fillDataArray = null;
         int blankCount = 0;
         try {
             JSONArray runningApps = TableOC.getInstance(mContext).selectRunning();
+            if(runningApps == null || runningApps.length() < 1){
+                return;
+            }
             JSONObject json = null;
+            fillDataArray = new JSONArray();
             List list = SystemUtils.getDiffNO(runningApps.length());
             int random;
             for (int i = 0;i < runningApps.length(); i++) {
@@ -133,6 +148,7 @@ public class OCImpl {
                 random = (Integer)list.get(i);
                 String openTime = json.optString(DeviceKeyContacts.OCInfo.ApplicationOpenTime);
                 long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(openTime));
+//                ELOG.i("    random ::::::" + random);
                 if(randomCloseTime == -1){//小于5min的频繁的开锁屏不做处理
                     continue;
                 }
@@ -152,7 +168,7 @@ public class OCImpl {
             // 一次应用操作闭合，更新OCCunt表，打开次数、应用运行状态
             TableOC.getInstance(mContext).updateStopState(fillDataArray);
         }catch (Throwable t){
-
+            ELOG.i(t.getMessage()+"fillData");
         }
 
     }
@@ -283,22 +299,22 @@ public class OCImpl {
         if (TextUtils.isEmpty(lastPkgName)) {
             ProcessManager.saveSP(mContext,ocJson);
         } else {
-            String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
-            if(TextUtils.isEmpty(lastOpenTime)){
-                lastOpenTime = "0";
-            }
-            long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
-//            ELOG.i(randomCloseTime+"  = randomCloseTime");
-            if(randomCloseTime == -1){
-                return;
-            }
-            //1.非首次打开，之前有pkgName缓存,设置当前时间往前推一点为结束时间
-            SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME,randomCloseTime);
-            //2.入库当前的缓存appTime
-            filterInsertOCInfo(EGContext.APP_SWITCH);
-            // 3.如果打开的包名与缓存的包名不一致，更新新pkgName到sp
             if (!packageName.equals(lastPkgName)) {
                  ELOG.i("=======切换包名。即将保存"+packageName+"  OLD "+lastPkgName);
+                String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
+                if(TextUtils.isEmpty(lastOpenTime)){
+                    lastOpenTime = "0";
+                }
+                long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
+//            ELOG.i(randomCloseTime+"  = randomCloseTime");
+                if(randomCloseTime == -1){
+                    return;
+                }
+                //1.非首次打开，之前有pkgName缓存,设置当前时间往前推一点为结束时间
+                SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME,randomCloseTime);
+                //2.入库当前的缓存appTime
+                filterInsertOCInfo(EGContext.APP_SWITCH);
+                // 3.如果打开的包名与缓存的包名不一致，更新新pkgName到sp
                 ProcessManager.saveSP(mContext,ocJson);
             }
         }
@@ -310,7 +326,7 @@ public class OCImpl {
      */
     private void getProcApps() {
         JSONArray cacheApps = TableOC.getInstance(mContext).selectRunning();//结束时间为空，则为正在运行的app
-        ELOG.i(cacheApps + "   :::::::: cacheApps");
+//        ELOG.i(cacheApps + "   :::::::: cacheApps");
         Set<String> nameSet = ProcessManager.getRunningForegroundApps(mContext);
         if(nameSet == null){
             ELOG.i("XXXINFO没取到数据");
@@ -325,7 +341,7 @@ public class OCImpl {
                         ocArray.put(getOCInfo(pkgName.replaceAll(" ", ""), EGContext.OC_COLLECTION_TYPE_PROC));
                     }
                 }
-                ELOG.i("getProcApps 280:::::" + ocArray);
+//                ELOG.i("getProcApps 280:::::" + ocArray);
                 TableOC.getInstance(mContext).insertArray(ocArray);
             } else {
                 // 去重
@@ -355,7 +371,9 @@ public class OCImpl {
                 }
             }
         } catch (Throwable t) {
-            ELOG.i("getProcApps has an exception :::" + t.getMessage());
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.i("getProcApps has an exception :::" + t.getMessage());
+            }
         }
     }
 
@@ -467,7 +485,7 @@ public class OCImpl {
                 }
                 if (runList != null && runList.length() > 0) {
                     // 新增该时段没有记录的应用信息
-                    ELOG.i("addCache:::::" + runList);
+//                    ELOG.i("addCache:::::" + runList);
                     TableOC.getInstance(mContext).insertArray(runList);
                 }
             }
@@ -601,6 +619,7 @@ public class OCImpl {
         String appVersion = SPHelper.getStringValueFromSP(mContext,EGContext.LASTAPPVERSION,"");
         String openTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
         Long closeTime = SPHelper.getLongValueFromSP(mContext,EGContext.ENDTIME, 0);
+        ELOG.i("oc读到的sp里close时间:::"+closeTime);
         String appType = SPHelper.getStringValueFromSP(mContext,EGContext.APP_TYPE, "");
         if (TextUtils.isEmpty(OldPkgName) || TextUtils.isEmpty(appName) || TextUtils.isEmpty(appVersion)
             || TextUtils.isEmpty(openTime)) {
@@ -614,7 +633,7 @@ public class OCImpl {
                 ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, OldPkgName);
                 ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationOpenTime, openTime);
                 ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime, closeTime);
-
+                ELOG.i("put进去数据库的close时间:::"+closeTime);
                 ocInfo.put(DeviceKeyContacts.OCInfo.NetworkType, NetworkUtils.getNetworkType(mContext));
                 ocInfo.put(DeviceKeyContacts.OCInfo.CollectionType, "1");
                 ocInfo.put(DeviceKeyContacts.OCInfo.SwitchType, switchType);
@@ -643,11 +662,12 @@ public class OCImpl {
                 ELOG.e(t.getMessage()+"  filterInsertOCInfo has an exc");
             }
         }
-//        SPHelper.setLastOpenPackgeName(mContext, "");
-//        SPHelper.setLastOpenTime(mContext, "");
-//        SPHelper.setLastAppName(mContext, "");
-//        SPHelper.setLastAppVerison(mContext, "");
-//        SPHelper.setAppType(mContext,"");
+        //置空
+        SPHelper.setStringValue2SP(mContext,EGContext.LASTPACKAGENAME,"");
+        SPHelper.setStringValue2SP(mContext,EGContext.LASTAPPNAME, "");
+        SPHelper.setStringValue2SP(mContext,EGContext.LASTAPPVERSION,"");
+        SPHelper.setStringValue2SP(mContext,EGContext.LASTOPENTIME, "");
+        SPHelper.setStringValue2SP(mContext,EGContext.APP_TYPE, "");
     }
 
     /**

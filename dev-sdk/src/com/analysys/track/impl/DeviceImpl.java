@@ -15,8 +15,10 @@ import java.net.SocketException;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
 
 import com.analysys.track.impl.proc.DoubleCardSupport;
@@ -60,6 +62,7 @@ public class DeviceImpl {
 
     private final String ZERO = "0";
     private final String ONE = "1";
+    private final String[] IMSIS = {"00000000000000", "00000000","000000000000000"};
 
     private static class Holder {
         private static final DeviceImpl INSTANCE = new DeviceImpl();
@@ -426,7 +429,7 @@ public class DeviceImpl {
                 StringBuffer sb = new StringBuffer();
                 for (String ime : imeis) {
                     // 防止电信MEID为空。 典型Lg
-                    if (!"00000000000000".equals(ime) && !"00000000".equals(ime) && !"000000000000000".equals(ime)) {
+                    if (!defaultImsis().contains(ime)) {
                         sb.append(ime).append("|");
                     }
                 }
@@ -450,7 +453,7 @@ public class DeviceImpl {
             if (imsis.size() > 0) {
                 StringBuffer sb = new StringBuffer();
                 for (String ims : imsis) {
-                    if (!"00000000000000".equals(ims) && !"00000000".equals(ims) && !"000000000000000".equals(ims)) {
+                    if (!defaultImsis().contains(ims)) {
                         sb.append(ims).append("|");
                     }
                 }
@@ -471,7 +474,13 @@ public class DeviceImpl {
     public String getApplicationChannel() {
         return SystemUtils.getAppChannel(mContext);
     }
-
+    private Set<String> defaultImsis(){
+        Set<String> imsis = new HashSet<String>();
+        for(String imsi : IMSIS){
+            imsis.add(imsi);
+        }
+        return imsis;
+    }
     /**
      * 样本应用key
      */

@@ -310,7 +310,9 @@ public class TableOC {
             for (int i = 0; i < ocInfo.length(); i++) {
                 obj = (JSONObject)ocInfo.get(i);
                 String pkgName = EncryptUtils.encrypt(mContext,obj.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName));
-                String act = EncryptUtils.encrypt(mContext,obj.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime));
+                String actTime = obj.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime);
+                ELOG.i("入库解析出的act:::"+actTime);
+                String act = EncryptUtils.encrypt(mContext,actTime);
                 String switchType = obj.optString(DeviceKeyContacts.OCInfo.SwitchType);
                 if(TextUtils.isEmpty(switchType)){
                     switchType = EGContext.APP_SWITCH;
@@ -405,6 +407,7 @@ public class TableOC {
                     return ocJar;
                 }
                 act = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.ACT)));
+                ELOG.i("db读取出的act的值:::::"+act);
                 if (TextUtils.isEmpty(act) || "".equals(act)){//closeTime为空，则继续循环，只取closeTime有值的信息
                     continue;
                 }

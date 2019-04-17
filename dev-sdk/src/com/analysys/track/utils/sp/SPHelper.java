@@ -34,7 +34,6 @@ public class SPHelper {
      */
     public static SharedPreferences getDefault(Context context) {
         if(res == null){
-            //TODO
             res = getInstance(context, DEFAULT_PREFERENCE);
         }
         return res;
@@ -216,7 +215,7 @@ public class SPHelper {
      * @param value
      */
     public static void setStringValue2SP(Context ctx,String key,String value){
-        if(TextUtils.isEmpty(key) || TextUtils.isEmpty(value)){
+        if(TextUtils.isEmpty(key)){
             return;
         }
         getEditor(ctx).putString(key, value).apply();

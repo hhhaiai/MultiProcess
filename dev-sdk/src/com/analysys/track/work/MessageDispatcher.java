@@ -227,15 +227,15 @@ public class MessageDispatcher {
             if(EGContext.OC_LAST_TIME_STMP == -1){
                 EGContext.OC_LAST_TIME_STMP = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_OC);
             }
-            if(Build.VERSION.SDK_INT < 21){
+            if(Build.VERSION.SDK_INT < 21){//4.X
                 if(shouldRemoveDelay){
-                    String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
-                    if(TextUtils.isEmpty(lastOpenTime)){
-                        lastOpenTime = "0";
-                    }
-                    long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
-                    SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME,randomCloseTime);
-                    OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.NORMAL);
+//                    String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
+//                    if(TextUtils.isEmpty(lastOpenTime)){
+//                        lastOpenTime = "0";
+//                    }
+//                    long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
+//                    SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME,randomCloseTime);
+//                    OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.NORMAL);
                     mHandler.removeMessages(msg.what);
                     sendMessage(msg,delayTime);
                 }else{
@@ -244,29 +244,29 @@ public class MessageDispatcher {
 //                        ELOG.i("DELAY 一次 ocInfo....."+delay);
                         sendMessage(msg, delay);
                     }else{
-                        ELOG.i("HAS ocInfo.....");
+                        ELOG.i("oc轮询发现有正在轮询的ocInfo.....");
                         return;
                     }//队列里有同样的msg 在等着delay，则不做任何操作，否则，发送msg
                 }
-            }else if(Build.VERSION.SDK_INT > 20){
+            }else if(Build.VERSION.SDK_INT > 20){//5.0以上
                 if(shouldRemoveDelay){
-                    // 补充时间
-                    String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
-                    if(TextUtils.isEmpty(lastOpenTime)){
-                        lastOpenTime = "0";
-                    }
-                    long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
-                    SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME,randomCloseTime);
-                    OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.NORMAL);
+//                    // 补充时间
+//                    String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
+//                    if(TextUtils.isEmpty(lastOpenTime)){
+//                        lastOpenTime = "0";
+//                    }
+//                    long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
+//                    SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME,randomCloseTime);
+//                    OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.NORMAL);
+//                    OCImpl.getInstance(mContext).fillData();//批量入库补数
                     mHandler.removeMessages(msg.what);
                     sendMessage(msg,delayTime);
                 }else {
                     if(!mHandler.hasMessages(msg.what)){
                         delay = delayTime - (System.currentTimeMillis() - EGContext.OC_LAST_TIME_STMP);
-                        ELOG.i("DELAY 一次 ocInfo....."+delay);
                         sendMessage(msg, delay);
                     }else{
-                        ELOG.i("HAS ocInfo.....");
+                        ELOG.i("oc轮询发现有正在轮询的ocInfo.....");
                         return;
                     }//队列里有同样的msg 在等着delay，则不做任何操作，否则，发送msg
                 }
@@ -275,7 +275,6 @@ public class MessageDispatcher {
                 long time = System.currentTimeMillis();
                 EGContext.OC_LAST_TIME_STMP = time;
                 FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_OC,time);
-                ELOG.i("记录时间"+time);
             }
 
         }catch (Throwable t){

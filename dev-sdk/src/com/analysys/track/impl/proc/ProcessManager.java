@@ -23,6 +23,9 @@ public class ProcessManager {
     public static void setIsCollected(boolean isCollected) {
         ProcessManager.isCollected = isCollected;
     }
+    public static boolean getIsCollected(){
+        return isCollected;
+    }
 
     public static Set<String> getRunningForegroundApps(Context ctx) {
         Set<String> nameSet = null;

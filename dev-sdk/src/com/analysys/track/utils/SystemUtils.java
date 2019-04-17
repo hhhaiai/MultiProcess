@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.PowerManager;
@@ -451,9 +452,16 @@ public class SystemUtils {
     public static long calculateCloseTime(long openTime) {
         long currentTime = System.currentTimeMillis();
         long closeTime = -1;
-        if (currentTime - openTime > EGContext.DEFAULT_SPACE_TIME) {
-            closeTime = (long) (Math.random() * (currentTime - openTime) + openTime);
+        if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24){
+            if (currentTime - openTime > EGContext.DEFAULT_SPACE_TIME) {
+                closeTime = (long) (Math.random() * (currentTime - openTime) + openTime);
+            }
+        }else if(Build.VERSION.SDK_INT < 21){
+            if (currentTime - openTime > EGContext.OC_CYCLE) {
+                closeTime = (long) (Math.random() * (currentTime - openTime) + openTime);
+            }
         }
+
         return closeTime;
     }
     public static String getCurrentProcessName(Context context) {

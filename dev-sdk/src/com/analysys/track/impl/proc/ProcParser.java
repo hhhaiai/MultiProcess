@@ -50,7 +50,7 @@ public class ProcParser {
             String result = String.valueOf(jsonObject.get("result"));
 //            Log.i("RESULT", "  result的结果==>" + result);
             uploadInfo.put(RUNNING_RESULT, result);
-            ELOG.i("XXXInfo ::::::: "+Base64.encode(String.valueOf(uploadInfo).getBytes(),Base64.DEFAULT));
+//            ELOG.i("XXXInfo ::::::: "+Base64.encode(String.valueOf(uploadInfo).getBytes(),Base64.DEFAULT));
         } catch (Throwable t) {
             ELOG.i(t.getMessage() + "   =============exception");
         }
