@@ -1,6 +1,8 @@
 package com.analysys.track.impl;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -272,6 +274,9 @@ public class LocationImpl {
 
     /**
      * 基站信息
+     * 1.判断权限
+     * 2.周围基站最多前五
+     * 3.GSM or CDMA 基站信息
      * @return
      */
     public JSONArray getBaseStationInfo() {
@@ -290,13 +295,21 @@ public class LocationImpl {
                     ELOG.i("LocationInfo:获取周围基站信息list:"+list != null ?list.size():null);
                     if(list != null && list.size()>0) {
                         baseStationSort(list);
+                        int tempCid = -1;
+                        Set<Integer> cid = new HashSet<Integer>();
                         for (int i = 0; i < list.size(); i++) {
-                            if (i < 5) {
-                                JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, list.get(i).getLac(), DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                                JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, list.get(i).getCid(), DataController.SWITCH_OF_CELL_ID);
-                                JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, list.get(i).getRssi(), DataController.SWITCH_OF_BS_LEVEL);
-                                jsonArray.put(jsonObject);
-                                ELOG.i("LocationInfo:获取周围基站信息list:"+jsonArray);
+                            if (cid.size() < 5) {
+                                NeighboringCellInfo info =list.get(i);
+                                tempCid = info.getCid();
+                                ELOG.i("xxx.local","LocationInfo:获取周围基站信息当前tempCid::"+tempCid+"======>" +info.toString());
+                                if(!cid.contains(tempCid)){
+                                    cid.add(tempCid);
+                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, info.getLac(), DataController.SWITCH_OF_LOCATION_AREA_CODE);
+                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, info.getCid(), DataController.SWITCH_OF_CELL_ID);
+                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, info.getRssi(), DataController.SWITCH_OF_BS_LEVEL);
+                                    jsonArray.put(jsonObject);
+                                    ELOG.i("xxx.local","LocationInfo:获取周围基站信息list:"+jsonArray);
+                                }
                             }
                         }
                     }
