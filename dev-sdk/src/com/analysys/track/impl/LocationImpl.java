@@ -286,7 +286,6 @@ public class LocationImpl {
             if(mTelephonyManager == null){
                 return jsonArray;
             }
-            jsonObject = new JSONObject();
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 ELOG.i(" LocationInfo:checkPermission is true");
                 jsonArray = new JSONArray();
@@ -301,9 +300,10 @@ public class LocationImpl {
                             if (cid.size() < 5) {
                                 NeighboringCellInfo info =list.get(i);
                                 tempCid = info.getCid();
-                                ELOG.i("xxx.local","LocationInfo:获取周围基站信息当前tempCid::"+tempCid+"======>" +info.toString());
+                                ELOG.i("xxx.local","LocationInfo:获取周围基站信息当前tempCid::"+tempCid);
                                 if(!cid.contains(tempCid)){
                                     cid.add(tempCid);
+                                    jsonObject = new JSONObject();
                                     JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, info.getLac(), DataController.SWITCH_OF_LOCATION_AREA_CODE);
                                     JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, info.getCid(), DataController.SWITCH_OF_CELL_ID);
                                     JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, info.getRssi(), DataController.SWITCH_OF_BS_LEVEL);
