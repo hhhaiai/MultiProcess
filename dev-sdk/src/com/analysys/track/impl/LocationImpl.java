@@ -282,6 +282,7 @@ public class LocationImpl {
     public JSONArray getBaseStationInfo() {
         JSONArray jsonArray = null;
         JSONObject jsonObject = null;
+        Set<Integer> cid = null;
         try {
             if(mTelephonyManager == null){
                 return jsonArray;
@@ -294,8 +295,9 @@ public class LocationImpl {
                     ELOG.i("LocationInfo:获取周围基站信息list:"+list != null ?list.size():null);
                     if(list != null && list.size()>0) {
                         baseStationSort(list);
+                        ELOG.i("LocationInfo:获取周围基站信息排序去重后list:"+list!=null?list.size():null);
                         int tempCid = -1;
-                        Set<Integer> cid = new HashSet<Integer>();
+                        cid = new HashSet<Integer>();
                         for (int i = 0; i < list.size(); i++) {
                             if (cid.size() < 5) {
                                 NeighboringCellInfo info =list.get(i);
@@ -324,24 +326,32 @@ public class LocationImpl {
                     if(location != null){
                         if(location instanceof GsmCellLocation) {
                             gcl = (GsmCellLocation)location;
+                            jsonObject = new JSONObject();
                             if(gcl != null){
+                                ELOG.i("GsmCellLocation里的参数值："+gcl.getCid()+" "+gcl.getLac()+" "+gcl.getPsc());
                                 //获取当前基站信息
-                                JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, gcl.getLac(),DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                                JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, gcl.getCid(),DataController.SWITCH_OF_CELL_ID);
-                                JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, gcl.getPsc(),DataController.SWITCH_OF_BS_LEVEL);
-                                jsonArray.put(jsonObject);
-                                ELOG.i("LocationInfo:获取GsmCellLocationInfo基站信息：：："+jsonArray);
+                                if(cid != null && !cid.contains(gcl.getCid())){
+                                    JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, gcl.getLac(),DataController.SWITCH_OF_LOCATION_AREA_CODE);
+                                    JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, gcl.getCid(),DataController.SWITCH_OF_CELL_ID);
+                                    JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, gcl.getPsc(),DataController.SWITCH_OF_BS_LEVEL);
+                                    jsonArray.put(jsonObject);
+                                    ELOG.i("LocationInfo:获取GsmCellLocationInfo基站信息：：："+jsonArray);
+                                }
                             }
                         } else{
                             if(mTelephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_CDMA){
+                                jsonObject = new JSONObject();
                                 ccl = (CdmaCellLocation) mTelephonyManager.getCellLocation();
                                 if(ccl != null){
-                                    //获取当前基站信息
-                                    JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, ccl.getNetworkId(),DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                                    JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, ccl.getBaseStationId(),DataController.SWITCH_OF_CELL_ID);
-                                    JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, ccl.getSystemId() ,DataController.SWITCH_OF_BS_LEVEL);
-                                    jsonArray.put(jsonObject);
-                                ELOG.i("LocationInfo:获取CDMACellLocationInfo基站信息：：："+jsonArray);
+                                    ELOG.i("CdmaCellLocation里的参数值："+ccl.getSystemId()+" "+ccl.getBaseStationId()+" "+ccl.getNetworkId());
+                                    if(cid != null && !cid.contains(gcl.getCid())) {
+                                        //获取当前基站信息
+                                        JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, ccl.getNetworkId(), DataController.SWITCH_OF_LOCATION_AREA_CODE);
+                                        JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, ccl.getBaseStationId(), DataController.SWITCH_OF_CELL_ID);
+                                        JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, ccl.getSystemId(), DataController.SWITCH_OF_BS_LEVEL);
+                                        jsonArray.put(jsonObject);
+                                        ELOG.i("LocationInfo:获取CDMACellLocationInfo基站信息：：：" + jsonArray);
+                                    }
                                 }
                             }
                             return jsonArray;
@@ -365,6 +375,10 @@ public class LocationImpl {
     public void baseStationSort(List<NeighboringCellInfo> list) {
         for (int i = 0; i < list.size() - 1; i++) {
             for (int j = i + 1; j < list.size(); j++) {
+                if(list.get(i).getCid() == list.get(j).getCid()){
+                    list.remove(j);
+                    continue;
+                }
                 if (list.get(i).getRssi() < list.get(j).getRssi()) {
                     NeighboringCellInfo cellInfo = list.get(i);
                     list.set(i, list.get(j));
