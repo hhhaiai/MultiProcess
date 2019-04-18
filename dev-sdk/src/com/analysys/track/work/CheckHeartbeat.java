@@ -41,12 +41,17 @@ public class CheckHeartbeat {
     public void sendMessages() {
         Message msg = new Message();
         msg.what = MSG_CHECK;
-        mHandler.sendMessageDelayed(msg, EGContext.CHECK_HEARTBEAT_CYCLE);
+        if(!mHandler.hasMessages(msg.what)){
+            mHandler.sendMessageDelayed(msg, EGContext.CHECK_HEARTBEAT_CYCLE);
+        }
     }
     public void checkRetry() {
         Message msg = new Message();
         msg.what = MSG_RETRY;
-        mHandler.sendMessageDelayed(msg, EGContext.CHECK_RETRY_CYCLE);
+        if(!mHandler.hasMessages(msg.what)){
+            mHandler.sendMessageDelayed(msg, EGContext.CHECK_RETRY_CYCLE);
+        }
+
     }
 
     class CheckHandler extends Handler {

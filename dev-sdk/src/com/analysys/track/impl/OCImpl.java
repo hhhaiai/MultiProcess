@@ -255,6 +255,7 @@ public class OCImpl {
                 am = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
                 List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
                 if (tasks == null || tasks.size() <= 0) {
+                    ELOG.i("OC获取RunningTaskInfo为空");
                     getRunningProcess(am);
                     return;
                 }
@@ -272,7 +273,7 @@ public class OCImpl {
         try {
             List<ActivityManager.RunningAppProcessInfo> processInfos = am.getRunningAppProcesses();
             if (processInfos == null || processInfos.size() <= 0) {
-                ELOG.i("  processInfos is null 。。。");
+                ELOG.i("OC获取RunningAppProcessInfo为空");
                 return;
             }
             for (ActivityManager.RunningAppProcessInfo appProcess : processInfos) {
@@ -290,6 +291,7 @@ public class OCImpl {
      * @param packageName
      */
     private void processPkgName(String packageName) {
+        ELOG.i("根据包名做一系列处理：获取到的包名：："+packageName);
         if (TextUtils.isEmpty(packageName)) {
             return;
         }
@@ -309,6 +311,14 @@ public class OCImpl {
 //                filterInsertOCInfo(EGContext.CLOSE_SCREEN);
 //                return;
 //            }
+            //如果当前sp没值或者被清理过了，则记录当前oc部分信息到sp
+            String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "0");
+            ELOG.i("OC新的轮询，lastOpenTime == "+lastOpenTime);
+            if(TextUtils.isEmpty(lastOpenTime) || lastOpenTime.equals("0")){
+                ELOG.i("OC新的轮询，如果当前sp中，oc没值则进去当前应用信息");
+                mLastPkgName = packageName;
+                ProcessManager.saveSP(mContext,ocJson);
+            }
             if (!packageName.equals(mLastPkgName)) {
                  ELOG.i("=======切换包名。即将保存"+packageName+"  OLD "+mLastPkgName);
                 //2.入库当前的缓存appTime
