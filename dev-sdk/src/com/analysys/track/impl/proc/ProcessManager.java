@@ -59,7 +59,9 @@ public class ProcessManager {
     }
 
     public static void saveSP(Context ctx, JSONObject ocInfo){
-        SPHelper.setStringValue2SP(ctx,EGContext.LASTPACKAGENAME,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName));
+        String pkgName = ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
+        ELOG.i("重新写进去sp里的pkgName = "+pkgName);
+        SPHelper.setStringValue2SP(ctx,EGContext.LASTPACKAGENAME,pkgName);
         SPHelper.setStringValue2SP(ctx,EGContext.LASTOPENTIME,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationOpenTime));
         SPHelper.setStringValue2SP(ctx,EGContext.LASTAPPNAME,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationName));
         SPHelper.setStringValue2SP(ctx,EGContext.LASTAPPVERSION,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationVersionCode));

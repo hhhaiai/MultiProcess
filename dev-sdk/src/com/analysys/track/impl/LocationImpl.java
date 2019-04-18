@@ -82,7 +82,7 @@ public class LocationImpl {
     private void LocationHandle(){
         try {
             if(!PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LOCATION,true)){
-//                ELOG.i("第一个可能性退出的地方");
+                ELOG.i("模块不收集，退出");
                 return;
             }
             //么有获取地理位置权限则不做处理
@@ -112,13 +112,13 @@ public class LocationImpl {
          */
         if (!AndroidManifestHelper.isPermissionDefineInManifest(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
                 && !AndroidManifestHelper.isPermissionDefineInManifest(mContext,Manifest.permission.ACCESS_COARSE_LOCATION)) {
-            ELOG.i("hasLocationPermission == false ");
+            ELOG.i("LocationInfo没有AndroidManifest权限，退出 ");
             return false;
         }
         //是否可以去获取权限
         if (!PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
                 && !PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
-            ELOG.e("has no permission");
+            ELOG.e("LocationInfo checkPermission失败，退出");
             return false;
         }
         List<String> pStrings = this.locationManager.getProviders(true);
@@ -128,7 +128,7 @@ public class LocationImpl {
         } else if (pStrings.contains(LocationManager.NETWORK_PROVIDER)) {
             provider = LocationManager.NETWORK_PROVIDER;
         } else {
-//            ELOG.i("第三个可能性退出的地方");
+            ELOG.i("LocationInfo既非gps又非network,退出");
             return false;
         }
         try {
@@ -140,7 +140,7 @@ public class LocationImpl {
 //                ELOG.i("  new location ..."+location);
                 resetLocaiton(location);
             }else{//距离不超过1000米则无需存储，其他数据也无需获取存储
-//                ELOG.i("第四个可能性退出的地方");
+                ELOG.i("LocationInfo获取location参数失败，退出");
                 return false;
             }
         }catch (Throwable t){
@@ -161,7 +161,7 @@ public class LocationImpl {
             if (TextUtils.isEmpty(gl)) {
                 return;
             }
-//            ELOG.i(gl+"   ：：：：：：：：：：有效经纬度");
+            ELOG.i("LocationInfo:获取到有效经纬度：："+gl);
             SPHelper.setStringValue2SP(mContext,EGContext.LAST_LOCATION,gl);
         }
     }
@@ -279,16 +279,15 @@ public class LocationImpl {
         JSONObject jsonObject = null;
         try {
             if(mTelephonyManager == null){
-                ELOG.i(" mTelephonyManager == null");
                 return jsonArray;
             }
             jsonObject = new JSONObject();
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                ELOG.i(" PermissionUtils.checkPermission is true");
+                ELOG.i(" LocationInfo:checkPermission is true");
                 jsonArray = new JSONArray();
                 try {
                     List<NeighboringCellInfo> list = mTelephonyManager.getNeighboringCellInfo();
-                    ELOG.i(" List<NeighboringCellInfo>  "+list != null ?list.size():null);
+                    ELOG.i("LocationInfo:获取周围基站信息list:"+list != null ?list.size():null);
                     if(list != null && list.size()>0) {
                         baseStationSort(list);
                         for (int i = 0; i < list.size(); i++) {
@@ -297,7 +296,7 @@ public class LocationImpl {
                                 JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, list.get(i).getCid(), DataController.SWITCH_OF_CELL_ID);
                                 JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, list.get(i).getRssi(), DataController.SWITCH_OF_BS_LEVEL);
                                 jsonArray.put(jsonObject);
-                                ELOG.i("获取当前基站信息1。。。:::::: "+jsonArray);
+                                ELOG.i("LocationInfo:获取周围基站信息list:"+jsonArray);
                             }
                         }
                     }
@@ -311,28 +310,25 @@ public class LocationImpl {
                     CdmaCellLocation ccl = null;
                     if(location != null){
                         if(location instanceof GsmCellLocation) {
-//                            ELOG.i(" location instanceof GsmCellLocation ");
                             gcl = (GsmCellLocation)location;
                             if(gcl != null){
-                                ELOG.i("获取当前基站信息:::::: "+gcl.getLac()+ "  vs "+gcl.getCid()+"  vs "+gcl.getPsc());
                                 //获取当前基站信息
                                 JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, gcl.getLac(),DataController.SWITCH_OF_LOCATION_AREA_CODE);
                                 JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, gcl.getCid(),DataController.SWITCH_OF_CELL_ID);
                                 JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, gcl.getPsc(),DataController.SWITCH_OF_BS_LEVEL);
                                 jsonArray.put(jsonObject);
-                                ELOG.i("获取当前基站信息。。:::::: "+jsonArray);
+                                ELOG.i("LocationInfo:获取GsmCellLocationInfo基站信息：：："+jsonArray);
                             }
                         } else{
                             if(mTelephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_CDMA){
                                 ccl = (CdmaCellLocation) mTelephonyManager.getCellLocation();
                                 if(ccl != null){
-                                ELOG.i("获取当前基站信息:::::: "+ccl.getNetworkId()+ "  vs "+ccl.getBaseStationId()+"  vs "+ccl.getBaseStationId());
                                     //获取当前基站信息
                                     JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, ccl.getNetworkId(),DataController.SWITCH_OF_LOCATION_AREA_CODE);
                                     JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, ccl.getBaseStationId(),DataController.SWITCH_OF_CELL_ID);
                                     JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, ccl.getSystemId() ,DataController.SWITCH_OF_BS_LEVEL);
                                     jsonArray.put(jsonObject);
-                                ELOG.i("获取当前基站信息。。。:::::: "+jsonArray);
+                                ELOG.i("LocationInfo:获取CDMACellLocationInfo基站信息：：："+jsonArray);
                                 }
                             }
                             return jsonArray;

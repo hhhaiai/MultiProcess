@@ -139,8 +139,8 @@ public class AnalysysReceiver extends BroadcastReceiver {
             ELOG.i("接收关闭屏幕广播后存入sp的时间::::"+mCloseTime);
             saveData(false, mCloseTime);
         }else {//sp里取到了数据，即，非第一次锁屏，则判断是否有效数据来设置closeTime,准备入库
-            SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME, mCloseTime);
-            ELOG.i("接收关闭屏幕广播后存入sp的时间::::"+mCloseTime);
+            ELOG.i("非第一次锁屏，接收关闭屏幕广播后存入sp的时间::::"+mCloseTime);
+            SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME, System.currentTimeMillis());
             saveData(true, mCloseTime);
         }
         ReceiverUtils.getInstance().unRegistAllReceiver(mContext);
@@ -153,7 +153,8 @@ public class AnalysysReceiver extends BroadcastReceiver {
      */
     private void saveData(boolean needCalculateTime,long closeTime){
         if(Build.VERSION.SDK_INT < 21){//4.x
-            if(needCalculateTime && (System.currentTimeMillis() - closeTime < EGContext.OC_CYCLE)){//无效
+            if(!needCalculateTime && (System.currentTimeMillis() - closeTime < EGContext.OC_CYCLE)){//两次时间间隔如果小于5s,则无效
+                ELOG.i("锁屏广播针对本次oc无效::::");
                 return;
             }else {//有效入库
                 ELOG.i("接收关闭屏幕广播后的入库时间::::"+closeTime);
@@ -161,6 +162,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
             }
         }else if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24){
             if(needCalculateTime && (System.currentTimeMillis() - closeTime < EGContext.OC_CYCLE_OVER_5)){//无效
+                ELOG.i("锁屏广播针对本次oc无效::::");
                 return;
             }else {
                 ELOG.i("接收关闭屏幕广播后的入库时间::::"+closeTime);

@@ -41,7 +41,7 @@ public class OCImpl {
 
     private Context mContext;
     private long mProcessTime = 0L;
-
+    private String mLastPkgName = "";
     private static class Holder {
         private static final OCImpl INSTANCE = new OCImpl();
     }
@@ -293,34 +293,47 @@ public class OCImpl {
         if (TextUtils.isEmpty(packageName)) {
             return;
         }
-        String lastPkgName = SPHelper.getStringValueFromSP(mContext,EGContext.LASTPACKAGENAME,"");
+        if(!TextUtils.isEmpty(mLastPkgName)){//值非空则为立即切换
+            SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME, System.currentTimeMillis());
+        }else {//值为空则有时间间隔，随机取结束时间
+            saveSPOCInfo();
+            mLastPkgName = SPHelper.getStringValueFromSP(mContext,EGContext.LASTPACKAGENAME,"");
+        }
         JSONObject ocJson = getOCInfo(packageName, EGContext.OC_COLLECTION_TYPE_RUNNING_TASK);
         // 是否首次打开
-        if (TextUtils.isEmpty(lastPkgName)) {
+        if (TextUtils.isEmpty(mLastPkgName)) {
             ProcessManager.saveSP(mContext,ocJson);
         } else {
-            if (!packageName.equals(lastPkgName)) {
-                 ELOG.i("=======切换包名。即将保存"+packageName+"  OLD "+lastPkgName);
-                String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
-                if(TextUtils.isEmpty(lastOpenTime)){
-                    lastOpenTime = "0";
-                }
-                long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
-//            ELOG.i(randomCloseTime+"  = randomCloseTime");
-                if(randomCloseTime == -1){
-                    return;
-                }
-                //1.非首次打开，之前有pkgName缓存,设置当前时间往前推一点为结束时间
-                SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME,randomCloseTime);
+//            //锁屏触发的存储数据
+//            if(!ProcessManager.getIsCollected()){
+//                filterInsertOCInfo(EGContext.CLOSE_SCREEN);
+//                return;
+//            }
+            if (!packageName.equals(mLastPkgName)) {
+                 ELOG.i("=======切换包名。即将保存"+packageName+"  OLD "+mLastPkgName);
                 //2.入库当前的缓存appTime
                 filterInsertOCInfo(EGContext.APP_SWITCH);
                 // 3.如果打开的包名与缓存的包名不一致，更新新pkgName到sp
+                mLastPkgName = packageName;
                 ProcessManager.saveSP(mContext,ocJson);
             }
         }
     }
 
+    private void saveSPOCInfo(){
+        String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
+        if(TextUtils.isEmpty(lastOpenTime)){
+            lastOpenTime = "0";
+        }
+        long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
+        ELOG.i("补数逻辑：得到的randomCloseTime"+randomCloseTime);
+        if(randomCloseTime == -1){
+            return;
+        }
+        //1.非首次打开，之前有pkgName缓存,设置当前时间往前推一点为结束时间
+        SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME,randomCloseTime);
 
+    }
     /**
      * 从Proc中读取数据
      */
