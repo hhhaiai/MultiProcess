@@ -3,6 +3,7 @@ package com.analysys.track.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -10,10 +11,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.analysys.track.database.TableOC;
+import com.analysys.track.database.TableXXXInfo;
 import com.analysys.track.impl.proc.ProcUtils;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.impl.proc.ProcessManager;
 import com.analysys.track.work.MessageDispatcher;
 import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.utils.AccessibilityHelper;
@@ -37,6 +38,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 
 public class OCImpl {
 
@@ -87,7 +89,7 @@ public class OCImpl {
     /**
      * 真正的OC处理
      */
-    private void processOC() {
+    public void processOC() {
         try {
 //            if(!ProcessManager.getIsCollected()){
 //                ELOG.i("屏幕关闭，不收集");
@@ -97,7 +99,7 @@ public class OCImpl {
             if (SystemUtils.isScreenOn(mContext)) {
 //                fillData();
                 if (!SystemUtils.isScreenLocked(mContext)) {
-                    ELOG.i("屏幕开启，正常收集");
+                    ELOG.i("xxx.oc","屏幕开启，正常收集");
                     boolean isOCCollected = PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC,true);
                     boolean isXXXCollected = PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_XXX,true);
                     if(!isOCCollected && !isXXXCollected){
@@ -112,7 +114,7 @@ public class OCImpl {
                 closeOC();
             }
         } catch (Throwable t) {
-            ELOG.i(t.getMessage()+"  processOCprocessOC");
+            ELOG.i("xxx.oc", Log.getStackTraceString(t));
         }finally {
             MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE, false);
         }
@@ -203,48 +205,81 @@ public class OCImpl {
      */
     @SuppressWarnings("deprecation")
     public void getInfoByVersion(boolean isOCCollected,boolean isXXXCollected,JSONObject obj) {
+        // 1. 获取info
+        obj = ProcUtils.getInstance(mContext).getRunningInfo();
+        if (obj == null || obj.length() <= 0) {
+            return;
+        }
+        // 2. 解析INFO详情
+        String ocr = null;
+        String[] strArray = null;
+        Set<String> nameSet = new HashSet<String>();
+        long now = System.currentTimeMillis();
+        if (obj.has(ProcUtils.RUNNING_OC_RESULT)) {
+            ocr = obj.optString(ProcUtils.RUNNING_OC_RESULT).replace("[","").replace("]","");
+            strArray = ocr.split(",");
+            if(strArray != null && strArray.length > 0){
+                for (int i = 0; i < strArray.length; i++) {
+                    String pkgName = strArray[i];
+                    nameSet.add(pkgName.substring(1,pkgName.length()-1));
+                }
+            }
+        }
+        if (obj.has(ProcUtils.RUNNING_TIME)) {
+            now = obj.optLong(ProcUtils.RUNNING_TIME);
+        }
         // 4.x和以下版本判断,逻辑: 有权限申请系统API获取; 无权限直接使用5.x/6.x版本
         if (Build.VERSION.SDK_INT < 21) {//4.x
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.GET_TASKS)) {
                 getRunningTasks();
-            }else {//没权限，用xxxinfo方式收集
-                getProcApps(obj);
+            } else {//没权限，用xxxinfo方式收集
+                getProcApps(nameSet);
             }
         } else if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {//5/6
-//            // 确定5.0和以上版本UsageStatsManager启用5秒处理一次
-//            if (SystemUtils.canUseUsageStatsManager(mContext)) {
-//                 ELOG.i("开启了。UsageStatsManager功能");
-//                processOCByUsageStatsManager();
-//            } else {
-//                // 确定5.0和以上版本proc判断30秒处理一次
-//
-//            }
-            obj = ProcUtils.getInstance(mContext).getRunningInfo();
-
-            JSONArray ocr = null;
-            //xxx是否收集
-            if(isXXXCollected){
-
-//                getProcApps(obj);
-                //判断oc是否需要收集
-                if(isOCCollected){
-                    ocr  = obj.optJSONArray(ProcUtils.RUNNING_OC_RESULT);
-                    ocCollection(ocr);
+            /**
+             * 样例数据
+             * <code>    {"time":1557237920076,"ocr":["com.oppo.market","com.android.mms","com.oppo.usercenter","com.nearme.gamecenter","com.coloros.gallery3d","cn.analysys.demo"],"result":[{"pid":17910,"oomScore":17,"pkg":"cn.analysys.demo","cgroup":"2:cpu:\/\n1:cpuacct:\/uid_10509\/pid_17910","oomAdj":"0"},{"pid":16205,"oomScore":66,"pkg":"com.coloros.gallery3d","cgroup":"2:cpu:\/\n1:cpuacct:\/uid_10011\/pid_16205"},{"pid":16263,"oomScore":71,"pkg":"com.android.mms","cgroup":"2:cpu:\/\n1:cpuacct:\/uid_10015\/pid_16263"}]}</code>
+             */
+            //3. 根据是否采集进行分支判断
+            if (isXXXCollected) {
+                // 3.1.1 写入XXX
+                TableXXXInfo.getInstance(mContext).insert(obj);
+//                // 3.1.2 xxx是否收集, 清除RESULT
+//                obj.remove(ProcUtils.RUNNING_RESULT);
+                // 3.1.3 判断oc是否需要收集
+                if (isOCCollected) {
+                    ocCollection(nameSet, now);
                 }
-            }else {//xxx不收集，oc一定收集
-                if(isOCCollected){
-                    ocr  = obj.optJSONArray(ProcUtils.RUNNING_OC_RESULT);
-                    ocCollection(ocr);
+                // 3.1.4 清除内存数据
+                ocr = null;
+                obj = null;
+            } else {
+                //3.2.1 xxx不收集
+                if (isOCCollected) {
+                    ocCollection(nameSet, now);
                 }
+                ocr = null;
+                obj = null;
             }
-
         } else {
             // TODO 7.0以上待调研
         }
     }
-    private void ocCollection(JSONArray obj){
-        if(obj == null){
-//            obj = ProcUtils.getInstance(mContext).getRunningInfo();
+
+    /**
+     * 辅助功能-->UsageStatsManager-->ocr
+     *
+     * @param ocr
+     * @param now
+     */
+    private void ocCollection(Set<String> ocr, long now) {
+        if(!AccessibilityHelper.isAccessibilitySettingsOn(mContext, AnalysysAccessibilityService.class)){//如果辅助功能开启则使用辅助功能
+            if(SystemUtils.canUseUsageStatsManager(mContext)){//如果开了USM则使用USM
+                ELOG.i("开启了。UsageStatsManager功能");
+                processOCByUsageStatsManager(ocr);
+            }else {//否则使用ocr
+                getProcApps(ocr);
+            }
         }
     }
     /**
@@ -422,22 +457,25 @@ public class OCImpl {
     /**
      * 从Proc中读取数据
      */
-    private void getProcApps(JSONObject obj) {
+    private void getProcApps(Set<String> nameSet) {
 //        JSONArray cacheApps = TableOC.getInstance(mContext).selectRunning();//结束时间为空，则为正在运行的app
-//        ELOG.i(cacheApps + "   :::::::: cacheApps");
         //本次proc取到的值
-        Set<String> nameSet = ProcessManager.getRunningForegroundApps(mContext,obj);
-        if(nameSet == null){
+        if(nameSet == null|| nameSet.size()<=0){
             ELOG.i("本次proc没获取到数据");
             return;
         }
+
         try {
+            ELOG.i("xxx.oc","mRunningApps:"+(mRunningApps== null ?" null ":mRunningApps.toString()));
+            ELOG.i("xxx.oc","ocr:"+nameSet.toString());
             //第一次轮询，内存没活跃app
             if(mRunningApps == null || mRunningApps.size()< 1){
+                mRunningApps = new ArrayList<JSONObject>();
                 for (String name:nameSet) {
                     String pkgName = name.replaceAll(" ","");
+                    ELOG.i("pkgName = "+pkgName);
                     if (!TextUtils.isEmpty(pkgName)) {
-                        mRunningApps.add(getOCInfo(pkgName.replaceAll(" ", ""), EGContext.OC_COLLECTION_TYPE_PROC));
+                        mRunningApps.add(getOCInfo(pkgName, EGContext.OC_COLLECTION_TYPE_PROC));
                     }
                 }
             }else {
@@ -468,15 +506,18 @@ public class OCImpl {
             }
         } catch (Throwable t) {
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.i("getProcApps has an exception :::" + t.getMessage());
+                ELOG.i("xxx.oc",Log.getStackTraceString(t));
             }
         }
+        ELOG.i("xxx.oc","结束时： :"+mRunningApps.toString());
     }
 
     /**
      * 缓存中应用列表与新获取应用列表去重
      */
     private JSONObject removeRepeat(List<JSONObject> cacheApps, Set<String> runApps) {
+        ELOG.i("xxx.oc",cacheApps+" :::::: 上次app");
+        ELOG.i("xxx.oc",runApps+" :::::: 本次app");
 
         JSONObject ocInfo = null, result = new JSONObject();
         try {
@@ -486,11 +527,14 @@ public class OCImpl {
             for (int i = 0; i < cacheApps.size(); i++) {
                 random = (Integer)list.get(i);
                 ocInfo = cacheApps.get(i);
+//                cacheApps.remove(ocInfo);
                 if (ocInfo == null || ocInfo.length() < 1){
                     continue;
                 }
-                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime,
-                    String.valueOf(System.currentTimeMillis() - random));
+                String act = String.valueOf(System.currentTimeMillis() - random);
+                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime,act);
+                ELOG.i("pkgName :" + ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName)+ "::act:::: "+act);
+//                cacheApps.add(ocInfo);
                 //内存里的pkgName
                 apn = ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName).replaceAll(" ", "");
                 //遍历当前获取到的，如果取到的值里不包含则close掉，包含则为一直存活的app,从当前set里去除
@@ -503,16 +547,16 @@ public class OCImpl {
                         break;
                     }
                 }
-                // ocInfo.put(DeviceKeyContacts.OCInfo.SwitchType, EGContext.SWITCH_TYPE_DEFAULT);
+                 ocInfo.put(DeviceKeyContacts.OCInfo.SwitchType, EGContext.APP_SWITCH);
             }
-            // ELOG.i(oc+" :::::: oc");
+             ELOG.i(ocInfo+" :::::: oc");
             if (cacheApps != null && cacheApps.size() > 0) {
                 result.put("cache", cacheApps);
-                // ELOG.i(cacheApps+" :::::: cacheApps");
+                 ELOG.i(cacheApps+" :::::: cacheApps");
             }
             if (runApps != null && runApps.size() > 0) {
                 result.put("run", runApps);
-                // ELOG.i(runApps+" :::::: runApps");
+                 ELOG.i(runApps+" :::::: runApps");
             }
         } catch (Throwable t) {
             ELOG.e(t.getMessage() + "tttttttttttttttttttt");
@@ -526,6 +570,7 @@ public class OCImpl {
     private void closeState2DB(List<JSONObject> cacheApps) {
         try {
             if (cacheApps != null && cacheApps.size() > 0) {
+                ELOG.i("xxx.oc","closeState2DB:"+cacheApps.toString());
                 TableOC.getInstance(mContext).insertArray(cacheApps);
             }
         } catch (Throwable e) {
@@ -645,7 +690,7 @@ public class OCImpl {
                 try {
                     ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName, String.valueOf(appInfo.loadLabel(pm)));
                 } catch (Throwable t) {
-                    // ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName, "unknown");
+//                     ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName, "unknown");
                 }
 
             }
@@ -727,7 +772,7 @@ public class OCImpl {
     /**
      * android 5以上，有UsageStatsManager权限可以使用的
      */
-    public void processOCByUsageStatsManager() {
+    public void processOCByUsageStatsManager(Set<String> ocr) {
         class RecentUseComparator implements Comparator<UsageStats> {
             @Override
             public int compare(UsageStats lhs, UsageStats rhs) {
@@ -752,10 +797,10 @@ public class OCImpl {
             if (!TextUtils.isEmpty(usmPkg)) {
                 processPkgName(usmPkg);
             } else {
-//                getProcApps();
+                getProcApps(ocr);
             }
         } catch (Throwable e) {
-//            getProcApps();
+            getProcApps(ocr);
         }
     }
 

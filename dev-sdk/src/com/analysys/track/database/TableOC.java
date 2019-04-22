@@ -174,7 +174,7 @@ public class TableOC {
                 cv = new ContentValues();
                 long insertTime = System.currentTimeMillis();
                 String act = ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime);
-//                ELOG.i(act + "  :::::::::::act`s value...");
+                ELOG.i(act + "  :::::::::::act`s value...");
                 String an = Base64Utils.encrypt(ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationName), insertTime);
                 cv.put(DBConfig.OC.Column.APN, EncryptUtils.encrypt(mContext,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName)));
                 cv.put(DBConfig.OC.Column.AN, EncryptUtils.encrypt(mContext,an));
@@ -202,95 +202,95 @@ public class TableOC {
     /**
      * 查询 正在运行的应用记录
      */
-    public JSONArray selectRunning() {
-        JSONArray array = null;
-        int blankCount = 0;
-        Cursor cursor = null;
-        try {
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if(db == null){
-               return null;
-            }
-            array = new JSONArray();
-            cursor = db.query(DBConfig.OC.TABLE_NAME, null, DBConfig.OC.Column.ACT + "=?",
-                new String[] {""}, null, null, null);//closeTime为空的信息
-            JSONObject jsonObject = null;
-            while (cursor.moveToNext()) {
-                if(blankCount >= EGContext.BLANK_COUNT_MAX){//防止空数据导致死循环
-                    return array;
-                }
-                jsonObject = new JSONObject();
-                String insertTime = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.IT)));
-                String appName = Base64Utils.decrypt(EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AN))), Long.parseLong(insertTime));
-                String apn = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.APN)));
-                if(TextUtils.isEmpty(apn)){
-                    blankCount += 1;
-                }
-                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, apn);
-                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationName, appName);
-                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationOpenTime,
-                        EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AOT))));
-                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode,
-                        EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AVC))));
-                jsonObject.put(DeviceKeyContacts.OCInfo.NetworkType,
-                        EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.NT))));
-                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationType,
-                    cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AT)));
-                jsonObject.put(DeviceKeyContacts.OCInfo.CollectionType,
-                    cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.CT)));
-                array.put(jsonObject);
-            }
-        } catch (Throwable e) {
-            if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(e+"  selectRunning ..");
-            }
-        }finally {
-            if(cursor != null){
-                cursor.close();
-            }
-            DBManager.getInstance(mContext).closeDB();
-        }
-        return array;
-    }
+//    public JSONArray selectRunning() {
+//        JSONArray array = null;
+//        int blankCount = 0;
+//        Cursor cursor = null;
+//        try {
+//            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+//            if(db == null){
+//               return null;
+//            }
+//            array = new JSONArray();
+//            cursor = db.query(DBConfig.OC.TABLE_NAME, null, DBConfig.OC.Column.ACT + "=?",
+//                new String[] {""}, null, null, null);//closeTime为空的信息
+//            JSONObject jsonObject = null;
+//            while (cursor.moveToNext()) {
+//                if(blankCount >= EGContext.BLANK_COUNT_MAX){//防止空数据导致死循环
+//                    return array;
+//                }
+//                jsonObject = new JSONObject();
+//                String insertTime = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.IT)));
+//                String appName = Base64Utils.decrypt(EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AN))), Long.parseLong(insertTime));
+//                String apn = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.APN)));
+//                if(TextUtils.isEmpty(apn)){
+//                    blankCount += 1;
+//                }
+//                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, apn);
+//                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationName, appName);
+//                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationOpenTime,
+//                        EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AOT))));
+//                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode,
+//                        EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AVC))));
+//                jsonObject.put(DeviceKeyContacts.OCInfo.NetworkType,
+//                        EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.NT))));
+//                jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationType,
+//                    cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AT)));
+//                jsonObject.put(DeviceKeyContacts.OCInfo.CollectionType,
+//                    cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.CT)));
+//                array.put(jsonObject);
+//            }
+//        } catch (Throwable e) {
+//            if(EGContext.FLAG_DEBUG_INNER){
+//                ELOG.e(e+"  selectRunning ..");
+//            }
+//        }finally {
+//            if(cursor != null){
+//                cursor.close();
+//            }
+//            DBManager.getInstance(mContext).closeDB();
+//        }
+//        return array;
+//    }
 
     /**
      * 更新缓存状态,从0到1
      */
-    public void updateRunState(JSONArray ocInfo) {
-        SQLiteDatabase db = null;
-        try {
-            db = DBManager.getInstance(mContext).openDB();
-            if(db == null || ocInfo == null || ocInfo.length()<1){
-                return;
-            }
-            db.beginTransaction();
-            ContentValues cv;
-            List list = SystemUtils.getDiffNO(ocInfo.length());
-            int random;
-            for (int i = 0; i < ocInfo.length(); i++) {
-                cv = new ContentValues();
-                random = (Integer)list.get(i);
-                cv.put(DBConfig.OC.Column.RS, ONE);
-                cv.put(DBConfig.OC.Column.ACT, EncryptUtils.encrypt(mContext,String.valueOf(System.currentTimeMillis() - random)));
-                String pkgName =
-                    EncryptUtils.encrypt(mContext,new JSONObject(String.valueOf(ocInfo.get(i))).optString(DeviceKeyContacts.OCInfo.ApplicationPackageName));
-                db.update(DBConfig.OC.TABLE_NAME, cv,
-                    DBConfig.OC.Column.APN + "=? and " + DBConfig.OC.Column.RS + "=?",
-                    new String[] {pkgName, ZERO});
-            }
-            db.setTransactionSuccessful();
-        } catch (Throwable e) {
-            if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(e+"  updateRunState ");
-            }
-
-        } finally {
-            if(db != null){
-                db.endTransaction();
-            }
-        }
-        DBManager.getInstance(mContext).closeDB();
-    }
+//    public void updateRunState(JSONArray ocInfo) {
+//        SQLiteDatabase db = null;
+//        try {
+//            db = DBManager.getInstance(mContext).openDB();
+//            if(db == null || ocInfo == null || ocInfo.length()<1){
+//                return;
+//            }
+//            db.beginTransaction();
+//            ContentValues cv;
+//            List list = SystemUtils.getDiffNO(ocInfo.length());
+//            int random;
+//            for (int i = 0; i < ocInfo.length(); i++) {
+//                cv = new ContentValues();
+//                random = (Integer)list.get(i);
+//                cv.put(DBConfig.OC.Column.RS, ONE);
+//                cv.put(DBConfig.OC.Column.ACT, EncryptUtils.encrypt(mContext,String.valueOf(System.currentTimeMillis() - random)));
+//                String pkgName =
+//                    EncryptUtils.encrypt(mContext,new JSONObject(String.valueOf(ocInfo.get(i))).optString(DeviceKeyContacts.OCInfo.ApplicationPackageName));
+//                db.update(DBConfig.OC.TABLE_NAME, cv,
+//                    DBConfig.OC.Column.APN + "=? and " + DBConfig.OC.Column.RS + "=?",
+//                    new String[] {pkgName, ZERO});
+//            }
+//            db.setTransactionSuccessful();
+//        } catch (Throwable e) {
+//            if(EGContext.FLAG_DEBUG_INNER){
+//                ELOG.e(e+"  updateRunState ");
+//            }
+//
+//        } finally {
+//            if(db != null){
+//                db.endTransaction();
+//            }
+//        }
+//        DBManager.getInstance(mContext).closeDB();
+//    }
 
     /**
      * 更新缓存状态，从1到0

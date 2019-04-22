@@ -9,7 +9,6 @@ import android.text.TextUtils;
 import com.analysys.track.impl.OCImpl;
 import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.impl.DeviceImpl;
-import com.analysys.track.impl.proc.ProcessManager;
 import com.analysys.track.utils.FileUtils;
 import com.analysys.track.utils.sp.SPHelper;
 import com.analysys.track.work.CheckHeartbeat;
@@ -74,13 +73,13 @@ public class AnalysysReceiver extends BroadcastReceiver {
                 ELOG.e("接收开启屏幕广播");
                 //设置开锁屏的flag 用于补数逻辑
                 EGContext.SCREEN_ON = true;
-                ProcessManager.setIsCollected(true);
+//                ProcessManager.setIsCollected(true);
                 processScreenOnOff(true);
                 CheckHeartbeat.getInstance(mContext).sendMessages();
             }
             if (SCREEN_OFF.equals(intent.getAction())) {
                 EGContext.SCREEN_ON = false;
-                ProcessManager.setIsCollected(false);
+//                ProcessManager.setIsCollected(false);
                 processScreenOnOff(false);
 
                 ELOG.e("接收关闭屏幕广播::::"+System.currentTimeMillis());

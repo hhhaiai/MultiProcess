@@ -334,6 +334,9 @@ public class LocationImpl {
                                     JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, gcl.getLac(),DataController.SWITCH_OF_LOCATION_AREA_CODE);
                                     JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, gcl.getCid(),DataController.SWITCH_OF_CELL_ID);
                                     JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, gcl.getPsc(),DataController.SWITCH_OF_BS_LEVEL);
+                                    if(jsonArray == null){
+                                        jsonArray = new JSONArray();
+                                    }
                                     jsonArray.put(jsonObject);
                                     ELOG.i("LocationInfo:获取GsmCellLocationInfo基站信息：：："+jsonArray);
                                 }

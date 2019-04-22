@@ -12,10 +12,10 @@ import com.analysys.track.database.TableAppSnapshot;
 import com.analysys.track.database.TableLocation;
 import com.analysys.track.database.TableOC;
 import com.analysys.track.database.TableXXXInfo;
+import com.analysys.track.impl.proc.ProcUtils;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.impl.proc.DataPackaging;
-import com.analysys.track.impl.proc.ProcParser;
 import com.analysys.track.utils.EguanIdUtils;
 import com.analysys.track.work.CheckHeartbeat;
 import com.analysys.track.work.MessageDispatcher;
@@ -386,7 +386,7 @@ public class UploadImpl {
                     info = (String) jsonArray.get(i);
                     // 判断单条大小是否超限,删除单条数据
                     if (info.getBytes().length > freeLen) {
-                        timeList.add(new JSONObject(new String(Base64.decode(info.getBytes(),Base64.DEFAULT))).getString(ProcParser.RUNNING_TIME));
+                        timeList.add(new JSONObject(new String(Base64.decode(info.getBytes(),Base64.DEFAULT))).getString(ProcUtils.RUNNING_TIME));
                         // 最后一个消费，则不需要再次发送
                         if (i == ss - 1) {
                             isChunkUpload = false;
@@ -404,7 +404,7 @@ public class UploadImpl {
                         break;
                     } else {
                         arr.put(info);
-                        timeList.add(new JSONObject(new String(Base64.decode(info.getBytes(),Base64.DEFAULT))).getString(ProcParser.RUNNING_TIME));
+                        timeList.add(new JSONObject(new String(Base64.decode(info.getBytes(),Base64.DEFAULT))).getString(ProcUtils.RUNNING_TIME));
                         // 最后一个消费，则不需要再次发送
                         if (i == ss - 1) {
                             isChunkUpload = false;

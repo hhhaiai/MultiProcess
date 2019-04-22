@@ -114,7 +114,7 @@ public class ProcUtils {
                             uploadInfo.put(RUNNING_OC_RESULT, resultArray);
                         }
                     }
-                    // 解析result，即xxx
+                    // 解析result
                     Object result = jsonObject.opt(RUNNING_RESULT);
                     if (result != null && result != "") {
                         JSONArray resultArray = new JSONArray(result.toString());

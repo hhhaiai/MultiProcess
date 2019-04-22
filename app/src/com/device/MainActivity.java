@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
+import com.analysys.track.impl.OCImpl;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PermissionUtils;
 
@@ -70,7 +71,7 @@ public class MainActivity extends Activity {
                 break;
             case R.id.btnOC:
 //                ELOG.i("btnOC ---------");
-//                OCImpl.getInstance(this).ocInfo();
+                OCImpl.getInstance(this).processOC();
                 break;
             default:
                 break;
