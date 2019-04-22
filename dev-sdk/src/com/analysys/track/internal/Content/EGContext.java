@@ -186,13 +186,14 @@ public class EGContext {
     public static final int DEFAULT = 0;
 
     // OCINFO
-    public static final String LASTAPPNAME = "lastAppName";
-    public static final String LASTPACKAGENAME = "lastPackageName";
-    public static final String ENDTIME = "ProcessEndTime";
-    public static final String LASTAPPVERSION = "lastAppVersion";
-    public static final String LASTOPENTIME = "lastOpenTime";
-    public static final String MIN_DURATION_TIME = "minDuration";
-    public static final String MAX_DURATION_TIME = "maxDuration";
+    public static final String LAST_APP_NAME = "lastAppName";
+    public static final String LAST_PACKAGE_NAME = "lastPackageName";
+    public static final String END_TIME = "ProcessEndTime";
+    public static final String LAST_APP_VERSION = "lastAppVersion";
+    public static final String LAST_OPEN_TIME = "lastOpenTime";
+    public static final String LAST_AVAILABLE_TIME = "lastAvailableTime";
+//    public static final String MIN_DURATION_TIME = "minDuration";
+//    public static final String MAX_DURATION_TIME = "maxDuration";
     public static final String APP_TYPE = "applicationType";
     public static final int SHORT_TIME = 5 * 1000;// 计时器时间间隔毫秒数
     public static final long LONGEST_TIME = 5 * 60 * 60 * 1000;
@@ -253,6 +254,7 @@ public class EGContext {
     public static final String MODULE_WIFI = "M_WIFI";
     public static final String MODULE_BASE = "M_BASE";
     public static final String MODULE_DEV = "M_DEV";
+    public static final String MODULE_XXX = "M_XXX";
     /**
      * 控制android8以后是否后台启动服务。提示通知
      */

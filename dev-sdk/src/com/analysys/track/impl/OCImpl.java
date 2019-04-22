@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.analysys.track.database.TableOC;
+import com.analysys.track.impl.proc.ProcUtils;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.impl.proc.ProcessManager;
@@ -40,8 +41,17 @@ import android.text.TextUtils;
 public class OCImpl {
 
     private Context mContext;
-    private long mProcessTime = 0L;
+//    private long mProcessTime = 0L;
     private String mLastPkgName = "";
+    public static long mLastAvailableOpenOrCloseTime = -1;
+    /**
+     * mRunningApps为Android5/6正在运行的app列表的内存变量值
+     */
+    private static List<JSONObject> mRunningApps = null;
+    /**
+     * mCache为Android4.x正在运行的app列表的内存变量值
+     */
+    public static JSONObject mCache = null;
     private static class Holder {
         private static final OCImpl INSTANCE = new OCImpl();
     }
@@ -79,39 +89,27 @@ public class OCImpl {
      */
     private void processOC() {
         try {
-            if(!ProcessManager.getIsCollected()){
-                ELOG.i("屏幕关闭，不收集");
-                return;
-            }
-            ELOG.i("屏幕开启，正常收集");
-            if(!PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC,true)){
-                return;
-            }
+//            if(!ProcessManager.getIsCollected()){
+//                ELOG.i("屏幕关闭，不收集");
+//                return;
+//            }
             // 亮屏幕工作
             if (SystemUtils.isScreenOn(mContext)) {
 //                fillData();
                 if (!SystemUtils.isScreenLocked(mContext)) {
-                    if (!AccessibilityHelper.isAccessibilitySettingsOn(mContext, AnalysysAccessibilityService.class)) {
-                        getInfoByVersion();
+                    ELOG.i("屏幕开启，正常收集");
+                    boolean isOCCollected = PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC,true);
+                    boolean isXXXCollected = PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_XXX,true);
+                    if(!isOCCollected && !isXXXCollected){
+                        return;
                     }
+                    JSONObject xxxInfo = null;
+//                    if (!AccessibilityHelper.isAccessibilitySettingsOn(mContext, AnalysysAccessibilityService.class)) {
+                    getInfoByVersion(isOCCollected, isXXXCollected, xxxInfo);
+//                    }
                 }
             }else{
-                if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24){
-                    //TODO 黑屏补充数据，待验证
-                    String openApp = SPHelper.getStringValueFromSP(mContext,EGContext.LASTAPPNAME, "");
-                    if (!TextUtils.isEmpty(openApp)) {
-                        // 补充时间
-                        String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
-                        if(TextUtils.isEmpty(lastOpenTime)){
-                            lastOpenTime = "0";
-                        }
-                        long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
-                        SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME,randomCloseTime);
-                        ELOG.i("黑屏补充数据系列");
-                        filterInsertOCInfo(EGContext.CLOSE_SCREEN);
-                        fillData();
-                    }
-                }
+                closeOC();
             }
         } catch (Throwable t) {
             ELOG.i(t.getMessage()+"  processOCprocessOC");
@@ -121,52 +119,73 @@ public class OCImpl {
     }
 
     /**
+     * 补数逻辑
+     */
+    private void closeOC(){
+        if(Build.VERSION.SDK_INT < 21){
+            SPHelper.setLongValue2SP(mContext,EGContext.END_TIME, System.currentTimeMillis());
+            OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.CLOSE_SCREEN);
+        }else if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24){
+            //TODO 黑屏补充数据，待验证
+            String openApp = SPHelper.getStringValueFromSP(mContext,EGContext.LAST_APP_NAME, "");
+            if (!TextUtils.isEmpty(openApp)) {
+                // 补充时间
+                String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LAST_OPEN_TIME, "");
+                if(TextUtils.isEmpty(lastOpenTime)){
+                    lastOpenTime = "0";
+                }
+                long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
+                SPHelper.setLongValue2SP(mContext,EGContext.END_TIME,randomCloseTime);
+                ELOG.i("黑屏补充数据系列");
+                filterInsertOCInfo(EGContext.CLOSE_SCREEN);
+                fillData();
+            }
+        }
+    }
+    /**
      * 补数逻辑，在屏幕亮屏但是正在锁屏未解锁的时候，对closeTime为空的数据进行补数操作；
      * 在opten时间和现在时间之间随机一个值：差值在5min左右，直接补数，对于小于5min的频繁的开锁屏不做处理，后续依然有补数操作
      * 为了保险起见，如果屏幕亮屏紧随解锁屏，则在正常状态下进行一批的补数操作
      *
      */
     public void fillData(){
-        //TODO 按逻辑注释
         ELOG.i("ocInfo 5&6系统进入补数逻辑...");
-        JSONArray fillDataArray = null;
+        List<JSONObject> fillDataList = null;
         int blankCount = 0;
         try {
-            JSONArray runningApps = TableOC.getInstance(mContext).selectRunning();
-            if(runningApps == null || runningApps.length() < 1){
+            /**
+             * 1.如果内存没数据则从db读取一次，然后赋值给内存变量，然后做数据闭合
+             * 2.如果有数据就用内存数据做闭合
+             * 3.闭合完内存数据同步给db
+             */
+            if(mRunningApps == null || mRunningApps.size() < 1){
                 return;
             }
             JSONObject json = null;
-            fillDataArray = new JSONArray();
-            List list = SystemUtils.getDiffNO(runningApps.length());
-            int random;
-            for (int i = 0;i < runningApps.length(); i++) {
-                if(blankCount >= 5){
+            fillDataList = new ArrayList<JSONObject>();
+            for (int i = 0; i < mRunningApps.size(); i++) {
+                if(blankCount >= EGContext.BLANK_COUNT_MAX){
                     break;
                 }
-                json = (JSONObject)runningApps.get(i);
-                random = (Integer)list.get(i);
+                json = mRunningApps.get(i);
                 String openTime = json.optString(DeviceKeyContacts.OCInfo.ApplicationOpenTime);
                 long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(openTime));
-//                ELOG.i("    random ::::::" + random);
-                if(randomCloseTime == -1){//小于5min的频繁的开锁屏不做处理
+                if(randomCloseTime == -1){//小于轮询周期的频繁的开锁屏不做处理
                     continue;
                 }
                 String apn = json.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
-                ELOG.i(apn + " -------apn" + "    random ::::::" + random);
                 if (!TextUtils.isEmpty(apn)) {
-                    json.put(DeviceKeyContacts.OCInfo.ApplicationPackageName,
-                            apn);
+                    mRunningApps.remove(json);
                     json.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime,
-                            String.valueOf(randomCloseTime- random));//再随机为了防止结束时间一样
+                            String.valueOf(randomCloseTime));//再随机为了防止结束时间一样
                     json.put(DeviceKeyContacts.OCInfo.SwitchType, EGContext.CLOSE_SCREEN);
-                    fillDataArray.put(json);
+                    fillDataList.add(json);
                 }else {
                     blankCount += 1;
                 }
             }
             // 一次应用操作闭合，更新OCCunt表，打开次数、应用运行状态
-            TableOC.getInstance(mContext).updateStopState(fillDataArray);
+            TableOC.getInstance(mContext).insertArray(fillDataList);
         }catch (Throwable t){
             ELOG.i(t.getMessage()+"fillData");
         }
@@ -183,51 +202,66 @@ public class OCImpl {
      * </pre>
      */
     @SuppressWarnings("deprecation")
-    public void getInfoByVersion() {
+    public void getInfoByVersion(boolean isOCCollected,boolean isXXXCollected,JSONObject obj) {
         // 4.x和以下版本判断,逻辑: 有权限申请系统API获取; 无权限直接使用5.x/6.x版本
-        if (Build.VERSION.SDK_INT < 21) {
+        if (Build.VERSION.SDK_INT < 21) {//4.x
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.GET_TASKS)) {
                 getRunningTasks();
-            } else {
-                getProcApps();
+            }else {//没权限，用xxxinfo方式收集
+                getProcApps(obj);
             }
-        } else if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {
-            // 确定5.0和以上版本UsageStatsManager启用5秒处理一次
-            if (SystemUtils.canUseUsageStatsManager(mContext)) {
-                 ELOG.i("开启了。UsageStatsManager功能");
-                processOCByUsageStatsManager();
-            } else {
-                // 确定5.0和以上版本proc判断30秒处理一次
-                if (isDurLThanThri()) {
-                    getProcApps();
+        } else if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {//5/6
+//            // 确定5.0和以上版本UsageStatsManager启用5秒处理一次
+//            if (SystemUtils.canUseUsageStatsManager(mContext)) {
+//                 ELOG.i("开启了。UsageStatsManager功能");
+//                processOCByUsageStatsManager();
+//            } else {
+//                // 确定5.0和以上版本proc判断30秒处理一次
+//
+//            }
+            obj = ProcUtils.getInstance(mContext).getRunningInfo();
+
+            JSONArray ocr = null;
+            //xxx是否收集
+            if(isXXXCollected){
+
+//                getProcApps(obj);
+                //判断oc是否需要收集
+                if(isOCCollected){
+                    ocr  = obj.optJSONArray(ProcUtils.RUNNING_OC_RESULT);
+                    ocCollection(ocr);
+                }
+            }else {//xxx不收集，oc一定收集
+                if(isOCCollected){
+                    ocr  = obj.optJSONArray(ProcUtils.RUNNING_OC_RESULT);
+                    ocCollection(ocr);
                 }
             }
+
         } else {
             // TODO 7.0以上待调研
         }
     }
-
+    private void ocCollection(JSONArray obj){
+        if(obj == null){
+//            obj = ProcUtils.getInstance(mContext).getRunningInfo();
+        }
+    }
     /**
      * getRunningTask、辅助功能 OC 信息采集
      */
     public void RunningApps(String pkgName, int collectionType) {
         try {
             this.pkgName = pkgName;
-//            ELOG.i(pkgName+"   pkgNamepkgNamepkgNamepkgNamepkgName");
             if(TextUtils.isEmpty(pkgName)){
                 return;
             }
-            JSONArray cacheApps = TableOC.getInstance(mContext).selectRunning();
-            ELOG.i("cacheApps::::::   " + cacheApps);
-            if (cacheApps != null && cacheApps.length() > 0) {
-                removeRepeat(cacheApps);
-                if (cacheApps != null && cacheApps.length() > 0) {
+            if (mRunningApps != null && mRunningApps.size() > 0) {
+                removeRepeat(mRunningApps);
+                if (mRunningApps != null && mRunningApps.size() > 0) {
                     // 完成一次闭合，存储到OC表
-//                    TableOCTemp.getInstance(mContext).insert(cacheApps);
-                    ELOG.i("RunningApps:::::::" + cacheApps);
-                    TableOC.getInstance(mContext).insertArray(cacheApps);
-                    // 一次应用操作闭合，更新OCCunt表，打开次数、应用运行状态
-                    TableOC.getInstance(mContext).updateStopState(cacheApps);
+                    // 更新缓存表
+                    closeState2DB(mRunningApps);
                 }
                 if (!TextUtils.isEmpty(pkgName)) {
                     updateCache(pkgName ,collectionType);
@@ -284,103 +318,143 @@ public class OCImpl {
         } catch (Throwable tw) {
         }
     }
-
+    private long lastAvailableTime = -1;
     /**
      * 根据包名进行一系列的处理
      *
      * @param packageName
      */
     private void processPkgName(String packageName) {
-        ELOG.i("根据包名做一系列处理：获取到的包名：："+packageName);
-        if (TextUtils.isEmpty(packageName)) {
-            return;
-        }
-        if(!TextUtils.isEmpty(mLastPkgName)){//值非空则为立即切换
-            SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME, System.currentTimeMillis());
-        }else {//值为空则有时间间隔，随机取结束时间
-            saveSPOCInfo();
-            mLastPkgName = SPHelper.getStringValueFromSP(mContext,EGContext.LASTPACKAGENAME,"");
-        }
-        JSONObject ocJson = getOCInfo(packageName, EGContext.OC_COLLECTION_TYPE_RUNNING_TASK);
-        // 是否首次打开
-        if (TextUtils.isEmpty(mLastPkgName)) {
-            ProcessManager.saveSP(mContext,ocJson);
-        } else {
-//            //锁屏触发的存储数据
-//            if(!ProcessManager.getIsCollected()){
-//                filterInsertOCInfo(EGContext.CLOSE_SCREEN);
-//                return;
+        try {
+            ELOG.i("根据包名做一系列处理：获取到的包名：："+packageName);
+            if (TextUtils.isEmpty(packageName)) {
+                return;
+            }
+            JSONObject ocJson = getOCInfo(packageName, EGContext.OC_COLLECTION_TYPE_RUNNING_TASK);
+            if(!TextUtils.isEmpty(mLastPkgName)){//值非空则为立即切换
+                if(mCache == null){
+                    mCache = new JSONObject();
+                }
+                if(TextUtils.isEmpty(mCache.optString(EGContext.LAST_OPEN_TIME))){
+                    if(lastAvailableTime == -1){
+                        lastAvailableTime = SPHelper.getLongValueFromSP(mContext,EGContext.LAST_AVAILABLE_TIME,0);
+                    }
+                    long time = System.currentTimeMillis()- lastAvailableTime;
+                    if(time > EGContext.OC_CYCLE){
+                        lastAvailableTime = System.currentTimeMillis();
+                        SPHelper.setLongValue2SP(mContext,EGContext.LAST_AVAILABLE_TIME,lastAvailableTime);
+                        saveCacheOCInfo(ocJson);
+                    }
+                }
+                if (!packageName.equals(mLastPkgName)) {
+                    ELOG.i("=======切换包名。即将保存"+packageName+"  OLD "+mLastPkgName);
+                    mCache.put(EGContext.END_TIME, System.currentTimeMillis());//endTime
+                    //2.入库当前的缓存appTime
+                    filterInsertOCInfo(EGContext.APP_SWITCH);
+                    // 3.如果打开的包名与缓存的包名不一致，更新新pkgName到sp
+                    mLastPkgName = packageName;
+                    saveCacheOCInfo(ocJson);
+                }
+            }else {//值为空则要么第一次打开，要么有时间间隔，需随机取结束时间
+                if(mCache == null){
+                    mCache = new JSONObject();
+                }
+                mLastPkgName = packageName;
+                //第一次打开存数进内存
+                saveCacheOCInfo(ocJson);
+            }
+
+//            // 是否首次打开
+//            if (TextUtils.isEmpty(mLastPkgName)) {
+//            } else {
+//                //如果当前sp没值或者被清理过了，则记录当前oc部分信息到sp
+//                String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LAST_OPEN_TIME, "");
+//                ELOG.i("OC新的轮询，lastOpenTime == "+lastOpenTime);
+//                if(TextUtils.isEmpty(lastOpenTime) && (System.currentTimeMillis() - mLastAvailableOpenOrCloseTime > EGContext.OC_CYCLE)){
+//                    ELOG.i("OC新的轮询，如果当前sp中，oc没值则进去当前应用信息");
+//                    mLastAvailableOpenOrCloseTime = System.currentTimeMillis();
+//                    mLastPkgName = packageName;
+//                    ProcessManager.saveSP(mContext,ocJson);
+//                }
+//
 //            }
-            //如果当前sp没值或者被清理过了，则记录当前oc部分信息到sp
-            String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "0");
-            ELOG.i("OC新的轮询，lastOpenTime == "+lastOpenTime);
-            if(TextUtils.isEmpty(lastOpenTime) || lastOpenTime.equals("0")){
-                ELOG.i("OC新的轮询，如果当前sp中，oc没值则进去当前应用信息");
-                mLastPkgName = packageName;
-                ProcessManager.saveSP(mContext,ocJson);
-            }
-            if (!packageName.equals(mLastPkgName)) {
-                 ELOG.i("=======切换包名。即将保存"+packageName+"  OLD "+mLastPkgName);
-                //2.入库当前的缓存appTime
-                filterInsertOCInfo(EGContext.APP_SWITCH);
-                // 3.如果打开的包名与缓存的包名不一致，更新新pkgName到sp
-                mLastPkgName = packageName;
-                ProcessManager.saveSP(mContext,ocJson);
-            }
+        }catch (Throwable t){
+
         }
+
     }
 
-    private void saveSPOCInfo(){
-        String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
+    private void saveCacheOCInfo(JSONObject ocJson){
+        try {
+            if(mCache == null){
+                mCache = new JSONObject();
+            }
+            String pkgName = ocJson.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
+            ELOG.i("重新写进去sp里的pkgName = "+pkgName);
+            mCache.put(EGContext.LAST_PACKAGE_NAME,pkgName);//pkgName
+            mCache.put(EGContext.LAST_OPEN_TIME,ocJson.optString(DeviceKeyContacts.OCInfo.ApplicationOpenTime));//打开时间
+            mCache.put(EGContext.LAST_APP_NAME,ocJson.optString(DeviceKeyContacts.OCInfo.ApplicationName));
+            mCache.put(EGContext.LAST_APP_VERSION,ocJson.optString(DeviceKeyContacts.OCInfo.ApplicationVersionCode));
+            mCache.put(EGContext.APP_TYPE,ocJson.optString(DeviceKeyContacts.OCInfo.ApplicationType));
+//            String lastOpenTime = mCache.optString(EGContext.LAST_OPEN_TIME,"");
+//            if(!TextUtils.isEmpty(lastOpenTime)){
+//                long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
+//                ELOG.i("补数逻辑：得到的randomCloseTime"+randomCloseTime);
+//                if(randomCloseTime == -1){//不足轮询时间间隔，无效数据
+//                    mCache = null;
+//                    return;
+//                }
+//                //1.非首次打开，之前有pkgName缓存,设置当前时间往前推一点为结束时间
+//                mCache.put(EGContext.LAST_OPEN_TIME,lastOpenTime);
+//            }else {//没有开始时间则无需闭合
+//                return;
+//            }
+        }catch (Throwable t){
+
+        }
+
+        String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LAST_OPEN_TIME, "");
         if(TextUtils.isEmpty(lastOpenTime)){
             lastOpenTime = "0";
         }
-        long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
-        ELOG.i("补数逻辑：得到的randomCloseTime"+randomCloseTime);
-        if(randomCloseTime == -1){
-            return;
-        }
-        //1.非首次打开，之前有pkgName缓存,设置当前时间往前推一点为结束时间
-        SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME,randomCloseTime);
 
     }
     /**
      * 从Proc中读取数据
      */
-    private void getProcApps() {
-        JSONArray cacheApps = TableOC.getInstance(mContext).selectRunning();//结束时间为空，则为正在运行的app
+    private void getProcApps(JSONObject obj) {
+//        JSONArray cacheApps = TableOC.getInstance(mContext).selectRunning();//结束时间为空，则为正在运行的app
 //        ELOG.i(cacheApps + "   :::::::: cacheApps");
-        Set<String> nameSet = ProcessManager.getRunningForegroundApps(mContext);
+        //本次proc取到的值
+        Set<String> nameSet = ProcessManager.getRunningForegroundApps(mContext,obj);
         if(nameSet == null){
-            ELOG.i("XXXINFO没取到数据");
+            ELOG.i("本次proc没获取到数据");
             return;
         }
         try {
-            if (cacheApps == null || cacheApps.length() < 1) {
-                JSONArray ocArray = new JSONArray();
+            //第一次轮询，内存没活跃app
+            if(mRunningApps == null || mRunningApps.size()< 1){
                 for (String name:nameSet) {
                     String pkgName = name.replaceAll(" ","");
                     if (!TextUtils.isEmpty(pkgName)) {
-                        ocArray.put(getOCInfo(pkgName.replaceAll(" ", ""), EGContext.OC_COLLECTION_TYPE_PROC));
+                        mRunningApps.add(getOCInfo(pkgName.replaceAll(" ", ""), EGContext.OC_COLLECTION_TYPE_PROC));
                     }
                 }
-//                ELOG.i("getProcApps 280:::::" + ocArray);
-                TableOC.getInstance(mContext).insertArray(ocArray);
-            } else {
-                // 去重
-                JSONObject res = removeRepeat(cacheApps, nameSet);
+            }else {
+                // 本次proc取到的值与原来的内存数据去重
+                JSONObject res = removeRepeat(mRunningApps, nameSet);
                 if (res != null && res.length() > 0) {
                     try {
-                        cacheApps = new JSONArray(String.valueOf(res.get("cache")));
-                        ELOG.i(cacheApps + "   ::::::::: cacheApps:::::");
+                        mRunningApps = (ArrayList<JSONObject>)(res.get("cache"));
+                        ELOG.i(mRunningApps + "   ::::::::: cacheApps:::::");
                     } catch (Throwable t) {
                         ELOG.i("   ::::::::: cacheApps 异常:::::");
-                        cacheApps = null;
+//                        cacheApps = null;
                     }
                 }
-                if (cacheApps != null && cacheApps.length() > 0) {
+                if (mRunningApps != null && mRunningApps.size() > 0) {
                     // 更新缓存表
-                    updateCacheState(cacheApps);
+                    closeState2DB(mRunningApps);
                 }
                 try {
                     nameSet = (Set<String>) res.get("run");
@@ -390,7 +464,6 @@ public class OCImpl {
                 if (nameSet != null && nameSet.size() > 0) {
                     // 新增该时段缓存信息
                     addCache(nameSet);
-//                    ELOG.i("RUN   :" + nameSet);
                 }
             }
         } catch (Throwable t) {
@@ -403,40 +476,37 @@ public class OCImpl {
     /**
      * 缓存中应用列表与新获取应用列表去重
      */
-    private JSONObject removeRepeat(JSONArray cacheApps, Set<String> runApps) {
+    private JSONObject removeRepeat(List<JSONObject> cacheApps, Set<String> runApps) {
 
         JSONObject ocInfo = null, result = new JSONObject();
         try {
-            List list = SystemUtils.getDiffNO(cacheApps.length());
+            List list = SystemUtils.getDiffNO(cacheApps.size());
             int random;
-            List<JSONObject> oc = new ArrayList();
-            String apn;
-            for (int i = 0; i < cacheApps.length() - 1; i++) {
+            String apn = "";
+            for (int i = 0; i < cacheApps.size(); i++) {
                 random = (Integer)list.get(i);
-                ocInfo = (JSONObject)cacheApps.get(i);
+                ocInfo = cacheApps.get(i);
                 if (ocInfo == null || ocInfo.length() < 1){
                     continue;
                 }
-                // ELOG.i(i+"ocInfoocInfoocInfo :::: "+ocInfo);
                 ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime,
                     String.valueOf(System.currentTimeMillis() - random));
-                oc.add(ocInfo);
+                //内存里的pkgName
                 apn = ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName).replaceAll(" ", "");
+                //遍历当前获取到的，如果取到的值里不包含则close掉，包含则为一直存活的app,从当前set里去除
                 for (String name: runApps) {
-                    // ELOG.i(runApps.size()+" :::runApps.size() "+j);
                     String pkgName = name.replaceAll(" ", "");
-                    // ELOG.i(pkgName +"::::::::pkgName ::"+apn+":::::"+ apn.equals(pkgName));
                     if (!TextUtils.isEmpty(apn) && apn.equals(pkgName)) {
-                        oc.remove(oc.size() - 1);
-                        runApps.remove(name);
+//                        cacheApps.remove(cacheApps.size() - 1);
+                        cacheApps.remove(ocInfo);
+//                        runApps.remove(name);
                         break;
                     }
                 }
                 // ocInfo.put(DeviceKeyContacts.OCInfo.SwitchType, EGContext.SWITCH_TYPE_DEFAULT);
             }
             // ELOG.i(oc+" :::::: oc");
-            if (cacheApps != null && cacheApps.length() > 0) {
-                cacheApps = new JSONArray(oc);
+            if (cacheApps != null && cacheApps.size() > 0) {
                 result.put("cache", cacheApps);
                 // ELOG.i(cacheApps+" :::::: cacheApps");
             }
@@ -453,25 +523,10 @@ public class OCImpl {
     /**
      * 更新缓存表
      */
-    private void updateCacheState(JSONArray cacheApps) {
+    private void closeState2DB(List<JSONObject> cacheApps) {
         try {
-            if (cacheApps != null && cacheApps.length() > 0) {
-                // 缓存数据列表与新获取数据列表去重，缓存列表剩余为已经关闭的应用，需要转存储到OC表，并更新运行状态为0
-                JSONArray ocList = new JSONArray();
-                JSONObject oc = null;
-                for (int i = 0; i < cacheApps.length(); i++) {
-                    oc = (JSONObject)cacheApps.get(i);
-//                    int numb = oc.optInt(DeviceKeyContacts.OCInfo.CU) + 1;
-                    String apn = oc.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
-                    String act = oc.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime);
-//                    oc.remove(DeviceKeyContacts.OCInfo.CU);
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationPackageName, apn);
-                    jsonObject.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime, act);
-//                    jsonObject.put(DeviceKeyContacts.OCInfo.CU, numb);忽略
-                    ocList.put(jsonObject);
-                }
-                TableOC.getInstance(mContext).updateStopState(ocList);
+            if (cacheApps != null && cacheApps.size() > 0) {
+                TableOC.getInstance(mContext).insertArray(cacheApps);
             }
         } catch (Throwable e) {
             ELOG.e(e);
@@ -483,37 +538,12 @@ public class OCImpl {
      */
     private void addCache(Set<String> runApps) {
         try {
-            List oc = new ArrayList();
+            List<JSONObject> oc = new ArrayList<JSONObject>();
             if (!runApps.isEmpty()) {
-                // 缓存数据列表与新获取数据列表去重，新获取列表剩余未新打开的应用，需要缓存到OCCount中，
-                List<String> ocInfo = TableOC.getInstance(mContext).getIntervalApps();
-                JSONArray runList = getOCArray(runApps);
-
-                JSONArray updateOCInfo = new JSONArray();
-                // 将新增列表拆开，该时段有应用打开记录的修改更新记录，该时段没有应用打开记录的新增记录
-                for (int i = runList.length() - 1; i >= 0; i--) {
-                    oc.add(runList.get(i));
-                    String pkgName = new JSONObject(String.valueOf(runList.get(i)))
-                        .optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
-                    if (!TextUtils.isEmpty(pkgName) && ocInfo.contains(pkgName)) {
-                        updateOCInfo.put(runList.get(i));
-                        // runList.remove(i);
-                        oc.remove(oc.size() - 1);
-                    }
-                }
-                runList = new JSONArray(oc);
-                if (updateOCInfo != null && updateOCInfo.length() > 0) {
-                    // 更新该时段有记录的应用信息，则更新缓存表中的运行状态为1
-                    TableOC.getInstance(mContext).updateRunState(updateOCInfo);
-                }
-                if (runList != null && runList.length() > 0) {
-                    // 新增该时段没有记录的应用信息
-//                    ELOG.i("addCache:::::" + runList);
-                    TableOC.getInstance(mContext).insertArray(runList);
-                }
+                oc = getOCArray(runApps);
+                mRunningApps = oc;
             }
         } catch (Throwable t) {
-
         }
 
     }
@@ -521,15 +551,15 @@ public class OCImpl {
     /**
      * 根据读取出的包列表，获取应用信息并组成json格式添加到列表
      */
-    private JSONArray getOCArray(Set<String> runApps) {
-        JSONArray list = null;
+    private List<JSONObject> getOCArray(Set<String> runApps) {
+        List<JSONObject> list = null;
         try {
-            list = new JSONArray();
+            list = new ArrayList<JSONObject>();
             for (String name:runApps) {
                 String pkgName = name.trim();
                 if (!TextUtils.isEmpty(pkgName)) {
                     JSONObject ocJson = getOCInfo(pkgName, EGContext.OC_COLLECTION_TYPE_PROC);
-                    list.put(ocJson);
+                    list.add(ocJson);
                 }
             }
         } catch (Throwable e) {
@@ -544,18 +574,9 @@ public class OCImpl {
     private void updateCache(String pkgName,int collectionType) {
         try {
             if (!TextUtils.isEmpty(pkgName)) {
-                // 根据包名和时段查询，判断当前时段是否已经启动过，如果有就更新，如果没有就新建
-                List<String> ocInfo = TableOC.getInstance(mContext).getIntervalApps();
-                JSONObject ocJson = getOCInfo(pkgName, EGContext.OC_COLLECTION_TYPE_RUNNING_TASK);
-//                ELOG.i(pkgName + " ==pkgName  &  ocJson =="+ocJson);
-                if (ocInfo.contains(pkgName)) {
-                    // 该时段存在数据,使用已有记录的数据 更新开始时间结束时间
-                    TableOC.getInstance(mContext).update(ocJson);
-                } else {
-                    // 该时段没有数据，存储该时段的记录
-                    ProcessManager.saveSP(mContext,ocJson);
-                    TableOC.getInstance(mContext).insert(ocJson);
-                }
+                JSONObject ocJson = getOCInfo(pkgName, collectionType);
+                mRunningApps.clear();
+                mRunningApps.add(ocJson);
             }else {
                 ELOG.i(" updateCache  else  pkgName == null");
             }
@@ -568,19 +589,17 @@ public class OCImpl {
     /**
      * 去除缓存中的重复，剩余为已经关闭的应用
      */
-    private void removeRepeat(JSONArray cacheApps) {
+    private void removeRepeat(List<JSONObject> cacheApps) {
         try {
             JSONObject json = null;
-            List list = SystemUtils.getDiffNO(cacheApps.length());
+            List list = SystemUtils.getDiffNO(cacheApps.size());
             int random;
-            for (int i = cacheApps.length() - 1; i >= 0; i--) {
-                json = (JSONObject)cacheApps.get(i);
+            for (int i = cacheApps.size() - 1; i >= 0; i--) {
+                json =cacheApps.get(i);
                 random = (Integer)list.get(i);
-
                 String apn = json.getString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
-//                ELOG.i(apn + " ********** apn" + "    random ::::::" + random);
                 if (!TextUtils.isEmpty(apn) && apn.equals(pkgName)) {
-                    cacheApps.remove(i);
+                    cacheApps.remove(json);
                     ELOG.i(" -------remove repeat ");
                     pkgName = null;
                     continue;
@@ -637,13 +656,13 @@ public class OCImpl {
     }
 
     public void filterInsertOCInfo(String switchType) {
-        String OldPkgName = SPHelper.getStringValueFromSP(mContext,EGContext.LASTPACKAGENAME,"");
-        String appName = SPHelper.getStringValueFromSP(mContext,EGContext.LASTAPPNAME, "");
-        String appVersion = SPHelper.getStringValueFromSP(mContext,EGContext.LASTAPPVERSION,"");
-        String openTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
-        Long closeTime = SPHelper.getLongValueFromSP(mContext,EGContext.ENDTIME, 0);
+        String OldPkgName = mCache.optString(EGContext.LAST_PACKAGE_NAME,"");
+        String appName =mCache.optString(EGContext.LAST_APP_NAME, "");
+        String appVersion =mCache.optString(EGContext.LAST_APP_VERSION,"");
+        String openTime =mCache.optString(EGContext.LAST_OPEN_TIME, "");
+        Long closeTime = mCache.optLong(EGContext.END_TIME, 0);
         ELOG.i("oc读到的sp里close时间:::"+closeTime);
-        String appType = SPHelper.getStringValueFromSP(mContext,EGContext.APP_TYPE, "");
+        String appType =mCache.optString(EGContext.APP_TYPE, "");
         if (TextUtils.isEmpty(OldPkgName) || TextUtils.isEmpty(appName) || TextUtils.isEmpty(appVersion)
             || TextUtils.isEmpty(openTime)) {
             return;
@@ -678,19 +697,17 @@ public class OCImpl {
                     }else {
                         TableOC.getInstance(mContext).insert(ocInfo);// 保存上一个打开关闭记录信息
                     }
-
-
                 }
             } catch (Throwable t) {
                 ELOG.e(t.getMessage()+"  filterInsertOCInfo has an exc");
             }
         }
         //置空
-        SPHelper.setStringValue2SP(mContext,EGContext.LASTPACKAGENAME,"");
-        SPHelper.setStringValue2SP(mContext,EGContext.LASTAPPNAME, "");
-        SPHelper.setStringValue2SP(mContext,EGContext.LASTAPPVERSION,"");
-        SPHelper.setStringValue2SP(mContext,EGContext.LASTOPENTIME, "");
-        SPHelper.setStringValue2SP(mContext,EGContext.APP_TYPE, "");
+        mCache.remove(EGContext.LAST_PACKAGE_NAME);
+        mCache.remove(EGContext.LAST_APP_NAME);
+        mCache.remove(EGContext.LAST_APP_VERSION);
+        mCache.remove(EGContext.LAST_OPEN_TIME);
+        mCache.remove(EGContext.APP_TYPE);
     }
 
     /**
@@ -698,14 +715,14 @@ public class OCImpl {
      *
      * @return
      */
-    private boolean isDurLThanThri() {
-        long now = System.currentTimeMillis();
-        if (mProcessTime == 0 || (now - mProcessTime) >= EGContext.OC_CYCLE_OVER_5) {
-            mProcessTime = now;
-            return true;
-        }
-        return false;
-    }
+//    private boolean isDurLThanThri() {
+//        long now = System.currentTimeMillis();
+//        if (mProcessTime == 0 || (now - mProcessTime) >= EGContext.OC_CYCLE_OVER_5) {
+//            mProcessTime = now;
+//            return true;
+//        }
+//        return false;
+//    }
 
     /**
      * android 5以上，有UsageStatsManager权限可以使用的
@@ -735,10 +752,10 @@ public class OCImpl {
             if (!TextUtils.isEmpty(usmPkg)) {
                 processPkgName(usmPkg);
             } else {
-                getProcApps();
+//                getProcApps();
             }
         } catch (Throwable e) {
-            getProcApps();
+//            getProcApps();
         }
     }
 

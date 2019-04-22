@@ -227,22 +227,22 @@ public class DeviceKeyContacts {
     public static final String DY = "DY";
   }
 
-  /**
-   * @Copyright © 2018 Analysys Inc. All rights reserved.
-   * @Description: 进程信息, 几种方式获取
-   * @Version: 1.0
-   * @Create: 2018年10月8日 下午1:38:24
-   * @Author: sanbo
-   */
-  public static class ProcessInfo {
-    public static final String NAME = "ProcessImpl";
-    // proc方式读取的数据
-    public static final String POC = "PROC";
-    // shell 执行top指令获取的数据
-    public static final String TOP = "TOP";
-    // shell 执行ps指令获取的数据
-    public static final String PS = "PS";
-  }
+//  /**
+//   * @Copyright © 2018 Analysys Inc. All rights reserved.
+//   * @Description: 进程信息, 几种方式获取
+//   * @Version: 1.0
+//   * @Create: 2018年10月8日 下午1:38:24
+//   * @Author: sanbo
+//   */
+//  public static class ProcessInfo {
+//    public static final String NAME = "ProcessImpl";
+//    // proc方式读取的数据
+//    public static final String POC = "PROC";
+//    // shell 执行top指令获取的数据
+//    public static final String TOP = "TOP";
+//    // shell 执行ps指令获取的数据
+//    public static final String PS = "PS";
+//  }
 
   /**
    * @Copyright © 2018 Analysys Inc. All rights reserved.
@@ -420,5 +420,7 @@ public class DeviceKeyContacts {
     public static final String RES_POLICY_MODULE_CL_BASE = "module_cl_base";
     //DEV
     public static final String RES_POLICY_MODULE_CL_DEV = "module_cl_dev";
+    //XXX
+    public static final String RES_POLICY_MODULE_CL_XXX = "module_cl_xxx";
   }
 }

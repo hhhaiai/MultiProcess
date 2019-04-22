@@ -229,12 +229,12 @@ public class MessageDispatcher {
             }
             if(Build.VERSION.SDK_INT < 21){//4.X
                 if(shouldRemoveDelay){
-//                    String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
+//                    String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LAST_OPEN_TIME, "");
 //                    if(TextUtils.isEmpty(lastOpenTime)){
 //                        lastOpenTime = "0";
 //                    }
 //                    long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
-//                    SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME,randomCloseTime);
+//                    SPHelper.setLongValue2SP(mContext,EGContext.END_TIME,randomCloseTime);
 //                    OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.NORMAL);
                     mHandler.removeMessages(msg.what);
                     sendMessage(msg,delayTime);
@@ -251,12 +251,12 @@ public class MessageDispatcher {
             }else if(Build.VERSION.SDK_INT > 20){//5.0以上
                 if(shouldRemoveDelay){
 //                    // 补充时间
-//                    String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
+//                    String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LAST_OPEN_TIME, "");
 //                    if(TextUtils.isEmpty(lastOpenTime)){
 //                        lastOpenTime = "0";
 //                    }
 //                    long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
-//                    SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME,randomCloseTime);
+//                    SPHelper.setLongValue2SP(mContext,EGContext.END_TIME,randomCloseTime);
 //                    OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.NORMAL);
 //                    OCImpl.getInstance(mContext).fillData();//批量入库补数
                     mHandler.removeMessages(msg.what);

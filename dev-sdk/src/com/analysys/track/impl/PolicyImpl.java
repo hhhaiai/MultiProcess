@@ -222,6 +222,11 @@ public class PolicyImpl {
                             setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_DEV,false);
                             continue;
                         }//1收集,默认值即为轮询的值，忽略最小最大,基本信息不轮询，发送时候现收集
+                    }else if(EGContext.MODULE_XXX.equals(module)){
+                        if ("0".equals(status)){//0不收集，跳过
+                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_XXX, false);
+                            continue;
+                        }
                     }
 
                     responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_STATUS,

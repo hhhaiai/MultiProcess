@@ -66,7 +66,7 @@ public class TableOC {
     /**
      * @param ocInfo
      */
-    public void insertArray(JSONArray ocInfo) {
+    public void insertArray(List<JSONObject> ocInfo) {
         SQLiteDatabase db = null;
         try {
 //            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_OC) || ocInfo == null){
@@ -76,12 +76,12 @@ public class TableOC {
             if(db == null){
                 return;
             }
-            if (ocInfo != null && ocInfo.length() > 0) {
+            if (ocInfo != null && ocInfo.size() > 0) {
                 db.beginTransaction();
                 JSONObject obj = null;
                 ContentValues cv = null;
-                ELOG.i(ocInfo.length() + "     ：：：：ocInfo size  ");
-                for (int i = 0; i < ocInfo.length(); i++) {
+                ELOG.i(ocInfo.size() + "     ：：：：ocInfo size  ");
+                for (int i = 0; i < ocInfo.size(); i++) {
                     obj = (JSONObject)ocInfo.get(i);
                     if (obj == null){//为空则过滤
                         continue;
@@ -115,34 +115,34 @@ public class TableOC {
     /**
      * 该时段有应用操作记录，更新记录状态做缓存
      */
-    public void update(JSONObject ocInfo) {
-        try {
-            if (ocInfo == null) {
-                return;
-            }
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if(db == null){
-                return;
-            }
-            String day = SystemUtils.getDay();
-            int timeInterval = Base64Utils.getTimeTag(System.currentTimeMillis());
-            ContentValues cv = getContentValues(ocInfo);
-//            ELOG.i(ocInfo + "  ocInfo update()");
-            db.update(DBConfig.OC.TABLE_NAME, cv,
-                DBConfig.OC.Column.APN + "=? and " + DBConfig.OC.Column.DY + "=? and "
-                    + DBConfig.OC.Column.TI + "=? and " + DBConfig.OC.Column.RS + "=?",
-                new String[] {EncryptUtils.encrypt(mContext,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName)), day,
-                    String.valueOf(timeInterval), ZERO});
-        } catch (Throwable e) {
-            if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(e+ "update() ..");
-            }
-
-        }finally {
-            DBManager.getInstance(mContext).closeDB();
-        }
-
-    }
+//    public void update(JSONObject ocInfo) {
+//        try {
+//            if (ocInfo == null) {
+//                return;
+//            }
+//            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+//            if(db == null){
+//                return;
+//            }
+//            String day = SystemUtils.getDay();
+//            int timeInterval = Base64Utils.getTimeTag(System.currentTimeMillis());
+//            ContentValues cv = getContentValues(ocInfo);
+////            ELOG.i(ocInfo + "  ocInfo update()");
+//            db.update(DBConfig.OC.TABLE_NAME, cv,
+//                DBConfig.OC.Column.APN + "=? and " + DBConfig.OC.Column.DY + "=? and "
+//                    + DBConfig.OC.Column.TI + "=? and " + DBConfig.OC.Column.RS + "=?",
+//                new String[] {EncryptUtils.encrypt(mContext,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName)), day,
+//                    String.valueOf(timeInterval), ZERO});
+//        } catch (Throwable e) {
+//            if(EGContext.FLAG_DEBUG_INNER){
+//                ELOG.e(e+ "update() ..");
+//            }
+//
+//        }finally {
+//            DBManager.getInstance(mContext).closeDB();
+//        }
+//
+//    }
 
     /**
      * json数据转成ContentValues

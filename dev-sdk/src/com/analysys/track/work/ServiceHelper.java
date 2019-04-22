@@ -196,12 +196,12 @@ public class ServiceHelper {
                 return;
             }
             // 补充时间
-            String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LASTOPENTIME, "");
+            String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LAST_OPEN_TIME, "");
             if(TextUtils.isEmpty(lastOpenTime)){
                 lastOpenTime = "0";
             }
             long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
-            SPHelper.setLongValue2SP(mContext,EGContext.ENDTIME,randomCloseTime);
+            SPHelper.setLongValue2SP(mContext,EGContext.END_TIME,randomCloseTime);
             OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.SERVICE_RESTART);
             ReceiverUtils.getInstance().registAllReceiver(mContext);
             PowerManager pm = (PowerManager)mContext.getSystemService(Context.POWER_SERVICE);

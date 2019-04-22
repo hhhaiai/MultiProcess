@@ -6,7 +6,12 @@ import com.analysys.track.utils.sp.SPHelper;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class JsonUtils {
     /**
@@ -33,5 +38,28 @@ public class JsonUtils {
             }
         }
     }
+    public static List<JSONObject> jsonArray2JsonObjList(JSONArray array){
+        List<JSONObject> list = null;
+        try {
+            JSONObject obj = null;
+            if(array != null && array.length() > 0){
+                list = new ArrayList<JSONObject>();
+                for(int i = 0;i<array.length();i++){
+                    obj = (JSONObject) array.get(i);
+                    list.add(obj);
+                }
+            }
+        }catch (Throwable t){
+        }
 
+        return list;
+    }
+    public static void save(JSONObject json, String key, String value) {
+        try {
+            if (json != null && !TextUtils.isEmpty(key) && !TextUtils.isEmpty(value)) {
+                json.put(key, value.trim());
+            }
+        } catch (Throwable e) {
+        }
+    }
 }
