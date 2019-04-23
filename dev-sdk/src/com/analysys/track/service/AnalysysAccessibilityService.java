@@ -65,6 +65,5 @@ public class AnalysysAccessibilityService extends AccessibilityService {
 
     @Override
     public void onInterrupt() {
-        ELOG.i(" onInterruptonInterruptonInterrupt");
     }
 }

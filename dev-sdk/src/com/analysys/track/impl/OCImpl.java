@@ -43,7 +43,6 @@ import android.util.Log;
 public class OCImpl {
 
     private Context mContext;
-//    private long mProcessTime = 0L;
     private String mLastPkgName = "";
     public static long mLastAvailableOpenOrCloseTime = -1;
     /**
@@ -106,12 +105,10 @@ public class OCImpl {
                         return;
                     }
                     JSONObject xxxInfo = null;
-//                    if (!AccessibilityHelper.isAccessibilitySettingsOn(mContext, AnalysysAccessibilityService.class)) {
                     getInfoByVersion(isOCCollected, isXXXCollected, xxxInfo);
-//                    }
                 }
             }else{
-                closeOC();
+                closeOC(false,System.currentTimeMillis());
             }
         } catch (Throwable t) {
             ELOG.i("xxx.oc", Log.getStackTraceString(t));
@@ -122,26 +119,42 @@ public class OCImpl {
 
     /**
      * 补数逻辑
+     * @param needCalculateTime
+     * @param closeTime
      */
-    private void closeOC(){
-        if(Build.VERSION.SDK_INT < 21){
-            SPHelper.setLongValue2SP(mContext,EGContext.END_TIME, System.currentTimeMillis());
-            OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.CLOSE_SCREEN);
-        }else if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24){
-            //TODO 黑屏补充数据，待验证
-            String openApp = SPHelper.getStringValueFromSP(mContext,EGContext.LAST_APP_NAME, "");
-            if (!TextUtils.isEmpty(openApp)) {
-                // 补充时间
-                String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LAST_OPEN_TIME, "");
-                if(TextUtils.isEmpty(lastOpenTime)){
-                    lastOpenTime = "0";
+    public void closeOC(boolean needCalculateTime,long closeTime){
+        try {
+            //        String lastAvailableTime = "";
+            if(Build.VERSION.SDK_INT < 21){//4.x
+                if(needCalculateTime && (System.currentTimeMillis() - closeTime < EGContext.OC_CYCLE)){//两次时间间隔如果小于5s,则无效
+                    ELOG.i("锁屏广播针对本次oc无效::::");
+                    if(mCache != null){
+                        mCache.remove(EGContext.LAST_OPEN_TIME);
+                    }
+                    return;
+                }else {//有效入库
+                    if(mCache != null){
+                        mCache.put(EGContext.END_TIME,mLastAvailableOpenOrCloseTime);
+                    }else {
+                        return;
+                    }
+                    filterInsertOCInfo(EGContext.CLOSE_SCREEN);
                 }
-                long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
-                SPHelper.setLongValue2SP(mContext,EGContext.END_TIME,randomCloseTime);
-                ELOG.i("黑屏补充数据系列");
-                filterInsertOCInfo(EGContext.CLOSE_SCREEN);
-                fillData();
+            }else if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24){//5/6
+                if(needCalculateTime && (System.currentTimeMillis() - closeTime < EGContext.OC_CYCLE_OVER_5)){//无效
+                    ELOG.i("锁屏广播针对本次oc无效::::");
+                    return;
+                }else {
+                    ELOG.i("接收关闭屏幕广播后的入库时间::::"+closeTime);
+                    /**
+                     * 读取数据库数据入缓存，只读取一次，缓存先改然后与数据库同步
+                     */
+//                    lastAvailableTime = SPHelper.getStringValueFromSP(mContext,EGContext.LAST_OPEN_TIME, "");
+                    fillData();//批量入库补数
+                }
             }
+        }catch (Throwable t){
+            ELOG.e(t);
         }
     }
     /**
@@ -458,7 +471,6 @@ public class OCImpl {
      * 从Proc中读取数据
      */
     private void getProcApps(Set<String> nameSet,long time) {
-//        JSONArray cacheApps = TableOC.getInstance(mContext).selectRunning();//结束时间为空，则为正在运行的app
         //本次proc取到的值
         if(nameSet == null|| nameSet.size()<=0){
             ELOG.i("本次proc没获取到数据");
