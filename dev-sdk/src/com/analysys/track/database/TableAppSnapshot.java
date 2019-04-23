@@ -169,7 +169,7 @@ public class TableAppSnapshot {
     /**
      * 更新应用标识状态
      */
-    public void update(String pkgName, String appTag) {
+    public void update(String pkgName, String appTag,long time) {
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if(db == null){
@@ -177,6 +177,7 @@ public class TableAppSnapshot {
             }
             ContentValues cv = new ContentValues();
             cv.put(DBConfig.AppSnapshot.Column.AT, EncryptUtils.encrypt(mContext,appTag));
+            cv.put(DBConfig.AppSnapshot.Column.AHT,time);
             db.update(DBConfig.AppSnapshot.TABLE_NAME, cv,
                 DBConfig.AppSnapshot.Column.APN + "= ? ", new String[] {EncryptUtils.encrypt(mContext,pkgName)});
         } catch (Throwable e) {

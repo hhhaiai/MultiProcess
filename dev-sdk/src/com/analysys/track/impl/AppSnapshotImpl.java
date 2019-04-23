@@ -180,7 +180,7 @@ public class AppSnapshotImpl {
     /**
      * 处理应用安装卸载更新广播改变状态
      */
-    public void changeActionType(final String pkgName, final int type) {
+    public void changeActionType(final String pkgName, final int type,final long time) {
         try {
             if (TextUtils.isEmpty(pkgName)) {
                 return;
@@ -206,10 +206,10 @@ public class AppSnapshotImpl {
                                 }
                             } else if (type == 1) {
                                 TableAppSnapshot.getInstance(mContext).update(pkgName,
-                                        EGContext.SNAP_SHOT_UNINSTALL);
+                                        EGContext.SNAP_SHOT_UNINSTALL,time);
                             } else if (type == 2) {
                                 TableAppSnapshot.getInstance(mContext).update(pkgName,
-                                        EGContext.SNAP_SHOT_UPDATE);
+                                        EGContext.SNAP_SHOT_UPDATE,time);
                             }
                         } catch (Throwable e) {
                             ELOG.e(e);
@@ -233,10 +233,10 @@ public class AppSnapshotImpl {
                         }
                     } else if (type == 1) {
                         TableAppSnapshot.getInstance(mContext).update(pkgName,
-                                EGContext.SNAP_SHOT_UNINSTALL);
+                                EGContext.SNAP_SHOT_UNINSTALL,time);
                     } else if (type == 2) {
                         TableAppSnapshot.getInstance(mContext).update(pkgName,
-                                EGContext.SNAP_SHOT_UPDATE);
+                                EGContext.SNAP_SHOT_UPDATE,time);
                     }
                 } catch (Throwable e) {
                     ELOG.e(e);

@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
+import com.analysys.track.database.TableAppSnapshot;
 import com.analysys.track.impl.OCImpl;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PermissionUtils;
@@ -85,8 +86,8 @@ public class MainActivity extends Activity {
                 time = 135792468;
                 OCImpl.getInstance(this).getProcApps(nameSet, time);
                 break;
-            case R.id.btnTT:
-//                test();
+            case R.id.btnT:
+                ELOG.e("snap:  "+TableAppSnapshot.getInstance(this).select());
                 break;
             case R.id.btnOC:
 //                ELOG.i("btnOC ---------");

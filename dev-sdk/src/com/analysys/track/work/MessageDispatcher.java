@@ -22,6 +22,8 @@ import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
+import org.json.JSONObject;
+
 
 public class MessageDispatcher {
     private long delay = 0;
@@ -134,12 +136,16 @@ public class MessageDispatcher {
 //    }
 
     // 应用安装卸载更新
-    public void appChangeReceiver(String pkgName, int type) {
+    public void appChangeReceiver(String pkgName, int type,long time) {
         try {
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_APP_CHANGE_RECEIVER;
             msg.arg1 = type;
-            msg.obj = pkgName;
+            JSONObject o = new JSONObject();
+            o.put("pkgName",pkgName);
+            o.put("time",time);
+            msg.obj = o;
+//            msg.obj = pkgName;
             sendMessage(msg, 0);
         }catch (Throwable t){
         }
@@ -385,7 +391,9 @@ public class MessageDispatcher {
                         break;
                     case MSG_APP_CHANGE_RECEIVER:
                         ELOG.d("接收到应用安装/卸载/更新消息");
-                        AppSnapshotImpl.getInstance(mContext).changeActionType(String.valueOf(msg.obj), msg.arg1);
+                        JSONObject js = null;
+                        js = (JSONObject) msg.obj;
+                        AppSnapshotImpl.getInstance(mContext).changeActionType(js.optString("pkgName"), msg.arg1,js.optLong("time"));
                         break;
                     case MSG_SCREEN_RECEIVER:
                         ELOG.d("接收到屏幕操作消息");

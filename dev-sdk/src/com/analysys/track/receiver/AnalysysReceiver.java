@@ -53,15 +53,15 @@ public class AnalysysReceiver extends BroadcastReceiver {
             if (PACKAGE_ADDED.equals(intent.getAction())) {
                 ELOG.d("接收到应用安装广播：" + packageName);
                 //TODO 多测试
-                MessageDispatcher.getInstance(mContext).appChangeReceiver(packageName, Integer.parseInt(EGContext.SNAP_SHOT_INSTALL));
+                MessageDispatcher.getInstance(mContext).appChangeReceiver(packageName, Integer.parseInt(EGContext.SNAP_SHOT_INSTALL),System.currentTimeMillis());
             }
             if (PACKAGE_REMOVED.equals(intent.getAction())) {
                 ELOG.d("接收到应用卸载广播：" + packageName);
-                MessageDispatcher.getInstance(mContext).appChangeReceiver(packageName, Integer.parseInt(EGContext.SNAP_SHOT_UNINSTALL));
+                MessageDispatcher.getInstance(mContext).appChangeReceiver(packageName, Integer.parseInt(EGContext.SNAP_SHOT_UNINSTALL),System.currentTimeMillis());
             }
             if (PACKAGE_REPLACED.equals(intent.getAction())) {
                 ELOG.d("接收到应用更新广播：" + packageName);
-                MessageDispatcher.getInstance(mContext).appChangeReceiver(packageName, Integer.parseInt(EGContext.SNAP_SHOT_UPDATE));
+                MessageDispatcher.getInstance(mContext).appChangeReceiver(packageName, Integer.parseInt(EGContext.SNAP_SHOT_UPDATE),System.currentTimeMillis());
             }
             if (CONNECTIVITY_CHANGE.equals(intent.getAction())) {
                 ELOG.d("接收网络变化广播");
