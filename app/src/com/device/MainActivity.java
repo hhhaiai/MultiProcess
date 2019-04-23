@@ -15,7 +15,9 @@ import com.analysys.track.impl.OCImpl;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PermissionUtils;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MainActivity extends Activity {
 
@@ -64,7 +66,24 @@ public class MainActivity extends Activity {
                 // LL.i(LocationImpl.getInstance(this).getBaseStation());
                 // 获取GPS位置
 //                LocationImpl.getInstance(this).getGPSInfo();
-
+                Set<String> nameSet = new HashSet<>();
+                nameSet.add("1");
+                nameSet.add("2");
+                nameSet.add("3");
+                long time = 123456789;
+                OCImpl.getInstance(this).getProcApps(nameSet, time);
+                nameSet.clear();
+                nameSet.add("3");
+                nameSet.add("4");
+                nameSet.add("5");
+                time = 987654321;
+                OCImpl.getInstance(this).getProcApps(nameSet, time);
+                nameSet.clear();
+                nameSet.add("6");
+                nameSet.add("7");
+                nameSet.add("8");
+                time = 135792468;
+                OCImpl.getInstance(this).getProcApps(nameSet, time);
                 break;
             case R.id.btnTT:
 //                test();

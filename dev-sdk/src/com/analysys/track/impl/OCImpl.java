@@ -305,7 +305,7 @@ public class OCImpl {
                 return;
             }
             if (mRunningApps != null && mRunningApps.size() > 0) {
-                removeRepeat(mRunningApps);
+                repeatHandle(mRunningApps);
                 if (mRunningApps != null && mRunningApps.size() > 0) {
                     // 完成一次闭合，存储到OC表
                     // 更新缓存表
@@ -470,78 +470,80 @@ public class OCImpl {
     /**
      * 从Proc中读取数据
      */
-    private void getProcApps(Set<String> nameSet,long time) {
+    public void getProcApps(Set<String> nameSet,long time) {
         //本次proc取到的值
         if(nameSet == null|| nameSet.size()<=0){
-            ELOG.i("本次proc没获取到数据");
+            ELOG.i("xxx.oc","本次proc没获取到数据");
             return;
         }
 
         try {
-            ELOG.i("xxx.oc","mRunningApps:"+(mRunningApps== null ?" null ":mRunningApps.toString()));
-            ELOG.i("xxx.oc","ocr:"+nameSet.toString());
+            ELOG.i("xxx.oc","当前缓存列表:"+(mRunningApps== null ?" null ":mRunningApps.toString()));
+            ELOG.i("xxx.oc","新来的列表:"+nameSet.toString());
             //第一次轮询，内存没活跃app
             if(mRunningApps == null || mRunningApps.size()< 1){
                 mRunningApps = new ArrayList<JSONObject>();
                 for (String name:nameSet) {
                     String pkgName = name.replaceAll(" ","");
-                    ELOG.i("pkgName = "+pkgName);
+//                    ELOG.i("pkgName = "+pkgName);
                     if (!TextUtils.isEmpty(pkgName)) {
                         mRunningApps.add(getOCInfo(pkgName, EGContext.OC_COLLECTION_TYPE_PROC,time));
                     }
                 }
             }else {
                 // 本次proc取到的值与原来的内存数据去重
-                JSONObject res = removeRepeat(mRunningApps, nameSet);
-                if (res != null && res.length() > 0) {
-                    try {
-                        mRunningApps = (ArrayList<JSONObject>)(res.get("cache"));
-                        ELOG.i(mRunningApps + "   ::::::::: cacheApps:::::");
-                    } catch (Throwable t) {
-                        ELOG.i("   ::::::::: cacheApps 异常:::::");
-//                        cacheApps = null;
-                    }
-                }
-                if (mRunningApps != null && mRunningApps.size() > 0) {
-                    // 更新缓存表
-                    closeState2DB(mRunningApps);
-                }
-                try {
-                    nameSet = (Set<String>) res.get("run");
-                } catch (Throwable t) {
-                    nameSet = null;
-                }
-                if (nameSet != null && nameSet.size() > 0) {
-                    // 新增该时段缓存信息
-                    addCache(nameSet, time);
-                }
+                repeatHandle(nameSet,time);
+//                if (res != null && res.length() > 0) {
+//                    try {
+//                        mRunningApps = (ArrayList<JSONObject>)(res.get("cache"));
+//                        ELOG.i(mRunningApps + "   ::::::::: cacheApps:::::");
+//                    } catch (Throwable t) {
+//                        ELOG.i("   ::::::::: cacheApps 异常:::::");
+////                        cacheApps = null;
+//                    }
+//                }
+//                if (mRunningApps != null && mRunningApps.size() > 0) {
+//                    // 更新缓存表
+//                    closeState2DB(mRunningApps);
+//                }
+//                try {
+//                    nameSet = (Set<String>) res.get("run");
+//                } catch (Throwable t) {
+//                    nameSet = null;
+//                }
+//                if (nameSet != null && nameSet.size() > 0) {
+//                    // 新增该时段缓存信息
+//                    addCache(nameSet, time);
+//                }
             }
         } catch (Throwable t) {
             if(EGContext.FLAG_DEBUG_INNER){
                 ELOG.i("xxx.oc",Log.getStackTraceString(t));
             }
         }
-        ELOG.i("xxx.oc","结束时： :"+mRunningApps.toString());
+        ELOG.i("xxx.oc","结束时缓存列表： :"+mRunningApps.toString());
     }
 
     /**
      * 缓存中应用列表与新获取应用列表去重
      */
-    private JSONObject removeRepeat(List<JSONObject> cacheApps, Set<String> runApps) {
-//        ELOG.d("xxx.oc", "removeRepeat上次列表" + cacheApps);
-//        ELOG.d("xxx.oc", "removeRepeat本次列表" + runApps);
+    private void repeatHandle(Set<String> runApps,long time) {
+        ELOG.d("xxx.oc", "removeRepeat缓存列表" + mRunningApps);
+        ELOG.d("xxx.oc", "removeRepeat本次列表" + runApps);
 
-        if (runApps == null || cacheApps == null) {
-            return new JSONObject();
+        if (runApps == null || mRunningApps == null) {
+            return;
         }
-        JSONObject tempMemoryJson = null, result = new JSONObject();
+        JSONObject tempMemoryJson = null;
         List<JSONObject> cacheJson = new ArrayList<JSONObject>();
+        List<JSONObject> shouldRemoveObject = new ArrayList<JSONObject>();
         try {
-            List list = SystemUtils.getDiffNO(cacheApps.size());
+            List list = SystemUtils.getDiffNO(mRunningApps.size());
             int random;
             String pkgName = "";
-            for (int i = 0; i < cacheApps.size(); i++) {
-                tempMemoryJson = cacheApps.get(i);
+            long openTime = -1;
+            for (int i = 0; i < mRunningApps.size(); i++) {
+                tempMemoryJson = mRunningApps.get(i);
                 if (tempMemoryJson == null || tempMemoryJson.length() < 1) {
                     continue;
                 }
@@ -549,19 +551,37 @@ public class OCImpl {
 
                 //  如果现在列表里没有，则给与结束时间，填写至cacheJson
                 pkgName = tempMemoryJson.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName).replaceAll(" ", "");
-                if (!runApps.contains(pkgName)) {
+                openTime = tempMemoryJson.optLong(DeviceKeyContacts.OCInfo.ApplicationOpenTime);
+                ELOG.e("xxx.oc",!runApps.contains(pkgName)+" :::: !runApps.contains(pkgName)::"+pkgName);
+                if (!runApps.contains(pkgName)) {//现有的不包含，则为闭合数据
+                    shouldRemoveObject.add(tempMemoryJson);
                     // 取结束时间，闭合
                     String closeTime = String.valueOf(System.currentTimeMillis() - random);
                     tempMemoryJson.put(DeviceKeyContacts.OCInfo.ApplicationCloseTime, closeTime);
                     cacheJson.add(tempMemoryJson);
+                }else {//现有的包含，则为长久存活数据，替换openTime
+                    runApps.remove(pkgName);
+//                    mRunningApps.add(getOCInfo(pkgName, EGContext.OC_COLLECTION_TYPE_PROC,openTime));
+//                    result.put(pkgName,openTime);
                 }
             }
-            result.put("cache", cacheJson);
-            result.put("run", runApps);
+            for(JSONObject obj:shouldRemoveObject){
+                mRunningApps.remove(obj);
+            }
+            if(cacheJson != null && cacheJson.size()>0){
+                // 更新缓存表
+                ELOG.e("xxx.oc", "最终入库数据：：" + cacheJson);
+                closeState2DB(cacheJson);
+            }
+            if (runApps != null && runApps.size() > 0) {
+                // 新增该时段缓存信息
+                addCache(runApps, time);
+            }
+//            result.put("run", runApps);
         } catch (Throwable t) {
             ELOG.d("xxx.oc", t);
         }
-        return result;
+        ELOG.e("xxx.oc", "最终缓存本次列表mRunningApps：：" + mRunningApps);
     }
 
     /**
@@ -570,7 +590,7 @@ public class OCImpl {
     private void closeState2DB(List<JSONObject> cacheApps) {
         try {
             if (cacheApps != null && cacheApps.size() > 0) {
-                ELOG.i("xxx.oc","closeState2DB:"+cacheApps.toString());
+//                ELOG.i("xxx.oc","closeState2DB:"+cacheApps.toString());
                 TableOC.getInstance(mContext).insertArray(cacheApps);
             }
         } catch (Throwable e) {
@@ -586,10 +606,11 @@ public class OCImpl {
             if(runApps == null || runApps.size()<1){
                 return;
             }
-            List<JSONObject> oc = new ArrayList<JSONObject>();
+            ELOG.e("xxx.oc","新增列表:::"+runApps);
+//            List<JSONObject> oc = new ArrayList<JSONObject>();
             if (!runApps.isEmpty()) {
-                oc = getOCArray(runApps ,time);
-                mRunningApps = oc;
+                getOCArray(runApps ,time);
+//                mRunningApps = oc;
             }
         } catch (Throwable t) {
         }
@@ -599,16 +620,16 @@ public class OCImpl {
     /**
      * 根据读取出的包列表，获取应用信息并组成json格式添加到列表
      */
-    private List<JSONObject> getOCArray(Set<String> runApps,long time) {
-        List<JSONObject> list = null;
+    private void getOCArray(Set<String> runApps,long time) {
+//        List<JSONObject> list = null;
         try {
             if(runApps == null|| runApps.size()<1){
-                return list;
+                return;
             }
             List randomList = SystemUtils.getDiffNO(runApps.size());
             int random;
             int i = 0;
-            list = new ArrayList<JSONObject>();
+//            list = new ArrayList<JSONObject>();
             String pkgName = null;
             for (String name:runApps) {
                 random = (int)randomList.get(i);
@@ -616,13 +637,13 @@ public class OCImpl {
                 pkgName = name.trim();
                 if (!TextUtils.isEmpty(pkgName)) {
                     JSONObject ocJson = getOCInfo(pkgName, EGContext.OC_COLLECTION_TYPE_PROC,time - random);
-                    list.add(ocJson);
+                    mRunningApps.add(ocJson);
                 }
             }
         } catch (Throwable e) {
             ELOG.e(e);
         }
-        return list;
+//        return list;
     }
 
     /**
@@ -646,7 +667,7 @@ public class OCImpl {
     /**
      * 去除缓存中的重复，剩余为已经关闭的应用
      */
-    private void removeRepeat(List<JSONObject> cacheApps) {
+    private void repeatHandle(List<JSONObject> cacheApps) {
         try {
             JSONObject json = null;
             List list = SystemUtils.getDiffNO(cacheApps.size());
