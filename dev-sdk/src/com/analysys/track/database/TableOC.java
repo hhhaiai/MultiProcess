@@ -67,6 +67,7 @@ public class TableOC {
      * @param ocInfo
      */
     public void insertArray(List<JSONObject> ocInfo) {
+//        ELOG.d("xxx.oc","come in insertArray..."+ocInfo);
         SQLiteDatabase db = null;
         try {
 //            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_OC) || ocInfo == null){
@@ -74,28 +75,34 @@ public class TableOC {
 //            }
             db = DBManager.getInstance(mContext).openDB();
             if(db == null){
+                ELOG.e("xxx.oc","insertArray db is null,return...");
                 return;
             }
             if (ocInfo != null && ocInfo.size() > 0) {
+//                ELOG.d("xxx.oc","come in insertArray..."+ocInfo.size());
                 db.beginTransaction();
                 JSONObject obj = null;
                 ContentValues cv = null;
-                ELOG.i(ocInfo.size() + "     ：：：：ocInfo size  ");
+//                ELOG.i(ocInfo.size() + "     ：：：：ocInfo size  ");
                 for (int i = 0; i < ocInfo.size(); i++) {
-                    obj = (JSONObject)ocInfo.get(i);
+                    obj = ocInfo.get(i);
                     if (obj == null){//为空则过滤
+                        ELOG.e("xxx.oc","insertArray obj is null,continue...");
                         continue;
                     }
-                    if (TextUtils.isEmpty(obj.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime))) {//一条新打开的app信息,执行插入操作
+                    String act = obj.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime);
+//                    ELOG.e("xxx.oc","insertArray act is ..."+act);
+                    if (!TextUtils.isEmpty(act)) {//一条新打开的app信息,执行插入操作
                         cv = getContentValues(obj);
                         // ELOG.i(cv+" ：：：：ocInfo "+DBConfig.OC.Column.CU);
                         cv.put(DBConfig.OC.Column.CU, 1);
                         db.insert(DBConfig.OC.TABLE_NAME, null, cv);
-                    } else {//包含closeTime,修改个别字段
-                        cv = getContentValuesForUpdate(obj);
-                        db.update(DBConfig.OC.TABLE_NAME, cv, DBConfig.OC.Column.APN + "=?",
-                            new String[] {obj.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName)});
                     }
+//                    else {//包含closeTime,修改个别字段
+//                        cv = getContentValuesForUpdate(obj);
+//                        db.update(DBConfig.OC.TABLE_NAME, cv, DBConfig.OC.Column.APN + "=?",
+//                            new String[] {obj.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName)});
+//                    }
                 }
                 db.setTransactionSuccessful();
             }
@@ -397,6 +404,7 @@ public class TableOC {
         JSONObject jsonObject, etdm;
         try {
             if(db == null){
+//                ELOG.e("xxx.oc","db为空...");
                return ocJar;
             }
             ocJar = new JSONArray();
@@ -404,11 +412,13 @@ public class TableOC {
             cursor = db.query(DBConfig.OC.TABLE_NAME, null, null, null, null, null, null);
             while (cursor.moveToNext()) {
                 if(blankCount >= EGContext.BLANK_COUNT_MAX){
+//                    ELOG.e("xxx.oc","blankCount >= EGContext.BLANK_COUNT_MAX...");
                     return ocJar;
                 }
                 act = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.ACT)));
-                ELOG.i("db读取出的act的值:::::"+act);
+//                ELOG.i("db读取出的act的值:::::"+act);
                 if (TextUtils.isEmpty(act) || "".equals(act)){//closeTime为空，则继续循环，只取closeTime有值的信息
+//                    ELOG.i("db读取出的act的值为空:::::");
                     continue;
                 }
                 jsonObject = new JSONObject();
@@ -437,6 +447,7 @@ public class TableOC {
                         cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.CT)),DataController.SWITCH_OF_COLLECTION_TYPE);
                 jsonObject.put(EGContext.EXTRA_DATA, etdm);
                 ocJar.put(jsonObject);
+//                ELOG.d("xxx.oc",ocJar+"  读到的数据...");
                 cv = new ContentValues();
                 cv.put(DBConfig.OC.Column.ST, ONE);
                 db.update(DBConfig.OC.TABLE_NAME, cv,

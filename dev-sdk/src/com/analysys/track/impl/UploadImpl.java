@@ -68,10 +68,10 @@ public class UploadImpl {
                 ELOG.i("upload无网return，进程Id：< " + Process.myPid() + " >");
                 return;
             }
-            if (SPHelper.getIntValueFromSP(mContext,EGContext.REQUEST_STATE,0) != 0) {
-                ELOG.i("upload有正在发送的数据return，进程Id：< " + Process.myPid() + " >");
-                return;
-            }
+//            if (SPHelper.getIntValueFromSP(mContext,EGContext.REQUEST_STATE,0) != 0) {
+//                ELOG.i("upload有正在发送的数据return，进程Id：< " + Process.myPid() + " >");
+//                return;
+//            }
             File dir = mContext.getFilesDir();
             File f = new File(dir, EGContext.DEV_UPLOAD_PROC_NAME);
             long now = System.currentTimeMillis();
