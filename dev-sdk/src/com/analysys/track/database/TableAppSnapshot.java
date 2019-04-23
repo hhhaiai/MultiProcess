@@ -55,7 +55,7 @@ public class TableAppSnapshot {
                 db.setTransactionSuccessful();
         } catch (Throwable e) {
         } finally {
-            if(db != null){
+            if(db != null && db.inTransaction()){
                 db.endTransaction();
             }
             DBManager.getInstance(mContext).closeDB();

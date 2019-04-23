@@ -113,6 +113,7 @@ public class OCImpl {
         } catch (Throwable t) {
             ELOG.i("xxx.oc", Log.getStackTraceString(t));
         }finally {
+            ELOG.d("finally执行调用oc");
             MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE, false);
         }
     }
@@ -407,9 +408,15 @@ public class OCImpl {
                 if(mCache == null){
                     mCache = new JSONObject();
                 }
-                mLastPkgName = packageName;
-                //第一次打开存数进内存
-                saveCacheOCInfo(ocJson);
+                long spLastAvailableTime = SPHelper.getLongValueFromSP(mContext, EGContext.LAST_AVAILABLE_TIME,0);
+                //第一次打开
+                if(mCache.optLong(EGContext.LAST_AVAILABLE_TIME) == 0 ||spLastAvailableTime == 0){
+                    SaveData2Sp(packageName,ocJson);
+                }else {//之前有缓存数据
+                    if(System.currentTimeMillis() - spLastAvailableTime > EGContext.OC_CYCLE){
+                        SaveData2Sp(packageName,ocJson);
+                    }
+                }
             }
 
 //            // 是否首次打开
@@ -430,6 +437,12 @@ public class OCImpl {
 
         }
 
+    }
+    private void SaveData2Sp(String packageName,JSONObject ocJson){
+        mLastPkgName = packageName;
+        //第一次打开存数进内存
+        SPHelper.setLongValue2SP(mContext,EGContext.LAST_AVAILABLE_TIME,System.currentTimeMillis());
+        saveCacheOCInfo(ocJson);
     }
 
     private void saveCacheOCInfo(JSONObject ocJson){
@@ -478,8 +491,8 @@ public class OCImpl {
         }
 
         try {
-            ELOG.i("xxx.oc","当前缓存列表:"+(mRunningApps== null ?" null ":mRunningApps.toString()));
-            ELOG.i("xxx.oc","新来的列表:"+nameSet.toString());
+//            ELOG.i("xxx.oc","当前缓存列表:"+(mRunningApps== null ?" null ":mRunningApps.toString()));
+//            ELOG.i("xxx.oc","新来的列表:"+nameSet.toString());
             //第一次轮询，内存没活跃app
             if(mRunningApps == null || mRunningApps.size()< 1){
                 mRunningApps = new ArrayList<JSONObject>();
@@ -521,15 +534,15 @@ public class OCImpl {
                 ELOG.i("xxx.oc",Log.getStackTraceString(t));
             }
         }
-        ELOG.i("xxx.oc","结束时缓存列表： :"+mRunningApps.toString());
+//        ELOG.i("xxx.oc","结束时缓存列表： :"+mRunningApps.toString());
     }
 
     /**
      * 缓存中应用列表与新获取应用列表去重
      */
     private void repeatHandle(Set<String> runApps,long time) {
-        ELOG.d("xxx.oc", "removeRepeat缓存列表" + mRunningApps);
-        ELOG.d("xxx.oc", "removeRepeat本次列表" + runApps);
+//        ELOG.d("xxx.oc", "removeRepeat缓存列表" + mRunningApps);
+//        ELOG.d("xxx.oc", "removeRepeat本次列表" + runApps);
 
         if (runApps == null || mRunningApps == null) {
             return;
@@ -552,7 +565,7 @@ public class OCImpl {
                 //  如果现在列表里没有，则给与结束时间，填写至cacheJson
                 pkgName = tempMemoryJson.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName).replaceAll(" ", "");
                 openTime = tempMemoryJson.optLong(DeviceKeyContacts.OCInfo.ApplicationOpenTime);
-                ELOG.e("xxx.oc",!runApps.contains(pkgName)+" :::: !runApps.contains(pkgName)::"+pkgName);
+//                ELOG.e("xxx.oc",!runApps.contains(pkgName)+" :::: !runApps.contains(pkgName)::"+pkgName);
                 if (!runApps.contains(pkgName)) {//现有的不包含，则为闭合数据
                     shouldRemoveObject.add(tempMemoryJson);
                     // 取结束时间，闭合

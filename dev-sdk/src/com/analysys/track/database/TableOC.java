@@ -112,7 +112,7 @@ public class TableOC {
             }
 
         } finally {
-            if(db != null){
+            if(db != null && db.inTransaction()){
                 db.endTransaction();
             }
             DBManager.getInstance(mContext).closeDB();
@@ -181,7 +181,7 @@ public class TableOC {
                 cv = new ContentValues();
                 long insertTime = System.currentTimeMillis();
                 String act = ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationCloseTime);
-                ELOG.i(act + "  :::::::::::act`s value...");
+//                ELOG.i(act + "  :::::::::::act`s value...");
                 String an = Base64Utils.encrypt(ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationName), insertTime);
                 cv.put(DBConfig.OC.Column.APN, EncryptUtils.encrypt(mContext,ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName)));
                 cv.put(DBConfig.OC.Column.AN, EncryptUtils.encrypt(mContext,an));
@@ -338,7 +338,7 @@ public class TableOC {
             }
 
         } finally {
-            if(db != null){
+            if(db != null && db.inTransaction()){
                 db.endTransaction();
             }
         }
@@ -463,7 +463,7 @@ public class TableOC {
             if (cursor != null){
                 cursor.close();
             }
-            if(db != null){
+            if(db != null && db.inTransaction()){
                 db.endTransaction();
             }
             DBManager.getInstance(mContext).closeDB();
@@ -535,7 +535,7 @@ public class TableOC {
             if (cursor != null){
                 cursor.close();
             }
-            if(db != null){
+            if(db != null && db.inTransaction()){
                 db.endTransaction();
             }
             DBManager.getInstance(mContext).closeDB();

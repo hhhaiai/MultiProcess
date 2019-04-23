@@ -461,11 +461,14 @@ public class MessageDispatcher {
                             delay = EGContext.OC_CYCLE_OVER_5 - (System.currentTimeMillis() - EGContext.OC_LAST_TIME_STMP);
                         }
                         if(delay <= 0 ){
+                            ELOG.d("轮询 delay小于0");
                             ocInfo(delay ,true);
                         }else{
+                            ELOG.d("轮询 delay大于0");
                             ocInfo(delay ,false);
                         }
                     }else {
+                        ELOG.d(" handler.hasMessages(MSG_OC_INFO) 为false");
                         MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE, false);
                     }
                     if(handler.hasMessages(MSG_LOCATION)){
@@ -515,6 +518,7 @@ public class MessageDispatcher {
          */
         private void msgInitModule() {
             try {
+                ELOG.d("初始化 delay为0");
                 ocInfo(0,false);
                 snapshotInfo(0,false);
                 locationInfo(0,false);

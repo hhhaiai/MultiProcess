@@ -112,7 +112,7 @@ public class TableLocation {
             if(cursor != null){
                 cursor.close();
             }
-            if(db != null){
+            if(db != null && db.inTransaction()){
                 db.endTransaction();
             }
             DBManager.getInstance(mContext).closeDB();
