@@ -333,37 +333,26 @@ public class DeviceKeyContacts {
     public static final String RES_POLICY_CTRL_STATUS = "status";
     //默认
     public static final String RES_POLICY_CTRL_DEUFREQ = "deuFreq";
-    //最小采集频率
-    public static final String RES_POLICY_CTRL_MIN_FREQ = "minFreq";
-    //最大采集频率
-    public static final String RES_POLICY_CTRL_MAX_FREQ = "maxFreq";
-    //
-    public static final String RES_POLICY_CTRL_MAX_COUNT = "maxCount";
     //不要的字段
     public static final String RES_POLICY_CTRL_UNWANTED = "exclude";
     //
     public static final String RES_POLICY_CTRL_SUB_CONTROL = "subControl";
     //子模块名称(需要SDK内置):0(蓝牙),1(电量),2(语言、时区、输入法),3(VPN),4(账号)，5(传感器)
     public static final String RES_POLICY_CTRL_SUB_MODULE = "submodule";
-    //
+    //子模块状态值
     public static final String RES_POLICY_CTRL_SUB_STATUS = "sub_status";
     //
-    public static final String RES_POLICY_CTRL_SUB_DEUFREQ = "sub_deuFreq";
-    //
-    public static final String RES_POLICY_CTRL_SUB_MIN_FREQ = "sub_minFreq";
-    //
-    public static final String RES_POLICY_CTRL_SUB_MAX_FREQ = "sub_maxFreq";
-    //
-    public static final String RES_POLICY_CTRL_COUNT= "count";
+    public static final String RES_POLICY_CTRL_SUB_UNWANTED = "sub_exclude";
+
 
 
     /*
      * 控制ProcessInfo模块的采集
      */
     public static final String RES_POLICY_CL = "pi_cl";
-    public static final String RES_POLICY_CL_MODULE_PROC = "pi_proc";
-    public static final String RES_POLICY_CL_MODULE_PS = "pi_ps";
-    public static final String RES_POLICY_CL_MODULE_TOP = "pi_top";
+//    public static final String RES_POLICY_CL_MODULE_PROC = "pi_proc";
+//    public static final String RES_POLICY_CL_MODULE_XXX_TIME = "pi_time";
+//    public static final String RES_POLICY_CL_MODULE_OCR = "pi_ocr";
     // 控制策略. 1,0
     public static final String RES_POLICY_CL_PROCESSINFO = "use_process_info";
     // 获取策略频率

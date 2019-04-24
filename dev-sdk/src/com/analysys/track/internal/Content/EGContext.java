@@ -70,10 +70,10 @@ public class EGContext {
     public static final String DEV_FURTHER_DETAIL = "4";
     // 防作弊相关信息开关
     public static final String PREVENT_CHEATING = "5";
-    // TOP信息
-    public static final String TOP = "6";
-    // PS信息
-    public static final String PS = "7";
+    // TIME信息
+    public static final String XXX_TIME = "6";
+    // OCR信息
+    public static final String OCR = "7";
     // PROC信息
     public static final String PROC = "8";
 

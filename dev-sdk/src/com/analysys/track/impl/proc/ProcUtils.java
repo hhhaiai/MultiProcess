@@ -30,7 +30,6 @@ public class ProcUtils {
     private static final String RUNNING_TOP = "top";
     private static final String RUNNING_PS = "ps";
     public static final String RUNNING_TIME = "time";
-    private static final String RUNNING_PROC = "proc";
     public static final String RUNNING_RESULT = "result";
     public static final String RUNNING_OC_RESULT = "ocr";
     private static final int DEF_VALUE = -8801;

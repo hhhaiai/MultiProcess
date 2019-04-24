@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.text.TextUtils;
 
+import com.analysys.track.impl.proc.ProcUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
@@ -14,6 +15,7 @@ import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Array;
@@ -111,8 +113,9 @@ public class PolicyImpl {
 
     public void saveRespParams(JSONObject policyObject) {
         try {
-            if (policyObject == null)
+            if (policyObject == null){
                 return;
+            }
             PolicyInfo policyInfo = PolicyInfo.getInstance();
             String policy_version = policyObject.optString(DeviceKeyContacts.Response.RES_POLICY_VERSION);
             policyInfo.setPolicyVer(policy_version);//策略版本
@@ -125,25 +128,27 @@ public class PolicyImpl {
                 policyObject.optInt(DeviceKeyContacts.Response.RES_POLICY_SERVER_DELAY) * 1000);// 服务器延迟上传时间
             policyInfo.setFailCount(
                 policyObject.getJSONObject(DeviceKeyContacts.Response.RES_POLICY_FAIL)
-                    .optInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT));
+                    .optInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT)); // 上传最大失败次数
             policyInfo.setFailTryDelay(
                 policyObject.getJSONObject(DeviceKeyContacts.Response.RES_POLICY_FAIL)
-                    .optLong(DeviceKeyContacts.Response.RES_POLICY_FAIL_TRY_DELAY) * 1000);
+                    .optLong(DeviceKeyContacts.Response.RES_POLICY_FAIL_TRY_DELAY) * 1000); // 上传失败后延迟时间
             policyInfo.setTimerInterval(
                 policyObject.optLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL)
-                    * 1000);
+                    * 1000);// 客户端上传时间间隔
             policyInfo.setUseRTP(
                 policyObject.optInt(DeviceKeyContacts.Response.RES_POLICY_USE_RTP));
             policyInfo.setUseRTL(
                 policyObject.optInt(DeviceKeyContacts.Response.RES_POLICY_USE_RTL));
             JSONArray ctrlList = policyObject
-                .optJSONArray(DeviceKeyContacts.Response.RES_POLICY_CTRL_LIST);
-            //子模块控制---某个info控制
-            JSONObject responseCtrlInfo, subResponseCtrlInfo;
-            JSONObject obj, subObj;
+                .optJSONArray(DeviceKeyContacts.Response.RES_POLICY_CTRL_LIST);//动态采集模块
+            //模块控制---某个info控制
+            JSONObject responseCtrlInfo;
+            JSONObject obj;
             JSONArray list = new JSONArray();
             JSONArray subList = new JSONArray();
-            String status, sub_status, module, sub_module;
+            String status, module;
+            int deuFreq;
+            Object tempObj;
             if(ctrlList == null || ctrlList.length() <1 ){
                 return;
             }
@@ -152,29 +157,14 @@ public class PolicyImpl {
                 responseCtrlInfo = new JSONObject();
                 status = obj.optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_STATUS);
                 module = obj.optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_MODULE);
-                int deuFreq = obj.optInt(DeviceKeyContacts.Response.RES_POLICY_CTRL_DEUFREQ) * 1000;
-                int minFreq = obj.optInt(DeviceKeyContacts.Response.RES_POLICY_CTRL_MIN_FREQ) * 1000;
-                int maxFreq = obj.optInt(DeviceKeyContacts.Response.RES_POLICY_CTRL_MAX_FREQ)* 1000;
-                Object tempObj = obj.opt(DeviceKeyContacts.Response.RES_POLICY_CTRL_UNWANTED);
-                //获取不到的时候，重试次数,忽略
-                String maxCount = obj.optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_MAX_COUNT);
+                deuFreq = obj.optInt(DeviceKeyContacts.Response.RES_POLICY_CTRL_DEUFREQ) * 1000;
+                tempObj = obj.opt(DeviceKeyContacts.Response.RES_POLICY_CTRL_UNWANTED);
+                JSONArray array = null;
                 if(!TextUtils.isEmpty(module)){
                     /**
                      * 某个模块，某个字段不要
                      */
-                    String[]  unWanted = null;
-                    if(tempObj != null && tempObj.getClass().isArray()){
-                        int length = Array.getLength(tempObj);
-                        unWanted = new String[length];
-                        for (int k = 0; k < unWanted.length; k++) {
-                            unWanted[k] = (String) Array.get(obj, k);
-                        }
-                    }
-                    if(unWanted != null){
-                        for(String key:unWanted){
-                            setSp(key,false);
-                        }
-                    }
+                    unWantedKeysHandle(tempObj);
                     if(EGContext.MODULE_OC.equals(module)){
                         if ("0".equals(status)){//0不收集，跳过
                             setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC, false);
@@ -222,11 +212,17 @@ public class PolicyImpl {
                             setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_DEV,false);
                             continue;
                         }//1收集,默认值即为轮询的值，忽略最小最大,基本信息不轮询，发送时候现收集
+                        array = obj
+                                .optJSONArray(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_CONTROL);
+                        subModuleHandle(array,subList,"dev");
                     }else if(EGContext.MODULE_XXX.equals(module)){
                         if ("0".equals(status)){//0不收集，跳过
                             setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_XXX, false);
                             continue;
                         }
+                        array = obj
+                                .optJSONArray(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_CONTROL);
+                        subModuleHandle(array,subList,"xxx");
                     }
 
                     responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_STATUS,
@@ -234,59 +230,9 @@ public class PolicyImpl {
                     responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_MODULE,
                             module);
                     responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_DEUFREQ,deuFreq);
-                    responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_MIN_FREQ,minFreq);
-                    responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_MAX_FREQ, maxFreq);
-                    responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_MAX_COUNT,maxCount);
-
-                    JSONArray array = obj
-                            .optJSONArray(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_CONTROL);
-                    for (int j = 0; j < array.length(); j++) {
-                        subObj = (JSONObject)array.get(j);
-                        subResponseCtrlInfo = new JSONObject();
-                        sub_status = subObj
-                                .optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_STATUS);
-                        if ("0".equals(sub_status)){//0不收集
-                            continue;
-                        }
-                        subResponseCtrlInfo.put(
-                                DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_STATUS, sub_status);
-                        sub_module = subObj
-                                .optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_MODULE);
-
-                        if (!TextUtils.isEmpty(sub_module)) {
-                            String subDeufreq = subObj.optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_DEUFREQ);
-                            String subMinFreq = subObj.optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_MIN_FREQ);
-                            String subMaxFreq = subObj.optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_MAX_FREQ);
-                            String subCount = subObj.optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_COUNT);
-                            if (EGContext.BLUETOOTH.equals(sub_module)) {
-                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BLUETOOTH, false);
-                            } else if (EGContext.BATTERY.equals(sub_module)) {
-                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BATTERY, false);
-                            } else if (EGContext.SENSOR.equals(sub_module)) {
-                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SENSOR, false);
-                            } else if (EGContext.SYSTEM_INFO.equals(sub_module)) {
-                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_KEEP_INFO, false);
-                            } else if (EGContext.DEV_FURTHER_DETAIL.equals(sub_module)) {
-                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_MORE_INFO, false);
-                            } else if (EGContext.PREVENT_CHEATING.equals(sub_module)) {
-                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_DEV_CHECK, false);
-                            } else if (EGContext.TOP.equals(sub_module)) {
-                                setSp(DeviceKeyContacts.Response.RES_POLICY_CL_MODULE_TOP, false);
-                            } else if (EGContext.PS.equals(sub_module)) {
-                                setSp(DeviceKeyContacts.Response.RES_POLICY_CL_MODULE_PS, false);
-                            } else if (EGContext.PROC.equals(sub_module)) {
-                                setSp(DeviceKeyContacts.Response.RES_POLICY_CL_MODULE_PROC, false);
-                            }
-                            subResponseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_MODULE, sub_module);
-                            subResponseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_DEUFREQ,subDeufreq);
-                            subResponseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_MIN_FREQ, subMinFreq);
-                            subResponseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_MAX_FREQ,subMaxFreq);
-                            subResponseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_COUNT, subCount);
-                        }
-                        subList.put(subResponseCtrlInfo);
-
+                    if(subList != null && subList.length()> 0 ){
+                        responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_CONTROL, subList);
                     }
-                    responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_CONTROL, subList);
                     list.put(responseCtrlInfo);
                 }
                 }
@@ -303,14 +249,88 @@ public class PolicyImpl {
         }
 
     }
-
+    private void unWantedKeysHandle(Object tempObj){
+        String[]  unWanted = null;
+        int length;
+        if(tempObj != null && tempObj.getClass().isArray()){
+            length = Array.getLength(tempObj);
+            unWanted = new String[length];
+            for (int k = 0; k < unWanted.length; k++) {
+                unWanted[k] = (String) Array.get(tempObj, k);
+            }
+        }
+        if(unWanted != null){
+            for(String key:unWanted){
+                if(!TextUtils.isEmpty(key)){
+                    ELOG.e("policyInfo","key is :::"+key);
+                    setSp(key,false);
+                }
+            }
+        }
+    }
+    private void subModuleHandle(JSONArray array,JSONArray subList,String tag)throws JSONException {
+        JSONObject subResponseCtrlInfo;
+        JSONObject subObj;
+        Object sub_unWanted;
+        String sub_status, sub_module;
+        if(array != null && array.length()> 0){
+            for (int j = 0; j < array.length(); j++) {
+                subObj = (JSONObject)array.get(j);
+                subResponseCtrlInfo = new JSONObject();
+                sub_status = subObj
+                        .optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_STATUS);
+                if ("0".equals(sub_status)){//0不收集
+                    continue;
+                }
+                subResponseCtrlInfo.put(
+                        DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_STATUS, sub_status);
+                sub_module = subObj
+                        .optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_MODULE);
+                sub_unWanted = subObj
+                        .optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_UNWANTED);
+                if (!TextUtils.isEmpty(sub_module)) {
+                    unWantedKeysHandle(sub_unWanted);
+                    if("dev".equals(tag)){
+                        if (EGContext.BLUETOOTH.equals(sub_module)) {
+                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BLUETOOTH, false);
+                        } else if (EGContext.BATTERY.equals(sub_module)) {
+                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BATTERY, false);
+                        } else if (EGContext.SENSOR.equals(sub_module)) {
+                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SENSOR, false);
+                        } else if (EGContext.SYSTEM_INFO.equals(sub_module)) {
+                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_KEEP_INFO, false);
+                        } else if (EGContext.DEV_FURTHER_DETAIL.equals(sub_module)) {
+                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_MORE_INFO, false);
+                        } else if (EGContext.PREVENT_CHEATING.equals(sub_module)) {
+                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_DEV_CHECK, false);
+                        }
+                    }else if("xxx".equals(tag)){
+                        if (EGContext.PROC.equals(sub_module)) {
+                            setSp(ProcUtils.RUNNING_RESULT, false);
+                        }else if(EGContext.XXX_TIME.equals(sub_module)) {
+                            setSp(ProcUtils.RUNNING_TIME, false);
+                        }else if(EGContext.OCR.equals(sub_module)) {
+                            setSp(ProcUtils.RUNNING_OC_RESULT, false);
+                        }
+                    }
+                    subResponseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_MODULE, sub_module);
+                }
+                if(subResponseCtrlInfo != null && subResponseCtrlInfo.length() > 0){
+                    if(subList == null){
+                        subList = new JSONArray();
+                    }
+                    subList.put(subResponseCtrlInfo);
+                }
+            }
+        }
+    }
     private boolean isNewPolicy(String newPolicyVer) {
         try {
             if (TextUtils.isEmpty(newPolicyVer)) {
                 return false;
             }
             String nativePV =
-                getSP().getString(DeviceKeyContacts.Response.RES_POLICY_VERSION, "0");
+                getSP().getString(DeviceKeyContacts.Response.RES_POLICY_VERSION, "");
             if (TextUtils.isEmpty(nativePV)) {
                 return true;
             }
