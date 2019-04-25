@@ -15,6 +15,7 @@ import com.analysys.track.database.TableXXXInfo;
 import com.analysys.track.impl.proc.ProcUtils;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.work.MessageDispatcher;
 import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.utils.AccessibilityHelper;
@@ -225,19 +226,20 @@ public class OCImpl {
             return;
         }
         // 2. 解析INFO详情
-        String ocr = null;
-        String[] strArray = null;
+//        String ocr = null;
+//        String[] strArray = null;
         Set<String> nameSet = new HashSet<String>();
         long now = System.currentTimeMillis();
         if (obj.has(ProcUtils.RUNNING_OC_RESULT)) {
-            ocr = obj.optString(ProcUtils.RUNNING_OC_RESULT).replace("[","").replace("]","");
-            strArray = ocr.split(",");
-            if(strArray != null && strArray.length > 0){
-                for (int i = 0; i < strArray.length; i++) {
-                    String pkgName = strArray[i];
-                    nameSet.add(pkgName.substring(1,pkgName.length()-1));
-                }
-            }
+//            ocr = obj.optString(ProcUtils.RUNNING_OC_RESULT).replace("[","").replace("]","");
+//            strArray = ocr.split(",");
+//            if(strArray != null && strArray.length > 0){
+//                for (int i = 0; i < strArray.length; i++) {
+//                    String pkgName = strArray[i];
+//                    nameSet.add(pkgName.substring(1,pkgName.length()-1));
+//                }
+//            }
+            nameSet = JsonUtils.transferStringArray2Set(obj.optString(ProcUtils.RUNNING_OC_RESULT));
         }
         if (obj.has(ProcUtils.RUNNING_TIME)) {
             now = obj.optLong(ProcUtils.RUNNING_TIME);
@@ -265,14 +267,14 @@ public class OCImpl {
                     ocCollection(nameSet, now);
                 }
                 // 3.1.4 清除内存数据
-                ocr = null;
+//                ocr = null;
                 obj = null;
             } else {
                 //3.2.1 xxx不收集
                 if (isOCCollected) {
                     ocCollection(nameSet, now);
                 }
-                ocr = null;
+//                ocr = null;
                 obj = null;
             }
         } else {

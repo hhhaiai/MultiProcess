@@ -291,7 +291,7 @@ public class LocationImpl {
     public JSONArray getBaseStationInfo() {
         JSONArray jsonArray = null;
         JSONObject jsonObject = null;
-        Set<Integer> cid = null;
+        Set<String> cid = null;
         try {
             if(mTelephonyManager == null){
                 return jsonArray;
@@ -305,18 +305,21 @@ public class LocationImpl {
                     if(list != null && list.size()>0) {
                         baseStationSort(list);
                         ELOG.i("location.info","LocationInfo:获取周围基站信息排序去重后list:"+list!=null?list.size():"null");
-                        int tempCid = -1;
-                        cid = new HashSet<Integer>();
+                        int tempCid = -1,tempLac=-1;
+                        String key = null;
+                        cid = new HashSet<String>();
                         for (int i = 0; i < list.size(); i++) {
                             if (cid.size() < 5) {
                                 NeighboringCellInfo info =list.get(i);
                                 tempCid = info.getCid();
+                                tempLac = info.getLac();
+                                key = tempCid+"|"+tempLac;
                                 ELOG.i("location.info","LocationInfo:获取周围基站信息当前tempCid::"+tempCid);
-                                if(!cid.contains(tempCid)){
-                                    cid.add(tempCid);
+                                if(!cid.contains(key)){
+                                    cid.add(key);
                                     jsonObject = new JSONObject();
-                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, info.getLac(), DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, info.getCid(), DataController.SWITCH_OF_CELL_ID);
+                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
+                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, tempCid, DataController.SWITCH_OF_CELL_ID);
                                     JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, info.getRssi(), DataController.SWITCH_OF_BS_LEVEL);
                                     jsonArray.put(jsonObject);
                                     ELOG.i("location.info","LocationInfo:获取周围基站信息list:"+jsonArray);
@@ -343,15 +346,16 @@ public class LocationImpl {
                                 //获取当前基站信息
                                 if(cid == null){
 //                                    ELOG.i("location.info","cid = null");
-                                    cid = new HashSet<Integer>();
+                                    cid = new HashSet<String>();
                                 }
-//                                ELOG.d("location.info","infos.size():::"+"!cid.contains(gcl.getCid())::"+cid.contains(gcl.getCid()));
-//                                ELOG.i("location.info","11111111111111");
-                                if(cid.size()<1 ||!cid.contains(gcl.getCid())){
+                                int tempCid = gcl.getCid(),tempLac=gcl.getLac();
+                                String key = tempCid+"|"+tempLac;
+                                if(!cid.contains(key)){
+                                    cid.add(key);
 //                                    ELOG.i("location.info","222222222222222");
                                     int stren = gcl.getPsc();
-                                    JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, gcl.getLac(),DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                                    JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, gcl.getCid(),DataController.SWITCH_OF_CELL_ID);
+                                    JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac,DataController.SWITCH_OF_LOCATION_AREA_CODE);
+                                    JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, tempCid ,DataController.SWITCH_OF_CELL_ID);
                                     JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, stren,DataController.SWITCH_OF_BS_LEVEL);
 //                                    if(jsonArray == null){
 //                                        jsonArray = new JSONArray();
@@ -373,15 +377,17 @@ public class LocationImpl {
                                 if(ccl != null){
                                     ELOG.i("location.info","location.info","CdmaCellLocation里的参数值："+ccl.getSystemId()+" "+ccl.getBaseStationId()+" "+ccl.getNetworkId());
                                     if(cid == null){
-                                        cid = new HashSet<Integer>();
+                                        cid = new HashSet<String>();
                                     }
-//                                    ELOG.i("location.info","888");
-                                    if(cid.size()<1 ||!cid.contains(gcl.getCid())) {
+                                    int tempCid = ccl.getBaseStationId(),tempLac=ccl.getNetworkId();
+                                    String key = tempCid+"|"+tempLac;
+                                    if(!cid.contains(key)) {
+                                        cid.add(key);
                                         //获取当前基站信息
 //                                        ELOG.i("location.info","999");
                                         int stren = ccl.getSystemId();
-                                        JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, ccl.getNetworkId(), DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                                        JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, ccl.getBaseStationId(), DataController.SWITCH_OF_CELL_ID);
+                                        JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
+                                        JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId,tempCid , DataController.SWITCH_OF_CELL_ID);
                                         JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, stren, DataController.SWITCH_OF_BS_LEVEL);
 //                                        ELOG.i("location.info","10------");
                                         tempCdmaMap.put(stren,jsonObject);
@@ -414,6 +420,7 @@ public class LocationImpl {
                         int tempCid = -1;//cid
                         int tempLac = -1;//lac
                         int strength = -1;//信号强度
+                        String key = null;
                         for (CellInfo info : infos) {
                             tempCid = -1;
                             tempLac = -1;
@@ -423,11 +430,12 @@ public class LocationImpl {
                                 CellInfoCdma cdma = (CellInfoCdma) info;
                                 tempCid = cdma.getCellIdentity().getBasestationId();
                                 tempLac = cdma.getCellIdentity().getNetworkId();
+                                key =  tempCid+"|"+tempLac;
                                 if(cid == null){
-                                    cid = new HashSet<Integer>();
+                                    cid = new HashSet<String>();
                                 }
-                                    if(tempCid > 0 && tempLac >0 && (cid.size()<1 ||!cid.contains(tempCid))){
-                                    cid.add(tempCid);
+                                if(tempCid > 0 && tempLac >0 && (!cid.contains(key))){
+                                    cid.add(key);
                                     obj = new JSONObject();
                                     strength = cdma.getCellSignalStrength().getDbm();
                                     JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
@@ -441,11 +449,12 @@ public class LocationImpl {
                                 CellInfoGsm gsm = (CellInfoGsm) info;
                                 tempCid = gsm.getCellIdentity().getCid();
                                 tempLac = gsm.getCellIdentity().getLac();
+                                key =  tempCid+"|"+tempLac;
                                 if(cid == null){
-                                    cid = new HashSet<Integer>();
+                                    cid = new HashSet<String>();
                                 }
-                                if(tempCid > 0 && tempLac >0 && (cid.size()<1 ||!cid.contains(tempCid))){
-                                    cid.add(tempCid);
+                                if(tempCid > 0 && tempLac >0 && (!cid.contains(key))){
+                                    cid.add(key);
                                     obj = new JSONObject();
                                     strength = gsm.getCellSignalStrength().getDbm();
                                     JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
@@ -459,12 +468,12 @@ public class LocationImpl {
                                 CellInfoLte lte = (CellInfoLte) info;
                                 tempCid = lte.getCellIdentity().getPci();
                                 tempLac = lte.getCellIdentity().getTac();
-
+                                key =  tempCid+"|"+tempLac;
                                 if(cid == null){
-                                    cid = new HashSet<Integer>();
+                                    cid = new HashSet<String>();
                                 }
-                                if(tempCid > 0 && tempLac >0 && (cid.size()<1 ||!cid.contains(tempCid))){
-                                    cid.add(tempCid);
+                                if(tempCid > 0 && tempLac >0 && (!cid.contains(key))){
+                                    cid.add(key);
                                     obj = new JSONObject();
                                     strength = lte.getCellSignalStrength().getDbm();
                                     JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
@@ -478,11 +487,12 @@ public class LocationImpl {
                                 CellInfoWcdma wcdma = (CellInfoWcdma) info;
                                 tempCid = wcdma.getCellIdentity().getCid();
                                 tempLac = wcdma.getCellIdentity().getLac();
+                                key =  tempCid+"|"+tempLac;
                                 if(cid == null){
-                                    cid = new HashSet<Integer>();
+                                    cid = new HashSet<String>();
                                 }
-                                if(tempCid > 0 && tempLac >0 && (cid.size()<1 ||!cid.contains(tempCid))){
-                                    cid.add(tempCid);
+                                if(tempCid > 0 && tempLac >0 && (!cid.contains(key))){
+                                    cid.add(key);
                                     obj = new JSONObject();
                                     strength = wcdma.getCellSignalStrength().getDbm();
                                     JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);

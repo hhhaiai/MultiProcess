@@ -170,7 +170,7 @@ public class AppSnapshotImpl {
         } catch (Exception e) {
             ELOG.e("xxx",e.getMessage());
         }
-        ELOG.i("xxx","list:::::"+list);
+//        ELOG.i("xxx","list:::::"+list);
         return list;
     }
 
@@ -189,7 +189,7 @@ public class AppSnapshotImpl {
         } catch (Throwable e) {
             ELOG.e("xxx",e.getMessage()+" has an excption");
         }
-        ELOG.i("xxx","appInfo === "+appInfo);
+//        ELOG.i("xxx","appInfo === "+appInfo);
         return appInfo;
     }
     public JSONObject getAppInfo(JSONObject appInfo,PackageInfo pkgInfo, PackageManager packageManager,String tag) throws JSONException {

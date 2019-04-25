@@ -6,6 +6,7 @@ import android.content.SharedPreferences.Editor;
 import android.text.TextUtils;
 
 import com.analysys.track.impl.proc.ProcUtils;
+import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
@@ -18,7 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
+import java.util.Set;
 
 public class PolicyImpl {
     static Context mContext;
@@ -102,7 +103,11 @@ public class PolicyImpl {
     private Editor getEditor() {
         return getSP().edit();
     }
-
+    private void clearSP(){
+        Editor editor =  getEditor();
+        editor.clear();
+        editor.commit();
+    }
     public void setSp(String key, boolean value) {
         getEditor().putBoolean(key, value).apply();
     }
@@ -122,6 +127,7 @@ public class PolicyImpl {
             if(!isNewPolicy(policy_version)){
                 return;
             }
+            clearSP();
             //有效策略处理
             //时间统一返回值类型为秒
             policyInfo.setServerDelay(
@@ -164,7 +170,11 @@ public class PolicyImpl {
                     /**
                      * 某个模块，某个字段不要
                      */
-                    unWantedKeysHandle(tempObj);
+                    if(tempObj != null){
+//                        ELOG.i("policyInfo","tempObj::::"+tempObj);
+                        unWantedKeysHandle(tempObj.toString());
+                    }
+
                     if(EGContext.MODULE_OC.equals(module)){
                         if ("0".equals(status)){//0不收集，跳过
                             setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC, false);
@@ -249,24 +259,20 @@ public class PolicyImpl {
         }
 
     }
-    private void unWantedKeysHandle(Object tempObj){
-        String[]  unWanted = null;
-        int length;
-        if(tempObj != null && tempObj.getClass().isArray()){
-            length = Array.getLength(tempObj);
-            unWanted = new String[length];
-            for (int k = 0; k < unWanted.length; k++) {
-                unWanted[k] = (String) Array.get(tempObj, k);
-            }
-        }
-        if(unWanted != null){
-            for(String key:unWanted){
-                if(!TextUtils.isEmpty(key)){
-                    ELOG.e("policyInfo","key is :::"+key);
-                    setSp(key,false);
+    private void unWantedKeysHandle(String tempObj){
+        Set<String> unWanted = null;
+        if(tempObj != null && tempObj.length()>0){
+            unWanted = JsonUtils.transferStringArray2Set(tempObj);
+            if(unWanted != null && unWanted.size() > 0){
+                for(String key:unWanted){
+                    if(!TextUtils.isEmpty(key)){
+                        ELOG.i("policyInfo","key is :::"+key);
+                        setSp(key,false);
+                    }
                 }
             }
         }
+
     }
     private void subModuleHandle(JSONArray array,JSONArray subList,String tag)throws JSONException {
         JSONObject subResponseCtrlInfo;
@@ -289,7 +295,9 @@ public class PolicyImpl {
                 sub_unWanted = subObj
                         .optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_UNWANTED);
                 if (!TextUtils.isEmpty(sub_module)) {
-                    unWantedKeysHandle(sub_unWanted);
+                    if(sub_unWanted != null){
+                        unWantedKeysHandle(sub_unWanted.toString());
+                    }
                     if("dev".equals(tag)){
                         if (EGContext.BLUETOOTH.equals(sub_module)) {
                             setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BLUETOOTH, false);
