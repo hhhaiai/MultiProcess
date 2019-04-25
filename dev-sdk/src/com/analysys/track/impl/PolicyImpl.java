@@ -266,7 +266,7 @@ public class PolicyImpl {
             if(unWanted != null && unWanted.size() > 0){
                 for(String key:unWanted){
                     if(!TextUtils.isEmpty(key)){
-                        ELOG.i("policyInfo","key is :::"+key);
+//                        ELOG.i("policyInfo","key is :::"+key);
                         setSp(key,false);
                     }
                 }

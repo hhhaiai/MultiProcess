@@ -39,15 +39,22 @@ public class TableLocation {
 //            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_LOCATION)){
 //                return;
 //            }
-            if (!TextUtils.isEmpty(String.valueOf(locationInfo))) {
-                String locationTime = locationInfo.optString(DeviceKeyContacts.LocationInfo.CollectionTime);
-                long time = 0;
+//            ELOG.i("insert","================="+System.currentTimeMillis());
+//            ELOG.i("insert","================="+locationInfo);
+            ContentValues cv = null;
+            String locationTime = null;
+            long time = -1;
+            String encryptLocation = null;
+            if (locationInfo != null && locationInfo.length() > 0) {
+                locationTime = null;
+                locationTime = locationInfo.optString(DeviceKeyContacts.LocationInfo.CollectionTime);
+                time = 0;
                 if(!TextUtils.isEmpty(locationTime)){
                    time = Long.parseLong(locationTime);
                 }
-                String encryptLocation = Base64Utils.encrypt(String.valueOf(locationInfo), time);
+                encryptLocation = Base64Utils.encrypt(String.valueOf(locationInfo), time);
                 if (!TextUtils.isEmpty(encryptLocation)) {
-                    ContentValues cv = new ContentValues();
+                    cv = new ContentValues();
                     cv.put(DBConfig.Location.Column.LI, EncryptUtils.encrypt(mContext,encryptLocation));
                     cv.put(DBConfig.Location.Column.IT, locationTime);
                     cv.put(DBConfig.Location.Column.ST, INSERT_STATUS_DEFAULT);
