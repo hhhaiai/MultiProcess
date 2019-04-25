@@ -1,6 +1,7 @@
 package com.analysys.track.database;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -38,21 +39,23 @@ public class TableAppSnapshot {
     /**
      * 覆盖新增数据，多条
      */
-    public void coverInsert(JSONArray snapshots) {
+    public void coverInsert(List<JSONObject> snapshots) {
         SQLiteDatabase db = null;
         try {
 //            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_APPSNAPSHOT)){
 //                return;
 //            }
-                db = DBManager.getInstance(mContext).openDB();
-                db.beginTransaction();
-                db.delete(DBConfig.AppSnapshot.TABLE_NAME,null,null);
-                for (int i = 0; i < snapshots.length(); i++) {
-                    JSONObject snapshot = (JSONObject) snapshots.get(i);
-                    db.insert(DBConfig.AppSnapshot.TABLE_NAME, null,
+            db = DBManager.getInstance(mContext).openDB();
+            db.beginTransaction();
+            db.delete(DBConfig.AppSnapshot.TABLE_NAME,null,null);
+            JSONObject snapshot = null;
+            for (int i = 0; i < snapshots.size(); i++) {
+                snapshot = null;
+                snapshot = (JSONObject) snapshots.get(i);
+                db.insert(DBConfig.AppSnapshot.TABLE_NAME, null,
                         getContentValues(snapshot));
-                }
-                db.setTransactionSuccessful();
+            }
+            db.setTransactionSuccessful();
         } catch (Throwable e) {
         } finally {
             if(db != null && db.inTransaction()){

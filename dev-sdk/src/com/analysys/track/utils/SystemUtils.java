@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
@@ -27,13 +28,13 @@ import android.os.Looper;
 import android.os.PowerManager;
 import android.text.TextUtils;
 
+import com.analysys.track.impl.AppSnapshotImpl;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.impl.PolicyImpl;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -426,25 +427,32 @@ public class SystemUtils {
     }
 
 
-    public static JSONArray getAppsFromShell(Context mContext, String tag) {
-        JSONArray appList = new JSONArray();
+    public static List<JSONObject> getAppsFromShell(Context mContext, String tag,List<JSONObject> appList) {
+//        JSONArray appList = new JSONArray();
         try {
             JSONObject appInfo;
             Set<String> result = new HashSet<>();
             PackageManager pm = mContext.getPackageManager();
             result = getPkgList(result, SHELL_PM_LIST_PACKAGES);
+            PackageInfo pi = null;
             for (String pkgName : result) {
                 if (!TextUtils.isEmpty(pkgName) && pm.getLaunchIntentForPackage(pkgName) != null) {
+                    pi = mContext.getPackageManager().getPackageInfo(pkgName, 0);
                     appInfo = new JSONObject();
-                    appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,
-                            pkgName);
-                    appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ActionType, tag);
-                    appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
-                            String.valueOf(System.currentTimeMillis()));
-                    appList.put(appInfo);
+                    appInfo = AppSnapshotImpl.getInstance(mContext).getAppInfo(appInfo, pi,pm,tag);
+//                    appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,
+//                            pkgName);
+//                    appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ActionType, tag);
+//                    appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
+//                            String.valueOf(System.currentTimeMillis()));
+                    if(!appList.contains(appInfo)){
+                        appList.add(appInfo);
+                    }
+
                 }
             }
         } catch (Throwable e) {
+            ELOG.e("snapshotInfo","E:::"+e.getMessage());
         }
         return appList;
     }

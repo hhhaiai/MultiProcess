@@ -27,7 +27,7 @@ public class JsonUtils {
             if(sp == null){
                 sp =  PolicyImpl.getInstance(mContext).getSP();
             }
-            if (value != null && (sp.getBoolean(key,SPDefaultValue) || SPHelper.getBooleanValueFromSP(mContext,key ,SPDefaultValue))&& !TextUtils.isEmpty(value.toString()) && !"unknown".equalsIgnoreCase(value.toString())) {
+            if (value != null && (SPHelper.getBooleanValueFromSP(mContext,key ,SPDefaultValue) || sp.getBoolean(key,SPDefaultValue))&& !TextUtils.isEmpty(value.toString()) && !"unknown".equalsIgnoreCase(value.toString())) {
                 if (!json.has(key)) {
                     json.put(key, value);
                 }
