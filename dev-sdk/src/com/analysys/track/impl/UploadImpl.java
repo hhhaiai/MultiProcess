@@ -361,7 +361,7 @@ public class UploadImpl {
         JSONArray jsonArray = new JSONArray();
         try {
             jsonArray = TableXXXInfo.getInstance(mContext).select();
-            ELOG.i("XXXInfo条数::::"+jsonArray.length());
+//            ELOG.i("XXXInfo条数::::"+jsonArray.length());
             if (jsonArray == null ||jsonArray.length() <= 0) {
                 isChunkUpload = false;
                 return arr;

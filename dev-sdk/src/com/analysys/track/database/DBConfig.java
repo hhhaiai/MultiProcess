@@ -127,7 +127,7 @@ public class DBConfig {
       public static final String L_RC = "xxx_rc";
     }
     //建表
-    public static final String CREATE_TABLE  = String.format("create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)",
+    public static final String CREATE_TABLE  = String.format("create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)",
             TABLE_NAME,Column.ID,DBType.AUTOINCREMENT ,Column.TIME,DBType.VARCHAR_TWENTY,
             Column.PROC,DBType.TEXT , Column.L_RA,DBType.TEXT ,Column.L_RB,DBType.TEXT ,Column.L_RC,DBType.TEXT);
   }
