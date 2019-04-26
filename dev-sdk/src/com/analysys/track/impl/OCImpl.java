@@ -387,17 +387,6 @@ public class OCImpl {
                 if(mCache == null){
                     mCache = new JSONObject();
                 }
-                if(TextUtils.isEmpty(mCache.optString(EGContext.LAST_OPEN_TIME))){
-                    if(lastAvailableTime == -1){
-                        lastAvailableTime = SPHelper.getLongValueFromSP(mContext,EGContext.LAST_AVAILABLE_TIME,0);
-                    }
-                    long time = System.currentTimeMillis()- lastAvailableTime;
-                    if(time > EGContext.OC_CYCLE){
-                        lastAvailableTime = System.currentTimeMillis();
-                        SPHelper.setLongValue2SP(mContext,EGContext.LAST_AVAILABLE_TIME,lastAvailableTime);
-                        saveCacheOCInfo(ocJson);
-                    }
-                }
                 if (!packageName.equals(mLastPkgName)) {
                     ELOG.i("=======切换包名。即将保存"+packageName+"  OLD "+mLastPkgName);
                     mCache.put(EGContext.END_TIME, System.currentTimeMillis());//endTime
@@ -406,6 +395,18 @@ public class OCImpl {
                     // 3.如果打开的包名与缓存的包名不一致，更新新pkgName到sp
                     mLastPkgName = packageName;
                     saveCacheOCInfo(ocJson);
+                }else{
+                    if(TextUtils.isEmpty(mCache.optString(EGContext.LAST_OPEN_TIME))){
+                        if(lastAvailableTime == -1){
+                            lastAvailableTime = SPHelper.getLongValueFromSP(mContext,EGContext.LAST_AVAILABLE_TIME,0);
+                        }
+                        long time = System.currentTimeMillis()- lastAvailableTime;
+                        if(time > EGContext.OC_CYCLE){
+                            lastAvailableTime = System.currentTimeMillis();
+                            SPHelper.setLongValue2SP(mContext,EGContext.LAST_AVAILABLE_TIME,lastAvailableTime);
+                            saveCacheOCInfo(ocJson);
+                        }
+                    }
                 }
             }else {//值为空则要么第一次打开，要么有时间间隔，需随机取结束时间
                 if(mCache == null){
