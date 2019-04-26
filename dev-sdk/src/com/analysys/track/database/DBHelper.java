@@ -49,8 +49,9 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = null;
         try {
             db = getWritableDatabase();
-            if (db == null)
+            if (db == null){
                 return;
+            }
             if (DBUtils.isTableExist(db, DBConfig.OC.CREATE_TABLE)) {
                 db.execSQL(DBConfig.OC.CREATE_TABLE);
             }

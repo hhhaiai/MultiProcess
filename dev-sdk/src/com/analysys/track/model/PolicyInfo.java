@@ -8,6 +8,7 @@ import java.io.Serializable;
  * 策略相关信息
  */
 public class PolicyInfo implements Serializable {
+    private PolicyInfo(){}
     private static class Holder {
         private static final PolicyInfo INSTANCE = new PolicyInfo();
     }

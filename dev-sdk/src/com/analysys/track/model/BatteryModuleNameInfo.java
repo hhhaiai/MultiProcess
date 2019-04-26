@@ -6,7 +6,7 @@ import java.io.Serializable;
  * 电量信息，默认不上传，需要根据服务器控制
  */
 public class BatteryModuleNameInfo implements Serializable {
-
+    private BatteryModuleNameInfo(){}
     private static class Holder {
         private static final BatteryModuleNameInfo INSTANCE = new BatteryModuleNameInfo();
     }

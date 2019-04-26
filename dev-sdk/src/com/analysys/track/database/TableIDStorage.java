@@ -12,7 +12,7 @@ import com.analysys.track.utils.reflectinon.EContextHelper;
 public class TableIDStorage {
 
     Context mContext;
-
+    private TableIDStorage(){}
     private static class Holder {
         private static final TableIDStorage INSTANCE = new TableIDStorage();
     }

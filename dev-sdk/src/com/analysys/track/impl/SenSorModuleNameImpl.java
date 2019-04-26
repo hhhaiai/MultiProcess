@@ -18,7 +18,7 @@ import java.util.List;
 
 public class SenSorModuleNameImpl{
     Context mContext;
-
+    private SenSorModuleNameImpl(){}
     private static class Holder {
         private static final SenSorModuleNameImpl INSTANCE = new SenSorModuleNameImpl();
     }

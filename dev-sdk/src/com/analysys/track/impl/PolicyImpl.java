@@ -25,13 +25,15 @@ public class PolicyImpl {
     static Context mContext;
 //    private static PolicyInfo policyLocal;
     private SharedPreferences sp = null;
+    private PolicyImpl(){
+    }
     private static class Holder {
         private static final PolicyImpl INSTANCE = new PolicyImpl();
     }
 
     public static PolicyImpl getInstance(Context context) {
-        if (PolicyImpl.Holder.INSTANCE.mContext == null) {
-            PolicyImpl.Holder.INSTANCE.mContext = EContextHelper.getContext(context);
+        if (mContext == null) {
+            mContext = EContextHelper.getContext(context);
         }
         return PolicyImpl.Holder.INSTANCE;
     }
@@ -283,49 +285,81 @@ public class PolicyImpl {
         JSONObject subObj;
         Object sub_unWanted;
         String sub_status, sub_module;
+        String unCollected = "0";
         if(array != null && array.length()> 0){
             for (int j = 0; j < array.length(); j++) {
                 subObj = (JSONObject)array.get(j);
                 subResponseCtrlInfo = new JSONObject();
                 sub_status = subObj
-                        .optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_STATUS);
-                if ("0".equals(sub_status)){//0不收集
-                    continue;
-                }
+                        .optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_STATUS);
+//                if ("0".equals(sub_status)){//0不收集
+//                    continue;
+//                }
                 subResponseCtrlInfo.put(
                         DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_STATUS, sub_status);
                 sub_module = subObj
                         .optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_MODULE);
+                subResponseCtrlInfo.put(
+                        DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_MODULE, sub_module);
                 sub_unWanted = subObj
-                        .optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_UNWANTED);
+                        .optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_UNWANTED);
+                subResponseCtrlInfo.put(
+                        DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_UNWANTED, sub_unWanted);
                 if (!TextUtils.isEmpty(sub_module)) {
                     if(sub_unWanted != null){
                         unWantedKeysHandle(sub_unWanted.toString());
                     }
                     if("dev".equals(tag)){
                         if (EGContext.BLUETOOTH.equals(sub_module)) {
-                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BLUETOOTH, false);
+                            if (unCollected.equals(sub_status)){//0不收集，跳过
+                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BLUETOOTH, false);
+                                continue;
+                            }
                         } else if (EGContext.BATTERY.equals(sub_module)) {
-                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BATTERY, false);
+                            if (unCollected.equals(sub_status)) {//0不收集，跳过
+                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BATTERY, false);
+                                continue;
+                            }
                         } else if (EGContext.SENSOR.equals(sub_module)) {
-                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SENSOR, false);
+                            if (unCollected.equals(sub_status)) {//0不收集，跳过
+                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SENSOR, false);
+                                continue;
+                            }
                         } else if (EGContext.SYSTEM_INFO.equals(sub_module)) {
-                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_KEEP_INFO, false);
+                            if (unCollected.equals(sub_status)) {//0不收集，跳过
+                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_KEEP_INFO, false);
+                                continue;
+                            }
                         } else if (EGContext.DEV_FURTHER_DETAIL.equals(sub_module)) {
-                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_MORE_INFO, false);
+                            if (unCollected.equals(sub_status)) {//0不收集，跳过
+                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_MORE_INFO, false);
+                                continue;
+                            }
                         } else if (EGContext.PREVENT_CHEATING.equals(sub_module)) {
-                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_DEV_CHECK, false);
+                            if (unCollected.equals(sub_status)) {//0不收集，跳过
+                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_DEV_CHECK, false);
+                                continue;
+                            }
                         }
                     }else if("xxx".equals(tag)){
                         if (EGContext.PROC.equals(sub_module)) {
-                            setSp(ProcUtils.RUNNING_RESULT, false);
+                            if (unCollected.equals(sub_status)) {//0不收集，跳过
+                                setSp(ProcUtils.RUNNING_RESULT, false);
+                                continue;
+                            }
                         }else if(EGContext.XXX_TIME.equals(sub_module)) {
-                            setSp(ProcUtils.RUNNING_TIME, false);
+                            if (unCollected.equals(sub_status)) {//0不收集，跳过
+                                setSp(ProcUtils.RUNNING_TIME, false);
+                                continue;
+                            }
                         }else if(EGContext.OCR.equals(sub_module)) {
-                            setSp(ProcUtils.RUNNING_OC_RESULT, false);
+                            if (unCollected.equals(sub_status)) {//0不收集，跳过
+                                setSp(ProcUtils.RUNNING_OC_RESULT, false);
+                                continue;
+                            }
                         }
                     }
-                    subResponseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_MODULE, sub_module);
+//                    subResponseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_MODULE, sub_module);
                 }
                 if(subResponseCtrlInfo != null && subResponseCtrlInfo.length() > 0){
                     if(subList == null){

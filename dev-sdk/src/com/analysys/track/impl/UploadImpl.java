@@ -53,7 +53,7 @@ public class UploadImpl {
      * 本条记录的时间
      */
     private static List<String> timeList = new ArrayList<String>();
-
+    private UploadImpl(){}
     private static class Holder {
         private static final UploadImpl INSTANCE = new UploadImpl();
     }

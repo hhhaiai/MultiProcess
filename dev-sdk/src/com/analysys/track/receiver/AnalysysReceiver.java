@@ -33,6 +33,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
     String BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED";
     //上次结束时间
     private static long mLastCloseTime = 0;
+    private AnalysysReceiver(){}
     public static AnalysysReceiver getInstance() {
         return AnalysysReceiver.Holder.INSTANCE;
     }
@@ -42,7 +43,9 @@ public class AnalysysReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         try {
-            if (intent == null)return;
+            if (intent == null){
+                return;
+            }
             String data = intent.getDataString();
             String packageName = "";
             if(!TextUtils.isEmpty(data)){
@@ -85,7 +88,9 @@ public class AnalysysReceiver extends BroadcastReceiver {
                 ELOG.e("接收关闭屏幕广播::::"+System.currentTimeMillis());
             }
             if (BATTERY_CHANGED.equals(intent.getAction())) {
-                if(DataController.SWITCH_OF_MODULE_CL_BATTERY) DeviceImpl.getInstance(mContext).processBattery(intent);
+                if(DataController.SWITCH_OF_MODULE_CL_BATTERY){
+                    DeviceImpl.getInstance(mContext).processBattery(intent);
+                }
                 ELOG.e("电池变化广播");
             }
             if (BOOT_COMPLETED.equals(intent.getAction())) {

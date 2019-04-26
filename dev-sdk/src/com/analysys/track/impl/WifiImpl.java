@@ -22,7 +22,7 @@ import static android.content.Context.WIFI_SERVICE;
 
 public class WifiImpl {
     Context mContext;
-
+    private WifiImpl(){}
     private static class Holder {
         private static final WifiImpl INSTANCE = new WifiImpl();
     }

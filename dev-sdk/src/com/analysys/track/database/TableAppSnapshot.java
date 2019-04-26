@@ -24,7 +24,8 @@ import android.text.TextUtils;
 public class TableAppSnapshot {
 
     Context mContext;
-
+    private TableAppSnapshot(){
+    }
     private static class Holder {
         private static final TableAppSnapshot INSTANCE = new TableAppSnapshot();
     }
@@ -137,8 +138,9 @@ public class TableAppSnapshot {
                 ELOG.e(e.getMessage());
             }
         } finally {
-            if (cursor != null)
+            if (cursor != null){
                 cursor.close();
+            }
             DBManager.getInstance(mContext).closeDB();
         }
         return map;
@@ -217,8 +219,9 @@ public class TableAppSnapshot {
                 ELOG.e(e.getMessage());
             }
         } finally {
-            if (cursor != null)
+            if (cursor != null){
                 cursor.close();
+            }
             DBManager.getInstance(mContext).closeDB();
         }
         return false;

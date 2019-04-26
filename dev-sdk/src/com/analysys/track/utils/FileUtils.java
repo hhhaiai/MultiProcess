@@ -123,7 +123,9 @@ public class FileUtils {
 
     public static void deleteFile(String filePath) {
         try {
-            if (isFileExist(filePath)) new File(filePath).delete();
+            if (isFileExist(filePath)){
+                new File(filePath).delete();
+            }
         } catch (Throwable t) {
 
         }
@@ -192,7 +194,9 @@ public class FileUtils {
     private static boolean isFileExist(String filePath) {
         if (TextUtils.isEmpty(filePath)) {
             File file = new File(filePath);
-            if (file != null) return file.exists();
+            if (file != null){
+                return file.exists();
+            }
         }
         return false;
     }
@@ -274,7 +278,9 @@ public class FileUtils {
     }
 
     public static String loadFileAsString(String fileName) throws Exception {
-        if (!(new File(fileName)).exists()) return "";
+        if (!(new File(fileName)).exists()){
+            return "";
+        }
         FileReader reader = new FileReader(fileName);
         String text = loadReaderAsString(reader);
         reader.close();

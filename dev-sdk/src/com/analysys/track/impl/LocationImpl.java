@@ -54,7 +54,7 @@ public class LocationImpl {
     TelephonyManager mTelephonyManager = null;
 //    CellLocation cellLocation = null;
     JSONObject locationJson = null;
-
+    private LocationImpl(){}
     private static class Holder {
         private static final LocationImpl INSTANCE = new LocationImpl();
     }

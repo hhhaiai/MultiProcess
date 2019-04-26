@@ -22,7 +22,7 @@ public class TableLocation {
     String INSERT_STATUS_DEFAULT = "0";
     String INSERT_STATUS_READ_OVER = "1";
 
-
+    private TableLocation(){}
     private static class Holder {
         private static final TableLocation INSTANCE = new TableLocation();
     }

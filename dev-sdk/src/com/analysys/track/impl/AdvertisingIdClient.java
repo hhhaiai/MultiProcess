@@ -36,8 +36,9 @@ public class  AdvertisingIdClient {
 
     public static AdInfo getAdvertisingIdInfo(Context context) throws Exception {
 
-        if(Looper.myLooper() == Looper.getMainLooper())
+        if(Looper.myLooper() == Looper.getMainLooper()){
             throw new  IllegalStateException("Cannot be called from the main thread");
+        }
         try{
             PackageManager pm = context.getPackageManager();
             pm.getPackageInfo("com.android.vending", 0);
@@ -68,16 +69,21 @@ public class  AdvertisingIdClient {
 
         private
         final LinkedBlockingQueue<IBinder> queue = new LinkedBlockingQueue<IBinder>(1);
+        @Override
         public void  onServiceConnected(ComponentName name, IBinder service) {
             try{
                 this.queue.put(service);
             } catch(InterruptedException localInterruptedException) {
             }
         }
+        @Override
         public void  onServiceDisconnected(ComponentName name) {
         }
+
         public IBinder getBinder() throws InterruptedException {
-            if(this.retrieved) throw new  IllegalStateException();
+            if(this.retrieved){
+                throw new  IllegalStateException();
+            }
             this.retrieved = true;
             return (IBinder) this.queue.take();
         }
@@ -88,6 +94,7 @@ public class  AdvertisingIdClient {
         public AdvertisingInterface(IBinder pBinder) {
             binder = pBinder;
         }
+        @Override
         public IBinder asBinder() {
             return binder;
         }

@@ -19,8 +19,12 @@ public class Md5Utils {
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < b.length; i++) {
             int a = b[i];
-            if (a < 0) a += 256;
-            if (a < 16) buf.append("0");
+            if (a < 0){
+                a += 256;
+            }
+            if (a < 16){
+                buf.append("0");
+            }
             buf.append(Integer.toHexString(a));
         }
         return String.valueOf(buf).substring(8, 24);  //16位; //32位

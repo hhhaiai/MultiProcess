@@ -63,7 +63,7 @@ public class DeviceImpl {
     private final String ZERO = "0";
     private final String ONE = "1";
     private final String[] IMSIS = {"00000000000000", "00000000","000000000000000"};
-
+    private DeviceImpl(){}
     private static class Holder {
         private static final DeviceImpl INSTANCE = new DeviceImpl();
     }
@@ -399,8 +399,9 @@ public class DeviceImpl {
         } catch (Throwable t) {
             operatorCode = "";
         }
-        if ("00000".equals(operatorCode))
+        if ("00000".equals(operatorCode)){
             operatorCode = "";
+        }
         return operatorCode;
     }
 
@@ -606,8 +607,9 @@ public class DeviceImpl {
         try {
             PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0);
             ApplicationInfo appinfo = packageInfo.applicationInfo;
-            if (0 != (appinfo.flags & ApplicationInfo.FLAG_DEBUGGABLE))
+            if (0 != (appinfo.flags & ApplicationInfo.FLAG_DEBUGGABLE)){
                 return ZERO;
+            }
         } catch (Exception e) {
             ELOG.i(e.getMessage() + "  getDebug  ");
             return ONE;
@@ -924,6 +926,7 @@ public class DeviceImpl {
         String idfa = "";
         try {
             new Thread(new Runnable() {
+                @Override
                 public void run() {
                     try {
                         AdvertisingIdClient.AdInfo adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);// 阻塞调用，需放在子线程处理

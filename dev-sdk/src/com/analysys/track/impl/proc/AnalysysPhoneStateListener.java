@@ -20,8 +20,8 @@ public class AnalysysPhoneStateListener {
     }
 
     public static AnalysysPhoneStateListener getInstance(Context context) {
-        if (AnalysysPhoneStateListener.Holder.INSTANCE.mContext == null) {
-            AnalysysPhoneStateListener.Holder.INSTANCE.mContext = EContextHelper.getContext(context);
+        if (mContext == null) {
+            mContext = EContextHelper.getContext(context);
             if(phoneStateListener == null){
                 phoneStateListener = phoneStateListener(mContext);
             }

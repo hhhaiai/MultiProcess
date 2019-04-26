@@ -54,6 +54,7 @@ public class OCImpl {
      * mCache为Android4.x正在运行的app列表的内存变量值
      */
     public static JSONObject mCache = null;
+    private OCImpl(){}
     private static class Holder {
         private static final OCImpl INSTANCE = new OCImpl();
     }

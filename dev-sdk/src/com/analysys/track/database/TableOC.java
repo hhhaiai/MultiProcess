@@ -27,7 +27,7 @@ public class TableOC {
     private final String ZERO = "0";
     private final String ONE = "1";
     Context mContext;
-
+    private TableOC(){}
     private static class Holder {
         private static final TableOC INSTANCE = new TableOC();
     }
@@ -545,8 +545,9 @@ public class TableOC {
     public void delete() {
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if (db == null)
+            if (db == null){
                 return;
+            }
             db.delete(DBConfig.OC.TABLE_NAME, DBConfig.OC.Column.ST + "=?", new String[] {ONE});
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){

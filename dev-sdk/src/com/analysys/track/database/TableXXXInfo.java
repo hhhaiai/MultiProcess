@@ -23,6 +23,7 @@ import java.util.List;
 
 public class TableXXXInfo {
     Context mContext;
+    private TableXXXInfo(){}
     private static class Holder {
         private static final TableXXXInfo INSTANCE = new TableXXXInfo();
     }
