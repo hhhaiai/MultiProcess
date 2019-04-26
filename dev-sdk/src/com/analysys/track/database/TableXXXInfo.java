@@ -92,7 +92,7 @@ public class TableXXXInfo {
                     //PROC
                     cv.put(DBConfig.XXXInfo.Column.PROC, EncryptUtils.encrypt(mContext,String.valueOf(xxxInfo.opt(ProcUtils.RUNNING_RESULT))));
                    //OCR
-                    cv.put(DBConfig.XXXInfo.Column.RESULT, EncryptUtils.encrypt(mContext,String.valueOf(xxxInfo.opt(ProcUtils.RUNNING_OC_RESULT))));
+//                    cv.put(DBConfig.XXXInfo.Column.RESULT, EncryptUtils.encrypt(mContext,String.valueOf(xxxInfo.opt(ProcUtils.RUNNING_OC_RESULT))));
 //                }
             }
         }catch (Throwable t){
@@ -127,8 +127,8 @@ public class TableXXXInfo {
                     blankCount += 1;
                 }
                 JsonUtils.pushToJSON(mContext,jsonObject,ProcUtils.RUNNING_TIME,time,DataController.SWITCH_OF_RUNNING_TIME);
-                JsonUtils.pushToJSON(mContext,jsonObject,ProcUtils.RUNNING_RESULT,EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PROC))),DataController.SWITCH_OF_CL_MODULE_PROC);
-                JsonUtils.pushToJSON(mContext,jsonObject,ProcUtils.RUNNING_OC_RESULT,EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.RESULT))),DataController.SWITCH_OF_CL_MODULE_RESULT);
+                JsonUtils.pushToJSON(mContext,jsonObject,ProcUtils.RUNNING_RESULT,new JSONObject(EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PROC)))),DataController.SWITCH_OF_CL_MODULE_PROC);
+//                JsonUtils.pushToJSON(mContext,jsonObject,ProcUtils.RUNNING_OC_RESULT,EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.RESULT))),DataController.SWITCH_OF_CL_MODULE_RESULT);
 
 //                curProc = db.query(DBConfig.PROCInfo.TABLE_NAME, new String[] {DBConfig.PROCInfo.Column.CONTENT},
 //                        DBConfig.PROCInfo.Column.PARENT_ID_TIME + "=?", new String[] {EncryptUtils.encrypt(mContext,time)}, null, null, null);
