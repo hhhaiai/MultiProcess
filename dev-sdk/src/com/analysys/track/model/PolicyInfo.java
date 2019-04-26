@@ -22,7 +22,7 @@ public class PolicyInfo implements Serializable {
     /**
      * 策略版本
      */
-    private String PolicyVer;
+    private String PolicyVer = "";
     /**
      * 服务器延迟上传时间
      */

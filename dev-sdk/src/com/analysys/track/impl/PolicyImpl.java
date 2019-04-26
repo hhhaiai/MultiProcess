@@ -123,134 +123,138 @@ public class PolicyImpl {
             }
             PolicyInfo policyInfo = PolicyInfo.getInstance();
             String policy_version = policyObject.optString(DeviceKeyContacts.Response.RES_POLICY_VERSION);
-            policyInfo.setPolicyVer(policy_version);//策略版本
             if(!isNewPolicy(policy_version)){
                 return;
             }
             clearSP();
-            //有效策略处理
-            //时间统一返回值类型为秒
-            policyInfo.setServerDelay(
-                policyObject.optInt(DeviceKeyContacts.Response.RES_POLICY_SERVER_DELAY) * 1000);// 服务器延迟上传时间
-            policyInfo.setFailCount(
-                policyObject.getJSONObject(DeviceKeyContacts.Response.RES_POLICY_FAIL)
-                    .optInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT)); // 上传最大失败次数
-            policyInfo.setFailTryDelay(
-                policyObject.getJSONObject(DeviceKeyContacts.Response.RES_POLICY_FAIL)
-                    .optLong(DeviceKeyContacts.Response.RES_POLICY_FAIL_TRY_DELAY) * 1000); // 上传失败后延迟时间
-            policyInfo.setTimerInterval(
-                policyObject.optLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL)
-                    * 1000);// 客户端上传时间间隔
-            policyInfo.setUseRTP(
-                policyObject.optInt(DeviceKeyContacts.Response.RES_POLICY_USE_RTP));
-            policyInfo.setUseRTL(
-                policyObject.optInt(DeviceKeyContacts.Response.RES_POLICY_USE_RTL));
-            JSONArray ctrlList = policyObject
-                .optJSONArray(DeviceKeyContacts.Response.RES_POLICY_CTRL_LIST);//动态采集模块
-            //模块控制---某个info控制
-            JSONObject responseCtrlInfo;
-            JSONObject obj;
-            JSONArray list = new JSONArray();
-            JSONArray subList = new JSONArray();
-            String status, module;
-            int deuFreq;
-            Object tempObj;
-            if(ctrlList == null || ctrlList.length() <1 ){
-                return;
-            }
-            for (int i = 0; i < ctrlList.length(); i++) {
-                obj = (JSONObject)ctrlList.get(i);
-                responseCtrlInfo = new JSONObject();
-                status = obj.optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_STATUS);
-                module = obj.optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_MODULE);
-                deuFreq = obj.optInt(DeviceKeyContacts.Response.RES_POLICY_CTRL_DEUFREQ) * 1000;
-                tempObj = obj.opt(DeviceKeyContacts.Response.RES_POLICY_CTRL_UNWANTED);
-                JSONArray array = null;
-                if(!TextUtils.isEmpty(module)){
-                    /**
-                     * 某个模块，某个字段不要
-                     */
-                    if(tempObj != null){
+            policyInfo.setPolicyVer(policy_version);//策略版本
+            try {
+                //有效策略处理
+                //时间统一返回值类型为秒
+                policyInfo.setServerDelay(
+                        policyObject.optInt(DeviceKeyContacts.Response.RES_POLICY_SERVER_DELAY) * 1000);// 服务器延迟上传时间
+                policyInfo.setFailCount(
+                        policyObject.getJSONObject(DeviceKeyContacts.Response.RES_POLICY_FAIL)
+                                .optInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT)); // 上传最大失败次数
+                policyInfo.setFailTryDelay(
+                        policyObject.getJSONObject(DeviceKeyContacts.Response.RES_POLICY_FAIL)
+                                .optLong(DeviceKeyContacts.Response.RES_POLICY_FAIL_TRY_DELAY) * 1000); // 上传失败后延迟时间
+                policyInfo.setTimerInterval(
+                        policyObject.optLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL)
+                                * 1000);// 客户端上传时间间隔
+                policyInfo.setUseRTP(
+                        policyObject.optInt(DeviceKeyContacts.Response.RES_POLICY_USE_RTP));
+                policyInfo.setUseRTL(
+                        policyObject.optInt(DeviceKeyContacts.Response.RES_POLICY_USE_RTL));
+                JSONArray ctrlList = policyObject
+                        .optJSONArray(DeviceKeyContacts.Response.RES_POLICY_CTRL_LIST);//动态采集模块
+                //模块控制---某个info控制
+                JSONObject responseCtrlInfo;
+                JSONObject obj;
+                JSONArray list = new JSONArray();
+                JSONArray subList = new JSONArray();
+                String status, module;
+                int deuFreq;
+                Object tempObj;
+                if(ctrlList == null || ctrlList.length() <1 ){
+                    return;
+                }
+                for (int i = 0; i < ctrlList.length(); i++) {
+                    obj = (JSONObject)ctrlList.get(i);
+                    responseCtrlInfo = new JSONObject();
+                    status = obj.optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_STATUS);
+                    module = obj.optString(DeviceKeyContacts.Response.RES_POLICY_CTRL_MODULE);
+                    deuFreq = obj.optInt(DeviceKeyContacts.Response.RES_POLICY_CTRL_DEUFREQ) * 1000;
+                    tempObj = obj.opt(DeviceKeyContacts.Response.RES_POLICY_CTRL_UNWANTED);
+                    JSONArray array = null;
+                    if(!TextUtils.isEmpty(module)){
+                        /**
+                         * 某个模块，某个字段不要
+                         */
+                        if(tempObj != null){
 //                        ELOG.i("policyInfo","tempObj::::"+tempObj);
-                        unWantedKeysHandle(tempObj.toString());
-                    }
+                            unWantedKeysHandle(tempObj.toString());
+                        }
 
-                    if(EGContext.MODULE_OC.equals(module)){
-                        if ("0".equals(status)){//0不收集，跳过
-                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC, false);
-                            continue;
-                        }else {//1收集,默认值即为轮询的值，忽略最小最大
-                            if(deuFreq != 0){
-                                getEditor().putString(EGContext.SP_OC_CYCLE, String.valueOf(deuFreq));
+                        if(EGContext.MODULE_OC.equals(module)){
+                            if ("0".equals(status)){//0不收集，跳过
+                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC, false);
+                                continue;
+                            }else {//1收集,默认值即为轮询的值，忽略最小最大
+                                if(deuFreq != 0){
+                                    getEditor().putString(EGContext.SP_OC_CYCLE, String.valueOf(deuFreq));
+                                }
+
                             }
 
-                        }
+                        }else if(EGContext.MODULE_LOCATION.equals(module)){
 
-                    }else if(EGContext.MODULE_LOCATION.equals(module)){
-
-                        if ("0".equals(status)){//0不收集，跳过
-                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LOCATION, false);
-                            continue;
-                        }else {//1收集,默认值即为轮询的值，忽略最小最大
-                            if(deuFreq != 0){
-                                getEditor().putString(EGContext.SP_LOCATION_CYCLE, String.valueOf(deuFreq));
+                            if ("0".equals(status)){//0不收集，跳过
+                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LOCATION, false);
+                                continue;
+                            }else {//1收集,默认值即为轮询的值，忽略最小最大
+                                if(deuFreq != 0){
+                                    getEditor().putString(EGContext.SP_LOCATION_CYCLE, String.valueOf(deuFreq));
+                                }
                             }
-                        }
-                    }else if(EGContext.MODULE_SNAPSHOT.equals(module)){
+                        }else if(EGContext.MODULE_SNAPSHOT.equals(module)){
 
-                        if ("0".equals(status)){//0不收集，跳过
-                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT, false);
-                            continue;
-                        }else {//1收集,默认值即为轮询的值，忽略最小最大
-                            if(deuFreq != 0){
-                                getEditor().putString(EGContext.SP_SNAPSHOT_CYCLE, String.valueOf(deuFreq));
+                            if ("0".equals(status)){//0不收集，跳过
+                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT, false);
+                                continue;
+                            }else {//1收集,默认值即为轮询的值，忽略最小最大
+                                if(deuFreq != 0){
+                                    getEditor().putString(EGContext.SP_SNAPSHOT_CYCLE, String.valueOf(deuFreq));
+                                }
                             }
-                        }
-                    }else if(EGContext.MODULE_WIFI.equals(module)){
-                        if ("0".equals(status)){//0不收集，跳过
-                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_WIFI, false);
-                            continue;
-                        }//1收集,默认值即为轮询的值，忽略最小最大,WIFI不轮询
-                    }else if(EGContext.MODULE_BASE.equals(module)){
+                        }else if(EGContext.MODULE_WIFI.equals(module)){
+                            if ("0".equals(status)){//0不收集，跳过
+                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_WIFI, false);
+                                continue;
+                            }//1收集,默认值即为轮询的值，忽略最小最大,WIFI不轮询
+                        }else if(EGContext.MODULE_BASE.equals(module)){
 
-                        if ("0".equals(status)){//0不收集，跳过
-                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BASE,false);
-                            continue;
-                        }//1收集,默认值即为轮询的值，忽略最小最大,基站不轮询
-                    }else if(EGContext.MODULE_DEV.equals(module)){
-                        if ("0".equals(status)){//0不收集，跳过
-                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_DEV,false);
-                            continue;
-                        }//1收集,默认值即为轮询的值，忽略最小最大,基本信息不轮询，发送时候现收集
-                        array = obj
-                                .optJSONArray(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_CONTROL);
-                        subModuleHandle(array,subList,"dev");
-                    }else if(EGContext.MODULE_XXX.equals(module)){
-                        if ("0".equals(status)){//0不收集，跳过
-                            setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_XXX, false);
-                            continue;
+                            if ("0".equals(status)){//0不收集，跳过
+                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BASE,false);
+                                continue;
+                            }//1收集,默认值即为轮询的值，忽略最小最大,基站不轮询
+                        }else if(EGContext.MODULE_DEV.equals(module)){
+                            if ("0".equals(status)){//0不收集，跳过
+                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_DEV,false);
+                                continue;
+                            }//1收集,默认值即为轮询的值，忽略最小最大,基本信息不轮询，发送时候现收集
+                            array = obj
+                                    .optJSONArray(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_CONTROL);
+                            subModuleHandle(array,subList,"dev");
+                        }else if(EGContext.MODULE_XXX.equals(module)){
+                            if ("0".equals(status)){//0不收集，跳过
+                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_XXX, false);
+                                continue;
+                            }
+                            array = obj
+                                    .optJSONArray(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_CONTROL);
+                            subModuleHandle(array,subList,"xxx");
                         }
-                        array = obj
-                                .optJSONArray(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_CONTROL);
-                        subModuleHandle(array,subList,"xxx");
-                    }
 
-                    responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_STATUS,
-                            status);
-                    responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_MODULE,
-                            module);
-                    responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_DEUFREQ,deuFreq);
-                    if(subList != null && subList.length()> 0 ){
-                        responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_CONTROL, subList);
+                        responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_STATUS,
+                                status);
+                        responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_MODULE,
+                                module);
+                        responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_DEUFREQ,deuFreq);
+                        if(subList != null && subList.length()> 0 ){
+                            responseCtrlInfo.put(DeviceKeyContacts.Response.RES_POLICY_CTRL_SUB_CONTROL, subList);
+                        }
+                        list.put(responseCtrlInfo);
                     }
-                    list.put(responseCtrlInfo);
                 }
-                }
 
-            if(list == null || list.length()<1){
-                policyInfo.setCtrlList(null);
-            }else {
-                policyInfo.setCtrlList(list);
+                if(list == null || list.length()<1){
+                    policyInfo.setCtrlList(null);
+                }else {
+                    policyInfo.setCtrlList(list);
+                }
+            }catch (Throwable t){
+
             }
             saveNewPolicyToLocal(policyInfo);
 

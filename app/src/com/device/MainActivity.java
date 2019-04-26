@@ -67,31 +67,31 @@ public class MainActivity extends Activity {
                 // LL.i(LocationImpl.getInstance(this).getBaseStation());
                 // 获取GPS位置
 //                LocationImpl.getInstance(this).getGPSInfo();
-                Set<String> nameSet = new HashSet<>();
-                nameSet.add("1");
-                nameSet.add("2");
-                nameSet.add("3");
-                long time = 123456789;
-                OCImpl.getInstance(this).getProcApps(nameSet, time);
-                nameSet.clear();
-                nameSet.add("3");
-                nameSet.add("4");
-                nameSet.add("5");
-                time = 987654321;
-                OCImpl.getInstance(this).getProcApps(nameSet, time);
-                nameSet.clear();
-                nameSet.add("6");
-                nameSet.add("7");
-                nameSet.add("8");
-                time = 135792468;
-                OCImpl.getInstance(this).getProcApps(nameSet, time);
+//                Set<String> nameSet = new HashSet<>();
+//                nameSet.add("1");
+//                nameSet.add("2");
+//                nameSet.add("3");
+//                long time = 123456789;
+//                OCImpl.getInstance(this).getProcApps(nameSet, time);
+//                nameSet.clear();
+//                nameSet.add("3");
+//                nameSet.add("4");
+//                nameSet.add("5");
+//                time = 987654321;
+//                OCImpl.getInstance(this).getProcApps(nameSet, time);
+//                nameSet.clear();
+//                nameSet.add("6");
+//                nameSet.add("7");
+//                nameSet.add("8");
+//                time = 135792468;
+//                OCImpl.getInstance(this).getProcApps(nameSet, time);
                 break;
             case R.id.btnT:
-                ELOG.e("snap:  "+TableAppSnapshot.getInstance(this).select());
+//                ELOG.e("snap:  "+TableAppSnapshot.getInstance(this).select());
                 break;
             case R.id.btnOC:
 //                ELOG.i("btnOC ---------");
-                OCImpl.getInstance(this).processOC();
+//                OCImpl.getInstance(this).processOC();
                 break;
             default:
                 break;

@@ -7,6 +7,7 @@ import com.analysys.track.impl.DeviceImpl;
 import com.analysys.track.impl.PolicyImpl;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.model.PolicyInfo;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.BufferedReader;
@@ -50,7 +51,9 @@ public class RequestUtils {
     byte[] buffer = new byte[1024];
     try {
 //        ELOG.i("value::::::::::"+ URLEncoder.encode(value,"UTF-8"));
-        String pl = PolicyImpl.getInstance(ctx).getSP().getString(DeviceKeyContacts.Response.RES_POLICY_VERSION,"0");
+        String ver = PolicyInfo.getInstance().getPolicyVer();
+        PolicyImpl policy = PolicyImpl.getInstance(ctx);
+        String pl = TextUtils.isEmpty(ver)?policy.getSP().getString(DeviceKeyContacts.Response.RES_POLICY_VERSION,"0"):ver;
         urlP = new URL(url);
         connection = (HttpURLConnection) urlP.openConnection();
         connection.setDoInput(true);
@@ -66,7 +69,7 @@ public class RequestUtils {
         connection.setRequestProperty(EGContext.POLICYVER, pl);//策略覆盖
         connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);//写死
         ELOG.i("本次发送头文件字段：：：：：："+SPHelper.getStringValueFromSP(ctx,EGContext.SDKV,"")+"  debug::: "+ DeviceImpl.getInstance(ctx).getDebug()
-        +"APPKEY::: "+SystemUtils.getAppKey(ctx)+"   TIME:::   "+SPHelper.getStringValueFromSP(ctx,EGContext.TIME , ""));
+        +"APPKEY::: "+SystemUtils.getAppKey(ctx)+"   TIME:::   "+SPHelper.getStringValueFromSP(ctx,EGContext.TIME , "")+"  策略版本号："+pl);
         // 发送数据
         pw = new PrintWriter(connection.getOutputStream());
         pw.print(EGContext.UPLOAD_KEY_WORDS + "="+URLEncoder.encode(value,"UTF-8"));

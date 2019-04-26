@@ -37,6 +37,9 @@ import android.os.Process;
 import android.text.TextUtils;
 import android.util.Base64;
 
+/**
+ * @author ly
+ */
 public class UploadImpl {
     Context mContext;
     public final String DI = "DevInfo";
@@ -44,9 +47,11 @@ public class UploadImpl {
     private final String LI = "LocationInfo";
     private final String OCI = "OCInfo";
     private final String XXXInfo = "XXXInfo";
-    // 是否分包上传
+    /**是否分包上传*/
     private boolean isChunkUpload = false;
-    // 本条记录的时间
+    /**
+     * 本条记录的时间
+     */
     private static List<String> timeList = new ArrayList<String>();
 
     private static class Holder {
@@ -60,7 +65,9 @@ public class UploadImpl {
         return Holder.INSTANCE;
     }
 
-    // 上传数据
+    /**
+     * 上传数据
+     */
     public void upload() {
         try {
             //TODO 测试下线程名字，判断子线程or主线程，应该子线程，测试是否会导致同级别的卡顿
@@ -149,6 +156,7 @@ public class UploadImpl {
             } else {
                 if(serverDelayTime > 0){
                     new Handler().postDelayed(new Runnable(){
+                        @Override
                         public void run() {
                             doUploadImpl();
                         }
@@ -238,7 +246,6 @@ public class UploadImpl {
                 }
             }
         } catch (Throwable e) {
-            // Log.getStackTraceString(e);
             if(EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e.getMessage() + "getInfo()");
             }
@@ -256,11 +263,11 @@ public class UploadImpl {
             if (TextUtils.isEmpty(msg)) {
                 return null;
             }
-            String key_inner = SystemUtils.getAppKey(mContext);
-            if (null == key_inner) {
-                key_inner = EGContext.ORIGINKEY_STRING;
+            String keyInner = SystemUtils.getAppKey(mContext);
+            if (null == keyInner) {
+                keyInner = EGContext.ORIGINKEY_STRING;
             }
-            key = DeflterCompressUtils.makeSercretKey(key_inner, mContext);
+            key = DeflterCompressUtils.makeSercretKey(keyInner, mContext);
             ELOG.i("uploadInfo加密key::::" + key);
 
             byte[] def = DeflterCompressUtils.compress(URLEncoder.encode(URLEncoder.encode(msg)).getBytes("UTF-8"));
@@ -300,7 +307,7 @@ public class UploadImpl {
                     if (EGContext.HTTP_SUCCESS.equals(code)) {
                         EguanIdUtils.getInstance(mContext).setId(json);
                         // 清除本地数据
-                        uploadSuccess(TimerTime(code));
+                        uploadSuccess(timerTime(code));
                         return;
                     }
                     if (EGContext.HTTP_RETRY.equals(code)) {
@@ -331,13 +338,13 @@ public class UploadImpl {
             }
         }
     }
-
+    String fail = "-1";
     private void handleUpload(final String url, final String uploadInfo) {
 
         String result = RequestUtils.httpRequest(url, uploadInfo, mContext);
         if (TextUtils.isEmpty(result)) {
             return;
-        }else if("-1".equals(result)){
+        }else if(fail.equals(result)){
             ELOG.i("uploadInfo发生异常一次");
             SPHelper.setIntValue2SP(mContext,EGContext.REQUEST_STATE,EGContext.sPrepare);
             //上传失败次数
@@ -364,7 +371,6 @@ public class UploadImpl {
             // 没有可以使用的大小，则需要重新发送
             if (freeLen <= 0) {
                 if (jsonArray.length() > 0) {
-//                    ELOG.i("jsonArray.length() > 0"+isChunkUpload);
                     isChunkUpload = true;
                 }
                 return arr;
@@ -391,9 +397,7 @@ public class UploadImpl {
                         // 最后一个消费，则不需要再次发送
                         if (i == ss - 1) {
                             isChunkUpload = false;
-//                            ELOG.i("i == ss - 1"+(i == ss - 1)+ isChunkUpload);
                         } else {
-//                            ELOG.i("i != ss - 1"+i + ss);
                             continue;
                         }
                     }
@@ -401,7 +405,6 @@ public class UploadImpl {
                     long size = info.getBytes().length + String.valueOf(arr).getBytes().length;
                     if (size >= freeLen) {
                         isChunkUpload = true;
-//                        ELOG.i("size >= freeLen"+(i == ss - 1)+ isChunkUpload);
                         break;
                     } else {
                         arr.put(info);
@@ -409,9 +412,7 @@ public class UploadImpl {
                         // 最后一个消费，则不需要再次发送
                         if (i == ss - 1) {
                             isChunkUpload = false;
-//                            ELOG.i("i == ss - 1"+(i == ss - 1)+ isChunkUpload);
                         } else {
-//                            ELOG.i("i != ss - 1"+i + ss);
                             continue;
                         }
                     }
@@ -479,7 +480,8 @@ public class UploadImpl {
             //上传失败时间
             SPHelper.setIntValue2SP(mContext,EGContext.FAILEDNUMBER,numb);
             SPHelper.setLongValue2SP(mContext,EGContext.FAILEDTIME,System.currentTimeMillis());
-            long time = SystemUtils.intervalTime(mContext);//多久重试
+            //多久重试
+            long time = SystemUtils.intervalTime(mContext);
             SPHelper.setLongValue2SP(mContext,EGContext.RETRYTIME,time);
         }catch (Throwable t){
             if(EGContext.FLAG_DEBUG_INNER){
@@ -488,7 +490,7 @@ public class UploadImpl {
         }
 
     }
-    private long TimerTime(String str) {
+    private long timerTime(String str) {
         long time = 0;
         switch (Integer.valueOf(str)) {
             case 200:
