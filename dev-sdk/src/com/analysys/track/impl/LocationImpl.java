@@ -315,7 +315,7 @@ public class LocationImpl {
                                 tempLac = info.getLac();
                                 key = tempCid+"|"+tempLac;
                                 ELOG.i("location.info","LocationInfo:获取周围基站信息当前tempCid::"+tempCid);
-                                if(!cid.contains(key)){
+                                if(tempCid > 0 && tempLac >0 && !cid.contains(key)){
                                     cid.add(key);
                                     jsonObject = new JSONObject();
                                     JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
@@ -350,7 +350,7 @@ public class LocationImpl {
                                 }
                                 int tempCid = gcl.getCid(),tempLac=gcl.getLac();
                                 String key = tempCid+"|"+tempLac;
-                                if(!cid.contains(key)){
+                                if(tempCid > 0 && tempLac >0 && !cid.contains(key)){
                                     cid.add(key);
 //                                    ELOG.i("location.info","222222222222222");
                                     int stren = gcl.getPsc();
@@ -381,7 +381,7 @@ public class LocationImpl {
                                     }
                                     int tempCid = ccl.getBaseStationId(),tempLac=ccl.getNetworkId();
                                     String key = tempCid+"|"+tempLac;
-                                    if(!cid.contains(key)) {
+                                    if(tempCid > 0 && tempLac >0 && !cid.contains(key)) {
                                         cid.add(key);
                                         //获取当前基站信息
 //                                        ELOG.i("location.info","999");
