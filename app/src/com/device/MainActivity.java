@@ -11,14 +11,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
-import com.analysys.track.database.TableAppSnapshot;
-import com.analysys.track.impl.OCImpl;
-import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PermissionUtils;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class MainActivity extends Activity {
 
@@ -34,19 +29,22 @@ public class MainActivity extends Activity {
         registerPermission();
 //        Intent intent = new Intent(this, testAct.class);
 //        startActivity(intent);
+
+        startService(new Intent(this, MyServiceA.class));
+        startService(new Intent(this, MyServiceB.class));
     }
 
     @TargetApi(23)
     private void registerPermission() {
         if (Build.VERSION.SDK_INT > 22) {
             if (!PermissionUtils.checkPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                requestPermissions(new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
             }
             if (!PermissionUtils.checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
             }
             if (!PermissionUtils.checkPermission(this, Manifest.permission.INTERNET)) {
-                requestPermissions(new String[] {Manifest.permission.INTERNET}, 2);
+                requestPermissions(new String[]{Manifest.permission.INTERNET}, 2);
             }
         }
 
@@ -102,7 +100,7 @@ public class MainActivity extends Activity {
      * 获取传感器方法
      */
     private void test() {
-        SensorManager sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+        SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         List<Sensor> sensorList = sensorManager.getSensorList(Sensor.TYPE_ALL);
         String type;
         for (int i = 0; i < sensorList.size(); i++) {
