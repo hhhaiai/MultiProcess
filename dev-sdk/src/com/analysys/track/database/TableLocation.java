@@ -39,8 +39,8 @@ public class TableLocation {
 //            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_LOCATION)){
 //                return;
 //            }
-//            ELOG.i("insert","================="+System.currentTimeMillis());
-//            ELOG.i("insert","================="+locationInfo);
+            ELOG.i("insert","================="+System.currentTimeMillis());
+            ELOG.i("insert","================="+locationInfo);
             ContentValues cv = null;
             String locationTime = null;
             long time = -1;
