@@ -331,7 +331,7 @@ public class LocationImpl {
                 } catch (Throwable t) {
                     ELOG.e("location.info", t.getMessage() + "  getBaseStationInfo has an exc. ");
                 }
-                Map<Integer, JSONObject> tempGsmMap = new HashMap<Integer, JSONObject>(), tempCdmaMap = new HashMap<Integer, JSONObject>();
+                Map<String, JSONObject> tempGsmMap = new HashMap<String, JSONObject>(), tempCdmaMap = new HashMap<String, JSONObject>();
                 List<Integer> gsmList = new ArrayList<Integer>(), cdmaList = new ArrayList<Integer>();
                 try {
                     CellLocation location = mTelephonyManager.getCellLocation();
@@ -364,7 +364,7 @@ public class LocationImpl {
 //                                    }
 //                                    jsonArray.put(jsonObject);
 //                                    ELOG.i("location.info","33333333333333333"+jsonObject);
-                                    tempGsmMap.put(stren, jsonObject);
+                                    tempGsmMap.put(stren+"|"+key, jsonObject);
 //                                    ELOG.i("location.info","444444444444444444444"+tempGsmMap);
                                     gsmList.add(stren);
 //                                    ELOG.i("LocationInfo:获取GsmCellLocationInfo基站信息：：："+jsonArray);
@@ -394,7 +394,7 @@ public class LocationImpl {
                                     JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, tempCid, DataController.SWITCH_OF_CELL_ID);
                                     JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, stren, DataController.SWITCH_OF_BS_LEVEL);
 //                                        ELOG.i("location.info","10------");
-                                    tempCdmaMap.put(stren, jsonObject);
+                                    tempCdmaMap.put(stren+"|"+key, jsonObject);
                                     cdmaList.add(stren);
 //                                        ELOG.i("location.info","11------------");
 //                                        jsonArray.put(jsonObject);
@@ -447,7 +447,7 @@ public class LocationImpl {
                                     JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
                                     JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, tempCid, DataController.SWITCH_OF_CELL_ID);
                                     JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, strength, DataController.SWITCH_OF_BS_LEVEL);
-                                    tempCdmaMap.put(strength, obj);
+                                    tempCdmaMap.put(strength+"|"+key, obj);
                                     cdmaList.add(strength);
                                 }
                             } else if (info instanceof CellInfoGsm) {
@@ -468,7 +468,7 @@ public class LocationImpl {
                                     JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
                                     JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, tempCid, DataController.SWITCH_OF_CELL_ID);
                                     JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, strength, DataController.SWITCH_OF_BS_LEVEL);
-                                    tempGsmMap.put(strength, obj);
+                                    tempGsmMap.put(strength+"|"+key, obj);
                                     gsmList.add(strength);
                                 }
                             } else if (info instanceof CellInfoLte) {
@@ -489,7 +489,7 @@ public class LocationImpl {
                                     JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
                                     JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, tempCid, DataController.SWITCH_OF_CELL_ID);
                                     JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, strength, DataController.SWITCH_OF_BS_LEVEL);
-                                    tempCdmaMap.put(strength, obj);
+                                    tempCdmaMap.put(strength+"|"+key, obj);
                                     cdmaList.add(strength);
                                 }
                             } else if (info instanceof CellInfoWcdma) {
@@ -510,7 +510,7 @@ public class LocationImpl {
                                     JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
                                     JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, tempCid, DataController.SWITCH_OF_CELL_ID);
                                     JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, strength, DataController.SWITCH_OF_BS_LEVEL);
-                                    tempCdmaMap.put(strength, obj);
+                                    tempCdmaMap.put(strength+"|"+key, obj);
                                     cdmaList.add(strength);
                                 }
                             }
@@ -551,7 +551,7 @@ public class LocationImpl {
     }
 
 
-    private JSONArray listFilter(List<Integer> list, JSONArray jsonArray, Map<Integer, JSONObject> map) {
+    private JSONArray listFilter(List<Integer> list, JSONArray jsonArray, Map<String, JSONObject> map) {
         try {
 //            ELOG.d("location.info","listFilter....");
             int count = 0;
