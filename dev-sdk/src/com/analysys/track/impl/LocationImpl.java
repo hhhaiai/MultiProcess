@@ -1,38 +1,9 @@
 package com.analysys.track.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import com.analysys.track.impl.proc.AnalysysPhoneStateListener;
-import com.analysys.track.internal.Content.DataController;
-import com.analysys.track.work.MessageDispatcher;
-import com.analysys.track.utils.JsonUtils;
-import com.analysys.track.utils.SystemUtils;
-
-import com.analysys.track.utils.reflectinon.EContextHelper;
-import com.analysys.track.database.TableLocation;
-import com.analysys.track.internal.Content.DeviceKeyContacts;
-import com.analysys.track.internal.Content.EGContext;
-
-import com.analysys.track.utils.AndroidManifestHelper;
-import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.EThreadPool;
-import com.analysys.track.utils.PermissionUtils;
-import com.analysys.track.utils.sp.SPHelper;
-
 import android.Manifest;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
-
 import android.telephony.CellInfo;
 import android.telephony.CellInfoCdma;
 import android.telephony.CellInfoGsm;
@@ -41,20 +12,48 @@ import android.telephony.CellInfoWcdma;
 import android.telephony.CellLocation;
 import android.telephony.NeighboringCellInfo;
 import android.telephony.TelephonyManager;
-
 import android.telephony.cdma.CdmaCellLocation;
 import android.telephony.gsm.GsmCellLocation;
 import android.text.TextUtils;
+
+import com.analysys.track.database.TableLocation;
+import com.analysys.track.impl.proc.AnalysysPhoneStateListener;
+import com.analysys.track.internal.Content.DataController;
+import com.analysys.track.internal.Content.DeviceKeyContacts;
+import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.utils.AndroidManifestHelper;
+import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.EThreadPool;
+import com.analysys.track.utils.JsonUtils;
+import com.analysys.track.utils.PermissionUtils;
+import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.reflectinon.EContextHelper;
+import com.analysys.track.utils.sp.SPHelper;
+import com.analysys.track.work.MessageDispatcher;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class LocationImpl {
 
     Context mContext;
     private LocationManager locationManager;
-//    PhoneStateListener phoneStateListener = null;
+    //    PhoneStateListener phoneStateListener = null;
     TelephonyManager mTelephonyManager = null;
-//    CellLocation cellLocation = null;
+    //    CellLocation cellLocation = null;
     JSONObject locationJson = null;
-    private LocationImpl(){}
+
+    private LocationImpl() {
+    }
+
     private static class Holder {
         private static final LocationImpl INSTANCE = new LocationImpl();
     }
@@ -75,34 +74,35 @@ public class LocationImpl {
 
     public void location() {
         try {
-            if(SystemUtils.isMainThread()){
+            if (SystemUtils.isMainThread()) {
                 EThreadPool.execute(new Runnable() {
                     @Override
                     public void run() {
                         LocationHandle();
                     }
                 });
-            }else {
+            } else {
                 LocationHandle();
             }
-        }catch (Throwable t){
+        } catch (Throwable t) {
         }
 
 
     }
-    private void LocationHandle(){
+
+    private void LocationHandle() {
         try {
-            if(!PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LOCATION,true)){
+            if (!PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
                 ELOG.i("模块不收集，退出");
                 return;
             }
             //么有获取地理位置权限则不做处理
-            if(!hasLocationPermission()){
+            if (!hasLocationPermission()) {
 //                ELOG.i("第二个可能性退出的地方location么有新值");
 //                return;
 
             }
-            if(mTelephonyManager == null){
+            if (mTelephonyManager == null) {
                 mTelephonyManager = AnalysysPhoneStateListener.getInstance(mContext).getTelephonyManager();
             }
             JSONObject location = getLocation();
@@ -111,18 +111,19 @@ public class LocationImpl {
             if (location != null) {
                 TableLocation.getInstance(mContext).insert(location);
             }
-        }catch (Throwable t){
-            ELOG.e(t.getMessage()+"  :::LocationHandle");
-        }finally {
-            MessageDispatcher.getInstance(mContext).locationInfo(EGContext.LOCATION_CYCLE,false);
+        } catch (Throwable t) {
+            ELOG.e(t.getMessage() + "  :::LocationHandle");
+        } finally {
+            MessageDispatcher.getInstance(mContext).locationInfo(EGContext.LOCATION_CYCLE, false);
         }
     }
+
     private boolean hasLocationPermission() {
         /**
          * Manifest是否声明权限
          */
         if (!AndroidManifestHelper.isPermissionDefineInManifest(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
-                && !AndroidManifestHelper.isPermissionDefineInManifest(mContext,Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                && !AndroidManifestHelper.isPermissionDefineInManifest(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
             ELOG.i("LocationInfo没有AndroidManifest权限，退出 ");
             return false;
         }
@@ -144,17 +145,17 @@ public class LocationImpl {
         }
         try {
             Location location = this.locationManager.getLastKnownLocation(provider);
-            if(location == null){
+            if (location == null) {
                 location = this.locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             }
             if (needSaveLocation(location)) {//距离超过1000米则存储，其他wifi等信息亦有效，存储
 //                ELOG.i("  new location ..."+location);
                 resetLocaiton(location);
-            }else{//距离不超过1000米则无需存储，其他数据也无需获取存储
+            } else {//距离不超过1000米则无需存储，其他数据也无需获取存储
                 ELOG.i("LocationInfo获取location参数失败，退出");
                 return false;
             }
-        }catch (Throwable t){
+        } catch (Throwable t) {
             ELOG.i(t.getMessage() + "hasLocationPermission has an exception ");
         }
         return true;
@@ -172,8 +173,8 @@ public class LocationImpl {
             if (TextUtils.isEmpty(gl)) {
                 return;
             }
-            ELOG.i("LocationInfo:获取到有效经纬度：："+gl);
-            SPHelper.setStringValue2SP(mContext,EGContext.LAST_LOCATION,gl);
+            ELOG.i("LocationInfo:获取到有效经纬度：：" + gl);
+            SPHelper.setStringValue2SP(mContext, EGContext.LAST_LOCATION, gl);
         }
     }
 
@@ -216,7 +217,7 @@ public class LocationImpl {
 //                ELOG.i("第五个可能性退出的地方");
                 return false;
             }
-            String lastLocation = SPHelper.getStringValueFromSP(mContext,EGContext.LAST_LOCATION,"");
+            String lastLocation = SPHelper.getStringValueFromSP(mContext, EGContext.LAST_LOCATION, "");
             if (TextUtils.isEmpty(lastLocation)) {
                 return true;
             }
@@ -233,7 +234,7 @@ public class LocationImpl {
                 return true;
             }
         } catch (Throwable e) {
-            ELOG.e(" needSaveLocation::::; "+ e.getMessage());
+            ELOG.e(" needSaveLocation::::; " + e.getMessage());
         }
 //        ELOG.i("第六个可能性退出的地方");
         return false;
@@ -243,42 +244,41 @@ public class LocationImpl {
         try {
             locationJson = new JSONObject();
             try {
-                JsonUtils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.CollectionTime, String.valueOf(System.currentTimeMillis()),DataController.SWITCH_OF_COLLECTION_TIME);
-            }catch (Throwable t){
+                JsonUtils.pushToJSON(mContext, locationJson, DeviceKeyContacts.LocationInfo.CollectionTime, String.valueOf(System.currentTimeMillis()), DataController.SWITCH_OF_COLLECTION_TIME);
+            } catch (Throwable t) {
 //                ELOG.i("1111111111111111111111111111");
             }
             try {
-                String locationInfo = SPHelper.getStringValueFromSP(mContext,EGContext.LAST_LOCATION,"");
-                JsonUtils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.GeographyLocation, locationInfo,DataController.SWITCH_OF_GEOGRAPHY_LOCATION);
-            }catch (Throwable t){
+                String locationInfo = SPHelper.getStringValueFromSP(mContext, EGContext.LAST_LOCATION, "");
+                JsonUtils.pushToJSON(mContext, locationJson, DeviceKeyContacts.LocationInfo.GeographyLocation, locationInfo, DataController.SWITCH_OF_GEOGRAPHY_LOCATION);
+            } catch (Throwable t) {
 //                ELOG.i("22222222222222");
             }
 
-            if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_WIFI,true)){
+            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_WIFI, true)) {
                 try {
                     JSONArray wifiInfo = WifiImpl.getInstance(mContext).getWifiInfo();
-                    JsonUtils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.WifiInfo.NAME, wifiInfo,DataController.SWITCH_OF_WIFI_NAME);
-                }catch (Throwable t){
+                    JsonUtils.pushToJSON(mContext, locationJson, DeviceKeyContacts.LocationInfo.WifiInfo.NAME, wifiInfo, DataController.SWITCH_OF_WIFI_NAME);
+                } catch (Throwable t) {
 //                    ELOG.i("333333333333333");
                 }
             }
 
-            if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BASE,true)){
+            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BASE, true)) {
                 try {
                     JSONArray baseStation = getBaseStationInfo();
-                    JsonUtils.pushToJSON(mContext,locationJson,DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME,baseStation,DataController.SWITCH_OF_BS_NAME);
-                }catch (Throwable t){
+                    JsonUtils.pushToJSON(mContext, locationJson, DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME, baseStation, DataController.SWITCH_OF_BS_NAME);
+                } catch (Throwable t) {
 //                    ELOG.i("4444444444444444444");
                 }
 
             }
 
         } catch (Throwable e) {
-            ELOG.e(e.getMessage()+"  getLocation has an exc.");
+            ELOG.e(e.getMessage() + "  getLocation has an exc.");
         }
         return locationJson;
     }
-
 
 
     /**
@@ -286,14 +286,15 @@ public class LocationImpl {
      * 1.判断权限
      * 2.周围基站最多前五
      * 3.GSM or CDMA 基站信息
+     *
      * @return
      */
     public JSONArray getBaseStationInfo() {
         JSONArray jsonArray = null;
         JSONObject jsonObject = null;
-        Set<String> cid = null;
+        Set<String> cid = new HashSet<String>();
         try {
-            if(mTelephonyManager == null){
+            if (mTelephonyManager == null) {
                 return jsonArray;
             }
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
@@ -301,111 +302,114 @@ public class LocationImpl {
                 jsonArray = new JSONArray();
                 try {
                     List<NeighboringCellInfo> list = mTelephonyManager.getNeighboringCellInfo();
-                    ELOG.i("location.info","LocationInfo:获取周围基站信息list:"+list != null ?list.size():"null");
-                    if(list != null && list.size()>0) {
+                    ELOG.i("location.info", "LocationInfo:获取周围基站信息list:" + list != null ? list.size() : "null");
+                    if (list != null && list.size() > 0) {
                         baseStationSort(list);
-                        ELOG.i("location.info","LocationInfo:获取周围基站信息排序去重后list:"+list!=null?list.size():"null");
-                        int tempCid = -1,tempLac=-1;
+                        ELOG.i("location.info", "LocationInfo:获取周围基站信息排序去重后list:" + list != null ? list.size() : "null");
+                        int tempCid = -1, tempLac = -1;
                         String key = null;
-                        cid = new HashSet<String>();
                         for (int i = 0; i < list.size(); i++) {
                             if (cid.size() < 5) {
-                                NeighboringCellInfo info =list.get(i);
+                                NeighboringCellInfo info = list.get(i);
                                 tempCid = info.getCid();
                                 tempLac = info.getLac();
-                                key = tempCid+"|"+tempLac;
-                                ELOG.i("location.info","LocationInfo:获取周围基站信息当前tempCid::"+tempCid);
-                                if(tempCid > 0 && tempLac >0 && !cid.contains(key)){
+                                key = tempCid + "|" + tempLac;
+                                ELOG.i("location.info", SystemUtils.getCurrentProcessName(mContext) + " 附近基站获取,  当前[" + key + "] 包含：{" + (cid.contains(key)) + "} 列表(" + cid.size() + ")[" + cid.toString() + "]");
+                                ELOG.i("location.info", "LocationInfo:获取周围基站信息当前tempCid::" + tempCid);
+                                if (tempCid > 0 && tempLac > 0 && !cid.contains(key)) {
                                     cid.add(key);
                                     jsonObject = new JSONObject();
                                     JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
                                     JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, tempCid, DataController.SWITCH_OF_CELL_ID);
                                     JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, info.getRssi(), DataController.SWITCH_OF_BS_LEVEL);
                                     jsonArray.put(jsonObject);
-                                    ELOG.i("location.info","LocationInfo:获取周围基站信息list:"+jsonArray);
+                                    ELOG.i("location.info", "LocationInfo:获取周围基站信息list:" + jsonArray);
                                 }
                             }
                         }
                     }
-                }catch (Throwable t){
-                    ELOG.e("location.info",t.getMessage()+"  getBaseStationInfo has an exc. " );
+                } catch (Throwable t) {
+                    ELOG.e("location.info", t.getMessage() + "  getBaseStationInfo has an exc. ");
                 }
-                Map<Integer,JSONObject> tempGsmMap = new HashMap<Integer,JSONObject>(),tempCdmaMap = new HashMap<Integer,JSONObject>();
-                List<Integer> gsmList = new ArrayList<Integer>(),cdmaList = new ArrayList<Integer>();
+                Map<Integer, JSONObject> tempGsmMap = new HashMap<Integer, JSONObject>(), tempCdmaMap = new HashMap<Integer, JSONObject>();
+                List<Integer> gsmList = new ArrayList<Integer>(), cdmaList = new ArrayList<Integer>();
                 try {
                     CellLocation location = mTelephonyManager.getCellLocation();
 //                    ELOG.i("location.info"," CellLocation  "+location);
                     GsmCellLocation gcl = null;
                     CdmaCellLocation ccl = null;
-                    if(location != null){
-                        if(location instanceof GsmCellLocation) {
-                            gcl = (GsmCellLocation)location;
+                    if (location != null) {
+                        if (location instanceof GsmCellLocation) {
+                            gcl = (GsmCellLocation) location;
                             jsonObject = new JSONObject();
-                            if(gcl != null){
-                                ELOG.i("location.info","GsmCellLocation里的参数值："+gcl.getCid()+" "+gcl.getLac()+" "+gcl.getPsc());
+                            if (gcl != null) {
+                                ELOG.i("location.info", SystemUtils.getCurrentProcessName(mContext) + " GsmCellLocation里的参数值：" + gcl.getCid() + " " + gcl.getLac() + " " + gcl.getPsc());
                                 //获取当前基站信息
-                                if(cid == null){
-//                                    ELOG.i("location.info","cid = null");
-                                    cid = new HashSet<String>();
-                                }
-                                int tempCid = gcl.getCid(),tempLac=gcl.getLac();
-                                String key = tempCid+"|"+tempLac;
-                                if(tempCid > 0 && tempLac >0 && !cid.contains(key)){
+//                                if (cid == null) {
+////                                    ELOG.i("location.info","cid = null");
+//                                    cid = new HashSet<String>();
+//                                }
+                                int tempCid = gcl.getCid(), tempLac = gcl.getLac();
+                                String key = tempCid + "|" + tempLac;
+                                ELOG.i("location.info", SystemUtils.getCurrentProcessName(mContext) + " GsmCellLocation获取,  当前[" + key + "] 包含：{" + (cid.contains(key)) + "} 列表(" + cid.size() + ")[" + cid.toString() + "]");
+                                if (tempCid > 0 && tempLac > 0 && !cid.contains(key)) {
                                     cid.add(key);
 //                                    ELOG.i("location.info","222222222222222");
                                     int stren = gcl.getPsc();
-                                    JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac,DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                                    JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, tempCid ,DataController.SWITCH_OF_CELL_ID);
-                                    JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, stren,DataController.SWITCH_OF_BS_LEVEL);
+                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
+                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, tempCid, DataController.SWITCH_OF_CELL_ID);
+                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, stren, DataController.SWITCH_OF_BS_LEVEL);
 //                                    if(jsonArray == null){
 //                                        jsonArray = new JSONArray();
 //                                    }
 //                                    jsonArray.put(jsonObject);
 //                                    ELOG.i("location.info","33333333333333333"+jsonObject);
-                                    tempGsmMap.put(stren,jsonObject);
+                                    tempGsmMap.put(stren, jsonObject);
 //                                    ELOG.i("location.info","444444444444444444444"+tempGsmMap);
                                     gsmList.add(stren);
 //                                    ELOG.i("LocationInfo:获取GsmCellLocationInfo基站信息：：："+jsonArray);
                                 }
                             }
-                        } else{
+                        } else if (location instanceof CdmaCellLocation) {
 //                            ELOG.i("location.info","666");
-                            if(location instanceof CdmaCellLocation||mTelephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_CDMA){
+//                            if (mTelephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_CDMA) {
 //                                ELOG.i("location.info","7777");
-                                jsonObject = new JSONObject();
-                                ccl = (CdmaCellLocation) mTelephonyManager.getCellLocation();
-                                if(ccl != null){
-                                    ELOG.i("location.info","location.info","CdmaCellLocation里的参数值："+ccl.getSystemId()+" "+ccl.getBaseStationId()+" "+ccl.getNetworkId());
-                                    if(cid == null){
-                                        cid = new HashSet<String>();
-                                    }
-                                    int tempCid = ccl.getBaseStationId(),tempLac=ccl.getNetworkId();
-                                    String key = tempCid+"|"+tempLac;
-                                    if(tempCid > 0 && tempLac >0 && !cid.contains(key)) {
-                                        cid.add(key);
-                                        //获取当前基站信息
+                            jsonObject = new JSONObject();
+                            ccl = (CdmaCellLocation) mTelephonyManager.getCellLocation();
+                            if (ccl != null) {
+                                ELOG.i("location.info", SystemUtils.getCurrentProcessName(mContext) + "  CdmaCellLocation里的参数值：" + ccl.getSystemId() + " " + ccl.getBaseStationId() + " " + ccl.getNetworkId());
+//                                if (cid == null) {
+//                                    cid = new HashSet<String>();
+//                                }
+                                int tempCid = ccl.getBaseStationId(), tempLac = ccl.getNetworkId();
+                                String key = tempCid + "|" + tempLac;
+                                ELOG.i("location.info", SystemUtils.getCurrentProcessName(mContext) + "  CdmaCellLocation获取,  当前[" + key + "] 包含：{" + (cid.contains(key)) + "} 列表(" + cid.size() + ")[" + cid.toString() + "]");
+
+                                if (tempCid > 0 && tempLac > 0 && !cid.contains(key)) {
+                                    cid.add(key);
+                                    //获取当前基站信息
 //                                        ELOG.i("location.info","999");
-                                        int stren = ccl.getSystemId();
-                                        JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                                        JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId,tempCid , DataController.SWITCH_OF_CELL_ID);
-                                        JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, stren, DataController.SWITCH_OF_BS_LEVEL);
+                                    int stren = ccl.getSystemId();
+                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
+                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, tempCid, DataController.SWITCH_OF_CELL_ID);
+                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, stren, DataController.SWITCH_OF_BS_LEVEL);
 //                                        ELOG.i("location.info","10------");
-                                        tempCdmaMap.put(stren,jsonObject);
-                                        cdmaList.add(stren);
+                                    tempCdmaMap.put(stren, jsonObject);
+                                    cdmaList.add(stren);
 //                                        ELOG.i("location.info","11------------");
 //                                        jsonArray.put(jsonObject);
 //                                        ELOG.i("LocationInfo:获取CDMACellLocationInfo基站信息：：：" + jsonArray);
-                                    }
                                 }
                             }
-//                            return jsonArray;
                         }
+//                            return jsonArray;
                     }
+//                    }
 //                    else {
 //                        return jsonArray;
 //                    }
-                }catch (Throwable t){
-                    ELOG.e("location.info",t.getMessage()+"  外层CellLocation catch");
+                } catch (Throwable t) {
+                    ELOG.e("location.info", t.getMessage() + "  外层CellLocation catch");
                 }
                 //方案B
                 try {
@@ -430,18 +434,20 @@ public class LocationImpl {
                                 CellInfoCdma cdma = (CellInfoCdma) info;
                                 tempCid = cdma.getCellIdentity().getBasestationId();
                                 tempLac = cdma.getCellIdentity().getNetworkId();
-                                key =  tempCid+"|"+tempLac;
-                                if(cid == null){
-                                    cid = new HashSet<String>();
-                                }
-                                if(tempCid > 0 && tempLac >0 && (!cid.contains(key))){
+                                key = tempCid + "|" + tempLac;
+                                ELOG.i("location.info", SystemUtils.getCurrentProcessName(mContext) + "  备用方案CellInfoCdma获取,  当前[" + key + "] 包含：{" + (cid.contains(key)) + "} 列表(" + cid.size() + ")[" + cid.toString() + "]");
+
+//                                if (cid == null) {
+//                                    cid = new HashSet<String>();
+//                                }
+                                if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
                                     cid.add(key);
                                     obj = new JSONObject();
                                     strength = cdma.getCellSignalStrength().getDbm();
                                     JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
                                     JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, tempCid, DataController.SWITCH_OF_CELL_ID);
                                     JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, strength, DataController.SWITCH_OF_BS_LEVEL);
-                                    tempCdmaMap.put(strength,obj);
+                                    tempCdmaMap.put(strength, obj);
                                     cdmaList.add(strength);
                                 }
                             } else if (info instanceof CellInfoGsm) {
@@ -449,11 +455,13 @@ public class LocationImpl {
                                 CellInfoGsm gsm = (CellInfoGsm) info;
                                 tempCid = gsm.getCellIdentity().getCid();
                                 tempLac = gsm.getCellIdentity().getLac();
-                                key =  tempCid+"|"+tempLac;
-                                if(cid == null){
-                                    cid = new HashSet<String>();
-                                }
-                                if(tempCid > 0 && tempLac >0 && (!cid.contains(key))){
+                                key = tempCid + "|" + tempLac;
+//                                if (cid == null) {
+//                                    cid = new HashSet<String>();
+//                                }
+                                ELOG.i("location.info", SystemUtils.getCurrentProcessName(mContext) + "  备用方案CellInfoGsm获取,  当前[" + key + "] 包含：{" + (cid.contains(key)) + "} 列表(" + cid.size() + ")[" + cid.toString() + "]");
+
+                                if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
                                     cid.add(key);
                                     obj = new JSONObject();
                                     strength = gsm.getCellSignalStrength().getDbm();
@@ -468,11 +476,13 @@ public class LocationImpl {
                                 CellInfoLte lte = (CellInfoLte) info;
                                 tempCid = lte.getCellIdentity().getPci();
                                 tempLac = lte.getCellIdentity().getTac();
-                                key =  tempCid+"|"+tempLac;
-                                if(cid == null){
-                                    cid = new HashSet<String>();
-                                }
-                                if(tempCid > 0 && tempLac >0 && (!cid.contains(key))){
+                                key = tempCid + "|" + tempLac;
+//                                if (cid == null) {
+////                                    cid = new HashSet<String>();
+////                                }
+                                ELOG.i("location.info", SystemUtils.getCurrentProcessName(mContext) + "  备用方案CellInfoLte获取,  当前[" + key + "] 包含：{" + (cid.contains(key)) + "} 列表(" + cid.size() + ")[" + cid.toString() + "]");
+
+                                if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
                                     cid.add(key);
                                     obj = new JSONObject();
                                     strength = lte.getCellSignalStrength().getDbm();
@@ -487,11 +497,13 @@ public class LocationImpl {
                                 CellInfoWcdma wcdma = (CellInfoWcdma) info;
                                 tempCid = wcdma.getCellIdentity().getCid();
                                 tempLac = wcdma.getCellIdentity().getLac();
-                                key =  tempCid+"|"+tempLac;
-                                if(cid == null){
-                                    cid = new HashSet<String>();
-                                }
-                                if(tempCid > 0 && tempLac >0 && (!cid.contains(key))){
+                                key = tempCid + "|" + tempLac;
+//                                if (cid == null) {
+//                                    cid = new HashSet<String>();
+//                                }
+                                ELOG.i("location.info", SystemUtils.getCurrentProcessName(mContext) + "  备用方案CellInfoLte获取,  当前[" + key + "] 包含：{" + (cid.contains(key)) + "} 列表(" + cid.size() + ")[" + cid.toString() + "]");
+
+                                if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
                                     cid.add(key);
                                     obj = new JSONObject();
                                     strength = wcdma.getCellSignalStrength().getDbm();
@@ -509,50 +521,54 @@ public class LocationImpl {
 //                            mWbgInfo.setLocationAreaCode(String.valueOf(tempMap.get(list.get(0)).optString("lac")));
 //                        }
                     }
-                }catch (Throwable t){
+                } catch (Throwable t) {
+                    ELOG.i("location.info", t);
                 }
 //                ELOG.i("location.info","19-------------------");
 //                ELOG.i("location.info","=====1"+tempGsmMap.size());
 //                ELOG.i("location.info","=====2"+tempCdmaMap.size());
-                if(gsmList != null && tempGsmMap!=null){
+                if (gsmList != null && tempGsmMap != null) {
 //                    ELOG.i("location.info","++++++++++++++++++++++++++++++");
-                    jsonArray = listFilter(gsmList,jsonArray,tempGsmMap);
+                    jsonArray = listFilter(gsmList, jsonArray, tempGsmMap);
                 }
-                if(cdmaList != null && tempCdmaMap!=null){
+                if (cdmaList != null && tempCdmaMap != null) {
 //                    ELOG.i("location.info","==============================");
-                    jsonArray = listFilter(cdmaList,jsonArray,tempCdmaMap);
+                    jsonArray = listFilter(cdmaList, jsonArray, tempCdmaMap);
                 }
-                ELOG.i("location.info","-------------------"+jsonArray);
+                ELOG.i("location.info", "-------------------" + jsonArray);
                 return jsonArray;
             }
         } catch (Exception e) {
-            ELOG.e(e.getMessage()+"   最外层catch");
+            ELOG.e(e.getMessage() + "   最外层catch");
         }
 //        ELOG.i("location.info","20-------------------");
 //        ELOG.d("location.info","jsonArray:::"+jsonArray==null?"null":jsonArray.length());
+        ELOG.i("location.info", SystemUtils.getCurrentProcessName(mContext) + "  获取结束,  列表(" + cid.size() + ")[" + cid.toString() + "]\n JSONArray:" + jsonArray.toString());
+
         return jsonArray;
     }
-    private JSONArray listFilter(List<Integer> list,JSONArray jsonArray,Map<Integer,JSONObject> map){
+
+    private JSONArray listFilter(List<Integer> list, JSONArray jsonArray, Map<Integer, JSONObject> map) {
         try {
 //            ELOG.d("location.info","listFilter....");
             int count = 0;
-            if(list != null && list.size()>0){
+            if (list != null && list.size() > 0) {
                 //降序排列
 //                ELOG.d("location.info","listFilter"+list.size());
-                Collections.sort(list,Collections.reverseOrder());
-                for (int k = 0;k<list.size();k++){
-                    if(count < 5){
-                        count = count + 1 ;
+                Collections.sort(list, Collections.reverseOrder());
+                for (int k = 0; k < list.size(); k++) {
+                    if (count < 5) {
+                        count = count + 1;
                         JSONObject obj = map.get(list.get(k));
                         jsonArray.put(obj);
 //                        ELOG.d("location.info","listFilter"+jsonArray);
-                    }else {
+                    } else {
                         break;
                     }
                 }
             }
-        }catch (Throwable t){
-            ELOG.e("location.info","listFilter has an exc::: "+t.getMessage());
+        } catch (Throwable t) {
+            ELOG.e("location.info", "listFilter has an exc::: " + t.getMessage());
         }
 
         return jsonArray;
@@ -564,7 +580,7 @@ public class LocationImpl {
     public void baseStationSort(List<NeighboringCellInfo> list) {
         for (int i = 0; i < list.size() - 1; i++) {
             for (int j = i + 1; j < list.size(); j++) {
-                if(list.get(i).getCid() == list.get(j).getCid()){
+                if (list.get(i).getCid() == list.get(j).getCid()) {
                     list.remove(j);
                     continue;
                 }
