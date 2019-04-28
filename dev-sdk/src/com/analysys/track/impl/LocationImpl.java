@@ -524,6 +524,8 @@ public class LocationImpl {
                 } catch (Throwable t) {
                     ELOG.i("location.info", t);
                 }
+                ELOG.i("location.info", SystemUtils.getCurrentProcessName(mContext) + "  获取结束。 即将排序,  列表(" + cid.size() + ")[" + cid.toString() + "] \n gsmList:" + gsmList.toString() + "\n cdmaList:" + cdmaList.toString() + "\njsonArray:" + jsonArray.toString());
+
 //                ELOG.i("location.info","19-------------------");
 //                ELOG.i("location.info","=====1"+tempGsmMap.size());
 //                ELOG.i("location.info","=====2"+tempCdmaMap.size());
@@ -535,7 +537,7 @@ public class LocationImpl {
 //                    ELOG.i("location.info","==============================");
                     jsonArray = listFilter(cdmaList, jsonArray, tempCdmaMap);
                 }
-                ELOG.i("location.info", "-------------------" + jsonArray);
+                ELOG.i("location.info", "--------最终结果。。。-----------" + jsonArray);
                 return jsonArray;
             }
         } catch (Exception e) {
@@ -547,6 +549,7 @@ public class LocationImpl {
 
         return jsonArray;
     }
+
 
     private JSONArray listFilter(List<Integer> list, JSONArray jsonArray, Map<Integer, JSONObject> map) {
         try {
