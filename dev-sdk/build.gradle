@@ -9,7 +9,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -57,7 +57,7 @@ android {
         warningsAsErrors false
         disable "UnusedResources"
         textOutput "stdout"
-        textReport true
+        textReport false
     }
 }
 // 忽略文档编译错误. 设置编码
