@@ -8,12 +8,16 @@ import java.io.Serializable;
  * 策略相关信息
  */
 public class PolicyInfo implements Serializable {
+    private static PolicyInfo info= null;
     private PolicyInfo(){}
     private static class Holder {
         private static final PolicyInfo INSTANCE = new PolicyInfo();
     }
     public static PolicyInfo getInstance() {
-        return PolicyInfo.Holder.INSTANCE;
+        if(info == null){
+            info = PolicyInfo.Holder.INSTANCE;
+        }
+        return info;
     }
     private static final long serialVersionUID = 1L;
     /**

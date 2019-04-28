@@ -53,7 +53,9 @@ public class RequestUtils {
 //        ELOG.i("value::::::::::"+ URLEncoder.encode(value,"UTF-8"));
         String ver = PolicyInfo.getInstance().getPolicyVer();
         PolicyImpl policy = PolicyImpl.getInstance(ctx);
-        String pl = TextUtils.isEmpty(ver)?policy.getSP().getString(DeviceKeyContacts.Response.RES_POLICY_VERSION,"0"):ver;
+        String version = policy.getSP().getString(DeviceKeyContacts.Response.RES_POLICY_VERSION,"0");
+        ELOG.i("upload.info","httpRequest本次发送：内存里的版本号："+ver+"  sp里存储的版本号："+version);
+        String pl = TextUtils.isEmpty(ver)?version:ver;
         urlP = new URL(url);
         connection = (HttpURLConnection) urlP.openConnection();
         connection.setDoInput(true);

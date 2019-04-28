@@ -18,7 +18,6 @@ import com.analysys.track.utils.reflectinon.EContextHelper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TableXXXInfo {
@@ -47,28 +46,12 @@ public class TableXXXInfo {
             if (db == null || xxxInfo == null){
                 return;
             }
-//            db.beginTransaction();
             ContentValues cv = getContentValues(xxxInfo);
-//            ContentValues contentValues;
-//            for (ContentValues cv:listCv) {
-//                ELOG.i("每一个cv::::::  "+cv);
-//                List<ContentValues> procCV = TablePROC.getInstance(mContext).getContentValues(cv.get(DBConfig.XXXInfo.Column.TIME).toString(), new JSONArray(EncryptUtils.decrypt(mContext,cv.get(DBConfig.XXXInfo.Column.PROC).toString())));
-//                cv.put(DBConfig.XXXInfo.Column.PROC, EncryptUtils.encrypt(mContext,"0"));
             db.insert(DBConfig.XXXInfo.TABLE_NAME, null, cv);
 
-//                for(int i = 0;i<procCV.size();i++){
-//                    contentValues = procCV.get(i);
-////                    ELOG.i("每一个子cv::::::  "+contentValues);
-//                    db.insert(DBConfig.PROCInfo.TABLE_NAME,null,contentValues);
-//                }
-//            }
-//            db.setTransactionSuccessful();
         } catch (Throwable e) {
             ELOG.e(e.getMessage()+"  insert XXX");
         }finally {
-//            if(db != null){
-//                db.endTransaction();
-//            }
             DBManager.getInstance(mContext).closeDB();
         }
 
@@ -105,13 +88,11 @@ public class TableXXXInfo {
         JSONArray  array = null;
         Cursor cursor = null;
         int blankCount = 0;
-//        int subBlankCount = 0;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if (db == null){
                 return array;
             }
-//            procArray = new JSONArray();
             array = new JSONArray();
             cursor = db.query(DBConfig.XXXInfo.TABLE_NAME,
                     null, null, null,
@@ -128,24 +109,9 @@ public class TableXXXInfo {
                 }
                 JsonUtils.pushToJSON(mContext,jsonObject,ProcUtils.RUNNING_TIME,time,DataController.SWITCH_OF_RUNNING_TIME);
                 JsonUtils.pushToJSON(mContext,jsonObject,ProcUtils.RUNNING_RESULT,new JSONArray(EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PROC)))),DataController.SWITCH_OF_CL_MODULE_PROC);
-//                JsonUtils.pushToJSON(mContext,jsonObject,ProcUtils.RUNNING_OC_RESULT,EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.RESULT))),DataController.SWITCH_OF_CL_MODULE_RESULT);
-
-//                curProc = db.query(DBConfig.PROCInfo.TABLE_NAME, new String[] {DBConfig.PROCInfo.Column.CONTENT},
-//                        DBConfig.PROCInfo.Column.PARENT_ID_TIME + "=?", new String[] {EncryptUtils.encrypt(mContext,time)}, null, null, null);
-//                while (curProc.moveToNext()) {
-//                    if(subBlankCount >= EGContext.BLANK_COUNT_MAX){
-//                        return array;
-//                    }
-//                    String content = EncryptUtils.decrypt(mContext,curProc.getString(curProc.getColumnIndex(DBConfig.PROCInfo.Column.CONTENT)));
-//                    if(!TextUtils.isEmpty(content)){
-//                        procArray.put(new JSONObject(new String(Base64.decode(content.getBytes(),Base64.DEFAULT))));
-//                    }else {
-//                        subBlankCount += 1;
-//                    }
-//
-//                }
-//                JsonUtils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_PROC,procArray,DataController.SWITCH_OF_CL_MODULE_PROC);
-//                JsonUtils.pushToJSON(mContext,jsonObject,ProcParser.RUNNING_RESULT,EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.RESULT))),DataController.SWITCH_OF_CL_MODULE_RESULT);
+                if(jsonObject == null || jsonObject.length() < 1){
+                    return array;
+                }
                 array.put(new String(Base64.encode(String.valueOf(jsonObject).getBytes(),Base64.DEFAULT)));
 //                array.put(jsonObject);
 //                ELOG.i("array :::::::::" +array);
@@ -168,15 +134,9 @@ public class TableXXXInfo {
             if(db == null){
                 return;
             }
-            db.beginTransaction();
             db.delete(DBConfig.XXXInfo.TABLE_NAME, null, null);
-//            db.delete(DBConfig.PROCInfo.TABLE_NAME,null,null);
-            db.setTransactionSuccessful();
         } catch (Throwable e) {
         }finally {
-            if(db != null && db.inTransaction()){
-                db.endTransaction();
-            }
             DBManager.getInstance(mContext).closeDB();
         }
     }
@@ -192,7 +152,6 @@ public class TableXXXInfo {
             if (db == null){
                 return;
             }
-//            db.beginTransaction();
             String time = "";
             for(int i = 0;i < timeList.size();i++){
                 time = timeList.get(i);
@@ -200,15 +159,10 @@ public class TableXXXInfo {
                     return;
                 }
                 db.delete(DBConfig.XXXInfo.TABLE_NAME, DBConfig.XXXInfo.Column.TIME + "=?", new String[] {EncryptUtils.encrypt(mContext,time)});
-//                db.delete(DBConfig.PROCInfo.TABLE_NAME, DBConfig.PROCInfo.Column.PARENT_ID_TIME + "=?", new String[] {EncryptUtils.encrypt(mContext,time)});
             }
-//            db.setTransactionSuccessful();
         } catch (Throwable e) {
             ELOG.e(e.getMessage()+"  :::::deleteByTime ");
         } finally {
-//            if(db != null){
-//                db.endTransaction();
-//            }
             DBManager.getInstance(mContext).closeDB();
         }
     }

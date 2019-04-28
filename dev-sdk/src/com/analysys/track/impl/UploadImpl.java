@@ -17,6 +17,7 @@ import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.impl.proc.DataPackaging;
 import com.analysys.track.utils.EguanIdUtils;
+import com.analysys.track.utils.FileUtils;
 import com.analysys.track.work.CheckHeartbeat;
 import com.analysys.track.work.MessageDispatcher;
 import com.analysys.track.model.PolicyInfo;
@@ -70,13 +71,15 @@ public class UploadImpl {
      */
     public void upload() {
         try {
-            //TODO 测试下线程名字，判断子线程or主线程，应该子线程，测试是否会导致同级别的卡顿
             if(EGContext.NETWORK_TYPE_NO_NET.equals(NetworkUtils.getNetworkType(mContext))){
                 ELOG.i("upload无网return，进程Id：< " + Process.myPid() + " >");
                 return;
             }
             if (SPHelper.getIntValueFromSP(mContext,EGContext.REQUEST_STATE,0) != 0) {
                 ELOG.i("upload有正在发送的数据return，进程Id：< " + Process.myPid() + " >");
+                return;
+            }
+            if(!duringCycleTime()){
                 return;
             }
             File dir = mContext.getFilesDir();
@@ -109,17 +112,31 @@ public class UploadImpl {
             MessageDispatcher.getInstance(mContext).uploadInfo(PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE), false);
         }
     }
+    private boolean duringCycleTime(){
+        try {
+            long time = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_UPLOAD);
+            long now = System.currentTimeMillis();
+            if( now - time > EGContext.UPLOAD_CYCLE){
+                EGContext.UPLOAD_LAST_TIME_STMP = now;
+                FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_UPLOAD, now);
+                return true;
+            }
+        }catch (Throwable t){
+            return false;
+        }
+        return false;
+    }
     public void reTryAndUpload(boolean isNormalUpload){
         int failNum = SPHelper.getIntValueFromSP(mContext,EGContext.FAILEDNUMBER,0);
         int maxFailCount = PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT,EGContext.FAIL_COUNT_DEFALUT);
         long faildTime = SPHelper.getLongValueFromSP(mContext,EGContext.FAILEDTIME,0);
-        long retryTime = SPHelper.getLongValueFromSP(mContext,EGContext.RETRYTIME, EGContext.FAIL_COUNT_DEFALUT);
+        long retryTime = SystemUtils.intervalTime(mContext);
         if (isNormalUpload) {
             doUpload();
         }else if (!isNormalUpload && failNum > 0 && (failNum < maxFailCount)
                 && (System.currentTimeMillis() - faildTime> retryTime)) {
             doUpload();
-        } else if(!isNormalUpload && failNum> 0 && (failNum == maxFailCount)){
+        } else if(!isNormalUpload && failNum> 0 && (failNum == maxFailCount)&& (System.currentTimeMillis() - faildTime> retryTime)){
             doUpload();
             //上传失败次数
             SPHelper.setIntValue2SP(mContext,EGContext.FAILEDNUMBER,0);
@@ -268,7 +285,6 @@ public class UploadImpl {
                 keyInner = EGContext.ORIGINKEY_STRING;
             }
             key = DeflterCompressUtils.makeSercretKey(keyInner, mContext);
-            ELOG.i("uploadInfo加密key::::" + key);
 
             byte[] def = DeflterCompressUtils.compress(URLEncoder.encode(URLEncoder.encode(msg)).getBytes("UTF-8"));
             byte[] encryptMessage = AESUtils.encrypt(def, key.getBytes("UTF-8"));
@@ -477,7 +493,7 @@ public class UploadImpl {
             SPHelper.setIntValue2SP(mContext,EGContext.REQUEST_STATE,EGContext.sPrepare);
             //上传失败记录上传次数
             int numb = SPHelper.getIntValueFromSP(mContext,EGContext.FAILEDNUMBER,0) + 1;
-            //上传失败时间
+            //上传失败次数、时间
             SPHelper.setIntValue2SP(mContext,EGContext.FAILEDNUMBER,numb);
             SPHelper.setLongValue2SP(mContext,EGContext.FAILEDTIME,System.currentTimeMillis());
             //多久重试

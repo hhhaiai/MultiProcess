@@ -24,6 +24,7 @@ import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
+import com.analysys.track.utils.FileUtils;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.SystemUtils;
@@ -35,7 +36,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -74,6 +74,11 @@ public class LocationImpl {
 
     public void location() {
         try {
+            if(!duringCycleTime()){
+                ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"---------------return...");
+                return;
+            }
+            ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"---------------location");
             if (SystemUtils.isMainThread()) {
                 EThreadPool.execute(new Runnable() {
                     @Override
@@ -85,9 +90,25 @@ public class LocationImpl {
                 LocationHandle();
             }
         } catch (Throwable t) {
+        }finally {
+            MessageDispatcher.getInstance(mContext).locationInfo(EGContext.LOCATION_CYCLE, false);
         }
+    }
 
-
+    private boolean duringCycleTime(){
+        try {
+            long time = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_LOCATION);
+            long now = System.currentTimeMillis();
+            if( now - time > EGContext.LOCATION_CYCLE){
+                EGContext.LOCATION_LAST_TIME_STMP = now;
+                FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, now);
+                return true;
+            }
+        }catch (Throwable t){
+            ELOG.e("location.info",t);
+            return false;
+        }
+        return false;
     }
 
     private void LocationHandle() {
@@ -113,8 +134,6 @@ public class LocationImpl {
             }
         } catch (Throwable t) {
             ELOG.e(t.getMessage() + "  :::LocationHandle");
-        } finally {
-            MessageDispatcher.getInstance(mContext).locationInfo(EGContext.LOCATION_CYCLE, false);
         }
     }
 

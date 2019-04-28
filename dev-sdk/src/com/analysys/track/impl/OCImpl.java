@@ -15,6 +15,7 @@ import com.analysys.track.database.TableXXXInfo;
 import com.analysys.track.impl.proc.ProcUtils;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.utils.FileUtils;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.work.MessageDispatcher;
 import com.analysys.track.service.AnalysysAccessibilityService;
@@ -71,6 +72,9 @@ public class OCImpl {
      */
     public void ocInfo() {
         try {
+            if(!duringCycleTime()){
+                return;
+            }
             if (SystemUtils.isMainThread()) {
                 EThreadPool.execute(new Runnable() {
                     @Override
@@ -83,10 +87,39 @@ public class OCImpl {
             }
         } catch (Throwable t) {
 
+        }finally {
+            ELOG.d("finally执行调用oc");
+            if(Build.VERSION.SDK_INT < 21){
+                MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE, false);
+            }else if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24){
+                MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE_OVER_5, false);
+            }
         }
 
     }
+    private boolean duringCycleTime(){
+        try {
+            long time = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_OC);
+            long now = System.currentTimeMillis();
+            if(Build.VERSION.SDK_INT < 21){
+                if( now - time > EGContext.OC_CYCLE){
+                    EGContext.OC_LAST_TIME_STMP = now;
+                    FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_OC, now);
+                    return true;
+                }
+            }else if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24){
+                if( now - time > EGContext.OC_CYCLE_OVER_5){
+                    EGContext.OC_LAST_TIME_STMP = now;
+                    FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_OC, now);
+                    return true;
+                }
+            }
 
+        }catch (Throwable t){
+            return false;
+        }
+        return false;
+    }
     /**
      * 真正的OC处理
      */
@@ -114,9 +147,6 @@ public class OCImpl {
             }
         } catch (Throwable t) {
             ELOG.i("xxx.oc", Log.getStackTraceString(t));
-        }finally {
-            ELOG.d("finally执行调用oc");
-            MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE, false);
         }
     }
 
@@ -598,7 +628,7 @@ public class OCImpl {
         } catch (Throwable t) {
             ELOG.d("xxx.oc", t);
         }
-        ELOG.e("xxx.oc", "最终缓存本次列表mRunningApps：：" + mRunningApps);
+        ELOG.e("xxx.oc", SystemUtils.getCurrentProcessName(mContext)+"最终缓存本次列表mRunningApps：：" + mRunningApps);
     }
 
     /**

@@ -66,9 +66,7 @@ public class DeflterCompressUtils {
         sb.append(value);//前三位
         long time = System.currentTimeMillis();
         SPHelper.setStringValue2SP(ctx,EGContext.TIME , String.valueOf(time));
-        //"1548155536157"
         sb.append(time);
-        ELOG.i(sb.toString()+" ::::::::::::key");
        return Md5Utils.getMD5(String.valueOf(sb));
     }
     /**

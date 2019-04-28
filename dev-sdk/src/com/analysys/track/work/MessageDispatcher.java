@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
-import android.text.TextUtils;
 
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
@@ -100,7 +99,7 @@ public class MessageDispatcher {
     }
     private void reTryUpload(){
         try {
-            if(SPHelper.getLongValueFromSP(mContext,EGContext.RETRYTIME,EGContext.FAIL_COUNT_DEFALUT) > 0 ){
+            if(SPHelper.getLongValueFromSP(mContext,DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT,EGContext.FAIL_COUNT_DEFALUT) > 0 ){
                 UploadImpl.getInstance(mContext).reTryAndUpload(false);
             }
         }catch (Throwable t){
@@ -181,11 +180,6 @@ public class MessageDispatcher {
                     return;
                 }
             }
-            if(delayTime <= 0 || delay <= 0) {
-                long time = System.currentTimeMillis();
-                EGContext.SNAPSHOT_LAST_TIME_STMP = time;
-                FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, time);
-            }
         }catch (Throwable t){
             if(EGContext.FLAG_DEBUG_INNER){
                 ELOG.e(t.getMessage());
@@ -212,11 +206,7 @@ public class MessageDispatcher {
                     return;
                 }
             }
-            if(delayTime <= 0 || delay <= 0) {
-                long time = System.currentTimeMillis();
-                EGContext.LOCATION_LAST_TIME_STMP = time;
-                FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, time);
-            }
+
         }catch (Throwable t){
             if(EGContext.FLAG_DEBUG_INNER){
                 ELOG.e(" locationInfo :::: "+t.getMessage());
@@ -277,11 +267,7 @@ public class MessageDispatcher {
                     }//队列里有同样的msg 在等着delay，则不做任何操作，否则，发送msg
                 }
             }
-            if(delayTime <= 0 || delay <= 0){
-                long time = System.currentTimeMillis();
-                EGContext.OC_LAST_TIME_STMP = time;
-                FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_OC,time);
-            }
+
 
         }catch (Throwable t){
             if(EGContext.FLAG_DEBUG_INNER){
@@ -311,11 +297,7 @@ public class MessageDispatcher {
                     return;
                 }
             }
-            if(delayTime <= 0 || delay <= 0){
-                long time = System.currentTimeMillis();
-                EGContext.UPLOAD_LAST_TIME_STMP = time;
-                FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_UPLOAD,time);
-            }
+
 
         }catch (Throwable t){
             if(EGContext.FLAG_DEBUG_INNER){
@@ -408,7 +390,7 @@ public class MessageDispatcher {
                         LocationImpl.getInstance(mContext).location();
                         break;
                     case MSG_OC_INFO:
-                        ELOG.i("接收到获取OC消息,进程 Id：" );
+                        ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到获取OC消息,进程 Id：" );
                         OCImpl.getInstance(mContext).ocInfo();
                         break;
                     case MSG_UPLOAD:

@@ -219,20 +219,20 @@ public class EGContext {
     // SDK发送同步文件,首次SDK初始化时创建
     public static final String FILES_SYNC_UPLOAD = "SNET.TAG";
     // SDK发送同步文件两次间隔时间，同时只有一个进程工作,默认6个小时，两次间隔5小时58分
-    public static final long TIME_SYNC_UPLOAD = 5 * 60 * 60 * 1000 + 59 * 60 * 1000;
+    public static final long TIME_SYNC_UPLOAD = 6 * 60 * 60 * 1000;
     // SDK应用列表更新间隔,同时只有一个进程工作,首次SDK初始化时创建,涉及广播，5秒监听就行
     public static final String FILES_SYNC_APPSNAPSHOT = "SAP.TAG";
     public static final String FILES_SYNC_OC = "OCS.TAG";
     // OC 5+同步时间,同时只有一个进程工作
-    public static final long TIME_SYNC_OC_OVER_5 = 25 * 1000;
+    public static final long TIME_SYNC_OC_OVER_5 = 30 * 1000;
     // 位置信息,通进程只有一个工作,两次间隔29分钟
     public static final String FILES_SYNC_LOCATION = "LCT.TAG";
-    public static final long TIME_SYNC_OC_LOCATION = 29 * 60 * 1000;
+    public static final long TIME_SYNC_LOCATION = 30 * 60 * 1000;
     // 数据库写入，多进程只有一个写入,两次间隔5秒
     public static final String FILES_SYNC_SP_WRITER = "SP.TAG";
     public static final long TIME_SYNC_SP = 5 * 1000;//最少间隔5s查询一次
     // 默认同步写入时间，5秒内能写入一次。 间隔范围: APP列表(多进程广播方面)、 OC 5.x以下、DB写入
-    public static final long TIME_SYNC_DEFAULT = 10 * 1000;
+    public static final long TIME_SYNC_DEFAULT = 5 * 1000;
     public static final String PERMISSION_TIME = "LOCATION_PERMISSION";
     public static final String PERMISSION_COUNT = "LOCATION_COUNT";
     public static final long LEN_MAX_UPDATE_SIZE = 1 * 1024 * 1024;

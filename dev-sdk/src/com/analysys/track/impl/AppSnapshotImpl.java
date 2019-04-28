@@ -12,6 +12,7 @@ import com.analysys.track.database.TableAppSnapshot;
 import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.utils.FileUtils;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.work.MessageDispatcher;
 import com.analysys.track.utils.ELOG;
@@ -48,6 +49,10 @@ public class AppSnapshotImpl {
      */
     public void snapshotsInfo() {
         try {
+            if(!duringCycleTime()){
+                return;
+            }
+            ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"------------snapshotsInfo");
             if(SystemUtils.isMainThread()){
                 EThreadPool.execute(new Runnable() {
                     @Override
@@ -59,7 +64,24 @@ public class AppSnapshotImpl {
                 getSnapShotInfo();
             }
         }catch (Throwable t){
+        }finally {
+            MessageDispatcher.getInstance(mContext)
+                    .snapshotInfo(EGContext.SNAPSHOT_CYCLE,false);
         }
+    }
+    private boolean duringCycleTime(){
+        try {
+            long time = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_APPSNAPSHOT);
+            long now = System.currentTimeMillis();
+            if( now - time > EGContext.SNAPSHOT_CYCLE){
+                EGContext.SNAPSHOT_LAST_TIME_STMP = now;
+                FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, now);
+                return true;
+            }
+        }catch (Throwable t){
+            return false;
+        }
+        return false;
     }
     private void getSnapShotInfo(){
         try {
@@ -78,9 +100,6 @@ public class AppSnapshotImpl {
                     .coverInsert(currentSnapshotsList);
         }catch (Throwable t){
             ELOG.e("snapshotInfo",t.getMessage());
-        }finally {
-            MessageDispatcher.getInstance(mContext)
-                    .snapshotInfo(EGContext.SNAPSHOT_CYCLE,false);
         }
     }
 

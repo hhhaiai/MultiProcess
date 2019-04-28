@@ -118,13 +118,13 @@ public class AnalysysInternal {
                 return;
             }
             FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_UPLOAD, EGContext.TIME_SYNC_UPLOAD);
-            FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_APPSNAPSHOT, EGContext.TIME_SYNC_DEFAULT);
+            FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_APPSNAPSHOT, EGContext.SNAPSHOT_CYCLE);
             if (Build.VERSION.SDK_INT < 21) {
                 FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_OC, EGContext.TIME_SYNC_DEFAULT);
             } else {
                 FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_OC, EGContext.TIME_SYNC_OC_OVER_5);
             }
-            FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_LOCATION, EGContext.TIME_SYNC_OC_LOCATION);
+            FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_LOCATION, EGContext.TIME_SYNC_LOCATION);
             FileUtils.createLockFile(cxt,EGContext.FILES_SYNC_SP_WRITER,EGContext.TIME_SYNC_SP);
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
