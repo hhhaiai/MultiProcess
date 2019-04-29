@@ -133,35 +133,38 @@ public class FileUtils {
      * @return
      */
     public static boolean isNeedWorkByLockFile(Context cxt, String lock, long time, long now) {
-        cxt = EContextHelper.getContext(cxt);
-        if (cxt == null) {
-            return false;
-        }
-        // 文件同步
-        File f = new File(lock);
-        RandomAccessFile randomFile = null;
-        FileChannel fileChannel = null;
-        FileLock fl = null;
         try {
-            randomFile = new RandomAccessFile(f, "rw");
-            fileChannel = randomFile.getChannel();
-            fl = fileChannel.tryLock();
-            if (fl != null) {
-                // 对比间隔时间
-                long lastModifyTime = getLockFileLastModifyTime(cxt, lock);
-                if (Math.abs(lastModifyTime - now) > time) {
-                    return true;
+            cxt = EContextHelper.getContext(cxt);
+            if (cxt == null) {
+                return false;
+            }
+            // 文件同步
+            File f = new File(cxt.getFilesDir(),lock);
+            RandomAccessFile randomFile = null;
+            FileChannel fileChannel = null;
+            FileLock fl = null;
+            try {
+                randomFile = new RandomAccessFile(f, "rw");
+                fileChannel = randomFile.getChannel();
+                fl = fileChannel.tryLock();
+                if (fl != null) {
+                    // 对比间隔时间
+                    long lastModifyTime = getLockFileLastModifyTime(cxt, lock);
+                    if (Math.abs(lastModifyTime - now) > time) {
+                        return true;
+                    } else {
+                        return false;
+                    }
                 } else {
                     return false;
                 }
-            } else {
-                return false;
+            } catch (Throwable e) {
+            } finally {
+                StreamerUtils.safeClose(fl);
+                StreamerUtils.safeClose(fileChannel);
+                StreamerUtils.safeClose(randomFile);
             }
-        } catch (Throwable e) {
-        } finally {
-            StreamerUtils.safeClose(fl);
-            StreamerUtils.safeClose(fileChannel);
-            StreamerUtils.safeClose(randomFile);
+        }catch (Throwable t){
         }
         return false;
     }
