@@ -13,7 +13,10 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.io.Reader;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,13 +62,30 @@ public class FileUtils {
     public static long getLockFileLastModifyTime(Context cxt, String fileName) {
         try {
             cxt = EContextHelper.getContext(cxt);
-            if (cxt != null) {
-                File dev = new File(cxt.getFilesDir(), fileName);
-                if (dev.exists()) {
-                    return dev.lastModified();
+            RandomAccessFile randomFile = null;
+            FileChannel fileChannel = null;
+            try {
+                if (cxt != null) {
+                    File dev = new File(cxt.getFilesDir(), fileName);
+                    if (!dev.exists()) {
+                        createLockFile(cxt,fileName,0);
+                    }
+                    randomFile = new RandomAccessFile(dev, "rw");
+                    fileChannel = randomFile.getChannel();
+                    FileLock fl = fileChannel.tryLock();
+                    if (fl != null) {
+                        return dev.lastModified();
+                    }
                 }
+            }catch (Throwable t){
+                ELOG.e("多进程问题：："+t);
+            }finally {
+                StreamerUtils.safeClose(randomFile);
+                StreamerUtils.safeClose(fileChannel);
             }
+
         } catch (Throwable e) {
+            ELOG.e("获取最后修改时间异常：："+e);
         }
         return -1;
     }

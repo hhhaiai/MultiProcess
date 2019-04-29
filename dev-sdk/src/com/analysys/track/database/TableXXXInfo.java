@@ -98,6 +98,7 @@ public class TableXXXInfo {
                     null, null, null,
                     null, null, null);
             JSONObject jsonObject = null;
+            String proc = null;
             while (cursor.moveToNext()) {
                 if(blankCount >= EGContext.BLANK_COUNT_MAX){
                     return array;
@@ -108,7 +109,10 @@ public class TableXXXInfo {
                     blankCount += 1;
                 }
                 JsonUtils.pushToJSON(mContext,jsonObject,ProcUtils.RUNNING_TIME,time,DataController.SWITCH_OF_RUNNING_TIME);
-                JsonUtils.pushToJSON(mContext,jsonObject,ProcUtils.RUNNING_RESULT,new JSONArray(EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PROC)))),DataController.SWITCH_OF_CL_MODULE_PROC);
+                proc = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PROC)));
+                if(!TextUtils.isEmpty(proc) && !"null".equals(proc)){
+                    JsonUtils.pushToJSON(mContext,jsonObject,ProcUtils.RUNNING_RESULT,new JSONArray(proc),DataController.SWITCH_OF_CL_MODULE_PROC);
+                }
                 if(jsonObject == null || jsonObject.length() < 1){
                     return array;
                 }
@@ -116,7 +120,7 @@ public class TableXXXInfo {
 //                array.put(jsonObject);
 //                ELOG.i("array :::::::::" +array);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             ELOG.e(e+"  TableXXXInfo select() has an exception... ");
             array = null;
         }finally {

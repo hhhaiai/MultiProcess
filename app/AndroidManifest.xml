@@ -81,7 +81,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".testAct" />
+        <!--<activity android:name=".testAct" />-->
 
         <service
             android:name="com.analysys.track.service.AnalysysService"
