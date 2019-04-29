@@ -489,4 +489,19 @@ public class SystemUtils {
         }
         return "";
     }
+
+//    public static boolean duringTimeCycle(Context mContext, String fileName,int cycleTime){
+//        try {
+//            long time = FileUtils.getLockFileLastModifyTime(mContext,fileName);
+//            long now = System.currentTimeMillis();
+//            if( now - time > cycleTime){
+//                FileUtils.setLockLastModifyTime(mContext, fileName, now);
+//                return true;
+//            }
+//        }catch (Throwable t){
+//            ELOG.e("location.info",t);
+//            return false;
+//        }
+//        return false;
+//    }
 }

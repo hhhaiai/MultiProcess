@@ -102,10 +102,10 @@ public class FileUtils {
     /**
      * 根据锁文件时间，判断是否达到触发时间
      *
-     * @param cxt
-     * @param lock
-     * @param time
-     * @param now
+     * @param cxt 上下文
+     * @param lock 文件名
+     * @param time 轮询间隔
+     * @param now 本次时间
      * @return
      */
     public static boolean isNeedWorkByLockFile(Context cxt, String lock, long time, long now) {

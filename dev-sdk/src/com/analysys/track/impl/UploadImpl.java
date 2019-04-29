@@ -72,16 +72,23 @@ public class UploadImpl {
     public void upload() {
         try {
             if(EGContext.NETWORK_TYPE_NO_NET.equals(NetworkUtils.getNetworkType(mContext))){
-                ELOG.i("upload无网return，进程Id：< " + Process.myPid() + " >");
+                ELOG.i("upload无网return，进程Id：< " + SystemUtils.getCurrentProcessName(mContext) + " >");
                 return;
             }
             if (SPHelper.getIntValueFromSP(mContext,EGContext.REQUEST_STATE,0) != 0) {
-                ELOG.i("upload有正在发送的数据return，进程Id：< " + Process.myPid() + " >");
+                ELOG.i("upload有正在发送的数据return，进程Id：< " + SystemUtils.getCurrentProcessName(mContext) + " >");
                 return;
             }
-            if(!duringCycleTime()){
+            long currentTime = System.currentTimeMillis();
+            long upLoadCycle = PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE);
+            MessageDispatcher.getInstance(mContext).uploadInfo(upLoadCycle);
+            if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_UPLOAD,upLoadCycle,currentTime)){
+                FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_UPLOAD,currentTime);
+            }else {
+                ELOG.i("upload不符合发送轮询周期return，进程Id：< " + SystemUtils.getCurrentProcessName(mContext) + " >");
                 return;
             }
+            ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"进入upload获取.....");
             File dir = mContext.getFilesDir();
             File f = new File(dir, EGContext.DEV_UPLOAD_PROC_NAME);
             long now = System.currentTimeMillis();
@@ -89,7 +96,7 @@ public class UploadImpl {
                 long time = f.lastModified();
                 long dur = now - time;
                 //Math.abs(dur)
-                if ( dur <= PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE)) {
+                if ( dur <= upLoadCycle) {
                     ELOG.i("upload时间轮询周期不到，return，进程Id：< " + Process.myPid() + " >");
                     return;
                 }
@@ -97,7 +104,7 @@ public class UploadImpl {
                 f.createNewFile();
                 f.setLastModified(now);
             }
-            boolean isDurOK = (now - SPHelper.getLongValueFromSP(mContext,EGContext.LASTQUESTTIME,0)) > PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE);
+            boolean isDurOK = (now - SPHelper.getLongValueFromSP(mContext,EGContext.LASTQUESTTIME,0)) > upLoadCycle;
              ELOG.i("---------upload发送时机符合上传条件，即将发送数据isDurOK：" + isDurOK);
             if (isDurOK) {
                 f.setLastModified(now);
@@ -108,23 +115,7 @@ public class UploadImpl {
                 ELOG.e("upload has an exception:::" + t.getMessage());
             }
 
-        }finally {
-            MessageDispatcher.getInstance(mContext).uploadInfo(PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE), false);
         }
-    }
-    private boolean duringCycleTime(){
-        try {
-            long time = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_UPLOAD);
-            long now = System.currentTimeMillis();
-            if( now - time > EGContext.UPLOAD_CYCLE){
-                EGContext.UPLOAD_LAST_TIME_STMP = now;
-                FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_UPLOAD, now);
-                return true;
-            }
-        }catch (Throwable t){
-            return false;
-        }
-        return false;
     }
     public void reTryAndUpload(boolean isNormalUpload){
         int failNum = SPHelper.getIntValueFromSP(mContext,EGContext.FAILEDNUMBER,0);
@@ -482,6 +473,8 @@ public class UploadImpl {
             if(EGContext.FLAG_DEBUG_INNER){
                 ELOG.e(t.getMessage());
             }
+        }finally {
+            MessageDispatcher.getInstance(mContext).killRetryWorker();
         }
     }
     /**

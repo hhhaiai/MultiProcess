@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
-import com.analysys.track.utils.PermissionUtils;
 
 import java.util.List;
 
@@ -32,6 +31,9 @@ public class MainActivity extends Activity {
 
         startService(new Intent(this, MyServiceA.class));
         startService(new Intent(this, MyServiceB.class));
+        startService(new Intent(this, MyServiceC.class));
+        startService(new Intent(this, MyServiceD.class));
+        startService(new Intent(this, MyServiceE.class));
     }
 
     @TargetApi(23)

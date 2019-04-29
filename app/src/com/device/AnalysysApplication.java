@@ -4,7 +4,7 @@ import android.app.Application;
 import android.os.StrictMode;
 
 import com.analysys.track.AnalysysTracker;
-import com.analysys.track.utils.ELOG;
+//import com.analysys.track.utils.ELOG;
 
 
 public class AnalysysApplication extends Application {

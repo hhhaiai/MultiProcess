@@ -46,11 +46,9 @@ public class LocationImpl {
 
     Context mContext;
     private LocationManager locationManager;
-    //    PhoneStateListener phoneStateListener = null;
     TelephonyManager mTelephonyManager = null;
-    //    CellLocation cellLocation = null;
     JSONObject locationJson = null;
-
+    private static boolean isLocationBlockRunning = false;
     private LocationImpl() {
     }
 
@@ -74,8 +72,18 @@ public class LocationImpl {
 
     public void location() {
         try {
-            if(!duringCycleTime()){
-                ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"---------------return...");
+            long currentTime = System.currentTimeMillis();
+//            long snapCollectCycle = PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE);
+            MessageDispatcher.getInstance(mContext).locationInfo(EGContext.LOCATION_CYCLE);
+            if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_LOCATION,EGContext.LOCATION_CYCLE,currentTime)){
+                FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_LOCATION,currentTime);
+            }else {
+                ELOG.i("locationInfo不符合采集轮询周期return，进程Id：< " + SystemUtils.getCurrentProcessName(mContext) + " >");
+                return;
+            }
+            if(!isLocationBlockRunning){
+                isLocationBlockRunning = true;
+            }else {
                 return;
             }
             ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"---------------location");
@@ -91,24 +99,8 @@ public class LocationImpl {
             }
         } catch (Throwable t) {
         }finally {
-            MessageDispatcher.getInstance(mContext).locationInfo(EGContext.LOCATION_CYCLE, false);
+            isLocationBlockRunning = false;
         }
-    }
-
-    private boolean duringCycleTime(){
-        try {
-            long time = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_LOCATION);
-            long now = System.currentTimeMillis();
-            if( now - time > EGContext.LOCATION_CYCLE){
-                EGContext.LOCATION_LAST_TIME_STMP = now;
-                FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, now);
-                return true;
-            }
-        }catch (Throwable t){
-            ELOG.e("location.info",t);
-            return false;
-        }
-        return false;
     }
 
     private void LocationHandle() {

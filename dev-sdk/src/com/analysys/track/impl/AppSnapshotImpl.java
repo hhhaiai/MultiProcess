@@ -27,7 +27,7 @@ import android.content.pm.PackageManager;
 import android.text.TextUtils;
 
 public class AppSnapshotImpl {
-
+    private static boolean isSnapShotBlockRunning = false;
     Context mContext;
     private AppSnapshotImpl() {
 
@@ -49,10 +49,20 @@ public class AppSnapshotImpl {
      */
     public void snapshotsInfo() {
         try {
-            if(!duringCycleTime()){
+            long currentTime = System.currentTimeMillis();
+//            long snapCollectCycle = PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE);
+            MessageDispatcher.getInstance(mContext).snapshotInfo(EGContext.SNAPSHOT_CYCLE);
+            if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_APPSNAPSHOT,EGContext.SNAPSHOT_CYCLE,currentTime)){
+                FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_APPSNAPSHOT,currentTime);
+            }else {
+                ELOG.i("snapshotsInfo不符合采集轮询周期return，进程Id：< " + SystemUtils.getCurrentProcessName(mContext) + " >");
                 return;
             }
-            ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"------------snapshotsInfo");
+            if(!isSnapShotBlockRunning){
+                isSnapShotBlockRunning = true;
+            }else {
+                return;
+            }
             if(SystemUtils.isMainThread()){
                 EThreadPool.execute(new Runnable() {
                     @Override
@@ -65,26 +75,12 @@ public class AppSnapshotImpl {
             }
         }catch (Throwable t){
         }finally {
-            MessageDispatcher.getInstance(mContext)
-                    .snapshotInfo(EGContext.SNAPSHOT_CYCLE,false);
+            isSnapShotBlockRunning = false;
         }
-    }
-    private boolean duringCycleTime(){
-        try {
-            long time = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_APPSNAPSHOT);
-            long now = System.currentTimeMillis();
-            if( now - time > EGContext.SNAPSHOT_CYCLE){
-                EGContext.SNAPSHOT_LAST_TIME_STMP = now;
-                FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, now);
-                return true;
-            }
-        }catch (Throwable t){
-            return false;
-        }
-        return false;
     }
     private void getSnapShotInfo(){
         try {
+            ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"进入getSnapShotInfo获取.....");
             if(!PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT,true)){
                 return;
             }

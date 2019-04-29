@@ -6,6 +6,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 
+import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.ELOG;
@@ -45,6 +46,17 @@ public class CheckHeartbeat {
             mHandler.sendMessageDelayed(msg, EGContext.CHECK_HEARTBEAT_CYCLE);
         }
     }
+    public void exitRetryHandler() {
+        try {
+            Message msg = new Message();
+            msg.what = MSG_RETRY;
+            if(mHandler.hasMessages(msg.what)){
+                mHandler.removeMessages(msg.what);
+            }
+        }catch (Throwable t){
+        }
+
+    }
     public void checkRetry() {
         Message msg = new Message();
         msg.what = MSG_RETRY;
@@ -64,7 +76,7 @@ public class CheckHeartbeat {
             super.handleMessage(msg);
             switch (msg.what) {
                 case MSG_CHECK:
-                    ELOG.i("心跳检查,进程：");
+                    ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"心跳检查");
                     SPHelper.setLongValue2SP(mContext,EGContext.HEARTBEAT_LAST_TIME,System.currentTimeMillis());
                     //本次发送
                     MessageDispatcher.getInstance(mContext).checkHeartbeat(EGContext.CHECK_HEARTBEAT_CYCLE);
@@ -72,7 +84,7 @@ public class CheckHeartbeat {
                     sendMessages();
                     break;
                 case MSG_RETRY:
-                    ELOG.i("轮询检查,进程：");
+                    ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"数据重发轮询检查");
                     MessageDispatcher.getInstance(mContext) .isNeedRetry(EGContext.CHECK_RETRY_CYCLE);
                     checkRetry();
                     break;

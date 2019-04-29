@@ -40,7 +40,7 @@ public class EGContext {
     // 应用打开关闭获取周期时间
     public static final int UPLOAD_CYCLE = 6 * 60 * 60 * 1000;
     // 心跳检查
-    public static final int CHECK_HEARTBEAT_CYCLE = 15 * 1000;
+    public static final int CHECK_HEARTBEAT_CYCLE = 5 * 1000;
     public static final String HEARTBEAT_LAST_TIME = "HEART_BETA";
     // 发送失败后重复发送的心跳检查
     public static final int CHECK_RETRY_CYCLE = 5 * 1000;
@@ -203,11 +203,11 @@ public class EGContext {
     public static final String SERVICE_RESTART = "3";
     public static final String NORMAL = "0";
     public static final String THREAD_NAME = "com.eguan";
-    public static long HEARTBEAT_LAST_TIME_STMP = -1;
-    public static long SNAPSHOT_LAST_TIME_STMP = -1;
-    public static long LOCATION_LAST_TIME_STMP = -1;
-    public static long OC_LAST_TIME_STMP = -1;
-    public static long UPLOAD_LAST_TIME_STMP = -1;
+//    public static long HEARTBEAT_LAST_TIME_STMP = -1;
+//    public static long SNAPSHOT_LAST_TIME_STMP = -1;
+//    public static long LOCATION_LAST_TIME_STMP = -1;
+//    public static long OC_LAST_TIME_STMP = -1;
+//    public static long UPLOAD_LAST_TIME_STMP = -1;
     public static final String UPLOAD_KEY_WORDS = "facility4";
     public static final String EXTRA_DATA = "ETDM";
     public static final int BLANK_COUNT_MAX = 10;

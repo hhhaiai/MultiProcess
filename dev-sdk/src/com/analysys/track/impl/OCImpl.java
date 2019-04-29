@@ -55,6 +55,7 @@ public class OCImpl {
      * mCache为Android4.x正在运行的app列表的内存变量值
      */
     public static JSONObject mCache = null;
+    private static boolean isOCBlockRunning = false;
     private OCImpl(){}
     private static class Holder {
         private static final OCImpl INSTANCE = new OCImpl();
@@ -72,7 +73,27 @@ public class OCImpl {
      */
     public void ocInfo() {
         try {
-            if(!duringCycleTime()){
+            long currentTime = System.currentTimeMillis();
+            if(Build.VERSION.SDK_INT < 21){
+                MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE);
+                if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_OC,EGContext.OC_CYCLE,currentTime)){
+                    FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_OC,currentTime);
+                }else {
+                    return;
+                }
+            }else if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24){
+                MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE_OVER_5);
+                if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_OC,EGContext.OC_CYCLE_OVER_5,currentTime)){
+                    FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_OC,currentTime);
+                }else {
+                    return;
+                }
+            }else {//6以上不处理
+                return;
+            }
+            if(!isOCBlockRunning){
+                isOCBlockRunning = true;
+            }else {
                 return;
             }
             if (SystemUtils.isMainThread()) {
@@ -88,37 +109,9 @@ public class OCImpl {
         } catch (Throwable t) {
 
         }finally {
-            ELOG.d("finally执行调用oc");
-            if(Build.VERSION.SDK_INT < 21){
-                MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE, false);
-            }else if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24){
-                MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE_OVER_5, false);
-            }
+            isOCBlockRunning = false;
         }
 
-    }
-    private boolean duringCycleTime(){
-        try {
-            long time = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_OC);
-            long now = System.currentTimeMillis();
-            if(Build.VERSION.SDK_INT < 21){
-                if( now - time > EGContext.OC_CYCLE){
-                    EGContext.OC_LAST_TIME_STMP = now;
-                    FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_OC, now);
-                    return true;
-                }
-            }else if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24){
-                if( now - time > EGContext.OC_CYCLE_OVER_5){
-                    EGContext.OC_LAST_TIME_STMP = now;
-                    FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_OC, now);
-                    return true;
-                }
-            }
-
-        }catch (Throwable t){
-            return false;
-        }
-        return false;
     }
     /**
      * 真正的OC处理
@@ -130,6 +123,7 @@ public class OCImpl {
 //                return;
 //            }
             // 亮屏幕工作
+            ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"进入processOC获取.....");
             if (SystemUtils.isScreenOn(mContext)) {
 //                fillData();
                 if (!SystemUtils.isScreenLocked(mContext)) {

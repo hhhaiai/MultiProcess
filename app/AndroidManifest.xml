@@ -58,6 +58,21 @@
             android:enabled="true"
             android:exported="true"
             android:process=":sera" />
+        <service
+            android:name=".MyServiceC"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":serc" />
+        <service
+            android:name=".MyServiceD"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":serd" />
+        <service
+            android:name=".MyServiceE"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":sere" />
 
         <activity android:name=".MainActivity">
             <intent-filter>
