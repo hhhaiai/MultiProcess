@@ -61,32 +61,34 @@ public class FileUtils {
      */
     public static long getLockFileLastModifyTime(Context cxt, String fileName) {
         try {
-            ELOG.i(SystemUtils.getCurrentProcessName(cxt)+" :::getLockFileLastModifyTime "+System.currentTimeMillis());
+            ELOG.i(SystemUtils.getCurrentProcessName(cxt) + " :::getLockFileLastModifyTime " + System.currentTimeMillis());
             cxt = EContextHelper.getContext(cxt);
-            RandomAccessFile randomFile = null;
-            FileChannel fileChannel = null;
-            try {
-                if (cxt != null) {
-                    File dev = new File(cxt.getFilesDir(), fileName);
-                    if (!dev.exists()) {
-                        createLockFile(cxt,fileName,0);
-                    }
-                    randomFile = new RandomAccessFile(dev, "rw");
-                    fileChannel = randomFile.getChannel();
-                    FileLock fl = fileChannel.tryLock();
-                    if (fl != null) {
-                        return dev.lastModified();
-                    }
+//            RandomAccessFile randomFile = null;
+//            FileChannel fileChannel = null;
+//            try {
+            if (cxt != null) {
+                File dev = new File(cxt.getFilesDir(), fileName);
+                if (!dev.exists()) {
+                    createLockFile(cxt, fileName, 0);
                 }
-            }catch (Throwable t){
-                ELOG.e("多进程问题：："+t);
-            }finally {
-                StreamerUtils.safeClose(randomFile);
-                StreamerUtils.safeClose(fileChannel);
+                return dev.lastModified();
             }
+//                    randomFile = new RandomAccessFile(dev, "rw");
+//                    fileChannel = randomFile.getChannel();
+//                    FileLock fl = fileChannel.tryLock();
+//                    if (fl != null) {
+//                return dev.lastModified();
+//                    }
+//            }
+//            } catch (Throwable t) {
+//                ELOG.e("多进程问题：：" + t);
+//            } finally {
+//                StreamerUtils.safeClose(randomFile);
+//                StreamerUtils.safeClose(fileChannel);
+//            }
 
         } catch (Throwable e) {
-            ELOG.e("获取最后修改时间异常：："+e);
+            ELOG.e("获取最后修改时间异常：：" + e);
         }
         return -1;
     }
@@ -124,10 +126,10 @@ public class FileUtils {
     /**
      * 根据锁文件时间，判断是否达到触发时间
      *
-     * @param cxt 上下文
+     * @param cxt  上下文
      * @param lock 文件名
      * @param time 轮询间隔
-     * @param now 本次时间
+     * @param now  本次时间
      * @return
      */
     public static boolean isNeedWorkByLockFile(Context cxt, String lock, long time, long now) {
@@ -135,17 +137,38 @@ public class FileUtils {
         if (cxt == null) {
             return false;
         }
-        long lastModifyTime = getLockFileLastModifyTime(cxt, lock);
-        if (Math.abs(lastModifyTime - now) > time) {
-            return true;
-        } else {
-            return false;
+        // 文件同步
+        File f = new File(lock);
+        RandomAccessFile randomFile = null;
+        FileChannel fileChannel = null;
+        FileLock fl = null;
+        try {
+            randomFile = new RandomAccessFile(f, "rw");
+            fileChannel = randomFile.getChannel();
+            fl = fileChannel.tryLock();
+            if (fl != null) {
+                // 对比间隔时间
+                long lastModifyTime = getLockFileLastModifyTime(cxt, lock);
+                if (Math.abs(lastModifyTime - now) > time) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } catch (Throwable e) {
+        } finally {
+            StreamerUtils.safeClose(fl);
+            StreamerUtils.safeClose(fileChannel);
+            StreamerUtils.safeClose(randomFile);
         }
+        return false;
     }
 
     public static void deleteFile(String filePath) {
         try {
-            if (isFileExist(filePath)){
+            if (isFileExist(filePath)) {
                 new File(filePath).delete();
             }
         } catch (Throwable t) {
@@ -216,7 +239,7 @@ public class FileUtils {
     private static boolean isFileExist(String filePath) {
         if (TextUtils.isEmpty(filePath)) {
             File file = new File(filePath);
-            if (file != null){
+            if (file != null) {
                 return file.exists();
             }
         }
@@ -300,7 +323,7 @@ public class FileUtils {
     }
 
     public static String loadFileAsString(String fileName) throws Exception {
-        if (!(new File(fileName)).exists()){
+        if (!(new File(fileName)).exists()) {
             return "";
         }
         FileReader reader = new FileReader(fileName);
