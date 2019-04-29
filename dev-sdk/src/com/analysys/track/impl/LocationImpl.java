@@ -76,14 +76,10 @@ public class LocationImpl {
 //            long snapCollectCycle = PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE);
             MessageDispatcher.getInstance(mContext).locationInfo(EGContext.LOCATION_CYCLE);
             if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_LOCATION,EGContext.LOCATION_CYCLE,currentTime)){
+                ELOG.i("修改时间：：："+currentTime);
                 FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_LOCATION,currentTime);
             }else {
                 ELOG.i("locationInfo不符合采集轮询周期return，进程Id：< " + SystemUtils.getCurrentProcessName(mContext) + " >");
-                return;
-            }
-            if(!isLocationBlockRunning){
-                isLocationBlockRunning = true;
-            }else {
                 return;
             }
             ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"---------------location");
