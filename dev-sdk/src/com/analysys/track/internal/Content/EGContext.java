@@ -230,7 +230,17 @@ public class EGContext {
     public static final long TIME_SYNC_LOCATION = 30 * 60 * 1000;
     // 数据库写入，多进程只有一个写入,两次间隔5秒
     public static final String FILES_SYNC_SP_WRITER = "SP.TAG";
-    public static final long TIME_SYNC_SP = 5 * 1000;//最少间隔5s查询一次
+    //最少间隔5s查询一次
+    public static final long TIME_SYNC_SP = 5 * 1000;
+    public static final String FILES_SYNC_SCREEN_BROADCAST = "SCREEN.TAG";
+    public static final String FILES_SYNC_SNAP_ADD_BROADCAST = "SADD.TAG";
+    public static final String FILES_SYNC_SNAP_DELETE_BROADCAST = "SDEL.TAG";
+    public static final String FILES_SYNC_SNAP_UPDATE_BROADCAST = "SUPDATE.TAG";
+    public static final String FILES_SYNC_BOOT_BROADCAST = "BOOT.TAG";
+    public static final String FILES_SYNC_BATTERY_BROADCAST = "BATTERY.TAG";
+    //最少间隔2s查询一次
+    public static final long TIME_SYNC_BROADCAST = 3 * 1000;
+    //广播多进程处理，一次只能有一个进程在处理
     // 默认同步写入时间，5秒内能写入一次。 间隔范围: APP列表(多进程广播方面)、 OC 5.x以下、DB写入
     public static final long TIME_SYNC_DEFAULT = 5 * 1000;
     public static final String PERMISSION_TIME = "LOCATION_PERMISSION";

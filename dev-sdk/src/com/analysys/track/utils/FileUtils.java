@@ -61,7 +61,7 @@ public class FileUtils {
      */
     public static long getLockFileLastModifyTime(Context cxt, String fileName) {
         try {
-            ELOG.i(SystemUtils.getCurrentProcessName(cxt) + " :::getLockFileLastModifyTime " + System.currentTimeMillis());
+//            ELOG.i(SystemUtils.getCurrentProcessName(cxt) + " :::getLockFileLastModifyTime " + System.currentTimeMillis());
             cxt = EContextHelper.getContext(cxt);
 //            RandomAccessFile randomFile = null;
 //            FileChannel fileChannel = null;
