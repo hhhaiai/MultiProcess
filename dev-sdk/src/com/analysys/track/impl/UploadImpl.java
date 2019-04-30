@@ -122,6 +122,7 @@ public class UploadImpl {
         int maxFailCount = PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT,EGContext.FAIL_COUNT_DEFALUT);
         long faildTime = SPHelper.getLongValueFromSP(mContext,EGContext.FAILEDTIME,0);
         long retryTime = SystemUtils.intervalTime(mContext);
+//        ELOG.e("isNormalUpload="+isNormalUpload+"  failNum="+failNum+"  maxFailCount="+maxFailCount+" faildTime="+faildTime+" retryTime ="+retryTime);
         if (isNormalUpload) {
             doUpload();
         }else if (!isNormalUpload && failNum > 0 && (failNum < maxFailCount)

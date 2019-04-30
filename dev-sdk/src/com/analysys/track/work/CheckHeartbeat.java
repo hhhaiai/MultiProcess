@@ -85,7 +85,7 @@ public class CheckHeartbeat {
                     break;
                 case MSG_RETRY:
                     ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"数据重发轮询检查");
-                    MessageDispatcher.getInstance(mContext) .isNeedRetry(EGContext.CHECK_RETRY_CYCLE);
+                    MessageDispatcher.getInstance(mContext).isNeedRetry(EGContext.CHECK_RETRY_CYCLE);
                     checkRetry();
                     break;
                 default:

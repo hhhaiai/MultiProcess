@@ -7,6 +7,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 
+import com.analysys.track.impl.PolicyImpl;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.impl.AppSnapshotImpl;
@@ -101,7 +102,7 @@ public class MessageDispatcher {
         try {
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_CHECK_RETRY;
-            if(reTryLastTime  == 0 || System.currentTimeMillis() - reTryLastTime >= delayTime){
+            if(reTryLastTime  == 0 || (System.currentTimeMillis() - reTryLastTime >= delayTime)){
                 reTryLastTime = System.currentTimeMillis();
                 if(mHandler.hasMessages(msg.what)){
                     mHandler.removeMessages(msg.what);
@@ -122,12 +123,13 @@ public class MessageDispatcher {
     }
     private void reTryUpload(){
         try {
-            if(SPHelper.getLongValueFromSP(mContext,DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT,EGContext.FAIL_COUNT_DEFALUT) > 0 ){
+            int failCount =SPHelper.getIntValueFromSP(mContext,DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT,EGContext.FAIL_COUNT_DEFALUT);
+            if(failCount > 0 ){
                 UploadImpl.getInstance(mContext).reTryAndUpload(false);
             }
         }catch (Throwable t){
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(t.getMessage());
+                ELOG.e("异常：：："+t.getMessage());
             }
         }
     }
@@ -310,7 +312,13 @@ public class MessageDispatcher {
     private void sendMessage(Message msg) {
         synchronized (mHandlerLock) {
             if (mHandler != null) {
-                mHandler.sendMessage(msg);
+                if(msg.what == MSG_CHECK_RETRY){
+                    ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到重试检测消息");
+                    reTryUpload();
+                }else {
+                    mHandler.sendMessage(msg);
+                }
+
             }
         }
     }
@@ -350,10 +358,6 @@ public class MessageDispatcher {
                         ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到启动服务消息");
                         ServiceHelper.getInstance(mContext).startSelfService();
                         break;
-                    case MSG_KILL_RETRY_WORKER:
-                        CheckHeartbeat.getInstance(mContext).exitRetryHandler();
-//                        ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到kill消息");
-                        break;
                     case MSG_APP_CHANGE_RECEIVER:
 //                        ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到应用安装/卸载/更新消息");
                         JSONObject js = null;
@@ -379,15 +383,22 @@ public class MessageDispatcher {
 //                        ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到上传消息");
                         UploadImpl.getInstance(mContext).upload();
                         break;
-                    case MSG_CHECK_RETRY:
-//                        ELOG.e(SystemUtils.getCurrentProcessName(mContext)+"接收到重试检测消息");
-                        reTryUpload();
+//                    case MSG_CHECK_RETRY:
+//                        ELOG.i("接收到重试检测消息============");
+//                        ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到重试检测消息");
+//                        reTryUpload();
+//                        break;
+                    case MSG_KILL_RETRY_WORKER:
+
+                        CheckHeartbeat.getInstance(mContext).exitRetryHandler();
+                        ELOG.e(SystemUtils.getCurrentProcessName(mContext)+"接收到kill消息");
                         break;
                     default:
-//                        ELOG.e(SystemUtils.getCurrentProcessName(mContext)+"其他消息:" + msg.what);
+                        ELOG.e(SystemUtils.getCurrentProcessName(mContext)+"其他消息:" + msg.what);
                         break;
                 }
             }catch (Throwable t){
+                ELOG.e(t+"  exc..");
             }
         }
 
@@ -409,7 +420,7 @@ public class MessageDispatcher {
                         || handler.hasMessages(MSG_OC_INFO)
                         || handler.hasMessages(MSG_UPLOAD)) {
                     if(handler.hasMessages(MSG_UPLOAD)){
-                       if(System.currentTimeMillis() - uploadLastTime >= uploadCycle){
+                        if(System.currentTimeMillis() - uploadLastTime >= uploadCycle){
                          uploadInfo(uploadCycle);
                        }
                     }else {

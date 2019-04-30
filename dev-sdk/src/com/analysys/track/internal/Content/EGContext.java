@@ -43,7 +43,7 @@ public class EGContext {
     public static final int CHECK_HEARTBEAT_CYCLE = 5 * 1000;
     public static final String HEARTBEAT_LAST_TIME = "HEART_BETA";
     // 发送失败后重复发送的心跳检查
-    public static final int CHECK_RETRY_CYCLE = 5 * 1000;
+    public static final int CHECK_RETRY_CYCLE = 10 * 1000;
 
     public static final String SP_APP_KEY = "appKey";
     public static final String SP_APP_CHANNEL = "appChannel";

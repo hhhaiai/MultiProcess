@@ -77,6 +77,7 @@ public class OCImpl {
             if(Build.VERSION.SDK_INT < 21){
                 MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE);
                 if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_OC,EGContext.OC_CYCLE,currentTime)){
+                    ELOG.e(SystemUtils.getCurrentProcessName(mContext)+" oc4.x正常轮询进来...");
                     FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_OC,currentTime);
                 }else {
                     return;
@@ -84,6 +85,7 @@ public class OCImpl {
             }else if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24){
                 MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE_OVER_5);
                 if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_OC,EGContext.OC_CYCLE_OVER_5,currentTime)){
+                    ELOG.e(SystemUtils.getCurrentProcessName(mContext)+" oc5/6正常轮询进来...");
                     FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_OC,currentTime);
                 }else {
                     return;

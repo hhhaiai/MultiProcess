@@ -103,7 +103,6 @@ public class FileUtils {
      */
     public static boolean setLockLastModifyTime(Context cxt, String fileName, long time) {
         try {
-            ELOG.i(SystemUtils.getCurrentProcessName(cxt)+"set时间");
             cxt = EContextHelper.getContext(cxt);
             if (cxt != null) {
                 File dev = new File(cxt.getFilesDir(), fileName);
