@@ -61,22 +61,18 @@ public class TableXXXInfo {
      */
     private ContentValues getContentValues(JSONObject xxxInfo) {
         ContentValues cv = null;
-//        JSONObject object = new JSONObject();
+        String result = null;
         try{
             if (xxxInfo != null) {
-//                list = new ArrayList<ContentValues>();
-//                for(int i = 0; i< xxxInfo.length();i++){
-//                    object = (JSONObject) xxxInfo.get(i);
+                result = String.valueOf(xxxInfo.opt(ProcUtils.RUNNING_RESULT));
+                if(!TextUtils.isEmpty(result) && !"null".equalsIgnoreCase(result) ){
                     cv = new ContentValues();
-//                    ELOG.i(xxxInfo.toString()+"     xxxInfo  ");
                     cv.put(DBConfig.XXXInfo.Column.TIME, EncryptUtils.encrypt(mContext,String.valueOf(xxxInfo.opt(ProcUtils.RUNNING_TIME))));
 //                    cv.put(DBConfig.XXXInfo.Column.TOP, EncryptUtils.encrypt(mContext,String.valueOf(object.opt(ProcParser.RUNNING_TOP))));
 //                    cv.put(DBConfig.XXXInfo.Column.PS, EncryptUtils.encrypt(mContext,String.valueOf(object.opt(ProcParser.RUNNING_PS))));
                     //PROC
-                    cv.put(DBConfig.XXXInfo.Column.PROC, EncryptUtils.encrypt(mContext,String.valueOf(xxxInfo.opt(ProcUtils.RUNNING_RESULT))));
-                   //OCR
-//                    cv.put(DBConfig.XXXInfo.Column.RESULT, EncryptUtils.encrypt(mContext,String.valueOf(xxxInfo.opt(ProcUtils.RUNNING_OC_RESULT))));
-//                }
+                    cv.put(DBConfig.XXXInfo.Column.PROC, EncryptUtils.encrypt(mContext,result));
+                }
             }
         }catch (Throwable t){
             ELOG.e(t.getMessage()+  "getContentValues() ...");
@@ -110,7 +106,7 @@ public class TableXXXInfo {
                 }
                 JsonUtils.pushToJSON(mContext,jsonObject,ProcUtils.RUNNING_TIME,time,DataController.SWITCH_OF_RUNNING_TIME);
                 proc = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PROC)));
-                if(!TextUtils.isEmpty(proc) && !"null".equals(proc)){
+                if(!TextUtils.isEmpty(proc) && !"null".equalsIgnoreCase(proc)){
                     JsonUtils.pushToJSON(mContext,jsonObject,ProcUtils.RUNNING_RESULT,new JSONArray(proc),DataController.SWITCH_OF_CL_MODULE_PROC);
                 }
                 if(jsonObject == null || jsonObject.length() < 1){

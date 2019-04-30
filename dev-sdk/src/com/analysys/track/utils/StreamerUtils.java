@@ -24,10 +24,11 @@ public class StreamerUtils {
     public static void safeClose(Process proc) {
         if (proc != null) {
             try {
-                proc.destroy();
-                proc = null;
+                proc.exitValue();
             }catch (Throwable t){
+                proc.destroy();
             }
+            proc = null;
 
         }
 
