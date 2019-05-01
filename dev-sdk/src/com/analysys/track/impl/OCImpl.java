@@ -159,6 +159,7 @@ public class OCImpl {
                     ELOG.i("锁屏广播针对本次oc无效::::");
                     if(mCache != null){
                         mCache.remove(EGContext.LAST_OPEN_TIME);
+                        mCache = null;
                     }
                     return;
                 }else {//有效入库
@@ -429,8 +430,12 @@ public class OCImpl {
                         long time = System.currentTimeMillis()- lastAvailableTime;
                         if(time > EGContext.OC_CYCLE){
                             lastAvailableTime = System.currentTimeMillis();
+                            ELOG.e("间隔时间超过5s..."+lastAvailableTime);
                             SPHelper.setLongValue2SP(mContext,EGContext.LAST_AVAILABLE_TIME,lastAvailableTime);
                             saveCacheOCInfo(ocJson);
+                        }else{
+                            ELOG.e("间隔时间小于5s...");
+                            SaveData2Sp(packageName,null);
                         }
                     }
                 }
@@ -438,31 +443,21 @@ public class OCImpl {
                 if(mCache == null){
                     mCache = new JSONObject();
                 }
-                long spLastAvailableTime = SPHelper.getLongValueFromSP(mContext, EGContext.LAST_AVAILABLE_TIME,0);
+                lastAvailableTime = SPHelper.getLongValueFromSP(mContext, EGContext.LAST_AVAILABLE_TIME,0);
                 //第一次打开
-                if(mCache.optLong(EGContext.LAST_AVAILABLE_TIME) == 0 ||spLastAvailableTime == 0){
+                if(mCache.optLong(EGContext.LAST_AVAILABLE_TIME) == 0 && lastAvailableTime == 0){
+                    ELOG.e("第一次打开oc...");
                     SaveData2Sp(packageName,ocJson);
                 }else {//之前有缓存数据
-                    if(System.currentTimeMillis() - spLastAvailableTime > EGContext.OC_CYCLE){
+                    if(System.currentTimeMillis() - lastAvailableTime > EGContext.OC_CYCLE){
+                        ELOG.e("间隔时间超过5s..."+lastAvailableTime);
                         SaveData2Sp(packageName,ocJson);
+                    }else {
+                        ELOG.e("间隔时间小于5s...");
+                        SaveData2Sp(packageName,null);
                     }
                 }
             }
-
-//            // 是否首次打开
-//            if (TextUtils.isEmpty(mLastPkgName)) {
-//            } else {
-//                //如果当前sp没值或者被清理过了，则记录当前oc部分信息到sp
-//                String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LAST_OPEN_TIME, "");
-//                ELOG.i("OC新的轮询，lastOpenTime == "+lastOpenTime);
-//                if(TextUtils.isEmpty(lastOpenTime) && (System.currentTimeMillis() - mLastAvailableOpenOrCloseTime > EGContext.OC_CYCLE)){
-//                    ELOG.i("OC新的轮询，如果当前sp中，oc没值则进去当前应用信息");
-//                    mLastAvailableOpenOrCloseTime = System.currentTimeMillis();
-//                    mLastPkgName = packageName;
-//                    ProcessManager.saveSP(mContext,ocJson);
-//                }
-//
-//            }
         }catch (Throwable t){
 
         }
@@ -480,26 +475,19 @@ public class OCImpl {
             if(mCache == null){
                 mCache = new JSONObject();
             }
+            if(ocJson == null || ocJson.length() < 1){
+                mCache = null;
+                return;
+            }
             String pkgName = ocJson.optString(DeviceKeyContacts.OCInfo.ApplicationPackageName);
             ELOG.i("重新写进去sp里的pkgName = "+pkgName);
-            mCache.put(EGContext.LAST_PACKAGE_NAME,pkgName);//pkgName
-            mCache.put(EGContext.LAST_OPEN_TIME,ocJson.optString(DeviceKeyContacts.OCInfo.ApplicationOpenTime));//打开时间
+            //pkgName
+            mCache.put(EGContext.LAST_PACKAGE_NAME,pkgName);
+            //打开时间
+            mCache.put(EGContext.LAST_OPEN_TIME,ocJson.optString(DeviceKeyContacts.OCInfo.ApplicationOpenTime));
             mCache.put(EGContext.LAST_APP_NAME,ocJson.optString(DeviceKeyContacts.OCInfo.ApplicationName));
             mCache.put(EGContext.LAST_APP_VERSION,ocJson.optString(DeviceKeyContacts.OCInfo.ApplicationVersionCode));
             mCache.put(EGContext.APP_TYPE,ocJson.optString(DeviceKeyContacts.OCInfo.ApplicationType));
-//            String lastOpenTime = mCache.optString(EGContext.LAST_OPEN_TIME,"");
-//            if(!TextUtils.isEmpty(lastOpenTime)){
-//                long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
-//                ELOG.i("补数逻辑：得到的randomCloseTime"+randomCloseTime);
-//                if(randomCloseTime == -1){//不足轮询时间间隔，无效数据
-//                    mCache = null;
-//                    return;
-//                }
-//                //1.非首次打开，之前有pkgName缓存,设置当前时间往前推一点为结束时间
-//                mCache.put(EGContext.LAST_OPEN_TIME,lastOpenTime);
-//            }else {//没有开始时间则无需闭合
-//                return;
-//            }
         }catch (Throwable t){
 
         }
@@ -536,28 +524,6 @@ public class OCImpl {
             }else {
                 // 本次proc取到的值与原来的内存数据去重
                 repeatHandle(nameSet,time);
-//                if (res != null && res.length() > 0) {
-//                    try {
-//                        mRunningApps = (ArrayList<JSONObject>)(res.get("cache"));
-//                        ELOG.i(mRunningApps + "   ::::::::: cacheApps:::::");
-//                    } catch (Throwable t) {
-//                        ELOG.i("   ::::::::: cacheApps 异常:::::");
-////                        cacheApps = null;
-//                    }
-//                }
-//                if (mRunningApps != null && mRunningApps.size() > 0) {
-//                    // 更新缓存表
-//                    closeState2DB(mRunningApps);
-//                }
-//                try {
-//                    nameSet = (Set<String>) res.get("run");
-//                } catch (Throwable t) {
-//                    nameSet = null;
-//                }
-//                if (nameSet != null && nameSet.size() > 0) {
-//                    // 新增该时段缓存信息
-//                    addCache(nameSet, time);
-//                }
             }
         } catch (Throwable t) {
             if(EGContext.FLAG_DEBUG_INNER){
@@ -830,20 +796,6 @@ public class OCImpl {
         mCache.remove(EGContext.LAST_OPEN_TIME);
         mCache.remove(EGContext.APP_TYPE);
     }
-
-    /**
-     * android 5/6需要间隔大于30秒
-     *
-     * @return
-     */
-//    private boolean isDurLThanThri() {
-//        long now = System.currentTimeMillis();
-//        if (mProcessTime == 0 || (now - mProcessTime) >= EGContext.OC_CYCLE_OVER_5) {
-//            mProcessTime = now;
-//            return true;
-//        }
-//        return false;
-//    }
 
     /**
      * android 5以上，有UsageStatsManager权限可以使用的

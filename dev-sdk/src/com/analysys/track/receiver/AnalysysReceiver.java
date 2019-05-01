@@ -31,7 +31,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
     String BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED";
     //上次结束时间
     private static long mLastCloseTime = 0;
-    private static boolean isScreenBroadCastHandled = false;
+    private static boolean isScreenOnOffBroadCastHandled = false;
     private static boolean isSnapShotAddBroadCastHandled = false;
     private static boolean isSnapShotDeleteBroadCastHandled = false;
     private static boolean isSnapShotUpdateBroadCastHandled = false;
@@ -179,18 +179,27 @@ public class AnalysysReceiver extends BroadcastReceiver {
     private void processScreenOnOff(final boolean on) {
         try {
             long currentTime = System.currentTimeMillis();
-            if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_SCREEN_BROADCAST,EGContext.TIME_SYNC_BROADCAST,currentTime)){
-                ELOG.e(SystemUtils.getCurrentProcessName(mContext)+"多进程进来处理一次...");
-                FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_SCREEN_BROADCAST,currentTime);
+            if(on){
+                if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_SCREEN_ON_BROADCAST,EGContext.TIME_SYNC_BROADCAST,currentTime)){
+                    ELOG.e(SystemUtils.getCurrentProcessName(mContext)+"多进程进来处理一次...");
+                    FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_SCREEN_ON_BROADCAST,currentTime);
+                }else {
+                    ELOG.e(SystemUtils.getCurrentProcessName(mContext)+"阻挡多进程一次...");
+                    return;
+                }
             }else {
-                ELOG.e(SystemUtils.getCurrentProcessName(mContext)+"阻挡多进程一次...");
-                return;
+                if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST,EGContext.TIME_SYNC_BROADCAST,currentTime)){
+                    ELOG.e(SystemUtils.getCurrentProcessName(mContext)+"多进程进来处理一次...");
+                    FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST,currentTime);
+                }else {
+                    ELOG.e(SystemUtils.getCurrentProcessName(mContext)+"阻挡多进程一次...");
+                    return;
+                }
             }
-            if(!isScreenBroadCastHandled){
-                ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"处理广播一次...");
-                isScreenBroadCastHandled = true;
+
+            if(!isScreenOnOffBroadCastHandled){
+                isScreenOnOffBroadCastHandled = true;
             }else {
-                ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"阻挡广播一次...");
                 return;
             }
             ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"正式处理广播---------------");
@@ -210,7 +219,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
                 ELOG.e(e.getMessage());
             }
         }finally {
-            isScreenBroadCastHandled = false;
+            isScreenOnOffBroadCastHandled = false;
         }
     }
     /**
@@ -231,20 +240,36 @@ public class AnalysysReceiver extends BroadcastReceiver {
             }
             if(mLastCloseTime == 0){//取完sp时间后依然为空，则为第一次锁屏，设置closeTime,准备入库
                 mLastCloseTime = System.currentTimeMillis();
-                OCImpl.mLastAvailableOpenOrCloseTime = mLastCloseTime;
                 SPHelper.setLongValue2SP(mContext,EGContext.LAST_AVAILABLE_TIME, mLastCloseTime);
-                ELOG.i("接收关闭屏幕广播后存入sp的时间::::"+ mLastCloseTime);
                 if(on){
                     return;
                 }
+                OCImpl.mLastAvailableOpenOrCloseTime = mLastCloseTime;
+                ELOG.i("接收关闭屏幕广播后存入sp的时间::::"+ mLastCloseTime);
                 OCImpl.getInstance(mContext).closeOC(false, mLastCloseTime);
             }else {//sp里取到了数据，即，非第一次锁屏，则判断是否有效数据来设置closeTime,准备入库
                 ELOG.i("非第一次锁屏，接收关闭屏幕广播后存入sp的时间::::"+ mLastCloseTime);
-                OCImpl.mLastAvailableOpenOrCloseTime = System.currentTimeMillis();
-                SPHelper.setLongValue2SP(mContext,EGContext.LAST_AVAILABLE_TIME, OCImpl.mLastAvailableOpenOrCloseTime);
+                long currentTime  = System.currentTimeMillis();
+                try {
+                    if(Build.VERSION.SDK_INT < 21){
+                        if(currentTime - mLastCloseTime < EGContext.OC_CYCLE){
+                            OCImpl.mCache = null;
+                            return;
+                        }
+                    }else if(Build.VERSION.SDK_INT >20 && Build.VERSION.SDK_INT < 24){
+                        if(currentTime - mLastCloseTime < EGContext.OC_CYCLE_OVER_5){
+                            OCImpl.mCache = null;
+                            return;
+                        }
+                    }
+                }catch (Throwable t){
+                }finally {
+                    SPHelper.setLongValue2SP(mContext,EGContext.LAST_AVAILABLE_TIME,currentTime);
+                }
                 if(on){
                     return;
                 }
+                OCImpl.mLastAvailableOpenOrCloseTime = currentTime;
                 OCImpl.getInstance(mContext).closeOC(true, mLastCloseTime);
             }
             ReceiverUtils.getInstance().unRegistAllReceiver(mContext);

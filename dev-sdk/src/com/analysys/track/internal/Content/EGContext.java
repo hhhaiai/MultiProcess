@@ -232,7 +232,8 @@ public class EGContext {
     public static final String FILES_SYNC_SP_WRITER = "SP.TAG";
     //最少间隔5s查询一次
     public static final long TIME_SYNC_SP = 5 * 1000;
-    public static final String FILES_SYNC_SCREEN_BROADCAST = "SCREEN.TAG";
+    public static final String FILES_SYNC_SCREEN_OFF_BROADCAST = "OFF.TAG";
+    public static final String FILES_SYNC_SCREEN_ON_BROADCAST = "ON.TAG";
     public static final String FILES_SYNC_SNAP_ADD_BROADCAST = "SADD.TAG";
     public static final String FILES_SYNC_SNAP_DELETE_BROADCAST = "SDEL.TAG";
     public static final String FILES_SYNC_SNAP_UPDATE_BROADCAST = "SUPDATE.TAG";
