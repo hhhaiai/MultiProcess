@@ -10,7 +10,6 @@ import com.analysys.track.impl.OCImpl;
 import com.analysys.track.impl.DeviceImpl;
 import com.analysys.track.utils.FileUtils;
 import com.analysys.track.utils.sp.SPHelper;
-import com.analysys.track.work.CheckHeartbeat;
 import com.analysys.track.work.MessageDispatcher;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
@@ -118,7 +117,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
             }
             if (SCREEN_ON.equals(intent.getAction())) {
                 if(Build.VERSION.SDK_INT >= 24){
-                    CheckHeartbeat.getInstance(mContext).sendMessages();
+                    MessageDispatcher.getInstance(mContext).sendMessages();
                     return;
                 }
                 ELOG.e("接收开启屏幕广播");
@@ -252,50 +251,9 @@ public class AnalysysReceiver extends BroadcastReceiver {
         }catch (Throwable t){
         }finally {
             if(on){
-                CheckHeartbeat.getInstance(mContext).sendMessages();
+                MessageDispatcher.getInstance(mContext).sendMessages();
             }
         }
     }
 
-//    /**
-//     * 补数入库
-//     * @param needCalculateTime
-//     * @param closeTime
-//     */
-//    public void saveData(boolean needCalculateTime,long closeTime){
-//        try {
-//            //        String lastAvailableTime = "";
-//            if(Build.VERSION.SDK_INT < 21){//4.x
-//                if(needCalculateTime && (System.currentTimeMillis() - closeTime < EGContext.OC_CYCLE)){//两次时间间隔如果小于5s,则无效
-//                    ELOG.i("锁屏广播针对本次oc无效::::");
-//                    if(OCImpl.getInstance(mContext).mCache != null){
-//                        OCImpl.getInstance(mContext).mCache.remove(EGContext.LAST_OPEN_TIME);
-//                    }
-//                    return;
-//                }else {//有效入库
-//                    if(OCImpl.getInstance(mContext).mCache != null){
-//                        OCImpl.getInstance(mContext).mCache.put(EGContext.END_TIME,OCImpl.mLastAvailableOpenOrCloseTime);
-//                    }else {
-//                        return;
-//                    }
-//                    OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.CLOSE_SCREEN);
-//                }
-//            }else if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24){//5/6
-//                if(needCalculateTime && (System.currentTimeMillis() - closeTime < EGContext.OC_CYCLE_OVER_5)){//无效
-//                    ELOG.i("锁屏广播针对本次oc无效::::");
-//                    return;
-//                }else {
-//                    ELOG.i("接收关闭屏幕广播后的入库时间::::"+closeTime);
-//                    /**
-//                     * 读取数据库数据入缓存，只读取一次，缓存先改然后与数据库同步
-//                     */
-////                    lastAvailableTime = SPHelper.getStringValueFromSP(mContext,EGContext.LAST_OPEN_TIME, "");
-//                    OCImpl.getInstance(mContext).fillData();//批量入库补数
-//                }
-//            }
-//        }catch (Throwable t){
-//            ELOG.e(t);
-//        }
-//
-//    }
 }

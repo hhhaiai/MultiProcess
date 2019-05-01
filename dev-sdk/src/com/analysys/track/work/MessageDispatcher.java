@@ -123,6 +123,10 @@ public class MessageDispatcher {
     }
     private void reTryUpload(){
         try {
+            long upLoadCycle = PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE);
+            if(uploadCycle != upLoadCycle){
+                uploadCycle = upLoadCycle;
+            }
             int failCount =SPHelper.getIntValueFromSP(mContext,DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT,EGContext.FAIL_COUNT_DEFALUT);
             if(failCount > 0 ){
                 UploadImpl.getInstance(mContext).reTryAndUpload(false);
@@ -153,7 +157,7 @@ public class MessageDispatcher {
         try {
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_KILL_RETRY_WORKER;
-            sendMessage(msg, 0);
+            sendMessage(msg);
         }catch (Throwable t){
         }
 
@@ -254,7 +258,7 @@ public class MessageDispatcher {
             if(ocLastTime  == 0 || System.currentTimeMillis() - ocLastTime >= cycleTime){
                 ocLastTime = System.currentTimeMillis();
                 if(mHandler.hasMessages(msg.what)){
-                   mHandler.removeMessages(msg.what);
+                    mHandler.removeMessages(msg.what);
                 }
                 sendMessage(msg);
             }else {
@@ -312,13 +316,7 @@ public class MessageDispatcher {
     private void sendMessage(Message msg) {
         synchronized (mHandlerLock) {
             if (mHandler != null) {
-                if(msg.what == MSG_CHECK_RETRY){
-                    ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到重试检测消息");
-                    reTryUpload();
-                }else {
-                    mHandler.sendMessage(msg);
-                }
-
+                mHandler.sendMessage(msg);
             }
         }
     }
@@ -329,7 +327,22 @@ public class MessageDispatcher {
         final Handler ret = new AnalysyHandler(thread.getLooper());
         return ret;
     }
+    public void checkRetry() {
+        Message msg = new Message();
+        msg.what = MSG_RETRY;
+        if(!mHandler.hasMessages(msg.what)){
+            mHandler.sendMessageDelayed(msg, EGContext.CHECK_RETRY_CYCLE);
+        }
 
+    }
+    public void sendMessages() {
+        Message msg = new Message();
+        msg.what = MSG_CHECK;
+        if(!mHandler.hasMessages(msg.what)){
+            ELOG.e(SystemUtils.getCurrentProcessName(mContext)+"一次delay...");
+            mHandler.sendMessageDelayed(msg, EGContext.CHECK_HEARTBEAT_CYCLE);
+        }
+    }
     /**
      * @Copyright © 2018 Analysys Inc. All rights reserved.
      * @Description: 真正的消息处理
@@ -351,12 +364,16 @@ public class MessageDispatcher {
                         msgInitModule();
                         break;
                     case MSG_CHECK_HEARTBEAT:
-//                        ELOG.e(SystemUtils.getCurrentProcessName(mContext)+"接收到心跳检测消息");
+                        ELOG.e(SystemUtils.getCurrentProcessName(mContext)+"接收到心跳检测消息");
                         isHasMessage(this);
                         break;
                     case MSG_START_SERVICE_SELF:
                         ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到启动服务消息");
                         ServiceHelper.getInstance(mContext).startSelfService();
+                        break;
+                    case MSG_KILL_RETRY_WORKER:
+                        exitRetryHandler();
+//                        ELOG.e(SystemUtils.getCurrentProcessName(mContext)+"接收到kill消息");
                         break;
                     case MSG_APP_CHANGE_RECEIVER:
 //                        ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到应用安装/卸载/更新消息");
@@ -368,30 +385,39 @@ public class MessageDispatcher {
 //                        ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到屏幕操作消息");
                         break;
                     case MSG_SNAPSHOT:
-//                        ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到获取应用列表消息");
+                        ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到获取应用列表消息");
                         AppSnapshotImpl.getInstance(mContext).snapshotsInfo();
                         break;
                     case MSG_LOCATION:
-//                        ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到获取地理位置消息");
+                        ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到获取地理位置消息");
                         LocationImpl.getInstance(mContext).location();
                         break;
                     case MSG_OC_INFO:
-//                        ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到获取OC消息,进程 Id：" );
+                        ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到获取OC消息,进程 Id：" );
                         OCImpl.getInstance(mContext).ocInfo();
                         break;
                     case MSG_UPLOAD:
-//                        ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到上传消息");
+                        ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到上传消息");
                         UploadImpl.getInstance(mContext).upload();
                         break;
-//                    case MSG_CHECK_RETRY:
-//                        ELOG.i("接收到重试检测消息============");
-//                        ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到重试检测消息");
-//                        reTryUpload();
-//                        break;
-                    case MSG_KILL_RETRY_WORKER:
+                    case MSG_CHECK_RETRY:
+                        ELOG.i("接收到重试检测消息============");
+                        ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到重试检测消息");
+                        MessageDispatcher.getInstance(mContext).reTryUpload();
+                        break;
 
-                        CheckHeartbeat.getInstance(mContext).exitRetryHandler();
-                        ELOG.e(SystemUtils.getCurrentProcessName(mContext)+"接收到kill消息");
+                    case MSG_CHECK:
+                        ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"心跳检查");
+//                    SPHelper.setLongValue2SP(mContext,EGContext.HEARTBEAT_LAST_TIME,System.currentTimeMillis());
+                        //本次发送
+                        MessageDispatcher.getInstance(mContext).checkHeartbeat(EGContext.CHECK_HEARTBEAT_CYCLE);
+                        //本次delay,用于轮询
+                        sendMessages();
+                        break;
+                    case MSG_RETRY:
+                        ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"数据重发轮询检查");
+                        MessageDispatcher.getInstance(mContext).isNeedRetry(EGContext.CHECK_RETRY_CYCLE);
+                        checkRetry();
                         break;
                     default:
                         ELOG.e(SystemUtils.getCurrentProcessName(mContext)+"其他消息:" + msg.what);
@@ -420,9 +446,7 @@ public class MessageDispatcher {
                         || handler.hasMessages(MSG_OC_INFO)
                         || handler.hasMessages(MSG_UPLOAD)) {
                     if(handler.hasMessages(MSG_UPLOAD)){
-                        if(System.currentTimeMillis() - uploadLastTime >= uploadCycle){
-                         uploadInfo(uploadCycle);
-                       }
+                        if(System.currentTimeMillis() - uploadLastTime >= uploadCycle){ uploadInfo(uploadCycle); }
                     }else {
                         ELOG.i("心跳开启一次upload......");
                         MessageDispatcher.getInstance(mContext).uploadInfo(0);
@@ -437,14 +461,18 @@ public class MessageDispatcher {
                         }
                     }
                     if(handler.hasMessages(MSG_LOCATION)){
+                        ELOG.e("*************MSG_LOCATION");
                         if(System.currentTimeMillis() - locationLastTime >= locationCycle){
+                            ELOG.e("*************MSG_LOCATION111");
                             locationInfo(locationCycle);
                         }
                     }else {
                         MessageDispatcher.getInstance(mContext).locationInfo(0);
                     }
                     if(handler.hasMessages(MSG_SNAPSHOT)){
+                        ELOG.e("*************MSG_SNAPSHOT");
                         if(System.currentTimeMillis() - snapShotLastTime >= snapShotCycle){
+                            ELOG.e("*************MSG_SNAPSHOT111");
                             snapshotInfo(snapShotCycle);
                         }
                     }else {
@@ -471,7 +499,7 @@ public class MessageDispatcher {
                 snapshotInfo(0);
                 locationInfo(0);
                 uploadInfo(0);
-                CheckHeartbeat.getInstance(mContext).sendMessages();
+                sendMessages();
                 if(ELOG.USER_DEBUG){
                     ELOG.info("初始化完成");
                 }
@@ -481,6 +509,20 @@ public class MessageDispatcher {
                 }
             }
         }
+
+
+        public void exitRetryHandler() {
+            try {
+                Message msg = new Message();
+                msg.what = MSG_RETRY;
+                if(mHandler.hasMessages(msg.what)){
+                    mHandler.removeMessages(msg.what);
+                }
+            }catch (Throwable t){
+            }
+
+        }
+
     }
 
     private Context mContext = null;
@@ -497,8 +539,7 @@ public class MessageDispatcher {
     protected static final int MSG_LOCATION = 0x08;
     protected static final int MSG_OC_INFO = 0x09;
     protected static final int MSG_UPLOAD = 0x0a;
-    //    protected static final int MSG_OC_COUNT = 0x0b;
-//    protected static final int MSG_DB_DEALY = 0x0e;
     protected static final int MSG_CHECK_RETRY = 0x0d;
-
+    private static final int MSG_CHECK = 0x0b;
+    private static final int MSG_RETRY = 0x0e;
 }

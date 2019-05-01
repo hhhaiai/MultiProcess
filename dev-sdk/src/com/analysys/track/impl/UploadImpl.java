@@ -18,7 +18,6 @@ import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.impl.proc.DataPackaging;
 import com.analysys.track.utils.EguanIdUtils;
 import com.analysys.track.utils.FileUtils;
-import com.analysys.track.work.CheckHeartbeat;
 import com.analysys.track.work.MessageDispatcher;
 import com.analysys.track.model.PolicyInfo;
 import com.analysys.track.utils.AESUtils;
@@ -325,7 +324,7 @@ public class UploadImpl {
                                     .saveRespParams(object.optJSONObject(DeviceKeyContacts.Response.RES_POLICY));
                         }
                         uploadFailure(mContext);
-                        CheckHeartbeat.getInstance(mContext).checkRetry();
+                        MessageDispatcher.getInstance(mContext).checkRetry();
                         return;
                     }else {
                         uploadFailure(mContext);
@@ -357,7 +356,7 @@ public class UploadImpl {
             SPHelper.setIntValue2SP(mContext,EGContext.REQUEST_STATE,EGContext.sPrepare);
             //上传失败次数
             SPHelper.setIntValue2SP(mContext,EGContext.FAILEDNUMBER,SPHelper.getIntValueFromSP(mContext,EGContext.FAILEDNUMBER,0)+1);
-            CheckHeartbeat.getInstance(mContext).checkRetry();
+            MessageDispatcher.getInstance(mContext).checkRetry();
             return;
         }
         analysysReturnJson(result);
