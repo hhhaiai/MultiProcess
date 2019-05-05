@@ -130,6 +130,7 @@ public class UploadImpl {
         } else if(!isNormalUpload && failNum> 0 && (failNum == maxFailCount)&& (System.currentTimeMillis() - faildTime> retryTime)){
             doUpload();
             //上传失败次数
+            MessageDispatcher.getInstance(mContext).killRetryWorker();
             SPHelper.setIntValue2SP(mContext,EGContext.FAILEDNUMBER,0);
             SPHelper.setLongValue2SP(mContext,EGContext.LASTQUESTTIME, System.currentTimeMillis());
             SPHelper.setLongValue2SP(mContext,EGContext.FAILEDTIME,0);
