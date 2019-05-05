@@ -37,7 +37,6 @@ public class AnalysysReceiver extends BroadcastReceiver {
     private static boolean isSnapShotUpdateBroadCastHandled = false;
     private static boolean isBatteryBroadCastHandled = false;
     private static boolean isBootBroadCastHandled = false;
-    private AnalysysReceiver(){}
     public static AnalysysReceiver getInstance() {
         return AnalysysReceiver.Holder.INSTANCE;
     }

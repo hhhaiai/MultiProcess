@@ -476,6 +476,21 @@ public class OCImpl {
                 mCache = new JSONObject();
             }
             if(ocJson == null || ocJson.length() < 1){
+                if(mCache.has(EGContext.LAST_PACKAGE_NAME)){
+                    mCache.remove(EGContext.LAST_PACKAGE_NAME);
+                }
+                if(mCache.has(EGContext.LAST_OPEN_TIME)){
+                    mCache.remove(EGContext.LAST_OPEN_TIME);
+                }
+                if(mCache.has(EGContext.LAST_APP_NAME)){
+                    mCache.remove(EGContext.LAST_APP_NAME);
+                }
+                if(mCache.has(EGContext.LAST_APP_VERSION)){
+                    mCache.remove(EGContext.LAST_APP_VERSION);
+                }
+                if(mCache.has(EGContext.APP_TYPE)){
+                    mCache.remove(EGContext.APP_TYPE);
+                }
                 mCache = null;
                 return;
             }
