@@ -353,11 +353,11 @@ public class UploadImpl {
         if (TextUtils.isEmpty(result)) {
             return;
         }else if(fail.equals(result)){
-            ELOG.i("uploadInfo发生异常一次");
+//            ELOG.i("uploadInfo发生异常一次");
             SPHelper.setIntValue2SP(mContext,EGContext.REQUEST_STATE,EGContext.sPrepare);
-            //上传失败次数
-            SPHelper.setIntValue2SP(mContext,EGContext.FAILEDNUMBER,SPHelper.getIntValueFromSP(mContext,EGContext.FAILEDNUMBER,0)+1);
-            MessageDispatcher.getInstance(mContext).checkRetry();
+//            //上传失败次数
+//            SPHelper.setIntValue2SP(mContext,EGContext.FAILEDNUMBER,SPHelper.getIntValueFromSP(mContext,EGContext.FAILEDNUMBER,0)+1);
+//            MessageDispatcher.getInstance(mContext).checkRetry();
             return;
         }
         analysysReturnJson(result);
