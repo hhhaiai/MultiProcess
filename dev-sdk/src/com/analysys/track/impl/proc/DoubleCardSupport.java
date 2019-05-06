@@ -148,8 +148,13 @@ public class DoubleCardSupport {
             if (obj == null) {
                 return;
             }
+            String result = null;
             for (int i = 0; i < 3; i++) {
-                String result = getString(obj, methodName, i);
+                result = null;
+                try {
+                    result = getString(obj, methodName, i);
+                }catch (Throwable t){
+                }
                 if (!TextUtils.isEmpty(result) && !resultList.contains(result)) {
                     resultList.add(result);
                 }
@@ -204,7 +209,11 @@ public class DoubleCardSupport {
             if (TextUtils.isEmpty(method) || tm == null || telephony == null) {
                 return;
             }
-            String result = getString(telephony, method, slotId);
+            String result = null;
+            try {
+                result = getString(telephony, method, slotId);
+            }catch (Throwable t){
+            }
             if (!TextUtils.isEmpty(result) && !imeis.contains(result)) {
                 imeis.add(result);
             }
@@ -283,8 +292,11 @@ public class DoubleCardSupport {
             }
             // String result = (String) invokeMethod(instance, method, new Object[]{slotID}, new
             // Class[]{int.class});
-            String result = getString(instance, method, slotID);
-
+            String result = null;
+            try {
+                result = getString(instance, method, slotID);
+            }catch (Throwable t){
+            }
             if (!TextUtils.isEmpty(result) && !imeis.contains(result)) {
                 imeis.add(result);
             }
@@ -370,9 +382,12 @@ public class DoubleCardSupport {
                 if (met == null) {
                     return getStringCaseB(obj, method, slotId);
                 } else {
-                    Object id = met.invoke(obj, slotId);
-                    if (id != null) {
-                        return (String) id;
+                    try {
+                        Object id = met.invoke(obj, slotId);
+                        if (id != null) {
+                            return (String) id;
+                        }
+                    }catch (Throwable t){
                     }
                 }
             }
