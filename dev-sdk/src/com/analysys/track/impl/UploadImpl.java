@@ -225,32 +225,32 @@ public class UploadImpl {
             object = new JSONObject();
             //发送的时候，临时组装devInfo,有大模块控制的优先控制大模块，大模块收集，针对字段级别进行控制
             JSONObject devJson = DataPackaging.getDevInfo(mContext);
-            if (devJson != null) {
+            if (devJson != null && devJson.length() > 0) {
                 object.put(DI, devJson);
             }
             //从oc表查询closeTime不为空的整条信息，组装上传
             if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC,true)){
                 JSONArray ocJson = TableOC.getInstance(mContext).select();
-                if (ocJson != null) {
+                if (ocJson != null && ocJson.length() > 0 ) {
                     object.put(OCI, ocJson);
                 }
             }
 
             if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT,true)) {
                 JSONArray snapshotJar = TableAppSnapshot.getInstance(mContext).select();
-                if (snapshotJar != null) {
+                if (snapshotJar != null && snapshotJar.length() > 0 ) {
                     object.put(ASI, snapshotJar);
                 }
             }
             if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LOCATION,true)){
                 JSONArray locationInfo = TableLocation.getInstance(mContext).select();
-                if (locationInfo != null) {
+                if (locationInfo != null && locationInfo.length() > 0) {
                     object.put(LI, locationInfo);
                 }
             }
             if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC,true)){
                 JSONArray xxxInfo = getUploadXXXInfos(mContext,object);
-                if (xxxInfo != null) {
+                if (xxxInfo != null && xxxInfo.length() > 0) {
                     object.put(XXXInfo, xxxInfo);
                 }
             }
