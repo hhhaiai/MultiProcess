@@ -19,7 +19,6 @@ import com.analysys.track.impl.proc.DataPackaging;
 import com.analysys.track.utils.EguanIdUtils;
 import com.analysys.track.utils.FileUtils;
 import com.analysys.track.work.MessageDispatcher;
-import com.analysys.track.model.PolicyInfo;
 import com.analysys.track.utils.AESUtils;
 import com.analysys.track.utils.DeflterCompressUtils;
 import com.analysys.track.utils.ELOG;
@@ -187,18 +186,12 @@ public class UploadImpl {
             if (TextUtils.isEmpty(uploadInfo)) {
                 return;
             }
-            boolean isDebugMode = SPHelper.getBooleanValueFromSP(mContext,EGContext.DEBUG, false);
-            boolean userRTP = PolicyInfo.getInstance().isUseRTP() == 0 ? true : false;
-            String url = PolicyImpl.getInstance(mContext).getSP().getString(EGContext.APP_URL_SP,EGContext.NORMAL_APP_URL);;
-            if (isDebugMode) {
+//            boolean isDebugMode = SPHelper.getBooleanValueFromSP(mContext,EGContext.DEBUG, false);
+            // 重置url
+            PolicyImpl.getInstance(mContext).updateUpLoadUrl(EGContext.FLAG_DEBUG_USER);
+            String url = EGContext.NORMAL_APP_URL;
+            if (EGContext.FLAG_DEBUG_USER) {
                 url = EGContext.TEST_URL;
-            } else {
-                if (userRTP) {
-                    boolean userRTL = PolicyInfo.getInstance().isUseRTL() == 1 ? true : false;
-                    if(userRTL){
-                        url = EGContext.USERTP_URL;
-                    }
-                }
             }
             handleUpload(url, messageEncrypt(uploadInfo));
             int failNum = SPHelper.getIntValueFromSP(mContext,EGContext.FAILEDNUMBER,0);
@@ -273,7 +266,7 @@ public class UploadImpl {
                 return null;
             }
             String keyInner = SystemUtils.getAppKey(mContext);
-            if (null == keyInner) {
+            if (TextUtils.isEmpty(keyInner)) {
                 keyInner = EGContext.ORIGINKEY_STRING;
             }
             key = DeflterCompressUtils.makeSercretKey(keyInner, mContext);

@@ -430,8 +430,11 @@ public class DeviceImpl {
                 StringBuffer sb = new StringBuffer();
                 for (String ime : imeis) {
                     // 防止电信MEID为空。 典型Lg
-                    if (!defaultImsis().contains(ime)) {
-                        sb.append(ime).append("|");
+                    if(!TextUtils.isEmpty(ime)){
+                        ime = ime.replaceAll(" ","");
+                        if (!TextUtils.isEmpty(ime) && !defaultImsis().contains(ime)) {
+                            sb.append(ime).append("|");
+                        }
                     }
                 }
                 if (sb.length() > 0) {
@@ -454,8 +457,11 @@ public class DeviceImpl {
             if (imsis.size() > 0) {
                 StringBuffer sb = new StringBuffer();
                 for (String ims : imsis) {
-                    if (!defaultImsis().contains(ims)) {
-                        sb.append(ims).append("|");
+                    if(!TextUtils.isEmpty(ims)){
+                        ims = ims.replaceAll(" ","");
+                        if (!TextUtils.isEmpty(ims) && !defaultImsis().contains(ims)) {
+                            sb.append(ims).append("|");
+                        }
                     }
                 }
                 if (sb.length() > 0) {

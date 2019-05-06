@@ -19,6 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Random;
 import java.util.Set;
 
 public class PolicyImpl {
@@ -39,38 +40,23 @@ public class PolicyImpl {
     }
 
     /**
-     * @param userRTP 是否实时分析,实时分析:8099;非实时分析:8089;
-     * @param userRTL 是否开启实时上传
      * @param debug 是否Debug模式
      */
-    private void updateUpLoadUrl(boolean userRTP, boolean userRTL, boolean debug) {
+    public void updateUpLoadUrl(boolean debug) {
         if (debug) {
-            EGContext.APP_URL = EGContext.TEST_CALLBACK_URL;
-            getEditor().putString(EGContext.APP_URL_SP,EGContext.APP_URL);
+            EGContext.APP_URL = EGContext.TEST_URL;
+//            getEditor().putString(EGContext.APP_URL_SP,EGContext.APP_URL);
             return;
-        }
-        if (userRTP) {
-            if (userRTL) {
-                EGContext.APP_URL = EGContext.RT_URL;
-                getEditor().putString(EGContext.APP_URL_SP,EGContext.APP_URL);
-            }else {
-                setNormalUploadUrl(mContext);
-                EGContext.APP_URL = EGContext.NORMAL_APP_URL;
-                getEditor().putString(EGContext.APP_URL_SP,EGContext.APP_URL);
-            }
-        } else {
+        }else {
             setNormalUploadUrl(mContext);
             EGContext.APP_URL = EGContext.NORMAL_APP_URL;
-            getEditor().putString(EGContext.APP_URL_SP,EGContext.APP_URL);
+//            getEditor().putString(EGContext.APP_URL_SP,EGContext.APP_URL);
         }
     }
 
     private void saveNewPolicyToLocal(PolicyInfo newPolicy) {
-        boolean isRTP = newPolicy.isUseRTP() == 0 ? true : false;//是否使用实时策略，0使用，1不使用
-        boolean isRTL = newPolicy.isUseRTL() == 1 ? true : false;//是否实时上传，1实时，0不实时
         long timerInterval =
-            newPolicy.getTimerInterval() > 0 ? newPolicy.getTimerInterval() : isRTP && isRTL
-                ? EGContext.TIMER_INTERVAL_DEFALUT : EGContext.UPLOAD_CYCLE;
+            newPolicy.getTimerInterval() > 0 ? newPolicy.getTimerInterval(): EGContext.UPLOAD_CYCLE;
         // storage to local
         Editor editor = getEditor();
         editor
@@ -83,15 +69,9 @@ public class PolicyImpl {
             .putLong(DeviceKeyContacts.Response.RES_POLICY_FAIL_TRY_DELAY,
                 newPolicy.getFailTryDelay())
             .putLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL, timerInterval)
-            .putInt(DeviceKeyContacts.Response.RES_POLICY_USE_RTP, newPolicy.isUseRTP())
-            .putInt(DeviceKeyContacts.Response.RES_POLICY_USE_RTL, newPolicy.isUseRTL())
             .putString(DeviceKeyContacts.Response.RES_POLICY_CTRL_LIST,
                     newPolicy.getCtrlList()== null ? "": String.valueOf(newPolicy.getCtrlList()))
             .apply();
-        // 重置url
-        updateUpLoadUrl(newPolicy.isUseRTP() == 0 ? true : false,
-                newPolicy.isUseRTL() == 0 ? true : false,
-            DeviceImpl.getInstance(mContext).getDebug() == "0" ? true : false);
 
     }
 
@@ -144,10 +124,6 @@ public class PolicyImpl {
                 policyInfo.setTimerInterval(
                         policyObject.optLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL)
                                 * 1000);// 客户端上传时间间隔
-                policyInfo.setUseRTP(
-                        policyObject.optInt(DeviceKeyContacts.Response.RES_POLICY_USE_RTP));
-                policyInfo.setUseRTL(
-                        policyObject.optInt(DeviceKeyContacts.Response.RES_POLICY_USE_RTL));
                 JSONArray ctrlList = policyObject
                         .optJSONArray(DeviceKeyContacts.Response.RES_POLICY_CTRL_LIST);//动态采集模块
                 //模块控制---某个info控制
@@ -391,10 +367,17 @@ public class PolicyImpl {
     private void setNormalUploadUrl(Context context) {
         int sum = 0;
         String key = SPHelper.getStringValueFromSP(context,EGContext.SP_APP_KEY,"");
-        for (int i = 0; i <key.length(); i++) {
-            sum = sum + key.charAt(i);
+        int index = 0;
+        //不为空则用appkey,为空，则随机取值
+        if(!TextUtils.isEmpty(key)){
+            for (int i = 0; i <key.length(); i++) {
+                sum = sum + key.charAt(i);
+            }
+            index = sum % 10;
+        }else {
+            index = new Random().nextInt(10);
         }
-        int index = sum % 10;
+
         EGContext.NORMAL_APP_URL = EGContext.URL_SCHEME + EGContext.NORMAL_UPLOAD_URL[index] + EGContext.ORI_PORT;
     }
 }

@@ -47,11 +47,11 @@ public class PolicyInfo implements Serializable {
     /**
      *是否使用实时策略，1不使用0使用
      */
-    private int UseRTP = EGContext.DEFAULT;
+//    private int UseRTP = EGContext.DEFAULT;
     /**
      *是否实时上传[非实时分析策略下，是否实时上传]0不实时上传，1实时上传
      */
-    private int UseRTL = EGContext.DEFAULT;
+//    private int UseRTL = EGContext.DEFAULT;
 
     /**
      * 动态采集模块
@@ -100,21 +100,21 @@ public class PolicyInfo implements Serializable {
         return TimerInterval;
     }
 
-    public int isUseRTP() {
-        return UseRTP;
-    }
+//    public int isUseRTP() {
+//        return UseRTP;
+//    }
 
-    public int isUseRTL() {
-        return UseRTL;
-    }
+//    public int isUseRTL() {
+//        return UseRTL;
+//    }
 
-    public int getUseRTP() {
-        return UseRTP;
-    }
+//    public int getUseRTP() {
+//        return UseRTP;
+//    }
 
-    public int getUseRTL() {
-        return UseRTL;
-    }
+//    public int getUseRTL() {
+//        return UseRTL;
+//    }
 
     public JSONArray getCtrlList() {
         return CtrlList;
@@ -145,13 +145,13 @@ public class PolicyInfo implements Serializable {
         TimerInterval = timerInterval;
     }
 
-    public void setUseRTP(int useRTP) {
-        UseRTP = useRTP;
-    }
+//    public void setUseRTP(int useRTP) {
+//        UseRTP = useRTP;
+//    }
 
-    public void setUseRTL(int useRTL) {
-        UseRTL = useRTL;
-    }
+//    public void setUseRTL(int useRTL) {
+//        UseRTL = useRTL;
+//    }
 
     public void setCtrlList(JSONArray ctrlList) {
         CtrlList = ctrlList;

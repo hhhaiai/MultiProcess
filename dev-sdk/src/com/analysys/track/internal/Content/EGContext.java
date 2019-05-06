@@ -116,17 +116,14 @@ public class EGContext {
     /**
      * 测试回传接口.Debug模式
      */
-    public final static String TEST_CALLBACK_PORT = ":8089";
-    /**
-     * 实时域名
-     */
-    public static final String RT_DOMAIN_NAME = "rt101.analysys.cn";
-    public static final String USERTP_URL = URL_SCHEME + RT_DOMAIN_NAME + RT_PORT;
+    public final static String TEST_CALLBACK_PORT = ":10031";
+
+//    public static final String RT_DOMAIN_NAME = "rt101.analysys.cn";
+//    public static final String USERTP_URL = URL_SCHEME + RT_DOMAIN_NAME + RT_PORT;
     /**
      * 测试域名
      */
-    // public static final String TEST_CALLBACK_DOMAIN_NAME = "192.168.220.167";
-    public static final String TEST_CALLBACK_DOMAIN_NAME = "192.168.8.150";
+    public static final String TEST_CALLBACK_DOMAIN_NAME = "apptest.analysys.cn";
     /**
      * 非实时上传是,使用的域名池,以urd开始的为设备上传接口
      */
@@ -143,19 +140,11 @@ public class EGContext {
                "urd025.analysys.cn", // 9
                "urd339.analysys.cn"// 头部应用 用作测试
             };
-    /**
-     * 实时计算接口
-     */
-    public static final String RT_URL = URL_SCHEME + RT_DOMAIN_NAME + RT_PORT;
-    /**
-     * 测试回传接口
-     */
-    public static final String TEST_CALLBACK_URL =
-            URL_SCHEME + TEST_CALLBACK_DOMAIN_NAME + TEST_CALLBACK_PORT;
+
     public static final String TEST_URL =
             URL_SCHEME + TEST_CALLBACK_DOMAIN_NAME + TEST_CALLBACK_PORT;
     public static String NORMAL_APP_URL = EGContext.URL_SCHEME + EGContext.NORMAL_UPLOAD_URL[0] + EGContext.ORI_PORT;
-    public static final String APP_URL_SP = "app_url_sp";
+//    public static final String APP_URL_SP = "app_url_sp";
 
     public static final String ORIGINKEY_STRING = "analysys";
     public static final String EGUANFILE = "eg.a";

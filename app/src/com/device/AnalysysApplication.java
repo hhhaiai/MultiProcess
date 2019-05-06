@@ -32,6 +32,6 @@ public class AnalysysApplication extends Application {
 
         super.onCreate();
         AnalysysTracker.init(this, "7752552892442721d", "WanDouJia");
-        AnalysysTracker.setDebugMode(this,true);
+        AnalysysTracker.setDebugMode(true);
     }
 }
