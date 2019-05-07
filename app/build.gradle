@@ -80,5 +80,5 @@ dependencies {
     implementation 'com.amitshekhar.android:debug-db:1.0.6'
     //    implementation 'com.amitshekhar.android:debug-db-base:1.0.6'
     //    implementation 'com.amitshekhar.android:debug-db-encrypt:1.0.6'
-    implementation files('libs/analysys_track_v4.3.0.0_20190507.jar')
+    implementation project(':dev-sdk')
 }

@@ -135,8 +135,12 @@ public class LocationImpl {
             return false;
         }
         //是否可以去获取权限
-        if (!PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
-                && !PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
+        if(canCheckPermission(mContext)){
+            if (!PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
+                    && !PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                return false;
+            }
+        }else {
             return false;
         }
         List<String> pStrings = this.locationManager.getProviders(true);
@@ -165,7 +169,34 @@ public class LocationImpl {
         }
         return true;
     }
-
+    private static int permissionAskCount = 0;
+    private boolean canCheckPermission(Context context){
+        try {
+            if(context == null){
+                return false;
+            }
+            String day = SystemUtils.getDay();
+            String spDay = SPHelper.getStringValueFromSP(context,EGContext.PERMISSION_TIME,"-1");
+            if(permissionAskCount == 0){
+                permissionAskCount = SPHelper.getIntValueFromSP(context,EGContext.PERMISSION_COUNT,0);
+            }
+            if(spDay.equals(day) && permissionAskCount > 5){
+                return false;
+            }
+            //如果是当天，则累加，并将当前count存sp；否则，则置零，重新累加。即，一天只能有5次申请授权
+            if(spDay.equals(day)){
+                permissionAskCount += 1;
+                SPHelper.setIntValue2SP(context,EGContext.PERMISSION_COUNT,permissionAskCount);
+            }else{
+                permissionAskCount += 1;
+                SPHelper.setStringValue2SP(context,EGContext.PERMISSION_TIME,day);
+                SPHelper.setIntValue2SP(context,EGContext.PERMISSION_COUNT,permissionAskCount);
+            }
+            return true;
+        }catch (Throwable t){
+        }
+        return false;
+    }
 
     /**
      * 缓存地理位置信息数据

@@ -59,7 +59,7 @@ public class DeviceImpl {
 
     private final String ZERO = "0";
     private final String ONE = "1";
-    private final String[] IMSIS = {"00000000000000", "00000000", "000000000000000", "00000"};
+    private final String[] inEffectiveValue = {"00000000000000", "00000000", "000000000000000", "00000"};
 
     private DeviceImpl() {
     }
@@ -403,8 +403,11 @@ public class DeviceImpl {
         } catch (Throwable t) {
             operatorCode = "";
         }
-        if ("00000".equals(operatorCode)) {
-            operatorCode = "";
+        for (String code : inEffectiveValue) {
+            if (code.equals(operatorCode)) {
+                operatorCode = "";
+                break;
+            }
         }
         return operatorCode;
     }
@@ -486,7 +489,7 @@ public class DeviceImpl {
 
     private Set<String> defaultImsis() {
         Set<String> imsis = new HashSet<String>();
-        for (String imsi : IMSIS) {
+        for (String imsi : inEffectiveValue) {
             imsis.add(imsi);
         }
         return imsis;
