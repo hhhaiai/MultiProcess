@@ -1,39 +1,5 @@
 package com.analysys.track.impl;
 
-import static java.lang.Runtime.getRuntime;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
-import java.lang.reflect.Method;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.TimeZone;
-
-import com.analysys.track.impl.proc.DoubleCardSupport;
-import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.model.BatteryModuleNameInfo;
-import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.FileUtils;
-
-import com.analysys.track.utils.NetworkUtils;
-import com.analysys.track.utils.PermissionUtils;
-import com.analysys.track.utils.SystemUtils;
-
-import com.analysys.track.utils.reflectinon.EContextHelper;
-import com.analysys.track.utils.sp.SPHelper;
-
 import android.Manifest;
 import android.Manifest.permission;
 import android.annotation.TargetApi;
@@ -56,14 +22,48 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 
+import com.analysys.track.impl.proc.DoubleCardSupport;
+import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.model.BatteryModuleNameInfo;
+import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.FileUtils;
+import com.analysys.track.utils.NetworkUtils;
+import com.analysys.track.utils.PermissionUtils;
+import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.reflectinon.EContextHelper;
+import com.analysys.track.utils.sp.SPHelper;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.lang.reflect.Method;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.security.MessageDigest;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.TimeZone;
+
+import static java.lang.Runtime.getRuntime;
+
 public class DeviceImpl {
 
     private Context mContext;
 
     private final String ZERO = "0";
     private final String ONE = "1";
-    private final String[] IMSIS = {"00000000000000", "00000000","000000000000000"};
-    private DeviceImpl(){}
+    private final String[] IMSIS = {"00000000000000", "00000000", "000000000000000", "00000"};
+
+    private DeviceImpl() {
+    }
+
     private static class Holder {
         private static final DeviceImpl INSTANCE = new DeviceImpl();
     }
@@ -117,14 +117,14 @@ public class DeviceImpl {
             if (mContext != null) {
                 String imei = "", imsi = "";
                 if (PermissionUtils.checkPermission(mContext, Manifest.permission.READ_PHONE_STATE)) {
-                    TelephonyManager tm = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
+                    TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
                     imei = tm.getDeviceId();
                     imsi = tm.getSubscriberId();
                 }
                 String androidId = android.provider.Settings.System.getString(mContext.getContentResolver(),
-                    Settings.Secure.ANDROID_ID);
+                        Settings.Secure.ANDROID_ID);
                 deviceId = (TextUtils.isEmpty(imei) ? "null" : imei) + "-" + (TextUtils.isEmpty(imsi) ? "null" : imsi)
-                    + "-" + (TextUtils.isEmpty(androidId) ? "null" : androidId);
+                        + "-" + (TextUtils.isEmpty(androidId) ? "null" : androidId);
             }
         } catch (Throwable t) {
             deviceId = "";
@@ -148,9 +148,9 @@ public class DeviceImpl {
 
     private final String DEFALT_MAC = "";
     private final String[] FILE_LIST =
-        {Base64.encodeToString("/sys/class/net/wlan0/address".getBytes(), Base64.DEFAULT),
-            Base64.encodeToString("/sys/class/net/eth0/address".getBytes(), Base64.DEFAULT),
-            Base64.encodeToString("/sys/devices/virtual/net/wlan0/address".getBytes(), Base64.DEFAULT)};
+            {Base64.encodeToString("/sys/class/net/wlan0/address".getBytes(), Base64.DEFAULT),
+                    Base64.encodeToString("/sys/class/net/eth0/address".getBytes(), Base64.DEFAULT),
+                    Base64.encodeToString("/sys/devices/virtual/net/wlan0/address".getBytes(), Base64.DEFAULT)};
 
     /**
      * MAC 地址
@@ -177,7 +177,7 @@ public class DeviceImpl {
         }
 
         if (!mac.equals(DEFALT_MAC)) {
-            SPHelper.setStringValue2SP(mContext,EGContext.SP_MAC_ADDRESS, mac);
+            SPHelper.setStringValue2SP(mContext, EGContext.SP_MAC_ADDRESS, mac);
         }
         return mac;
     }
@@ -188,7 +188,7 @@ public class DeviceImpl {
     private String getMacByAndridAPI() {
         String macAddress = "";
         try {
-            WifiManager wifi = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
+            WifiManager wifi = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
             if (PermissionUtils.checkPermission(mContext, permission.ACCESS_WIFI_STATE)) {
                 WifiInfo info = wifi.getConnectionInfo();
                 macAddress = info.getMacAddress();
@@ -256,7 +256,7 @@ public class DeviceImpl {
                     }
                 }
             } catch (IOException e) {
-                if(EGContext.FLAG_DEBUG_INNER){
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.e(e);
                 }
             } finally {
@@ -288,7 +288,7 @@ public class DeviceImpl {
                 }
             }
         } catch (Exception e) {
-            if(EGContext.FLAG_DEBUG_INNER){
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
         } finally {
@@ -319,7 +319,7 @@ public class DeviceImpl {
 
                 Class<?> clazz = Class.forName("android.os");
                 Method method = clazz.getMethod("getSerial");
-                result = (String)method.invoke(null);
+                result = (String) method.invoke(null);
             } else {
                 result = Build.SERIAL;
             }
@@ -370,7 +370,7 @@ public class DeviceImpl {
     public String getMobileOperator() {
         String operatorName = "";
         try {
-            TelephonyManager tm = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
+            TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
             operatorName = tm.getSimOperator();
         } catch (Throwable e) {
         }
@@ -383,7 +383,7 @@ public class DeviceImpl {
     public String getMobileOperatorName() {
         String operatorName = "";
         try {
-            TelephonyManager tm = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
+            TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
             operatorName = tm.getSimOperatorName();
         } catch (Throwable e) {
             operatorName = "";
@@ -397,13 +397,13 @@ public class DeviceImpl {
     public String getNetworkOperatorCode() {
         String operatorCode = "";
         try {
-            TelephonyManager tm = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
+            TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
             operatorCode = tm.getNetworkOperator();
 
         } catch (Throwable t) {
             operatorCode = "";
         }
-        if ("00000".equals(operatorCode)){
+        if ("00000".equals(operatorCode)) {
             operatorCode = "";
         }
         return operatorCode;
@@ -415,7 +415,7 @@ public class DeviceImpl {
     public String getNetworkOperatorName() {
         String operatorCode = "";
         try {
-            TelephonyManager tm = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
+            TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
             operatorCode = tm.getNetworkOperatorName();
         } catch (Throwable t) {
             operatorCode = "";
@@ -428,14 +428,13 @@ public class DeviceImpl {
      */
     public String getIMEIS(Context context) {
         try {
-            List<String> imeis = new ArrayList<String>();
-            DoubleCardSupport.getIMEIS(context, imeis);
+            List<String> imeis = DoubleCardSupport.getIMEIS(context);
             if (imeis != null && imeis.size() > 0) {
                 StringBuffer sb = new StringBuffer();
                 for (String ime : imeis) {
                     // 防止电信MEID为空。 典型Lg
-                    if(!TextUtils.isEmpty(ime)){
-                        ime = ime.replaceAll(" ","");
+                    if (!TextUtils.isEmpty(ime)) {
+                        ime = ime.replaceAll(" ", "");
                         if (!TextUtils.isEmpty(ime) && !defaultImsis().contains(ime)) {
                             sb.append(ime).append("|");
                         }
@@ -456,13 +455,12 @@ public class DeviceImpl {
      */
     public String getIMSIS(Context context) {
         try {
-            List<String> imsis = new ArrayList<String>();
-            DoubleCardSupport.getIMSIS(context, imsis);
+            List<String> imsis = DoubleCardSupport.getIMSIS(context);
             if (imsis != null && imsis.size() > 0) {
                 StringBuffer sb = new StringBuffer();
                 for (String ims : imsis) {
-                    if(!TextUtils.isEmpty(ims)){
-                        ims = ims.replaceAll(" ","");
+                    if (!TextUtils.isEmpty(ims)) {
+                        ims = ims.replaceAll(" ", "");
                         if (!TextUtils.isEmpty(ims) && !defaultImsis().contains(ims)) {
                             sb.append(ims).append("|");
                         }
@@ -485,13 +483,15 @@ public class DeviceImpl {
     public String getApplicationChannel() {
         return SystemUtils.getAppChannel(mContext);
     }
-    private Set<String> defaultImsis(){
+
+    private Set<String> defaultImsis() {
         Set<String> imsis = new HashSet<String>();
-        for(String imsi : IMSIS){
+        for (String imsi : IMSIS) {
             imsis.add(imsi);
         }
         return imsis;
     }
+
     /**
      * 样本应用key
      */
@@ -509,7 +509,7 @@ public class DeviceImpl {
         try {
             PackageManager packageManager = mContext.getApplicationContext().getPackageManager();
             ApplicationInfo applicationInfo = packageManager.getApplicationInfo(mContext.getPackageName(), 0);
-            return (String)packageManager.getApplicationLabel(applicationInfo);
+            return (String) packageManager.getApplicationLabel(applicationInfo);
         } catch (Throwable e) {
         }
         return UNKNOW;
@@ -617,7 +617,7 @@ public class DeviceImpl {
         try {
             PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0);
             ApplicationInfo appinfo = packageInfo.applicationInfo;
-            if (0 != (appinfo.flags & ApplicationInfo.FLAG_DEBUGGABLE)){
+            if (0 != (appinfo.flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
                 return ZERO;
             }
         } catch (Exception e) {
@@ -726,7 +726,7 @@ public class DeviceImpl {
 
     /**
      * 系统字体大小
-     * 
+     *
      * @return
      */
     public String getSystemFontSize() {
@@ -735,7 +735,7 @@ public class DeviceImpl {
             Class<?> activityManagerNative = Class.forName("android.app.ActivityManagerNative");
             Object obj = activityManagerNative.getMethod("getDefault").invoke(activityManagerNative);
             Method method = obj.getClass().getMethod("getConfiguration");
-            mCurConfig = (Configuration)method.invoke(obj);
+            mCurConfig = (Configuration) method.invoke(obj);
             return mCurConfig.fontScale + "";
         } catch (Throwable e) {
             return "0";
@@ -903,19 +903,21 @@ public class DeviceImpl {
         }
 
     }
-    public String getBuildSdkInt(){
+
+    public String getBuildSdkInt() {
         try {
             return String.valueOf(Build.VERSION.SDK_INT);
-        }catch (Throwable t){
+        } catch (Throwable t) {
             return "";
         }
 
     }
-    public String getBuildPreviewSdkInt(){
+
+    public String getBuildPreviewSdkInt() {
         String value = "";
         try {
             value = String.valueOf(Build.VERSION.PREVIEW_SDK_INT);
-        }catch (Throwable t){
+        } catch (Throwable t) {
             value = "";
         }
         return value;
@@ -940,12 +942,12 @@ public class DeviceImpl {
                     try {
                         AdvertisingIdClient.AdInfo adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);// 阻塞调用，需放在子线程处理
                         String advertisingId = adInfo.getId();
-                        SPHelper.setStringValue2SP(mContext,EGContext.SP_APP_IDFA, advertisingId);
+                        SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_IDFA, advertisingId);
                     } catch (Exception e) {
                     }
                 }
             }).start();
-            idfa = SPHelper.getStringValueFromSP(mContext,EGContext.SP_APP_IDFA, "");
+            idfa = SPHelper.getStringValueFromSP(mContext, EGContext.SP_APP_IDFA, "");
             if (!idfa.isEmpty()) {
                 return idfa;
             }
