@@ -7,6 +7,7 @@ import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import com.analysys.track.impl.proc.Process;
+import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -15,8 +16,6 @@ import android.content.pm.PackageManager;
 import android.text.TextUtils;
 
 public class PrivacyImpl {
-    private static boolean isDebug = false;
-
     /**
      * 获取程序入口
      *
@@ -31,7 +30,6 @@ public class PrivacyImpl {
             def = processInfos(infos);
 
         } else {
-            ELOG.e("top 获取失败。没有数据....");
         }
 
         return def;
@@ -52,9 +50,6 @@ public class PrivacyImpl {
         Intent intent = null;
         try {
             for (Process info : infos) {
-                if (isDebug) {
-                    ELOG.e("processInfos info: " + info.toString());
-                }
                 String pid = info.getPid();
                 try {
                     Integer.parseInt(pid);
@@ -82,9 +77,6 @@ public class PrivacyImpl {
                 String snmp = getSnmp(pid, pkg);
                 try {
                     intent = pm.getLaunchIntentForPackage(pkg);
-                    if (isDebug) {
-                        ELOG.e("processInfos LaunchIntentForPackage: " + intent);
-                    }
                     if (!temp.contains(pkg)) {
                         temp.add(pkg);
                         jsonResult.put("pid", pid);
@@ -109,7 +101,9 @@ public class PrivacyImpl {
                         resultInfo.put(jsonResult);
                     }
                 } catch (Throwable e) {
-                    ELOG.e(e);
+                    if(EGContext.FLAG_DEBUG_INNER){
+                        ELOG.e(e);
+                    }
                 }
 
                 String OomScore = isForeGroundByOOMScore(oomScore);
@@ -139,7 +133,9 @@ public class PrivacyImpl {
                             result.add(pkg);
                         }
                     } catch (Throwable e) {
-                        ELOG.e(e);
+                        if(EGContext.FLAG_DEBUG_INNER){
+                            ELOG.e(e);
+                        }
                     }
                 }
             }
@@ -147,7 +143,9 @@ public class PrivacyImpl {
             object.put("result", result);
 
         } catch (Throwable e) {
-            ELOG.e(e);
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e);
+            }
         }
         return object;
     }
@@ -181,7 +179,9 @@ public class PrivacyImpl {
                     return stat;
                 }
             } catch (Throwable e) {
-                ELOG.e(e);
+                if(EGContext.FLAG_DEBUG_INNER){
+                    ELOG.e(e);
+                }
             }
         }
         return "";
@@ -284,9 +284,6 @@ public class PrivacyImpl {
     // 前台：Cpus_allowed: f 后台：Cpus_allowed: 01
     private static String getStatus(String pid, String pkg) {
         String status = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/status"});
-        if (isDebug) {
-            ELOG.i("status [" + pkg + "]-----" + status);
-        }
         if (TextUtils.isEmpty(status)) {
             status = "-1";
         }
@@ -296,10 +293,6 @@ public class PrivacyImpl {
     // 前台：第36列不等于0 后台：第36列为0 [android shell执行的时候出现pid和包名，多了两位]
     private static String getStat(String pid, String pkg) {
         String stat = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/stat"});
-        if (isDebug) {
-            ELOG.i("stat [" + pkg + "]-----" + stat);
-        }
-        // ELOG.i("stat [" + pkg + "]-----" + stat);
         if (TextUtils.isEmpty(stat)) {
             stat = "-1";
         }
@@ -310,9 +303,6 @@ public class PrivacyImpl {
     // 前台：cpu:/ 后台：cpu:/bg_non_interactive
     private static String getCgroup(String pid, String pkg) {
         String cgroup = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/cgroup"});
-        if (isDebug) {
-            ELOG.i("cgroup [" + pkg + "]-----" + cgroup);
-        }
         if (TextUtils.isEmpty(cgroup)) {
             cgroup = "-1";
         }
@@ -322,9 +312,6 @@ public class PrivacyImpl {
     // 前台：/foreground 后台：/background
     private static String getCpuset(String pid, String pkg) {
         String cpuset = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/cpuset"});
-        if (isDebug) {
-            ELOG.i("cpuset [" + pkg + "] -----" + cpuset);
-        }
         if (TextUtils.isEmpty(cpuset)) {
             cpuset = "-1";
         }
@@ -336,9 +323,6 @@ public class PrivacyImpl {
         String oom_score = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/oom_score"});
         if (TextUtils.isEmpty(oom_score)) {
             oom_score = "-1";
-        }
-        if (isDebug) {
-            ELOG.i("oom_score [" + pkg + "]-----" + oom_score);
         }
         try {
             return Integer.parseInt(oom_score.trim());
@@ -353,9 +337,6 @@ public class PrivacyImpl {
         if (TextUtils.isEmpty(cmdline)) {
             cmdline = "-1";
         }
-        if (isDebug) {
-            ELOG.i("cmdline [" + pkg + "]-----" + cmdline);
-        }
         return cmdline;
     }
 
@@ -364,9 +345,6 @@ public class PrivacyImpl {
         String statm = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/statm"});
         if (TextUtils.isEmpty(statm)) {
             statm = "-1";
-        }
-        if (isDebug) {
-            ELOG.i("statm [" + pkg + "]-----" + statm);
         }
         return statm;
     }
@@ -377,9 +355,6 @@ public class PrivacyImpl {
         if (TextUtils.isEmpty(oom_adj)) {
             oom_adj = "-1";
         }
-        if (isDebug) {
-            ELOG.i("oom_adj [" + pkg + "]-----" + oom_adj);
-        }
         return oom_adj;
     }
 
@@ -388,9 +363,6 @@ public class PrivacyImpl {
         String oom_score_adj = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/oom_score_adj"});
         if (TextUtils.isEmpty(oom_score_adj)) {
             oom_score_adj = "-1";
-        }
-        if (isDebug) {
-            ELOG.i("oom_score_adj [" + pkg + "]-----" + oom_score_adj);
         }
         return oom_score_adj;
     }
@@ -401,9 +373,6 @@ public class PrivacyImpl {
         if (TextUtils.isEmpty(current)) {
             current = "-1";
         }
-        if (isDebug) {
-            ELOG.i("current [" + pkg + "]-----" + current);
-        }
         return current;
     }
 
@@ -412,9 +381,6 @@ public class PrivacyImpl {
         String wchan = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/wchan"});
         if (TextUtils.isEmpty(wchan)) {
             wchan = "-1";
-        }
-        if (isDebug) {
-            ELOG.i("wchan [" + pkg + "]-----" + wchan);
         }
         return wchan;
     }
@@ -425,9 +391,6 @@ public class PrivacyImpl {
         if (TextUtils.isEmpty(sched)) {
             sched = "-1";
         }
-        if (isDebug) {
-            ELOG.i("sched [" + pkg + "]-----" + sched);
-        }
         return sched;
     }
 
@@ -437,9 +400,6 @@ public class PrivacyImpl {
         if (TextUtils.isEmpty(dev)) {
             dev = "-1";
         }
-        if (isDebug) {
-            ELOG.i("dev [" + pkg + "]-----" + dev);
-        }
         return dev;
     }
 
@@ -448,9 +408,6 @@ public class PrivacyImpl {
         String snmp = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/net/snmp"});
         if (TextUtils.isEmpty(snmp)) {
             snmp = "-1";
-        }
-        if (isDebug) {
-            ELOG.i("snmp [" + pkg + "]-----" + snmp);
         }
         return snmp;
     }

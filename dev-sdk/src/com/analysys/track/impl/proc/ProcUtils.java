@@ -19,13 +19,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * @Copyright © 2019 analysys Inc. All rights reserved.
- * @Description: 方舟进程管理
- * @Version: 1.0
- * @Create: Mar 6, 2019 8:26:31 PM
- * @Author: sanbo
- */
 public class ProcUtils {
     private static final String RUNNING_TOP = "top";
     private static final String RUNNING_PS = "ps";

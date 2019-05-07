@@ -57,7 +57,6 @@ public class AnalysysReceiver extends BroadcastReceiver {
             mContext = context.getApplicationContext();
             long currentTime = System.currentTimeMillis();
             if (PACKAGE_ADDED.equals(intent.getAction())) {
-                ELOG.d("接收到应用安装广播：" + packageName);
                 try {
                     if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_SNAP_ADD_BROADCAST,EGContext.TIME_SYNC_DEFAULT,currentTime)){
                         FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_SNAP_ADD_BROADCAST,currentTime);
@@ -77,7 +76,6 @@ public class AnalysysReceiver extends BroadcastReceiver {
 
             }
             if (PACKAGE_REMOVED.equals(intent.getAction())) {
-                ELOG.d("接收到应用卸载广播：" + packageName);
                 try {
                     if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST,EGContext.TIME_SYNC_DEFAULT,currentTime)){
                         FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST,currentTime);
@@ -96,7 +94,6 @@ public class AnalysysReceiver extends BroadcastReceiver {
                 }
             }
             if (PACKAGE_REPLACED.equals(intent.getAction())) {
-                ELOG.d("接收到应用更新广播：" + packageName);
                 try {
                     if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST,EGContext.TIME_SYNC_DEFAULT,currentTime)){
                         FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST,currentTime);
@@ -119,7 +116,6 @@ public class AnalysysReceiver extends BroadcastReceiver {
                     MessageDispatcher.getInstance(mContext).sendMessages();
                     return;
                 }
-                ELOG.e("接收开启屏幕广播");
                 //设置开锁屏的flag 用于补数逻辑
                 EGContext.SCREEN_ON = true;
                 processScreenOnOff(true);
@@ -130,7 +126,6 @@ public class AnalysysReceiver extends BroadcastReceiver {
                 }
                 EGContext.SCREEN_ON = false;
                 processScreenOnOff(false);
-                ELOG.e("接收关闭屏幕广播::::"+System.currentTimeMillis());
             }
             if (BATTERY_CHANGED.equals(intent.getAction())) {
                 try {
@@ -170,7 +165,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
             }
         }catch (Throwable t){
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(t.getMessage());
+                ELOG.e(t);
             }
         }
     }
@@ -180,18 +175,14 @@ public class AnalysysReceiver extends BroadcastReceiver {
             long currentTime = System.currentTimeMillis();
             if(on){
                 if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_SCREEN_ON_BROADCAST,EGContext.TIME_SYNC_BROADCAST,currentTime)){
-                    ELOG.e(SystemUtils.getCurrentProcessName(mContext)+"多进程进来处理一次...");
                     FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_SCREEN_ON_BROADCAST,currentTime);
                 }else {
-                    ELOG.e(SystemUtils.getCurrentProcessName(mContext)+"阻挡多进程一次...");
                     return;
                 }
             }else {
                 if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST,EGContext.TIME_SYNC_BROADCAST,currentTime)){
-                    ELOG.e(SystemUtils.getCurrentProcessName(mContext)+"多进程进来处理一次...");
                     FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST,currentTime);
                 }else {
-                    ELOG.e(SystemUtils.getCurrentProcessName(mContext)+"阻挡多进程一次...");
                     return;
                 }
             }
@@ -201,7 +192,9 @@ public class AnalysysReceiver extends BroadcastReceiver {
             }else {
                 return;
             }
-            ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"正式处理广播---------------");
+            if (EGContext.FLAG_DEBUG_INNER){
+                ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"正式处理广播---------------");
+            }
             if (SystemUtils.isMainThread()) {
                 EThreadPool.execute(new Runnable() {
                     @Override
@@ -215,7 +208,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
             }
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(e.getMessage());
+                ELOG.e(e);
             }
         }finally {
             isScreenOnOffBroadCastHandled = false;
@@ -244,10 +237,8 @@ public class AnalysysReceiver extends BroadcastReceiver {
                     return;
                 }
                 OCImpl.mLastAvailableOpenOrCloseTime = mLastCloseTime;
-                ELOG.i("接收关闭屏幕广播后存入sp的时间::::"+ mLastCloseTime);
                 OCImpl.getInstance(mContext).closeOC(false, mLastCloseTime);
             }else {//sp里取到了数据，即，非第一次锁屏，则判断是否有效数据来设置closeTime,准备入库
-                ELOG.i("非第一次锁屏，接收关闭屏幕广播后存入sp的时间::::"+ mLastCloseTime);
                 long currentTime  = System.currentTimeMillis();
                 try {
                     if(Build.VERSION.SDK_INT < 21){

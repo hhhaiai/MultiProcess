@@ -1,5 +1,7 @@
 package com.analysys.track.utils;
 
+import com.analysys.track.internal.Content.EGContext;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -46,7 +48,9 @@ public class AESUtils {
             byte[] result = cipher.doFinal(content);
             return result;
         } catch (Throwable e) {
-            ELOG.e(e.getMessage() + "   encrypt has an exception");
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
         }
 
         return null;
@@ -73,7 +77,9 @@ public class AESUtils {
             byte[] result = cipher.doFinal(content);
             return result;
         } catch (Throwable e) {
-            ELOG.i(e.getMessage() + "  decrypt has an exception");
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
         }
 
         return null;

@@ -32,7 +32,6 @@ import com.analysys.track.utils.sp.SPHelper;
 
 import android.content.Context;
 import android.os.Handler;
-import android.os.Process;
 import android.text.TextUtils;
 import android.util.Base64;
 
@@ -70,11 +69,15 @@ public class UploadImpl {
     public void upload() {
         try {
             if(EGContext.NETWORK_TYPE_NO_NET.equals(NetworkUtils.getNetworkType(mContext))){
-                ELOG.i("upload无网return，进程Id：< " + SystemUtils.getCurrentProcessName(mContext) + " >");
+                if(EGContext.FLAG_DEBUG_INNER){
+                    ELOG.i("upload无网return，进程Id：< " + SystemUtils.getCurrentProcessName(mContext) + " >");
+                }
                 return;
             }
             if (SPHelper.getIntValueFromSP(mContext,EGContext.REQUEST_STATE,0) != 0) {
-                ELOG.i("upload有正在发送的数据return，进程Id：< " + SystemUtils.getCurrentProcessName(mContext) + " >");
+                if(EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.i("upload有正在发送的数据return，进程Id：< " + SystemUtils.getCurrentProcessName(mContext) + " >");
+                }
                 return;
             }
             long currentTime = System.currentTimeMillis();
@@ -83,10 +86,8 @@ public class UploadImpl {
             if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_UPLOAD,upLoadCycle,currentTime)){
                 FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_UPLOAD,currentTime);
             }else {
-                ELOG.i("upload不符合发送轮询周期return，进程Id：< " + SystemUtils.getCurrentProcessName(mContext) + " >");
                 return;
             }
-            ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"进入upload获取.....");
             File dir = mContext.getFilesDir();
             File f = new File(dir, EGContext.DEV_UPLOAD_PROC_NAME);
             long now = System.currentTimeMillis();
@@ -95,7 +96,6 @@ public class UploadImpl {
                 long dur = now - time;
                 //Math.abs(dur)
                 if ( dur <= upLoadCycle) {
-                    ELOG.i("upload时间轮询周期不到，return，进程Id：< " + Process.myPid() + " >");
                     return;
                 }
             } else {
@@ -103,14 +103,13 @@ public class UploadImpl {
                 f.setLastModified(now);
             }
             boolean isDurOK = (now - SPHelper.getLongValueFromSP(mContext,EGContext.LASTQUESTTIME,0)) > upLoadCycle;
-             ELOG.i("---------upload发送时机符合上传条件，即将发送数据isDurOK：" + isDurOK);
             if (isDurOK) {
                 f.setLastModified(now);
                 reTryAndUpload(true);
             }
         } catch (Throwable t) {
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e("upload has an exception:::" + t.getMessage());
+                ELOG.e(t);
             }
 
         }
@@ -175,14 +174,16 @@ public class UploadImpl {
             }
         } catch (Throwable t) {
             if(EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e("发送逻辑问题" + t.getMessage());
+                ELOG.e(t);
             }
         }
     }
     private void doUploadImpl(){
         try {
             String uploadInfo = getInfo();
-            ELOG.i("发送一次uploadInfo ::::"+uploadInfo);
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.i("发送一次uploadInfo ::::"+uploadInfo);
+            }
             if (TextUtils.isEmpty(uploadInfo)) {
                 return;
             }
@@ -198,14 +199,12 @@ public class UploadImpl {
             int maxFailCount = PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT,EGContext.FAIL_COUNT_DEFALUT);
             // 3. 兼容多次分包的上传
             while (isChunkUpload && failNum < maxFailCount) {
-                ELOG.i("是否分包发送:::  " + isChunkUpload);
                 uploadInfo = getInfo();
-                ELOG.i("uploadInfo分包发送 ::::  "+uploadInfo);
                 handleUpload(url, messageEncrypt(uploadInfo));
             }
         } catch (Throwable t) {
             if(EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e("EThreadPool has an exception:::" + t.getMessage());
+                ELOG.e(t);
             }
         }
     }
@@ -217,7 +216,10 @@ public class UploadImpl {
         try {
             object = new JSONObject();
             //发送的时候，临时组装devInfo,有大模块控制的优先控制大模块，大模块收集，针对字段级别进行控制
-            JSONObject devJson = DataPackaging.getDevInfo(mContext);
+            JSONObject devJson = null;
+            try {
+                devJson = DataPackaging.getDevInfo(mContext);
+            }catch (Throwable t){}
             if (devJson != null && devJson.length() > 0) {
                 object.put(DI, devJson);
             }
@@ -249,7 +251,7 @@ public class UploadImpl {
             }
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e.getMessage() + "getInfo()");
+                ELOG.e(e);
             }
         }
         return String.valueOf(object);
@@ -278,8 +280,8 @@ public class UploadImpl {
                 return new String(returnData).replace("\n", "");
             }
         } catch (Throwable t) {
-            if(EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e("messageEncrypt has an exception." + t.getMessage());
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(t);
             }
         }
 
@@ -294,7 +296,9 @@ public class UploadImpl {
      */
     private void analysysReturnJson(String json) {
         try {
-            ELOG.i("uploadInfo返回值json::::::::" + json);
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.i("uploadInfo返回值json::::::::" + json);
+            }
             if (!TextUtils.isEmpty(json)) {
                 // 返回413，表示包太大，大于1M字节，本地直接删除
                 if (EGContext.HTTP_DATA_OVERLOAD.equals(json)) {
@@ -335,7 +339,7 @@ public class UploadImpl {
             }
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(e.getMessage());
+                ELOG.e(e);
             }
         }
     }
@@ -346,7 +350,6 @@ public class UploadImpl {
         if (TextUtils.isEmpty(result)) {
             return;
         }else if(fail.equals(result)){
-//            ELOG.i("uploadInfo发生异常一次");
             SPHelper.setIntValue2SP(mContext,EGContext.REQUEST_STATE,EGContext.sPrepare);
 //            //上传失败次数
 //            SPHelper.setIntValue2SP(mContext,EGContext.FAILEDNUMBER,SPHelper.getIntValueFromSP(mContext,EGContext.FAILEDNUMBER,0)+1);
@@ -427,7 +430,7 @@ public class UploadImpl {
             }
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e("getUploadXXXInfos :::" + e.getMessage());
+                ELOG.e(e);
             }
         }
         return arr;
@@ -447,7 +450,6 @@ public class UploadImpl {
             SPHelper.setLongValue2SP(mContext,EGContext.LASTQUESTTIME, System.currentTimeMillis());
             //重置发送失败次数与时间
             SPHelper.setIntValue2SP(mContext,EGContext.FAILEDNUMBER,0);
-            ELOG.i("uploadSuccess设置failnumber:::"+ SPHelper.getIntValueFromSP(mContext,EGContext.FAILEDNUMBER,0));
             SPHelper.setLongValue2SP(mContext,EGContext.FAILEDTIME,0);
             SPHelper.setLongValue2SP(mContext,EGContext.RETRYTIME,0);
             //上传完成回来清理数据的时候，snapshot删除卸载的，其余的统一恢复成正常值
@@ -465,7 +467,7 @@ public class UploadImpl {
             TableOC.getInstance(mContext).delete();
         }catch (Throwable t){
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(t.getMessage());
+                ELOG.e(t);
             }
         }finally {
             MessageDispatcher.getInstance(mContext).killRetryWorker();
@@ -475,7 +477,6 @@ public class UploadImpl {
      * 数据上传失败 记录信息
      */
     private void uploadFailure(Context mContext) {
-        ELOG.i("uploadFailure");
         try {
             SPHelper.setIntValue2SP(mContext,EGContext.REQUEST_STATE,EGContext.sPrepare);
             //上传失败记录上传次数
@@ -488,7 +489,7 @@ public class UploadImpl {
             SPHelper.setLongValue2SP(mContext,EGContext.RETRYTIME,time);
         }catch (Throwable t){
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(t.getMessage());
+                ELOG.e(t);
             }
         }
 

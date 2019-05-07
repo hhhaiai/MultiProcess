@@ -30,7 +30,7 @@ public class MyServiceA extends Service {
                     while (true) {
                         try {
                             Thread.sleep(1000);
-                            Log.i("servive.test", "。。。。。" + mClassName + "。。。");
+//                            Log.i("servive.test", "。。。。。" + mClassName + "。。。");
                         } catch (InterruptedException e) {
                         }
                     }

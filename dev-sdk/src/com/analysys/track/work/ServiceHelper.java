@@ -7,7 +7,6 @@ import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.impl.OCImpl;
 import com.analysys.track.service.AnalysysJobService;
 import com.analysys.track.service.AnalysysService;
-import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.PermissionUtils;
@@ -57,7 +56,6 @@ public class ServiceHelper {
             }
             if (canStartService()) {
                 boolean isWorking = isServiceWorking(mContext, EGContext.SERVICE_NAME);
-                ELOG.i(isWorking + "  is servicework");
                 if (!isWorking) {
                     try {
                         ComponentName cn = new ComponentName(mContext, AnalysysService.class);
@@ -110,7 +108,6 @@ public class ServiceHelper {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {// 5.0以上
             boolean runJobService = isJobPollServiceOn(context);
-            ELOG.i(runJobService + " ==runJobService");
             if (!runJobService) {
                 JobScheduler jobScheduler = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
                 JobInfo.Builder builder = new JobInfo.Builder(EGContext.JOB_ID,

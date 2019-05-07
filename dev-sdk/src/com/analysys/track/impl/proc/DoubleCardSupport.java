@@ -50,9 +50,6 @@ public class DoubleCardSupport {
             addBySystemProperties(imeis, "ro.ril.miui.meid1", "");
             addBySystemProperties(imeis, "ro.ril.miui.meid2", "");
         } catch (Throwable e) {
-//            if (Config.EG_DEBUG) {
-//                ELog.e(Config.DEVICE_TAG, e);
-//            }
         }
     }
 
@@ -64,9 +61,6 @@ public class DoubleCardSupport {
             }
             getContent(context, imsis, "getSubscriberId");
         } catch (Throwable e) {
-//            if (Config.EG_DEBUG) {
-//                ELog.e(Config.DEVICE_TAG, e);
-//            }
         }
     }
 
@@ -100,10 +94,20 @@ public class DoubleCardSupport {
                 addWithSolt(resultList, telephony, tm, methodName + "Gemini", 1);
                 addWithSolt(resultList, telephony, tm, methodName + "Gemini", 2);
                 // MTK
+                try {
+                    Class.forName("com.mediatek.telephony.TelephonyManagerEx");
+                }catch (Throwable t){
+                   return;
+                }
                 addWithSolt(resultList, "com.mediatek.telephony.TelephonyManagerEx", methodName, 0);
                 addWithSolt(resultList, "com.mediatek.telephony.TelephonyManagerEx", methodName, 1);
                 addWithSolt(resultList, "com.mediatek.telephony.TelephonyManagerEx", methodName, 2);
                 // 高通
+                try {
+                   Class.forName("android.telephony.MSimTelephonyManager");
+                }catch (Throwable t){
+                    return;
+                }
                 addWithSolt(resultList, "android.telephony.MSimTelephonyManager", methodName, 0);
                 addWithSolt(resultList, "android.telephony.MSimTelephonyManager", methodName, 1);
                 addWithSolt(resultList, "android.telephony.MSimTelephonyManager", methodName, 2);
@@ -122,9 +126,6 @@ public class DoubleCardSupport {
                 addForZhanXun(context, resultList, methodName);
             }
         } catch (Throwable e) {
-//            if (Config.EG_DEBUG) {
-//                ELog.e(Config.DEVICE_TAG, Log.getStackTraceString(e));
-//            }
         }
     }
 
@@ -160,9 +161,6 @@ public class DoubleCardSupport {
                 }
             }
         } catch (Throwable e) {
-//            if (Config.EG_DEBUG) {
-//                ELog.e(Config.DEVICE_TAG, Log.getStackTraceString(e));
-//            }
         }
     }
 
@@ -197,9 +195,6 @@ public class DoubleCardSupport {
                 add(resultList, telephony, tm, methodName);
             }
         } catch (Throwable e) {
-//            if (Config.EG_DEBUG) {
-//                ELog.e(Config.DEVICE_TAG, e);
-//            }
         }
     }
 
@@ -218,9 +213,6 @@ public class DoubleCardSupport {
                 imeis.add(result);
             }
         } catch (Throwable e) {
-//            if (Config.EG_DEBUG) {
-//                ELog.e(Config.DEVICE_TAG, e);
-//            }
         }
     }
 
@@ -243,9 +235,6 @@ public class DoubleCardSupport {
                 imeis.add(result);
             }
         } catch (Throwable e) {
-//            if (Config.EG_DEBUG) {
-//                ELog.e(Config.DEVICE_TAG, Log.getStackTraceString(e));
-//            }
         }
     }
 
@@ -302,9 +291,6 @@ public class DoubleCardSupport {
             }
 
         } catch (Throwable e) {
-//            if (Config.EG_DEBUG) {
-//                ELog.e(Config.DEVICE_TAG, Log.getStackTraceString(e));
-//            }
         }
     }
 
@@ -355,9 +341,6 @@ public class DoubleCardSupport {
                 }
             }
         } catch (Throwable e) {
-//            if (Config.EG_DEBUG) {
-//                ELog.e(Config.DEVICE_TAG, Log.getStackTraceString(e));
-//            }
         }
     }
 
@@ -383,6 +366,9 @@ public class DoubleCardSupport {
                     return getStringCaseB(obj, method, slotId);
                 } else {
                     try {
+                        if(met == null || obj == null){
+                            return "";
+                        }
                         Object id = met.invoke(obj, slotId);
                         if (id != null) {
                             return (String) id;
@@ -395,7 +381,7 @@ public class DoubleCardSupport {
         } catch (Throwable e) {
             return getStringCaseB(obj, method, slotId);
         }
-        return null;
+        return "";
     }
 
     private static String getStringCaseB(Object obj, String method, int slotId) {

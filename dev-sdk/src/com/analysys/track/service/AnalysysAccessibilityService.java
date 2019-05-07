@@ -23,7 +23,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
             settingAccessibilityInfo();
         }catch (Throwable t){
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(t.getMessage());
+                ELOG.e(t);
             }
         }
     }
@@ -58,7 +58,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
 
         }catch (Throwable t){
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(t.getMessage());
+                ELOG.e(t);
             }
         }
     }

@@ -453,7 +453,9 @@ public class SystemUtils {
                 }
             }
         } catch (Throwable e) {
-            ELOG.e("snapshotInfo","E:::"+e.getMessage());
+            if (EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e);
+            }
         }
         return appList;
     }

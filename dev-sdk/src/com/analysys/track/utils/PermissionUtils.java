@@ -20,7 +20,6 @@ public class PermissionUtils {
      * @return
      */
     public static boolean checkPermission(Context context, String permission) {
-//        ELOG.i("本次permission::::::"+permission);
         boolean result = false;
         String day = SystemUtils.getDay();
         if(SPHelper.getStringValueFromSP(context,EGContext.PERMISSION_TIME,"-1").equals(day) && permissionAskCount > 5){

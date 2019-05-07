@@ -150,7 +150,6 @@ public class PolicyImpl {
                          * 某个模块，某个字段不要
                          */
                         if(tempObj != null){
-//                        ELOG.i("policyInfo","tempObj::::"+tempObj);
                             unWantedKeysHandle(tempObj.toString());
                         }
 
@@ -237,7 +236,9 @@ public class PolicyImpl {
             saveNewPolicyToLocal(policyInfo);
 
         } catch (Throwable t) {
-            ELOG.i("saveRespParams() has an exception :::" + t.getMessage());
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(t);
+            }
         }
 
     }

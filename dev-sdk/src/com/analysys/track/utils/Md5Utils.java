@@ -2,6 +2,8 @@ package com.analysys.track.utils;
 
 
 
+import com.analysys.track.internal.Content.EGContext;
+
 import java.security.MessageDigest;
 
 public class Md5Utils {
@@ -12,7 +14,9 @@ public class Md5Utils {
             byte[] m = md5.digest();//加密
             return getString(m);
         }catch (Throwable t ){
-            ELOG.i(t.getMessage()+"getMD5 has an exception");
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(t);
+            }
         }
         return "";
     }

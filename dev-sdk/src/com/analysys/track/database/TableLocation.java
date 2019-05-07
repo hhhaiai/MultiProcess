@@ -39,8 +39,6 @@ public class TableLocation {
 //            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_LOCATION)){
 //                return;
 //            }
-            ELOG.i("insert","================="+System.currentTimeMillis());
-            ELOG.i("insert","================="+locationInfo);
             ContentValues cv = null;
             String locationTime = null;
             long time = -1;
@@ -67,7 +65,7 @@ public class TableLocation {
             }
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(e.getMessage());
+                ELOG.e(e);
             }
         }finally {
             DBManager.getInstance(mContext).closeDB();
@@ -113,7 +111,7 @@ public class TableLocation {
             db.setTransactionSuccessful();
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(e.getMessage());
+                ELOG.e(e);
             }
         }finally {
             if(cursor != null){
@@ -141,7 +139,7 @@ public class TableLocation {
             db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?", new String[]{INSERT_STATUS_READ_OVER});
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(e.getMessage());
+                ELOG.e(e);
             }
         }finally {
             DBManager.getInstance(mContext).closeDB();

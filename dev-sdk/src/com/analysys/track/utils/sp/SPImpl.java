@@ -143,7 +143,7 @@ class SPImpl implements SharedPreferences {
                     }
                 } catch (Exception e) {
                     if(EGContext.FLAG_DEBUG_INNER){
-                        ELOG.e(e.getMessage());
+                        ELOG.e(e);
                     }
                 }
                 mFileMonitor = new FileMonitor(mBackupFilePath, FileObserver.MODIFY);
@@ -495,7 +495,7 @@ class SPImpl implements SharedPreferences {
                         fileLock.release();
                     } catch (IOException e) {
                         if(EGContext.FLAG_DEBUG_INNER){
-                         ELOG.e(e.getMessage());
+                            ELOG.e(e);
                         }
                     }
                     mIsSaving = false;
@@ -657,7 +657,7 @@ class SPImpl implements SharedPreferences {
                 }
             } catch (Exception e) {
                 if(EGContext.FLAG_DEBUG_INNER){
-                    ELOG.e(e.getMessage()+" reallocBuffer has an exception");
+                    ELOG.e(e);
                 }
             }
         }
@@ -694,7 +694,7 @@ class SPImpl implements SharedPreferences {
                     parseOK = parseBytesIntoMap(allBytes, true);
                 } catch (Exception e) {
                     if(EGContext.FLAG_DEBUG_INNER){
-                        ELOG.e(e.getMessage());
+                        ELOG.e(e);
                     }
                 }
 
@@ -708,7 +708,7 @@ class SPImpl implements SharedPreferences {
                     }
                 } catch (Exception e) {
                     if(EGContext.FLAG_DEBUG_INNER){
-                        ELOG.e(e.getMessage());
+                        ELOG.e(e);
                     }
                 }
             }
@@ -780,7 +780,7 @@ class SPImpl implements SharedPreferences {
                     SPImpl.this.wait();
                 } catch (Throwable t) {
                     if(EGContext.FLAG_DEBUG_INNER){
-                        ELOG.e(t.getMessage());
+                        ELOG.e(t);
                     }
                 }
             }
@@ -813,7 +813,7 @@ class SPImpl implements SharedPreferences {
             mMappedByteBuffer = mFileChannel.map(FileChannel.MapMode.READ_WRITE, 0, length);
         } catch (Exception e) {
             if(EGContext.FLAG_DEBUG_INNER){
-               ELOG.e(e.getMessage());
+               ELOG.e(e);
             }
         }
 

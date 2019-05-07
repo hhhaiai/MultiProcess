@@ -41,7 +41,9 @@ public class RequestUtils {
    * HTTP
    */
   public static String httpRequest(String url, String value , Context ctx) {
-    ELOG.i("当前发送的URL ::::::::::"+url);
+      if (EGContext.FLAG_DEBUG_INNER) {
+          ELOG.i("当前发送的URL ::::::::::"+url);
+      }
     String response = "";
     URL urlP;
     HttpURLConnection connection;
@@ -53,8 +55,10 @@ public class RequestUtils {
 //        ELOG.i("value::::::::::"+ URLEncoder.encode(value,"UTF-8"));
         String ver = PolicyInfo.getInstance().getPolicyVer();
         PolicyImpl policy = PolicyImpl.getInstance(ctx);
-        String version = policy.getSP().getString(DeviceKeyContacts.Response.RES_POLICY_VERSION,"0");
-        ELOG.i("upload.info","httpRequest本次发送：内存里的版本号："+ver+"  sp里存储的版本号："+version);
+        String version = policy.getSP().getString(DeviceKeyContacts.Response.RES_POLICY_VERSION, "0");
+        if (EGContext.FLAG_DEBUG_INNER){
+            ELOG.i("upload.info", "httpRequest本次发送：内存里的版本号：" + ver + "  sp里存储的版本号：" + version);
+        }
         String pl = TextUtils.isEmpty(ver)?version:ver;
         urlP = new URL(url);
         connection = (HttpURLConnection) urlP.openConnection();
@@ -70,8 +74,10 @@ public class RequestUtils {
         connection.setRequestProperty(EGContext.TIME, SPHelper.getStringValueFromSP(ctx,EGContext.TIME , ""));
         connection.setRequestProperty(EGContext.POLICYVER, pl);//策略覆盖
         connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);//写死
-        ELOG.i("本次发送头文件字段：：：：：："+SPHelper.getStringValueFromSP(ctx,EGContext.SDKV,"")+"  debug::: "+ DeviceImpl.getInstance(ctx).getDebug()
-        +"APPKEY::: "+SystemUtils.getAppKey(ctx)+"   TIME:::   "+SPHelper.getStringValueFromSP(ctx,EGContext.TIME , "")+"  策略版本号："+pl);
+        if (EGContext.FLAG_DEBUG_INNER){
+            ELOG.i("本次发送头文件字段：：：：：："+SPHelper.getStringValueFromSP(ctx,EGContext.SDKV,"")+"  debug::: "+ DeviceImpl.getInstance(ctx).getDebug()
+                    +"APPKEY::: "+SystemUtils.getAppKey(ctx)+"   TIME:::   "+SPHelper.getStringValueFromSP(ctx,EGContext.TIME , "")+"  策略版本号："+pl);
+        }
         // 发送数据
         pw = new PrintWriter(connection.getOutputStream());
         pw.print(EGContext.UPLOAD_KEY_WORDS + "="+URLEncoder.encode(value,"UTF-8"));
@@ -79,7 +85,6 @@ public class RequestUtils {
         pw.close();
 
         int status = connection.getResponseCode();
-        ELOG.e(status +"  :::::::status  ::::::  "+connection.getResponseMessage());
         // 获取数据
         if (HttpURLConnection.HTTP_OK == status) {
           is = connection.getInputStream();
@@ -94,7 +99,9 @@ public class RequestUtils {
           response = EGContext.HTTP_DATA_OVERLOAD;
         }
     } catch (Throwable e) {
-        ELOG.e(e.getMessage()+"  :::::::http has an exception.");
+        if (EGContext.FLAG_DEBUG_INNER){
+            ELOG.e(e);
+        }
         response = "-1";
     } finally {
       StreamerUtils.safeClose(is);
@@ -131,7 +138,9 @@ public class RequestUtils {
         return null;
       }
     } catch (Throwable e) {
-      ELOG.e(e);
+        if (EGContext.FLAG_DEBUG_INNER){
+            ELOG.e(e);
+        }
     } finally {
       if (connection != null) {
         connection.disconnect();

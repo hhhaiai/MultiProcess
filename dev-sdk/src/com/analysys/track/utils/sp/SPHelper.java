@@ -64,11 +64,10 @@ public class SPHelper {
                         f.createNewFile();
                     } catch (IOException e) {
                         if(EGContext.FLAG_DEBUG_INNER){
-                            ELOG.e(e.getMessage());
+                            ELOG.e(e);
                         }
                     }
                 }
-                ELOG.v("File[" + f.getAbsolutePath() + "]====>" + f.exists());
             }
             return res;
         }
@@ -180,7 +179,7 @@ public class SPHelper {
             returnValue = method.invoke(o, args);
         } catch (Exception e) {
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(e.getMessage());
+                ELOG.e(e);
             }
         }
 

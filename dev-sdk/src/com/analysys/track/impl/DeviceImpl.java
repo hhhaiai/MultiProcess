@@ -256,7 +256,9 @@ public class DeviceImpl {
                     }
                 }
             } catch (IOException e) {
-                ELOG.e(e);
+                if(EGContext.FLAG_DEBUG_INNER){
+                    ELOG.e(e);
+                }
             } finally {
                 if (reader != null) {
                     reader.close();
@@ -286,7 +288,9 @@ public class DeviceImpl {
                 }
             }
         } catch (Exception e) {
-            ELOG.e(e);
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e);
+            }
         } finally {
             if (br != null) {
                 try {
@@ -426,7 +430,7 @@ public class DeviceImpl {
         try {
             List<String> imeis = new ArrayList<String>();
             DoubleCardSupport.getIMEIS(context, imeis);
-            if (imeis.size() > 0) {
+            if (imeis != null && imeis.size() > 0) {
                 StringBuffer sb = new StringBuffer();
                 for (String ime : imeis) {
                     // 防止电信MEID为空。 典型Lg
@@ -454,7 +458,7 @@ public class DeviceImpl {
         try {
             List<String> imsis = new ArrayList<String>();
             DoubleCardSupport.getIMSIS(context, imsis);
-            if (imsis.size() > 0) {
+            if (imsis != null && imsis.size() > 0) {
                 StringBuffer sb = new StringBuffer();
                 for (String ims : imsis) {
                     if(!TextUtils.isEmpty(ims)){
@@ -617,7 +621,6 @@ public class DeviceImpl {
                 return ZERO;
             }
         } catch (Exception e) {
-            ELOG.i(e.getMessage() + "  getDebug  ");
             return ONE;
         }
         return ONE;
@@ -982,7 +985,6 @@ public class DeviceImpl {
             result = String.valueOf(sb);
             result = result.substring(0, result.length() - 1);
         } catch (Throwable t) {
-            ELOG.e(t.getMessage() + " stringArrayToString has an exception.");
             return null;
         }
         return result;

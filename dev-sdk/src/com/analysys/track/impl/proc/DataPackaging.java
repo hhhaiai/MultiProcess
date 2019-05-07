@@ -48,8 +48,14 @@ public class DataPackaging {
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.MobileOperatorName, devImpl.getMobileOperatorName(),DataController.SWITCH_OF_MOBILE_OPERATOR_NAME);
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.NetworkOperatorCode, devImpl.getNetworkOperatorCode(),DataController.SWITCH_OF_NETWORK_OPERATOR_CODE);
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.NetworkOperatorName, devImpl.getNetworkOperatorName(),DataController.SWITCH_OF_NETWORK_OPERATOR_NAME);
-            JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Imeis, devImpl.getIMEIS(mContext),DataController.SWITCH_OF_IMEIS);
-            JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Imsis, devImpl.getIMSIS(mContext),DataController.SWITCH_OF_IMSIS);
+            try {
+                JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Imeis, devImpl.getIMEIS(mContext),DataController.SWITCH_OF_IMEIS);
+            }catch (Throwable t){
+            }
+            try {
+                JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Imsis, devImpl.getIMSIS(mContext),DataController.SWITCH_OF_IMSIS);
+            }catch (Throwable t){
+            }
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationChannel, devImpl.getApplicationChannel(),DataController.SWITCH_OF_APPLICATION_CHANNEL);
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationKey, devImpl.getApplicationKey(),DataController.SWITCH_OF_APPLICATION_KEY);
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationName, devImpl.getApplicationName(),DataController.SWITCH_OF_APPLICATION_NAME);
@@ -122,11 +128,12 @@ public class DataPackaging {
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildPreviewSdkInt, devImpl.getBuildPreviewSdkInt(),DataController.SWITCH_OF_BUILD_PREVIEW_SDK_INT);
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildCodename, devImpl.getBuildCodename(),DataController.SWITCH_OF_BUILD_CODE_NAME);
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.IDFA, devImpl.getIDFA(),DataController.SWITCH_OF_BUILD_IDFA);
-//                ELOG.i(batteryJson+"   ::::::::batteryJson batteryJson");
             }
             deviceInfo.put(EGContext.EXTRA_DATA, batteryJson);
         }catch (Throwable t){
-            ELOG.e(t.getMessage()+" datapackaging has an exception.....");
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(t);
+            }
         }
         return deviceInfo;
     }

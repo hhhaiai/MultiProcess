@@ -21,7 +21,7 @@ public class AccessibilityHelper {
     public static boolean isAccessibilitySettingsOn(Context context, Class<?> clazz) {
         if (context == null || clazz == null) {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e("AccessibilityHelper.isAccessibilitySettingsOn  the param is null!");
+                ELOG.i("AccessibilityHelper.isAccessibilitySettingsOn  the param is null!");
             }
             return false;
         }
@@ -40,13 +40,13 @@ public class AccessibilityHelper {
          */
         if (!AndroidManifestHelper.isServiceDefineInManifest(context, clazz)) {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e("please define  service [" + clazz.getCanonicalName() + "]  in AndroidManifest.xml! ");
+                ELOG.i("please define  service [" + clazz.getCanonicalName() + "]  in AndroidManifest.xml! ");
             }
             return false;
         }
         if (!AndroidManifestHelper.isPermissionDefineInManifest(context, permission.BIND_ACCESSIBILITY_SERVICE)) {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e("please check android.permission.BIND_ACCESSIBILITY_SERVICEAndroid about service["
+                ELOG.i("please check android.permission.BIND_ACCESSIBILITY_SERVICEAndroid about service["
                     + clazz.getCanonicalName() + "] in AndroidManifest.xml !");
             }
             return false;
@@ -88,7 +88,7 @@ public class AccessibilityHelper {
             }
         } else {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.v("please make sure  accessibility  Enabled!");
+                ELOG.i("please make sure  accessibility  Enabled!");
             }
         }
         return false;

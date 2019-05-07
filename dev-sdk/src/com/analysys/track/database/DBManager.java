@@ -40,7 +40,7 @@ public class DBManager {
             }
         }catch (Throwable t){
             if(EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i("openDB()   " + t.getMessage());
+                ELOG.e(t);
             }
         }
         return db;
@@ -55,7 +55,7 @@ public class DBManager {
 
         } catch (Throwable t){
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e("closeDB "+t.getMessage());
+                ELOG.e(t);
             }
 
         }

@@ -82,7 +82,7 @@ public class TableAppSnapshot {
             db.insert(DBConfig.AppSnapshot.TABLE_NAME, null, getContentValues(snapshots));
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(e.getMessage());
+                ELOG.e(e);
             }
         }finally {
             DBManager.getInstance(mContext).closeDB();
@@ -135,7 +135,7 @@ public class TableAppSnapshot {
             }
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(e.getMessage());
+                ELOG.e(e);
             }
         } finally {
             if (cursor != null){
@@ -152,7 +152,6 @@ public class TableAppSnapshot {
         try {
             jsonObj = new JSONObject();
             String an = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AN)));
-//            ELOG.i("   AN =====  "+an);
             pkgName = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN)));
             JsonUtils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,pkgName,DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
             JsonUtils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ApplicationName,an
@@ -165,7 +164,7 @@ public class TableAppSnapshot {
                     cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AHT)),DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(e.getMessage());
+                ELOG.e(e);
             }
         }
         return jsonObj;
@@ -187,7 +186,7 @@ public class TableAppSnapshot {
                 DBConfig.AppSnapshot.Column.APN + "= ? ", new String[] {EncryptUtils.encrypt(mContext,pkgName)});
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(e.getMessage());
+                ELOG.e(e);
             }
 
         } finally {
@@ -209,14 +208,13 @@ public class TableAppSnapshot {
 //                DBConfig.AppSnapshot.Column.APN + "=?", new String[] {pkgName}, null,
 //                null, null);
             if (cursor.getCount() == 0) {
-                ELOG.i(cursor.getCount()+" cursor.getCount() ");
                 return false;
             } else {
                 return true;
             }
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(e.getMessage());
+                ELOG.e(e);
             }
         } finally {
             if (cursor != null){
@@ -260,7 +258,7 @@ public class TableAppSnapshot {
             }
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(e.getMessage());
+                ELOG.e(e);
             }
         } finally {
             if (cursor != null){
@@ -281,7 +279,7 @@ public class TableAppSnapshot {
 
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(e.getMessage());
+                ELOG.e(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -302,7 +300,7 @@ public class TableAppSnapshot {
                     null, null);
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(e.getMessage());
+                ELOG.e(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();

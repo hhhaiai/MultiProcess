@@ -6,6 +6,7 @@ import android.hardware.SensorManager;
 import android.text.TextUtils;
 
 import com.analysys.track.internal.Content.DataController;
+import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.utils.ELOG;
@@ -47,7 +48,6 @@ public class SenSorModuleNameImpl{
                     info.put(DeviceKeyContacts.DevInfo.SenSorName,s.getName());
                 }
 
-//                ELOG.i("SenSorName :::::::"+s.getName());
                 // 传感器版本
                 if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorVersion ,DataController.SWITCH_OF_SENSOR_VERSION) && !TextUtils.isEmpty(String.valueOf(s.getVersion()))){
                     // 传感器名称
@@ -83,11 +83,12 @@ public class SenSorModuleNameImpl{
                 if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorPower ,DataController.SWITCH_OF_SENSOR_POWER)) {
                     info.put(DeviceKeyContacts.DevInfo.SenSorPower, s.getPower());
                 }
-//                ELOG.i("传感器信息：：：：："+info);
                 senSorArray.put(info);
             }
         }catch (Throwable t){
-            ELOG.e("  getSensorInfo  has an exception::::"+t);
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(t);
+            }
         }
         return senSorArray;
     }

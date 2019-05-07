@@ -36,7 +36,7 @@ public class DeflterCompressUtils {
         } catch (Exception e) {
             output = data;
             if(EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e.getMessage() + "  compress has an exception.");
+                ELOG.e(e);
             }
         } finally {
             try {

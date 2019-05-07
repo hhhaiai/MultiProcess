@@ -132,27 +132,6 @@ public class DBConfig {
             Column.PROC,DBType.TEXT , Column.L_RA,DBType.TEXT ,Column.L_RB,DBType.TEXT ,Column.L_RC,DBType.TEXT);
   }
 
-//  public static class PROCInfo {
-//    // 表名
-//    public static final String TABLE_NAME = "e_proc";
-//
-//    public static class Column {
-//      public static final String ID = "id";
-//      //父id
-//      public static final String PARENT_ID_TIME = "proc_a";
-//      // 内容，JSONOBJECT.toString()后的数据
-//      public static final String CONTENT = "proc_b";
-//
-//      // 备用字段 text 类型
-//      public static final String L_RA = "proc_ra";
-//      public static final String L_RB = "proc_rb";
-//      public static final String L_RC = "proc_rc";
-//    }
-//    //建表
-//    public static final String CREATE_TABLE  = String.format("create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)",
-//            TABLE_NAME,Column.ID,DBType.AUTOINCREMENT ,Column.PARENT_ID_TIME,DBType.VARCHAR_TWENTY,Column.CONTENT,DBType.TEXT ,
-//            Column.L_RA,DBType.TEXT ,Column.L_RB,DBType.TEXT ,Column.L_RC,DBType.TEXT);
-//  }
 
   public static class IDStorage {
     // 表名

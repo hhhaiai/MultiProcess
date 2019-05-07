@@ -55,7 +55,6 @@ public class AppSnapshotImpl {
             if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_APPSNAPSHOT,EGContext.SNAPSHOT_CYCLE,currentTime)){
                 FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_APPSNAPSHOT,currentTime);
             }else {
-                ELOG.i("snapshotsInfo不符合采集轮询周期return，进程Id：< " + SystemUtils.getCurrentProcessName(mContext) + " >");
                 return;
             }
             if(!isSnapShotBlockRunning){
@@ -80,7 +79,6 @@ public class AppSnapshotImpl {
     }
     private void getSnapShotInfo(){
         try {
-            ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"进入getSnapShotInfo获取.....");
             if(!PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT,true)){
                 return;
             }
@@ -95,7 +93,10 @@ public class AppSnapshotImpl {
             TableAppSnapshot.getInstance(mContext)
                     .coverInsert(currentSnapshotsList);
         }catch (Throwable t){
-            ELOG.e("snapshotInfo",t.getMessage());
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(t);
+            }
+
         }
     }
 
@@ -183,9 +184,11 @@ public class AppSnapshotImpl {
             }
 
         } catch (Exception e) {
-            ELOG.e("xxx",e.getMessage());
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e);
+            }
+
         }
-//        ELOG.i("xxx","list:::::"+list);
         return list;
     }
 
@@ -202,9 +205,7 @@ public class AppSnapshotImpl {
             PackageManager packageManager = mContext.getPackageManager();
             appInfo = getAppInfo(appInfo, pkgInfo,packageManager,tag);
         } catch (Throwable e) {
-            ELOG.e("xxx",e.getMessage()+" has an excption");
         }
-//        ELOG.i("xxx","appInfo === "+appInfo);
         return appInfo;
     }
     public JSONObject getAppInfo(JSONObject appInfo,PackageInfo pkgInfo, PackageManager packageManager,String tag) throws JSONException {
@@ -263,7 +264,6 @@ public class AppSnapshotImpl {
                                         EGContext.SNAP_SHOT_UPDATE,time);
                             }
                         } catch (Throwable e) {
-                            ELOG.e(e);
                         }
                     }
                 });
@@ -292,7 +292,9 @@ public class AppSnapshotImpl {
                                 EGContext.SNAP_SHOT_UPDATE,time);
                     }
                 } catch (Throwable e) {
-                    ELOG.e(e);
+                    if(EGContext.FLAG_DEBUG_INNER){
+                        ELOG.e(e);
+                    }
                 }
             }
 

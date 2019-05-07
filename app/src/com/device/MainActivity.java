@@ -31,9 +31,9 @@ public class MainActivity extends Activity {
 
         startService(new Intent(this, MyServiceA.class));
         startService(new Intent(this, MyServiceB.class));
-        startService(new Intent(this, MyServiceC.class));
-        startService(new Intent(this, MyServiceD.class));
-        startService(new Intent(this, MyServiceE.class));
+//        startService(new Intent(this, MyServiceC.class));
+//        startService(new Intent(this, MyServiceD.class));
+//        startService(new Intent(this, MyServiceE.class));
     }
 
     @TargetApi(23)
@@ -87,10 +87,8 @@ public class MainActivity extends Activity {
 //                OCImpl.getInstance(this).getProcApps(nameSet, time);
                 break;
             case R.id.btnT:
-//                ELOG.e("snap:  "+TableAppSnapshot.getInstance(this).select());
                 break;
             case R.id.btnOC:
-//                ELOG.i("btnOC ---------");
 //                OCImpl.getInstance(this).processOC();
                 break;
             default:
@@ -224,7 +222,6 @@ public class MainActivity extends Activity {
                 // 同一个应用程序传感器ID将是唯一的，除非该设备是恢复出厂设置
                 s.getId();
             }
-//            ELOG.e("名称：" + s.getName() + "，版本：" + s.getVersion() + "，厂商：" + s.getVendor());
         }
     }
 

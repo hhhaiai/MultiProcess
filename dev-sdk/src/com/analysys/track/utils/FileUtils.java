@@ -61,7 +61,6 @@ public class FileUtils {
      */
     public static long getLockFileLastModifyTime(Context cxt, String fileName) {
         try {
-//            ELOG.i(SystemUtils.getCurrentProcessName(cxt) + " :::getLockFileLastModifyTime " + System.currentTimeMillis());
             cxt = EContextHelper.getContext(cxt);
 //            RandomAccessFile randomFile = null;
 //            FileChannel fileChannel = null;
@@ -88,7 +87,9 @@ public class FileUtils {
 //            }
 
         } catch (Throwable e) {
-            ELOG.e("获取最后修改时间异常：：" + e);
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
         }
         return -1;
     }
@@ -303,11 +304,9 @@ public class FileUtils {
         if (!file.exists()) {
             File path = new File(file.getParent());
             if (!path.exists() && !path.mkdirs()) {   // 判断文件夹是否存在，不存在则创建文件夹
-                ELOG.i("文件创建失败");
                 return;
             }
             if (!file.createNewFile()) {    // 创建文件
-                ELOG.i("文件创建失败");
                 return;
             }
         }

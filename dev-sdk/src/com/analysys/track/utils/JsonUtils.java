@@ -36,7 +36,7 @@ public class JsonUtils {
             }
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e("pushToJSON has an exception... =" + e.getMessage());
+                ELOG.e(e);
             }
         }
     }

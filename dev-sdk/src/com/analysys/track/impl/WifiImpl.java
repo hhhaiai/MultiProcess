@@ -6,6 +6,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 
 import com.analysys.track.internal.Content.DataController;
+import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -65,7 +66,9 @@ public class WifiImpl {
                 }
             }
         } catch (Throwable e) {
-            ELOG.e("getWifiInfo :::"+e.getMessage());
+            if (EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e);
+            }
         }
         return jar;
     }

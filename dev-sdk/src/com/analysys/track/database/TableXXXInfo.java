@@ -50,7 +50,9 @@ public class TableXXXInfo {
             db.insert(DBConfig.XXXInfo.TABLE_NAME, null, cv);
 
         } catch (Throwable e) {
-            ELOG.e(e.getMessage()+"  insert XXX");
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e);
+            }
         }finally {
             DBManager.getInstance(mContext).closeDB();
         }
@@ -75,7 +77,9 @@ public class TableXXXInfo {
                 }
             }
         }catch (Throwable t){
-            ELOG.e(t.getMessage()+  "getContentValues() ...");
+            if(EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(t);
+            }
         }
         return cv;
     }
@@ -113,11 +117,11 @@ public class TableXXXInfo {
                     return array;
                 }
                 array.put(new String(Base64.encode(String.valueOf(jsonObject).getBytes(),Base64.DEFAULT)));
-//                array.put(jsonObject);
-//                ELOG.i("array :::::::::" +array);
             }
         } catch (Throwable e) {
-            ELOG.e(e+"  TableXXXInfo select() has an exception... ");
+            if(EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
             array = null;
         }finally {
             if(cursor != null){
@@ -161,7 +165,9 @@ public class TableXXXInfo {
                 db.delete(DBConfig.XXXInfo.TABLE_NAME, DBConfig.XXXInfo.Column.TIME + "=?", new String[] {EncryptUtils.encrypt(mContext,time)});
             }
         } catch (Throwable e) {
-            ELOG.e(e.getMessage()+"  :::::deleteByTime ");
+            if(EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
         } finally {
             DBManager.getInstance(mContext).closeDB();
         }

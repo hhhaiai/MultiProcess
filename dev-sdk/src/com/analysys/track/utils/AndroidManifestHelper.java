@@ -140,7 +140,9 @@ public class AndroidManifestHelper {
             }
 
         } catch (Throwable e) {
-            ELOG.e(e.getMessage() + " isPermissionDefineInManifest has an exception ");
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
         }
         return false;
     }

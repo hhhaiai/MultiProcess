@@ -23,7 +23,7 @@ import java.lang.ref.WeakReference;
 
 public class AnalysysInternal {
     private WeakReference<Context> mContextRef = null;
-    private static boolean hasInit = false;//TODO onkillProcess hasInit置为false,么有kill时机，待做
+    private static boolean hasInit = false;
     public static void setInitFalse(){
         hasInit = false;
     }
@@ -63,7 +63,7 @@ public class AnalysysInternal {
             });
         } catch (Throwable t) {
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(t.getMessage());
+                ELOG.e(t);
             }
         }
     }
@@ -77,7 +77,6 @@ public class AnalysysInternal {
      */
     private void init(String key, String channel) {
         hasInit = true;
-        ELOG.d("初始化，进程Id：< " + Process.myPid() + " >");
         // 0.首先检查是否有Context
         Context ctx = EContextHelper.getContext(mContextRef == null ? null : mContextRef.get());
         if (ctx == null) {
@@ -135,7 +134,7 @@ public class AnalysysInternal {
             FileUtils.createLockFile(cxt,EGContext.FILES_SYNC_BATTERY_BROADCAST,EGContext.TIME_SYNC_DEFAULT);
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(e.getMessage());
+                ELOG.e(e);
             }
         }
     }
