@@ -11,23 +11,29 @@
         tools:ignore="OldTargetApi" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" /> <!-- Location -->
+    <!-- Location -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.GET_TASKS" /> <!-- 开机 -->
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <!-- 开机 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.RESTART_PACKAGES" />
     <uses-permission
         android:name="android.permission.WRITE_SETTINGS"
-        tools:ignore="ProtectedPermissions" /> <!-- UsageStatsManager权限 -->
+        tools:ignore="ProtectedPermissions" />
+    <!-- UsageStatsManager权限 -->
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
-        tools:ignore="ProtectedPermissions" /> <!-- P和以后版本 服务需要该权限 -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> <!-- 下面权限新版本建议增加 -->
+        tools:ignore="ProtectedPermissions" />
+    <!-- P和以后版本 服务需要该权限 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- 下面权限新版本建议增加 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission
         android:name="android.permission.MOUNT_FORMAT_FILESYSTEMS"
@@ -35,7 +41,6 @@
     <uses-permission
         android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
         tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission
         android:name="android.permission.BIND_ACCESSIBILITY_SERVICE"
@@ -48,31 +53,7 @@
         android:label="@string/app_name"
         android:logo="@mipmap/ic_launcher"
         android:theme="@style/AppTheme">
-        <service
-            android:name=".MyServiceB"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":serb"></service>
-        <service
-            android:name=".MyServiceA"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":sera" />
-       <!-- <service
-            android:name=".MyServiceC"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":serc" />
-        <service
-            android:name=".MyServiceD"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":serd" />
-        <service
-            android:name=".MyServiceE"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":sere" />-->
+
 
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -81,7 +62,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!--<activity android:name=".testAct" />-->
 
         <service
             android:name="com.analysys.track.service.AnalysysService"
@@ -106,27 +86,13 @@
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
                 <!-- 一个已存在的应用程序包已经从设备上移除，包括包名（卸载监听所在的app，则无法接收到） -->
                 <action android:name="android.intent.action.PACKAGE_REMOVED" />
-
-                <!--<data android:scheme="package" />-->
                 <!-- 开机广播 -->
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
 
-                <!--<category android:name="android.intent.category.HOME" />-->
                 <!-- 网络变化广播 7.0以下有效 -->
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
-        <!--
-<receiver android:name="com.analysys.track.receiver.DynamicReceivers">
-            <intent-filter android:priority="9999">
-                <action android:name="android.intent.action.SCREEN_ON" />
-                <action android:name="android.intent.action.SCREEN_OFF" />
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.BATTERY_CHANGED" />
-            </intent-filter>
-        </receiver>
-        -->
         <service
             android:name="com.analysys.track.service.AnalysysAccessibilityService"
             android:enabled="true"
