@@ -109,12 +109,15 @@ public class DoubleCardSupport {
                 addWithSolt(result, telephony, tm, methodName, 0);
                 addWithSolt(result, telephony, tm, methodName, 1);
                 addWithSolt(result, telephony, tm, methodName, 2);
+
                 // 联发科: 代表手机：魅族
                 add(result, telephony, tm, methodName + "Gemini");
+
                 // 这部分貌似是MTK的方案
                 addWithSolt(result, telephony, tm, methodName + "Gemini", 0);
                 addWithSolt(result, telephony, tm, methodName + "Gemini", 1);
                 addWithSolt(result, telephony, tm, methodName + "Gemini", 2);
+
             }
             // MTK
             if (hasClass("com.mediatek.telephony.TelephonyManagerEx")) {
@@ -131,6 +134,7 @@ public class DoubleCardSupport {
                 // 高通另一种方式获取
                 addForQualcomm(context, result, "android.telephony.MSimTelephonyManager", methodName);
             }
+
             // 三星的双卡 代表手机：note2，3，s4
             if (Build.VERSION.SDK_INT < 21) {
                 if (hasClass("android.telephony.MultiSimTelephonyManager")) {
@@ -145,6 +149,7 @@ public class DoubleCardSupport {
             }
             // 展讯手机
             addForZhanXun(context, result, methodName);
+
 
         } catch (Throwable e) {
         }
@@ -285,8 +290,7 @@ public class DoubleCardSupport {
         }
     }
 
-    private static void addWithSolt(List<String> resultList, TelephonyManager telephony, Class<?> tm, String method,
-                                    int slotId) {
+    private static void addWithSolt(List<String> resultList, TelephonyManager telephony, Class<?> tm, String method, int slotId) {
         try {
             if (TextUtils.isEmpty(method) || tm == null || telephony == null) {
                 return;
@@ -491,7 +495,7 @@ public class DoubleCardSupport {
         return null;
     }
 
-    private static String getInvoke(Method met, Object obj, int... slotId) {
+    private static String getInvoke(Method met, Object obj, Object... slotId) {
         try {
             if (met == null || obj == null) {
                 return null;
@@ -500,7 +504,7 @@ public class DoubleCardSupport {
             if (id != null) {
                 return String.valueOf(id);
             }
-        } catch (Throwable t) {
+        } catch (Throwable e) {
         }
         return null;
     }
@@ -552,7 +556,7 @@ public class DoubleCardSupport {
             if (clazz != null) {
                 return clazz.getMethod(methodName, parameterTypes) != null;
             }
-        } catch (Throwable t) {
+        } catch (Throwable e) {
         }
         return false;
     }
