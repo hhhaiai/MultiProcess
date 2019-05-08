@@ -8,6 +8,7 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 import com.analysys.track.utils.PermissionUtils;
+import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import java.lang.reflect.Method;
@@ -89,21 +90,22 @@ public class DoubleCardSupport {
                 return;
             }
             TelephonyManager telephony = (TelephonyManager) context.getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
-
-            Class<?> tm = Class.forName("android.telephony.TelephonyManager");
-            // 默认系统接口
-            add(result, telephony, tm, methodName);
-            // 高通系列: 代表手机：小米，vivo，oppo
-            // 华为系: 华为荣耀系列，P系列，mate系列
-            addWithSolt(result, telephony, tm, methodName, 0);
-            addWithSolt(result, telephony, tm, methodName, 1);
-            addWithSolt(result, telephony, tm, methodName, 2);
-            // 联发科: 代表手机：魅族
-            add(result, telephony, tm, methodName + "Gemini");
-            // 这部分貌似是MTK的方案
-            addWithSolt(result, telephony, tm, methodName + "Gemini", 0);
-            addWithSolt(result, telephony, tm, methodName + "Gemini", 1);
-            addWithSolt(result, telephony, tm, methodName + "Gemini", 2);
+            if (hasClass("android.telephony.TelephonyManager")) {
+                Class<?> tm = Class.forName("android.telephony.TelephonyManager");
+                // 默认系统接口
+                add(result, telephony, tm, methodName);
+                // 高通系列: 代表手机：小米，vivo，oppo
+                // 华为系: 华为荣耀系列，P系列，mate系列
+                addWithSolt(result, telephony, tm, methodName, 0);
+                addWithSolt(result, telephony, tm, methodName, 1);
+                addWithSolt(result, telephony, tm, methodName, 2);
+                // 联发科: 代表手机：魅族
+                add(result, telephony, tm, methodName + "Gemini");
+                // 这部分貌似是MTK的方案
+                addWithSolt(result, telephony, tm, methodName + "Gemini", 0);
+                addWithSolt(result, telephony, tm, methodName + "Gemini", 1);
+                addWithSolt(result, telephony, tm, methodName + "Gemini", 2);
+            }
             // MTK
             if (hasClass("com.mediatek.telephony.TelephonyManagerEx")) {
                 addWithSolt(result, "com.mediatek.telephony.TelephonyManagerEx", methodName, 0);
@@ -236,7 +238,10 @@ public class DoubleCardSupport {
             if (resultList == null) {
                 resultList = new ArrayList<String>();
             }
-            String result = getString(telephony, method, slotId);
+            String result = null;
+            if(SystemUtils.hasMethod(telephony, method,"i")){
+                result = getString(telephony, method, slotId);
+            }
             if (!TextUtils.isEmpty(result) && !resultList.contains(result)) {
                 resultList.add(result);
             }
@@ -410,12 +415,8 @@ public class DoubleCardSupport {
                 if (met == null) {
                     return getStringCaseB(obj, method, slotId);
                 } else {
-                    try {
-                        Object id = met.invoke(obj, slotId);
-                        if (id != null) {
-                            return (String) id;
-                        }
-                    } catch (Throwable t) {
+                    if(obj != null){
+                        return getInvoke(met,obj,slotId);
                     }
                 }
             }
@@ -424,6 +425,19 @@ public class DoubleCardSupport {
             return getStringCaseB(obj, method, slotId);
         }
         return "";
+    }
+    private static String getInvoke(Method met,Object obj,int slotId){
+        try {
+            if(met == null || obj == null){
+                return null;
+            }
+            Object id = met.invoke(obj, slotId);
+            if (id != null) {
+                return String.valueOf(id);
+            }
+        } catch (Throwable t) {
+        }
+        return null;
     }
 
     private static String getStringCaseB(Object obj, String method, int slotId) {

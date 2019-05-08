@@ -331,24 +331,26 @@ public class LocationImpl {
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 jsonArray = new JSONArray();
                 try {
-                    List<NeighboringCellInfo> list = mTelephonyManager.getNeighboringCellInfo();
-                    if (list != null && list.size() > 0) {
-                        baseStationSort(list);
-                        int tempCid = -1, tempLac = -1;
-                        String key = null;
-                        for (int i = 0; i < list.size(); i++) {
-                            if (cid.size() < 5) {
-                                NeighboringCellInfo info = list.get(i);
-                                tempCid = info.getCid();
-                                tempLac = info.getLac();
-                                key = tempCid + "|" + tempLac;
-                                if (tempCid > 0 && tempLac > 0 && !cid.contains(key)) {
-                                    cid.add(key);
-                                    jsonObject = new JSONObject();
-                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, tempCid, DataController.SWITCH_OF_CELL_ID);
-                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, info.getRssi(), DataController.SWITCH_OF_BS_LEVEL);
-                                    jsonArray.put(jsonObject);
+                    if(SystemUtils.hasMethod(mTelephonyManager,"getNeighboringCellInfo","list")){
+                        List<NeighboringCellInfo> list = mTelephonyManager.getNeighboringCellInfo();
+                        if (list != null && list.size() > 0) {
+                            baseStationSort(list);
+                            int tempCid = -1, tempLac = -1;
+                            String key = null;
+                            for (int i = 0; i < list.size(); i++) {
+                                if (cid.size() < 5) {
+                                    NeighboringCellInfo info = list.get(i);
+                                    tempCid = info.getCid();
+                                    tempLac = info.getLac();
+                                    key = tempCid + "|" + tempLac;
+                                    if (tempCid > 0 && tempLac > 0 && !cid.contains(key)) {
+                                        cid.add(key);
+                                        jsonObject = new JSONObject();
+                                        JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
+                                        JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, tempCid, DataController.SWITCH_OF_CELL_ID);
+                                        JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, info.getRssi(), DataController.SWITCH_OF_BS_LEVEL);
+                                        jsonArray.put(jsonObject);
+                                    }
                                 }
                             }
                         }

@@ -80,15 +80,22 @@ public class EncryptUtils {
     }
 
     private static void clearEncryptKey(Context context) {
-        if (context == null) {
-            return;
+        try {
+            if (context == null) {
+                return;
+            }
+            SharedPreferences pref = context.getSharedPreferences(EGContext.SPUTIL, Context.MODE_PRIVATE);
+            if(pref != null){
+                SharedPreferences.Editor editor = pref.edit();
+                // editor.putString(SP_EK_ID, "");
+                if(editor != null && pref.contains(SP_EK_ID)){
+                    editor.remove(SP_EK_ID);
+                    editor.apply();
+                }
+            }
+            mEncryptKey = null;
+        }catch (Throwable t){
         }
-        SharedPreferences pref = context.getSharedPreferences(EGContext.SPUTIL, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        // editor.putString(SP_EK_ID, "");
-        editor.remove(SP_EK_ID);
-        editor.apply();
-        mEncryptKey = null;
     }
 
     /**
@@ -136,7 +143,13 @@ public class EncryptUtils {
             return "";
         }
     }
-
+    private static boolean canGetAndroidId(Context context){
+        try {
+            return !TextUtils.isEmpty(Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID));
+        }catch (Throwable t){
+        }
+        return false;
+    }
     /**
      * 初始化秘钥key,检验确保可用.
      *
@@ -150,7 +163,10 @@ public class EncryptUtils {
 
             // 2.参考key异常则重新生成
             if (TextUtils.isEmpty(id) || !id.contains("|")) {
-                String preID = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+                String preID = null;
+                if(canGetAndroidId(context)){
+                    preID = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+                }
                 String serialNO = null;
                 if (Build.VERSION.SDK_INT > 24) {
                     if (checkPermission(context, Manifest.permission.READ_PHONE_STATE)) {

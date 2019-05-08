@@ -279,7 +279,7 @@ class SPImpl implements SharedPreferences {
 
     @Override
     public void unregisterOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener onSharedPreferenceChangeListener) {
-        if (onSharedPreferenceChangeListener != null) {
+        if (onSharedPreferenceChangeListener != null && mListeners != null) {
             mListeners.remove(onSharedPreferenceChangeListener);
             if (mFileMonitor != null && mListeners.size() <= 0) {
                 mFileMonitor.stopWatching();

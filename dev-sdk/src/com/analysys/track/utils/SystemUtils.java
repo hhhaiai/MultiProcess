@@ -26,6 +26,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.PowerManager;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 import com.analysys.track.impl.AppSnapshotImpl;
@@ -506,4 +507,27 @@ public class SystemUtils {
 //        }
 //        return false;
 //    }
+    /**
+     *
+     * @param telephonyManager
+     * @param methodName
+     * @return
+     */
+    public static boolean hasMethod(TelephonyManager telephonyManager, String methodName,String tag) {
+        try {
+            if(telephonyManager == null || TextUtils.isEmpty(methodName)){
+                return false;
+            }
+            Class<?> clazz = Class.forName(telephonyManager.getClass().getName());
+            if(clazz != null){
+                if(!TextUtils.isEmpty(tag) && "i".equals(tag)){
+                    return clazz.getMethod(methodName, Integer.class) != null;
+                }else if(!TextUtils.isEmpty(tag) && "list".equals(tag)){
+                    return clazz.getMethod(methodName,List.class)!=null;
+                }
+            }
+        } catch (Throwable t) {
+        }
+        return false;
+    }
 }
