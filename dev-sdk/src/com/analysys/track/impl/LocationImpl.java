@@ -331,7 +331,7 @@ public class LocationImpl {
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 jsonArray = new JSONArray();
                 try {
-                    if(SystemUtils.hasMethod(mTelephonyManager,"getNeighboringCellInfo","list")){
+                    if(SystemUtils.hasMethod(mTelephonyManager.getClass().getName(),"getNeighboringCellInfo","list")){
                         List<NeighboringCellInfo> list = mTelephonyManager.getNeighboringCellInfo();
                         if (list != null && list.size() > 0) {
                             baseStationSort(list);

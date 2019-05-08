@@ -207,7 +207,10 @@ public class DoubleCardSupport {
             if (c == null) {
                 return;
             }
-            Method m = c.getMethod("getServiceName", String.class, int.class);
+            Method m = null;
+            if(SystemUtils.hasMethod("com.android.internal.telephony.PhoneFactory", methodName,"s")){
+                m = c.getMethod("getServiceName", String.class, int.class);
+            }
             if (m == null) {
                 return;
             }
@@ -239,7 +242,7 @@ public class DoubleCardSupport {
                 resultList = new ArrayList<String>();
             }
             String result = null;
-            if(SystemUtils.hasMethod(telephony, method,"i")){
+            if(SystemUtils.hasMethod(telephony.getClass().getName(), method,"i")){
                 result = getString(telephony, method, slotId);
             }
             if (!TextUtils.isEmpty(result) && !resultList.contains(result)) {
@@ -254,7 +257,10 @@ public class DoubleCardSupport {
             if (TextUtils.isEmpty(method) || tm == null || telephony == null) {
                 return;
             }
-            Method m = tm.getMethod(method);
+            Method m = null;
+            if(SystemUtils.hasMethod(telephony.getClass().getName(),method,"no")){
+                m = tm.getMethod(method);
+            }
             if (m == null) {
                 return;
             }
@@ -295,7 +301,10 @@ public class DoubleCardSupport {
             if (clazz == null) {
                 return;
             }
-            Method md = clazz.getMethod(method);
+            Method md = null;
+            if(SystemUtils.hasMethod(instance.getClass().getName(),method,"no")){
+                md = clazz.getMethod(method);
+            }
             if (md == null) {
                 return;
             }
@@ -331,7 +340,10 @@ public class DoubleCardSupport {
             if (resultList == null) {
                 resultList = new ArrayList<String>();
             }
-            String result = getString(instance, method, slotID);
+            String result = null;
+            if(SystemUtils.hasMethod(className, method,"i")){
+                result = getString(instance, method, slotID);
+            }
             if (!TextUtils.isEmpty(result) && !resultList.contains(result)) {
                 resultList.add(result);
             }
@@ -411,7 +423,10 @@ public class DoubleCardSupport {
             if (clazz == null) {
                 return getStringCaseB(obj, method, slotId);
             } else {
-                Method met = clazz.getMethod(method, int.class);
+                Method met = null;
+                if(SystemUtils.hasMethod(obj.getClass().getName(),method,"i")){
+                    met = clazz.getMethod(method, int.class);
+                }
                 if (met == null) {
                     return getStringCaseB(obj, method, slotId);
                 } else {
