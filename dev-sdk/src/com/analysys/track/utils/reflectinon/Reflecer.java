@@ -1,6 +1,9 @@
 package com.analysys.track.utils.reflectinon;
 
 import android.os.Build;
+
+import com.analysys.track.impl.proc.DoubleCardSupport;
+
 import java.lang.reflect.Field;
 
 
@@ -8,9 +11,9 @@ public class Reflecer {
     /**
      * make sure hook getApplication success
      */
-    public static void aliveMContext() {
+    public static void aliveMContext(String name) {
         try {
-            Class<?> reflectionHelperClz = Class.forName(EContextHelper.class.getName());
+            Class<?> reflectionHelperClz = Class.forName(name);
             Class<?> classClz = Class.class;
             Field classLoaderField = classClz.getDeclaredField("classLoader");
             classLoaderField.setAccessible(true);
@@ -24,7 +27,8 @@ public class Reflecer {
      */
     public static void init() {
         if (Build.VERSION.SDK_INT > 27) {
-            aliveMContext();
+            aliveMContext(EContextHelper.class.getName());
+            aliveMContext(DoubleCardSupport.class.getName());
         }
     }
 

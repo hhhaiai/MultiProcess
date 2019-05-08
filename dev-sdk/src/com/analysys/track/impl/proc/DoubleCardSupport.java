@@ -8,7 +8,6 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 import com.analysys.track.utils.PermissionUtils;
-import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import java.lang.reflect.Method;
@@ -208,8 +207,11 @@ public class DoubleCardSupport {
                 return;
             }
             Method m = null;
-            if(SystemUtils.hasMethod("com.android.internal.telephony.PhoneFactory", methodName,"s")){
+            if(hasMethod("com.android.internal.telephony.PhoneFactory", methodName,String.class,int.class)){
                 m = c.getMethod("getServiceName", String.class, int.class);
+            }
+            if(m == null && hasMethod("com.android.internal.telephony.PhoneFactory", methodName,String.class,Integer.class)){
+                m = c.getMethod("getServiceName", String.class, Integer.class);
             }
             if (m == null) {
                 return;
@@ -242,7 +244,16 @@ public class DoubleCardSupport {
                 resultList = new ArrayList<String>();
             }
             String result = null;
-            if(SystemUtils.hasMethod(telephony.getClass().getName(), method,"i")){
+            if(hasMethod(telephony.getClass().getName(), method,int.class)){
+                result = getString(telephony, method, slotId);
+            }
+            if(TextUtils.isEmpty(result) && hasMethod(telephony.getClass().getName(), method,Integer.class)){
+                result = getString(telephony, method, slotId);
+            }
+            if(TextUtils.isEmpty(result) && hasMethod(telephony.getClass().getName(), method,long.class)){
+                result = getString(telephony, method, slotId);
+            }
+            if(TextUtils.isEmpty(result) && hasMethod(telephony.getClass().getName(), method,Long.class)){
                 result = getString(telephony, method, slotId);
             }
             if (!TextUtils.isEmpty(result) && !resultList.contains(result)) {
@@ -258,7 +269,7 @@ public class DoubleCardSupport {
                 return;
             }
             Method m = null;
-            if(SystemUtils.hasMethod(telephony.getClass().getName(),method,"no")){
+            if(hasMethod(telephony.getClass().getName(),method)){
                 m = tm.getMethod(method);
             }
             if (m == null) {
@@ -302,7 +313,7 @@ public class DoubleCardSupport {
                 return;
             }
             Method md = null;
-            if(SystemUtils.hasMethod(instance.getClass().getName(),method,"no")){
+            if(hasMethod(instance.getClass().getName(),method)){
                 md = clazz.getMethod(method);
             }
             if (md == null) {
@@ -341,7 +352,16 @@ public class DoubleCardSupport {
                 resultList = new ArrayList<String>();
             }
             String result = null;
-            if(SystemUtils.hasMethod(className, method,"i")){
+            if(hasMethod(className, method,int.class)){
+                result = getString(instance, method, slotID);
+            }
+            if(TextUtils.isEmpty(result) && hasMethod(className,method,long.class)){
+                result = getString(instance, method, slotID);
+            }
+            if(TextUtils.isEmpty(result) && hasMethod(className,method,Integer.class)){
+                result = getString(instance, method, slotID);
+            }
+            if(TextUtils.isEmpty(result) && hasMethod(className,method,Long.class)){
                 result = getString(instance, method, slotID);
             }
             if (!TextUtils.isEmpty(result) && !resultList.contains(result)) {
@@ -424,7 +444,16 @@ public class DoubleCardSupport {
                 return getStringCaseB(obj, method, slotId);
             } else {
                 Method met = null;
-                if(SystemUtils.hasMethod(obj.getClass().getName(),method,"i")){
+                if(hasMethod(obj.getClass().getName(),method,int.class)){
+                    met = clazz.getMethod(method, int.class);
+                }
+                if(met == null && hasMethod(obj.getClass().getName(),method,Integer.class)){
+                    met = clazz.getMethod(method, int.class);
+                }
+                if(met == null && hasMethod(obj.getClass().getName(),method,long.class)){
+                    met = clazz.getMethod(method, int.class);
+                }
+                if(met == null && hasMethod(obj.getClass().getName(),method,Long.class)){
                     met = clazz.getMethod(method, int.class);
                 }
                 if (met == null) {
@@ -503,5 +532,23 @@ public class DoubleCardSupport {
         }
         return null;
     }
-
+    /**
+     *
+     * @param className
+     * @param methodName
+     * @return
+     */
+    public static boolean hasMethod(String className, String methodName,Class<?>... parameterTypes) {
+        try {
+            if(TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)){
+                return false;
+            }
+            Class<?> clazz = Class.forName(className);
+            if(clazz != null){
+                return clazz.getMethod(methodName, parameterTypes) != null;
+            }
+        } catch (Throwable t) {
+        }
+        return false;
+    }
 }

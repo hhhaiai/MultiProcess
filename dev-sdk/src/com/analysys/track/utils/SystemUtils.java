@@ -507,33 +507,4 @@ public class SystemUtils {
 //        }
 //        return false;
 //    }
-
-    /**
-     *
-     * @param className
-     * @param methodName
-     * @return
-     */
-    public static boolean hasMethod(String className, String methodName,String tag) {
-        try {
-            if(TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)){
-                return false;
-            }
-            Class<?> clazz = Class.forName(className);
-            if(clazz != null){
-                if(!TextUtils.isEmpty(tag) && "i".equals(tag)){
-                    return (clazz.getMethod(methodName, Integer.class) != null)||(clazz.getMethod(methodName, int.class) != null);
-                }else if(!TextUtils.isEmpty(tag) && "s".equals(tag)){
-                    return (clazz.getMethod("getServiceName", String.class, Integer.class)!=null)||(clazz.getMethod("getServiceName", String.class, int.class)!=null) ;
-                }else if(!TextUtils.isEmpty(tag) && "no".equals(tag)){
-                    return clazz.getMethod(methodName) != null;
-                }else if(!TextUtils.isEmpty(tag) && "list".equals(tag)){
-                    return clazz.getMethod(methodName,List.class)!=null;
-                }
-
-            }
-        } catch (Throwable t) {
-        }
-        return false;
-    }
 }

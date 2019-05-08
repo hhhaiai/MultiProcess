@@ -18,6 +18,7 @@ import android.text.TextUtils;
 
 import com.analysys.track.database.TableLocation;
 import com.analysys.track.impl.proc.AnalysysPhoneStateListener;
+import com.analysys.track.impl.proc.DoubleCardSupport;
 import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
@@ -331,7 +332,7 @@ public class LocationImpl {
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 jsonArray = new JSONArray();
                 try {
-                    if(SystemUtils.hasMethod(mTelephonyManager.getClass().getName(),"getNeighboringCellInfo","list")){
+                    if(DoubleCardSupport.hasMethod(mTelephonyManager.getClass().getName(),"getNeighboringCellInfo",List.class)){
                         List<NeighboringCellInfo> list = mTelephonyManager.getNeighboringCellInfo();
                         if (list != null && list.size() > 0) {
                             baseStationSort(list);
