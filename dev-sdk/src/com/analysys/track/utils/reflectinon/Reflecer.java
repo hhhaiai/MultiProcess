@@ -18,7 +18,7 @@ public class Reflecer {
             Field classLoaderField = classClz.getDeclaredField("classLoader");
             classLoaderField.setAccessible(true);
             classLoaderField.set(reflectionHelperClz, null);
-        } catch (Exception e) {
+        } catch (Throwable e) {
         }
     }
 
