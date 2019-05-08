@@ -1,11 +1,13 @@
 package com.analysys.track.impl.proc;
 
+import android.Manifest;
 import android.content.Context;
 import android.telephony.CellLocation;
 import android.telephony.ServiceState;
 import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 
+import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import android.telephony.PhoneStateListener;
 
@@ -31,10 +33,16 @@ public class AnalysysPhoneStateListener {
     }
 
     public TelephonyManager getTelephonyManager(){
-        if(telephonyManager == null){
-            telephonyManager = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
-            telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
-            telephonyManager.listen(phoneStateListener,PhoneStateListener.LISTEN_CELL_LOCATION);
+        try {
+            if(telephonyManager == null){
+                telephonyManager = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
+                telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+                if(PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        && PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)){
+                    telephonyManager.listen(phoneStateListener,PhoneStateListener.LISTEN_CELL_LOCATION);
+                }
+            }
+        }catch (Throwable t){
         }
         return telephonyManager;
     }
