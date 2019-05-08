@@ -15,11 +15,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DoubleCardSupport {
+
     /**
-     * 获取IMEIS 1) TelephonyManager.getDeviceId(int) API21就开始有api未公开。API23开始有。26版本废弃 2). getMeid 26 之后才有的功能 .
-     * 国产低版本手机这方法很早就提供了。。。 3). getImei 20版本已经包含，公开在26之后
+     * <pre>
+     *     获取IMEIS
+     *     1) TelephonyManager.getDeviceId(int) API21就开始有api未公开。API23开始有。26版本废弃
+     *     2). getMeid 26 之后才有的功能. 国产低版本手机这方法很早就提供了。。。
+     *     3). getImei 20版本已经包含，公开在26之后
+     * </pre>
      *
      * @param context
+     * @return
      */
     public static List<String> getIMEIS(Context context) {
         List<String> imeis = new ArrayList<String>();
@@ -57,6 +63,10 @@ public class DoubleCardSupport {
         return imeis;
     }
 
+    /**
+     * @param context
+     * @return
+     */
     public static List<String> getIMSIS(Context context) {
         List<String> imsis = new ArrayList<String>();
         try {
@@ -69,6 +79,7 @@ public class DoubleCardSupport {
         }
         return imsis;
     }
+
 
     /**
      * 公共双卡获取方法.包含IMEI和IMSI
@@ -163,29 +174,54 @@ public class DoubleCardSupport {
      */
 
     private static void addForQualcomm(Context context, List<String> resultList, String className, String methodName) {
-        if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName) || context == null) {
+        if (TextUtils.isEmpty(methodName) || context == null) {
             return;
         }
-        if (resultList == null) {
-            resultList = new ArrayList<String>();
-        }
+
         try {
             @SuppressLint("WrongConstant")
             Object obj = context.getApplicationContext().getSystemService("phone_msim");
             if (obj == null) {
+                obj = getObjectInstance(className);
+                if (obj == null) {
+                    return;
+                }
+            } else {
+                className = obj.getClass().getName();
+            }
+
+            if (TextUtils.isEmpty(className)) {
                 return;
+            }
+            if (resultList == null) {
+                resultList = new ArrayList<String>();
+            }
+            if (hasMethod(className, methodName)) {
+                try {
+                    Method met = obj.getClass().getMethod(methodName);
+                    if (obj != null && met != null) {
+                        String result = getInvoke(met, obj);
+                        if (!TextUtils.isEmpty(result) && !resultList.contains(result)) {
+                            resultList.add(result);
+                        }
+                    }
+                } catch (Throwable e) {
+                }
             }
             for (int i = 0; i < 3; i++) {
                 try {
-                    String result = getString(obj, methodName, i);
-                    if (!TextUtils.isEmpty(result) && !resultList.contains(result)) {
-                        resultList.add(result);
+                    if (hasMethod(className, methodName, int.class)) {
+                        String result = getString(obj, methodName, i);
+                        if (!TextUtils.isEmpty(result) && !resultList.contains(result)) {
+                            resultList.add(result);
+                        }
                     }
                 } catch (Throwable e) {
                 }
             }
         } catch (Throwable e) {
         }
+
     }
 
     /**
@@ -201,23 +237,39 @@ public class DoubleCardSupport {
             if (TextUtils.isEmpty(methodName)) {
                 return;
             }
+            String className = "com.android.internal.telephony.PhoneFactory";
             // 利用反射获取 展讯手机服务名字
-            Class<?> c = Class.forName("com.android.internal.telephony.PhoneFactory");
+            Class<?> c = Class.forName(className);
             if (c == null) {
                 return;
             }
             Method m = null;
-            if(hasMethod("com.android.internal.telephony.PhoneFactory", methodName,String.class,int.class)){
+            if (hasMethod(className, methodName, String.class, int.class)) {
                 m = c.getMethod("getServiceName", String.class, int.class);
             }
-            if(m == null && hasMethod("com.android.internal.telephony.PhoneFactory", methodName,String.class,Integer.class)){
+            if (m == null && hasMethod(className, methodName, String.class, Integer.class)) {
                 m = c.getMethod("getServiceName", String.class, Integer.class);
             }
+            if (m == null && hasMethod(className, methodName, String.class, Long.class)) {
+                m = c.getMethod("getServiceName", String.class, Long.class);
+            }
+            if (m == null && hasMethod(className, methodName, String.class, long.class)) {
+                m = c.getMethod("getServiceName", String.class, long.class);
+            }
+
             if (m == null) {
                 return;
             }
             if (resultList == null) {
                 resultList = new ArrayList<String>();
+            }
+            try {
+                String ts = (String) m.invoke(c, Context.TELEPHONY_SERVICE);
+                TelephonyManager telephony =
+                        (TelephonyManager) context.getApplicationContext().getSystemService(ts);
+                Class<?> tm = Class.forName(telephony.getClass().getName());
+                add(resultList, telephony, tm, methodName);
+            } catch (Throwable e) {
             }
             for (int i = 0; i < 3; i++) {
                 try {
@@ -225,7 +277,6 @@ public class DoubleCardSupport {
                     TelephonyManager telephony =
                             (TelephonyManager) context.getApplicationContext().getSystemService(spreadTmService);
                     Class<?> tm = Class.forName(telephony.getClass().getName());
-                    // 默认系统接口
                     add(resultList, telephony, tm, methodName);
                 } catch (Throwable e) {
                 }
@@ -243,19 +294,7 @@ public class DoubleCardSupport {
             if (resultList == null) {
                 resultList = new ArrayList<String>();
             }
-            String result = null;
-            if(hasMethod(telephony.getClass().getName(), method,int.class)){
-                result = getString(telephony, method, slotId);
-            }
-            if(TextUtils.isEmpty(result) && hasMethod(telephony.getClass().getName(), method,Integer.class)){
-                result = getString(telephony, method, slotId);
-            }
-            if(TextUtils.isEmpty(result) && hasMethod(telephony.getClass().getName(), method,long.class)){
-                result = getString(telephony, method, slotId);
-            }
-            if(TextUtils.isEmpty(result) && hasMethod(telephony.getClass().getName(), method,Long.class)){
-                result = getString(telephony, method, slotId);
-            }
+            String result = getString(telephony, method, slotId);
             if (!TextUtils.isEmpty(result) && !resultList.contains(result)) {
                 resultList.add(result);
             }
@@ -269,7 +308,7 @@ public class DoubleCardSupport {
                 return;
             }
             Method m = null;
-            if(hasMethod(telephony.getClass().getName(),method)){
+            if (hasMethod(telephony.getClass().getName(), method)) {
                 m = tm.getMethod(method);
             }
             if (m == null) {
@@ -313,7 +352,7 @@ public class DoubleCardSupport {
                 return;
             }
             Method md = null;
-            if(hasMethod(instance.getClass().getName(),method)){
+            if (hasMethod(instance.getClass().getName(), method)) {
                 md = clazz.getMethod(method);
             }
             if (md == null) {
@@ -323,16 +362,11 @@ public class DoubleCardSupport {
             if (obj == null) {
                 return;
             }
-            String result = null;
-            if (obj instanceof String) {
-                result = (String) obj;
-            } else {
-                result = obj.toString();
-            }
-            if (resultList == null) {
-                resultList = new ArrayList<String>();
-            }
+            String result = (String) obj;
             if (!TextUtils.isEmpty(result) && !resultList.contains(result)) {
+                if (resultList == null) {
+                    resultList = new ArrayList<String>();
+                }
                 resultList.add(result);
             }
         } catch (Throwable e) {
@@ -348,23 +382,11 @@ public class DoubleCardSupport {
             if (instance == null) {
                 return;
             }
-            if (resultList == null) {
-                resultList = new ArrayList<String>();
-            }
-            String result = null;
-            if(hasMethod(className, method,int.class)){
-                result = getString(instance, method, slotID);
-            }
-            if(TextUtils.isEmpty(result) && hasMethod(className,method,long.class)){
-                result = getString(instance, method, slotID);
-            }
-            if(TextUtils.isEmpty(result) && hasMethod(className,method,Integer.class)){
-                result = getString(instance, method, slotID);
-            }
-            if(TextUtils.isEmpty(result) && hasMethod(className,method,Long.class)){
-                result = getString(instance, method, slotID);
-            }
+            String result = getString(instance, method, slotID);
             if (!TextUtils.isEmpty(result) && !resultList.contains(result)) {
+                if (resultList == null) {
+                    resultList = new ArrayList<String>();
+                }
                 resultList.add(result);
             }
         } catch (Throwable e) {
@@ -440,39 +462,38 @@ public class DoubleCardSupport {
                 return null;
             }
             Class<?> clazz = Class.forName(obj.getClass().getName());
-            if (clazz == null) {
-                return getStringCaseB(obj, method, slotId);
-            } else {
+
+            if (clazz != null) {
                 Method met = null;
-                if(hasMethod(obj.getClass().getName(),method,int.class)){
+
+                if (hasMethod(obj.getClass().getName(), method, int.class)) {
                     met = clazz.getMethod(method, int.class);
                 }
-                if(met == null && hasMethod(obj.getClass().getName(),method,Integer.class)){
-                    met = clazz.getMethod(method, int.class);
+                if (met == null && hasMethod(obj.getClass().getName(), method, Integer.class)) {
+                    met = clazz.getMethod(method, Integer.class);
                 }
-                if(met == null && hasMethod(obj.getClass().getName(),method,long.class)){
-                    met = clazz.getMethod(method, int.class);
+                if (met == null && hasMethod(obj.getClass().getName(), method, long.class)) {
+                    met = clazz.getMethod(method, long.class);
                 }
-                if(met == null && hasMethod(obj.getClass().getName(),method,Long.class)){
-                    met = clazz.getMethod(method, int.class);
+                if (met == null && hasMethod(obj.getClass().getName(), method, Long.class)) {
+                    met = clazz.getMethod(method, Long.class);
                 }
-                if (met == null) {
-                    return getStringCaseB(obj, method, slotId);
-                } else {
-                    if(obj != null){
-                        return getInvoke(met,obj,slotId);
-                    }
+                if (met == null && hasMethod(obj.getClass().getName(), method, Number.class)) {
+                    met = clazz.getMethod(method, Number.class);
+                }
+                if (obj != null && met != null) {
+                    return getInvoke(met, obj, slotId);
                 }
             }
 
         } catch (Throwable e) {
-            return getStringCaseB(obj, method, slotId);
         }
-        return "";
+        return null;
     }
-    private static String getInvoke(Method met,Object obj,int slotId){
+
+    private static String getInvoke(Method met, Object obj, int... slotId) {
         try {
-            if(met == null || obj == null){
+            if (met == null || obj == null) {
                 return null;
             }
             Object id = met.invoke(obj, slotId);
@@ -484,27 +505,6 @@ public class DoubleCardSupport {
         return null;
     }
 
-    private static String getStringCaseB(Object obj, String method, int slotId) {
-        try {
-            if (obj == null || TextUtils.isEmpty(method)) {
-                return null;
-            }
-            Class<?> clazz = Class.forName(obj.getClass().getName());
-            if (clazz == null) {
-                return null;
-            }
-            Method met = clazz.getMethod(method, long.class);
-            if (met == null) {
-                return null;
-            }
-            Object id = met.invoke(obj, slotId);
-            if (id != null) {
-                return (String) id;
-            }
-        } catch (Throwable th) {
-        }
-        return null;
-    }
 
     /**
      * 获取tm示例
@@ -522,6 +522,9 @@ public class DoubleCardSupport {
             if (clazzName == null) {
                 return null;
             }
+            if (!hasMethod(className, "getDefault")) {
+                return null;
+            }
             // 通过Class基类的getDefault方法获取此类的实例
             Method getdefault = clazzName.getMethod("getDefault");
             if (getdefault == null) {
@@ -532,19 +535,21 @@ public class DoubleCardSupport {
         }
         return null;
     }
+
+
     /**
-     *
      * @param className
      * @param methodName
+     * @param parameterTypes
      * @return
      */
-    public static boolean hasMethod(String className, String methodName,Class<?>... parameterTypes) {
+    public static boolean hasMethod(String className, String methodName, Class<?>... parameterTypes) {
         try {
-            if(TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)){
+            if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)) {
                 return false;
             }
             Class<?> clazz = Class.forName(className);
-            if(clazz != null){
+            if (clazz != null) {
                 return clazz.getMethod(methodName, parameterTypes) != null;
             }
         } catch (Throwable t) {
