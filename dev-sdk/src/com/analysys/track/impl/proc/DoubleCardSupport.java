@@ -7,6 +7,7 @@ import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
+import com.analysys.track.impl.DeviceImpl;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
@@ -27,13 +28,13 @@ public class DoubleCardSupport {
      * @param context
      * @return
      */
-    public static List<String> getIMEIS(Context context) {
+    public static String getIMEIS(Context context) {
         List<String> imeis = new ArrayList<String>();
         try {
 
             context = EContextHelper.getContext(context);
             if (context == null) {
-                return imeis;
+                return null;
             }
             getContent(context, imeis, "getDeviceId");
             getContent(context, imeis, "getMeid");
@@ -58,9 +59,27 @@ public class DoubleCardSupport {
             addBySystemProperties(imeis, "ro.ril.miui.meid0", "");
             addBySystemProperties(imeis, "ro.ril.miui.meid1", "");
             addBySystemProperties(imeis, "ro.ril.miui.meid2", "");
+            if (imeis != null && imeis.size() > 0) {
+                StringBuffer sb = new StringBuffer();
+                for (String ime : imeis) {
+                    // 防止电信MEID为空。 典型Lg
+                    if (!TextUtils.isEmpty(ime)) {
+                        ime = ime.replaceAll(" ", "");
+                        if (!TextUtils.isEmpty(ime) && !DeviceImpl.getInstance(context).minEffectiveValue.contains(ime)) {
+                            sb.append(ime).append("|");
+                        }
+                    }
+                }
+                if (sb.length() > 0) {
+                    sb.deleteCharAt(sb.length() - 1);
+                }
+                return String.valueOf(sb);
+            } else {
+                return null;
+            }
         } catch (Throwable e) {
         }
-        return imeis;
+        return null;
     }
 
     /**
@@ -491,7 +510,7 @@ public class DoubleCardSupport {
                     id = (Number) id;
                 }
                 if (obj != null && met != null) {
-                    return getInvoke(met, obj, slotId);
+                    return getInvoke(met, obj, id);
                 }
             }
 

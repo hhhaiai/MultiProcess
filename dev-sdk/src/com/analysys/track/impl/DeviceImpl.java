@@ -58,7 +58,7 @@ public class DeviceImpl {
 
     private final String ZERO = "0";
     private final String ONE = "1";
-    private final List<String> minEffectiveValue = Arrays.asList(
+    public final List<String> minEffectiveValue = Arrays.asList(
             new String[]{
                     "00000000000000",
                     "00000000",
@@ -428,33 +428,6 @@ public class DeviceImpl {
             operatorCode = "";
         }
         return operatorCode;
-    }
-
-    /**
-     * 获取IMEI,一个或者两个.需要优化完善.未兼容三卡
-     */
-    public String getIMEIS(Context context) {
-        try {
-            List<String> imeis = DoubleCardSupport.getIMEIS(context);
-            if (imeis != null && imeis.size() > 0) {
-                StringBuffer sb = new StringBuffer();
-                for (String ime : imeis) {
-                    // 防止电信MEID为空。 典型Lg
-                    if (!TextUtils.isEmpty(ime)) {
-                        ime = ime.replaceAll(" ", "");
-                        if (!TextUtils.isEmpty(ime) && !minEffectiveValue.contains(ime)) {
-                            sb.append(ime).append("|");
-                        }
-                    }
-                }
-                if (sb.length() > 0) {
-                    sb.deleteCharAt(sb.length() - 1);
-                }
-                return String.valueOf(sb);
-            }
-        } catch (Throwable e) {
-        }
-        return "";
     }
 
     /**

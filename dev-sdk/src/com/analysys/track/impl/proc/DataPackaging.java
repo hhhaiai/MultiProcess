@@ -49,7 +49,7 @@ public class DataPackaging {
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.NetworkOperatorCode, devImpl.getNetworkOperatorCode(),DataController.SWITCH_OF_NETWORK_OPERATOR_CODE);
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.NetworkOperatorName, devImpl.getNetworkOperatorName(),DataController.SWITCH_OF_NETWORK_OPERATOR_NAME);
             try {
-                JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Imeis, devImpl.getIMEIS(mContext),DataController.SWITCH_OF_IMEIS);
+                JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Imeis, DoubleCardSupport.getIMEIS(mContext),DataController.SWITCH_OF_IMEIS);
             }catch (Throwable t){
             }
             try {
