@@ -44,11 +44,10 @@ import java.lang.reflect.Method;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.security.MessageDigest;
+import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.TimeZone;
 
 import static java.lang.Runtime.getRuntime;
@@ -59,7 +58,15 @@ public class DeviceImpl {
 
     private final String ZERO = "0";
     private final String ONE = "1";
-    private final String[] inEffectiveValue = {"00000000000000", "00000000", "000000000000000", "00000"};
+    private final List<String> minEffectiveValue = Arrays.asList(
+            new String[]{
+                    "00000000000000",
+                    "00000000",
+                    "000000000000000",
+                    "00000",
+                    // 三星有1个零的情况
+                    "0"}
+    );
 
     private DeviceImpl() {
     }
@@ -403,11 +410,8 @@ public class DeviceImpl {
         } catch (Throwable t) {
             operatorCode = "";
         }
-        for (String code : inEffectiveValue) {
-            if (code.equals(operatorCode)) {
-                operatorCode = "";
-                break;
-            }
+        if (minEffectiveValue.contains(operatorCode)) {
+            operatorCode = "";
         }
         return operatorCode;
     }
@@ -438,7 +442,7 @@ public class DeviceImpl {
                     // 防止电信MEID为空。 典型Lg
                     if (!TextUtils.isEmpty(ime)) {
                         ime = ime.replaceAll(" ", "");
-                        if (!TextUtils.isEmpty(ime) && !defaultImsis().contains(ime)) {
+                        if (!TextUtils.isEmpty(ime) && !minEffectiveValue.contains(ime)) {
                             sb.append(ime).append("|");
                         }
                     }
@@ -464,7 +468,7 @@ public class DeviceImpl {
                 for (String ims : imsis) {
                     if (!TextUtils.isEmpty(ims)) {
                         ims = ims.replaceAll(" ", "");
-                        if (!TextUtils.isEmpty(ims) && !defaultImsis().contains(ims)) {
+                        if (!TextUtils.isEmpty(ims) && !minEffectiveValue.contains(ims)) {
                             sb.append(ims).append("|");
                         }
                     }
@@ -485,14 +489,6 @@ public class DeviceImpl {
      */
     public String getApplicationChannel() {
         return SystemUtils.getAppChannel(mContext);
-    }
-
-    private Set<String> defaultImsis() {
-        Set<String> imsis = new HashSet<String>();
-        for (String imsi : inEffectiveValue) {
-            imsis.add(imsi);
-        }
-        return imsis;
     }
 
     /**
@@ -651,8 +647,6 @@ public class DeviceImpl {
         return ONE;
     }
 
-    // 蓝牙信息BluetoothModuleNameImpl
-
     /**
      * 蓝牙MAC，如“6c:5c:14:25:be:ba”
      */
@@ -678,7 +672,7 @@ public class DeviceImpl {
                 try {
                     return FileUtils.loadFileAsString("/sys/class/net/eth0/address").toUpperCase(Locale.getDefault()).substring(0, 17);
                 } catch (Exception e) {
-                    return "";
+                    return macSerial;
                 }
             }
             return macSerial;

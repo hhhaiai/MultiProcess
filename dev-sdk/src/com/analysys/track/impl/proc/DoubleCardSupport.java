@@ -470,20 +470,25 @@ public class DoubleCardSupport {
             if (clazz != null) {
                 Method met = null;
 
+                Object id = slotId;
                 if (hasMethod(obj.getClass().getName(), method, int.class)) {
                     met = clazz.getMethod(method, int.class);
                 }
                 if (met == null && hasMethod(obj.getClass().getName(), method, Integer.class)) {
                     met = clazz.getMethod(method, Integer.class);
+                    id = (Integer) id;
                 }
                 if (met == null && hasMethod(obj.getClass().getName(), method, long.class)) {
                     met = clazz.getMethod(method, long.class);
+                    id = (long) id;
                 }
                 if (met == null && hasMethod(obj.getClass().getName(), method, Long.class)) {
                     met = clazz.getMethod(method, Long.class);
+                    id = (Long) id;
                 }
                 if (met == null && hasMethod(obj.getClass().getName(), method, Number.class)) {
                     met = clazz.getMethod(method, Number.class);
+                    id = (Number) id;
                 }
                 if (obj != null && met != null) {
                     return getInvoke(met, obj, slotId);
