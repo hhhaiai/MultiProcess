@@ -35,7 +35,6 @@ public class PermissionUtils {
             result = true;
 //            }
         }
-//        ELOG.i("第3个可能返回的地方"+result);
         return result;
     }
 }

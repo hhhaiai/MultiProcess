@@ -192,9 +192,9 @@ public class AnalysysReceiver extends BroadcastReceiver {
             }else {
                 return;
             }
-            if (EGContext.FLAG_DEBUG_INNER){
-                ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"正式处理广播---------------");
-            }
+//            if (EGContext.FLAG_DEBUG_INNER){
+//                ELOG.i(SystemUtils.getCurrentProcessName(mContext));
+//            }
             if (SystemUtils.isMainThread()) {
                 EThreadPool.execute(new Runnable() {
                     @Override

@@ -107,7 +107,6 @@ public class LocationImpl {
             }
             //么有获取地理位置权限则不做处理
             if (!hasLocationPermission()) {
-//                ELOG.i("第二个可能性退出的地方location么有新值");
 //                return;
 
             }
@@ -115,8 +114,6 @@ public class LocationImpl {
                 mTelephonyManager = AnalysysPhoneStateListener.getInstance(mContext).getTelephonyManager();
             }
             JSONObject location = getLocation();
-//            String log =Log.getStackTraceString(new Exception("采集完毕"));
-//            Log.i("xxx.log", SystemUtils.getCurrentProcessName(mContext)+ Thread.currentThread().getName()+log);
             if (location != null) {
                 TableLocation.getInstance(mContext).insert(location);
             }
@@ -250,7 +247,6 @@ public class LocationImpl {
 
         try {
             if (location == null) {
-//                ELOG.i("第五个可能性退出的地方");
                 return false;
             }
             String lastLocation = SPHelper.getStringValueFromSP(mContext, EGContext.LAST_LOCATION, "");

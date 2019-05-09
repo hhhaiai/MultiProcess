@@ -118,7 +118,6 @@ public class OCImpl {
     public void processOC() {
         try {
 //            if(!ProcessManager.getIsCollected()){
-//                ELOG.i("屏幕关闭，不收集");
 //                return;
 //            }
             // 亮屏幕工作

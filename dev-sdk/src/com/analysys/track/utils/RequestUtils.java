@@ -42,7 +42,7 @@ public class RequestUtils {
    */
   public static String httpRequest(String url, String value , Context ctx) {
       if (EGContext.FLAG_DEBUG_INNER) {
-          ELOG.i("当前发送的URL ::::::::::"+url);
+          ELOG.i(url);
       }
     String response = "";
     URL urlP;
@@ -52,13 +52,9 @@ public class RequestUtils {
     PrintWriter pw;
     byte[] buffer = new byte[1024];
     try {
-//        ELOG.i("value::::::::::"+ URLEncoder.encode(value,"UTF-8"));
         String ver = PolicyInfo.getInstance().getPolicyVer();
         PolicyImpl policy = PolicyImpl.getInstance(ctx);
         String version = policy.getSP().getString(DeviceKeyContacts.Response.RES_POLICY_VERSION, "0");
-        if (EGContext.FLAG_DEBUG_INNER){
-            ELOG.i("upload.info", "httpRequest本次发送：内存里的版本号：" + ver + "  sp里存储的版本号：" + version);
-        }
         String pl = TextUtils.isEmpty(ver)?version:ver;
         urlP = new URL(url);
         connection = (HttpURLConnection) urlP.openConnection();
@@ -75,8 +71,8 @@ public class RequestUtils {
         connection.setRequestProperty(EGContext.POLICYVER, pl);//策略覆盖
         connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);//写死
         if (EGContext.FLAG_DEBUG_INNER){
-            ELOG.i("本次发送头文件字段：：：：：："+SPHelper.getStringValueFromSP(ctx,EGContext.SDKV,"")+"  debug::: "+ DeviceImpl.getInstance(ctx).getDebug()
-                    +"APPKEY::: "+SystemUtils.getAppKey(ctx)+"   TIME:::   "+SPHelper.getStringValueFromSP(ctx,EGContext.TIME , "")+"  策略版本号："+pl);
+            ELOG.i(SPHelper.getStringValueFromSP(ctx,EGContext.SDKV,"")+" "+ DeviceImpl.getInstance(ctx).getDebug()
+                    +" "+SystemUtils.getAppKey(ctx)+" "+SPHelper.getStringValueFromSP(ctx,EGContext.TIME , "")+" "+pl);
         }
         // 发送数据
         pw = new PrintWriter(connection.getOutputStream());

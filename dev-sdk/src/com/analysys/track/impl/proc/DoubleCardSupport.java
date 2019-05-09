@@ -520,17 +520,16 @@ public class DoubleCardSupport {
     }
 
     private static String getInvoke(Method met, Object obj, Object... slotId) {
-        try {
-            if (met == null || obj == null) {
-                return null;
-            }
-            String name = obj.getClass().getName();
-            Object id = met.invoke(name.substring(name.lastIndexOf(".")+1,name.length()), slotId);
-            if (id != null) {
-                return String.valueOf(id);
-            }
-        } catch (Throwable e) {
-        }
+//        try {
+//            if (met == null || obj == null) {
+//                return null;
+//            }
+//            Object id = met.invoke(obj, slotId);
+//            if (id != null) {
+//                return String.valueOf(id);
+//            }
+//        } catch (Throwable e) {
+//        }
         return null;
     }
 

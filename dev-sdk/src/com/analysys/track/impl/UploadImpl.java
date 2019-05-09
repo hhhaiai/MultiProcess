@@ -70,13 +70,13 @@ public class UploadImpl {
         try {
             if(EGContext.NETWORK_TYPE_NO_NET.equals(NetworkUtils.getNetworkType(mContext))){
                 if(EGContext.FLAG_DEBUG_INNER){
-                    ELOG.i("upload无网return，进程Id：< " + SystemUtils.getCurrentProcessName(mContext) + " >");
+                    ELOG.i("upload return");
                 }
                 return;
             }
             if (SPHelper.getIntValueFromSP(mContext,EGContext.REQUEST_STATE,0) != 0) {
                 if(EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.i("upload有正在发送的数据return，进程Id：< " + SystemUtils.getCurrentProcessName(mContext) + " >");
+                    ELOG.i("upload return");
                 }
                 return;
             }
@@ -119,7 +119,6 @@ public class UploadImpl {
         int maxFailCount = PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT,EGContext.FAIL_COUNT_DEFALUT);
         long faildTime = SPHelper.getLongValueFromSP(mContext,EGContext.FAILEDTIME,0);
         long retryTime = SystemUtils.intervalTime(mContext);
-//        ELOG.e("isNormalUpload="+isNormalUpload+"  failNum="+failNum+"  maxFailCount="+maxFailCount+" faildTime="+faildTime+" retryTime ="+retryTime);
         if (isNormalUpload) {
             doUpload();
         }else if (!isNormalUpload && failNum > 0 && (failNum < maxFailCount)
@@ -182,7 +181,7 @@ public class UploadImpl {
         try {
             String uploadInfo = getInfo();
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.i("发送一次uploadInfo ::::"+uploadInfo);
+                ELOG.i(uploadInfo);
             }
             if (TextUtils.isEmpty(uploadInfo)) {
                 return;
@@ -297,7 +296,7 @@ public class UploadImpl {
     private void analysysReturnJson(String json) {
         try {
             if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.i("uploadInfo返回值json::::::::" + json);
+                ELOG.i(json);
             }
             if (!TextUtils.isEmpty(json)) {
                 // 返回413，表示包太大，大于1M字节，本地直接删除
@@ -365,7 +364,6 @@ public class UploadImpl {
         JSONArray jsonArray = new JSONArray();
         try {
             jsonArray = TableXXXInfo.getInstance(mContext).select();
-//            ELOG.i("XXXInfo条数::::"+jsonArray.length());
             if (jsonArray == null ||jsonArray.length() <= 0) {
                 isChunkUpload = false;
                 return arr;
