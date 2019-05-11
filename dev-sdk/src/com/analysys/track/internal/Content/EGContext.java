@@ -5,7 +5,7 @@ public class EGContext {
     /**
      * EGuan 内部调试控制. 主要用于控制堆栈打印、错误打印、内部提示信息打印
      */
-    public static final boolean FLAG_DEBUG_INNER = false;
+    public static final boolean FLAG_DEBUG_INNER = true;
     /**
      * 用户debug控制
      */
@@ -116,29 +116,32 @@ public class EGContext {
     /**
      * 测试回传接口.Debug模式
      */
-    public final static String TEST_CALLBACK_PORT = ":10031";
+//    public final static String TEST_CALLBACK_PORT = ":10031";
+    public final static String TEST_CALLBACK_PORT = ":8089";
 
 //    public static final String RT_DOMAIN_NAME = "rt101.analysys.cn";
 //    public static final String USERTP_URL = URL_SCHEME + RT_DOMAIN_NAME + RT_PORT;
     /**
      * 测试域名
      */
-    public static final String TEST_CALLBACK_DOMAIN_NAME = "apptest.analysys.cn";
+//    public static final String TEST_CALLBACK_DOMAIN_NAME = "apptest.analysys.cn";
+    public static final String TEST_CALLBACK_DOMAIN_NAME = "192.168.8.150";
+
     /**
      * 非实时上传是,使用的域名池,以urd开始的为设备上传接口
      */
     public final static String[] NORMAL_UPLOAD_URL =
             { "urd103.analysys.cn", // 0
-              "urd240.analysys.cn", // 1
-               "urd183.analysys.cn", // 2
-               "urd409.analysys.cn", // 3
-               "urd203.analysys.cn", // 4
-               "urd490.analysys.cn", // 5
-               "urd609.analysys.cn", // 6
-               "urd301.analysys.cn", // 7
-               "urd405.analysys.cn", // 8
-               "urd025.analysys.cn", // 9
-               "urd339.analysys.cn"// 头部应用 用作测试
+                    "urd240.analysys.cn", // 1
+                    "urd183.analysys.cn", // 2
+                    "urd409.analysys.cn", // 3
+                    "urd203.analysys.cn", // 4
+                    "urd490.analysys.cn", // 5
+                    "urd609.analysys.cn", // 6
+                    "urd301.analysys.cn", // 7
+                    "urd405.analysys.cn", // 8
+                    "urd025.analysys.cn", // 9
+                    "urd339.analysys.cn"// 头部应用 用作测试
             };
 
     public static final String TEST_URL =
@@ -181,7 +184,7 @@ public class EGContext {
     public static final String LAST_APP_VERSION = "lastAppVersion";
     public static final String LAST_OPEN_TIME = "lastOpenTime";
     public static final String LAST_AVAILABLE_TIME = "lastAvailableTime";
-//    public static final String MIN_DURATION_TIME = "minDuration";
+    //    public static final String MIN_DURATION_TIME = "minDuration";
 //    public static final String MAX_DURATION_TIME = "maxDuration";
     public static final String APP_TYPE = "applicationType";
     public static final int SHORT_TIME = 5 * 1000;// 计时器时间间隔毫秒数
@@ -192,7 +195,7 @@ public class EGContext {
     public static final String SERVICE_RESTART = "3";
     public static final String NORMAL = "0";
     public static final String THREAD_NAME = "com.eguan";
-//    public static long HEARTBEAT_LAST_TIME_STMP = -1;
+    //    public static long HEARTBEAT_LAST_TIME_STMP = -1;
 //    public static long SNAPSHOT_LAST_TIME_STMP = -1;
 //    public static long LOCATION_LAST_TIME_STMP = -1;
 //    public static long OC_LAST_TIME_STMP = -1;

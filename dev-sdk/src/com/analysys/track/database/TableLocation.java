@@ -145,5 +145,19 @@ public class TableLocation {
             DBManager.getInstance(mContext).closeDB();
         }
     }
-
+    public void deleteAll() {
+        try {
+            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            if(db == null) {
+                return;
+            }
+            db.delete(DBConfig.Location.TABLE_NAME, null, null);
+        } catch (Throwable e) {
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e);
+            }
+        }finally {
+            DBManager.getInstance(mContext).closeDB();
+        }
+    }
 }

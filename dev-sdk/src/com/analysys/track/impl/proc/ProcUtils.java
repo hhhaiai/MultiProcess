@@ -25,6 +25,7 @@ public class ProcUtils {
     public static final String RUNNING_TIME = "time";
     public static final String RUNNING_RESULT = "result";
     public static final String RUNNING_OC_RESULT = "ocr";
+    public static final String ID = "id";
     private static final int DEF_VALUE = -8801;
     public Context mContext = null;
 

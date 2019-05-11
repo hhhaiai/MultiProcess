@@ -22,9 +22,9 @@ public class DataController {
      * 控制ProcessInfo模块的采集
      */
     public static boolean SWITCH_OF_CL_MODULE_PROC = true;
-    public static boolean SWITCH_OF_CL_MODULE_PS = true;
-    public static boolean SWITCH_OF_CL_MODULE_TOP = true;
-    public static boolean SWITCH_OF_CL_MODULE_RESULT = true;
+//    public static boolean SWITCH_OF_CL_MODULE_PS = true;
+//    public static boolean SWITCH_OF_CL_MODULE_TOP = true;
+//    public static boolean SWITCH_OF_CL_MODULE_RESULT = true;
 
     public static boolean SWITCH_OF_SYSTEM_NAME = true;
     public static boolean SWITCH_OF_SYSTEM_VERSION = true;

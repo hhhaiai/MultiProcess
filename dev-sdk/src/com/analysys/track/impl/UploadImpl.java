@@ -50,7 +50,7 @@ public class UploadImpl {
     /**
      * 本条记录的时间
      */
-    private static List<String> timeList = new ArrayList<String>();
+    private static List<String> idList = new ArrayList<String>();
     private UploadImpl(){}
     private static class Holder {
         private static final UploadImpl INSTANCE = new UploadImpl();
@@ -228,25 +228,35 @@ public class UploadImpl {
                 if (ocJson != null && ocJson.length() > 0 ) {
                     object.put(OCI, ocJson);
                 }
+            }else {
+                TableOC.getInstance(mContext).deleteAll();
             }
-
+            //策略控制大模块收集则进行数据组装，不收集则删除数据
             if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT,true)) {
                 JSONArray snapshotJar = TableAppSnapshot.getInstance(mContext).select();
                 if (snapshotJar != null && snapshotJar.length() > 0 ) {
                     object.put(ASI, snapshotJar);
                 }
+            }else {
+                TableAppSnapshot.getInstance(mContext).deleteAll();
             }
+            //策略控制大模块收集则进行数据组装，不收集则删除数据
             if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LOCATION,true)){
                 JSONArray locationInfo = TableLocation.getInstance(mContext).select();
                 if (locationInfo != null && locationInfo.length() > 0) {
                     object.put(LI, locationInfo);
                 }
+            }else {
+                TableLocation.getInstance(mContext).deleteAll();
             }
-            if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC,true)){
+            //策略控制大模块收集则进行数据组装，不收集则删除数据
+            if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_XXX,true)){
                 JSONArray xxxInfo = getUploadXXXInfos(mContext,object);
                 if (xxxInfo != null && xxxInfo.length() > 0) {
                     object.put(XXXInfo, xxxInfo);
                 }
+            }else {
+                TableXXXInfo.getInstance(mContext).delete();
             }
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER) {
@@ -391,11 +401,13 @@ public class UploadImpl {
                  * 3. 测试JSON不超限, 则加入使用数据，id计入清除列表中
                  */
                 String info = null;
+                JSONObject jsonObject = null;
                 for (int i = 0; i < ss; i++) {
                     info = (String) jsonArray.get(i);
                     // 判断单条大小是否超限,删除单条数据
                     if (info.getBytes().length > freeLen) {
-                        timeList.add(new JSONObject(new String(Base64.decode(info.getBytes(),Base64.DEFAULT))).getString(ProcUtils.RUNNING_TIME));
+                        jsonObject = new JSONObject(new String(Base64.decode(info.getBytes(),Base64.DEFAULT)));
+                        idList.add(jsonObject.getString(ProcUtils.ID));
                         // 最后一个消费，则不需要再次发送
                         if (i == ss - 1) {
                             isChunkUpload = false;
@@ -409,8 +421,10 @@ public class UploadImpl {
                         isChunkUpload = true;
                         break;
                     } else {
-                        arr.put(info);
-                        timeList.add(new JSONObject(new String(Base64.decode(info.getBytes(),Base64.DEFAULT))).getString(ProcUtils.RUNNING_TIME));
+                        jsonObject = new JSONObject(new String(Base64.decode(info.getBytes(),Base64.DEFAULT)));
+                        idList.add(jsonObject.getString(ProcUtils.ID));
+                        jsonObject.remove(ProcUtils.ID);
+                        arr.put(new String(Base64.encode(jsonObject.toString().getBytes(),Base64.DEFAULT)));
                         // 最后一个消费，则不需要再次发送
                         if (i == ss - 1) {
                             isChunkUpload = false;
@@ -422,7 +436,7 @@ public class UploadImpl {
                 if (arr.length() <= 0) {
                     // 兼容只有一条数据,但是数据量超级大. 清除DB中所有数据
                     TableXXXInfo.getInstance(mContext).delete();
-                    timeList.clear();
+                    idList.clear();
                 }
 
             }
@@ -458,9 +472,9 @@ public class UploadImpl {
             TableLocation.getInstance(mContext).delete();
 
             //按time值delete xxxinfo表和proc表
-            TableXXXInfo.getInstance(mContext).deleteByTime(timeList);
-            if(timeList != null && timeList.size()>0){
-                timeList.clear();
+            TableXXXInfo.getInstance(mContext).deleteByID(idList);
+            if(idList != null && idList.size()>0){
+                idList.clear();
             }
             TableOC.getInstance(mContext).delete();
         }catch (Throwable t){

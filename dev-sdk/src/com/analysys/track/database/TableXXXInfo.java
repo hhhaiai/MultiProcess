@@ -104,16 +104,21 @@ public class TableXXXInfo {
                     return array;
                 }
                 jsonObject = new JSONObject();
-                String time = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TIME)));
-                if(TextUtils.isEmpty(time)){
+                String id = cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.ID));
+                if(TextUtils.isEmpty(id)){
                     blankCount += 1;
                 }
-                JsonUtils.pushToJSON(mContext,jsonObject,ProcUtils.RUNNING_TIME,time,DataController.SWITCH_OF_RUNNING_TIME);
                 proc = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PROC)));
                 if(!TextUtils.isEmpty(proc) && !"null".equalsIgnoreCase(proc)){
                     JsonUtils.pushToJSON(mContext,jsonObject,ProcUtils.RUNNING_RESULT,new JSONArray(proc),DataController.SWITCH_OF_CL_MODULE_PROC);
-                }
-                if(jsonObject == null || jsonObject.length() < 1){
+                    if(jsonObject == null || jsonObject.length() < 1){
+                        return array;
+                    }else {
+                        String time = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TIME)));
+                        JsonUtils.pushToJSON(mContext,jsonObject,ProcUtils.RUNNING_TIME,time,DataController.SWITCH_OF_RUNNING_TIME);
+                        jsonObject.put(ProcUtils.ID,id);
+                    }
+                }else {
                     return array;
                 }
                 array.put(new String(Base64.encode(String.valueOf(jsonObject).getBytes(),Base64.DEFAULT)));
@@ -147,22 +152,22 @@ public class TableXXXInfo {
 
     /**
      * 按时间删除
-     * @param timeList
+     * @param idList
      */
-    public void deleteByTime(List<String> timeList) {
+    public void deleteByID(List<String> idList) {
         SQLiteDatabase db = null;
         try {
             db = DBManager.getInstance(mContext).openDB();
             if (db == null){
                 return;
             }
-            String time = "";
-            for(int i = 0;i < timeList.size();i++){
-                time = timeList.get(i);
-                if(TextUtils.isEmpty(time)){
+            String id = "";
+            for(int i = 0;i < idList.size();i++){
+                id = idList.get(i);
+                if(TextUtils.isEmpty(id)){
                     return;
                 }
-                db.delete(DBConfig.XXXInfo.TABLE_NAME, DBConfig.XXXInfo.Column.TIME + "=?", new String[] {EncryptUtils.encrypt(mContext,time)});
+                db.delete(DBConfig.XXXInfo.TABLE_NAME, DBConfig.XXXInfo.Column.ID + "=?", new String[] {id});
             }
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER) {
