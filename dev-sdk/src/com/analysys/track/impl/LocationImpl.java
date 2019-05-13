@@ -378,10 +378,7 @@ public class LocationImpl {
                                 if (tempCid > 0 && tempLac > 0 && !cid.contains(key)) {
                                     cid.add(key);
                                     int stren = gcl.getPsc();
-                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, tempCid, DataController.SWITCH_OF_CELL_ID);
-                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, stren, DataController.SWITCH_OF_BS_LEVEL);
-
+                                    jsonObject = getBaseStationInfoObj(jsonObject,tempLac,tempCid,stren);
                                     tempGsmMap.put(stren+"|"+key, jsonObject);
                                     tempJsonObj = new JSONObject();
                                     tempJsonObj.put("stren",stren);
@@ -400,9 +397,7 @@ public class LocationImpl {
                                     cid.add(key);
                                     //获取当前基站信息
                                     int stren = ccl.getSystemId();
-                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, tempCid, DataController.SWITCH_OF_CELL_ID);
-                                    JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, stren, DataController.SWITCH_OF_BS_LEVEL);
+                                    jsonObject = getBaseStationInfoObj(jsonObject,tempLac,tempCid,stren);
                                     tempCdmaMap.put(stren+"|"+key, jsonObject);
                                     tempJsonObj = new JSONObject();
                                     tempJsonObj.put("stren",stren);
@@ -442,9 +437,7 @@ public class LocationImpl {
                                     cid.add(key);
                                     obj = new JSONObject();
                                     strength = cdma.getCellSignalStrength().getDbm();
-                                    JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                                    JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, tempCid, DataController.SWITCH_OF_CELL_ID);
-                                    JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, strength, DataController.SWITCH_OF_BS_LEVEL);
+                                    obj = getBaseStationInfoObj(obj,tempLac,tempCid,strength);
                                     tempCdmaMap.put(strength+"|"+key, obj);
                                     tempJsonObj = new JSONObject();
                                     tempJsonObj.put("stren",strength);
@@ -460,9 +453,7 @@ public class LocationImpl {
                                     cid.add(key);
                                     obj = new JSONObject();
                                     strength = gsm.getCellSignalStrength().getDbm();
-                                    JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                                    JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, tempCid, DataController.SWITCH_OF_CELL_ID);
-                                    JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, strength, DataController.SWITCH_OF_BS_LEVEL);
+                                    obj = getBaseStationInfoObj(obj,tempLac,tempCid,strength);
                                     tempGsmMap.put(strength+"|"+key, obj);
                                     tempJsonObj = new JSONObject();
                                     tempJsonObj.put("stren",strength);
@@ -588,5 +579,14 @@ public class LocationImpl {
                 }
             }
         }
+    }
+    public JSONObject getBaseStationInfoObj(JSONObject jsonObject,int lac,int cid,int stren){
+        try {
+            JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, lac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
+            JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, cid, DataController.SWITCH_OF_CELL_ID);
+            JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, stren, DataController.SWITCH_OF_BS_LEVEL);
+        }catch (Throwable t){
+        }
+        return jsonObject;
     }
 }

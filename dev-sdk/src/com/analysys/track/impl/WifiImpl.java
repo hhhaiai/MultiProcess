@@ -55,12 +55,10 @@ public class WifiImpl {
                         if (i < 5) {
                             s = list.get(i);
                             jsonObject = new JSONObject();
-                            JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.WifiInfo.SSID, s.SSID,DataController.SWITCH_OF_SSID);
-                            JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.WifiInfo.BSSID, s.BSSID,DataController.SWITCH_OF_BSSID);
-                            JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.WifiInfo.Level, s.level,DataController.SWITCH_OF_LEVEL);
-                            JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.WifiInfo.Capabilities, s.capabilities,DataController.SWITCH_OF_CAPABILITIES);
-                            JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.WifiInfo.Frequency, s.frequency,DataController.SWITCH_OF_FREQUENCY);
-                            jar.put(jsonObject);
+                            jsonObject = getWifiInfoObj(jsonObject,s.SSID,s.BSSID,s.level,s.capabilities,s.frequency);
+                            if(jsonObject != null && jsonObject.length() > 0){
+                                jar.put(jsonObject);
+                            }
                         }
                     }
                 }
@@ -86,6 +84,19 @@ public class WifiImpl {
             }
         }
     }
-
+    public JSONObject getWifiInfoObj(JSONObject jsonObject,String ssid,String bssid,int level,String capabilities,int frequency){
+        try {
+            if(jsonObject == null){
+                jsonObject = new JSONObject();
+            }
+            JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.WifiInfo.SSID, ssid,DataController.SWITCH_OF_SSID);
+            JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.WifiInfo.BSSID, bssid,DataController.SWITCH_OF_BSSID);
+            JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.WifiInfo.Level, level,DataController.SWITCH_OF_LEVEL);
+            JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.WifiInfo.Capabilities, capabilities,DataController.SWITCH_OF_CAPABILITIES);
+            JsonUtils.pushToJSON(mContext,jsonObject,DeviceKeyContacts.LocationInfo.WifiInfo.Frequency, frequency,DataController.SWITCH_OF_FREQUENCY);
+        }catch (Throwable t){
+        }
+        return jsonObject;
+    }
 
 }

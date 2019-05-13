@@ -269,7 +269,7 @@ public class UploadImpl {
     }
     private JSONArray uploadLocationInfo(){
         JSONArray oldArray = null , newArray = null,locationArray = null,wifiFilterArray = null,baseStationFilterArray = null;
-        JSONObject locationObj = null,tempObject = null,wifiFilterObject = null,baseStationFilterObject = null,filterObject = null;
+        JSONObject locationObj = null,tempObject = null;
         String sdkv = null,locationInfo = null;
         try {
            locationArray = TableLocation.getInstance(mContext).select();
@@ -280,7 +280,6 @@ public class UploadImpl {
                newArray = new JSONArray();
                wifiFilterArray = new JSONArray();
                baseStationFilterArray = new JSONArray();
-               filterObject = new JSONObject();
                for(int i = 0;i < locationArray.length();i++){
                    locationObj = new JSONObject();
                    locationObj = (JSONObject)locationArray.get(i);
@@ -297,55 +296,7 @@ public class UploadImpl {
                         locationInfo = locationObj.optString(EGContext.LOCATION_INFO);
                         if(newArray != null && !TextUtils.isEmpty(locationInfo) && locationInfo.length()>0){
                             tempObject = new JSONObject(locationInfo);
-                            //拆分location值，拆为经纬度、wifi、基站
-                            String ct = tempObject.optString(DeviceKeyContacts.LocationInfo.CollectionTime);
-                            String gl = tempObject.optString(DeviceKeyContacts.LocationInfo.GeographyLocation);
-                            JSONArray wifiInfo = tempObject.optJSONArray(DeviceKeyContacts.LocationInfo.WifiInfo.NAME);
-                            JSONArray baseStationInfo = tempObject.optJSONArray(DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME);
-                                //wifi不为空且需要获取
-                            if(wifiInfo != null && wifiInfo.length() > 0 && PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_WIFI,DataController.SWITCH_OF_WIFI_NAME)){
-                                for(int k = 0;k<wifiInfo.length();k++){
-                                    tempObject = (JSONObject)wifiInfo.get(k);
-                                    wifiFilterObject = new JSONObject();
-                                    String ssid = tempObject.optString(DeviceKeyContacts.LocationInfo.WifiInfo.SSID);
-                                    String bssid = tempObject.optString(DeviceKeyContacts.LocationInfo.WifiInfo.BSSID);
-                                    String level = tempObject.optString(DeviceKeyContacts.LocationInfo.WifiInfo.Level);
-                                    String capabilities = tempObject.optString(DeviceKeyContacts.LocationInfo.WifiInfo.Capabilities);
-                                    String frequency = tempObject.optString(DeviceKeyContacts.LocationInfo.WifiInfo.Frequency);
-                                    JsonUtils.pushToJSON(mContext,wifiFilterObject,DeviceKeyContacts.LocationInfo.WifiInfo.SSID, ssid,DataController.SWITCH_OF_SSID);
-                                    JsonUtils.pushToJSON(mContext,wifiFilterObject,DeviceKeyContacts.LocationInfo.WifiInfo.BSSID, bssid,DataController.SWITCH_OF_BSSID);
-                                    JsonUtils.pushToJSON(mContext,wifiFilterObject,DeviceKeyContacts.LocationInfo.WifiInfo.Level, level,DataController.SWITCH_OF_LEVEL);
-                                    JsonUtils.pushToJSON(mContext,wifiFilterObject,DeviceKeyContacts.LocationInfo.WifiInfo.Capabilities, capabilities,DataController.SWITCH_OF_CAPABILITIES);
-                                    JsonUtils.pushToJSON(mContext,wifiFilterObject,DeviceKeyContacts.LocationInfo.WifiInfo.Frequency, frequency,DataController.SWITCH_OF_FREQUENCY);
-                                    wifiFilterArray.put(wifiFilterObject);
-                                }
-                            }else {
-                                wifiFilterArray = null;
-                            }
-                            if(baseStationInfo != null && baseStationInfo.length() > 0 && PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BASE,DataController.SWITCH_OF_BS_NAME)){
-                                for(int t = 0;t<wifiInfo.length();t++){
-                                    tempObject = (JSONObject)wifiInfo.get(t);
-                                    baseStationFilterObject = new JSONObject();
-                                    int lac = tempObject.optInt(DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode);
-                                    int cid = tempObject.optInt(DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId);
-                                    int level = tempObject.optInt(DeviceKeyContacts.LocationInfo.BaseStationInfo.Level);
-                                    JsonUtils.pushToJSON(mContext, baseStationFilterObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, lac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                                    JsonUtils.pushToJSON(mContext, baseStationFilterObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, cid, DataController.SWITCH_OF_CELL_ID);
-                                    JsonUtils.pushToJSON(mContext, baseStationFilterObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, level, DataController.SWITCH_OF_BS_LEVEL);
-                                    baseStationFilterArray.put(baseStationFilterObject);
-                                }
-                            }else {
-                                baseStationFilterArray = null;
-                            }
-                            ELOG.e(baseStationFilterArray);
-                            //数据重新组装
-                            JsonUtils.pushToJSON(mContext,filterObject,DeviceKeyContacts.LocationInfo.CollectionTime,ct,DataController.SWITCH_OF_COLLECTION_TIME);
-                            JsonUtils.pushToJSON(mContext,filterObject,DeviceKeyContacts.LocationInfo.GeographyLocation,gl,DataController.SWITCH_OF_GEOGRAPHY_LOCATION);
-                            JsonUtils.pushToJSON(mContext,filterObject,DeviceKeyContacts.LocationInfo.WifiInfo.NAME,wifiFilterArray,DataController.SWITCH_OF_WIFI_NAME);
-                            JsonUtils.pushToJSON(mContext,filterObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME,baseStationFilterArray,DataController.SWITCH_OF_BS_NAME);
-                            newArray.put(filterObject);
-//                            }
-                            ELOG.e(newArray);
+                            newArray = locationInfoFiltered(tempObject,wifiFilterArray,baseStationFilterArray,newArray);
                         }
                    }
                }
@@ -360,6 +311,71 @@ public class UploadImpl {
         }else {
             return newArray;
         }
+    }
+
+    /**
+     * locationInfo数据按照策略过滤不需要的模块或字段
+     * @param tempObject
+     * @param wifiFilterArray
+     * @param baseStationFilterArray
+     * @param newArray
+     * @return
+     */
+    private JSONArray locationInfoFiltered(JSONObject tempObject, JSONArray wifiFilterArray, JSONArray baseStationFilterArray, JSONArray newArray){
+        try {
+            JSONObject wifiFilterObject = null,baseStationFilterObject = null,filterObject = null;
+            //拆分location值，拆为经纬度、wifi、基站
+            String ct = tempObject.optString(DeviceKeyContacts.LocationInfo.CollectionTime);
+            String gl = tempObject.optString(DeviceKeyContacts.LocationInfo.GeographyLocation);
+            JSONArray wifiInfo = tempObject.optJSONArray(DeviceKeyContacts.LocationInfo.WifiInfo.NAME);
+            JSONArray baseStationInfo = tempObject.optJSONArray(DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME);
+            //wifi不为空且需要获取
+            if(wifiInfo != null && wifiInfo.length() > 0 && PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_WIFI,DataController.SWITCH_OF_WIFI_NAME)){
+                for(int k = 0;k<wifiInfo.length();k++){
+                    tempObject = (JSONObject)wifiInfo.get(k);
+                    wifiFilterObject = new JSONObject();
+                    String ssid = tempObject.optString(DeviceKeyContacts.LocationInfo.WifiInfo.SSID);
+                    String bssid = tempObject.optString(DeviceKeyContacts.LocationInfo.WifiInfo.BSSID);
+                    int level = tempObject.optInt(DeviceKeyContacts.LocationInfo.WifiInfo.Level);
+                    String capabilities = tempObject.optString(DeviceKeyContacts.LocationInfo.WifiInfo.Capabilities);
+                    int frequency = tempObject.optInt(DeviceKeyContacts.LocationInfo.WifiInfo.Frequency);
+                    wifiFilterObject = WifiImpl.getInstance(mContext).getWifiInfoObj(wifiFilterObject,ssid,bssid,level,capabilities,frequency);
+                    if(wifiFilterObject != null && wifiFilterObject.length() > 0){
+                        wifiFilterArray.put(wifiFilterObject);
+                    }
+
+                }
+            }else {
+                wifiFilterArray = null;
+            }
+            if(baseStationInfo != null && baseStationInfo.length() > 0 && PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BASE,DataController.SWITCH_OF_BS_NAME)){
+                for(int t = 0;t<wifiInfo.length();t++){
+                    tempObject = (JSONObject)wifiInfo.get(t);
+                    baseStationFilterObject = new JSONObject();
+                    int lac = tempObject.optInt(DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode);
+                    int cid = tempObject.optInt(DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId);
+                    int level = tempObject.optInt(DeviceKeyContacts.LocationInfo.BaseStationInfo.Level);
+                    baseStationFilterObject = LocationImpl.getInstance(mContext).getBaseStationInfoObj(baseStationFilterObject,lac,cid,level);
+                    if(baseStationFilterObject != null && baseStationFilterObject.length() > 0){
+                        baseStationFilterArray.put(baseStationFilterObject);
+                    }
+                }
+            }else {
+                baseStationFilterArray = null;
+            }
+            filterObject = new JSONObject();
+            //数据重新组装
+            JsonUtils.pushToJSON(mContext,filterObject,DeviceKeyContacts.LocationInfo.CollectionTime,ct,DataController.SWITCH_OF_COLLECTION_TIME);
+            JsonUtils.pushToJSON(mContext,filterObject,DeviceKeyContacts.LocationInfo.GeographyLocation,gl,DataController.SWITCH_OF_GEOGRAPHY_LOCATION);
+            JsonUtils.pushToJSON(mContext,filterObject,DeviceKeyContacts.LocationInfo.WifiInfo.NAME,wifiFilterArray,DataController.SWITCH_OF_WIFI_NAME);
+            JsonUtils.pushToJSON(mContext,filterObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME,baseStationFilterArray,DataController.SWITCH_OF_BS_NAME);
+            if(filterObject.has(DeviceKeyContacts.LocationInfo.GeographyLocation) || filterObject.has(DeviceKeyContacts.LocationInfo.WifiInfo.NAME)
+                    || filterObject.has(DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME)){
+                newArray.put(filterObject);
+            }
+        }catch (Throwable t){
+        }
+        return newArray;
     }
     //
     /**
