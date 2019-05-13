@@ -118,7 +118,8 @@ public class LocationImpl {
                 mTelephonyManager = AnalysysPhoneStateListener.getInstance(mContext).getTelephonyManager();
             }
             JSONObject location = getLocation();
-            if (location != null) {
+            if (location != null && (location.has(DeviceKeyContacts.LocationInfo.GeographyLocation)||location.has
+                    (DeviceKeyContacts.LocationInfo.WifiInfo.NAME)||location.has(DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME))) {
                 TableLocation.getInstance(mContext).insert(location);
             }
         } catch (Throwable t) {
@@ -290,7 +291,9 @@ public class LocationImpl {
             if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_WIFI, true)) {
                 try {
                     JSONArray wifiInfo = WifiImpl.getInstance(mContext).getWifiInfo();
-                    JsonUtils.pushToJSON(mContext, locationJson, DeviceKeyContacts.LocationInfo.WifiInfo.NAME, wifiInfo, DataController.SWITCH_OF_WIFI_NAME);
+                    if(wifiInfo != null && wifiInfo.length() > 0){
+                        JsonUtils.pushToJSON(mContext, locationJson, DeviceKeyContacts.LocationInfo.WifiInfo.NAME, wifiInfo, DataController.SWITCH_OF_WIFI_NAME);
+                    }
                 } catch (Throwable t) {
                 }
             }
@@ -298,7 +301,9 @@ public class LocationImpl {
             if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BASE, true)) {
                 try {
                     JSONArray baseStation = getBaseStationInfo();
-                    JsonUtils.pushToJSON(mContext, locationJson, DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME, baseStation, DataController.SWITCH_OF_BS_NAME);
+                    if(baseStation != null && baseStation.length() > 0){
+                        JsonUtils.pushToJSON(mContext, locationJson, DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME, baseStation, DataController.SWITCH_OF_BS_NAME);
+                    }
                 } catch (Throwable t) {
                 }
 
@@ -347,10 +352,10 @@ public class LocationImpl {
                                     if (tempCid > 0 && tempLac > 0 && !cid.contains(key)) {
                                         cid.add(key);
                                         jsonObject = new JSONObject();
-                                        JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                                        JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, tempCid, DataController.SWITCH_OF_CELL_ID);
-                                        JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, info.getRssi(), DataController.SWITCH_OF_BS_LEVEL);
-                                        jsonArray.put(jsonObject);
+                                        jsonObject = getBaseStationInfoObj(jsonObject,tempLac,tempCid,info.getRssi());
+                                        if(jsonObject != null && jsonObject.length() > 0){
+                                            jsonArray.put(jsonObject);
+                                        }
                                     }
                                 }
                             }
@@ -469,9 +474,7 @@ public class LocationImpl {
                                     cid.add(key);
                                     obj = new JSONObject();
                                     strength = lte.getCellSignalStrength().getDbm();
-                                    JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                                    JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, tempCid, DataController.SWITCH_OF_CELL_ID);
-                                    JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, strength, DataController.SWITCH_OF_BS_LEVEL);
+                                    obj = getBaseStationInfoObj(obj,tempLac,tempCid,strength);
                                     tempCdmaMap.put(strength+"|"+key, obj);
                                     tempJsonObj = new JSONObject();
                                     tempJsonObj.put("stren",strength);
@@ -487,9 +490,7 @@ public class LocationImpl {
                                     cid.add(key);
                                     obj = new JSONObject();
                                     strength = wcdma.getCellSignalStrength().getDbm();
-                                    JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, tempLac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                                    JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, tempCid, DataController.SWITCH_OF_CELL_ID);
-                                    JsonUtils.pushToJSON(mContext, obj, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, strength, DataController.SWITCH_OF_BS_LEVEL);
+                                    obj = getBaseStationInfoObj(obj,tempLac,tempCid,strength);
                                     tempCdmaMap.put(strength+"|"+key, obj);
                                     tempJsonObj = new JSONObject();
                                     tempJsonObj.put("stren",strength);
@@ -532,7 +533,9 @@ public class LocationImpl {
                     if (count < 5) {
                         count = count + 1;
                         JSONObject obj = map.get(list.get(k).optString("mapKey"));
-                        jsonArray.put(obj);
+                        if(obj != null && obj.length() > 0){
+                            jsonArray.put(obj);
+                        }
                     } else {
                         break;
                     }

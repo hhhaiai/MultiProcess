@@ -53,7 +53,6 @@ public class TableLocation {
                     cv.put(DBConfig.Location.Column.LI, EncryptUtils.encrypt(mContext,encryptLocation));
                     cv.put(DBConfig.Location.Column.IT, locationTime);
                     cv.put(DBConfig.Location.Column.ST, INSERT_STATUS_DEFAULT);
-                    cv.put(DBConfig.Location.Column.L_RA, EGContext.SDK_VERSION);
                     SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
                     if(db == null){
                         return;
@@ -84,9 +83,8 @@ public class TableLocation {
             db.beginTransaction();
             cursor = db.query(DBConfig.Location.TABLE_NAME, null,
                     null, null, null, null, null);
-            String id = "",encryptLocation = "",time = "",version = "";
+            String id = "",encryptLocation = "",time = "";
             long timeStamp = 0;
-            JSONObject jsonObject = null;
             while (cursor.moveToNext()) {
                 if(blankCount >= EGContext.BLANK_COUNT_MAX){
                     return array;
@@ -94,7 +92,6 @@ public class TableLocation {
                 id = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.ID));
                 encryptLocation = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.LI));
                 time = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.IT));
-                version = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.L_RA));
                 ContentValues cv = new ContentValues();
                 cv.put(DBConfig.Location.Column.ST, INSERT_STATUS_READ_OVER);
                 db.update(DBConfig.Location.TABLE_NAME, cv, DBConfig.Location.Column.ID + "=?", new String[]{id});
@@ -103,10 +100,7 @@ public class TableLocation {
                 }
                 String decryptLocation = Base64Utils.decrypt(EncryptUtils.decrypt(mContext,encryptLocation), timeStamp);
                 if(!TextUtils.isEmpty(decryptLocation)){
-                    jsonObject = new JSONObject();
-                    jsonObject.put(EGContext.LOCATION_INFO,decryptLocation);
-                    jsonObject.put(EGContext.VERSION,version);
-                    array.put(jsonObject);
+                    array.put(new JSONObject(decryptLocation));
                 } else {
                     blankCount += 1;
                 }

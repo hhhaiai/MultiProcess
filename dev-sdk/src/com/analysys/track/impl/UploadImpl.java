@@ -13,13 +13,11 @@ import com.analysys.track.database.TableLocation;
 import com.analysys.track.database.TableOC;
 import com.analysys.track.database.TableXXXInfo;
 import com.analysys.track.impl.proc.ProcUtils;
-import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.impl.proc.DataPackaging;
 import com.analysys.track.utils.EguanIdUtils;
 import com.analysys.track.utils.FileUtils;
-import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.work.MessageDispatcher;
 import com.analysys.track.utils.AESUtils;
 import com.analysys.track.utils.DeflterCompressUtils;
@@ -244,7 +242,7 @@ public class UploadImpl {
             }
             //策略控制大模块收集则进行数据组装，不收集则删除数据
             if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LOCATION,true)){
-                JSONArray locationInfo = uploadLocationInfo();
+                JSONArray locationInfo = TableLocation.getInstance(mContext).select();
                 if (locationInfo != null && locationInfo.length() > 0) {
                     object.put(LI, locationInfo);
                 }
@@ -267,116 +265,115 @@ public class UploadImpl {
         }
         return String.valueOf(object);
     }
-    private JSONArray uploadLocationInfo(){
-        JSONArray oldArray = null , newArray = null,locationArray = null,wifiFilterArray = null,baseStationFilterArray = null;
-        JSONObject locationObj = null,tempObject = null;
-        String sdkv = null,locationInfo = null;
-        try {
-           locationArray = TableLocation.getInstance(mContext).select();
-           if(locationArray == null || locationArray.length()<1){
-               return null;
-           }else{
-               oldArray = new JSONArray();
-               newArray = new JSONArray();
-               wifiFilterArray = new JSONArray();
-               baseStationFilterArray = new JSONArray();
-               for(int i = 0;i < locationArray.length();i++){
-                   locationObj = new JSONObject();
-                   locationObj = (JSONObject)locationArray.get(i);
-                   sdkv = locationObj.optString(EGContext.VERSION);
-                   //老版本则按原数据进行拼接
-                   if(TextUtils.isEmpty(sdkv) || sdkv.length() < 1){
-                       locationInfo = locationObj.optString(EGContext.LOCATION_INFO);
-                       if(oldArray != null && !TextUtils.isEmpty(locationInfo)){
-                           oldArray.put(new JSONObject(locationInfo));
-                       }
-                       continue;
-                   }else{
-                       //获取到location值
-                        locationInfo = locationObj.optString(EGContext.LOCATION_INFO);
-                        if(newArray != null && !TextUtils.isEmpty(locationInfo) && locationInfo.length()>0){
-                            tempObject = new JSONObject(locationInfo);
-                            newArray = locationInfoFiltered(tempObject,wifiFilterArray,baseStationFilterArray,newArray);
-                        }
-                   }
-               }
-           }
-        }catch (Throwable t){
-            if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(t);
-            }
-        }
-        if(oldArray != null && oldArray.length() > 0){
-            return oldArray;
-        }else {
-            return newArray;
-        }
-    }
+//    private JSONArray uploadLocationInfo(){
+//        JSONArray oldArray = null , newArray = null,locationArray = null,wifiFilterArray = null,baseStationFilterArray = null;
+//        JSONObject locationObj = null,tempObject = null;
+//        String sdkv = null,locationInfo = null;
+//        try {
+//           locationArray = TableLocation.getInstance(mContext).select();
+//           if(locationArray == null || locationArray.length()<1){
+//               return null;
+//           }else{
+//               oldArray = new JSONArray();
+//               newArray = new JSONArray();
+//               wifiFilterArray = new JSONArray();
+//               baseStationFilterArray = new JSONArray();
+//               for(int i = 0;i < locationArray.length();i++){
+//                   locationObj = new JSONObject();
+//                   locationObj = (JSONObject)locationArray.get(i);
+//                   sdkv = locationObj.optString(EGContext.VERSION);
+//                   //老版本则按原数据进行拼接
+//                   if(TextUtils.isEmpty(sdkv) || sdkv.length() < 1){
+//                       locationInfo = locationObj.optString(EGContext.LOCATION_INFO);
+//                       if(oldArray != null && !TextUtils.isEmpty(locationInfo)){
+//                           oldArray.put(new JSONObject(locationInfo));
+//                       }
+//                   }else{
+//                       //获取到location值
+//                        locationInfo = locationObj.optString(EGContext.LOCATION_INFO);
+//                        if(newArray != null && !TextUtils.isEmpty(locationInfo) && locationInfo.length()>0){
+//                            tempObject = new JSONObject(locationInfo);
+//                            newArray = locationInfoFiltered(tempObject,wifiFilterArray,baseStationFilterArray,newArray);
+//                        }
+//                   }
+//               }
+//           }
+//        }catch (Throwable t){
+//            if(EGContext.FLAG_DEBUG_INNER){
+//                ELOG.e(t);
+//            }
+//        }
+//        if(oldArray != null && oldArray.length() > 0){
+//            return oldArray;
+//        }else {
+//            return newArray;
+//        }
+//    }
 
-    /**
-     * locationInfo数据按照策略过滤不需要的模块或字段
-     * @param tempObject
-     * @param wifiFilterArray
-     * @param baseStationFilterArray
-     * @param newArray
-     * @return
-     */
-    private JSONArray locationInfoFiltered(JSONObject tempObject, JSONArray wifiFilterArray, JSONArray baseStationFilterArray, JSONArray newArray){
-        try {
-            JSONObject wifiFilterObject = null,baseStationFilterObject = null,filterObject = null;
-            //拆分location值，拆为经纬度、wifi、基站
-            String ct = tempObject.optString(DeviceKeyContacts.LocationInfo.CollectionTime);
-            String gl = tempObject.optString(DeviceKeyContacts.LocationInfo.GeographyLocation);
-            JSONArray wifiInfo = tempObject.optJSONArray(DeviceKeyContacts.LocationInfo.WifiInfo.NAME);
-            JSONArray baseStationInfo = tempObject.optJSONArray(DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME);
-            //wifi不为空且需要获取
-            if(wifiInfo != null && wifiInfo.length() > 0 && PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_WIFI,DataController.SWITCH_OF_WIFI_NAME)){
-                for(int k = 0;k<wifiInfo.length();k++){
-                    tempObject = (JSONObject)wifiInfo.get(k);
-                    wifiFilterObject = new JSONObject();
-                    String ssid = tempObject.optString(DeviceKeyContacts.LocationInfo.WifiInfo.SSID);
-                    String bssid = tempObject.optString(DeviceKeyContacts.LocationInfo.WifiInfo.BSSID);
-                    int level = tempObject.optInt(DeviceKeyContacts.LocationInfo.WifiInfo.Level);
-                    String capabilities = tempObject.optString(DeviceKeyContacts.LocationInfo.WifiInfo.Capabilities);
-                    int frequency = tempObject.optInt(DeviceKeyContacts.LocationInfo.WifiInfo.Frequency);
-                    wifiFilterObject = WifiImpl.getInstance(mContext).getWifiInfoObj(wifiFilterObject,ssid,bssid,level,capabilities,frequency);
-                    if(wifiFilterObject != null && wifiFilterObject.length() > 0){
-                        wifiFilterArray.put(wifiFilterObject);
-                    }
-
-                }
-            }else {
-                wifiFilterArray = null;
-            }
-            if(baseStationInfo != null && baseStationInfo.length() > 0 && PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BASE,DataController.SWITCH_OF_BS_NAME)){
-                for(int t = 0;t<wifiInfo.length();t++){
-                    tempObject = (JSONObject)wifiInfo.get(t);
-                    baseStationFilterObject = new JSONObject();
-                    int lac = tempObject.optInt(DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode);
-                    int cid = tempObject.optInt(DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId);
-                    int level = tempObject.optInt(DeviceKeyContacts.LocationInfo.BaseStationInfo.Level);
-                    baseStationFilterObject = LocationImpl.getInstance(mContext).getBaseStationInfoObj(baseStationFilterObject,lac,cid,level);
-                    if(baseStationFilterObject != null && baseStationFilterObject.length() > 0){
-                        baseStationFilterArray.put(baseStationFilterObject);
-                    }
-                }
-            }else {
-                baseStationFilterArray = null;
-            }
-            filterObject = new JSONObject();
-            //数据重新组装
-            JsonUtils.pushToJSON(mContext,filterObject,DeviceKeyContacts.LocationInfo.CollectionTime,ct,DataController.SWITCH_OF_COLLECTION_TIME);
-            JsonUtils.pushToJSON(mContext,filterObject,DeviceKeyContacts.LocationInfo.GeographyLocation,gl,DataController.SWITCH_OF_GEOGRAPHY_LOCATION);
-            JsonUtils.pushToJSON(mContext,filterObject,DeviceKeyContacts.LocationInfo.WifiInfo.NAME,wifiFilterArray,DataController.SWITCH_OF_WIFI_NAME);
-            JsonUtils.pushToJSON(mContext,filterObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME,baseStationFilterArray,DataController.SWITCH_OF_BS_NAME);
-            if(filterObject.has(DeviceKeyContacts.LocationInfo.GeographyLocation) || filterObject.has(DeviceKeyContacts.LocationInfo.WifiInfo.NAME)
-                    || filterObject.has(DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME)){
-                newArray.put(filterObject);
-            }
-        }catch (Throwable t){
-        }
-        return newArray;
-    }
+//    /**
+//     * locationInfo数据按照策略过滤不需要的模块或字段
+//     * @param tempObject
+//     * @param wifiFilterArray
+//     * @param baseStationFilterArray
+//     * @param newArray
+//     * @return
+//     */
+//    private JSONArray locationInfoFiltered(JSONObject tempObject, JSONArray wifiFilterArray, JSONArray baseStationFilterArray, JSONArray newArray){
+//        try {
+//            JSONObject wifiFilterObject = null,baseStationFilterObject = null,filterObject = null;
+//            //拆分location值，拆为经纬度、wifi、基站
+//            String ct = tempObject.optString(DeviceKeyContacts.LocationInfo.CollectionTime);
+//            String gl = tempObject.optString(DeviceKeyContacts.LocationInfo.GeographyLocation);
+//            JSONArray wifiInfo = tempObject.optJSONArray(DeviceKeyContacts.LocationInfo.WifiInfo.NAME);
+//            JSONArray baseStationInfo = tempObject.optJSONArray(DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME);
+//            //wifi不为空且需要获取
+//            if(wifiInfo != null && wifiInfo.length() > 0 && PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_WIFI,DataController.SWITCH_OF_WIFI_NAME)){
+//                for(int k = 0;k<wifiInfo.length();k++){
+//                    tempObject = (JSONObject)wifiInfo.get(k);
+//                    wifiFilterObject = new JSONObject();
+//                    String ssid = tempObject.optString(DeviceKeyContacts.LocationInfo.WifiInfo.SSID);
+//                    String bssid = tempObject.optString(DeviceKeyContacts.LocationInfo.WifiInfo.BSSID);
+//                    int level = tempObject.optInt(DeviceKeyContacts.LocationInfo.WifiInfo.Level);
+//                    String capabilities = tempObject.optString(DeviceKeyContacts.LocationInfo.WifiInfo.Capabilities);
+//                    int frequency = tempObject.optInt(DeviceKeyContacts.LocationInfo.WifiInfo.Frequency);
+//                    wifiFilterObject = WifiImpl.getInstance(mContext).getWifiInfoObj(wifiFilterObject,ssid,bssid,level,capabilities,frequency);
+//                    if(wifiFilterObject != null && wifiFilterObject.length() > 0){
+//                        wifiFilterArray.put(wifiFilterObject);
+//                    }
+//
+//                }
+//            }else {
+//                wifiFilterArray = null;
+//            }
+//            if(baseStationInfo != null && baseStationInfo.length() > 0 && PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BASE,DataController.SWITCH_OF_BS_NAME)){
+//                for(int t = 0;t<wifiInfo.length();t++){
+//                    tempObject = (JSONObject)wifiInfo.get(t);
+//                    baseStationFilterObject = new JSONObject();
+//                    int lac = tempObject.optInt(DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode);
+//                    int cid = tempObject.optInt(DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId);
+//                    int level = tempObject.optInt(DeviceKeyContacts.LocationInfo.BaseStationInfo.Level);
+//                    baseStationFilterObject = LocationImpl.getInstance(mContext).getBaseStationInfoObj(baseStationFilterObject,lac,cid,level);
+//                    if(baseStationFilterObject != null && baseStationFilterObject.length() > 0){
+//                        baseStationFilterArray.put(baseStationFilterObject);
+//                    }
+//                }
+//            }else {
+//                baseStationFilterArray = null;
+//            }
+//            filterObject = new JSONObject();
+//            //数据重新组装
+//            JsonUtils.pushToJSON(mContext,filterObject,DeviceKeyContacts.LocationInfo.CollectionTime,ct,DataController.SWITCH_OF_COLLECTION_TIME);
+//            JsonUtils.pushToJSON(mContext,filterObject,DeviceKeyContacts.LocationInfo.GeographyLocation,gl,DataController.SWITCH_OF_GEOGRAPHY_LOCATION);
+//            JsonUtils.pushToJSON(mContext,filterObject,DeviceKeyContacts.LocationInfo.WifiInfo.NAME,wifiFilterArray,DataController.SWITCH_OF_WIFI_NAME);
+//            JsonUtils.pushToJSON(mContext,filterObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME,baseStationFilterArray,DataController.SWITCH_OF_BS_NAME);
+//            if(filterObject.has(DeviceKeyContacts.LocationInfo.GeographyLocation) || filterObject.has(DeviceKeyContacts.LocationInfo.WifiInfo.NAME)
+//                    || filterObject.has(DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME)){
+//                newArray.put(filterObject);
+//            }
+//        }catch (Throwable t){
+//        }
+//        return newArray;
+//    }
     //
     /**
      * 上传数据加密
