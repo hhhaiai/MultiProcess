@@ -74,10 +74,14 @@ public class LocationImpl {
     public void location() {
         try {
             long currentTime = System.currentTimeMillis();
-//            long snapCollectCycle = PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE);
             MessageDispatcher.getInstance(mContext).locationInfo(EGContext.LOCATION_CYCLE);
             if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_LOCATION,EGContext.LOCATION_CYCLE,currentTime)){
                 FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_LOCATION,currentTime);
+            }else {
+                return;
+            }
+            if(!isLocationBlockRunning){
+                isLocationBlockRunning = true;
             }else {
                 return;
             }
@@ -434,9 +438,6 @@ public class LocationImpl {
                                 tempLac = cdma.getCellIdentity().getNetworkId();
                                 key = tempCid + "|" + tempLac;
 
-//                                if (cid == null) {
-//                                    cid = new HashSet<String>();
-//                                }
                                 if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
                                     cid.add(key);
                                     obj = new JSONObject();
@@ -455,9 +456,6 @@ public class LocationImpl {
                                 tempCid = gsm.getCellIdentity().getCid();
                                 tempLac = gsm.getCellIdentity().getLac();
                                 key = tempCid + "|" + tempLac;
-//                                if (cid == null) {
-//                                    cid = new HashSet<String>();
-//                                }
                                 if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
                                     cid.add(key);
                                     obj = new JSONObject();
@@ -476,9 +474,6 @@ public class LocationImpl {
                                 tempCid = lte.getCellIdentity().getPci();
                                 tempLac = lte.getCellIdentity().getTac();
                                 key = tempCid + "|" + tempLac;
-//                                if (cid == null) {
-////                                    cid = new HashSet<String>();
-////                                }
                                 if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
                                     cid.add(key);
                                     obj = new JSONObject();
@@ -497,9 +492,6 @@ public class LocationImpl {
                                 tempCid = wcdma.getCellIdentity().getCid();
                                 tempLac = wcdma.getCellIdentity().getLac();
                                 key = tempCid + "|" + tempLac;
-//                                if (cid == null) {
-//                                    cid = new HashSet<String>();
-//                                }
                                 if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
                                     cid.add(key);
                                     obj = new JSONObject();
@@ -516,10 +508,6 @@ public class LocationImpl {
                             }
 
                         }
-//                        if (tempCid > 0 && tempLac > 0) {
-//                            mWbgInfo.setCellId(String.valueOf(tempMap.get(list.get(0)).optString("cid")));
-//                            mWbgInfo.setLocationAreaCode(String.valueOf(tempMap.get(list.get(0)).optString("lac")));
-//                        }
                     }
                 } catch (Throwable t) {
                     if(EGContext.FLAG_DEBUG_INNER){

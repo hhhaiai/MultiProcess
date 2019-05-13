@@ -264,5 +264,8 @@ public class EGContext {
     public static boolean IS_SHOW_NOTIFITION = false;
     public static boolean SCREEN_ON = true;
     public static final String SPUTIL = "sptrack";
+    public static final String LOCATION_INFO = "eg_li";
+    public static final String VERSION = "eg_v";
+
 
 }

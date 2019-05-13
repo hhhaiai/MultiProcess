@@ -36,9 +36,6 @@ public class TableLocation {
 
     public void insert(JSONObject locationInfo) {
         try {
-//            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_LOCATION)){
-//                return;
-//            }
             ContentValues cv = null;
             String locationTime = null;
             long time = -1;
@@ -56,6 +53,7 @@ public class TableLocation {
                     cv.put(DBConfig.Location.Column.LI, EncryptUtils.encrypt(mContext,encryptLocation));
                     cv.put(DBConfig.Location.Column.IT, locationTime);
                     cv.put(DBConfig.Location.Column.ST, INSERT_STATUS_DEFAULT);
+                    cv.put(DBConfig.Location.Column.L_RA, EGContext.SDK_VERSION);
                     SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
                     if(db == null){
                         return;
@@ -86,8 +84,9 @@ public class TableLocation {
             db.beginTransaction();
             cursor = db.query(DBConfig.Location.TABLE_NAME, null,
                     null, null, null, null, null);
-            String id = "",encryptLocation = "",time = "";
+            String id = "",encryptLocation = "",time = "",version = "";
             long timeStamp = 0;
+            JSONObject jsonObject = null;
             while (cursor.moveToNext()) {
                 if(blankCount >= EGContext.BLANK_COUNT_MAX){
                     return array;
@@ -95,6 +94,7 @@ public class TableLocation {
                 id = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.ID));
                 encryptLocation = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.LI));
                 time = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.IT));
+                version = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.L_RA));
                 ContentValues cv = new ContentValues();
                 cv.put(DBConfig.Location.Column.ST, INSERT_STATUS_READ_OVER);
                 db.update(DBConfig.Location.TABLE_NAME, cv, DBConfig.Location.Column.ID + "=?", new String[]{id});
@@ -103,7 +103,10 @@ public class TableLocation {
                 }
                 String decryptLocation = Base64Utils.decrypt(EncryptUtils.decrypt(mContext,encryptLocation), timeStamp);
                 if(!TextUtils.isEmpty(decryptLocation)){
-                    array.put(new JSONObject(decryptLocation));
+                    jsonObject = new JSONObject();
+                    jsonObject.put(EGContext.LOCATION_INFO,decryptLocation);
+                    jsonObject.put(EGContext.VERSION,version);
+                    array.put(jsonObject);
                 } else {
                     blankCount += 1;
                 }
@@ -131,11 +134,6 @@ public class TableLocation {
             if(db == null) {
                 return;
             }
-//            String sql = "delete from " + DBConfig.Location.TABLE_NAME + " where "+DBConfig.Location.Column.ID +
-//                    "!=(select max(" + DBConfig.Location.Column.ID + ") from " + DBConfig.Location.TABLE_NAME + "" +
-//                    " where " + DBConfig.Location.Column.ST + "=1) and " + DBConfig.Location.Column.ST + "=1";
-//            ELOG.i("sql ::::::::  "+sql);
-//            db.execSQL(sql);
             db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?", new String[]{INSERT_STATUS_READ_OVER});
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
