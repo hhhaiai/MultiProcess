@@ -2,6 +2,7 @@ package com.analysys.track.utils;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -19,6 +20,8 @@ import java.util.UUID;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+
+import static android.provider.Settings.System.AIRPLANE_MODE_ON;
 
 /**
  * @Copyright © 2018 EGuan Inc. All rights reserved.
@@ -333,5 +336,17 @@ public class EncryptUtils {
         }
         return result;
     }
-
+    private static boolean isAirplaneModeOn(Context context) {
+        try {
+            ContentResolver contentResolver = context.getContentResolver();
+            if(contentResolver != null){
+                return Settings.System.getInt(contentResolver, AIRPLANE_MODE_ON, 0) != 0;
+            }
+        }catch (Throwable t){
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(t);
+            }
+        }
+        return false;
+    }
 }
