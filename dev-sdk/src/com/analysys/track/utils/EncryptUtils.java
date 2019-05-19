@@ -90,11 +90,8 @@ public class EncryptUtils {
             SharedPreferences pref = context.getSharedPreferences(EGContext.SPUTIL, Context.MODE_PRIVATE);
             if(pref != null){
                 SharedPreferences.Editor editor = pref.edit();
-                // editor.putString(SP_EK_ID, "");
-                if(editor != null && pref.contains(SP_EK_ID)){
-                    editor.remove(SP_EK_ID);
-                    editor.apply();
-                }
+                editor.putString(SP_EK_ID, "");
+                editor.apply();
             }
             mEncryptKey = null;
         }catch (Throwable t){
@@ -148,7 +145,11 @@ public class EncryptUtils {
     }
     private static boolean canGetAndroidId(Context context){
         try {
-            return !TextUtils.isEmpty(Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID));
+            if(isAirplaneModeOn(context)){
+                return false;
+            }else {
+                return !TextUtils.isEmpty(Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID));
+            }
         }catch (Throwable t){
         }
         return false;
@@ -338,6 +339,9 @@ public class EncryptUtils {
     }
     private static boolean isAirplaneModeOn(Context context) {
         try {
+            if(context == null){
+                return false;
+            }
             ContentResolver contentResolver = context.getContentResolver();
             if(contentResolver != null){
                 return Settings.System.getInt(contentResolver, AIRPLANE_MODE_ON, 0) != 0;

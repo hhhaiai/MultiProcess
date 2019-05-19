@@ -9,11 +9,8 @@ import android.telephony.CellInfoCdma;
 import android.telephony.CellInfoGsm;
 import android.telephony.CellInfoLte;
 import android.telephony.CellInfoWcdma;
-import android.telephony.CellLocation;
 import android.telephony.NeighboringCellInfo;
 import android.telephony.TelephonyManager;
-import android.telephony.cdma.CdmaCellLocation;
-import android.telephony.gsm.GsmCellLocation;
 import android.text.TextUtils;
 
 import com.analysys.track.database.TableLocation;
@@ -308,7 +305,33 @@ public class LocationImpl {
                 }
 
             }
+            //cidList 获取
+            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_CID_LIST, true)) {
+                try {
+                    String cidList = SPHelper.getStringValueFromSP(mContext,EGContext.CID_LIST,null);
+                    if(cidList != null && cidList.length() > 0){
+                        JsonUtils.pushToJSON(mContext, locationJson, DeviceKeyContacts.LocationInfo.BaseStationInfo.cidList, cidList, DataController.SWITCH_OF_BS_CID_LIST);
+                    }
+                } catch (Throwable t) {
+                    if(EGContext.FLAG_DEBUG_INNER){
+                        ELOG.e(t);
+                    }
+                }
 
+            }
+            //lacList 获取
+            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LAC_LIST, true)) {
+                try {
+                    String lacList = SPHelper.getStringValueFromSP(mContext,EGContext.LAC_LIST,null);
+                    if(lacList != null && lacList.length() > 0){
+                        JsonUtils.pushToJSON(mContext, locationJson, DeviceKeyContacts.LocationInfo.BaseStationInfo.lacList, lacList, DataController.SWITCH_OF_BS_LAC_LIST);
+                    }
+                } catch (Throwable t) {
+                    if(EGContext.FLAG_DEBUG_INNER){
+                        ELOG.e(t);
+                    }
+                }
+            }
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
                 ELOG.e(e);
@@ -330,6 +353,8 @@ public class LocationImpl {
         JSONArray jsonArray = null;
         JSONObject jsonObject = null,tempJsonObj = null;
         Set<String> cid = new HashSet<String>();
+        List<Integer> cidList = new ArrayList<Integer>();
+        List<Integer> lacList = new ArrayList<Integer>();
         try {
             if (mTelephonyManager == null) {
                 return jsonArray;
@@ -352,9 +377,11 @@ public class LocationImpl {
                                     if (tempCid > 0 && tempLac > 0 && !cid.contains(key)) {
                                         cid.add(key);
                                         jsonObject = new JSONObject();
-                                        jsonObject = getBaseStationInfoObj(jsonObject,tempLac,tempCid,info.getRssi());
+                                        jsonObject = getBaseStationInfoObj(jsonObject,tempLac,tempCid,info.getRssi(),info.getPsc(),0,0);
                                         if(jsonObject != null && jsonObject.length() > 0){
                                             jsonArray.put(jsonObject);
+                                            cidList.add(tempCid);
+                                            lacList.add(tempLac);
                                         }
                                     }
                                 }
@@ -368,56 +395,56 @@ public class LocationImpl {
                 }
                 Map<String, JSONObject> tempGsmMap = new HashMap<String, JSONObject>(), tempCdmaMap = new HashMap<String, JSONObject>();
                 List<JSONObject> gsmList = new ArrayList<JSONObject>(), cdmaList = new ArrayList<JSONObject>();
-                try {
-                    CellLocation location = mTelephonyManager.getCellLocation();
-                    GsmCellLocation gcl = null;
-                    CdmaCellLocation ccl = null;
-                    if (location != null) {
-                        if (location instanceof GsmCellLocation) {
-                            gcl = (GsmCellLocation) location;
-                            jsonObject = new JSONObject();
-                            if (gcl != null) {
-                                //获取当前基站信息
-                                int tempCid = gcl.getCid(), tempLac = gcl.getLac();
-                                String key = tempCid + "|" + tempLac;
-                                if (tempCid > 0 && tempLac > 0 && !cid.contains(key)) {
-                                    cid.add(key);
-                                    int stren = gcl.getPsc();
-                                    jsonObject = getBaseStationInfoObj(jsonObject,tempLac,tempCid,stren);
-                                    tempGsmMap.put(stren+"|"+key, jsonObject);
-                                    tempJsonObj = new JSONObject();
-                                    tempJsonObj.put("stren",stren);
-                                    tempJsonObj.put("mapKey",stren+"|"+key);
-                                    gsmList.add(tempJsonObj);
-                                }
-                            }
-                        } else if (location instanceof CdmaCellLocation) {
-                            jsonObject = new JSONObject();
-                            ccl = (CdmaCellLocation) mTelephonyManager.getCellLocation();
-                            if (ccl != null) {
-                                int tempCid = ccl.getBaseStationId(), tempLac = ccl.getNetworkId();
-                                String key = tempCid + "|" + tempLac;
-
-                                if (tempCid > 0 && tempLac > 0 && !cid.contains(key)) {
-                                    cid.add(key);
-                                    //获取当前基站信息
-                                    int stren = ccl.getSystemId();
-                                    jsonObject = getBaseStationInfoObj(jsonObject,tempLac,tempCid,stren);
-                                    tempCdmaMap.put(stren+"|"+key, jsonObject);
-                                    tempJsonObj = new JSONObject();
-                                    tempJsonObj.put("stren",stren);
-                                    tempJsonObj.put("mapKey",stren+"|"+key);
-                                    cdmaList.add(tempJsonObj);
-                                }
-                            }
-                        }
-                    }
-
-                } catch (Throwable t) {
-                    if(EGContext.FLAG_DEBUG_INNER){
-                        ELOG.e(t);
-                    }
-                }
+                //是方案b的子集
+//                try {
+//                    CellLocation location = mTelephonyManager.getCellLocation();
+//                    GsmCellLocation gcl = null;
+//                    CdmaCellLocation ccl = null;
+//                    if (location != null) {
+//                        if (location instanceof GsmCellLocation) {
+//                            gcl = (GsmCellLocation) location;
+//                            jsonObject = new JSONObject();
+//                            if (gcl != null) {
+//                                //获取当前基站信息
+//                                int tempCid = gcl.getCid(), tempLac = gcl.getLac();
+//                                String key = tempCid + "|" + tempLac;
+//                                if (tempCid > 0 && tempLac > 0 && !cid.contains(key)) {
+//                                    cid.add(key);
+//                                    int stren = gcl.getPsc();
+//                                    jsonObject = getBaseStationInfoObj(jsonObject,tempLac,tempCid,stren,gcl.getPsc(),0,0);
+//                                    tempGsmMap.put(stren+"|"+key, jsonObject);
+//                                    tempJsonObj = new JSONObject();
+//                                    tempJsonObj.put("stren",stren);
+//                                    tempJsonObj.put("mapKey",stren+"|"+key);
+//                                    gsmList.add(tempJsonObj);
+//                                }
+//                            }
+//                        } else if (location instanceof CdmaCellLocation) {
+//                            jsonObject = new JSONObject();
+//                            ccl = (CdmaCellLocation) mTelephonyManager.getCellLocation();
+//                            if (ccl != null) {
+//                                int tempCid = ccl.getBaseStationId(), tempLac = ccl.getNetworkId();
+//                                String key = tempCid + "|" + tempLac;
+//                                if (tempCid > 0 && tempLac > 0 && !cid.contains(key)) {
+//                                    cid.add(key);
+//                                    //获取当前基站信息
+//                                    int stren = ccl.getSystemId();
+//                                    jsonObject = getBaseStationInfoObj(jsonObject,tempLac,tempCid,stren,0,0,0);
+//                                    tempCdmaMap.put(stren+"|"+key, jsonObject);
+//                                    tempJsonObj = new JSONObject();
+//                                    tempJsonObj.put("stren",stren);
+//                                    tempJsonObj.put("mapKey",stren+"|"+key);
+//                                    cdmaList.add(tempJsonObj);
+//                                }
+//                            }
+//                        }
+//                    }
+//
+//                } catch (Throwable t) {
+//                    if(EGContext.FLAG_DEBUG_INNER){
+//                        ELOG.e(t);
+//                    }
+//                }
                 //方案B
                 try {
                     JSONObject obj = null;
@@ -442,7 +469,7 @@ public class LocationImpl {
                                     cid.add(key);
                                     obj = new JSONObject();
                                     strength = cdma.getCellSignalStrength().getDbm();
-                                    obj = getBaseStationInfoObj(obj,tempLac,tempCid,strength);
+                                    obj = getBaseStationInfoObj(obj,tempLac,tempCid,strength,0,0,cdma.getCellSignalStrength().getCdmaEcio());
                                     tempCdmaMap.put(strength+"|"+key, obj);
                                     tempJsonObj = new JSONObject();
                                     tempJsonObj.put("stren",strength);
@@ -458,7 +485,7 @@ public class LocationImpl {
                                     cid.add(key);
                                     obj = new JSONObject();
                                     strength = gsm.getCellSignalStrength().getDbm();
-                                    obj = getBaseStationInfoObj(obj,tempLac,tempCid,strength);
+                                    obj = getBaseStationInfoObj(obj,tempLac,tempCid,strength,gsm.getCellIdentity().getPsc(),0,0);
                                     tempGsmMap.put(strength+"|"+key, obj);
                                     tempJsonObj = new JSONObject();
                                     tempJsonObj.put("stren",strength);
@@ -474,7 +501,7 @@ public class LocationImpl {
                                     cid.add(key);
                                     obj = new JSONObject();
                                     strength = lte.getCellSignalStrength().getDbm();
-                                    obj = getBaseStationInfoObj(obj,tempLac,tempCid,strength);
+                                    obj = getBaseStationInfoObj(obj,tempLac,tempCid,strength,lte.getCellIdentity().getPci(),lte.getCellSignalStrength().getRsrp(),0);
                                     tempCdmaMap.put(strength+"|"+key, obj);
                                     tempJsonObj = new JSONObject();
                                     tempJsonObj.put("stren",strength);
@@ -490,7 +517,7 @@ public class LocationImpl {
                                     cid.add(key);
                                     obj = new JSONObject();
                                     strength = wcdma.getCellSignalStrength().getDbm();
-                                    obj = getBaseStationInfoObj(obj,tempLac,tempCid,strength);
+                                    obj = getBaseStationInfoObj(obj,tempLac,tempCid,strength,wcdma.getCellIdentity().getPsc(),0,0);
                                     tempCdmaMap.put(strength+"|"+key, obj);
                                     tempJsonObj = new JSONObject();
                                     tempJsonObj.put("stren",strength);
@@ -507,10 +534,16 @@ public class LocationImpl {
                     }
                 }
                 if (gsmList != null && tempGsmMap != null) {
-                    jsonArray = listFilter(gsmList, jsonArray, tempGsmMap);
+                    listFilter(gsmList, jsonArray, tempGsmMap,cidList,lacList);
                 }
                 if (cdmaList != null && tempCdmaMap != null) {
-                    jsonArray = listFilter(cdmaList, jsonArray, tempCdmaMap);
+                    listFilter(cdmaList, jsonArray, tempCdmaMap,cidList,lacList);
+                }
+                if(lacList != null){
+                    SPHelper.setStringValue2SP(mContext,EGContext.LAC_LIST,lacList.toString());
+                }
+                if(cidList != null){
+                    SPHelper.setStringValue2SP(mContext,EGContext.CID_LIST,cidList.toString());
                 }
                 return jsonArray;
             }
@@ -523,18 +556,27 @@ public class LocationImpl {
     }
 
 
-    private JSONArray listFilter(List<JSONObject> list, JSONArray jsonArray, Map<String, JSONObject> map) {
+    private void listFilter(List<JSONObject> list, JSONArray jsonArray, Map<String, JSONObject> map,List<Integer> cidList,List<Integer> lacList) {
         try {
             int count = 0;
             if (list != null && list.size() > 0) {
                 //降序排列
                 baseStationSortByStren(list);
+                String tempKey = null;
+                String[] temp = null;
                 for (int k = 0; k < list.size(); k++) {
                     if (count < 5) {
                         count = count + 1;
-                        JSONObject obj = map.get(list.get(k).optString("mapKey"));
+                        tempKey = list.get(k).optString("mapKey");
+                        JSONObject obj = map.get(tempKey);
                         if(obj != null && obj.length() > 0){
                             jsonArray.put(obj);
+                            temp = tempKey.split("\\|");
+                            try {
+                                cidList.add(Integer.parseInt(temp[1]));
+                                lacList.add(Integer.parseInt(temp[2]));
+                            }catch (Throwable t){
+                            }
                         }
                     } else {
                         break;
@@ -546,8 +588,6 @@ public class LocationImpl {
                 ELOG.e(t);
             }
         }
-
-        return jsonArray;
     }
 
     /**
@@ -583,11 +623,20 @@ public class LocationImpl {
             }
         }
     }
-    public JSONObject getBaseStationInfoObj(JSONObject jsonObject,int lac,int cid,int stren){
+    public JSONObject getBaseStationInfoObj(JSONObject jsonObject,int lac,int cid,int stren,int psc,int rsrp,int ecio){
         try {
             JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode, lac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
             JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId, cid, DataController.SWITCH_OF_CELL_ID);
             JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.Level, stren, DataController.SWITCH_OF_BS_LEVEL);
+           if(psc != 0){
+               JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.PCI, psc, DataController.SWITCH_OF_BS_PCI);
+           }
+           if(rsrp != 0){
+               JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.RSRP, rsrp, DataController.SWITCH_OF_BS_RSRP);
+           }
+           if(ecio != 0){
+               JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.SinrDown, ecio, DataController.SWITCH_OF_BS_ECIO);
+           }
         }catch (Throwable t){
         }
         return jsonObject;

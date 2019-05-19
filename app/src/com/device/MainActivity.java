@@ -48,6 +48,9 @@ public class MainActivity extends Activity {
         if (!checkPermission(this, Manifest.permission.INTERNET)) {
             s.add(Manifest.permission.INTERNET);
         }
+        if (!checkPermission(this, Manifest.permission.WRITE_SETTINGS)) {
+            s.add(Manifest.permission.WRITE_SETTINGS);
+        }
         if (s.size() > 0) {
             String[] permissions = new String[s.size()];
             for (int i = 0; i < s.size(); i++) {

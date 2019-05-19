@@ -14,8 +14,12 @@ import com.analysys.track.impl.AppSnapshotImpl;
 import com.analysys.track.impl.LocationImpl;
 import com.analysys.track.impl.OCImpl;
 import com.analysys.track.impl.UploadImpl;
+import com.analysys.track.receiver.AnalysysReceiver;
 import com.analysys.track.utils.ELOG;
 
+import com.analysys.track.utils.EThreadPool;
+import com.analysys.track.utils.FileUtils;
+import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
@@ -151,7 +155,22 @@ public class MessageDispatcher {
         }
 
     }
-
+    // 启动服务任务接入
+    public void screenStatusHandle(boolean on) {
+        try {
+            Message msg = new Message();
+            if(on){
+                msg.what = MessageDispatcher.MSG_HANDLE_SCREEN_ON;
+            }else {
+                msg.what = MessageDispatcher.MSG_HANDLE_SCREEN_OFF;
+            }
+            sendMessage(msg);
+        }catch (Throwable t){
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(t);
+            }
+        }
+    }
     // 停止工作
     public void killRetryWorker() {
         try {
@@ -305,6 +324,108 @@ public class MessageDispatcher {
         }
 
     }
+    private void processScreenOnOff(final boolean on) {
+        try {
+            long currentTime = System.currentTimeMillis();
+            if(on){
+                if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_SCREEN_ON_BROADCAST,EGContext.TIME_SYNC_BROADCAST,currentTime)){
+                    FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_SCREEN_ON_BROADCAST,currentTime);
+                }else {
+                    return;
+                }
+            }else {
+                if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST,EGContext.TIME_SYNC_BROADCAST,currentTime)){
+                    FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST,currentTime);
+                }else {
+                    return;
+                }
+            }
+
+            if(!AnalysysReceiver.isScreenOnOffBroadCastHandled){
+                AnalysysReceiver.isScreenOnOffBroadCastHandled = true;
+            }else {
+                return;
+            }
+//            if (EGContext.FLAG_DEBUG_INNER){
+//                ELOG.i(SystemUtils.getCurrentProcessName(mContext));
+//            }
+            if (SystemUtils.isMainThread()) {
+                EThreadPool.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        screenOnOffHandle(on);
+                    }
+                });
+
+            } else {
+                screenOnOffHandle(on);
+            }
+        } catch (Throwable e) {
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.e(e);
+            }
+        }finally {
+            AnalysysReceiver.isScreenOnOffBroadCastHandled = false;
+        }
+    }
+
+
+    /**
+     * 锁屏补时间
+     */
+    private void screenOnOffHandle(boolean on){
+        try {
+            // 补充时间
+            if(AnalysysReceiver.mLastCloseTime == 0){//第一次时间为空，则取sp时间
+                long spLastVisitTime = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_SP_WRITER);
+                if(System.currentTimeMillis() - spLastVisitTime > EGContext.TIME_SYNC_SP){//即便频繁开关屏也不能频繁操作sp
+                    AnalysysReceiver.mLastCloseTime = SPHelper.getLongValueFromSP(mContext,EGContext.LAST_AVAILABLE_TIME, 0);
+                    FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_SP_WRITER,System.currentTimeMillis());
+                }else {
+                    return;
+                }
+
+            }
+            if(AnalysysReceiver.mLastCloseTime == 0){//取完sp时间后依然为空，则为第一次锁屏，设置closeTime,准备入库
+                AnalysysReceiver.mLastCloseTime = System.currentTimeMillis();
+                SPHelper.setLongValue2SP(mContext,EGContext.LAST_AVAILABLE_TIME, AnalysysReceiver.mLastCloseTime);
+                if(on){
+                    return;
+                }
+                OCImpl.mLastAvailableOpenOrCloseTime = AnalysysReceiver.mLastCloseTime;
+                OCImpl.getInstance(mContext).closeOC(false, AnalysysReceiver.mLastCloseTime);
+            }else {//sp里取到了数据，即，非第一次锁屏，则判断是否有效数据来设置closeTime,准备入库
+                long currentTime  = System.currentTimeMillis();
+                try {
+                    if(Build.VERSION.SDK_INT < 21){
+                        if(currentTime - AnalysysReceiver.mLastCloseTime < EGContext.OC_CYCLE){
+                            OCImpl.mCache = null;
+                            return;
+                        }
+                    }else if(Build.VERSION.SDK_INT >20 && Build.VERSION.SDK_INT < 24){
+                        if(currentTime - AnalysysReceiver.mLastCloseTime < EGContext.OC_CYCLE_OVER_5){
+                            OCImpl.mCache = null;
+                            return;
+                        }
+                    }
+                }catch (Throwable t){
+                }finally {
+                    SPHelper.setLongValue2SP(mContext,EGContext.LAST_AVAILABLE_TIME,currentTime);
+                }
+                if(on){
+                    return;
+                }
+                OCImpl.mLastAvailableOpenOrCloseTime = currentTime;
+                OCImpl.getInstance(mContext).closeOC(true, AnalysysReceiver.mLastCloseTime);
+            }
+            ReceiverUtils.getInstance().unRegistAllReceiver(mContext);
+        }catch (Throwable t){
+        }finally {
+            if(on){
+                MessageDispatcher.getInstance(mContext).sendMessages();
+            }
+        }
+    }
 
     private void sendMessage(Message msg,long delayTime) {
         synchronized (mHandlerLock) {
@@ -434,6 +555,18 @@ public class MessageDispatcher {
                         MessageDispatcher.getInstance(mContext).isNeedRetry(EGContext.CHECK_RETRY_CYCLE);
                         checkRetry();
                         break;
+                    case MSG_HANDLE_SCREEN_ON:
+                        if (EGContext.FLAG_DEBUG_INNER) {
+                            ELOG.i(SystemUtils.getCurrentProcessName(mContext) + "开屏");
+                        }
+                        processScreenOnOff(true);
+                        break;
+                    case MSG_HANDLE_SCREEN_OFF:
+                        if (EGContext.FLAG_DEBUG_INNER) {
+                            ELOG.i(SystemUtils.getCurrentProcessName(mContext) + "关屏");
+                        }
+                        processScreenOnOff(false);
+                        break;
                     default:
                         break;
                 }
@@ -553,6 +686,8 @@ public class MessageDispatcher {
     protected static final int MSG_OC_INFO = 0x09;
     protected static final int MSG_UPLOAD = 0x0a;
     protected static final int MSG_CHECK_RETRY = 0x0d;
+    protected static final int MSG_HANDLE_SCREEN_ON = 0x0c;
+    protected static final int MSG_HANDLE_SCREEN_OFF = 0x0f;
     private static final int MSG_CHECK = 0x0b;
     private static final int MSG_RETRY = 0x0e;
 }
