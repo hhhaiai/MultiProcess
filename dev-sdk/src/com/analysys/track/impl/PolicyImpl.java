@@ -193,8 +193,10 @@ public class PolicyImpl {
 
                             if ("0".equals(status)){//0不收集，跳过
                                 setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BASE,false);
-                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LAC_LIST,false);
-                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_CID_LIST,false);
+//                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LAC_LIST,false);
+//                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_CID_LIST,false);
+//                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_RSRP_LIST,false);
+//                                setSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_ECIO_LIST,false);
                                 continue;
                             }//1收集,默认值即为轮询的值，忽略最小最大,基站不轮询
                         }else if(EGContext.MODULE_DEV.equals(module)){
