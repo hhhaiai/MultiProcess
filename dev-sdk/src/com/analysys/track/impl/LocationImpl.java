@@ -401,6 +401,7 @@ public class LocationImpl {
                                     tempCid = info.getCid();
                                     tempLac = info.getLac();
                                     key = tempCid + "|" + tempLac;
+//                                    ELOG.e("NeighboringCellInfo:: "+ tempCid);
                                     if (tempCid > 0 && tempLac > 0 && !cid.contains(key)) {
                                         cid.add(key);
                                         jsonObject = new JSONObject();
@@ -442,7 +443,7 @@ public class LocationImpl {
                                 tempCid = cdma.getCellIdentity().getBasestationId();
                                 tempLac = cdma.getCellIdentity().getNetworkId();
                                 key = tempCid + "|" + tempLac;
-
+//                                ELOG.e("CellInfoCdma:: "+ tempCid);
                                 if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
                                     cid.add(key);
                                     obj = new JSONObject();
@@ -460,6 +461,7 @@ public class LocationImpl {
                                 tempCid = gsm.getCellIdentity().getCid();
                                 tempLac = gsm.getCellIdentity().getLac();
                                 key = tempCid + "|" + tempLac;
+//                                ELOG.e("CellInfoGsm:: "+ tempCid);
                                 if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
                                     cid.add(key);
                                     obj = new JSONObject();
@@ -476,11 +478,13 @@ public class LocationImpl {
                                 tempCid = lte.getCellIdentity().getPci();
                                 tempLac = lte.getCellIdentity().getTac();
                                 key = tempCid + "|" + tempLac;
+//                                ELOG.e("CellInfoLte:: "+ tempCid);
                                 if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
                                     cid.add(key);
                                     obj = new JSONObject();
                                     strength = lte.getCellSignalStrength().getDbm();
-                                    obj = getBaseStationInfoObj(obj,tempLac,tempCid,strength,DeviceKeyContacts.LocationInfo.BaseStationInfo.PCI+"&"+lte.getCellIdentity().getPci(),lte.getCellSignalStrength().getRsrp(),0,lte.getCellSignalStrength().getRsrq());
+                                    String lteString = lte.getCellSignalStrength().toString();
+                                    obj = getBaseStationInfoObj(obj,tempLac,tempCid,strength,DeviceKeyContacts.LocationInfo.BaseStationInfo.PCI+"&"+lte.getCellIdentity().getPci(),strength,0,Integer.parseInt(lteString.substring(lteString.indexOf("rsrq=")+5,lteString.indexOf(" rssnr="))));
                                     tempCdmaMap.put(strength+"|"+key, obj);
                                     tempJsonObj = new JSONObject();
                                     tempJsonObj.put("stren",strength);
@@ -493,6 +497,7 @@ public class LocationImpl {
                                 tempCid = wcdma.getCellIdentity().getCid();
                                 tempLac = wcdma.getCellIdentity().getLac();
                                 key = tempCid + "|" + tempLac;
+//                                ELOG.e("CellInfoWcdma:: "+ tempCid);
                                 if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
                                     cid.add(key);
                                     obj = new JSONObject();
@@ -504,6 +509,8 @@ public class LocationImpl {
                                     tempJsonObj.put("mapKey",strength+"|"+key);
                                     cdmaList.add(tempJsonObj);
                                 }
+                            }else {
+//                                ELOG.e("其他分支"+info.toString()+"   vs  "+info.describeContents());
                             }
 
                         }
