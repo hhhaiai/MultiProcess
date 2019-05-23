@@ -237,10 +237,6 @@ public class EGContext {
     // 默认同步写入时间，5秒内能写入一次。 间隔范围: APP列表(多进程广播方面)、 OC 5.x以下、DB写入
     public static final long TIME_SYNC_DEFAULT = 5 * 1000;
     public static final String PERMISSION_TIME = "LOCATION_PERMISSION";
-//    public static final String LAC_LIST = "LAC_LIST";
-//    public static final String CID_LIST = "CID_LIST";
-//    public static final String RSRP_LIST = "RSRP_LIST";
-//    public static final String ECIO_LIST = "ECIO_LIST";
     public static final String PERMISSION_COUNT = "LOCATION_COUNT";
     public static final long LEN_MAX_UPDATE_SIZE = 1 * 1024 * 1024;
     public static final String INTERVALTIME = "TimerIntervalTime";
