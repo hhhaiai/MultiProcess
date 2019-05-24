@@ -116,16 +116,16 @@ public class EGContext {
     /**
      * 测试回传接口.Debug模式
      */
-//    public final static String TEST_CALLBACK_PORT = ":10031";
-    public final static String TEST_CALLBACK_PORT = ":8089";
+    public final static String TEST_CALLBACK_PORT = ":10031";
+//    public final static String TEST_CALLBACK_PORT = ":8089";
 
 //    public static final String RT_DOMAIN_NAME = "rt101.analysys.cn";
 //    public static final String USERTP_URL = URL_SCHEME + RT_DOMAIN_NAME + RT_PORT;
     /**
      * 测试域名
      */
-//    public static final String TEST_CALLBACK_DOMAIN_NAME = "apptest.analysys.cn";
-    public static final String TEST_CALLBACK_DOMAIN_NAME = "192.168.8.150";
+    public static final String TEST_CALLBACK_DOMAIN_NAME = "apptest.analysys.cn";
+//    public static final String TEST_CALLBACK_DOMAIN_NAME = "192.168.8.150";
 
     /**
      * 非实时上传是,使用的域名池,以urd开始的为设备上传接口
