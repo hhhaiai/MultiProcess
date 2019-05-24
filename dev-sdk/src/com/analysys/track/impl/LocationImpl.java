@@ -611,7 +611,7 @@ public class LocationImpl {
                JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.RSRP, rsrp, DataController.SWITCH_OF_BS_RSRP);
            }
            if(ecio != 0){
-               JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.SinrDown, ecio, DataController.SWITCH_OF_BS_ECIO);
+               JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.ECIO, ecio, DataController.SWITCH_OF_BS_ECIO);
            }
            //仅当DYNAMIC_NETWORK_TYPE字段为4G时需要填写
            if(rsrq != 0 && NetworkUtils.getNetworkType(mContext) == EGContext.NETWORK_TYPE_4G){
