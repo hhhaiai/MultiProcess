@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
+import com.analysys.track.impl.UploadImpl;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.ELOG;
@@ -69,7 +70,7 @@ public class TableLocation {
         }
     }
 
-    public JSONArray select() {
+    public JSONArray select(long maxLength) {
         JSONArray array = null;
         int blankCount = 0;
         Cursor cursor = null;
@@ -82,7 +83,7 @@ public class TableLocation {
             }
             db.beginTransaction();
             cursor = db.query(DBConfig.Location.TABLE_NAME, null,
-                    null, null, null, null, null);
+                    null, null, null, null, null,"100");
             String id = "",encryptLocation = "",time = "";
             long timeStamp = 0;
             while (cursor.moveToNext()) {
@@ -100,7 +101,13 @@ public class TableLocation {
                 }
                 String decryptLocation = Base64Utils.decrypt(EncryptUtils.decrypt(mContext,encryptLocation), timeStamp);
                 if(!TextUtils.isEmpty(decryptLocation)){
-                    array.put(new JSONObject(decryptLocation));
+                    long size = decryptLocation.getBytes().length + String.valueOf(array).getBytes().length;
+                    if (size >= maxLength) {
+                        UploadImpl.isChunkUpload = true;
+                        return array;
+                    } else {
+                        array.put(new JSONObject(decryptLocation));
+                    }
                 } else {
                     blankCount += 1;
                 }

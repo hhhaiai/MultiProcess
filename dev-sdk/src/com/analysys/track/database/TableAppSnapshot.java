@@ -7,6 +7,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.analysys.track.impl.UploadImpl;
 import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
@@ -228,10 +229,11 @@ public class TableAppSnapshot {
     /**
      * 数据查询，格式：{JSONObject}
      */
-    public JSONArray select() {
+    public JSONArray select(long maxLength) {
         JSONArray array = null;
         Cursor cursor = null;
         int blankCount = 0;
+        JSONObject jsonObject = null;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if(db == null){
@@ -239,7 +241,7 @@ public class TableAppSnapshot {
             }
             array = new JSONArray();
             cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null,
-                null, null);
+                null, null,"100");
             if(cursor == null){
                 return array;
             }
@@ -249,12 +251,18 @@ public class TableAppSnapshot {
                 }
                 String pkgName = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN)));
                 if(!TextUtils.isEmpty(pkgName)){
-                    array.put(getCursor(cursor));
+                    jsonObject = getCursor(cursor);
                 }else {
                     blankCount += 1;
                     continue;
                 }
-
+                long size = String.valueOf(jsonObject).getBytes().length + String.valueOf(array).getBytes().length;
+                if (size >= maxLength) {
+                    UploadImpl.isChunkUpload = true;
+                    return array;
+                } else {
+                    array.put(jsonObject);
+                }
             }
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){

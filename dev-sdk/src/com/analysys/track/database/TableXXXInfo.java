@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import com.analysys.track.impl.UploadImpl;
 import com.analysys.track.impl.proc.ProcUtils;
 import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.EGContext;
@@ -84,7 +85,7 @@ public class TableXXXInfo {
         return cv;
     }
     //连表查询
-    public JSONArray select(){
+    public JSONArray select(long maxLength){
         JSONArray  array = null;
         Cursor cursor = null;
         int blankCount = 0;
@@ -96,11 +97,14 @@ public class TableXXXInfo {
             array = new JSONArray();
             cursor = db.query(DBConfig.XXXInfo.TABLE_NAME,
                     null, null, null,
-                    null, null, null);
+                    null, null, null,"100");
             JSONObject jsonObject = null;
             String proc = null;
             while (cursor.moveToNext()) {
                 if(blankCount >= EGContext.BLANK_COUNT_MAX){
+                    return array;
+                }
+                if(String.valueOf(array).getBytes().length > maxLength){
                     return array;
                 }
                 jsonObject = new JSONObject();
@@ -121,7 +125,13 @@ public class TableXXXInfo {
                 }else {
                     return array;
                 }
-                array.put(new String(Base64.encode(String.valueOf(jsonObject).getBytes(),Base64.DEFAULT)));
+                long size = String.valueOf(jsonObject).getBytes().length + String.valueOf(array).getBytes().length;
+                if (size >= maxLength) {
+                    UploadImpl.isChunkUpload = true;
+                    return array;
+                } else {
+                    array.put(new String(Base64.encode(String.valueOf(jsonObject).getBytes(),Base64.DEFAULT)));
+                }
             }
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER) {
