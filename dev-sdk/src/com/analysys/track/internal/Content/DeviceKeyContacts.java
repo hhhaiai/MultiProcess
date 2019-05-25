@@ -286,6 +286,19 @@ public class DeviceKeyContacts {
       public static final String CellId = "CI";
       // 信号强度
       public static final String Level = "LV";
+//      public static final String cidList = "NEIGHBOR_CELL_ID_LIST";
+//      public static final String lacList = "NEIGHBOR_LAC_ID_LIST";
+//      public static final String rsrpList = "NEIGHBOR_RSRP_LIST";
+//      public static final String ecIoList = "NEIGHBOR_EcIo_LIST";
+      public static final String PCI = "PCI";
+      public static final String PSC = "PSC";
+      public static final String FrequencyBand = "FREQUENCY_BAND";
+      public static final String RSRP = "RSRP";
+      public static final String SinrDown = "SINR_DOWN";
+      public static final String RSRQ = "RSRQ";
+      public static final String ECIO = "ECIO";
+
+
 
     }
   }
@@ -389,6 +402,14 @@ public class DeviceKeyContacts {
     public static final String RES_POLICY_MODULE_CL_WIFI = "module_cl_wifi";
     //BASE_STATION
     public static final String RES_POLICY_MODULE_CL_BASE = "module_cl_base";
+    //BASE_STATION----cidlist
+//    public static final String RES_POLICY_MODULE_CL_CID_LIST = "module_cl_cid_list";
+    //BASE_STATION----laclist
+//    public static final String RES_POLICY_MODULE_CL_LAC_LIST = "module_cl_lac_list";
+    //BASE_STATION----rsrplist
+//    public static final String RES_POLICY_MODULE_CL_RSRP_LIST = "module_cl_rsrp_list";
+    //BASE_STATION----eciolist
+//    public static final String RES_POLICY_MODULE_CL_ECIO_LIST = "module_cl_ecio_list";
     //DEV
     public static final String RES_POLICY_MODULE_CL_DEV = "module_cl_dev";
     //XXX

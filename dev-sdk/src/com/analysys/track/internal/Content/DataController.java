@@ -120,6 +120,15 @@ public class DataController {
     public static boolean SWITCH_OF_LOCATION_AREA_CODE = true;
     public static boolean SWITCH_OF_CELL_ID = true;
     public static boolean SWITCH_OF_BS_LEVEL = true;//基站信号强度
+    public static boolean SWITCH_OF_BS_PCI = true;//PCI
+    public static boolean SWITCH_OF_BS_RSRP = true;//RSRP
+    public static boolean SWITCH_OF_BS_ECIO = true;//ECIO
+    public static boolean SWITCH_OF_BS_RSRQ = true;//RSRQ
+//    public static boolean SWITCH_OF_BS_CID_LIST = true;//cid
+//    public static boolean SWITCH_OF_BS_LAC_LIST = true;//lac
+//    public static boolean SWITCH_OF_BS_RSRP_LIST = true;//lac
+//    public static boolean SWITCH_OF_BS_ECIO_LIST = true;//lac
+
 
 
 

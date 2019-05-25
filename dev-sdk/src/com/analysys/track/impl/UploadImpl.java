@@ -184,6 +184,7 @@ public class UploadImpl {
                 ELOG.i(uploadInfo);
             }
             if (TextUtils.isEmpty(uploadInfo)) {
+                SPHelper.setIntValue2SP(mContext,EGContext.REQUEST_STATE,EGContext.sPrepare);
                 return;
             }
 //            boolean isDebugMode = SPHelper.getBooleanValueFromSP(mContext,EGContext.DEBUG, false);
@@ -193,12 +194,20 @@ public class UploadImpl {
             if (EGContext.FLAG_DEBUG_USER) {
                 url = EGContext.TEST_URL;
             }
+            if(TextUtils.isEmpty(url)){
+                SPHelper.setIntValue2SP(mContext,EGContext.REQUEST_STATE,EGContext.sPrepare);
+                return;
+            }
             handleUpload(url, messageEncrypt(uploadInfo));
             int failNum = SPHelper.getIntValueFromSP(mContext,EGContext.FAILEDNUMBER,0);
             int maxFailCount = PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT,EGContext.FAIL_COUNT_DEFALUT);
             // 3. 兼容多次分包的上传
             while (isChunkUpload && failNum < maxFailCount) {
                 uploadInfo = getInfo();
+                if(TextUtils.isEmpty(url)){
+                    SPHelper.setIntValue2SP(mContext,EGContext.REQUEST_STATE,EGContext.sPrepare);
+                    return;
+                }
                 handleUpload(url, messageEncrypt(uploadInfo));
             }
         } catch (Throwable t) {
@@ -462,9 +471,13 @@ public class UploadImpl {
     }
     String fail = "-1";
     private void handleUpload(final String url, final String uploadInfo) {
-
+        if(TextUtils.isEmpty(url)){
+            SPHelper.setIntValue2SP(mContext,EGContext.REQUEST_STATE,EGContext.sPrepare);
+            return;
+        }
         String result = RequestUtils.httpRequest(url, uploadInfo, mContext);
         if (TextUtils.isEmpty(result)) {
+            SPHelper.setIntValue2SP(mContext,EGContext.REQUEST_STATE,EGContext.sPrepare);
             return;
         }else if(fail.equals(result)){
             SPHelper.setIntValue2SP(mContext,EGContext.REQUEST_STATE,EGContext.sPrepare);

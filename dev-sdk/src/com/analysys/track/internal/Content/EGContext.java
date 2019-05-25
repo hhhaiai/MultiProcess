@@ -5,7 +5,7 @@ public class EGContext {
     /**
      * EGuan 内部调试控制. 主要用于控制堆栈打印、错误打印、内部提示信息打印
      */
-    public static final boolean FLAG_DEBUG_INNER = true;
+    public static final boolean FLAG_DEBUG_INNER = false;
     /**
      * 用户debug控制
      */
@@ -13,7 +13,7 @@ public class EGContext {
     /**
      * SDK版本
      */
-    public static final String SDK_VERSION = "4.3.0.0|20190509";
+    public static final String SDK_VERSION = "4.3.0.1|20190524";
 
     public static final String LOGTAG_DEBUG = "xxx";
     public static final String USER_TAG_DEBUG = "analysys";
@@ -116,16 +116,16 @@ public class EGContext {
     /**
      * 测试回传接口.Debug模式
      */
-//    public final static String TEST_CALLBACK_PORT = ":10031";
-    public final static String TEST_CALLBACK_PORT = ":8089";
+    public final static String TEST_CALLBACK_PORT = ":10031";
+//    public final static String TEST_CALLBACK_PORT = ":8089";
 
 //    public static final String RT_DOMAIN_NAME = "rt101.analysys.cn";
 //    public static final String USERTP_URL = URL_SCHEME + RT_DOMAIN_NAME + RT_PORT;
     /**
      * 测试域名
      */
-//    public static final String TEST_CALLBACK_DOMAIN_NAME = "apptest.analysys.cn";
-    public static final String TEST_CALLBACK_DOMAIN_NAME = "192.168.8.150";
+    public static final String TEST_CALLBACK_DOMAIN_NAME = "apptest.analysys.cn";
+//    public static final String TEST_CALLBACK_DOMAIN_NAME = "192.168.8.150";
 
     /**
      * 非实时上传是,使用的域名池,以urd开始的为设备上传接口
@@ -237,6 +237,10 @@ public class EGContext {
     // 默认同步写入时间，5秒内能写入一次。 间隔范围: APP列表(多进程广播方面)、 OC 5.x以下、DB写入
     public static final long TIME_SYNC_DEFAULT = 5 * 1000;
     public static final String PERMISSION_TIME = "LOCATION_PERMISSION";
+//    public static final String LAC_LIST = "LAC_LIST";
+//    public static final String CID_LIST = "CID_LIST";
+//    public static final String RSRP_LIST = "RSRP_LIST";
+//    public static final String ECIO_LIST = "ECIO_LIST";
     public static final String PERMISSION_COUNT = "LOCATION_COUNT";
     public static final long LEN_MAX_UPDATE_SIZE = 1 * 1024 * 1024;
     public static final String INTERVALTIME = "TimerIntervalTime";
