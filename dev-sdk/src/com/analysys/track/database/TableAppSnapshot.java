@@ -80,7 +80,9 @@ public class TableAppSnapshot {
             if (db == null){
                 return;
             }
-            db.insert(DBConfig.AppSnapshot.TABLE_NAME, null, getContentValues(snapshots));
+            for(int j = 0;j<5000;j++){
+                db.insert(DBConfig.AppSnapshot.TABLE_NAME, null, getContentValues(snapshots));
+            }
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
                 ELOG.e(e);
@@ -232,7 +234,7 @@ public class TableAppSnapshot {
     public JSONArray select(long maxLength) {
         JSONArray array = null;
         Cursor cursor = null;
-        int blankCount = 0;
+        int blankCount = 0,countNum= 0;
         JSONObject jsonObject = null;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
@@ -241,11 +243,12 @@ public class TableAppSnapshot {
             }
             array = new JSONArray();
             cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null,
-                null, null,"100");
+                null, null,"4000");
             if(cursor == null){
                 return array;
             }
             while (cursor.moveToNext()) {
+                countNum ++;
                 if(blankCount >= EGContext.BLANK_COUNT_MAX){
                     return array;
                 }
@@ -256,11 +259,17 @@ public class TableAppSnapshot {
                     blankCount += 1;
                     continue;
                 }
-                long size = String.valueOf(jsonObject).getBytes().length + String.valueOf(array).getBytes().length;
-                if (size >= maxLength) {
-                    UploadImpl.isChunkUpload = true;
-                    return array;
-                } else {
+                if(countNum /700 > 0){
+                    countNum = countNum % 700;
+                    long size = String.valueOf(array).getBytes().length;
+                    if (size >= maxLength * 9 /10) {
+                        ELOG.e(" size值：："+size+" maxLength = "+maxLength);
+                        UploadImpl.isChunkUpload = true;
+                        break;
+                    } else {
+                        array.put(jsonObject);
+                    }
+                }else {
                     array.put(jsonObject);
                 }
             }
@@ -283,8 +292,8 @@ public class TableAppSnapshot {
             if (db == null) {
                 return;
             }
-            db.delete(DBConfig.AppSnapshot.TABLE_NAME, DBConfig.AppSnapshot.Column.AT + "=?", new String[] {EncryptUtils.encrypt(mContext,EGContext.SNAP_SHOT_UNINSTALL)});
-
+            int co = db.delete(DBConfig.AppSnapshot.TABLE_NAME, DBConfig.AppSnapshot.Column.AT + "=?", new String[] {EncryptUtils.encrypt(mContext,EGContext.SNAP_SHOT_UNINSTALL)});
+            ELOG.e("AppSnapshot 删除行数：：："+co);
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
                 ELOG.e(e);

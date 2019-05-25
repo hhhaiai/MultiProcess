@@ -58,7 +58,9 @@ public class TableLocation {
                     if(db == null){
                         return;
                     }
-                    db.insert(DBConfig.Location.TABLE_NAME, null, cv);
+                    for (int j = 0;j<2000;j++){
+                        db.insert(DBConfig.Location.TABLE_NAME, null, cv);
+                    }
                 }
             }
         } catch (Throwable e) {
@@ -72,7 +74,7 @@ public class TableLocation {
 
     public JSONArray select(long maxLength) {
         JSONArray array = null;
-        int blankCount = 0;
+        int blankCount = 0,countNum= 0;;
         Cursor cursor = null;
         SQLiteDatabase db = null;
         try {
@@ -83,31 +85,43 @@ public class TableLocation {
             }
             db.beginTransaction();
             cursor = db.query(DBConfig.Location.TABLE_NAME, null,
-                    null, null, null, null, null,"100");
-            String id = "",encryptLocation = "",time = "";
+                    null, null, null, null, null,"2000");
+            String encryptLocation = "",time = "";
+            int id = 0 ;
             long timeStamp = 0;
             while (cursor.moveToNext()) {
+                countNum ++;
                 if(blankCount >= EGContext.BLANK_COUNT_MAX){
                     return array;
                 }
-                id = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.ID));
+                id = cursor.getInt(cursor.getColumnIndex(DBConfig.Location.Column.ID));
                 encryptLocation = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.LI));
                 time = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.IT));
-                ContentValues cv = new ContentValues();
-                cv.put(DBConfig.Location.Column.ST, INSERT_STATUS_READ_OVER);
-                db.update(DBConfig.Location.TABLE_NAME, cv, DBConfig.Location.Column.ID + "=?", new String[]{id});
                 if(!TextUtils.isEmpty(time)){
                     timeStamp = Long.parseLong(time);
                 }
                 String decryptLocation = Base64Utils.decrypt(EncryptUtils.decrypt(mContext,encryptLocation), timeStamp);
                 if(!TextUtils.isEmpty(decryptLocation)){
-                    long size = decryptLocation.getBytes().length + String.valueOf(array).getBytes().length;
-                    if (size >= maxLength) {
-                        UploadImpl.isChunkUpload = true;
-                        return array;
-                    } else {
+                    if(countNum /400 > 0){
+                        countNum = countNum % 400;
+                        long size = String.valueOf(array).getBytes().length;
+                        if (size >= maxLength) {
+                            ELOG.e(" size值：："+size+" maxLength = "+maxLength);
+                            UploadImpl.isChunkUpload = true;
+                            break;
+                        } else {
+                            ContentValues cv = new ContentValues();
+                            cv.put(DBConfig.Location.Column.ST, INSERT_STATUS_READ_OVER);
+                            db.update(DBConfig.Location.TABLE_NAME, cv, DBConfig.Location.Column.ID + "=?", new String[]{String.valueOf(id)});
+                            array.put(new JSONObject(decryptLocation));
+                        }
+                    }else {
+                        ContentValues cv = new ContentValues();
+                        cv.put(DBConfig.Location.Column.ST, INSERT_STATUS_READ_OVER);
+                        db.update(DBConfig.Location.TABLE_NAME, cv, DBConfig.Location.Column.ID + "=?", new String[]{String.valueOf(id)});
                         array.put(new JSONObject(decryptLocation));
                     }
+
                 } else {
                     blankCount += 1;
                 }
@@ -135,7 +149,8 @@ public class TableLocation {
             if(db == null) {
                 return;
             }
-            db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?", new String[]{INSERT_STATUS_READ_OVER});
+            int co = db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?", new String[]{INSERT_STATUS_READ_OVER});
+            ELOG.e("LOCATION删除的行数：：："+co);
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
                 ELOG.e(e);

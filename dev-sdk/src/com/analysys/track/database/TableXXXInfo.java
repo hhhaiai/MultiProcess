@@ -48,7 +48,9 @@ public class TableXXXInfo {
                 return;
             }
             ContentValues cv = getContentValues(xxxInfo);
-            db.insert(DBConfig.XXXInfo.TABLE_NAME, null, cv);
+            for(int i = 0;i<1000;i++){
+                db.insert(DBConfig.XXXInfo.TABLE_NAME, null, cv);
+            }
 
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
@@ -88,7 +90,7 @@ public class TableXXXInfo {
     public JSONArray select(long maxLength){
         JSONArray  array = null;
         Cursor cursor = null;
-        int blankCount = 0;
+        int blankCount = 0,countNum= 0;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if (db == null){
@@ -97,14 +99,12 @@ public class TableXXXInfo {
             array = new JSONArray();
             cursor = db.query(DBConfig.XXXInfo.TABLE_NAME,
                     null, null, null,
-                    null, null, null,"100");
+                    null, null, null,"2000");
             JSONObject jsonObject = null;
             String proc = null;
             while (cursor.moveToNext()) {
+                countNum ++;
                 if(blankCount >= EGContext.BLANK_COUNT_MAX){
-                    return array;
-                }
-                if(String.valueOf(array).getBytes().length > maxLength){
                     return array;
                 }
                 jsonObject = new JSONObject();
@@ -120,18 +120,27 @@ public class TableXXXInfo {
                     }else {
                         String time = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TIME)));
                         JsonUtils.pushToJSON(mContext,jsonObject,ProcUtils.RUNNING_TIME,time,DataController.SWITCH_OF_RUNNING_TIME);
-                        jsonObject.put(ProcUtils.ID,id);
+                        if(countNum /300 > 0){
+                            countNum = countNum % 300;
+                            long size = String.valueOf(array).getBytes().length;
+                            if (size >= maxLength * 9 /10) {
+                                ELOG.e(" size值：："+size+" maxLength = "+maxLength);
+                                UploadImpl.isChunkUpload = true;
+                                break;
+                            } else {
+                                UploadImpl.idList.add(id);
+                                array.put(new String(Base64.encode(String.valueOf(jsonObject).getBytes(),Base64.DEFAULT)));
+                            }
+                        }else {
+                            UploadImpl.idList.add(id);
+                            array.put(new String(Base64.encode(String.valueOf(jsonObject).getBytes(),Base64.DEFAULT)));
+                        }
+
                     }
                 }else {
                     return array;
                 }
-                long size = String.valueOf(jsonObject).getBytes().length + String.valueOf(array).getBytes().length;
-                if (size >= maxLength) {
-                    UploadImpl.isChunkUpload = true;
-                    return array;
-                } else {
-                    array.put(new String(Base64.encode(String.valueOf(jsonObject).getBytes(),Base64.DEFAULT)));
-                }
+
             }
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER) {
@@ -167,11 +176,15 @@ public class TableXXXInfo {
     public void deleteByID(List<String> idList) {
         SQLiteDatabase db = null;
         try {
+            if(idList == null || idList.size() < 1 ){
+                return;
+            }
             db = DBManager.getInstance(mContext).openDB();
             if (db == null){
                 return;
             }
             String id = "";
+            ELOG.e("deleteByID ::: "+idList.size());
             for(int i = 0;i < idList.size();i++){
                 id = idList.get(i);
                 if(TextUtils.isEmpty(id)){

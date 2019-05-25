@@ -91,7 +91,7 @@ public class TableOC {
                     if (!TextUtils.isEmpty(act)) {//一条新打开的app信息,执行插入操作
                         cv = getContentValues(obj);
                         cv.put(DBConfig.OC.Column.CU, 1);
-                        for(int j= 0;j<10000;j++){
+                        for(int j= 0;j<5000;j++){
                             db.insert(DBConfig.OC.TABLE_NAME, null, cv);
                         }
                     }
@@ -250,14 +250,15 @@ public class TableOC {
         Cursor cursor = null;
         int blankCount = 0,countNum= 0;
         String pkgName = "",act = "";
-        ContentValues cv =null;
-        JSONObject jsonObject, etdm;
+        JSONObject jsonObject = null, etdm = null;
         try {
-            if(db == null){
+            if(db == null || !db.isOpen()){
                return ocJar;
             }
             ocJar = new JSONArray();
             db.beginTransaction();
+            int id = -1;
+            ContentValues contentValues = new ContentValues();
             cursor = db.query(DBConfig.OC.TABLE_NAME, null, null, null, null, null, null,"6000");
             while (cursor.moveToNext()) {
                 countNum ++;
@@ -268,6 +269,7 @@ public class TableOC {
                 if (TextUtils.isEmpty(act) || "".equals(act)){//closeTime为空，则继续循环，只取closeTime有值的信息
                     continue;
                 }
+                id = cursor.getInt(cursor.getColumnIndexOrThrow(DBConfig.OC.Column.ID));
                 jsonObject = new JSONObject();
                 String insertTime = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.IT)));
                 String encryptAn = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AN)));
@@ -293,36 +295,27 @@ public class TableOC {
                 JsonUtils.pushToJSON(mContext,etdm ,DeviceKeyContacts.OCInfo.CollectionType,
                         cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.CT)),DataController.SWITCH_OF_COLLECTION_TYPE);
                 jsonObject.put(EGContext.EXTRA_DATA, etdm);
-                if(countNum /1000 > 0){
-                    countNum = countNum % 1000;
+                if(countNum /800 > 0){
+                    countNum = countNum % 800;
                     long size = String.valueOf(ocJar).getBytes().length;
                     if (size >= maxLength * 9 /10) {
                         ELOG.e(" size值：："+size+" maxLength = "+maxLength);
                         UploadImpl.isChunkUpload = true;
-                        return ocJar;
+                        break;
                     } else {
                         ocJar.put(jsonObject);
-                        cv = new ContentValues();
-                        cv.put(DBConfig.OC.Column.ST, ONE);
-                        String id = cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.ID));
-                        int c = db.update(DBConfig.OC.TABLE_NAME, cv,
-                                DBConfig.OC.Column.ID + "=?",
-                                new String[]{id});
-                        ELOG.i("updata影响的行数：：： "+c);
+                        contentValues.clear();
+                        contentValues.put(DBConfig.OC.Column.ST, ONE);
+                        db.update(DBConfig.OC.TABLE_NAME, contentValues,DBConfig.OC.Column.ID + "=?",new String[] { String.valueOf(id) });
                     }
                 }else {
                     ocJar.put(jsonObject);
-                    cv = new ContentValues();
-                    cv.put(DBConfig.OC.Column.ST, ONE);
-                    String id = cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.ID));
-                    int c = db.update(DBConfig.OC.TABLE_NAME, cv,
-                            DBConfig.OC.Column.ID + "=? ",
-                            new String[]{id});
-                    ELOG.i("updata影响的行数：：： "+c);
+                    contentValues.clear();
+                    contentValues.put(DBConfig.OC.Column.ST, ONE);
+                    db.update(DBConfig.OC.TABLE_NAME, contentValues,DBConfig.OC.Column.ID + "=?",new String[]{String.valueOf(id)});
                 }
 
 //                ELOG.e(" size值：："+size+" maxLength = "+maxLength);
-
             }
              db.setTransactionSuccessful();
         } catch (Exception e) {
@@ -350,7 +343,7 @@ public class TableOC {
         Cursor cursor = null;
         int blankCount = 0;
         String pkgName = "",act = "";
-        ContentValues cv =null;
+        ContentValues cv = new ContentValues();;
         JSONObject jsonObject, etdm;
         try {
             if(db == null){
@@ -390,11 +383,10 @@ public class TableOC {
                         cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.CT)),DataController.SWITCH_OF_COLLECTION_TYPE);
                 jsonObject.put(EGContext.EXTRA_DATA, etdm);
                 ocJar.put(jsonObject);
-                cv = new ContentValues();
+                cv.clear();
                 cv.put(DBConfig.OC.Column.ST, ONE);
-                db.update(DBConfig.OC.TABLE_NAME, cv,
-                        DBConfig.OC.Column.ID + "=? ",
-                        new String[]{cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.ID))});
+                db.update(DBConfig.OC.TABLE_NAME, cv,DBConfig.OC.Column.ID + "=?",
+                        new String[]{String.valueOf(cursor.getInt(cursor.getColumnIndex(DBConfig.OC.Column.ID)))});
             }
             db.setTransactionSuccessful();
         } catch (Exception e) {
@@ -418,7 +410,7 @@ public class TableOC {
             if (db == null){
                 return;
             }
-            int count  = db.delete(DBConfig.OC.TABLE_NAME, DBConfig.OC.Column.ST + "=?", new String[] {ONE});
+           int count  = db.delete(DBConfig.OC.TABLE_NAME, DBConfig.OC.Column.ST + "=?", new String[] {ONE});
             ELOG.e("删除的行数：：：  "+count);
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){

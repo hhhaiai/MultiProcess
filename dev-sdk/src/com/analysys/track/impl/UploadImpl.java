@@ -50,7 +50,7 @@ public class UploadImpl {
     /**
      * 本条记录的时间
      */
-    private static List<String> idList = new ArrayList<String>();
+    public static List<String> idList = new ArrayList<String>();
     private UploadImpl(){}
     private static class Holder {
         private static final UploadImpl INSTANCE = new UploadImpl();
@@ -235,8 +235,7 @@ public class UploadImpl {
             }
             //从oc表查询closeTime不为空的整条信息，组装上传
             if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC,true)){
-                long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 9 / 10- String.valueOf(object).getBytes().length;
-                ELOG.e("OC useFulLength::: "+useFulLength);
+                long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10- String.valueOf(object).getBytes().length;
                 if(useFulLength > 0 && !isChunkUpload){
                     JSONArray ocJson = getModuleInfos(mContext,object,"OC", useFulLength);
                     if (ocJson != null && ocJson.length() > 0 ) {
@@ -248,7 +247,7 @@ public class UploadImpl {
             }
             //策略控制大模块收集则进行数据组装，不收集则删除数据
             if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LOCATION,true)){
-                long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 9 / 10- String.valueOf(object).getBytes().length;
+                long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10- String.valueOf(object).getBytes().length;
                 if(useFulLength > 0 && !isChunkUpload ){
                     JSONArray locationInfo = getModuleInfos(mContext,object,"LOCATION", useFulLength);
                     if (locationInfo != null && locationInfo.length() > 0) {
@@ -260,7 +259,7 @@ public class UploadImpl {
             }
             //策略控制大模块收集则进行数据组装，不收集则删除数据
             if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT,true)) {
-                long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 9 / 10- String.valueOf(object).getBytes().length;
+                long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10- String.valueOf(object).getBytes().length;
                 if(useFulLength > 0 && !isChunkUpload){
                     JSONArray snapshotJar = getModuleInfos(mContext,object,"SNAPSHOT", useFulLength);
                     if (snapshotJar != null && snapshotJar.length() > 0 ) {
@@ -273,7 +272,7 @@ public class UploadImpl {
             //策略控制大模块收集则进行数据组装，不收集则删除数据
             if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_XXX,true)){
                 // 计算离最大上线的差值
-                long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 9 / 10- String.valueOf(object).getBytes().length;
+                long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10- String.valueOf(object).getBytes().length;
                 if(useFulLength > 0 && !isChunkUpload){
                     JSONArray xxxInfo = getModuleInfos(mContext,object,"XXX", useFulLength);
                     if (xxxInfo != null && xxxInfo.length() > 0) {
@@ -458,6 +457,7 @@ public class UploadImpl {
                         return;
                     }
                     if (EGContext.HTTP_RETRY.equals(code)) {
+                        isChunkUpload = false;
                         int numb = SPHelper.getIntValueFromSP(mContext,EGContext.FAILEDNUMBER,0);
                         if(numb == 0){
                             PolicyImpl.getInstance(mContext)
@@ -731,19 +731,18 @@ public class UploadImpl {
             if("OC".equals(moduleName)){
                 ELOG.e("OC模块数据读取开始：：：");
                 arr = TableOC.getInstance(mContext).select(useFulLength);
-//                ELOG.e("OC模块数据 jsonArray = "+arr);
             }else if("LOCATION".equals(moduleName)){
+                ELOG.e("LOCATION模块数据读取开始：：：");
                 arr = TableLocation.getInstance(mContext).select(useFulLength);
-                ELOG.e("LOCATION模块数据 jsonArray = "+arr);
             }else if("SNAPSHOT".equals(moduleName)){
+                ELOG.e("SNAPSHOT模块数据读取开始：：：");
                 arr = TableAppSnapshot.getInstance(mContext).select(useFulLength);
-                ELOG.e("SNAPSHOT模块数据 jsonArray = "+arr);
             }else if("XXX".equals(moduleName)){
+                ELOG.e("XXX模块数据读取开始：：：");
                 arr = TableXXXInfo.getInstance(mContext).select(useFulLength);
-                ELOG.e("XXX模块数据 jsonArray = "+arr);
             }
             ELOG.e("isChunkUpload  :::: "+isChunkUpload);
-            if (arr == null ||arr.length() <= 0) {
+            if (arr == null ||arr.length() <= 1) {
                 isChunkUpload = false;
                 return arr;
             }
