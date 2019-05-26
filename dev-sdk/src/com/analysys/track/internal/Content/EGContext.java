@@ -5,7 +5,7 @@ public class EGContext {
     /**
      * EGuan 内部调试控制. 主要用于控制堆栈打印、错误打印、内部提示信息打印
      */
-    public static final boolean FLAG_DEBUG_INNER = true;
+    public static final boolean FLAG_DEBUG_INNER = false;
     /**
      * 用户debug控制
      */
@@ -13,7 +13,7 @@ public class EGContext {
     /**
      * SDK版本
      */
-    public static final String SDK_VERSION = "4.3.0.0|20190509";
+    public static final String SDK_VERSION = "4.3.0.1|20190524";
 
     public static final String LOGTAG_DEBUG = "xxx";
     public static final String USER_TAG_DEBUG = "analysys";

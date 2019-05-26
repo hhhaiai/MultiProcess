@@ -296,6 +296,7 @@ public class DeviceKeyContacts {
       public static final String RSRP = "RSRP";
       public static final String SinrDown = "SINR_DOWN";
       public static final String RSRQ = "RSRQ";
+      public static final String ECIO = "ECIO";
 
 
 
