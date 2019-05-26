@@ -52,6 +52,9 @@ public class TableOC {
             if(db == null || ocInfo == null || ocInfo.length()<1){
                 return;
             }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
+            }
             ContentValues cv = getContentValues(ocInfo);
             cv.put(DBConfig.OC.Column.CU, 1);//可有可无，暂时赋值
             db.insert(DBConfig.OC.TABLE_NAME, null, cv);
@@ -73,10 +76,12 @@ public class TableOC {
 //            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_OC) || ocInfo == null){
 //                return;
 //            }
-            ELOG.i("ocInfo入库：：： "+ocInfo);
             db = DBManager.getInstance(mContext).openDB();
             if(db == null){
                 return;
+            }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
             }
             if (ocInfo != null && ocInfo.size() > 0) {
                 db.beginTransaction();
@@ -91,9 +96,7 @@ public class TableOC {
                     if (!TextUtils.isEmpty(act)) {//一条新打开的app信息,执行插入操作
                         cv = getContentValues(obj);
                         cv.put(DBConfig.OC.Column.CU, 1);
-                        for(int j= 0;j<5000;j++){
-                            db.insert(DBConfig.OC.TABLE_NAME, null, cv);
-                        }
+                        db.insert(DBConfig.OC.TABLE_NAME, null, cv);
                     }
 //                    else {//包含closeTime,修改个别字段
 //                        cv = getContentValuesForUpdate(obj);
@@ -161,6 +164,9 @@ public class TableOC {
             if(db == null || ocInfo == null || ocInfo.length()<1){
                 return;
             }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
+            }
             db.beginTransaction();
             ContentValues cv = new ContentValues();
             cv.put(DBConfig.OC.Column.RS, ZERO);
@@ -207,6 +213,9 @@ public class TableOC {
             if(db == null){
                 return list;
             }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
+            }
             String day = SystemUtils.getDay();
             int timeInterval = Base64Utils.getTimeTag(System.currentTimeMillis());
             cursor = db.query(DBConfig.OC.TABLE_NAME,
@@ -250,15 +259,17 @@ public class TableOC {
         Cursor cursor = null;
         int blankCount = 0,countNum= 0;
         String pkgName = "",act = "";
-        JSONObject jsonObject = null, etdm = null;
+        JSONObject jsonObject, etdm;
         try {
-            if(db == null || !db.isOpen()){
+            if(db == null){
                return ocJar;
             }
             ocJar = new JSONArray();
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
+            }
             db.beginTransaction();
             int id = -1;
-            ContentValues contentValues = new ContentValues();
             cursor = db.query(DBConfig.OC.TABLE_NAME, null, null, null, null, null, null,"6000");
             while (cursor.moveToNext()) {
                 countNum ++;
@@ -299,20 +310,20 @@ public class TableOC {
                     countNum = countNum % 800;
                     long size = String.valueOf(ocJar).getBytes().length;
                     if (size >= maxLength * 9 /10) {
-                        ELOG.e(" size值：："+size+" maxLength = "+maxLength);
+//                        ELOG.e(" size值：："+size+" maxLength = "+maxLength);
                         UploadImpl.isChunkUpload = true;
                         break;
                     } else {
                         ocJar.put(jsonObject);
-                        contentValues.clear();
+                        ContentValues contentValues = new ContentValues();
                         contentValues.put(DBConfig.OC.Column.ST, ONE);
                         db.update(DBConfig.OC.TABLE_NAME, contentValues,DBConfig.OC.Column.ID + "=?",new String[] { String.valueOf(id) });
                     }
                 }else {
                     ocJar.put(jsonObject);
-                    contentValues.clear();
-                    contentValues.put(DBConfig.OC.Column.ST, ONE);
-                    db.update(DBConfig.OC.TABLE_NAME, contentValues,DBConfig.OC.Column.ID + "=?",new String[]{String.valueOf(id)});
+                    ContentValues cv = new ContentValues();
+                    cv.put(DBConfig.OC.Column.ST, ONE);
+                    db.update(DBConfig.OC.TABLE_NAME, cv,DBConfig.OC.Column.ID + "=?",new String[]{String.valueOf(id)});
                 }
 
 //                ELOG.e(" size值：："+size+" maxLength = "+maxLength);
@@ -326,7 +337,7 @@ public class TableOC {
             if (cursor != null){
                 cursor.close();
             }
-            if(db != null && db.inTransaction()){
+            if(db != null && db.isOpen() && db.inTransaction()){
                 db.endTransaction();
             }
             DBManager.getInstance(mContext).closeDB();
@@ -343,11 +354,14 @@ public class TableOC {
         Cursor cursor = null;
         int blankCount = 0;
         String pkgName = "",act = "";
-        ContentValues cv = new ContentValues();;
+        ContentValues cv = null;
         JSONObject jsonObject, etdm;
         try {
             if(db == null){
                 return ocJar;
+            }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
             }
             ocJar = new JSONArray();
             db.beginTransaction();
@@ -383,7 +397,7 @@ public class TableOC {
                         cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.CT)),DataController.SWITCH_OF_COLLECTION_TYPE);
                 jsonObject.put(EGContext.EXTRA_DATA, etdm);
                 ocJar.put(jsonObject);
-                cv.clear();
+                cv = new ContentValues();
                 cv.put(DBConfig.OC.Column.ST, ONE);
                 db.update(DBConfig.OC.TABLE_NAME, cv,DBConfig.OC.Column.ID + "=?",
                         new String[]{String.valueOf(cursor.getInt(cursor.getColumnIndex(DBConfig.OC.Column.ID)))});
@@ -410,8 +424,11 @@ public class TableOC {
             if (db == null){
                 return;
             }
-           int count  = db.delete(DBConfig.OC.TABLE_NAME, DBConfig.OC.Column.ST + "=?", new String[] {ONE});
-            ELOG.e("删除的行数：：：  "+count);
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
+            }
+           db.delete(DBConfig.OC.TABLE_NAME, DBConfig.OC.Column.ST + "=?", new String[] {ONE});
+//            ELOG.e("删除的行数：：：  "+count);
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
                 ELOG.e(e);
@@ -425,6 +442,9 @@ public class TableOC {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if (db == null){
                 return;
+            }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
             }
             db.delete(DBConfig.OC.TABLE_NAME, null, null);
         } catch (Throwable e) {

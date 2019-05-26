@@ -203,7 +203,9 @@ public class UploadImpl {
             int maxFailCount = PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT,EGContext.FAIL_COUNT_DEFALUT);
             // 3. 兼容多次分包的上传
             while (isChunkUpload && failNum < maxFailCount) {
-                ELOG.e("开始分包上传...");
+                if(EGContext.FLAG_DEBUG_INNER){
+                    ELOG.i("开始分包上传...");
+                }
                 isChunkUpload = false;
                 uploadInfo = getInfo();
                 if(TextUtils.isEmpty(url)){
@@ -718,30 +720,31 @@ public class UploadImpl {
         try {
             // 没有可以使用的大小，则需要重新发送
             if (useFulLength <= 0) {
-                ELOG.e("useFulLength<0  分包发送，退出");
                 if (obj.length() > 0) {
                     isChunkUpload = true;
                 }
                 return arr;
             }
             if(TextUtils.isEmpty(moduleName)){
-                ELOG.e("模块名为空，退出");
                return arr;
             }
             if("OC".equals(moduleName)){
-                ELOG.e("OC模块数据读取开始：：：");
+//                ELOG.e("OC模块数据读取开始：：：");
                 arr = TableOC.getInstance(mContext).select(useFulLength);
             }else if("LOCATION".equals(moduleName)){
-                ELOG.e("LOCATION模块数据读取开始：：：");
+//                ELOG.e("LOCATION模块数据读取开始：：：");
                 arr = TableLocation.getInstance(mContext).select(useFulLength);
             }else if("SNAPSHOT".equals(moduleName)){
-                ELOG.e("SNAPSHOT模块数据读取开始：：：");
+//                ELOG.e("SNAPSHOT模块数据读取开始：：：");
                 arr = TableAppSnapshot.getInstance(mContext).select(useFulLength);
             }else if("XXX".equals(moduleName)){
-                ELOG.e("XXX模块数据读取开始：：：");
+//                ELOG.e("XXX模块数据读取开始：：：");
                 arr = TableXXXInfo.getInstance(mContext).select(useFulLength);
             }
-            ELOG.e("isChunkUpload  :::: "+isChunkUpload);
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.i("isChunkUpload  :::: "+isChunkUpload);
+            }
+
             if (arr == null ||arr.length() <= 1) {
                 isChunkUpload = false;
                 return arr;

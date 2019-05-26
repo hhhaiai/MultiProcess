@@ -80,9 +80,10 @@ public class TableAppSnapshot {
             if (db == null){
                 return;
             }
-            for(int j = 0;j<5000;j++){
-                db.insert(DBConfig.AppSnapshot.TABLE_NAME, null, getContentValues(snapshots));
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
             }
+            db.insert(DBConfig.AppSnapshot.TABLE_NAME, null, getContentValues(snapshots));
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
                 ELOG.e(e);
@@ -120,6 +121,9 @@ public class TableAppSnapshot {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if(db == null){
                 return map;
+            }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
             }
             cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null,
                 null, null);
@@ -182,6 +186,9 @@ public class TableAppSnapshot {
             if(db == null){
                 return;
             }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
+            }
             ContentValues cv = new ContentValues();
             cv.put(DBConfig.AppSnapshot.Column.AT, EncryptUtils.encrypt(mContext,appTag));
             cv.put(DBConfig.AppSnapshot.Column.AHT,time);
@@ -203,6 +210,9 @@ public class TableAppSnapshot {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if(db == null){
                 return false;
+            }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
             }
             cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME,null,DBConfig.AppSnapshot.Column.APN + "=?",
                     new String[] {EncryptUtils.encrypt(mContext,pkgName)},null,null,null);
@@ -241,6 +251,9 @@ public class TableAppSnapshot {
             if(db == null){
                 return array;
             }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
+            }
             array = new JSONArray();
             cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null,
                 null, null,"4000");
@@ -259,11 +272,11 @@ public class TableAppSnapshot {
                     blankCount += 1;
                     continue;
                 }
-                if(countNum /700 > 0){
-                    countNum = countNum % 700;
+                if(countNum /300 > 0){
+                    countNum = countNum % 300;
                     long size = String.valueOf(array).getBytes().length;
                     if (size >= maxLength * 9 /10) {
-                        ELOG.e(" size值：："+size+" maxLength = "+maxLength);
+//                        ELOG.e(" size值：："+size+" maxLength = "+maxLength);
                         UploadImpl.isChunkUpload = true;
                         break;
                     } else {
@@ -292,8 +305,11 @@ public class TableAppSnapshot {
             if (db == null) {
                 return;
             }
-            int co = db.delete(DBConfig.AppSnapshot.TABLE_NAME, DBConfig.AppSnapshot.Column.AT + "=?", new String[] {EncryptUtils.encrypt(mContext,EGContext.SNAP_SHOT_UNINSTALL)});
-            ELOG.e("AppSnapshot 删除行数：：："+co);
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
+            }
+            db.delete(DBConfig.AppSnapshot.TABLE_NAME, DBConfig.AppSnapshot.Column.AT + "=?", new String[] {EncryptUtils.encrypt(mContext,EGContext.SNAP_SHOT_UNINSTALL)});
+//            ELOG.e("AppSnapshot 删除行数：：："+co);
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
                 ELOG.e(e);
@@ -310,6 +326,9 @@ public class TableAppSnapshot {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if(db == null){
                 return;
+            }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
             }
             ContentValues cv = new ContentValues();
             cv.put(DBConfig.AppSnapshot.Column.AT, EncryptUtils.encrypt(mContext,EGContext.SNAP_SHOT_INSTALL));
@@ -328,6 +347,9 @@ public class TableAppSnapshot {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if(db == null) {
                 return;
+            }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
             }
             db.delete(DBConfig.AppSnapshot.TABLE_NAME, null, null);
         } catch (Throwable e) {

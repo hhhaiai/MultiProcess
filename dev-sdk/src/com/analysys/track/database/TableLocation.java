@@ -58,9 +58,10 @@ public class TableLocation {
                     if(db == null){
                         return;
                     }
-                    for (int j = 0;j<2000;j++){
-                        db.insert(DBConfig.Location.TABLE_NAME, null, cv);
+                    if(!db.isOpen()){
+                        db = DBManager.getInstance(mContext).openDB();
                     }
+                    db.insert(DBConfig.Location.TABLE_NAME, null, cv);
                 }
             }
         } catch (Throwable e) {
@@ -83,6 +84,9 @@ public class TableLocation {
             if(db == null){
                return array;
             }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
+            }
             db.beginTransaction();
             cursor = db.query(DBConfig.Location.TABLE_NAME, null,
                     null, null, null, null, null,"2000");
@@ -102,11 +106,11 @@ public class TableLocation {
                 }
                 String decryptLocation = Base64Utils.decrypt(EncryptUtils.decrypt(mContext,encryptLocation), timeStamp);
                 if(!TextUtils.isEmpty(decryptLocation)){
-                    if(countNum /400 > 0){
-                        countNum = countNum % 400;
+                    if(countNum /200 > 0){
+                        countNum = countNum % 200;
                         long size = String.valueOf(array).getBytes().length;
                         if (size >= maxLength) {
-                            ELOG.e(" size值：："+size+" maxLength = "+maxLength);
+//                            ELOG.i(" size值：："+size+" maxLength = "+maxLength);
                             UploadImpl.isChunkUpload = true;
                             break;
                         } else {
@@ -135,7 +139,7 @@ public class TableLocation {
             if(cursor != null){
                 cursor.close();
             }
-            if(db != null && db.inTransaction()){
+            if(db != null && db.isOpen() && db.inTransaction()){
                 db.endTransaction();
             }
             DBManager.getInstance(mContext).closeDB();
@@ -149,8 +153,11 @@ public class TableLocation {
             if(db == null) {
                 return;
             }
-            int co = db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?", new String[]{INSERT_STATUS_READ_OVER});
-            ELOG.e("LOCATION删除的行数：：："+co);
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
+            }
+            db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?", new String[]{INSERT_STATUS_READ_OVER});
+//            ELOG.e("LOCATION删除的行数：：："+co);
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
                 ELOG.e(e);
@@ -164,6 +171,9 @@ public class TableLocation {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if(db == null) {
                 return;
+            }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
             }
             db.delete(DBConfig.Location.TABLE_NAME, null, null);
         } catch (Throwable e) {
