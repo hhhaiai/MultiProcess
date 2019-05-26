@@ -46,11 +46,11 @@ public class UploadImpl {
     private final String OCI = "OCInfo";
     private final String XXXInfo = "XXXInfo";
     /**是否分包上传*/
-    private boolean isChunkUpload = false;
+    public static boolean isChunkUpload = false;
     /**
      * 本条记录的时间
      */
-    private static List<String> idList = new ArrayList<String>();
+    public static List<String> idList = new ArrayList<String>();
     private UploadImpl(){}
     private static class Holder {
         private static final UploadImpl INSTANCE = new UploadImpl();
@@ -184,6 +184,7 @@ public class UploadImpl {
                 ELOG.i(uploadInfo);
             }
             if (TextUtils.isEmpty(uploadInfo)) {
+                SPHelper.setIntValue2SP(mContext,EGContext.REQUEST_STATE,EGContext.sPrepare);
                 return;
             }
 //            boolean isDebugMode = SPHelper.getBooleanValueFromSP(mContext,EGContext.DEBUG, false);
@@ -193,12 +194,24 @@ public class UploadImpl {
             if (EGContext.FLAG_DEBUG_USER) {
                 url = EGContext.TEST_URL;
             }
+            if(TextUtils.isEmpty(url)){
+                SPHelper.setIntValue2SP(mContext,EGContext.REQUEST_STATE,EGContext.sPrepare);
+                return;
+            }
             handleUpload(url, messageEncrypt(uploadInfo));
             int failNum = SPHelper.getIntValueFromSP(mContext,EGContext.FAILEDNUMBER,0);
             int maxFailCount = PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT,EGContext.FAIL_COUNT_DEFALUT);
             // 3. 兼容多次分包的上传
             while (isChunkUpload && failNum < maxFailCount) {
+                if(EGContext.FLAG_DEBUG_INNER){
+                    ELOG.i("开始分包上传...");
+                }
+                isChunkUpload = false;
                 uploadInfo = getInfo();
+                if(TextUtils.isEmpty(url)){
+                    SPHelper.setIntValue2SP(mContext,EGContext.REQUEST_STATE,EGContext.sPrepare);
+                    return;
+                }
                 handleUpload(url, messageEncrypt(uploadInfo));
             }
         } catch (Throwable t) {
@@ -224,36 +237,49 @@ public class UploadImpl {
             }
             //从oc表查询closeTime不为空的整条信息，组装上传
             if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC,true)){
-                JSONArray ocJson = TableOC.getInstance(mContext).select();
-                if (ocJson != null && ocJson.length() > 0 ) {
-                    object.put(OCI, ocJson);
+                long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10- String.valueOf(object).getBytes().length;
+                if(useFulLength > 0 && !isChunkUpload){
+                    JSONArray ocJson = getModuleInfos(mContext,object,"OC", useFulLength);
+                    if (ocJson != null && ocJson.length() > 0 ) {
+                        object.put(OCI, ocJson);
+                    }
                 }
             }else {
                 TableOC.getInstance(mContext).deleteAll();
             }
             //策略控制大模块收集则进行数据组装，不收集则删除数据
-            if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT,true)) {
-                JSONArray snapshotJar = TableAppSnapshot.getInstance(mContext).select();
-                if (snapshotJar != null && snapshotJar.length() > 0 ) {
-                    object.put(ASI, snapshotJar);
-                }
-            }else {
-                TableAppSnapshot.getInstance(mContext).deleteAll();
-            }
-            //策略控制大模块收集则进行数据组装，不收集则删除数据
             if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LOCATION,true)){
-                JSONArray locationInfo = TableLocation.getInstance(mContext).select();
-                if (locationInfo != null && locationInfo.length() > 0) {
-                    object.put(LI, locationInfo);
+                long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10- String.valueOf(object).getBytes().length;
+                if(useFulLength > 0 && !isChunkUpload ){
+                    JSONArray locationInfo = getModuleInfos(mContext,object,"LOCATION", useFulLength);
+                    if (locationInfo != null && locationInfo.length() > 0) {
+                        object.put(LI, locationInfo);
+                    }
                 }
             }else {
                 TableLocation.getInstance(mContext).deleteAll();
             }
             //策略控制大模块收集则进行数据组装，不收集则删除数据
+            if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT,true)) {
+                long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10- String.valueOf(object).getBytes().length;
+                if(useFulLength > 0 && !isChunkUpload){
+                    JSONArray snapshotJar = getModuleInfos(mContext,object,"SNAPSHOT", useFulLength);
+                    if (snapshotJar != null && snapshotJar.length() > 0 ) {
+                        object.put(ASI, snapshotJar);
+                    }
+                }
+            }else {
+                TableAppSnapshot.getInstance(mContext).deleteAll();
+            }
+            //策略控制大模块收集则进行数据组装，不收集则删除数据
             if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_XXX,true)){
-                JSONArray xxxInfo = getUploadXXXInfos(mContext,object);
-                if (xxxInfo != null && xxxInfo.length() > 0) {
-                    object.put(XXXInfo, xxxInfo);
+                // 计算离最大上线的差值
+                long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10- String.valueOf(object).getBytes().length;
+                if(useFulLength > 0 && !isChunkUpload){
+                    JSONArray xxxInfo = getModuleInfos(mContext,object,"XXX", useFulLength);
+                    if (xxxInfo != null && xxxInfo.length() > 0) {
+                        object.put(XXXInfo, xxxInfo);
+                    }
                 }
             }else {
                 TableXXXInfo.getInstance(mContext).delete();
@@ -433,6 +459,7 @@ public class UploadImpl {
                         return;
                     }
                     if (EGContext.HTTP_RETRY.equals(code)) {
+                        isChunkUpload = false;
                         int numb = SPHelper.getIntValueFromSP(mContext,EGContext.FAILEDNUMBER,0);
                         if(numb == 0){
                             PolicyImpl.getInstance(mContext)
@@ -462,9 +489,13 @@ public class UploadImpl {
     }
     String fail = "-1";
     private void handleUpload(final String url, final String uploadInfo) {
-
+        if(TextUtils.isEmpty(url)){
+            SPHelper.setIntValue2SP(mContext,EGContext.REQUEST_STATE,EGContext.sPrepare);
+            return;
+        }
         String result = RequestUtils.httpRequest(url, uploadInfo, mContext);
         if (TextUtils.isEmpty(result)) {
+            SPHelper.setIntValue2SP(mContext,EGContext.REQUEST_STATE,EGContext.sPrepare);
             return;
         }else if(fail.equals(result)){
             SPHelper.setIntValue2SP(mContext,EGContext.REQUEST_STATE,EGContext.sPrepare);
@@ -476,85 +507,85 @@ public class UploadImpl {
         analysysReturnJson(result);
     }
 
-    private JSONArray getUploadXXXInfos(Context mContext,JSONObject obj){
-        // 结果存放的XXXInfo结构
-        JSONArray arr = new JSONArray();
-        JSONArray jsonArray = new JSONArray();
-        try {
-            jsonArray = TableXXXInfo.getInstance(mContext).select();
-            if (jsonArray == null ||jsonArray.length() <= 0) {
-                isChunkUpload = false;
-                return arr;
-            }
-            // 计算离最大上线的差值
-            long freeLen = EGContext.LEN_MAX_UPDATE_SIZE - String.valueOf(obj).getBytes().length;
-            // 没有可以使用的大小，则需要重新发送
-            if (freeLen <= 0) {
-                if (jsonArray.length() > 0) {
-                    isChunkUpload = true;
-                }
-                return arr;
-            }
-            int ss = jsonArray.length();
-            if (jsonArray != null && ss > 0) {
-                // 测试大小是否超限的预览版XXXInfo
-                // 挨个遍历,使用JSON如果不超限，则
-                /**
-                 * 遍历逻辑:
-                 * </p>
-                 * 1. 判断单条超限问题(非最后一个跳过处理下一个，加入待清除列表)
-                 * </p>
-                 * 2. 测试JSON如超限，退出组装
-                 * </p>
-                 * 3. 测试JSON不超限, 则加入使用数据，id计入清除列表中
-                 */
-                String info = null;
-                JSONObject jsonObject = null;
-                for (int i = 0; i < ss; i++) {
-                    info = (String) jsonArray.get(i);
-                    // 判断单条大小是否超限,删除单条数据
-                    if (info.getBytes().length > freeLen) {
-                        jsonObject = new JSONObject(new String(Base64.decode(info.getBytes(),Base64.DEFAULT)));
-                        idList.add(jsonObject.getString(ProcUtils.ID));
-                        // 最后一个消费，则不需要再次发送
-                        if (i == ss - 1) {
-                            isChunkUpload = false;
-                        } else {
-                            continue;
-                        }
-                    }
-                    // 先尝试是否超限.如果超限,则不在增加
-                    long size = info.getBytes().length + String.valueOf(arr).getBytes().length;
-                    if (size >= freeLen) {
-                        isChunkUpload = true;
-                        break;
-                    } else {
-                        jsonObject = new JSONObject(new String(Base64.decode(info.getBytes(),Base64.DEFAULT)));
-                        idList.add(jsonObject.getString(ProcUtils.ID));
-                        jsonObject.remove(ProcUtils.ID);
-                        arr.put(new String(Base64.encode(jsonObject.toString().getBytes(),Base64.DEFAULT)));
-                        // 最后一个消费，则不需要再次发送
-                        if (i == ss - 1) {
-                            isChunkUpload = false;
-                        } else {
-                            continue;
-                        }
-                    }
-                }
-                if (arr.length() <= 0) {
-                    // 兼容只有一条数据,但是数据量超级大. 清除DB中所有数据
-                    TableXXXInfo.getInstance(mContext).delete();
-                    idList.clear();
-                }
-
-            }
-        } catch (Throwable e) {
-            if(EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
-            }
-        }
-        return arr;
-    }
+//    private JSONArray getUploadXXXInfos(Context mContext,JSONObject obj){
+//        // 结果存放的XXXInfo结构
+//        JSONArray arr = new JSONArray();
+//        JSONArray jsonArray = new JSONArray();
+//        try {
+//            jsonArray = TableXXXInfo.getInstance(mContext).select();
+//            if (jsonArray == null ||jsonArray.length() <= 0) {
+//                isChunkUpload = false;
+//                return arr;
+//            }
+//            // 计算离最大上线的差值,为了避免原始数据压缩后超过1M大小，设置取值前大小为0.9M
+//            long freeLen = EGContext.LEN_MAX_UPDATE_SIZE * 9 / 10  - String.valueOf(obj).getBytes().length;
+//            // 没有可以使用的大小，则需要重新发送
+//            if (freeLen <= 0) {
+//                if (jsonArray.length() > 0) {
+//                    isChunkUpload = true;
+//                }
+//                return arr;
+//            }
+//            int ss = jsonArray.length();
+//            if (jsonArray != null && ss > 0) {
+//                // 测试大小是否超限的预览版XXXInfo
+//                // 挨个遍历,使用JSON如果不超限，则
+//                /**
+//                 * 遍历逻辑:
+//                 * </p>
+//                 * 1. 判断单条超限问题(非最后一个跳过处理下一个，加入待清除列表)
+//                 * </p>
+//                 * 2. 测试JSON如超限，退出组装
+//                 * </p>
+//                 * 3. 测试JSON不超限, 则加入使用数据，id计入清除列表中
+//                 */
+//                String info = null;
+//                JSONObject jsonObject = null;
+//                for (int i = 0; i < ss; i++) {
+//                    info = (String) jsonArray.get(i);
+//                    // 判断单条大小是否超限,删除单条数据
+//                    if (info.getBytes().length > freeLen) {
+//                        jsonObject = new JSONObject(new String(Base64.decode(info.getBytes(),Base64.DEFAULT)));
+//                        idList.add(jsonObject.getString(ProcUtils.ID));
+//                        // 最后一个消费，则不需要再次发送
+//                        if (i == ss - 1) {
+//                            isChunkUpload = false;
+//                        } else {
+//                            continue;
+//                        }
+//                    }
+//                    // 先尝试是否超限.如果超限,则不在增加
+//                    long size = info.getBytes().length + String.valueOf(arr).getBytes().length;
+//                    if (size >= freeLen) {
+//                        isChunkUpload = true;
+//                        break;
+//                    } else {
+//                        jsonObject = new JSONObject(new String(Base64.decode(info.getBytes(),Base64.DEFAULT)));
+//                        idList.add(jsonObject.getString(ProcUtils.ID));
+//                        jsonObject.remove(ProcUtils.ID);
+//                        arr.put(new String(Base64.encode(jsonObject.toString().getBytes(),Base64.DEFAULT)));
+//                        // 最后一个消费，则不需要再次发送
+//                        if (i == ss - 1) {
+//                            isChunkUpload = false;
+//                        } else {
+//                            continue;
+//                        }
+//                    }
+//                }
+//                if (arr.length() <= 0) {
+//                    // 兼容只有一条数据,但是数据量超级大. 清除DB中所有数据
+//                    TableXXXInfo.getInstance(mContext).delete();
+//                    idList.clear();
+//                }
+//
+//            }
+//        } catch (Throwable e) {
+//            if(EGContext.FLAG_DEBUG_INNER) {
+//                ELOG.e(e);
+//            }
+//        }
+//        return arr;
+//    }
 
     /**
      * 数据上传成功 本地数据处理
@@ -572,6 +603,7 @@ public class UploadImpl {
             SPHelper.setIntValue2SP(mContext,EGContext.FAILEDNUMBER,0);
             SPHelper.setLongValue2SP(mContext,EGContext.FAILEDTIME,0);
             SPHelper.setLongValue2SP(mContext,EGContext.RETRYTIME,0);
+            TableOC.getInstance(mContext).delete();
             //上传完成回来清理数据的时候，snapshot删除卸载的，其余的统一恢复成正常值
             TableAppSnapshot.getInstance(mContext).delete();
             TableAppSnapshot.getInstance(mContext).update();
@@ -584,7 +616,6 @@ public class UploadImpl {
             if(idList != null && idList.size()>0){
                 idList.clear();
             }
-            TableOC.getInstance(mContext).delete();
         }catch (Throwable t){
             if(EGContext.FLAG_DEBUG_INNER){
                 ELOG.e(t);
@@ -682,5 +713,47 @@ public class UploadImpl {
                 break;
         }
         return time;
+    }
+    private JSONArray getModuleInfos(Context mContext,JSONObject obj,String moduleName, long useFulLength){
+        // 结果存放JsonObject结构
+        JSONArray arr = new JSONArray();
+        try {
+            // 没有可以使用的大小，则需要重新发送
+            if (useFulLength <= 0) {
+                if (obj.length() > 0) {
+                    isChunkUpload = true;
+                }
+                return arr;
+            }
+            if(TextUtils.isEmpty(moduleName)){
+               return arr;
+            }
+            if("OC".equals(moduleName)){
+//                ELOG.e("OC模块数据读取开始：：：");
+                arr = TableOC.getInstance(mContext).select(useFulLength);
+            }else if("LOCATION".equals(moduleName)){
+//                ELOG.e("LOCATION模块数据读取开始：：：");
+                arr = TableLocation.getInstance(mContext).select(useFulLength);
+            }else if("SNAPSHOT".equals(moduleName)){
+//                ELOG.e("SNAPSHOT模块数据读取开始：：：");
+                arr = TableAppSnapshot.getInstance(mContext).select(useFulLength);
+            }else if("XXX".equals(moduleName)){
+//                ELOG.e("XXX模块数据读取开始：：：");
+                arr = TableXXXInfo.getInstance(mContext).select(useFulLength);
+            }
+            if(EGContext.FLAG_DEBUG_INNER){
+                ELOG.i("isChunkUpload  :::: "+isChunkUpload);
+            }
+
+            if (arr == null ||arr.length() <= 1) {
+                isChunkUpload = false;
+                return arr;
+            }
+        } catch (Throwable e) {
+            if(EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
+        }
+        return arr;
     }
 }

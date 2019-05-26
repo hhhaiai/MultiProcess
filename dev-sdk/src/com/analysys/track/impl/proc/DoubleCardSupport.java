@@ -520,16 +520,20 @@ public class DoubleCardSupport {
     }
 
     private static String getInvoke(Method met, Object obj, Object... slotId) {
-//        try {
-//            if (met == null || obj == null) {
-//                return null;
-//            }
-//            Object id = met.invoke(obj, slotId);
-//            if (id != null) {
-//                return String.valueOf(id);
-//            }
-//        } catch (Throwable e) {
-//        }
+        try {
+            if (met == null || obj == null) {
+                return null;
+            }
+            if(Build.VERSION.SDK_INT <= 20 || (Build.VERSION.SDK_INT == 20 && "Letv".equalsIgnoreCase(Build.MANUFACTURER))){
+               return null;
+            }else {
+                Object id = met.invoke(obj, slotId);
+                if (id != null) {
+                    return String.valueOf(id);
+                }
+            }
+        } catch (Throwable e) {
+        }
         return null;
     }
 

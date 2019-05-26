@@ -7,6 +7,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.analysys.track.impl.UploadImpl;
 import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
@@ -79,6 +80,9 @@ public class TableAppSnapshot {
             if (db == null){
                 return;
             }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
+            }
             db.insert(DBConfig.AppSnapshot.TABLE_NAME, null, getContentValues(snapshots));
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
@@ -117,6 +121,9 @@ public class TableAppSnapshot {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if(db == null){
                 return map;
+            }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
             }
             cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null,
                 null, null);
@@ -179,6 +186,9 @@ public class TableAppSnapshot {
             if(db == null){
                 return;
             }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
+            }
             ContentValues cv = new ContentValues();
             cv.put(DBConfig.AppSnapshot.Column.AT, EncryptUtils.encrypt(mContext,appTag));
             cv.put(DBConfig.AppSnapshot.Column.AHT,time);
@@ -200,6 +210,9 @@ public class TableAppSnapshot {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if(db == null){
                 return false;
+            }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
             }
             cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME,null,DBConfig.AppSnapshot.Column.APN + "=?",
                     new String[] {EncryptUtils.encrypt(mContext,pkgName)},null,null,null);
@@ -228,33 +241,50 @@ public class TableAppSnapshot {
     /**
      * 数据查询，格式：{JSONObject}
      */
-    public JSONArray select() {
+    public JSONArray select(long maxLength) {
         JSONArray array = null;
         Cursor cursor = null;
-        int blankCount = 0;
+        int blankCount = 0,countNum= 0;
+        JSONObject jsonObject = null;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if(db == null){
                 return array;
             }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
+            }
             array = new JSONArray();
             cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null,
-                null, null);
+                null, null,"4000");
             if(cursor == null){
                 return array;
             }
             while (cursor.moveToNext()) {
+                countNum ++;
                 if(blankCount >= EGContext.BLANK_COUNT_MAX){
                     return array;
                 }
                 String pkgName = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN)));
                 if(!TextUtils.isEmpty(pkgName)){
-                    array.put(getCursor(cursor));
+                    jsonObject = getCursor(cursor);
                 }else {
                     blankCount += 1;
                     continue;
                 }
-
+                if(countNum /300 > 0){
+                    countNum = countNum % 300;
+                    long size = String.valueOf(array).getBytes().length;
+                    if (size >= maxLength * 9 /10) {
+//                        ELOG.e(" size值：："+size+" maxLength = "+maxLength);
+                        UploadImpl.isChunkUpload = true;
+                        break;
+                    } else {
+                        array.put(jsonObject);
+                    }
+                }else {
+                    array.put(jsonObject);
+                }
             }
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
@@ -275,8 +305,11 @@ public class TableAppSnapshot {
             if (db == null) {
                 return;
             }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
+            }
             db.delete(DBConfig.AppSnapshot.TABLE_NAME, DBConfig.AppSnapshot.Column.AT + "=?", new String[] {EncryptUtils.encrypt(mContext,EGContext.SNAP_SHOT_UNINSTALL)});
-
+//            ELOG.e("AppSnapshot 删除行数：：："+co);
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
                 ELOG.e(e);
@@ -293,6 +326,9 @@ public class TableAppSnapshot {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if(db == null){
                 return;
+            }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
             }
             ContentValues cv = new ContentValues();
             cv.put(DBConfig.AppSnapshot.Column.AT, EncryptUtils.encrypt(mContext,EGContext.SNAP_SHOT_INSTALL));
@@ -311,6 +347,9 @@ public class TableAppSnapshot {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if(db == null) {
                 return;
+            }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
             }
             db.delete(DBConfig.AppSnapshot.TABLE_NAME, null, null);
         } catch (Throwable e) {

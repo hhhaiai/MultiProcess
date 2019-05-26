@@ -6,15 +6,10 @@ import android.content.Intent;
 import android.os.Build;
 import android.text.TextUtils;
 
-import com.analysys.track.impl.OCImpl;
 import com.analysys.track.impl.DeviceImpl;
 import com.analysys.track.utils.FileUtils;
-import com.analysys.track.utils.sp.SPHelper;
 import com.analysys.track.work.MessageDispatcher;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.EThreadPool;
-import com.analysys.track.utils.ReceiverUtils;
-import com.analysys.track.utils.SystemUtils;
 
 import com.analysys.track.internal.Content.EGContext;
 
@@ -30,8 +25,8 @@ public class AnalysysReceiver extends BroadcastReceiver {
     String BATTERY_CHANGED = "android.intent.action.BATTERY_CHANGED";
     String BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED";
     //上次结束时间
-    private static long mLastCloseTime = 0;
-    private static boolean isScreenOnOffBroadCastHandled = false;
+    public static long mLastCloseTime = 0;
+    public static boolean isScreenOnOffBroadCastHandled = false;
     private static boolean isSnapShotAddBroadCastHandled = false;
     private static boolean isSnapShotDeleteBroadCastHandled = false;
     private static boolean isSnapShotUpdateBroadCastHandled = false;
@@ -118,14 +113,14 @@ public class AnalysysReceiver extends BroadcastReceiver {
                 }
                 //设置开锁屏的flag 用于补数逻辑
                 EGContext.SCREEN_ON = true;
-                processScreenOnOff(true);
+                MessageDispatcher.getInstance(mContext).screenStatusHandle(true);
             }
             if (SCREEN_OFF.equals(intent.getAction())) {
                 if(Build.VERSION.SDK_INT >= 24){
                     return;
                 }
                 EGContext.SCREEN_ON = false;
-                processScreenOnOff(false);
+                MessageDispatcher.getInstance(mContext).screenStatusHandle(false);
             }
             if (BATTERY_CHANGED.equals(intent.getAction())) {
                 try {
@@ -166,107 +161,6 @@ public class AnalysysReceiver extends BroadcastReceiver {
         }catch (Throwable t){
             if(EGContext.FLAG_DEBUG_INNER){
                 ELOG.e(t);
-            }
-        }
-    }
-
-    private void processScreenOnOff(final boolean on) {
-        try {
-            long currentTime = System.currentTimeMillis();
-            if(on){
-                if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_SCREEN_ON_BROADCAST,EGContext.TIME_SYNC_BROADCAST,currentTime)){
-                    FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_SCREEN_ON_BROADCAST,currentTime);
-                }else {
-                    return;
-                }
-            }else {
-                if(FileUtils.isNeedWorkByLockFile(mContext,EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST,EGContext.TIME_SYNC_BROADCAST,currentTime)){
-                    FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST,currentTime);
-                }else {
-                    return;
-                }
-            }
-
-            if(!isScreenOnOffBroadCastHandled){
-                isScreenOnOffBroadCastHandled = true;
-            }else {
-                return;
-            }
-//            if (EGContext.FLAG_DEBUG_INNER){
-//                ELOG.i(SystemUtils.getCurrentProcessName(mContext));
-//            }
-            if (SystemUtils.isMainThread()) {
-                EThreadPool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        screenOnOffHandle(on);
-                    }
-                });
-
-            } else {
-                screenOnOffHandle(on);
-            }
-        } catch (Throwable e) {
-            if(EGContext.FLAG_DEBUG_INNER){
-                ELOG.e(e);
-            }
-        }finally {
-            isScreenOnOffBroadCastHandled = false;
-        }
-    }
-    /**
-     * 锁屏补时间
-     */
-    private void screenOnOffHandle(boolean on){
-        try {
-            // 补充时间
-            if(mLastCloseTime == 0){//第一次时间为空，则取sp时间
-                long spLastVisitTime = FileUtils.getLockFileLastModifyTime(mContext,EGContext.FILES_SYNC_SP_WRITER);
-                if(System.currentTimeMillis() - spLastVisitTime > EGContext.TIME_SYNC_SP){//即便频繁开关屏也不能频繁操作sp
-                    mLastCloseTime = SPHelper.getLongValueFromSP(mContext,EGContext.LAST_AVAILABLE_TIME, 0);
-                    FileUtils.setLockLastModifyTime(mContext,EGContext.FILES_SYNC_SP_WRITER,System.currentTimeMillis());
-                }else {
-                    return;
-                }
-
-            }
-            if(mLastCloseTime == 0){//取完sp时间后依然为空，则为第一次锁屏，设置closeTime,准备入库
-                mLastCloseTime = System.currentTimeMillis();
-                SPHelper.setLongValue2SP(mContext,EGContext.LAST_AVAILABLE_TIME, mLastCloseTime);
-                if(on){
-                    return;
-                }
-                OCImpl.mLastAvailableOpenOrCloseTime = mLastCloseTime;
-                OCImpl.getInstance(mContext).closeOC(false, mLastCloseTime);
-            }else {//sp里取到了数据，即，非第一次锁屏，则判断是否有效数据来设置closeTime,准备入库
-                long currentTime  = System.currentTimeMillis();
-                try {
-                    if(Build.VERSION.SDK_INT < 21){
-                        if(currentTime - mLastCloseTime < EGContext.OC_CYCLE){
-                            OCImpl.mCache = null;
-                            return;
-                        }
-                    }else if(Build.VERSION.SDK_INT >20 && Build.VERSION.SDK_INT < 24){
-                        if(currentTime - mLastCloseTime < EGContext.OC_CYCLE_OVER_5){
-                            OCImpl.mCache = null;
-                            return;
-                        }
-                    }
-                }catch (Throwable t){
-                }finally {
-                    SPHelper.setLongValue2SP(mContext,EGContext.LAST_AVAILABLE_TIME,currentTime);
-                }
-                if(on){
-                    return;
-                }
-                OCImpl.mLastAvailableOpenOrCloseTime = currentTime;
-                OCImpl.getInstance(mContext).closeOC(true, mLastCloseTime);
-            }
-            ReceiverUtils.getInstance().unRegistAllReceiver(mContext);
-        }catch (Throwable t){
-        }finally {
-            if(on){
-                MessageDispatcher.getInstance(mContext).sendMessages();
             }
         }
     }

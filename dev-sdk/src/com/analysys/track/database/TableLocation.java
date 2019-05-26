@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
+import com.analysys.track.impl.UploadImpl;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.ELOG;
@@ -57,6 +58,9 @@ public class TableLocation {
                     if(db == null){
                         return;
                     }
+                    if(!db.isOpen()){
+                        db = DBManager.getInstance(mContext).openDB();
+                    }
                     db.insert(DBConfig.Location.TABLE_NAME, null, cv);
                 }
             }
@@ -69,9 +73,9 @@ public class TableLocation {
         }
     }
 
-    public JSONArray select() {
+    public JSONArray select(long maxLength) {
         JSONArray array = null;
-        int blankCount = 0;
+        int blankCount = 0,countNum= 0;;
         Cursor cursor = null;
         SQLiteDatabase db = null;
         try {
@@ -80,27 +84,48 @@ public class TableLocation {
             if(db == null){
                return array;
             }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
+            }
             db.beginTransaction();
             cursor = db.query(DBConfig.Location.TABLE_NAME, null,
-                    null, null, null, null, null);
-            String id = "",encryptLocation = "",time = "";
+                    null, null, null, null, null,"2000");
+            String encryptLocation = "",time = "";
+            int id = 0 ;
             long timeStamp = 0;
             while (cursor.moveToNext()) {
+                countNum ++;
                 if(blankCount >= EGContext.BLANK_COUNT_MAX){
                     return array;
                 }
-                id = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.ID));
+                id = cursor.getInt(cursor.getColumnIndex(DBConfig.Location.Column.ID));
                 encryptLocation = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.LI));
                 time = cursor.getString(cursor.getColumnIndex(DBConfig.Location.Column.IT));
-                ContentValues cv = new ContentValues();
-                cv.put(DBConfig.Location.Column.ST, INSERT_STATUS_READ_OVER);
-                db.update(DBConfig.Location.TABLE_NAME, cv, DBConfig.Location.Column.ID + "=?", new String[]{id});
                 if(!TextUtils.isEmpty(time)){
                     timeStamp = Long.parseLong(time);
                 }
                 String decryptLocation = Base64Utils.decrypt(EncryptUtils.decrypt(mContext,encryptLocation), timeStamp);
                 if(!TextUtils.isEmpty(decryptLocation)){
-                    array.put(new JSONObject(decryptLocation));
+                    if(countNum /200 > 0){
+                        countNum = countNum % 200;
+                        long size = String.valueOf(array).getBytes().length;
+                        if (size >= maxLength) {
+//                            ELOG.i(" size值：："+size+" maxLength = "+maxLength);
+                            UploadImpl.isChunkUpload = true;
+                            break;
+                        } else {
+                            ContentValues cv = new ContentValues();
+                            cv.put(DBConfig.Location.Column.ST, INSERT_STATUS_READ_OVER);
+                            db.update(DBConfig.Location.TABLE_NAME, cv, DBConfig.Location.Column.ID + "=?", new String[]{String.valueOf(id)});
+                            array.put(new JSONObject(decryptLocation));
+                        }
+                    }else {
+                        ContentValues cv = new ContentValues();
+                        cv.put(DBConfig.Location.Column.ST, INSERT_STATUS_READ_OVER);
+                        db.update(DBConfig.Location.TABLE_NAME, cv, DBConfig.Location.Column.ID + "=?", new String[]{String.valueOf(id)});
+                        array.put(new JSONObject(decryptLocation));
+                    }
+
                 } else {
                     blankCount += 1;
                 }
@@ -114,7 +139,7 @@ public class TableLocation {
             if(cursor != null){
                 cursor.close();
             }
-            if(db != null && db.inTransaction()){
+            if(db != null && db.isOpen() && db.inTransaction()){
                 db.endTransaction();
             }
             DBManager.getInstance(mContext).closeDB();
@@ -128,7 +153,11 @@ public class TableLocation {
             if(db == null) {
                 return;
             }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
+            }
             db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?", new String[]{INSERT_STATUS_READ_OVER});
+//            ELOG.e("LOCATION删除的行数：：："+co);
         } catch (Throwable e) {
             if(EGContext.FLAG_DEBUG_INNER){
                 ELOG.e(e);
@@ -142,6 +171,9 @@ public class TableLocation {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if(db == null) {
                 return;
+            }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
             }
             db.delete(DBConfig.Location.TABLE_NAME, null, null);
         } catch (Throwable e) {

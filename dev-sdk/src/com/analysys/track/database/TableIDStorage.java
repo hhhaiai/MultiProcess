@@ -38,6 +38,9 @@ public class TableIDStorage {
             }
             ContentValues cv = new ContentValues();
             cv.put(DBConfig.IDStorage.Column.TEMPID, EncryptUtils.encrypt(mContext,tmpId));
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
+            }
             db.insert(DBConfig.IDStorage.TABLE_NAME, null, cv);
         } catch (Throwable e) {
         }finally {
@@ -57,6 +60,9 @@ public class TableIDStorage {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if(db == null){
                 return tmpid;
+            }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
             }
             cursor = db.query(DBConfig.IDStorage.TABLE_NAME, null, null, null, null,
                 null, null);
@@ -89,6 +95,9 @@ public class TableIDStorage {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if (db == null) {
                 return;
+            }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
             }
             db.delete(DBConfig.IDStorage.TABLE_NAME, null, null);
         } catch (Throwable e) {
