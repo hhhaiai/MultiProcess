@@ -201,8 +201,11 @@ public class TableXXXInfo {
         int blankCount = 0,countNum= 0;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if (db == null || !db.isOpen()){
+            if (db == null){
                 return array;
+            }
+            if(!db.isOpen()){
+                db = DBManager.getInstance(mContext).openDB();
             }
             array = new JSONArray();
             cursor = db.query(DBConfig.XXXInfo.TABLE_NAME,
