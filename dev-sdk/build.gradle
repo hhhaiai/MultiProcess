@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
-def version = "4.3.0.1"
-def date = "20190524"
+def version = "4.3.0.2"
+def date = "20190526"
 
 android {
     compileSdkVersion 26
