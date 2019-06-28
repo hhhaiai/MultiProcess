@@ -28,20 +28,9 @@ android {
         release.setRoot('build-types/release')
     }
     dexOptions {
-        // 声明是否预 dex 库依赖项以加快您的增量构建速度。由于此功能可能减慢您的干净构建的速度，您可能需要为持续性集成服务器停用此功能。
         preDexLibraries false
-        // 设置运行 dex-in-process 时要使用的最大线程数量。默认值为 4。
         maxProcessCount 8
-        // 设置 DEX 编译器的最大堆大小。不过，您应当增加 Gradle 的堆大小（启用 dex-in-process 时，将与 DEX 编译器共享），而不是设置此属性。
-        // javaMaxHeapSize "2048m"
-        // Instead of setting the heap size for the DEX process, increase Gradle's
-        // heap size to enable dex-in-process. To learm more, read the next section.
-        // javaMaxHeapSize "2048m"
-        javaMaxHeapSize "4g" //此处可根据电脑本身配置 数值越大 当然越快
-    }
-    aaptOptions {
-        // 停用 PNG 处理. 如果您无法（或者不想）将 PNG 图像转换成 WebP，仍可以通过在每次构建应用时停用自动图像压缩的方式加快构建速度。要停用此优化
-        cruncherEnabled false
+        javaMaxHeapSize "4g"
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
@@ -60,7 +49,7 @@ android {
         textReport false
     }
 }
-// 忽略文档编译错误. 设置编码
+
 tasks.withType(Javadoc) {
     options.addStringOption('Xdoclint:none', '-quiet')
     options.addStringOption('encoding', 'UTF-8')
