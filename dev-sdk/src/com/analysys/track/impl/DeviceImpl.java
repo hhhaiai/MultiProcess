@@ -54,10 +54,8 @@ import static java.lang.Runtime.getRuntime;
 
 public class DeviceImpl {
 
-    private Context mContext;
-
-    private final String ZERO = "0";
-    private final String ONE = "1";
+    // 应用信息SoftwareInfoImpl
+    private static final String UNKNOW = "";
     public final List<String> minEffectiveValue = Arrays.asList(
             new String[]{
                     "00000000000000",
@@ -67,12 +65,16 @@ public class DeviceImpl {
                     // 三星有1个零的情况
                     "0"}
     );
+    private final String ZERO = "0";
+    private final String ONE = "1";
+    private final String DEFALT_MAC = "";
+    private final String[] FILE_LIST =
+            {Base64.encodeToString("/sys/class/net/wlan0/address".getBytes(), Base64.DEFAULT),
+                    Base64.encodeToString("/sys/class/net/eth0/address".getBytes(), Base64.DEFAULT),
+                    Base64.encodeToString("/sys/devices/virtual/net/wlan0/address".getBytes(), Base64.DEFAULT)};
+    private Context mContext;
 
     private DeviceImpl() {
-    }
-
-    private static class Holder {
-        private static final DeviceImpl INSTANCE = new DeviceImpl();
     }
 
     public static DeviceImpl getInstance(Context context) {
@@ -152,12 +154,6 @@ public class DeviceImpl {
         }
         return model;
     }
-
-    private final String DEFALT_MAC = "";
-    private final String[] FILE_LIST =
-            {Base64.encodeToString("/sys/class/net/wlan0/address".getBytes(), Base64.DEFAULT),
-                    Base64.encodeToString("/sys/class/net/eth0/address".getBytes(), Base64.DEFAULT),
-                    Base64.encodeToString("/sys/devices/virtual/net/wlan0/address".getBytes(), Base64.DEFAULT)};
 
     /**
      * MAC 地址
@@ -471,9 +467,6 @@ public class DeviceImpl {
         return SystemUtils.getAppKey(mContext);
     }
 
-    // 应用信息SoftwareInfoImpl
-    private static final String UNKNOW = "";
-
     /**
      * 应用名称
      */
@@ -664,8 +657,6 @@ public class DeviceImpl {
         }
     }
 
-    // 电池相关信息BatteryModuleNameImpl
-
     public void processBattery(final Intent intent) {
         try {
             int status = intent.getIntExtra("status", 0);
@@ -693,6 +684,8 @@ public class DeviceImpl {
 
         }
     }
+
+    // 电池相关信息BatteryModuleNameImpl
 
     /**
      * 系统字体大小
@@ -960,5 +953,9 @@ public class DeviceImpl {
             return null;
         }
         return result;
+    }
+
+    private static class Holder {
+        private static final DeviceImpl INSTANCE = new DeviceImpl();
     }
 }

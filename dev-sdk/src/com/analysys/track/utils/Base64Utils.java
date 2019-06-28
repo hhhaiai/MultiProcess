@@ -17,7 +17,7 @@ public class Base64Utils {
         byte[] bytes = info.getBytes();
         int len = bytes.length;
         for (int i = 0; i < len; i++) {
-            bytes[i] = (byte)(bytes[i] ^ key);
+            bytes[i] = (byte) (bytes[i] ^ key);
             key = bytes[i];
         }
         byte[] bt = Base64.encode(bytes, Base64.NO_WRAP);
@@ -27,7 +27,7 @@ public class Base64Utils {
     /**
      * 数据解密
      */
-    public static String decrypt(String info, long time) throws Exception{
+    public static String decrypt(String info, long time) throws Exception {
         if (TextUtils.isEmpty(info)) {
             return null;
         }
@@ -35,11 +35,12 @@ public class Base64Utils {
         byte[] bytes = Base64.decode(info.getBytes("UTF-8"), Base64.NO_WRAP);
         int len = bytes.length;
         for (int i = len - 1; i > 0; i--) {
-            bytes[i] = (byte)(bytes[i] ^ bytes[i - 1]);
+            bytes[i] = (byte) (bytes[i] ^ bytes[i - 1]);
         }
-        bytes[0] = (byte)(bytes[0] ^ key);
+        bytes[0] = (byte) (bytes[0] ^ key);
         return new String(bytes);
     }
+
     /**
      * 获取时段标记
      */

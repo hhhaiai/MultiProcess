@@ -23,12 +23,14 @@ function clean()
 # gradlew build
 function build_gradlew()
 {
+    ./gradlew build
     ./gradlew zip
 }
 
 # gradle build
 function build_gradle()
 {
+    gradle build
     gradle zip
 }
 

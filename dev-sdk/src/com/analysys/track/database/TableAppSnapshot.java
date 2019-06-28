@@ -1,11 +1,10 @@
 package com.analysys.track.database;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 
 import com.analysys.track.impl.UploadImpl;
 import com.analysys.track.internal.Content.DataController;
@@ -16,19 +15,18 @@ import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.text.TextUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TableAppSnapshot {
 
     Context mContext;
-    private TableAppSnapshot(){
-    }
-    private static class Holder {
-        private static final TableAppSnapshot INSTANCE = new TableAppSnapshot();
+
+    private TableAppSnapshot() {
     }
 
     public static TableAppSnapshot getInstance(Context context) {
@@ -49,7 +47,7 @@ public class TableAppSnapshot {
 //            }
             db = DBManager.getInstance(mContext).openDB();
             db.beginTransaction();
-            db.delete(DBConfig.AppSnapshot.TABLE_NAME,null,null);
+            db.delete(DBConfig.AppSnapshot.TABLE_NAME, null, null);
             JSONObject snapshot = null;
             for (int i = 0; i < snapshots.size(); i++) {
                 snapshot = null;
@@ -60,7 +58,7 @@ public class TableAppSnapshot {
             db.setTransactionSuccessful();
         } catch (Throwable e) {
         } finally {
-            if(db != null && db.inTransaction()){
+            if (db != null && db.inTransaction()) {
                 db.endTransaction();
             }
             DBManager.getInstance(mContext).closeDB();
@@ -77,34 +75,34 @@ public class TableAppSnapshot {
 //                return;
 //            }
             db = DBManager.getInstance(mContext).openDB();
-            if (db == null){
+            if (db == null) {
                 return;
             }
-            if(!db.isOpen()){
+            if (!db.isOpen()) {
                 db = DBManager.getInstance(mContext).openDB();
             }
             db.insert(DBConfig.AppSnapshot.TABLE_NAME, null, getContentValues(snapshots));
         } catch (Throwable e) {
-            if(EGContext.FLAG_DEBUG_INNER){
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
-        }finally {
+        } finally {
             DBManager.getInstance(mContext).closeDB();
         }
     }
 
     private ContentValues getContentValues(JSONObject snapshot) {
         ContentValues cv = new ContentValues();
-        String an = EncryptUtils.encrypt(mContext,snapshot.optString(DeviceKeyContacts.AppSnapshotInfo.ApplicationName));
+        String an = EncryptUtils.encrypt(mContext, snapshot.optString(DeviceKeyContacts.AppSnapshotInfo.ApplicationName));
 //        ELOG.i(an+ " getContentValues  an");
         cv.put(DBConfig.AppSnapshot.Column.APN,
-                EncryptUtils.encrypt(mContext,snapshot.optString(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName)));
+                EncryptUtils.encrypt(mContext, snapshot.optString(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName)));
         cv.put(DBConfig.AppSnapshot.Column.AN,
                 an);
         cv.put(DBConfig.AppSnapshot.Column.AVC,
-                EncryptUtils.encrypt(mContext,snapshot.optString(DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode)));
+                EncryptUtils.encrypt(mContext, snapshot.optString(DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode)));
         cv.put(DBConfig.AppSnapshot.Column.AT,
-                EncryptUtils.encrypt(mContext,snapshot.optString(DeviceKeyContacts.AppSnapshotInfo.ActionType)));
+                EncryptUtils.encrypt(mContext, snapshot.optString(DeviceKeyContacts.AppSnapshotInfo.ActionType)));
         cv.put(DBConfig.AppSnapshot.Column.AHT,
                 snapshot.optString(DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime));
         return cv;
@@ -119,33 +117,33 @@ public class TableAppSnapshot {
         int blankCount = 0;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if(db == null){
+            if (db == null) {
                 return map;
             }
-            if(!db.isOpen()){
+            if (!db.isOpen()) {
                 db = DBManager.getInstance(mContext).openDB();
             }
             cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null,
-                null, null);
+                    null, null);
             map = new HashMap<String, String>();
             while (cursor.moveToNext()) {
-                if(blankCount >= EGContext.BLANK_COUNT_MAX){
+                if (blankCount >= EGContext.BLANK_COUNT_MAX) {
                     return map;
                 }
-                String apn = EncryptUtils.decrypt(mContext,cursor
+                String apn = EncryptUtils.decrypt(mContext, cursor
                         .getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN)));
-                if(!TextUtils.isEmpty(apn)){
+                if (!TextUtils.isEmpty(apn)) {
                     map.put(apn, String.valueOf(getCursor(cursor)));
-                }else {
+                } else {
                     blankCount += 1;
                 }
             }
         } catch (Throwable e) {
-            if(EGContext.FLAG_DEBUG_INNER){
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
         } finally {
-            if (cursor != null){
+            if (cursor != null) {
                 cursor.close();
             }
             DBManager.getInstance(mContext).closeDB();
@@ -158,19 +156,19 @@ public class TableAppSnapshot {
         String pkgName = "";
         try {
             jsonObj = new JSONObject();
-            String an = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AN)));
-            pkgName = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN)));
-            JsonUtils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,pkgName,DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
-            JsonUtils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ApplicationName,an
-                    ,DataController.SWITCH_OF_APPLICATION_NAME);
-            JsonUtils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode,
-                    EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AVC))),DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
-            JsonUtils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ActionType,
-                    EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AT))),DataController.SWITCH_OF_ACTION_TYPE);
-            JsonUtils.pushToJSON(mContext,jsonObj,DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
-                    cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AHT)),DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
+            String an = EncryptUtils.decrypt(mContext, cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AN)));
+            pkgName = EncryptUtils.decrypt(mContext, cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN)));
+            JsonUtils.pushToJSON(mContext, jsonObj, DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName, pkgName, DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
+            JsonUtils.pushToJSON(mContext, jsonObj, DeviceKeyContacts.AppSnapshotInfo.ApplicationName, an
+                    , DataController.SWITCH_OF_APPLICATION_NAME);
+            JsonUtils.pushToJSON(mContext, jsonObj, DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode,
+                    EncryptUtils.decrypt(mContext, cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AVC))), DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
+            JsonUtils.pushToJSON(mContext, jsonObj, DeviceKeyContacts.AppSnapshotInfo.ActionType,
+                    EncryptUtils.decrypt(mContext, cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AT))), DataController.SWITCH_OF_ACTION_TYPE);
+            JsonUtils.pushToJSON(mContext, jsonObj, DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
+                    cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AHT)), DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
         } catch (Throwable e) {
-            if(EGContext.FLAG_DEBUG_INNER){
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
         }
@@ -180,22 +178,22 @@ public class TableAppSnapshot {
     /**
      * 更新应用标识状态
      */
-    public void update(String pkgName, String appTag,long time) {
+    public void update(String pkgName, String appTag, long time) {
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if(db == null){
+            if (db == null) {
                 return;
             }
-            if(!db.isOpen()){
+            if (!db.isOpen()) {
                 db = DBManager.getInstance(mContext).openDB();
             }
             ContentValues cv = new ContentValues();
-            cv.put(DBConfig.AppSnapshot.Column.AT, EncryptUtils.encrypt(mContext,appTag));
-            cv.put(DBConfig.AppSnapshot.Column.AHT,time);
+            cv.put(DBConfig.AppSnapshot.Column.AT, EncryptUtils.encrypt(mContext, appTag));
+            cv.put(DBConfig.AppSnapshot.Column.AHT, time);
             db.update(DBConfig.AppSnapshot.TABLE_NAME, cv,
-                DBConfig.AppSnapshot.Column.APN + "= ? ", new String[] {EncryptUtils.encrypt(mContext,pkgName)});
+                    DBConfig.AppSnapshot.Column.APN + "= ? ", new String[]{EncryptUtils.encrypt(mContext, pkgName)});
         } catch (Throwable e) {
-            if(EGContext.FLAG_DEBUG_INNER){
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
 
@@ -208,14 +206,14 @@ public class TableAppSnapshot {
         Cursor cursor = null;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if(db == null){
+            if (db == null) {
                 return false;
             }
-            if(!db.isOpen()){
+            if (!db.isOpen()) {
                 db = DBManager.getInstance(mContext).openDB();
             }
-            cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME,null,DBConfig.AppSnapshot.Column.APN + "=?",
-                    new String[] {EncryptUtils.encrypt(mContext,pkgName)},null,null,null);
+            cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, DBConfig.AppSnapshot.Column.APN + "=?",
+                    new String[]{EncryptUtils.encrypt(mContext, pkgName)}, null, null, null);
 //            cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME,
 //                new String[] {DBConfig.AppSnapshot.Column.APN},
 //                DBConfig.AppSnapshot.Column.APN + "=?", new String[] {pkgName}, null,
@@ -226,11 +224,11 @@ public class TableAppSnapshot {
                 return true;
             }
         } catch (Throwable e) {
-            if(EGContext.FLAG_DEBUG_INNER){
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
         } finally {
-            if (cursor != null){
+            if (cursor != null) {
                 cursor.close();
             }
             DBManager.getInstance(mContext).closeDB();
@@ -244,54 +242,54 @@ public class TableAppSnapshot {
     public JSONArray select(long maxLength) {
         JSONArray array = null;
         Cursor cursor = null;
-        int blankCount = 0,countNum= 0;
+        int blankCount = 0, countNum = 0;
         JSONObject jsonObject = null;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if(db == null){
+            if (db == null) {
                 return array;
             }
-            if(!db.isOpen()){
+            if (!db.isOpen()) {
                 db = DBManager.getInstance(mContext).openDB();
             }
             array = new JSONArray();
             cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null,
-                null, null,"4000");
-            if(cursor == null){
+                    null, null, "4000");
+            if (cursor == null) {
                 return array;
             }
             while (cursor.moveToNext()) {
-                countNum ++;
-                if(blankCount >= EGContext.BLANK_COUNT_MAX){
+                countNum++;
+                if (blankCount >= EGContext.BLANK_COUNT_MAX) {
                     return array;
                 }
-                String pkgName = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN)));
-                if(!TextUtils.isEmpty(pkgName)){
+                String pkgName = EncryptUtils.decrypt(mContext, cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN)));
+                if (!TextUtils.isEmpty(pkgName)) {
                     jsonObject = getCursor(cursor);
-                }else {
+                } else {
                     blankCount += 1;
                     continue;
                 }
-                if(countNum /300 > 0){
+                if (countNum / 300 > 0) {
                     countNum = countNum % 300;
                     long size = String.valueOf(array).getBytes().length;
-                    if (size >= maxLength * 9 /10) {
+                    if (size >= maxLength * 9 / 10) {
 //                        ELOG.e(" size值：："+size+" maxLength = "+maxLength);
                         UploadImpl.isChunkUpload = true;
                         break;
                     } else {
                         array.put(jsonObject);
                     }
-                }else {
+                } else {
                     array.put(jsonObject);
                 }
             }
         } catch (Throwable e) {
-            if(EGContext.FLAG_DEBUG_INNER){
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
         } finally {
-            if (cursor != null){
+            if (cursor != null) {
                 cursor.close();
             }
             DBManager.getInstance(mContext).closeDB();
@@ -305,59 +303,65 @@ public class TableAppSnapshot {
             if (db == null) {
                 return;
             }
-            if(!db.isOpen()){
+            if (!db.isOpen()) {
                 db = DBManager.getInstance(mContext).openDB();
             }
-            db.delete(DBConfig.AppSnapshot.TABLE_NAME, DBConfig.AppSnapshot.Column.AT + "=?", new String[] {EncryptUtils.encrypt(mContext,EGContext.SNAP_SHOT_UNINSTALL)});
+            db.delete(DBConfig.AppSnapshot.TABLE_NAME, DBConfig.AppSnapshot.Column.AT + "=?", new String[]{EncryptUtils.encrypt(mContext, EGContext.SNAP_SHOT_UNINSTALL)});
 //            ELOG.e("AppSnapshot 删除行数：：："+co);
         } catch (Throwable e) {
-            if(EGContext.FLAG_DEBUG_INNER){
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
         }
     }
+
     /**
      * 更新应用标识状态
      */
     public void update() {
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if(db == null){
+            if (db == null) {
                 return;
             }
-            if(!db.isOpen()){
+            if (!db.isOpen()) {
                 db = DBManager.getInstance(mContext).openDB();
             }
             ContentValues cv = new ContentValues();
-            cv.put(DBConfig.AppSnapshot.Column.AT, EncryptUtils.encrypt(mContext,EGContext.SNAP_SHOT_INSTALL));
+            cv.put(DBConfig.AppSnapshot.Column.AT, EncryptUtils.encrypt(mContext, EGContext.SNAP_SHOT_INSTALL));
             db.update(DBConfig.AppSnapshot.TABLE_NAME, cv,
                     null, null);
         } catch (Throwable e) {
-            if(EGContext.FLAG_DEBUG_INNER){
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
         }
     }
+
     public void deleteAll() {
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if(db == null) {
+            if (db == null) {
                 return;
             }
-            if(!db.isOpen()){
+            if (!db.isOpen()) {
                 db = DBManager.getInstance(mContext).openDB();
             }
             db.delete(DBConfig.AppSnapshot.TABLE_NAME, null, null);
         } catch (Throwable e) {
-            if(EGContext.FLAG_DEBUG_INNER){
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
-        }finally {
+        } finally {
             DBManager.getInstance(mContext).closeDB();
         }
+    }
+
+    private static class Holder {
+        private static final TableAppSnapshot INSTANCE = new TableAppSnapshot();
     }
 }

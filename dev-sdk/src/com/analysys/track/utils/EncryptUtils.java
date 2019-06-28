@@ -33,9 +33,9 @@ import static android.provider.Settings.System.AIRPLANE_MODE_ON;
  */
 public class EncryptUtils {
     private static final byte[] iv = {0xA, 0xB, 0xC, 0xD, 0xE, 0xF, 3, 11, 42, 9, 1, 6, 8, 33, 21, 91};
-    private static String mEncryptKey = null;
     private static final String SP_EK_ID = "track_id";
     private static final String SP_CONTENT = "track";
+    private static String mEncryptKey = null;
 
 //    public static String getCheckID(Context context) {
 //        if (context == null) {
@@ -88,13 +88,13 @@ public class EncryptUtils {
                 return;
             }
             SharedPreferences pref = context.getSharedPreferences(EGContext.SPUTIL, Context.MODE_PRIVATE);
-            if(pref != null){
+            if (pref != null) {
                 SharedPreferences.Editor editor = pref.edit();
                 editor.putString(SP_EK_ID, "");
                 editor.apply();
             }
             mEncryptKey = null;
-        }catch (Throwable t){
+        } catch (Throwable t) {
         }
     }
 
@@ -143,17 +143,19 @@ public class EncryptUtils {
             return "";
         }
     }
-    private static boolean canGetAndroidId(Context context){
+
+    private static boolean canGetAndroidId(Context context) {
         try {
-            if(isAirplaneModeOn(context)){
+            if (isAirplaneModeOn(context)) {
                 return false;
-            }else {
+            } else {
                 return !TextUtils.isEmpty(Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID));
             }
-        }catch (Throwable t){
+        } catch (Throwable t) {
         }
         return false;
     }
+
     /**
      * 初始化秘钥key,检验确保可用.
      *
@@ -168,7 +170,7 @@ public class EncryptUtils {
             // 2.参考key异常则重新生成
             if (TextUtils.isEmpty(id) || !id.contains("|")) {
                 String preID = null;
-                if(canGetAndroidId(context)){
+                if (canGetAndroidId(context)) {
                     preID = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
                 }
                 String serialNO = null;
@@ -337,17 +339,18 @@ public class EncryptUtils {
         }
         return result;
     }
+
     private static boolean isAirplaneModeOn(Context context) {
         try {
-            if(context == null){
+            if (context == null) {
                 return false;
             }
             ContentResolver contentResolver = context.getContentResolver();
-            if(contentResolver != null){
+            if (contentResolver != null) {
                 return Settings.System.getInt(contentResolver, AIRPLANE_MODE_ON, 0) != 0;
             }
-        }catch (Throwable t){
-            if(EGContext.FLAG_DEBUG_INNER){
+        } catch (Throwable t) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }

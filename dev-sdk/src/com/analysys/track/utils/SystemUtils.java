@@ -1,18 +1,5 @@
 package com.analysys.track.utils;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
@@ -26,17 +13,29 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.PowerManager;
-import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 import com.analysys.track.impl.AppSnapshotImpl;
+import com.analysys.track.impl.PolicyImpl;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.impl.PolicyImpl;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Random;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * @Copyright © 2019 analysys Inc. All rights reserved.
@@ -46,6 +45,14 @@ import org.json.JSONObject;
  * @Author: sanbo
  */
 public class SystemUtils {
+    private static final String SHELL_PM_LIST_PACKAGES = "pm list packages";//all
+    private static final String APP_LIST_SYSTEM = "pm list packages -s";// system
+    // private final String APP_LIST_USER = "pm list packages -3";// third party
+    // 获取系统应用列表
+    private static final Set<String> mSystemAppSet = new HashSet<String>();
+    // 已经获取应用列表
+    private static volatile boolean isGetAppList = false;
+
     /**
      * 生成n个不同的随机数，且随机数区间为[0,10)
      *
@@ -170,6 +177,7 @@ public class SystemUtils {
 
         return reTryTime;
     }
+
     /**
      * 获取APP类型
      *
@@ -227,6 +235,7 @@ public class SystemUtils {
         }
         return false;
     }
+
     /**
      * 获取安装列表
      *
@@ -257,14 +266,6 @@ public class SystemUtils {
         }
         return appSet;
     }
-    private static final String SHELL_PM_LIST_PACKAGES = "pm list packages";//all
-    private static final String APP_LIST_SYSTEM = "pm list packages -s";// system
-    // private final String APP_LIST_USER = "pm list packages -3";// third party
-    // 获取系统应用列表
-    private static final Set<String> mSystemAppSet = new HashSet<String>();
-    // 已经获取应用列表
-    private static volatile boolean isGetAppList = false;
-
 
     /**
      * 检测xposed相关文件,尝试加载xposed的类,如果能加载则表示已经安装了
@@ -290,6 +291,7 @@ public class SystemUtils {
         }
         return result;
     }
+
     /**
      * @param key     优先级 传入==>metaData==>XML
      * @param channel 多渠道打包==>代码==>XML
@@ -303,7 +305,7 @@ public class SystemUtils {
         }
         if (!TextUtils.isEmpty(key)) {
             EGContext.APP_KEY_VALUE = key;
-            SPHelper.setStringValue2SP(mContext,EGContext.SP_APP_KEY, key);
+            SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_KEY, key);
         }
         // 此处需要进行channel优先级处理,优先处理多渠道打包过来的channel,配置文件次之,接口传入的channel优先级最低
         String channelFromApk = getChannelFromApk(mContext);
@@ -315,7 +317,7 @@ public class SystemUtils {
                 if (!TextUtils.isEmpty(xmlChannel)) {
                     // 赋值为空
                     EGContext.APP_CHANNEL_VALUE = xmlChannel;
-                    SPHelper.setStringValue2SP(mContext,EGContext.SP_APP_CHANNEL, xmlChannel);
+                    SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_CHANNEL, xmlChannel);
                     return;
                 }
             } catch (Throwable e) {
@@ -323,14 +325,15 @@ public class SystemUtils {
             if (!TextUtils.isEmpty(channel)) {
                 // 赋值接口传入的channel
                 EGContext.APP_CHANNEL_VALUE = channel;
-                SPHelper.setStringValue2SP(mContext,EGContext.SP_APP_CHANNEL, channel);
+                SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_CHANNEL, channel);
             }
         } else {
             // 赋值多渠道打包的channel
             EGContext.APP_CHANNEL_VALUE = channelFromApk;
-            SPHelper.setStringValue2SP(mContext,EGContext.SP_APP_CHANNEL, channelFromApk);
+            SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_CHANNEL, channelFromApk);
         }
     }
+
     /**
      * 仅用作多渠道打包,获取apk文件中的渠道信息
      *
@@ -366,6 +369,7 @@ public class SystemUtils {
         // Eg的渠道文件以EGUAN_CHANNEL_XXX为例,其XXX为最终的渠道信息
         return channelName.substring(23);
     }
+
     /**
      * 获取Appkey. 优先级：内存==>SP==>XML
      *
@@ -381,7 +385,7 @@ public class SystemUtils {
         if (cxt == null) {
             return "";
         }
-        appkey = SPHelper.getStringValueFromSP(context,EGContext.SP_APP_KEY, "");
+        appkey = SPHelper.getStringValueFromSP(context, EGContext.SP_APP_KEY, "");
         if (!TextUtils.isEmpty(appkey)) {
             return appkey;
         }
@@ -421,7 +425,7 @@ public class SystemUtils {
         if (!TextUtils.isEmpty(EGContext.APP_CHANNEL_VALUE)) {
             return EGContext.APP_CHANNEL_VALUE;
         }
-        channel = SPHelper.getStringValueFromSP(context,EGContext.SP_APP_CHANNEL, "");
+        channel = SPHelper.getStringValueFromSP(context, EGContext.SP_APP_CHANNEL, "");
         if (!TextUtils.isEmpty(channel)) {
             return channel;
         }
@@ -429,7 +433,7 @@ public class SystemUtils {
     }
 
 
-    public static List<JSONObject> getAppsFromShell(Context mContext, String tag,List<JSONObject> appList) {
+    public static List<JSONObject> getAppsFromShell(Context mContext, String tag, List<JSONObject> appList) {
 //        JSONArray appList = new JSONArray();
         try {
             JSONObject appInfo;
@@ -441,20 +445,20 @@ public class SystemUtils {
                 if (!TextUtils.isEmpty(pkgName) && pm.getLaunchIntentForPackage(pkgName) != null) {
                     pi = mContext.getPackageManager().getPackageInfo(pkgName, 0);
                     appInfo = new JSONObject();
-                    appInfo = AppSnapshotImpl.getInstance(mContext).getAppInfo(appInfo, pi,pm,tag);
+                    appInfo = AppSnapshotImpl.getInstance(mContext).getAppInfo(appInfo, pi, pm, tag);
 //                    appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,
 //                            pkgName);
 //                    appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ActionType, tag);
 //                    appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
 //                            String.valueOf(System.currentTimeMillis()));
-                    if(!appList.contains(appInfo)){
+                    if (!appList.contains(appInfo)) {
                         appList.add(appInfo);
                     }
 
                 }
             }
         } catch (Throwable e) {
-            if (EGContext.FLAG_DEBUG_INNER){
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
         }
@@ -464,11 +468,11 @@ public class SystemUtils {
     public static long calculateCloseTime(long openTime) {
         long currentTime = System.currentTimeMillis();
         long closeTime = -1;
-        if(Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24){
+        if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {
             if (currentTime - openTime > EGContext.DEFAULT_SPACE_TIME) {
                 closeTime = (long) (Math.random() * (currentTime - openTime) + openTime);
             }
-        }else if(Build.VERSION.SDK_INT < 21){
+        } else if (Build.VERSION.SDK_INT < 21) {
             if (currentTime - openTime > EGContext.OC_CYCLE) {
                 closeTime = (long) (Math.random() * (currentTime - openTime) + openTime);
             }
@@ -476,6 +480,7 @@ public class SystemUtils {
 
         return closeTime;
     }
+
     public static String getCurrentProcessName(Context context) {
         try {
             int pid = android.os.Process.myPid();

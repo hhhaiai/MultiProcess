@@ -524,9 +524,9 @@ public class DoubleCardSupport {
             if (met == null || obj == null) {
                 return null;
             }
-            if(Build.VERSION.SDK_INT <= 20 || (Build.VERSION.SDK_INT == 20 && "Letv".equalsIgnoreCase(Build.MANUFACTURER))){
-               return null;
-            }else {
+            if (Build.VERSION.SDK_INT <= 20 || (Build.VERSION.SDK_INT == 20 && "Letv".equalsIgnoreCase(Build.MANUFACTURER))) {
+                return null;
+            } else {
                 Object id = met.invoke(obj, slotId);
                 if (id != null) {
                     return String.valueOf(id);

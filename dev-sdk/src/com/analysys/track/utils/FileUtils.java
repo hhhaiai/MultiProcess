@@ -139,7 +139,7 @@ public class FileUtils {
                 return false;
             }
             // 文件同步
-            File f = new File(cxt.getFilesDir(),lock);
+            File f = new File(cxt.getFilesDir(), lock);
             RandomAccessFile randomFile = null;
             FileChannel fileChannel = null;
             FileLock fl = null;
@@ -164,7 +164,7 @@ public class FileUtils {
                 StreamerUtils.safeClose(fileChannel);
                 StreamerUtils.safeClose(randomFile);
             }
-        }catch (Throwable t){
+        } catch (Throwable t) {
         }
         return false;
     }

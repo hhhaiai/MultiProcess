@@ -60,9 +60,10 @@ import javax.xml.transform.stream.StreamSource;
  */
 public class ELOG {
 
-    private ELOG() {
-    }
-
+    // 解析属性最大层级
+    public static final int MAX_CHILD_LEVEL = 3;
+    // 换行符
+    public static final String BR = System.getProperty("line.separator");
     private static final int JSON_INDENT = 2;
     // 是否打印bug.建议在application中调用init接口初始化
     public static boolean USER_DEBUG = EGContext.FLAG_DEBUG_USER;
@@ -76,7 +77,6 @@ public class ELOG {
     private static boolean isNeedWrapper = false;
     // 是否格式化展示,主要针对JSON
     private static boolean isFormat = false;
-
     // 默认tag
     private static String DEFAULT_TAG = EGContext.LOGTAG_DEBUG;
     //user tag
@@ -85,21 +85,14 @@ public class ELOG {
     private static String TEMP_TAG = "";
     // 规定每段显示的长度.每行最大日志长度 (Android Studio3.1最多2902字符)
     private static int LOG_MAXLENGTH = 2900;
-
-    // 解析属性最大层级
-    public static final int MAX_CHILD_LEVEL = 3;
-    // 换行符
-    public static final String BR = System.getProperty("line.separator");
     // 类名(getClassName).方法名(getMethodName)[行号(getLineNumber)]
     private static String content_simple_callstack = "简易调用堆栈: %s.%s[%d]";
-
     // 格式化时，行首封闭符
     private static String CONTENT_LINE = "║ ";
     // 空格
     private static String CONTENT_SPACE = "  ";
     private static String CONTENT_LOG_INFO = "log info:";
     private static String CONTENT_LOG_EMPTY = "打印的日志信息为空!";
-
     private static String content_title_begin =
             "╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
     private static String content_title_info_callstack =
@@ -112,7 +105,6 @@ public class ELOG {
             + "」════════════════════════════════════════════════════";
     private static String content_title_end =
             "╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
-
     /**
      * 行首为该符号时，不增加行首封闭符
      */
@@ -121,17 +113,11 @@ public class ELOG {
     private static String CONTENT_C = "╚";
     private static String CONTENT_D = " ╔";
     private static String CONTENT_E = " ╚";
-
     private static String CONTENT_WARNNING_SHELL = DEFAULT_TAG;
+    private static Character FORMATER = '%';
 //            "Wranning....不够打印级别,请在命令行设置指令后重新尝试打印,命令行指令: adb shell setprop log.tag." + DEFAULT_TAG + " ";
 
-    public static final class MLEVEL {
-        public static final int VERBOSE = 0x1;
-        public static final int DEBUG = 0x2;
-        public static final int INFO = 0x3;
-        public static final int WARN = 0x4;
-        public static final int ERROR = 0x5;
-        public static final int WTF = 0x6;
+    private ELOG() {
     }
 
     /**
@@ -162,15 +148,15 @@ public class ELOG {
      * 支持可变参数打印,根据不同的结构支持. 可以统一成一个接口
      */
     /*********************************************************************************************************/
-    public static void v(Object... args ) {
+    public static void v(Object... args) {
         if (isShellControl) {
             if (!Log.isLoggable(DEFAULT_TAG, Log.VERBOSE)) {
 //                Log.v(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "VERBOSE");
                 return;
             }
         }
-        if(EGContext.FLAG_DEBUG_INNER){
-            parserArgsMain(false,MLEVEL.VERBOSE, args);
+        if (EGContext.FLAG_DEBUG_INNER) {
+            parserArgsMain(false, MLEVEL.VERBOSE, args);
         }
     }
 
@@ -181,8 +167,8 @@ public class ELOG {
                 return;
             }
         }
-        if(EGContext.FLAG_DEBUG_INNER){
-            parserArgsMain(false,MLEVEL.DEBUG, args);
+        if (EGContext.FLAG_DEBUG_INNER) {
+            parserArgsMain(false, MLEVEL.DEBUG, args);
         }
     }
 
@@ -193,10 +179,11 @@ public class ELOG {
                 return;
             }
         }
-        if(EGContext.FLAG_DEBUG_INNER){
-            parserArgsMain(false,MLEVEL.INFO, args);
+        if (EGContext.FLAG_DEBUG_INNER) {
+            parserArgsMain(false, MLEVEL.INFO, args);
         }
     }
+
     public static void info(Object... args) {
         if (isShellControl) {
             if (!Log.isLoggable(USER_TAG, Log.INFO)) {
@@ -204,10 +191,11 @@ public class ELOG {
                 return;
             }
         }
-        if(EGContext.FLAG_DEBUG_USER){
+        if (EGContext.FLAG_DEBUG_USER) {
             parserArgsMain(true, MLEVEL.INFO, args);
         }
     }
+
     public static void w(Object... args) {
         if (isShellControl) {
             if (!Log.isLoggable(DEFAULT_TAG, Log.WARN)) {
@@ -215,8 +203,8 @@ public class ELOG {
                 return;
             }
         }
-        if(EGContext.FLAG_DEBUG_INNER){
-            parserArgsMain(false,MLEVEL.WARN, args);
+        if (EGContext.FLAG_DEBUG_INNER) {
+            parserArgsMain(false, MLEVEL.WARN, args);
         }
     }
 
@@ -227,8 +215,8 @@ public class ELOG {
                 return;
             }
         }
-        if(EGContext.FLAG_DEBUG_INNER){
-            parserArgsMain(false,MLEVEL.ERROR, args);
+        if (EGContext.FLAG_DEBUG_INNER) {
+            parserArgsMain(false, MLEVEL.ERROR, args);
         }
     }
 
@@ -239,16 +227,15 @@ public class ELOG {
                 return;
             }
         }
-        if(EGContext.FLAG_DEBUG_INNER){
-            parserArgsMain(false,MLEVEL.WTF, args);
+        if (EGContext.FLAG_DEBUG_INNER) {
+            parserArgsMain(false, MLEVEL.WTF, args);
         }
     }
-
-    private static Character FORMATER = '%';
 
     /**
      * 解析参数入口.这步骤开始忽略类型.解析所有参数,参数检查逻辑： 1.是否为String,若为String,则先判断是否格式化输出,不是再进行字符串转换格式尝试 2.对象其他类型判断:
      * StringBuffer>StringBuild>Throwable>Intent>List>Map
+     *
      * @param isUserDebug 是否用户控制的debug true 用户控制;false 开发者控制
      * @param level
      * @param args
@@ -258,12 +245,12 @@ public class ELOG {
         //用户级别的log打印
         if (isUserDebug) {
             tag = USER_TAG;
-            if(!USER_DEBUG){
+            if (!USER_DEBUG) {
                 Log.e(tag, "请确认Log工具类已经设置打印!");
                 return;
             }
-        }else{
-            if(!DEV_DEBUG){
+        } else {
+            if (!DEV_DEBUG) {
                 Log.e(DEFAULT_TAG, "请确认Log工具类已经设置打印!");
                 return;
             }
@@ -364,15 +351,10 @@ public class ELOG {
             sb.append(content_title_end);
         }
         // 打印字符
-        preparePrint(tag,level, sb.toString());
+        preparePrint(tag, level, sb.toString());
 
     }
 
-    /*********************************************************************************************************/
-    /**
-     * 基础工具方法
-     */
-    /*********************************************************************************************************/
     /**
      * 处理对象
      *
@@ -401,6 +383,12 @@ public class ELOG {
         }
         return sb.toString();
     }
+
+    /*********************************************************************************************************/
+    /**
+     * 基础工具方法
+     */
+    /*********************************************************************************************************/
 
     /**
      * <pre>
@@ -533,13 +521,14 @@ public class ELOG {
     }
 
     /*********************************************************************************************************/
-    /**
-     * 解析对象成字符串
-     */
-    /*********************************************************************************************************/
     private static String objectToString(Object object) {
         return objectToString(object, 0);
     }
+
+    /*********************************************************************************************************/
+    /**
+     * 解析对象成字符串
+     */
 
     /**
      * 是否为静态内部类
@@ -1122,12 +1111,6 @@ public class ELOG {
         return String.valueOf(builder);
     }
 
-    /*********************************************************************************************************/
-    /**
-     * 格式化字符串、异常、JSONArray、JSONObject
-     */
-    /*********************************************************************************************************/
-
     /**
      * 格式化输出JSONArray
      *
@@ -1143,6 +1126,12 @@ public class ELOG {
         }
         return "";
     }
+
+    /*********************************************************************************************************/
+    /**
+     * 格式化字符串、异常、JSONArray、JSONObject
+     */
+    /*********************************************************************************************************/
 
     /**
      * 格式化输出JSONObject
@@ -1161,11 +1150,6 @@ public class ELOG {
         return "";
     }
 
-    /*********************************************************************************************************/
-    /**
-     * 字符串包裹处理
-     */
-    /*********************************************************************************************************/
     /**
      * 字符串处理,wrapper选中情况下,行首加封闭符
      *
@@ -1274,7 +1258,7 @@ public class ELOG {
 
     /*********************************************************************************************************/
     /**
-     * 打印方法
+     * 字符串包裹处理
      */
     /*********************************************************************************************************/
 
@@ -1284,7 +1268,7 @@ public class ELOG {
      * @param level
      * @param msg
      */
-    private static void preparePrint(String tag ,int level, String msg) {
+    private static void preparePrint(String tag, int level, String msg) {
         String TAG = tag;
         if (!TextUtils.isEmpty(TEMP_TAG)) {
             TAG = TEMP_TAG;
@@ -1325,6 +1309,12 @@ public class ELOG {
         }
         TEMP_TAG = "";
     }
+
+    /*********************************************************************************************************/
+    /**
+     * 打印方法
+     */
+    /*********************************************************************************************************/
 
     /**
      * 真正打印单个信息
@@ -1416,6 +1406,15 @@ public class ELOG {
         } else {
             result.add(line);
         }
+    }
+
+    public static final class MLEVEL {
+        public static final int VERBOSE = 0x1;
+        public static final int DEBUG = 0x2;
+        public static final int INFO = 0x3;
+        public static final int WARN = 0x4;
+        public static final int ERROR = 0x5;
+        public static final int WTF = 0x6;
     }
 
 }

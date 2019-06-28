@@ -35,7 +35,7 @@ public class DeflterCompressUtils {
             output = bos.toByteArray();
         } catch (Exception e) {
             output = data;
-            if(EGContext.FLAG_DEBUG_INNER) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
         } finally {
@@ -47,17 +47,18 @@ public class DeflterCompressUtils {
         compresser.end();
         return output;
     }
-    public static String makeSercretKey(String value , Context ctx) {
+
+    public static String makeSercretKey(String value, Context ctx) {
         StringBuilder sb = new StringBuilder();
-        if(value.length() > 3){
-            SPHelper.setStringValue2SP(ctx,EGContext.APPKEY ,value);
-            value = value.substring(0,3);
+        if (value.length() > 3) {
+            SPHelper.setStringValue2SP(ctx, EGContext.APPKEY, value);
+            value = value.substring(0, 3);
         }
         String sdkv = DeviceImpl.getInstance(ctx).getSdkVersion();
-        SPHelper.setStringValue2SP(ctx,EGContext.SDKV , sdkv);
-        if(sdkv.contains("|")){
-            sdkv = sdkv.substring(0,sdkv.indexOf("|")).replace(".", "");
-        }else{
+        SPHelper.setStringValue2SP(ctx, EGContext.SDKV, sdkv);
+        if (sdkv.contains("|")) {
+            sdkv = sdkv.substring(0, sdkv.indexOf("|")).replace(".", "");
+        } else {
             sdkv = sdkv.replace(".", "");
         }
         sb.append(sdkv);//版本号-主版本号去掉点---规则变动，不需要处理了
@@ -65,10 +66,11 @@ public class DeflterCompressUtils {
         sb.append(DeviceImpl.getInstance(ctx).getDebug());//是否debug模式，0/1值
         sb.append(value);//前三位
         long time = System.currentTimeMillis();
-        SPHelper.setStringValue2SP(ctx,EGContext.TIME , String.valueOf(time));
+        SPHelper.setStringValue2SP(ctx, EGContext.TIME, String.valueOf(time));
         sb.append(time);
-       return Md5Utils.getMD5(String.valueOf(sb));
+        return Md5Utils.getMD5(String.valueOf(sb));
     }
+
     /**
      * Deflater 解压数据
      */

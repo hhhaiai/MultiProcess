@@ -23,9 +23,8 @@ import java.util.List;
 
 public class TableXXXInfo {
     Context mContext;
-    private TableXXXInfo(){}
-    private static class Holder {
-        private static final TableXXXInfo INSTANCE = new TableXXXInfo();
+
+    private TableXXXInfo() {
     }
 
     public static TableXXXInfo getInstance(Context context) {
@@ -34,6 +33,7 @@ public class TableXXXInfo {
         }
         return Holder.INSTANCE;
     }
+
     /**
      * 存储数据
      */
@@ -44,49 +44,51 @@ public class TableXXXInfo {
 //                return;
 //            }
             db = DBManager.getInstance(mContext).openDB();
-            if (db == null || xxxInfo == null){
+            if (db == null || xxxInfo == null) {
                 return;
             }
-            if(!db.isOpen()){
+            if (!db.isOpen()) {
                 db = DBManager.getInstance(mContext).openDB();
             }
             ContentValues cv = getContentValues(xxxInfo);
             db.insert(DBConfig.XXXInfo.TABLE_NAME, null, cv);
 
         } catch (Throwable e) {
-            if(EGContext.FLAG_DEBUG_INNER){
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
-        }finally {
+        } finally {
             DBManager.getInstance(mContext).closeDB();
         }
 
     }
+
     /**
      * json数据转成ContentValues
      */
     private ContentValues getContentValues(JSONObject xxxInfo) {
         ContentValues cv = null;
         String result = null;
-        try{
+        try {
             if (xxxInfo != null) {
                 result = String.valueOf(xxxInfo.opt(ProcUtils.RUNNING_RESULT));
-                if(!TextUtils.isEmpty(result) && !"null".equalsIgnoreCase(result) ){
+                if (!TextUtils.isEmpty(result) && !"null".equalsIgnoreCase(result)) {
                     cv = new ContentValues();
-                    cv.put(DBConfig.XXXInfo.Column.TIME, EncryptUtils.encrypt(mContext,String.valueOf(xxxInfo.opt(ProcUtils.RUNNING_TIME))));
+                    cv.put(DBConfig.XXXInfo.Column.TIME, EncryptUtils.encrypt(mContext, String.valueOf(xxxInfo.opt(ProcUtils.RUNNING_TIME))));
 //                    cv.put(DBConfig.XXXInfo.Column.TOP, EncryptUtils.encrypt(mContext,String.valueOf(object.opt(ProcParser.RUNNING_TOP))));
 //                    cv.put(DBConfig.XXXInfo.Column.PS, EncryptUtils.encrypt(mContext,String.valueOf(object.opt(ProcParser.RUNNING_PS))));
                     //PROC
-                    cv.put(DBConfig.XXXInfo.Column.PROC, EncryptUtils.encrypt(mContext,result));
+                    cv.put(DBConfig.XXXInfo.Column.PROC, EncryptUtils.encrypt(mContext, result));
                 }
             }
-        }catch (Throwable t){
-            if(EGContext.FLAG_DEBUG_INNER) {
+        } catch (Throwable t) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }
         return cv;
     }
+
     //连表查询
 //    public JSONArray select(){
 //        JSONArray  array = null;
@@ -147,124 +149,130 @@ public class TableXXXInfo {
         SQLiteDatabase db = null;
         try {
             db = DBManager.getInstance(mContext).openDB();
-            if(db == null){
+            if (db == null) {
                 return;
             }
-            if(!db.isOpen()){
+            if (!db.isOpen()) {
                 db = DBManager.getInstance(mContext).openDB();
             }
             db.delete(DBConfig.XXXInfo.TABLE_NAME, null, null);
         } catch (Throwable e) {
-        }finally {
+        } finally {
             DBManager.getInstance(mContext).closeDB();
         }
     }
 
     /**
      * 按时间删除
+     *
      * @param idList
      */
     public void deleteByID(List<String> idList) {
         SQLiteDatabase db = null;
         try {
-            if(idList == null || idList.size() < 1 ){
+            if (idList == null || idList.size() < 1) {
                 return;
             }
             db = DBManager.getInstance(mContext).openDB();
-            if (db == null){
+            if (db == null) {
                 return;
             }
-            if(!db.isOpen()){
+            if (!db.isOpen()) {
                 db = DBManager.getInstance(mContext).openDB();
             }
             String id = "";
 //            ELOG.e("deleteByID ::: "+idList.size());
-            for(int i = 0;i < idList.size();i++){
+            for (int i = 0; i < idList.size(); i++) {
                 id = idList.get(i);
-                if(TextUtils.isEmpty(id)){
+                if (TextUtils.isEmpty(id)) {
                     return;
                 }
-               db.delete(DBConfig.XXXInfo.TABLE_NAME, DBConfig.XXXInfo.Column.ID + "=?", new String[] {id});
+                db.delete(DBConfig.XXXInfo.TABLE_NAME, DBConfig.XXXInfo.Column.ID + "=?", new String[]{id});
             }
         } catch (Throwable e) {
-            if(EGContext.FLAG_DEBUG_INNER) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
         }
     }
+
     //连表查询
-    public JSONArray select(long maxLength){
-        JSONArray  array = null;
+    public JSONArray select(long maxLength) {
+        JSONArray array = null;
         Cursor cursor = null;
-        int blankCount = 0,countNum= 0;
+        int blankCount = 0, countNum = 0;
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if (db == null){
+            if (db == null) {
                 return array;
             }
-            if(!db.isOpen()){
+            if (!db.isOpen()) {
                 db = DBManager.getInstance(mContext).openDB();
             }
             array = new JSONArray();
             cursor = db.query(DBConfig.XXXInfo.TABLE_NAME,
                     null, null, null,
-                    null, null, null,"2000");
+                    null, null, null, "2000");
             JSONObject jsonObject = null;
             String proc = null;
             while (cursor.moveToNext()) {
-                countNum ++;
-                if(blankCount >= EGContext.BLANK_COUNT_MAX){
+                countNum++;
+                if (blankCount >= EGContext.BLANK_COUNT_MAX) {
                     return array;
                 }
                 jsonObject = new JSONObject();
                 String id = cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.ID));
-                if(TextUtils.isEmpty(id)){
+                if (TextUtils.isEmpty(id)) {
                     blankCount += 1;
                 }
-                proc = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PROC)));
-                if(!TextUtils.isEmpty(proc) && !"null".equalsIgnoreCase(proc)){
-                    JsonUtils.pushToJSON(mContext,jsonObject,ProcUtils.RUNNING_RESULT,new JSONArray(proc),DataController.SWITCH_OF_CL_MODULE_PROC);
-                    if(jsonObject == null || jsonObject.length() < 1){
+                proc = EncryptUtils.decrypt(mContext, cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PROC)));
+                if (!TextUtils.isEmpty(proc) && !"null".equalsIgnoreCase(proc)) {
+                    JsonUtils.pushToJSON(mContext, jsonObject, ProcUtils.RUNNING_RESULT, new JSONArray(proc), DataController.SWITCH_OF_CL_MODULE_PROC);
+                    if (jsonObject == null || jsonObject.length() < 1) {
                         return array;
-                    }else {
-                        String time = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TIME)));
-                        JsonUtils.pushToJSON(mContext,jsonObject,ProcUtils.RUNNING_TIME,time,DataController.SWITCH_OF_RUNNING_TIME);
-                        if(countNum /300 > 0){
+                    } else {
+                        String time = EncryptUtils.decrypt(mContext, cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TIME)));
+                        JsonUtils.pushToJSON(mContext, jsonObject, ProcUtils.RUNNING_TIME, time, DataController.SWITCH_OF_RUNNING_TIME);
+                        if (countNum / 300 > 0) {
                             countNum = countNum % 300;
                             long size = String.valueOf(array).getBytes().length;
-                            if (size >= maxLength * 9 /10) {
+                            if (size >= maxLength * 9 / 10) {
 //                                ELOG.e(" size值：："+size+" maxLength = "+maxLength);
                                 UploadImpl.isChunkUpload = true;
                                 break;
                             } else {
                                 UploadImpl.idList.add(id);
-                                array.put(new String(Base64.encode(String.valueOf(jsonObject).getBytes(),Base64.DEFAULT)));
+                                array.put(new String(Base64.encode(String.valueOf(jsonObject).getBytes(), Base64.DEFAULT)));
                             }
-                        }else {
+                        } else {
                             UploadImpl.idList.add(id);
-                            array.put(new String(Base64.encode(String.valueOf(jsonObject).getBytes(),Base64.DEFAULT)));
+                            array.put(new String(Base64.encode(String.valueOf(jsonObject).getBytes(), Base64.DEFAULT)));
                         }
 
                     }
-                }else {
+                } else {
                     return array;
                 }
 
             }
         } catch (Throwable e) {
-            if(EGContext.FLAG_DEBUG_INNER) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
             array = null;
-        }finally {
-            if(cursor != null){
+        } finally {
+            if (cursor != null) {
                 cursor.close();
             }
             DBManager.getInstance(mContext).closeDB();
         }
         return array;
+    }
+
+    private static class Holder {
+        private static final TableXXXInfo INSTANCE = new TableXXXInfo();
     }
 }
 

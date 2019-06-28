@@ -1,21 +1,5 @@
 package com.analysys.track.work;
 
-import java.lang.reflect.Method;
-import java.util.List;
-
-import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.impl.OCImpl;
-import com.analysys.track.service.AnalysysJobService;
-import com.analysys.track.service.AnalysysService;
-import com.analysys.track.utils.EThreadPool;
-import com.analysys.track.utils.EncryptUtils;
-import com.analysys.track.utils.PermissionUtils;
-import com.analysys.track.utils.ReceiverUtils;
-import com.analysys.track.utils.SystemUtils;
-
-import com.analysys.track.utils.reflectinon.EContextHelper;
-import com.analysys.track.utils.sp.SPHelper;
-
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.job.JobInfo;
@@ -27,14 +11,26 @@ import android.os.Build;
 import android.os.PowerManager;
 import android.text.TextUtils;
 
+import com.analysys.track.impl.OCImpl;
+import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.service.AnalysysJobService;
+import com.analysys.track.service.AnalysysService;
+import com.analysys.track.utils.EThreadPool;
+import com.analysys.track.utils.EncryptUtils;
+import com.analysys.track.utils.PermissionUtils;
+import com.analysys.track.utils.ReceiverUtils;
+import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.reflectinon.EContextHelper;
+import com.analysys.track.utils.sp.SPHelper;
+
+import java.lang.reflect.Method;
+import java.util.List;
+
 public class ServiceHelper {
     private Context mContext;
     // private static AnalysysReceiver dynamicReceivers = null;
 
-    private ServiceHelper() {}
-
-    private static class Holder {
-        private static ServiceHelper INSTANCE = new ServiceHelper();
+    private ServiceHelper() {
     }
 
     public static ServiceHelper getInstance(Context context) {
@@ -42,6 +38,49 @@ public class ServiceHelper {
             Holder.INSTANCE.mContext = EContextHelper.getContext(context);
         }
         return Holder.INSTANCE;
+    }
+
+    @TargetApi(21)
+    private static boolean isJobPollServiceOn(Context context) {
+        JobScheduler scheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        boolean hasBeenScheduled = false;
+        // getAllPendingJobs得到是当前Package对应的已经安排的任务
+        for (JobInfo jobInfo : scheduler.getAllPendingJobs()) { // 获取所有挂起(即尚未执行)的任务
+            if (jobInfo.getId() == EGContext.JOB_ID) {
+                hasBeenScheduled = true;
+                break;
+            }
+        }
+        return hasBeenScheduled;
+    }
+
+    /**
+     * 判断服务是否启动
+     */
+    public static boolean isServiceWorking(Context mContext, String serviceName) {
+        boolean isWork = false;
+        try {
+            ActivityManager manager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+            List<ActivityManager.RunningServiceInfo> myList = manager.getRunningServices(Integer.MAX_VALUE);
+            if (myList.size() <= 0) {
+                return false;
+            }
+            for (int i = 0; i < myList.size(); i++) {
+                String mName = myList.get(i).service.getClassName();
+                if (mName.equals(serviceName)) {
+                    isWork = true;
+                    break;
+                }
+            }
+        } catch (Throwable e) {
+        }
+        return isWork;
+    }
+
+    public static void startForegroundService(Context context, Intent intent) throws Exception {
+        Class<?> clazz = Class.forName("android.content.Context");
+        Method startForegroundService = clazz.getMethod("startForegroundService", Intent.class);
+        startForegroundService.invoke(context, intent);
     }
 
     /**
@@ -103,15 +142,14 @@ public class ServiceHelper {
         return false;
     }
 
-
     public void startJobService(Context context) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {// 5.0以上
             boolean runJobService = isJobPollServiceOn(context);
             if (!runJobService) {
-                JobScheduler jobScheduler = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+                JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
                 JobInfo.Builder builder = new JobInfo.Builder(EGContext.JOB_ID,
-                    new ComponentName(context, AnalysysJobService.class.getName())); // 指定哪个JobService执行操作
+                        new ComponentName(context, AnalysysJobService.class.getName())); // 指定哪个JobService执行操作
                 builder.setPeriodic(EGContext.JOB_SERVICE_TIME);// 10s
                 builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
                 jobScheduler.schedule(builder.build());
@@ -119,20 +157,6 @@ public class ServiceHelper {
 
         }
 
-    }
-
-    @TargetApi(21)
-    private static boolean isJobPollServiceOn(Context context) {
-        JobScheduler scheduler = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        boolean hasBeenScheduled = false;
-        // getAllPendingJobs得到是当前Package对应的已经安排的任务
-        for (JobInfo jobInfo : scheduler.getAllPendingJobs()) { // 获取所有挂起(即尚未执行)的任务
-            if (jobInfo.getId() == EGContext.JOB_ID) {
-                hasBeenScheduled = true;
-                break;
-            }
-        }
-        return hasBeenScheduled;
     }
 
     public void startWork(Context context) {
@@ -193,15 +217,15 @@ public class ServiceHelper {
                 return;
             }
             // 补充时间
-            String lastOpenTime = SPHelper.getStringValueFromSP(mContext,EGContext.LAST_OPEN_TIME, "");
-            if(TextUtils.isEmpty(lastOpenTime)){
+            String lastOpenTime = SPHelper.getStringValueFromSP(mContext, EGContext.LAST_OPEN_TIME, "");
+            if (TextUtils.isEmpty(lastOpenTime)) {
                 lastOpenTime = "0";
             }
             long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
-            SPHelper.setLongValue2SP(mContext,EGContext.END_TIME,randomCloseTime);
+            SPHelper.setLongValue2SP(mContext, EGContext.END_TIME, randomCloseTime);
             OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.SERVICE_RESTART);
             ReceiverUtils.getInstance().registAllReceiver(mContext);
-            PowerManager pm = (PowerManager)mContext.getSystemService(Context.POWER_SERVICE);
+            PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
             boolean isScreenOn = pm.isScreenOn();
             // 如果为true，则表示屏幕正在使用，false则屏幕关闭。
             if (!isScreenOn) {
@@ -224,31 +248,7 @@ public class ServiceHelper {
 
     }
 
-    /**
-     * 判断服务是否启动
-     */
-    public static boolean isServiceWorking(Context mContext, String serviceName) {
-        boolean isWork = false;
-        try {
-            ActivityManager manager = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
-            List<ActivityManager.RunningServiceInfo> myList = manager.getRunningServices(Integer.MAX_VALUE);
-            if (myList.size() <= 0) {
-                return false;
-            }
-            for (int i = 0; i < myList.size(); i++) {
-                String mName = myList.get(i).service.getClassName();
-                if (mName.equals(serviceName)) {
-                    isWork = true;
-                    break;
-                }
-            }
-        } catch (Throwable e) {
-        }
-        return isWork;
-    }
-    public static void startForegroundService(Context context, Intent intent) throws Exception {
-        Class<?> clazz = Class.forName("android.content.Context");
-        Method startForegroundService = clazz.getMethod("startForegroundService", Intent.class);
-        startForegroundService.invoke(context, intent);
+    private static class Holder {
+        private static ServiceHelper INSTANCE = new ServiceHelper();
     }
 }

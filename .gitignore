@@ -12,9 +12,8 @@ import-summary.txt
 
 #mac temp file
 *.idea/
-__MACOSX
+*__MACOSX
 *.DS_Store
-
 #test android studio module
 *androidTest/
 *out/
@@ -22,7 +21,7 @@ __MACOSX
 *release/
 *build/
 *bin/
-
+*releasebak/
 
 #for eclipse
 .settings/

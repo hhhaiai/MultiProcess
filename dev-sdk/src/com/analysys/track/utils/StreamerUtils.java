@@ -25,7 +25,7 @@ public class StreamerUtils {
         if (proc != null) {
             try {
                 proc.exitValue();
-            }catch (Throwable t){
+            } catch (Throwable t) {
 //                proc.destroy();
             }
             proc = null;

@@ -13,14 +13,9 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         Thread.setDefaultUncaughtExceptionHandler(this);
     }
 
-    private static class Holder {
-        public static CrashHandler Instance = new CrashHandler();
-    }
-
     public static CrashHandler getInstance() {
         return Holder.Instance;
     }
-
 
     /**
      * 设置回调
@@ -70,11 +65,14 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         }
     }
 
-
     /**
      * 回调函数
      */
     public interface CrashCallBack {
         public abstract void onAppCrash(Throwable e);
+    }
+
+    private static class Holder {
+        public static CrashHandler Instance = new CrashHandler();
     }
 }

@@ -56,7 +56,7 @@ public class EguanIdUtils {
             String database = readDatabase();
             //四个文件作对比
             tmpId = getContrastId(file, setting, shard, database);
-        }catch (Throwable t){
+        } catch (Throwable t) {
             tmpId = "";
         }
 
@@ -85,6 +85,7 @@ public class EguanIdUtils {
 
     /**
      * 获取临时id,四个文件一致则上传，否则上传空串
+     *
      * @param fileId
      * @param settingId
      * @param shardId
@@ -95,39 +96,39 @@ public class EguanIdUtils {
                                  String databaseId) {
         String id = "";
         //4个全空返回空
-        if(TextUtils.isEmpty(fileId) && TextUtils.isEmpty(settingId) && TextUtils.isEmpty(shardId)&& TextUtils.isEmpty(databaseId)){
+        if (TextUtils.isEmpty(fileId) && TextUtils.isEmpty(settingId) && TextUtils.isEmpty(shardId) && TextUtils.isEmpty(databaseId)) {
             return id;
-        }else {
+        } else {
             //不全为空则不空的值相等可传，不等不传
-            if(!TextUtils.isEmpty(fileId)){
+            if (!TextUtils.isEmpty(fileId)) {
                 id = fileId;
             }
-            if(!TextUtils.isEmpty(settingId)){
-                if(TextUtils.isEmpty(id)){
+            if (!TextUtils.isEmpty(settingId)) {
+                if (TextUtils.isEmpty(id)) {
                     id = settingId;
-                }else if(!settingId.equals(id)){
+                } else if (!settingId.equals(id)) {
                     id = "";
                     return id;
                 }
             }
-            if(!TextUtils.isEmpty(shardId)){
-                if(TextUtils.isEmpty(id)){
+            if (!TextUtils.isEmpty(shardId)) {
+                if (TextUtils.isEmpty(id)) {
                     id = shardId;
-                }else if(!shardId.equals(id)){
+                } else if (!shardId.equals(id)) {
                     id = "";
                     return id;
                 }
             }
-            if(!TextUtils.isEmpty(databaseId)){
-                if(TextUtils.isEmpty(id)){
+            if (!TextUtils.isEmpty(databaseId)) {
+                if (TextUtils.isEmpty(id)) {
                     id = databaseId;
-                }else if(!databaseId.equals(id)){
+                } else if (!databaseId.equals(id)) {
                     id = "";
                     return id;
                 }
             }
         }
-       return id;
+        return id;
     }
 
     /**
@@ -135,21 +136,21 @@ public class EguanIdUtils {
      */
     private void writeDatabase(String tmpId) {
         try {
-            if(TextUtils.isEmpty(tmpId)){
+            if (TextUtils.isEmpty(tmpId)) {
                 return;
             }
             String id = TableIDStorage.getInstance(mContext).select();
-            if(tmpId.equals(id)){
+            if (tmpId.equals(id)) {
                 return;
-            }else {
-                if(TextUtils.isEmpty(id)){
+            } else {
+                if (TextUtils.isEmpty(id)) {
                     TableIDStorage.getInstance(mContext).insert(tmpId);
-                }else {
+                } else {
                     TableIDStorage.getInstance(mContext).delete();
                     TableIDStorage.getInstance(mContext).insert(tmpId);
                 }
             }
-        }catch (Throwable t){
+        } catch (Throwable t) {
         }
     }
 
@@ -164,9 +165,10 @@ public class EguanIdUtils {
 
     /**
      * 向Setting中存储数据
+     *
      * @param tmpId
      */
-    private void writeSetting( String tmpId) {
+    private void writeSetting(String tmpId) {
 
         if (PermissionUtils.checkPermission(mContext, Manifest.permission.WRITE_SETTINGS)) {
             if (!TextUtils.isEmpty(tmpId)) {
@@ -190,9 +192,10 @@ public class EguanIdUtils {
 
     /**
      * 向shared中存储数据
+     *
      * @param tmpid
      */
-    private void writeShared( String tmpid) {
+    private void writeShared(String tmpid) {
         if (!TextUtils.isEmpty(tmpid)) {
             SPHelper.setStringValue2SP(mContext, EGContext.TMPID, tmpid);
         }
@@ -204,7 +207,7 @@ public class EguanIdUtils {
      * @return
      */
     private String readShared() {
-        return SPHelper.getStringValueFromSP(mContext,EGContext.TMPID,"");
+        return SPHelper.getStringValueFromSP(mContext, EGContext.TMPID, "");
     }
 
     /**
@@ -220,10 +223,10 @@ public class EguanIdUtils {
             String idInfo = readIdFile();
             if (TextUtils.isEmpty(tmpId) && TextUtils.isEmpty(idInfo)) {
                 return;
-            }  else {
-                if(TextUtils.isEmpty(tmpId)){
+            } else {
+                if (TextUtils.isEmpty(tmpId)) {
                     id = idInfo;
-                }else {
+                } else {
                     id = tmpId;
                 }
             }

@@ -130,6 +130,4 @@ public class DataController {
 //    public static boolean SWITCH_OF_BS_ECIO_LIST = true;//lac
 
 
-
-
 }
