@@ -3,13 +3,13 @@ package com.analysys.track.impl.proc;
 import android.Manifest;
 import android.content.Context;
 import android.telephony.CellLocation;
+import android.telephony.PhoneStateListener;
 import android.telephony.ServiceState;
 import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
-import android.telephony.PhoneStateListener;
 
 public class AnalysysPhoneStateListener {
     private static Context mContext;
@@ -17,14 +17,10 @@ public class AnalysysPhoneStateListener {
     private static PhoneStateListener phoneStateListener = null;
 //    public static int lastSignal = 0;
 
-    private static class Holder {
-        private static final AnalysysPhoneStateListener INSTANCE = new AnalysysPhoneStateListener();
-    }
-
     public static AnalysysPhoneStateListener getInstance(Context context) {
         if (mContext == null) {
             mContext = EContextHelper.getContext(context);
-            if(phoneStateListener == null){
+            if (phoneStateListener == null) {
                 phoneStateListener = phoneStateListener(mContext);
             }
         }
@@ -32,21 +28,7 @@ public class AnalysysPhoneStateListener {
         return AnalysysPhoneStateListener.Holder.INSTANCE;
     }
 
-    public TelephonyManager getTelephonyManager(){
-        try {
-            if(telephonyManager == null){
-                telephonyManager = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
-                telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
-                if(PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
-                        && PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)){
-                    telephonyManager.listen(phoneStateListener,PhoneStateListener.LISTEN_CELL_LOCATION);
-                }
-            }
-        }catch (Throwable t){
-        }
-        return telephonyManager;
-    }
-    private static PhoneStateListener phoneStateListener(final Context context){
+    private static PhoneStateListener phoneStateListener(final Context context) {
         return new PhoneStateListener() {
             @Override
             public void onCellLocationChanged(CellLocation location) {
@@ -56,6 +38,7 @@ public class AnalysysPhoneStateListener {
             public void onServiceStateChanged(ServiceState serviceState) {
                 super.onServiceStateChanged(serviceState);
             }
+
             @Override
             public void onSignalStrengthsChanged(SignalStrength signalStrength) {
 //                int asu=signalStrength.getGsmSignalStrength();
@@ -63,6 +46,25 @@ public class AnalysysPhoneStateListener {
                 super.onSignalStrengthsChanged(signalStrength);
             }
         };
+    }
+
+    public TelephonyManager getTelephonyManager() {
+        try {
+            if (telephonyManager == null) {
+                telephonyManager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+                telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+                if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        && PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CELL_LOCATION);
+                }
+            }
+        } catch (Throwable t) {
+        }
+        return telephonyManager;
+    }
+
+    private static class Holder {
+        private static final AnalysysPhoneStateListener INSTANCE = new AnalysysPhoneStateListener();
     }
 
 }

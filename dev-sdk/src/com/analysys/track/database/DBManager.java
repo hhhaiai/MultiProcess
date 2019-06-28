@@ -1,11 +1,11 @@
 package com.analysys.track.database;
 
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.reflectinon.EContextHelper;
-
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -16,10 +16,7 @@ public class DBManager {
     private SQLiteDatabase db = null;
     private AtomicInteger mOpenWriteCounter = new AtomicInteger();
 
-    public DBManager() {}
-
-    private static class Holder {
-        private static final DBManager INSTANCE = new DBManager();
+    public DBManager() {
     }
 
     public static synchronized DBManager getInstance(Context context) {
@@ -38,8 +35,8 @@ public class DBManager {
                 // Opening new database
                 db = dbHelper.getWritableDatabase();
             }
-        }catch (Throwable t){
-            if(EGContext.FLAG_DEBUG_INNER) {
+        } catch (Throwable t) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }
@@ -53,8 +50,8 @@ public class DBManager {
                 db.close();
             }
 
-        } catch (Throwable t){
-            if(EGContext.FLAG_DEBUG_INNER){
+        } catch (Throwable t) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
 
@@ -62,5 +59,9 @@ public class DBManager {
 //        finally {
 //            db = null;
 //        }
+    }
+
+    private static class Holder {
+        private static final DBManager INSTANCE = new DBManager();
     }
 }

@@ -1,5 +1,13 @@
 package com.analysys.track.utils.sp;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.text.TextUtils;
+
+import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.utils.ELOG;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -9,22 +17,14 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.text.TextUtils;
-
-import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.utils.ELOG;
-
-
 public class SPHelper {
     private final static HashMap<String, Object> SP_CACHE = new HashMap<String, Object>();
     private static final String DEFAULT_PREFERENCE = "ana_sp_xml";
     private static Editor editor = null;
     private static SharedPreferences res = null;
 
-    private SPHelper() {}
+    private SPHelper() {
+    }
 
     /**
      * 获取超级SP实例
@@ -33,16 +33,17 @@ public class SPHelper {
      * @return
      */
     public static SharedPreferences getDefault(Context context) {
-        if(res == null){
+        if (res == null) {
             res = getInstance(context, DEFAULT_PREFERENCE);
         }
         return res;
     }
-    private static Editor getEditor(Context ctx){
-        if(editor == null){
-          editor = getDefault(ctx).edit();
+
+    private static Editor getEditor(Context ctx) {
+        if (editor == null) {
+            editor = getDefault(ctx).edit();
         }
-      return editor;
+        return editor;
     }
 
     /**
@@ -56,14 +57,14 @@ public class SPHelper {
         if (context == null) {
             return null;
         } else {
-            if(res == null){
-                res= getSharedPreferences(context, name);
+            if (res == null) {
+                res = getSharedPreferences(context, name);
                 File f = getSystemSharedPrefsFile(context, name);
                 if (!f.exists()) {
                     try {
                         f.createNewFile();
                     } catch (IOException e) {
-                        if(EGContext.FLAG_DEBUG_INNER){
+                        if (EGContext.FLAG_DEBUG_INNER) {
                             ELOG.e(e);
                         }
                     }
@@ -88,7 +89,7 @@ public class SPHelper {
                 SP_CACHE.put(fileName, nsp);
             }
 
-            SharedPreferences ret = (SharedPreferences)SP_CACHE.get(fileName);
+            SharedPreferences ret = (SharedPreferences) SP_CACHE.get(fileName);
             return ret;
         }
     }
@@ -108,7 +109,7 @@ public class SPHelper {
      */
     private static File getSystemSharedPrefsFile(Context ctx, String name) {
         File systemFile =
-            (File)invokeObjectMethod(ctx, "getSharedPrefsFile", new Class[] {String.class}, new Object[] {name});
+                (File) invokeObjectMethod(ctx, "getSharedPrefsFile", new Class[]{String.class}, new Object[]{name});
         return systemFile;
     }
 
@@ -119,7 +120,7 @@ public class SPHelper {
         synchronized (SP_CACHE) {
             if (SP_CACHE.size() > 0) {
                 for (Object sp : SP_CACHE.values()) {
-                    ((SPImpl)sp).onDestroy();
+                    ((SPImpl) sp).onDestroy();
                 }
             }
         }
@@ -138,7 +139,7 @@ public class SPHelper {
 
             SharedPreferences xsp = getNewSharedPreferences(ctx, fileName);
             SharedPreferences.Editor xedit = xsp.edit();
-            if (((SPImpl)xsp).getModifyID() <= 1) {
+            if (((SPImpl) xsp).getModifyID() <= 1) {
 
                 SharedPreferences sp = ctx.getSharedPreferences(fileName, Context.MODE_PRIVATE);
                 Map<String, ?> map = sp.getAll();
@@ -149,15 +150,15 @@ public class SPHelper {
                         Object val = entry.getValue();
                         if (key != null && key.trim().length() > 0 && val != null) {
                             if (val instanceof String) {
-                                xedit.putString(key, (String)val);
+                                xedit.putString(key, (String) val);
                             } else if (val instanceof Long) {
-                                xedit.putLong(key, (Long)val);
+                                xedit.putLong(key, (Long) val);
                             } else if (val instanceof Integer) {
-                                xedit.putInt(key, (Integer)val);
+                                xedit.putInt(key, (Integer) val);
                             } else if (val instanceof Float) {
-                                xedit.putFloat(key, (Float)val);
+                                xedit.putFloat(key, (Float) val);
                             } else if (val instanceof Boolean) {
-                                xedit.putBoolean(key, (Boolean)val);
+                                xedit.putBoolean(key, (Boolean) val);
                             }
                         }
                     }
@@ -178,7 +179,7 @@ public class SPHelper {
             method.setAccessible(true);
             returnValue = method.invoke(o, args);
         } catch (Exception e) {
-            if(EGContext.FLAG_DEBUG_INNER){
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
         }
@@ -188,88 +189,84 @@ public class SPHelper {
 
     /**
      * 存int类型数据入sp
-     * @param ctx
-     * @param key
-     * @param value
-     */
-    public static void setIntValue2SP(Context ctx,String key,int value){
-        getEditor(ctx).putInt(key, value).apply();
-    }
-
-    /**
-     * 从sp取值
-     * @param ctx
-     * @param key
-     * @param defaultValue
-     * @return
-     */
-    public static int getIntValueFromSP(Context ctx,String key,int defaultValue){
-        return getDefault(ctx).getInt(key, defaultValue);
-    }
-
-    /**
      *
      * @param ctx
      * @param key
      * @param value
      */
-    public static void setStringValue2SP(Context ctx,String key,String value){
-        if(TextUtils.isEmpty(key)){
+    public static void setIntValue2SP(Context ctx, String key, int value) {
+        getEditor(ctx).putInt(key, value).apply();
+    }
+
+    /**
+     * 从sp取值
+     *
+     * @param ctx
+     * @param key
+     * @param defaultValue
+     * @return
+     */
+    public static int getIntValueFromSP(Context ctx, String key, int defaultValue) {
+        return getDefault(ctx).getInt(key, defaultValue);
+    }
+
+    /**
+     * @param ctx
+     * @param key
+     * @param value
+     */
+    public static void setStringValue2SP(Context ctx, String key, String value) {
+        if (TextUtils.isEmpty(key)) {
             return;
         }
         getEditor(ctx).putString(key, value).apply();
     }
 
     /**
-     *
      * @param ctx
      * @param key
      * @param defaultValue
      * @return
      */
-    public static String getStringValueFromSP(Context ctx,String key,String defaultValue){
+    public static String getStringValueFromSP(Context ctx, String key, String defaultValue) {
         return getDefault(ctx).getString(key, defaultValue);
     }
 
     /**
-     *
      * @param ctx
      * @param key
      * @param value
      */
-    public static void setBooleanValue2SP(Context ctx,String key,boolean value){
+    public static void setBooleanValue2SP(Context ctx, String key, boolean value) {
         getEditor(ctx).putBoolean(key, value).apply();
     }
 
     /**
-     *
      * @param ctx
      * @param key
      * @param defaultValue
      * @return
      */
-    public static boolean getBooleanValueFromSP(Context ctx,String key,boolean defaultValue){
+    public static boolean getBooleanValueFromSP(Context ctx, String key, boolean defaultValue) {
         return getDefault(ctx).getBoolean(key, defaultValue);
     }
 
     /**
-     *
      * @param ctx
      * @param key
      * @param value
      */
-    public static void setLongValue2SP(Context ctx,String key,long value){
+    public static void setLongValue2SP(Context ctx, String key, long value) {
         getEditor(ctx).putLong(key, value).apply();
     }
 
     /**
-     *
      * @param ctx
      * @param key
      * @param defaultValue
      * @return
      */
-    public static long getLongValueFromSP(Context ctx,String key,long defaultValue){
+    public static long getLongValueFromSP(Context ctx, String key, long defaultValue) {
         return getDefault(ctx).getLong(key, defaultValue);
     }
 }

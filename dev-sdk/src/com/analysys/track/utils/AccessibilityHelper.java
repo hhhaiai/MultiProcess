@@ -6,14 +6,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.provider.Settings;
 import android.text.TextUtils;
+
 import com.analysys.track.internal.Content.EGContext;
+
 import java.util.Arrays;
 
 
 public class AccessibilityHelper {
     /**
      * 检测辅助功能是否开启<br>
-     * 
+     *
      * @param context
      * @param clazz
      * @return boolean
@@ -47,7 +49,7 @@ public class AccessibilityHelper {
         if (!AndroidManifestHelper.isPermissionDefineInManifest(context, permission.BIND_ACCESSIBILITY_SERVICE)) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i("please check android.permission.BIND_ACCESSIBILITY_SERVICEAndroid about service["
-                    + clazz.getCanonicalName() + "] in AndroidManifest.xml !");
+                        + clazz.getCanonicalName() + "] in AndroidManifest.xml !");
             }
             return false;
         }
@@ -59,7 +61,7 @@ public class AccessibilityHelper {
          */
         try {
             accessibilityEnabled = Settings.Secure.getInt(context.getApplicationContext().getContentResolver(),
-                android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
+                    android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
         } catch (Settings.SettingNotFoundException e) {
             return false;
         }
@@ -69,7 +71,7 @@ public class AccessibilityHelper {
          */
         if (accessibilityEnabled == 1) {
             String settingValue = Settings.Secure.getString(context.getApplicationContext().getContentResolver(),
-                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
 
             if (TextUtils.isEmpty(settingValue)) {
                 return false;
@@ -96,7 +98,7 @@ public class AccessibilityHelper {
 
     /**
      * 打开辅助功能
-     * 
+     *
      * @param context
      */
     public static void openAccessibilityService(Context context) {

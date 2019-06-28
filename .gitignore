@@ -10,12 +10,9 @@ import-summary.txt
 *.ipr
 *.iml
 
-#mac temp file
 *.idea/
 __MACOSX
 *.DS_Store
-
-#test android studio module
 *androidTest/
 *out/
 *.gradle/

@@ -1,19 +1,22 @@
 package com.analysys.track.impl;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.text.TextUtils;
+
 import com.analysys.track.impl.proc.Process;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.text.TextUtils;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class PrivacyImpl {
     /**
@@ -101,7 +104,7 @@ public class PrivacyImpl {
                         resultInfo.put(jsonResult);
                     }
                 } catch (Throwable e) {
-                    if(EGContext.FLAG_DEBUG_INNER){
+                    if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.e(e);
                     }
                 }
@@ -124,16 +127,16 @@ public class PrivacyImpl {
                 String Snmp = isForeGroundBySnmp(snmp);
                 // 只要有符合前台的，暂时可以理解成就在前台
                 if (!TextUtils.isEmpty(Stat) || !TextUtils.isEmpty(OomScore) || !TextUtils.isEmpty(Cpuset)
-                    || !TextUtils.isEmpty(Status) || !TextUtils.isEmpty(Cgroup) || !TextUtils.isEmpty(Cmdline)
-                    || !TextUtils.isEmpty(Statm) || !TextUtils.isEmpty(Current) || !TextUtils.isEmpty(OomAdj)
-                    || !TextUtils.isEmpty(OomScoreAdj) || !TextUtils.isEmpty(Wchan) || !TextUtils.isEmpty(Sched)
-                    || !TextUtils.isEmpty(Dev) || !TextUtils.isEmpty(Snmp)) {
+                        || !TextUtils.isEmpty(Status) || !TextUtils.isEmpty(Cgroup) || !TextUtils.isEmpty(Cmdline)
+                        || !TextUtils.isEmpty(Statm) || !TextUtils.isEmpty(Current) || !TextUtils.isEmpty(OomAdj)
+                        || !TextUtils.isEmpty(OomScoreAdj) || !TextUtils.isEmpty(Wchan) || !TextUtils.isEmpty(Sched)
+                        || !TextUtils.isEmpty(Dev) || !TextUtils.isEmpty(Snmp)) {
                     try {
                         if (!result.contains(pkg) && intent != null) {
                             result.add(pkg);
                         }
                     } catch (Throwable e) {
-                        if(EGContext.FLAG_DEBUG_INNER){
+                        if (EGContext.FLAG_DEBUG_INNER) {
                             ELOG.e(e);
                         }
                     }
@@ -143,7 +146,7 @@ public class PrivacyImpl {
             object.put("result", result);
 
         } catch (Throwable e) {
-            if(EGContext.FLAG_DEBUG_INNER){
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
         }
@@ -179,7 +182,7 @@ public class PrivacyImpl {
                     return stat;
                 }
             } catch (Throwable e) {
-                if(EGContext.FLAG_DEBUG_INNER){
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.e(e);
                 }
             }
@@ -206,7 +209,7 @@ public class PrivacyImpl {
 
     private static String isForeGroundByCgroup(String cgroup) throws Exception {
         if (!TextUtils.isEmpty(cgroup) && !cgroup.equals("-1")
-            && (cgroup.contains("cpuset:/foreground") || !cgroup.contains("cpu:/bg_non_interactive"))) {
+                && (cgroup.contains("cpuset:/foreground") || !cgroup.contains("cpu:/bg_non_interactive"))) {
             return cgroup;
         }
         return "";
@@ -283,7 +286,7 @@ public class PrivacyImpl {
     // 前台：Cpus_allowed: 3f 后台：Cpus_allowed: 01
     // 前台：Cpus_allowed: f 后台：Cpus_allowed: 01
     private static String getStatus(String pid, String pkg) {
-        String status = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/status"});
+        String status = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/status"});
         if (TextUtils.isEmpty(status)) {
             status = "-1";
         }
@@ -292,7 +295,7 @@ public class PrivacyImpl {
 
     // 前台：第36列不等于0 后台：第36列为0 [android shell执行的时候出现pid和包名，多了两位]
     private static String getStat(String pid, String pkg) {
-        String stat = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/stat"});
+        String stat = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/stat"});
         if (TextUtils.isEmpty(stat)) {
             stat = "-1";
         }
@@ -302,7 +305,7 @@ public class PrivacyImpl {
     // 前台：cpuset:/foreground 后台：cpuset:/background
     // 前台：cpu:/ 后台：cpu:/bg_non_interactive
     private static String getCgroup(String pid, String pkg) {
-        String cgroup = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/cgroup"});
+        String cgroup = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/cgroup"});
         if (TextUtils.isEmpty(cgroup)) {
             cgroup = "-1";
         }
@@ -311,7 +314,7 @@ public class PrivacyImpl {
 
     // 前台：/foreground 后台：/background
     private static String getCpuset(String pid, String pkg) {
-        String cpuset = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/cpuset"});
+        String cpuset = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/cpuset"});
         if (TextUtils.isEmpty(cpuset)) {
             cpuset = "-1";
         }
@@ -320,7 +323,7 @@ public class PrivacyImpl {
 
     // 前台：小于100 后台：大于100
     private static int getOOMScore(String pid, String pkg) {
-        String oom_score = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/oom_score"});
+        String oom_score = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/oom_score"});
         if (TextUtils.isEmpty(oom_score)) {
             oom_score = "-1";
         }
@@ -333,7 +336,7 @@ public class PrivacyImpl {
 
     // cmdline
     private static String getCmdline(String pid, String pkg) {
-        String cmdline = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/cmdline"});
+        String cmdline = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/cmdline"});
         if (TextUtils.isEmpty(cmdline)) {
             cmdline = "-1";
         }
@@ -342,7 +345,7 @@ public class PrivacyImpl {
 
     // statm
     private static String getStatm(String pid, String pkg) {
-        String statm = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/statm"});
+        String statm = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/statm"});
         if (TextUtils.isEmpty(statm)) {
             statm = "-1";
         }
@@ -351,7 +354,7 @@ public class PrivacyImpl {
 
     // oom_adj
     private static String getOOMAdj(String pid, String pkg) {
-        String oom_adj = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/oom_adj"});
+        String oom_adj = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/oom_adj"});
         if (TextUtils.isEmpty(oom_adj)) {
             oom_adj = "-1";
         }
@@ -360,7 +363,7 @@ public class PrivacyImpl {
 
     // oom_score_adj
     private static String getOOMScoreAdj(String pid, String pkg) {
-        String oom_score_adj = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/oom_score_adj"});
+        String oom_score_adj = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/oom_score_adj"});
         if (TextUtils.isEmpty(oom_score_adj)) {
             oom_score_adj = "-1";
         }
@@ -369,7 +372,7 @@ public class PrivacyImpl {
 
     // current
     private static String getCurrent(String pid, String pkg) {
-        String current = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/attr/current"});
+        String current = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/attr/current"});
         if (TextUtils.isEmpty(current)) {
             current = "-1";
         }
@@ -378,7 +381,7 @@ public class PrivacyImpl {
 
     // wchan
     private static String getWchan(String pid, String pkg) {
-        String wchan = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/wchan"});
+        String wchan = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/wchan"});
         if (TextUtils.isEmpty(wchan)) {
             wchan = "-1";
         }
@@ -387,7 +390,7 @@ public class PrivacyImpl {
 
     // sched
     private static String getSched(String pid, String pkg) {
-        String sched = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/sched"});
+        String sched = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/sched"});
         if (TextUtils.isEmpty(sched)) {
             sched = "-1";
         }
@@ -396,7 +399,7 @@ public class PrivacyImpl {
 
     // dev
     private static String getDev(String pid, String pkg) {
-        String dev = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/net/dev"});
+        String dev = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/net/dev"});
         if (TextUtils.isEmpty(dev)) {
             dev = "-1";
         }
@@ -405,7 +408,7 @@ public class PrivacyImpl {
 
     // snmp
     private static String getSnmp(String pid, String pkg) {
-        String snmp = ShellUtils.exec(new String[] {"cat", "/proc/" + pid + "/net/snmp"});
+        String snmp = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/net/snmp"});
         if (TextUtils.isEmpty(snmp)) {
             snmp = "-1";
         }

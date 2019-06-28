@@ -11,7 +11,7 @@ public class EContextHelper {
             if (context != null) {
                 return context.getApplicationContext();
             }
-        }catch (Throwable t){
+        } catch (Throwable t) {
         }
         return getApplication();
 

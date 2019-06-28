@@ -10,12 +10,14 @@ import com.analysys.track.internal.Content.EGContext;
 
 public class NetworkUtils {
     private static ConnectivityManager connManager = null;
-    private static ConnectivityManager getConnectivityManager(Context ctx){
-        if(connManager == null){
-            connManager = (ConnectivityManager)ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+    private static ConnectivityManager getConnectivityManager(Context ctx) {
+        if (connManager == null) {
+            connManager = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
         }
         return connManager;
     }
+
     /**
      * 获取当前的网络状态
      */
@@ -32,13 +34,13 @@ public class NetworkUtils {
         } else if (nType == ConnectivityManager.TYPE_MOBILE) {
 
             int nSubType = networkInfo.getSubtype();
-            TelephonyManager telephonyManager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+            TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             if (telephonyManager.isNetworkRoaming()) {
                 netType = EGContext.NETWORK_TYPE_2G;
             } else {
                 switch (nSubType) {
                     case TelephonyManager.NETWORK_TYPE_LTE:
-                        netType =EGContext.NETWORK_TYPE_4G;
+                        netType = EGContext.NETWORK_TYPE_4G;
                         break;
                     case TelephonyManager.NETWORK_TYPE_UMTS:
                     case TelephonyManager.NETWORK_TYPE_EVDO_0:
@@ -75,6 +77,7 @@ public class NetworkUtils {
         }
         return false;
     }
+
     public static boolean isNetworkAlive(Context mContext) {
         if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_NETWORK_STATE)) {
             if (getConnectivityManager(mContext) != null) {

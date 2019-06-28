@@ -13,61 +13,60 @@ import java.io.IOException;
 
 public class Process implements Parcelable {
 
-	/** the process name */
-	public final String name;
+    public static final Creator<Process> CREATOR = new Creator<Process>() {
 
-	/** the process id */
-	public final String pid;
+        @Override
+        public Process createFromParcel(Parcel source) {
+            return new Process(source);
+        }
 
-	public String getName() {
-		return name;
-	}
+        @Override
+        public Process[] newArray(int size) {
+            return new Process[size];
+        }
+    };
+    /**
+     * the process name
+     */
+    public final String name;
+    /**
+     * the process id
+     */
+    public final String pid;
 
-	public String getPid() {
-		return pid;
-	}
+    /**
+     * Process constructor
+     *
+     * @param pid the process id
+     * @throws IOException if /proc/[pid] does not exist or we don't have read access.
+     */
+    public Process(String pid, String pname) throws IOException {
+        this.pid = pid;
+        this.name = pname;
+    }
 
-	/**
-	 * Process constructor
-	 *
-	 * @param pid
-	 *            the process id
-	 * @throws IOException
-	 *             if /proc/[pid] does not exist or we don't have read access.
-	 */
-	public Process(String pid ,String pname) throws IOException {
-		this.pid = pid;
-		this.name = pname;
-	}
+    protected Process(Parcel in) {
+        this.name = in.readString();
+        this.pid = String.valueOf(in.readInt());
+    }
 
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public int describeContents() {
-		return 0;
-	}
+    public String getPid() {
+        return pid;
+    }
 
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(this.name);
-		dest.writeInt(Integer.parseInt(this.pid));
-	}
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 
-	protected Process(Parcel in) {
-		this.name = in.readString();
-		this.pid = String.valueOf(in.readInt());
-	}
-
-	public static final Creator<Process> CREATOR = new Creator<Process>() {
-
-		@Override
-		public Process createFromParcel(Parcel source) {
-			return new Process(source);
-		}
-
-		@Override
-		public Process[] newArray(int size) {
-			return new Process[size];
-		}
-	};
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.name);
+        dest.writeInt(Integer.parseInt(this.pid));
+    }
 
 }

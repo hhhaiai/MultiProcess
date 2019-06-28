@@ -1,18 +1,19 @@
 package com.analysys.track.utils;
 
-import com.analysys.track.receiver.AnalysysReceiver;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Build;
 
+import com.analysys.track.receiver.AnalysysReceiver;
+
 public class ReceiverUtils {
     private AnalysysReceiver aReceiver = null;
     private boolean sWorkStatus = false;
 
-    private ReceiverUtils() {}
+    private ReceiverUtils() {
+    }
 
     public static ReceiverUtils getInstance() {
         return Holder.INSTANCE;
@@ -68,14 +69,14 @@ public class ReceiverUtils {
         }
     }
 
-    private static class Holder {
-        private static final ReceiverUtils INSTANCE = new ReceiverUtils();
-    }
-
     /**
      * @param isWorking
      */
     public void setWork(boolean isWorking) {
         sWorkStatus = isWorking;
+    }
+
+    private static class Holder {
+        private static final ReceiverUtils INSTANCE = new ReceiverUtils();
     }
 }

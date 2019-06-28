@@ -6,21 +6,20 @@ import android.hardware.SensorManager;
 import android.text.TextUtils;
 
 import com.analysys.track.internal.Content.DataController;
-import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
+import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.List;
 
-public class SenSorModuleNameImpl{
+public class SenSorModuleNameImpl {
     Context mContext;
-    private SenSorModuleNameImpl(){}
-    private static class Holder {
-        private static final SenSorModuleNameImpl INSTANCE = new SenSorModuleNameImpl();
+
+    private SenSorModuleNameImpl() {
     }
 
     public static SenSorModuleNameImpl getInstance(Context context) {
@@ -30,66 +29,71 @@ public class SenSorModuleNameImpl{
 
         return SenSorModuleNameImpl.Holder.INSTANCE;
     }
+
     /**
      * 获取传感器方法
      */
     public JSONArray getSensorInfo() {
         JSONArray senSorArray = null;
-        try{
-            SensorManager sensorManager = (SensorManager)mContext.getSystemService(mContext.SENSOR_SERVICE);
+        try {
+            SensorManager sensorManager = (SensorManager) mContext.getSystemService(mContext.SENSOR_SERVICE);
             List<Sensor> sensorList = sensorManager.getSensorList(Sensor.TYPE_ALL);
             JSONObject info;
             senSorArray = new JSONArray();
             for (int i = 0; i < sensorList.size(); i++) {
                 Sensor s = sensorList.get(i);
                 info = new JSONObject();
-                if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorName ,DataController.SWITCH_OF_SENSOR_NAME)&& !TextUtils.isEmpty(s.getName())){
+                if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorName, DataController.SWITCH_OF_SENSOR_NAME) && !TextUtils.isEmpty(s.getName())) {
                     // 传感器名称
-                    info.put(DeviceKeyContacts.DevInfo.SenSorName,s.getName());
+                    info.put(DeviceKeyContacts.DevInfo.SenSorName, s.getName());
                 }
 
                 // 传感器版本
-                if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorVersion ,DataController.SWITCH_OF_SENSOR_VERSION) && !TextUtils.isEmpty(String.valueOf(s.getVersion()))){
+                if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorVersion, DataController.SWITCH_OF_SENSOR_VERSION) && !TextUtils.isEmpty(String.valueOf(s.getVersion()))) {
                     // 传感器名称
-                    info.put(DeviceKeyContacts.DevInfo.SenSorVersion,String.valueOf(s.getVersion()));
+                    info.put(DeviceKeyContacts.DevInfo.SenSorVersion, String.valueOf(s.getVersion()));
                 }
 
                 // 传感器厂商
-                if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorManufacturer ,DataController.SWITCH_OF_SENSOR_MANUFACTURER)&& !TextUtils.isEmpty(s.getVendor())){
+                if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorManufacturer, DataController.SWITCH_OF_SENSOR_MANUFACTURER) && !TextUtils.isEmpty(s.getVendor())) {
                     // 传感器名称
-                    info.put(DeviceKeyContacts.DevInfo.SenSorManufacturer,s.getVendor());
+                    info.put(DeviceKeyContacts.DevInfo.SenSorManufacturer, s.getVendor());
                 }
-                try{
+                try {
                     // 传感器id
-                    if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorId ,DataController.SWITCH_OF_SENSOR_ID)){
+                    if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorId, DataController.SWITCH_OF_SENSOR_ID)) {
                         // 传感器名称
-                        info.put(DeviceKeyContacts.DevInfo.SenSorId,s.getId());
+                        info.put(DeviceKeyContacts.DevInfo.SenSorId, s.getId());
                     }
-                }catch (Throwable t1){
+                } catch (Throwable t1) {
                 }
                 try {
                     //当传感器是唤醒状态返回true
-                    if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorWakeUpSensor ,DataController.SWITCH_OF_SENSOR_WAKEUPSENSOR)){
+                    if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorWakeUpSensor, DataController.SWITCH_OF_SENSOR_WAKEUPSENSOR)) {
                         // 传感器名称
-                        info.put(DeviceKeyContacts.DevInfo.SenSorWakeUpSensor,s.isWakeUpSensor());
+                        info.put(DeviceKeyContacts.DevInfo.SenSorWakeUpSensor, s.isWakeUpSensor());
                     }
-                }catch (Throwable t){
+                } catch (Throwable t) {
                     //当传感器是唤醒状态返回true
-                    if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorWakeUpSensor ,DataController.SWITCH_OF_SENSOR_WAKEUPSENSOR)){
-                        info.put(DeviceKeyContacts.DevInfo.SenSorWakeUpSensor,false);
+                    if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorWakeUpSensor, DataController.SWITCH_OF_SENSOR_WAKEUPSENSOR)) {
+                        info.put(DeviceKeyContacts.DevInfo.SenSorWakeUpSensor, false);
                     }
                 }
                 // 传感器耗电量
-                if(PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorPower ,DataController.SWITCH_OF_SENSOR_POWER)) {
+                if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorPower, DataController.SWITCH_OF_SENSOR_POWER)) {
                     info.put(DeviceKeyContacts.DevInfo.SenSorPower, s.getPower());
                 }
                 senSorArray.put(info);
             }
-        }catch (Throwable t){
-            if(EGContext.FLAG_DEBUG_INNER){
+        } catch (Throwable t) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }
         return senSorArray;
+    }
+
+    private static class Holder {
+        private static final SenSorModuleNameImpl INSTANCE = new SenSorModuleNameImpl();
     }
 }

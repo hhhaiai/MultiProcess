@@ -6,13 +6,6 @@ import java.io.Serializable;
  * 电量信息，默认不上传，需要根据服务器控制
  */
 public class BatteryModuleNameInfo implements Serializable {
-    private BatteryModuleNameInfo(){}
-    private static class Holder {
-        private static final BatteryModuleNameInfo INSTANCE = new BatteryModuleNameInfo();
-    }
-    public static BatteryModuleNameInfo getInstance() {
-        return BatteryModuleNameInfo.Holder.INSTANCE;
-    }
     private static final long serialVersionUID = 1L;
     /**
      * BS电源状态，下面有Android和iOS的传值与对应电源状态的码表
@@ -41,61 +34,71 @@ public class BatteryModuleNameInfo implements Serializable {
     /**
      * BTP电池温度，如270
      */
-    private String BatteryTemperature ;
+    private String BatteryTemperature;
+    private BatteryModuleNameInfo() {
+    }
+
+    public static BatteryModuleNameInfo getInstance() {
+        return BatteryModuleNameInfo.Holder.INSTANCE;
+    }
 
     public String getBatteryStatus() {
         return BatteryStatus;
-    }
-
-    public String getBatteryHealth() {
-        return BatteryHealth;
-    }
-
-    public String getBatteryLevel() {
-        return BatteryLevel;
-    }
-
-    public String getBatteryScale() {
-        return BatteryScale;
-    }
-
-    public String getBatteryPlugged() {
-        return BatteryPlugged;
-    }
-
-    public String getBatteryTechnology() {
-        return BatteryTechnology;
-    }
-
-    public String getBatteryTemperature() {
-        return BatteryTemperature;
     }
 
     public void setBatteryStatus(String batteryStatus) {
         BatteryStatus = batteryStatus;
     }
 
+    public String getBatteryHealth() {
+        return BatteryHealth;
+    }
+
     public void setBatteryHealth(String batteryHealth) {
         BatteryHealth = batteryHealth;
+    }
+
+    public String getBatteryLevel() {
+        return BatteryLevel;
     }
 
     public void setBatteryLevel(String batteryLevel) {
         BatteryLevel = batteryLevel;
     }
 
+    public String getBatteryScale() {
+        return BatteryScale;
+    }
+
     public void setBatteryScale(String batteryScale) {
         BatteryScale = batteryScale;
+    }
+
+    public String getBatteryPlugged() {
+        return BatteryPlugged;
     }
 
     public void setBatteryPlugged(String batteryPlugged) {
         BatteryPlugged = batteryPlugged;
     }
 
+    public String getBatteryTechnology() {
+        return BatteryTechnology;
+    }
+
     public void setBatteryTechnology(String batteryTechnology) {
         BatteryTechnology = batteryTechnology;
     }
 
+    public String getBatteryTemperature() {
+        return BatteryTemperature;
+    }
+
     public void setBatteryTemperature(String batteryTemperature) {
         BatteryTemperature = batteryTemperature;
+    }
+
+    private static class Holder {
+        private static final BatteryModuleNameInfo INSTANCE = new BatteryModuleNameInfo();
     }
 }

@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.Set;
 
 public class ProcUtils {
-    private static final String RUNNING_TOP = "top";
-    private static final String RUNNING_PS = "ps";
     public static final String RUNNING_TIME = "time";
     public static final String RUNNING_RESULT = "result";
     public static final String RUNNING_OC_RESULT = "ocr";
+    private static final String RUNNING_TOP = "top";
+    private static final String RUNNING_PS = "ps";
     private static final int DEF_VALUE = -8801;
     public Context mContext = null;
 
@@ -706,7 +706,7 @@ public class ProcUtils {
                     }
                 }
             }
-        }catch (Throwable t){
+        } catch (Throwable t) {
 
         }
 

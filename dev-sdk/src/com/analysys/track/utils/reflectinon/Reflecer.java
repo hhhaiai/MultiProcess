@@ -34,7 +34,7 @@ public class Reflecer {
 
     /**
      * 拦截方法
-     * 
+     *
      * @param o
      * @param methodName
      * @param args
@@ -58,7 +58,7 @@ public class Reflecer {
 //    }
 
     /**
-     * 
+     *
      * @param o
      * @param methodName
      * @param args

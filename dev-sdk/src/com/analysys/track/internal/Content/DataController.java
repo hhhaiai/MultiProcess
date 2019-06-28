@@ -122,5 +122,4 @@ public class DataController {
     public static boolean SWITCH_OF_BS_LEVEL = true;//基站信号强度
 
 
-
 }

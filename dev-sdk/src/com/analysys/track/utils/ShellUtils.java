@@ -1,11 +1,11 @@
 package com.analysys.track.utils;
 
+import android.text.TextUtils;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
-import android.text.TextUtils;
 
 public class ShellUtils {
     /**

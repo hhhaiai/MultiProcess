@@ -1,38 +1,33 @@
 package com.analysys.track.internal;
 
 import android.content.Context;
-
 import android.os.Build;
 import android.os.PowerManager;
-import android.os.Process;
 
 import com.analysys.track.internal.Content.EGContext;
-
-import com.analysys.track.utils.EncryptUtils;
-import com.analysys.track.work.CrashHandler;
-import com.analysys.track.work.MessageDispatcher;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
+import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.FileUtils;
 import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.reflectinon.Reflecer;
+import com.analysys.track.work.CrashHandler;
+import com.analysys.track.work.MessageDispatcher;
 
 import java.lang.ref.WeakReference;
 
 public class AnalysysInternal {
-    private WeakReference<Context> mContextRef = null;
     private static boolean hasInit = false;
-    public static void setInitFalse(){
-        hasInit = false;
-    }
+    private WeakReference<Context> mContextRef = null;
+
     private AnalysysInternal() {
         Reflecer.init();// 必须调用-----
     }
 
-    private static class Holder {
-        private static AnalysysInternal instance = new AnalysysInternal();
+    public static void setInitFalse() {
+        hasInit = false;
     }
 
     public static AnalysysInternal getInstance(Context context) {
@@ -62,7 +57,7 @@ public class AnalysysInternal {
                 }
             });
         } catch (Throwable t) {
-            if(EGContext.FLAG_DEBUG_INNER){
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }
@@ -124,18 +119,22 @@ public class AnalysysInternal {
                 FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_OC, EGContext.TIME_SYNC_OC_OVER_5);
             }
             FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_LOCATION, EGContext.TIME_SYNC_LOCATION);
-            FileUtils.createLockFile(cxt,EGContext.FILES_SYNC_SP_WRITER,EGContext.TIME_SYNC_SP);
-            FileUtils.createLockFile(cxt,EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST,EGContext.TIME_SYNC_BROADCAST);
-            FileUtils.createLockFile(cxt,EGContext.FILES_SYNC_SCREEN_ON_BROADCAST,EGContext.TIME_SYNC_BROADCAST);
-            FileUtils.createLockFile(cxt,EGContext.FILES_SYNC_SNAP_ADD_BROADCAST,EGContext.TIME_SYNC_DEFAULT);
-            FileUtils.createLockFile(cxt,EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST,EGContext.TIME_SYNC_DEFAULT);
-            FileUtils.createLockFile(cxt,EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST,EGContext.TIME_SYNC_DEFAULT);
-            FileUtils.createLockFile(cxt,EGContext.FILES_SYNC_BOOT_BROADCAST,EGContext.TIME_SYNC_DEFAULT);
-            FileUtils.createLockFile(cxt,EGContext.FILES_SYNC_BATTERY_BROADCAST,EGContext.TIME_SYNC_DEFAULT);
+            FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_SP_WRITER, EGContext.TIME_SYNC_SP);
+            FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST, EGContext.TIME_SYNC_BROADCAST);
+            FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_SCREEN_ON_BROADCAST, EGContext.TIME_SYNC_BROADCAST);
+            FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST, EGContext.TIME_SYNC_DEFAULT);
+            FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST, EGContext.TIME_SYNC_DEFAULT);
+            FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST, EGContext.TIME_SYNC_DEFAULT);
+            FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_BOOT_BROADCAST, EGContext.TIME_SYNC_DEFAULT);
+            FileUtils.createLockFile(cxt, EGContext.FILES_SYNC_BATTERY_BROADCAST, EGContext.TIME_SYNC_DEFAULT);
         } catch (Throwable e) {
-            if(EGContext.FLAG_DEBUG_INNER){
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
         }
+    }
+
+    private static class Holder {
+        private static AnalysysInternal instance = new AnalysysInternal();
     }
 }

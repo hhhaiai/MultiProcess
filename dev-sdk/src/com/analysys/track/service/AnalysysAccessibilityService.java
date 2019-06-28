@@ -1,14 +1,14 @@
 package com.analysys.track.service;
 
+import android.accessibilityservice.AccessibilityService;
+import android.accessibilityservice.AccessibilityServiceInfo;
+import android.view.accessibility.AccessibilityEvent;
+
 import com.analysys.track.impl.OCImpl;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.SystemUtils;
-
-import android.accessibilityservice.AccessibilityService;
-import android.accessibilityservice.AccessibilityServiceInfo;
-import android.view.accessibility.AccessibilityEvent;
 
 public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
@@ -21,8 +21,8 @@ public class AnalysysAccessibilityService extends AccessibilityService {
         try {
             super.onServiceConnected();
             settingAccessibilityInfo();
-        }catch (Throwable t){
-            if(EGContext.FLAG_DEBUG_INNER){
+        } catch (Throwable t) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }
@@ -43,8 +43,8 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         try {
-            final String pkgName = String.valueOf(event.getPackageName()).replaceAll(" ","");
-            if(SystemUtils.isMainThread()){
+            final String pkgName = String.valueOf(event.getPackageName()).replaceAll(" ", "");
+            if (SystemUtils.isMainThread()) {
                 EThreadPool.execute(new Runnable() {
                     @Override
                     public void run() {
@@ -52,12 +52,12 @@ public class AnalysysAccessibilityService extends AccessibilityService {
                     }
                 });
 
-            }else{
+            } else {
                 OCImpl.getInstance(this).RunningApps(pkgName, EGContext.OC_COLLECTION_TYPE_AUX);
             }
 
-        }catch (Throwable t){
-            if(EGContext.FLAG_DEBUG_INNER){
+        } catch (Throwable t) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }

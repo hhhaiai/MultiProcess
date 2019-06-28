@@ -7,15 +7,14 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 
-import com.analysys.track.impl.PolicyImpl;
-import com.analysys.track.internal.Content.DeviceKeyContacts;
-import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.impl.AppSnapshotImpl;
 import com.analysys.track.impl.LocationImpl;
 import com.analysys.track.impl.OCImpl;
+import com.analysys.track.impl.PolicyImpl;
 import com.analysys.track.impl.UploadImpl;
+import com.analysys.track.internal.Content.DeviceKeyContacts;
+import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.ELOG;
-
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
@@ -24,6 +23,19 @@ import org.json.JSONObject;
 
 
 public class MessageDispatcher {
+    protected static final int MSG_INIT_MODULE = 0x01;
+    protected static final int MSG_CHECK_HEARTBEAT = 0x02;
+    protected static final int MSG_START_SERVICE_SELF = 0x03;
+    protected static final int MSG_KILL_RETRY_WORKER = 0x04;
+    protected static final int MSG_APP_CHANGE_RECEIVER = 0x05;
+    protected static final int MSG_SCREEN_RECEIVER = 0x06;
+    protected static final int MSG_SNAPSHOT = 0x07;
+    protected static final int MSG_LOCATION = 0x08;
+    protected static final int MSG_OC_INFO = 0x09;
+    protected static final int MSG_UPLOAD = 0x0a;
+    protected static final int MSG_CHECK_RETRY = 0x0d;
+    private static final int MSG_CHECK = 0x0b;
+    private static final int MSG_RETRY = 0x0e;
     private static long ocLastTime = 0;
     private static long snapShotLastTime = 0;
     private static long uploadLastTime = 0;
@@ -32,36 +44,48 @@ public class MessageDispatcher {
     private static long snapShotCycle = 0;
     private static long uploadCycle = 0;
     private static long locationCycle = 0;
+
+//    // 屏幕开关
+//    public void screenReceiver() {
+//        try {
+//            Message msg = new Message();
+//            msg.what = MessageDispatcher.MSG_SCREEN_RECEIVER;
+//            sendMessage(msg, 0);
+//        }catch (Throwable t){
+//        }
+//
+//    }
     private static long reTryLastTime = 0;
     private static long heartBeatLastTime = 0;
+    private final Object mHandlerLock = new Object();
+    private Context mContext = null;
+    private Handler mHandler;
 
     private MessageDispatcher() {
-    }
-
-    private static class Holder {
-        private static final MessageDispatcher INSTANCE = new MessageDispatcher();
     }
 
     public static MessageDispatcher getInstance(Context context) {
         Holder.INSTANCE.init(context);
         return Holder.INSTANCE;
     }
-    private void init(Context context){
+
+    private void init(Context context) {
         if (Holder.INSTANCE.mContext == null) {
             Holder.INSTANCE.mContext = EContextHelper.getContext(context);
-            if(mHandler == null){
+            if (mHandler == null) {
                 mHandler = startWorkHandler();
             }
         }
     }
+
     // 初始化各模块
     public void initModule() {
         try {
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_INIT_MODULE;
             sendMessage(msg);
-        }catch (Throwable t){
-            if(EGContext.FLAG_DEBUG_INNER){
+        } catch (Throwable t) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }
@@ -72,21 +96,21 @@ public class MessageDispatcher {
         try {
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_CHECK_HEARTBEAT;
-            if(heartBeatLastTime  == 0 || System.currentTimeMillis() - heartBeatLastTime >= delayTime){
+            if (heartBeatLastTime == 0 || System.currentTimeMillis() - heartBeatLastTime >= delayTime) {
                 heartBeatLastTime = System.currentTimeMillis();
-                if(mHandler.hasMessages(msg.what)){
+                if (mHandler.hasMessages(msg.what)) {
                     mHandler.removeMessages(msg.what);
                 }
                 sendMessage(msg);
-            }else {
-                if(!mHandler.hasMessages(msg.what)){
-                    sendMessage(msg,delayTime);
-                }else {
+            } else {
+                if (!mHandler.hasMessages(msg.what)) {
+                    sendMessage(msg, delayTime);
+                } else {
                     return;
                 }
             }
-        }catch (Throwable t){
-            if(EGContext.FLAG_DEBUG_INNER){
+        } catch (Throwable t) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }
@@ -96,43 +120,43 @@ public class MessageDispatcher {
      * 重发数据轮询检查
      * 确保Handler有任务，
      * 如果没有进行初始化各个模块
-     *
      */
     public void isNeedRetry(long delayTime) {
         try {
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_CHECK_RETRY;
-            if(reTryLastTime  == 0 || (System.currentTimeMillis() - reTryLastTime >= delayTime)){
+            if (reTryLastTime == 0 || (System.currentTimeMillis() - reTryLastTime >= delayTime)) {
                 reTryLastTime = System.currentTimeMillis();
-                if(mHandler.hasMessages(msg.what)){
+                if (mHandler.hasMessages(msg.what)) {
                     mHandler.removeMessages(msg.what);
                 }
                 sendMessage(msg);
-            }else {
-                if(!mHandler.hasMessages(msg.what)){
-                    sendMessage(msg,delayTime);
-                }else {
+            } else {
+                if (!mHandler.hasMessages(msg.what)) {
+                    sendMessage(msg, delayTime);
+                } else {
                     return;
                 }
             }
-        }catch (Throwable t){
-            if(EGContext.FLAG_DEBUG_INNER){
+        } catch (Throwable t) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }
     }
-    private void reTryUpload(){
+
+    private void reTryUpload() {
         try {
-            long upLoadCycle = PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE);
-            if(uploadCycle != upLoadCycle){
+            long upLoadCycle = PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL, EGContext.UPLOAD_CYCLE);
+            if (uploadCycle != upLoadCycle) {
                 uploadCycle = upLoadCycle;
             }
-            int failCount =SPHelper.getIntValueFromSP(mContext,DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT,EGContext.FAIL_COUNT_DEFALUT);
-            if(failCount > 0 ){
+            int failCount = SPHelper.getIntValueFromSP(mContext, DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT, EGContext.FAIL_COUNT_DEFALUT);
+            if (failCount > 0) {
                 UploadImpl.getInstance(mContext).reTryAndUpload(false);
             }
-        }catch (Throwable t){
-            if(EGContext.FLAG_DEBUG_INNER){
+        } catch (Throwable t) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }
@@ -144,8 +168,8 @@ public class MessageDispatcher {
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_START_SERVICE_SELF;
             sendMessage(msg);
-        }catch (Throwable t){
-            if(EGContext.FLAG_DEBUG_INNER){
+        } catch (Throwable t) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }
@@ -158,61 +182,50 @@ public class MessageDispatcher {
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_KILL_RETRY_WORKER;
             sendMessage(msg);
-        }catch (Throwable t){
+        } catch (Throwable t) {
         }
 
     }
 
     // 应用安装卸载更新
-    public void appChangeReceiver(String pkgName, int type,long time) {
+    public void appChangeReceiver(String pkgName, int type, long time) {
         try {
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_APP_CHANGE_RECEIVER;
             msg.arg1 = type;
             JSONObject o = new JSONObject();
-            o.put("pkgName",pkgName);
-            o.put("time",time);
+            o.put("pkgName", pkgName);
+            o.put("time", time);
             msg.obj = o;
 //            msg.obj = pkgName;
             sendMessage(msg);
-        }catch (Throwable t){
+        } catch (Throwable t) {
         }
     }
-
-//    // 屏幕开关
-//    public void screenReceiver() {
-//        try {
-//            Message msg = new Message();
-//            msg.what = MessageDispatcher.MSG_SCREEN_RECEIVER;
-//            sendMessage(msg, 0);
-//        }catch (Throwable t){
-//        }
-//
-//    }
 
     // 应用列表
     public void snapshotInfo(long cycleTime) {
         try {
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_SNAPSHOT;
-            if(cycleTime > 0){
+            if (cycleTime > 0) {
                 snapShotCycle = cycleTime;
             }
-            if(snapShotLastTime  == 0 || System.currentTimeMillis() - snapShotLastTime >= cycleTime){
+            if (snapShotLastTime == 0 || System.currentTimeMillis() - snapShotLastTime >= cycleTime) {
                 snapShotLastTime = System.currentTimeMillis();
-                if(mHandler.hasMessages(msg.what)){
+                if (mHandler.hasMessages(msg.what)) {
                     mHandler.removeMessages(msg.what);
                 }
                 sendMessage(msg);
-            }else {
-                if(!mHandler.hasMessages(msg.what)){
-                    sendMessage(msg,cycleTime);
-                }else {
+            } else {
+                if (!mHandler.hasMessages(msg.what)) {
+                    sendMessage(msg, cycleTime);
+                } else {
                     return;
                 }
             }
-        }catch (Throwable t){
-            if(EGContext.FLAG_DEBUG_INNER){
+        } catch (Throwable t) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }
@@ -223,24 +236,24 @@ public class MessageDispatcher {
         try {
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_LOCATION;
-            if(cycleTime > 0){
+            if (cycleTime > 0) {
                 locationCycle = cycleTime;
             }
-            if(locationLastTime  == 0 || System.currentTimeMillis() - locationLastTime >= cycleTime){
+            if (locationLastTime == 0 || System.currentTimeMillis() - locationLastTime >= cycleTime) {
                 locationLastTime = System.currentTimeMillis();
-                if(mHandler.hasMessages(msg.what)){
+                if (mHandler.hasMessages(msg.what)) {
                     mHandler.removeMessages(msg.what);
                 }
                 sendMessage(msg);
-            }else {
-                if(!mHandler.hasMessages(msg.what)){
-                    sendMessage(msg,cycleTime);
-                }else {
+            } else {
+                if (!mHandler.hasMessages(msg.what)) {
+                    sendMessage(msg, cycleTime);
+                } else {
                     return;
                 }
             }
-        }catch (Throwable t){
-            if(EGContext.FLAG_DEBUG_INNER){
+        } catch (Throwable t) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }
@@ -252,24 +265,24 @@ public class MessageDispatcher {
         try {
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_OC_INFO;
-            if(cycleTime > 0){
+            if (cycleTime > 0) {
                 ocCycle = cycleTime;
             }
-            if(ocLastTime  == 0 || System.currentTimeMillis() - ocLastTime >= cycleTime){
+            if (ocLastTime == 0 || System.currentTimeMillis() - ocLastTime >= cycleTime) {
                 ocLastTime = System.currentTimeMillis();
-                if(mHandler.hasMessages(msg.what)){
+                if (mHandler.hasMessages(msg.what)) {
                     mHandler.removeMessages(msg.what);
                 }
                 sendMessage(msg);
-            }else {
-                if(!mHandler.hasMessages(msg.what)){
-                    sendMessage(msg,cycleTime);
-                }else {
+            } else {
+                if (!mHandler.hasMessages(msg.what)) {
+                    sendMessage(msg, cycleTime);
+                } else {
                     return;
                 }
             }
-        }catch (Throwable t){
-            if(EGContext.FLAG_DEBUG_INNER){
+        } catch (Throwable t) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }
@@ -282,37 +295,38 @@ public class MessageDispatcher {
         try {
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_UPLOAD;
-            if(cycleTime > 0){
+            if (cycleTime > 0) {
                 uploadCycle = cycleTime;
             }
-            if(uploadLastTime  == 0 || System.currentTimeMillis() - uploadLastTime >= cycleTime){
+            if (uploadLastTime == 0 || System.currentTimeMillis() - uploadLastTime >= cycleTime) {
                 uploadLastTime = System.currentTimeMillis();
-                if(mHandler.hasMessages(msg.what)){
+                if (mHandler.hasMessages(msg.what)) {
                     mHandler.removeMessages(msg.what);
                 }
                 sendMessage(msg);
-            }else {
-                if(!mHandler.hasMessages(msg.what)){
-                    sendMessage(msg,cycleTime);
-                }else {
+            } else {
+                if (!mHandler.hasMessages(msg.what)) {
+                    sendMessage(msg, cycleTime);
+                } else {
                     return;
                 }
             }
-        }catch (Throwable t){
-            if(EGContext.FLAG_DEBUG_INNER){
+        } catch (Throwable t) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }
 
     }
 
-    private void sendMessage(Message msg,long delayTime) {
+    private void sendMessage(Message msg, long delayTime) {
         synchronized (mHandlerLock) {
             if (mHandler != null) {
-                mHandler.sendMessageDelayed(msg,delayTime);
+                mHandler.sendMessageDelayed(msg, delayTime);
             }
         }
     }
+
     private void sendMessage(Message msg) {
         synchronized (mHandlerLock) {
             if (mHandler != null) {
@@ -327,21 +341,28 @@ public class MessageDispatcher {
         final Handler ret = new AnalysyHandler(thread.getLooper());
         return ret;
     }
+
     public void checkRetry() {
         Message msg = new Message();
         msg.what = MSG_RETRY;
-        if(!mHandler.hasMessages(msg.what)){
+        if (!mHandler.hasMessages(msg.what)) {
             mHandler.sendMessageDelayed(msg, EGContext.CHECK_RETRY_CYCLE);
         }
 
     }
+
     public void sendMessages() {
         Message msg = new Message();
         msg.what = MSG_CHECK;
-        if(!mHandler.hasMessages(msg.what)){
+        if (!mHandler.hasMessages(msg.what)) {
             mHandler.sendMessageDelayed(msg, EGContext.CHECK_HEARTBEAT_CYCLE);
         }
     }
+
+    private static class Holder {
+        private static final MessageDispatcher INSTANCE = new MessageDispatcher();
+    }
+
     /**
      * @Copyright © 2018 Analysys Inc. All rights reserved.
      * @Description: 真正的消息处理
@@ -356,11 +377,11 @@ public class MessageDispatcher {
 
         @Override
         public void handleMessage(Message msg) {
-            try{
+            try {
                 switch (msg.what) {
                     case MSG_INIT_MODULE:
-                        if (EGContext.FLAG_DEBUG_INNER){
-                            ELOG.i(SystemUtils.getCurrentProcessName(mContext)+"接收到初始化消息");
+                        if (EGContext.FLAG_DEBUG_INNER) {
+                            ELOG.i(SystemUtils.getCurrentProcessName(mContext) + "接收到初始化消息");
                         }
                         msgInitModule();
                         break;
@@ -382,7 +403,7 @@ public class MessageDispatcher {
                     case MSG_APP_CHANGE_RECEIVER:
                         JSONObject js = null;
                         js = (JSONObject) msg.obj;
-                        AppSnapshotImpl.getInstance(mContext).changeActionType(js.optString("pkgName"), msg.arg1,js.optLong("time"));
+                        AppSnapshotImpl.getInstance(mContext).changeActionType(js.optString("pkgName"), msg.arg1, js.optLong("time"));
                         break;
                     case MSG_SCREEN_RECEIVER:
                         break;
@@ -437,7 +458,7 @@ public class MessageDispatcher {
                     default:
                         break;
                 }
-            }catch (Throwable t){
+            } catch (Throwable t) {
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.e(t);
                 }
@@ -463,44 +484,47 @@ public class MessageDispatcher {
                         || handler.hasMessages(MSG_LOCATION)
                         || handler.hasMessages(MSG_OC_INFO)
                         || handler.hasMessages(MSG_UPLOAD)) {
-                    if(handler.hasMessages(MSG_UPLOAD)){
-                        if(System.currentTimeMillis() - uploadLastTime >= uploadCycle){ uploadInfo(uploadCycle); }
-                    }else {
+                    if (handler.hasMessages(MSG_UPLOAD)) {
+                        if (System.currentTimeMillis() - uploadLastTime >= uploadCycle) {
+                            uploadInfo(uploadCycle);
+                        }
+                    } else {
                         MessageDispatcher.getInstance(mContext).uploadInfo(0);
                     }
-                    if(handler.hasMessages(MSG_OC_INFO)) {
-                        if(Build.VERSION.SDK_INT < 24 && (System.currentTimeMillis() - ocLastTime >= ocCycle)){
+                    if (handler.hasMessages(MSG_OC_INFO)) {
+                        if (Build.VERSION.SDK_INT < 24 && (System.currentTimeMillis() - ocLastTime >= ocCycle)) {
                             ocInfo(ocCycle);
                         }
-                    }else {
+                    } else {
                         if (Build.VERSION.SDK_INT < 24) {
                             MessageDispatcher.getInstance(mContext).ocInfo(0);
                         }
                     }
-                    if(handler.hasMessages(MSG_LOCATION)){
-                        if(System.currentTimeMillis() - locationLastTime >= locationCycle){
+                    if (handler.hasMessages(MSG_LOCATION)) {
+                        if (System.currentTimeMillis() - locationLastTime >= locationCycle) {
                             locationInfo(locationCycle);
                         }
-                    }else {
+                    } else {
                         MessageDispatcher.getInstance(mContext).locationInfo(0);
                     }
-                    if(handler.hasMessages(MSG_SNAPSHOT)){
-                        if(System.currentTimeMillis() - snapShotLastTime >= snapShotCycle){
+                    if (handler.hasMessages(MSG_SNAPSHOT)) {
+                        if (System.currentTimeMillis() - snapShotLastTime >= snapShotCycle) {
                             snapshotInfo(snapShotCycle);
                         }
-                    }else {
+                    } else {
                         MessageDispatcher.getInstance(mContext).snapshotInfo(0);
                     }
-                }else{
+                } else {
                     MessageDispatcher.getInstance(mContext).initModule();
                 }
-            }catch (Throwable t){
-                if(EGContext.FLAG_DEBUG_INNER){
+            } catch (Throwable t) {
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.e(t);
                 }
             }
 
         }
+
         /**
          * 用于启动各个模块，
          * OC模块，snapshot模块，Location模块，
@@ -513,11 +537,11 @@ public class MessageDispatcher {
                 locationInfo(0);
                 uploadInfo(0);
                 sendMessages();
-                if(ELOG.USER_DEBUG){
+                if (ELOG.USER_DEBUG) {
                     ELOG.info("初始化完成");
                 }
-            }catch (Throwable t){
-                if(EGContext.FLAG_DEBUG_INNER){
+            } catch (Throwable t) {
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.e(t);
                 }
             }
@@ -528,31 +552,13 @@ public class MessageDispatcher {
             try {
                 Message msg = new Message();
                 msg.what = MSG_RETRY;
-                if(mHandler.hasMessages(msg.what)){
+                if (mHandler.hasMessages(msg.what)) {
                     mHandler.removeMessages(msg.what);
                 }
-            }catch (Throwable t){
+            } catch (Throwable t) {
             }
 
         }
 
     }
-
-    private Context mContext = null;
-    private Handler mHandler;
-    private final Object mHandlerLock = new Object();
-
-    protected static final int MSG_INIT_MODULE = 0x01;
-    protected static final int MSG_CHECK_HEARTBEAT = 0x02;
-    protected static final int MSG_START_SERVICE_SELF = 0x03;
-    protected static final int MSG_KILL_RETRY_WORKER = 0x04;
-    protected static final int MSG_APP_CHANGE_RECEIVER = 0x05;
-    protected static final int MSG_SCREEN_RECEIVER = 0x06;
-    protected static final int MSG_SNAPSHOT = 0x07;
-    protected static final int MSG_LOCATION = 0x08;
-    protected static final int MSG_OC_INFO = 0x09;
-    protected static final int MSG_UPLOAD = 0x0a;
-    protected static final int MSG_CHECK_RETRY = 0x0d;
-    private static final int MSG_CHECK = 0x0b;
-    private static final int MSG_RETRY = 0x0e;
 }

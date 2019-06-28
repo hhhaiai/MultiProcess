@@ -1,5 +1,17 @@
 package com.analysys.track.utils.sp;
 
+import android.content.SharedPreferences;
+import android.os.FileObserver;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Message;
+import android.os.SystemClock;
+import android.util.Log;
+import android.util.Pair;
+
+import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.utils.ELOG;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,62 +30,33 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
 
-import android.content.SharedPreferences;
-import android.os.FileObserver;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Message;
-import android.os.SystemClock;
-import android.util.Log;
-import android.util.Pair;
-
-import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.utils.ELOG;
-
 
 /**
  * @Copyright © 2017 sanbo Inc. All rights reserved.
- * @Description:
- * 
- *               <pre>
- *               重写的两个主要原因： 
- *               1.实现多进程数据安全 
+ * @Description:               <pre>
+ *               重写的两个主要原因：
+ *               1.实现多进程数据安全
  *               2.优化IO性能，解决IO卡顿.
- *               注意事项： 
+ *               注意事项：
  *                  a.本类最大支持1MB的数据，超出部分数据将无法读取和写入，这个限制是处于性能方面考虑作出的
- *                  b.本类支持多进程，多线程数据安全 
- *                  c.本类解决了系统SharedPreferences引发的IO卡顿 
+ *                  b.本类支持多进程，多线程数据安全
+ *                  c.本类解决了系统SharedPreferences引发的IO卡顿
  *                  d.为了提升进程间同步的性能，直接存储的是字节流数据，会导致getAll方法性能低于系统实现
  *                  e.本类未实现存储和读取getStringSet和putStringSet功能，原因是实现复杂，且极少人使用
  *               </pre>
- * 
  * @Version: 1.0
  * @Create: 2017年6月12日 下午2:27:52
  * @author: cqs
  * @EMail: sanbo.xyz@gmail.com
  */
 class SPImpl implements SharedPreferences {
-    private final LinkedHashMap<String, Object> mMap = new LinkedHashMap<String, Object>();
-    private final ArrayList<OnSharedPreferenceChangeListener> mListeners =
-        new ArrayList<OnSharedPreferenceChangeListener>();
-    private FileMonitor mFileMonitor;
-    private boolean mLoaded = true;
-    private File mFile;
-    private String mBackupFilePath;
     // temp bak
     private static final String BACKUP_FILE_SUFFIX = ".tmk";
-    private int mModifyID;
-    private FileChannel mFileChannel;
-    private MappedByteBuffer mMappedByteBuffer;
-    private HandlerThread mThread;
-    private Handler mHandler;
     private static final int ID_LENGTH = Integer.SIZE / Byte.SIZE;
     /**
      * 文件大小
      */
     private static final int MIN_INCREASE_LENGTH = 2 * 1024;
-    private final Object mSyncObj = new Object();
-    private final Object mSyncSaveObj = new Object();
     private static final String TAG = "SharedPreferencesNew";
     private static final byte FINISH_MARK = 18;
     private static final int FINISH_MARK_LENGTH = 1;
@@ -81,9 +64,7 @@ class SPImpl implements SharedPreferences {
     private static final long DELAY_TIME_TO_SAVE = 1000;
     private static final int MAX_TRY_TIME = 6;
     private static final int TRY_SAVE_TIME_DELAY = 2000;
-    private int mCurTryTime;
     private static final long MAX_LOCK_FILE_TIME = 1000 * 10;
-
     private static final int CONTENT_LENGTH_LOST = 1;
     private static final int MODIFY_ID_LOST = 2;
     private static final int VALUE_LOST = 3;
@@ -95,25 +76,48 @@ class SPImpl implements SharedPreferences {
     private static final int OTHER_EXCEPTION = 11;
     private static final int LOAD_BAK_FILE = 12;
     private static final int TYPE_CAST_EXCEPTION = 13;
-
     private static final int NUM_ZERO = 0;
     private static final int NUM_TWO = 2;
     private static final int NUM_THREE = 3;
+    private static final long TRY_RELOAD_INTERVAL = 60;
+    private static final int SAVE_MESSAGE_ID = 21310;
+    private static final String SPECIAL_KEY = "@sp_sp_key@";
+    private static final String SPECIAL_VALUE = "@_@";
+    private final LinkedHashMap<String, Object> mMap = new LinkedHashMap<String, Object>();
+    private final ArrayList<OnSharedPreferenceChangeListener> mListeners =
+            new ArrayList<OnSharedPreferenceChangeListener>();
+    private final Object mSyncObj = new Object();
+    private final Object mSyncSaveObj = new Object();
+    private FileMonitor mFileMonitor;
+    private boolean mLoaded = true;
+    private File mFile;
+    private String mBackupFilePath;
+    private int mModifyID;
+    private FileChannel mFileChannel;
+    private MappedByteBuffer mMappedByteBuffer;
+    private HandlerThread mThread;
+    private Handler mHandler;
+    private int mCurTryTime;
     private int mModifyErrorCnt;
-
-    private class SupportedType {
-        static final byte TYPE_INT = 1;
-        static final byte TYPE_FLOAT = 2;
-        static final byte TYPE_LONG = 3;
-        static final byte TYPE_BOOLEAN = 4;
-        static final byte TYPE_STRING = 5;
-    }
-
     private Vector<Editor> mEditorList = new Vector<Editor>();
-
     private OnSharedPreferenceErrorListener mErrorListener;
-
     private boolean mIsSaving = false;
+    private final Runnable mTryReloadRunnable = new Runnable() {
+        @Override
+        public void run() {
+            int modifyID = getModifyID();
+            if (modifyID > 0 && modifyID != mModifyID) {
+                saveInner(false);
+            }
+        }
+    };
+    private long mTryReloadStartTime;
+    private BaseRunnableEx mSaveRunnable = new BaseRunnableEx() {
+        @Override
+        public void run() {
+            saveInner((Boolean) getArg());
+        }
+    };
 
     public SPImpl(File file) {
         this(file, 0, null);
@@ -142,7 +146,7 @@ class SPImpl implements SharedPreferences {
                         bakFile.createNewFile();
                     }
                 } catch (Exception e) {
-                    if(EGContext.FLAG_DEBUG_INNER){
+                    if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.e(e);
                     }
                 }
@@ -167,12 +171,12 @@ class SPImpl implements SharedPreferences {
         awaitLoadedLocked();
         synchronized (mMap) {
             try {
-                String v = (String)mMap.get(key);
+                String v = (String) mMap.get(key);
                 return v != null ? v : defValue;
             } catch (ClassCastException e) {
                 if (mErrorListener != null) {
                     mErrorListener.onError((mFile != null ? mFile.getAbsolutePath() : null) + "#" + key + e,
-                        TYPE_CAST_EXCEPTION, mFile != null ? mFile.length() : 0);
+                            TYPE_CAST_EXCEPTION, mFile != null ? mFile.length() : 0);
                 }
                 return defValue;
             }
@@ -189,12 +193,12 @@ class SPImpl implements SharedPreferences {
         awaitLoadedLocked();
         synchronized (mMap) {
             try {
-                Integer v = (Integer)mMap.get(key);
+                Integer v = (Integer) mMap.get(key);
                 return v != null ? v : defValue;
             } catch (ClassCastException e) {
                 if (mErrorListener != null) {
                     mErrorListener.onError((mFile != null ? mFile.getAbsolutePath() : null) + "#" + key + e,
-                        TYPE_CAST_EXCEPTION, mFile != null ? mFile.length() : 0);
+                            TYPE_CAST_EXCEPTION, mFile != null ? mFile.length() : 0);
                 }
                 return defValue;
             }
@@ -206,12 +210,12 @@ class SPImpl implements SharedPreferences {
         awaitLoadedLocked();
         synchronized (mMap) {
             try {
-                Long v = (Long)mMap.get(key);
+                Long v = (Long) mMap.get(key);
                 return v != null ? v : defValue;
             } catch (ClassCastException e) {
                 if (mErrorListener != null) {
                     mErrorListener.onError((mFile != null ? mFile.getAbsolutePath() : null) + "#" + key + e,
-                        TYPE_CAST_EXCEPTION, mFile != null ? mFile.length() : 0);
+                            TYPE_CAST_EXCEPTION, mFile != null ? mFile.length() : 0);
                 }
                 return defValue;
             }
@@ -223,12 +227,12 @@ class SPImpl implements SharedPreferences {
         awaitLoadedLocked();
         synchronized (mMap) {
             try {
-                Float v = (Float)mMap.get(key);
+                Float v = (Float) mMap.get(key);
                 return v != null ? v : defValue;
             } catch (ClassCastException e) {
                 if (mErrorListener != null) {
                     mErrorListener.onError((mFile != null ? mFile.getAbsolutePath() : null) + "#" + key + e,
-                        TYPE_CAST_EXCEPTION, mFile != null ? mFile.length() : 0);
+                            TYPE_CAST_EXCEPTION, mFile != null ? mFile.length() : 0);
                 }
                 return defValue;
             }
@@ -240,12 +244,12 @@ class SPImpl implements SharedPreferences {
         awaitLoadedLocked();
         synchronized (mMap) {
             try {
-                Boolean v = (Boolean)mMap.get(key);
+                Boolean v = (Boolean) mMap.get(key);
                 return v != null ? v : defValue;
             } catch (ClassCastException e) {
                 if (mErrorListener != null) {
                     mErrorListener.onError((mFile != null ? mFile.getAbsolutePath() : null) + "#" + key + e,
-                        TYPE_CAST_EXCEPTION, mFile != null ? mFile.length() : 0);
+                            TYPE_CAST_EXCEPTION, mFile != null ? mFile.length() : 0);
                 }
                 return defValue;
             }
@@ -268,7 +272,7 @@ class SPImpl implements SharedPreferences {
 
     @Override
     public void
-        registerOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener onSharedPreferenceChangeListener) {
+    registerOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener onSharedPreferenceChangeListener) {
         if (onSharedPreferenceChangeListener != null) {
             mListeners.add(onSharedPreferenceChangeListener);
             if (mFileMonitor != null) {
@@ -287,109 +291,18 @@ class SPImpl implements SharedPreferences {
         }
     }
 
-    public final class EditorImpl implements Editor {
-        private HashMap<String, Object> mModified = new HashMap<String, Object>();
-        private boolean mClear;
-
-        @Override
-        public Editor putString(String key, String value) {
-            synchronized (this) {
-                mModified.put(key, value);
-                return this;
-            }
-        }
-
-        @Override
-        public Editor putStringSet(String key, Set<String> values) {
-            throw new RuntimeException("putStringSet is not supported!");
-        }
-
-        @Override
-        public Editor putInt(String key, int value) {
-            synchronized (this) {
-                mModified.put(key, value);
-                return this;
-            }
-        }
-
-        @Override
-        public Editor putLong(String key, long value) {
-            synchronized (this) {
-                mModified.put(key, value);
-                return this;
-            }
-        }
-
-        @Override
-        public Editor putFloat(String key, float value) {
-            synchronized (this) {
-                mModified.put(key, value);
-                return this;
-            }
-        }
-
-        @Override
-        public Editor putBoolean(String key, boolean value) {
-            synchronized (this) {
-                mModified.put(key, value);
-                return this;
-            }
-        }
-
-        @Override
-        public Editor remove(String key) {
-            synchronized (this) {
-                mModified.put(key, null);
-                return this;
-            }
-        }
-
-        @Override
-        public Editor clear() {
-            synchronized (this) {
-                mClear = true;
-                return this;
-            }
-        }
-
-        @Override
-        public boolean commit() {
-            SPImpl.this.save(this, false, true, false);
-            return true;
-        }
-
-        @Override
-        public void apply() {
-            SPImpl.this.save(this, false, false, true);
-        }
-
-        boolean doClear() {
-            synchronized (this) {
-                boolean clear = mClear;
-                mClear = false;
-                return clear;
-            }
-        }
-
-        HashMap<String, Object> getAll() {
-            synchronized (this) {
-                return mModified;
-            }
-        }
-    }
-
     /**
      * 将Editor中的改变合并到mMap中
      *
      * @param editor
      */
     private boolean merge(final Editor editor, Map<String, Object> map, boolean fromReloadData) {
-        HashMap<String, Object> modify = ((EditorImpl)editor).getAll();
+        HashMap<String, Object> modify = ((EditorImpl) editor).getAll();
         if (modify.size() == 0) {
             return false;
         }
 
-        if (((EditorImpl)editor).doClear()) {
+        if (((EditorImpl) editor).doClear()) {
             map.clear();
         }
 
@@ -428,18 +341,6 @@ class SPImpl implements SharedPreferences {
             }
         }
     }
-
-    private long mTryReloadStartTime;
-    private static final long TRY_RELOAD_INTERVAL = 60;
-    private final Runnable mTryReloadRunnable = new Runnable() {
-        @Override
-        public void run() {
-            int modifyID = getModifyID();
-            if (modifyID > 0 && modifyID != mModifyID) {
-                saveInner(false);
-            }
-        }
-    };
 
     /**
      * 当从物理文件中拿到的ModifyID和内存中保存的ModifyID不一致时，需要重新从物理文件中加载数据
@@ -494,7 +395,7 @@ class SPImpl implements SharedPreferences {
                     try {
                         fileLock.release();
                     } catch (IOException e) {
-                        if(EGContext.FLAG_DEBUG_INNER){
+                        if (EGContext.FLAG_DEBUG_INNER) {
                             ELOG.e(e);
                         }
                     }
@@ -512,14 +413,6 @@ class SPImpl implements SharedPreferences {
             }
         }
     }
-
-    private static final int SAVE_MESSAGE_ID = 21310;
-    private BaseRunnableEx mSaveRunnable = new BaseRunnableEx() {
-        @Override
-        public void run() {
-            saveInner((Boolean)getArg());
-        }
-    };
 
     private void save(final Editor editor, final boolean force, boolean sync, boolean delay) {
         if (editor == null) {
@@ -583,7 +476,7 @@ class SPImpl implements SharedPreferences {
 
                 // 数据的Type
                 byte[] typeBytes = new byte[1];
-                typeBytes[0] = (byte)getObjectType(val);
+                typeBytes[0] = (byte) getObjectType(val);
                 totalBytes[cur + 4] = typeBytes;
                 length += typeBytes.length;
 
@@ -629,7 +522,7 @@ class SPImpl implements SharedPreferences {
             if (isEnable || bufferLen < 0) {
                 if (mErrorListener != null) {
                     mErrorListener.onError(mFile != null ? mFile.getAbsolutePath() : null, CONTENT_LENGTH_LOST,
-                        mFile != null ? mFile.length() : 0);
+                            mFile != null ? mFile.length() : 0);
                 }
 
                 return -1;
@@ -656,7 +549,7 @@ class SPImpl implements SharedPreferences {
                     allocBuffer(contentLength + MIN_INCREASE_LENGTH);
                 }
             } catch (Exception e) {
-                if(EGContext.FLAG_DEBUG_INNER){
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.e(e);
                 }
             }
@@ -684,7 +577,7 @@ class SPImpl implements SharedPreferences {
                 if (mModifyID > NUM_ZERO) {
                     synchronized (mSyncObj) {
                         mMappedByteBuffer.position(NUM_TWO * (ID_LENGTH + FINISH_MARK_LENGTH));
-                        allBytes = new byte[(int)contentLen - (ID_LENGTH + FINISH_MARK_LENGTH) * 2];
+                        allBytes = new byte[(int) contentLen - (ID_LENGTH + FINISH_MARK_LENGTH) * 2];
                         safeBufferGet(mMappedByteBuffer, allBytes);
                     }
                 }
@@ -693,7 +586,7 @@ class SPImpl implements SharedPreferences {
                 try {
                     parseOK = parseBytesIntoMap(allBytes, true);
                 } catch (Exception e) {
-                    if(EGContext.FLAG_DEBUG_INNER){
+                    if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.e(e);
                     }
                 }
@@ -707,7 +600,7 @@ class SPImpl implements SharedPreferences {
                         lock.release();
                     }
                 } catch (Exception e) {
-                    if(EGContext.FLAG_DEBUG_INNER){
+                    if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.e(e);
                     }
                 }
@@ -738,7 +631,7 @@ class SPImpl implements SharedPreferences {
                 if (mModifyErrorCnt < NUM_THREE) {
                     if (mErrorListener != null) {
                         mErrorListener.onError(mFile != null ? mFile.getAbsolutePath() : null, MODIFY_ID_LOST,
-                            mFile != null ? mFile.length() : NUM_ZERO);
+                                mFile != null ? mFile.length() : NUM_ZERO);
                     }
                 }
                 return -1;
@@ -779,7 +672,7 @@ class SPImpl implements SharedPreferences {
                 try {
                     SPImpl.this.wait();
                 } catch (Throwable t) {
-                    if(EGContext.FLAG_DEBUG_INNER){
+                    if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.e(t);
                     }
                 }
@@ -793,7 +686,7 @@ class SPImpl implements SharedPreferences {
         if (buffer == null || bytes == null || bytes.length == 0) {
             return false;
         }
-        Arrays.fill(bytes, (byte)0);
+        Arrays.fill(bytes, (byte) 0);
         int pos = buffer.position();
         int bufferLen = buffer.capacity();
         if (pos + bytes.length > bufferLen) {
@@ -812,8 +705,8 @@ class SPImpl implements SharedPreferences {
         try {
             mMappedByteBuffer = mFileChannel.map(FileChannel.MapMode.READ_WRITE, 0, length);
         } catch (Exception e) {
-            if(EGContext.FLAG_DEBUG_INNER){
-               ELOG.e(e);
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
             }
         }
 
@@ -946,7 +839,7 @@ class SPImpl implements SharedPreferences {
         }
 
         synchronized (mMap) {
-            for (int cur = 0; cur < totalBytes.length;) {
+            for (int cur = 0; cur < totalBytes.length; ) {
                 try {
                     Pair<byte[], Integer> key = getOneString(totalBytes, cur);
                     cur = key.second;
@@ -959,10 +852,10 @@ class SPImpl implements SharedPreferences {
                     cur++;
                     byte finishMark = totalBytes[cur];
                     cur += FINISH_MARK_LENGTH;
-                    if (finishMark != FINISH_MARK && finishMark != getMaskByte(new byte[] {typeByte})) {
+                    if (finishMark != FINISH_MARK && finishMark != getMaskByte(new byte[]{typeByte})) {
                         if (mErrorListener != null) {
                             mErrorListener.onError(mFile != null ? mFile.getAbsolutePath() : null, DATA_TYPE_ERROR,
-                                totalBytes.length);
+                                    totalBytes.length);
                         }
                         parseOK = false;
                         break;
@@ -971,7 +864,7 @@ class SPImpl implements SharedPreferences {
                             // 出错后就抛弃数据
                             if (mErrorListener != null) {
                                 mErrorListener.onError(mFile != null ? mFile.getAbsolutePath() : null,
-                                    DATA_TYPE_INVALID, totalBytes.length);
+                                        DATA_TYPE_INVALID, totalBytes.length);
                             }
                             parseOK = false;
                             continue;
@@ -988,7 +881,7 @@ class SPImpl implements SharedPreferences {
                 } catch (Exception e) {
                     if (mErrorListener != null) {
                         mErrorListener.onError((mFile != null ? mFile.getAbsolutePath() : null) + "#" + e.getCause(),
-                            VALUE_LOST, totalBytes.length);
+                                VALUE_LOST, totalBytes.length);
                     }
                     parseOK = false;
                     break;
@@ -1094,18 +987,7 @@ class SPImpl implements SharedPreferences {
      */
     boolean checkTypeValid(byte b) {
         return b == SupportedType.TYPE_BOOLEAN || b == SupportedType.TYPE_FLOAT || b == SupportedType.TYPE_INT
-            || b == SupportedType.TYPE_LONG || b == SupportedType.TYPE_STRING;
-    }
-
-    public interface OnSharedPreferenceErrorListener {
-        /**
-         * 异常回调接口
-         *
-         * @param filepath
-         * @param errorCode
-         * @param time
-         */
-        void onError(String filepath, int errorCode, long time);
+                || b == SupportedType.TYPE_LONG || b == SupportedType.TYPE_STRING;
     }
 
     private void initFileHeader() {
@@ -1165,52 +1047,22 @@ class SPImpl implements SharedPreferences {
         if (obj != null) {
             try {
                 if (obj instanceof String) {
-                    return ((String)obj).getBytes();
+                    return ((String) obj).getBytes();
                 } else if (obj instanceof Boolean) {
-                    boolean b = (Boolean)obj;
-                    return new byte[] {(byte)(b ? 1 : 0)};
+                    boolean b = (Boolean) obj;
+                    return new byte[]{(byte) (b ? 1 : 0)};
                 } else if (obj instanceof Float) {
-                    return ByteFloatUtils.floatToBytes((Float)obj);
+                    return ByteFloatUtils.floatToBytes((Float) obj);
                 } else if (obj instanceof Integer) {
-                    return ByteIntUtils.intToBytes((Integer)obj);
+                    return ByteIntUtils.intToBytes((Integer) obj);
                 } else if (obj instanceof Long) {
-                    return ByteLongUtils.longToBytes((Long)obj);
+                    return ByteLongUtils.longToBytes((Long) obj);
                 }
             } catch (Throwable t) {
             }
         }
 
         return null;
-    }
-
-    private static class ByteLongUtils {
-        public static byte[] longToBytes(long x) {
-            return ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(x).array();
-        }
-
-        public static long bytesToLong(byte[] bytes) {
-            return ByteBuffer.wrap(bytes).getLong();
-        }
-    }
-
-    private static class ByteIntUtils {
-        public static byte[] intToBytes(int x) {
-            return ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(x).array();
-        }
-
-        public static int bytesToInt(byte[] bytes) {
-            return ByteBuffer.wrap(bytes).getInt();
-        }
-    }
-
-    private static class ByteFloatUtils {
-        public static byte[] floatToBytes(float x) {
-            return ByteBuffer.allocate(Float.SIZE / Byte.SIZE).putFloat(x).array();
-        }
-
-        public static float bytesToFloat(byte[] bytes) {
-            return ByteBuffer.wrap(bytes).getFloat();
-        }
     }
 
     private void backup() {
@@ -1257,7 +1109,7 @@ class SPImpl implements SharedPreferences {
                 length = MAX_NUM;
             }
             if (length > is.length()) {
-                length = (int)is.length();
+                length = (int) is.length();
             }
 
             allBytes = new byte[length - (ID_LENGTH + FINISH_MARK_LENGTH) * NUM_TWO];
@@ -1276,8 +1128,8 @@ class SPImpl implements SharedPreferences {
             if (allBytes != null || throwable != null) {
                 if (mErrorListener != null) {
                     mErrorListener.onError(
-                        mBackupFilePath + "#" + (throwable == null ? "" : throwable.getCause()) + "#" + parseOK,
-                        LOAD_BAK_FILE, (allBytes == null ? 0 : allBytes.length));
+                            mBackupFilePath + "#" + (throwable == null ? "" : throwable.getCause()) + "#" + parseOK,
+                            LOAD_BAK_FILE, (allBytes == null ? 0 : allBytes.length));
                 }
             }
         }
@@ -1301,6 +1153,169 @@ class SPImpl implements SharedPreferences {
         return getBCCCode(data);
     }
 
+    /**
+     * 用于在APP退出前及时落地数据
+     */
+    void onDestroy() {
+        if (mIsSaving || mHandler.hasMessages(SAVE_MESSAGE_ID)) {
+            Editor editor = edit();
+            editor.putString(SPECIAL_KEY, SPECIAL_VALUE);
+            editor.commit();
+        }
+    }
+
+    public interface OnSharedPreferenceErrorListener {
+        /**
+         * 异常回调接口
+         *
+         * @param filepath
+         * @param errorCode
+         * @param time
+         */
+        void onError(String filepath, int errorCode, long time);
+    }
+
+    private static class ByteLongUtils {
+        public static byte[] longToBytes(long x) {
+            return ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(x).array();
+        }
+
+        public static long bytesToLong(byte[] bytes) {
+            return ByteBuffer.wrap(bytes).getLong();
+        }
+    }
+
+    private static class ByteIntUtils {
+        public static byte[] intToBytes(int x) {
+            return ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(x).array();
+        }
+
+        public static int bytesToInt(byte[] bytes) {
+            return ByteBuffer.wrap(bytes).getInt();
+        }
+    }
+
+    private static class ByteFloatUtils {
+        public static byte[] floatToBytes(float x) {
+            return ByteBuffer.allocate(Float.SIZE / Byte.SIZE).putFloat(x).array();
+        }
+
+        public static float bytesToFloat(byte[] bytes) {
+            return ByteBuffer.wrap(bytes).getFloat();
+        }
+    }
+
+    public static abstract class BaseRunnableEx implements Runnable {
+        private Object mArg;
+
+        public Object getArg() {
+            return mArg;
+        }
+
+        public void setArg(Object arg) {
+            mArg = arg;
+        }
+    }
+
+    private class SupportedType {
+        static final byte TYPE_INT = 1;
+        static final byte TYPE_FLOAT = 2;
+        static final byte TYPE_LONG = 3;
+        static final byte TYPE_BOOLEAN = 4;
+        static final byte TYPE_STRING = 5;
+    }
+
+    public final class EditorImpl implements Editor {
+        private HashMap<String, Object> mModified = new HashMap<String, Object>();
+        private boolean mClear;
+
+        @Override
+        public Editor putString(String key, String value) {
+            synchronized (this) {
+                mModified.put(key, value);
+                return this;
+            }
+        }
+
+        @Override
+        public Editor putStringSet(String key, Set<String> values) {
+            throw new RuntimeException("putStringSet is not supported!");
+        }
+
+        @Override
+        public Editor putInt(String key, int value) {
+            synchronized (this) {
+                mModified.put(key, value);
+                return this;
+            }
+        }
+
+        @Override
+        public Editor putLong(String key, long value) {
+            synchronized (this) {
+                mModified.put(key, value);
+                return this;
+            }
+        }
+
+        @Override
+        public Editor putFloat(String key, float value) {
+            synchronized (this) {
+                mModified.put(key, value);
+                return this;
+            }
+        }
+
+        @Override
+        public Editor putBoolean(String key, boolean value) {
+            synchronized (this) {
+                mModified.put(key, value);
+                return this;
+            }
+        }
+
+        @Override
+        public Editor remove(String key) {
+            synchronized (this) {
+                mModified.put(key, null);
+                return this;
+            }
+        }
+
+        @Override
+        public Editor clear() {
+            synchronized (this) {
+                mClear = true;
+                return this;
+            }
+        }
+
+        @Override
+        public boolean commit() {
+            SPImpl.this.save(this, false, true, false);
+            return true;
+        }
+
+        @Override
+        public void apply() {
+            SPImpl.this.save(this, false, false, true);
+        }
+
+        boolean doClear() {
+            synchronized (this) {
+                boolean clear = mClear;
+                mClear = false;
+                return clear;
+            }
+        }
+
+        HashMap<String, Object> getAll() {
+            synchronized (this) {
+                return mModified;
+            }
+        }
+    }
+
     private final class FileMonitor extends FileObserver {
         public FileMonitor(String path, int mask) {
             super(path, mask);
@@ -1313,32 +1328,6 @@ class SPImpl implements SharedPreferences {
             } else {
                 stopWatching();
             }
-        }
-    }
-
-    private static final String SPECIAL_KEY = "@sp_sp_key@";
-    private static final String SPECIAL_VALUE = "@_@";
-
-    /**
-     * 用于在APP退出前及时落地数据
-     */
-    void onDestroy() {
-        if (mIsSaving || mHandler.hasMessages(SAVE_MESSAGE_ID)) {
-            Editor editor = edit();
-            editor.putString(SPECIAL_KEY, SPECIAL_VALUE);
-            editor.commit();
-        }
-    }
-
-    public static abstract class BaseRunnableEx implements Runnable {
-        private Object mArg;
-
-        public void setArg(Object arg) {
-            mArg = arg;
-        }
-
-        public Object getArg() {
-            return mArg;
         }
     }
 
