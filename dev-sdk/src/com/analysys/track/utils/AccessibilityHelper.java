@@ -77,9 +77,9 @@ public class AccessibilityHelper {
                 return false;
             }
             if (settingValue.contains(":")) {
-                String[] tempSS = settingValue.split(":");
-                if (tempSS.length > 0) {
-                    if (Arrays.asList(tempSS).contains(service)) {
+                String[] tempStringArr = settingValue.split(":");
+                if (tempStringArr.length > 0) {
+                    if (Arrays.asList(tempStringArr).contains(service)) {
                         return true;
                     }
                 }

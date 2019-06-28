@@ -15,18 +15,19 @@ public class ShellUtils {
      * @return
      */
     public static String shell(String cmd) {
-        // TODO : 如何防止卡死,需要增加超时机制.待调研测试
         if (TextUtils.isEmpty(cmd)) {
             return null;
         }
         java.lang.Process proc = null;
         BufferedInputStream in = null;
         BufferedReader br = null;
+        InputStreamReader is = null;
         StringBuilder sb = new StringBuilder();
         try {
             proc = Runtime.getRuntime().exec(cmd);
             in = new BufferedInputStream(proc.getInputStream());
-            br = new BufferedReader(new InputStreamReader(in));
+            is = new InputStreamReader(in);
+            br = new BufferedReader(is);
             String line = "";
             while ((line = br.readLine()) != null) {
                 sb.append(line).append("\n");
@@ -34,6 +35,7 @@ public class ShellUtils {
         } catch (Throwable e) {
         } finally {
             StreamerUtils.safeClose(br);
+            StreamerUtils.safeClose(is);
             StreamerUtils.safeClose(in);
             StreamerUtils.safeClose(proc);
         }

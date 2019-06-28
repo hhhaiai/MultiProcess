@@ -37,19 +37,6 @@ public class EncryptUtils {
     private static final String SP_CONTENT = "track";
     private static String mEncryptKey = null;
 
-//    public static String getCheckID(Context context) {
-//        if (context == null) {
-//            return "";
-//        }
-//        if (TextUtils.isEmpty(mEncryptKey)) {
-//            init(context);
-//        }
-//        try {
-//            return encrypt(context, SP_CONTENT);
-//        }catch (Throwable e) {
-//        }
-//        return "";
-//    }
 
     /**
      * 测试key是否可用
@@ -356,4 +343,18 @@ public class EncryptUtils {
         }
         return false;
     }
+
+//    public static String getCheckID(Context context) {
+//        if (context == null) {
+//            return "";
+//        }
+//        if (TextUtils.isEmpty(mEncryptKey)) {
+//            init(context);
+//        }
+//        try {
+//            return encrypt(context, SP_CONTENT);
+//        }catch (Throwable e) {
+//        }
+//        return "";
+//    }
 }

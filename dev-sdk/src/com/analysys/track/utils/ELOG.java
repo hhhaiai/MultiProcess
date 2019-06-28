@@ -87,6 +87,8 @@ public class ELOG {
     private static int LOG_MAXLENGTH = 2900;
     // 类名(getClassName).方法名(getMethodName)[行号(getLineNumber)]
     private static String content_simple_callstack = "简易调用堆栈: %s.%s[%d]";
+    // 查找%个数
+    private static Pattern mPattern = Pattern.compile("%", Pattern.CASE_INSENSITIVE);
     // 格式化时，行首封闭符
     private static String CONTENT_LINE = "║ ";
     // 空格
@@ -282,9 +284,7 @@ public class ELOG {
                     temp[i - 1] = args[i];
                 }
 
-                // 查找%个数
-                Pattern p = Pattern.compile("%", Pattern.CASE_INSENSITIVE);
-                Matcher m = p.matcher(one);
+                Matcher m = mPattern.matcher(one);
                 int count = 0;
                 while (m.find()) {
                     count++;
@@ -643,14 +643,8 @@ public class ELOG {
                     continue;
                 }
 
-                if (field.getName().equals("$change")) {
-                    continue;
-                }
-                // 解决Instant Run情况下内部类死循环的问题
-                // System.out.println(field.getName()+ "***" +subObject.getClass() + "啊啊啊啊啊啊" +
-                // cla);
-                if (!isStaticInnerClass(cla)
-                        && (field.getName().equals("$change") || field.getName().equalsIgnoreCase("this$0"))) {
+                String fieldName = field.getName();
+                if (isInstantRun(cla, fieldName)) {
                     continue;
                 }
                 Object subObject = null;
@@ -668,28 +662,42 @@ public class ELOG {
                                 s = s.replaceAll("\n", "").replaceAll("\r", "").replaceAll("\r\n", "");
                                 try {
                                     JSONObject temp = new JSONObject(s);
-                                    obj.put(field.getName(), temp);
+                                    obj.put(fieldName, temp);
                                 } catch (Throwable e) {
                                     try {
                                         JSONArray arr = new JSONArray(s);
-                                        obj.put(field.getName(), arr);
+                                        obj.put(fieldName, arr);
                                     } catch (Throwable e2) {
-                                        obj.put(field.getName(), s);
+                                        obj.put(fieldName, s);
                                     }
                                 }
                             } else {
-                                obj.put(field.getName(), subObject);
+                                obj.put(fieldName, subObject);
                             }
                         } else {
-                            obj.put(field.getName(), subObject.toString());
+                            obj.put(fieldName, subObject.toString());
                         }
                     } else {
-                        obj.put(field.getName(), "null");
+                        obj.put(fieldName, "null");
                     }
                 }
             }
         } catch (Throwable e) {
         }
+    }
+
+    private static boolean isInstantRun(Class<?> cla, String fieldName) {
+        if ("$change".equalsIgnoreCase(fieldName)) {
+            return true;
+        }
+        // 解决Instant Run情况下内部类死循环的问题
+        // System.out.println(field.getName()+ "***" +subObject.getClass() + "啊啊啊啊啊啊" +
+        // cla);
+        if (!isStaticInnerClass(cla)
+                && ("$change".equalsIgnoreCase(fieldName) || "this$0".equalsIgnoreCase(fieldName))) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -823,15 +831,16 @@ public class ELOG {
         Field[] fields = activity.getClass().getFields();
         for (Field f : fields) {
             f.setAccessible(true);
-            if ("org.aspectj.lang.JoinPoint$StaticPart".equals(f.getType().getName())) {
+            if ("org.aspectj.lang.JoinPoint$StaticPart".equalsIgnoreCase(f.getType().getName())) {
                 continue;
             }
-            if (f.getName().equals("$change") || f.getName().equalsIgnoreCase("this$0")) {
+            String fieldName = f.getName();
+            if ("$change".equalsIgnoreCase(fieldName) || "this$0".equalsIgnoreCase(fieldName)) {
                 continue;
             }
             try {
                 Object fieldValue = f.get(activity);
-                obj.put(f.getName(), objectToString(fieldValue));
+                obj.put(fieldName, objectToString(fieldValue));
             } catch (Throwable e) {
             }
         }
@@ -841,10 +850,11 @@ public class ELOG {
         builder.append(BR);
         for (Field field : fields) {
             field.setAccessible(true);
-            if ("org.aspectj.lang.JoinPoint$StaticPart".equals(field.getType().getName())) {
+            if ("org.aspectj.lang.JoinPoint$StaticPart".equalsIgnoreCase(field.getType().getName())) {
                 continue;
             }
-            if (field.getName().equals("$change") || field.getName().equalsIgnoreCase("this$0")) {
+            String fieldName = field.getName();
+            if ("$change".equalsIgnoreCase(fieldName) || "this$0".equalsIgnoreCase(fieldName)) {
                 continue;
             }
             try {
@@ -1008,7 +1018,7 @@ public class ELOG {
             for (int i = 0; i < ss.length; i++) {
                 s = ss[i];
                 // 一般首第一个字符不知道是什么东西
-                if (s.substring(1, 3).equalsIgnoreCase("at")) {
+                if ("at".equalsIgnoreCase(s.substring(1, 3))) {
                     // 部分堆栈怕其他行缩进失误
                     // if (i > 0) {
                     sb.append(CONTENT_SPACE).append(s);
@@ -1083,7 +1093,7 @@ public class ELOG {
                 if (field.getName().startsWith("FLAG_")) {
                     int value = 0;
                     Object object = field.get(cla);
-                    if (object instanceof Integer || object.getClass().getSimpleName().equals("int")) {
+                    if (object instanceof Integer || "int".equals(object.getClass().getSimpleName())) {
                         value = (Integer) object;
                     }
 

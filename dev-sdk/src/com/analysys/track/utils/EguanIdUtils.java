@@ -241,37 +241,6 @@ public class EguanIdUtils {
         }
     }
 
-//    private List<String> readFile() {
-//
-//        String idInfo = readIdFile();
-//        List<String> list = new ArrayList<String>();
-//        try {
-//            if (!TextUtils.isEmpty(idInfo)) {
-//                int index = idInfo.indexOf("$");
-//                int lastIndex = idInfo.lastIndexOf("$");
-//                if (idInfo.length() > 2 && index == lastIndex) {
-//                    if (index == 0 && idInfo.length() - 1 > 0) {
-//                        list.add("");
-//                        list.add(idInfo.substring(1, idInfo.length()));
-//                        return list;
-//                    }
-//                    if (index != 0 && index == idInfo.length() - 1) {
-//                        list.add(idInfo.substring(0, index));
-//                        list.add("");
-//                    } else {
-//                        String[] ids = idInfo.split("\\$");
-//                        if (ids.length == 2) {
-//                            list.add(ids[0]);
-//                            list.add(ids[1]);
-//                        }
-//                    }
-//                }
-//            }
-//        } catch (Throwable e) {
-//
-//        }
-//        return list;
-//    }
 
     /**
      * 从SD卡读数据
@@ -326,4 +295,36 @@ public class EguanIdUtils {
     private static class Holder {
         private static EguanIdUtils Instance = new EguanIdUtils();
     }
+
+//    private List<String> readFile() {
+//
+//        String idInfo = readIdFile();
+//        List<String> list = new ArrayList<String>();
+//        try {
+//            if (!TextUtils.isEmpty(idInfo)) {
+//                int index = idInfo.indexOf("$");
+//                int lastIndex = idInfo.lastIndexOf("$");
+//                if (idInfo.length() > 2 && index == lastIndex) {
+//                    if (index == 0 && idInfo.length() - 1 > 0) {
+//                        list.add("");
+//                        list.add(idInfo.substring(1, idInfo.length()));
+//                        return list;
+//                    }
+//                    if (index != 0 && index == idInfo.length() - 1) {
+//                        list.add(idInfo.substring(0, index));
+//                        list.add("");
+//                    } else {
+//                        String[] ids = idInfo.split("\\$");
+//                        if (ids.length == 2) {
+//                            list.add(ids[0]);
+//                            list.add(ids[1]);
+//                        }
+//                    }
+//                }
+//            }
+//        } catch (Throwable e) {
+//
+//        }
+//        return list;
+//    }
 }

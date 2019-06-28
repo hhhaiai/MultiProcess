@@ -36,7 +36,7 @@ public class SenSorModuleNameImpl {
     public JSONArray getSensorInfo() {
         JSONArray senSorArray = null;
         try {
-            SensorManager sensorManager = (SensorManager) mContext.getSystemService(mContext.SENSOR_SERVICE);
+            SensorManager sensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
             List<Sensor> sensorList = sensorManager.getSensorList(Sensor.TYPE_ALL);
             JSONObject info;
             senSorArray = new JSONArray();

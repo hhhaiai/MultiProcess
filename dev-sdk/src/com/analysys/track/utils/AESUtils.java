@@ -23,14 +23,14 @@ public class AESUtils {
      */
     public static String toHex(byte[] contentBytes) {
 
-        String HEX = "0123456789ABCDEF";
+        String hex = "0123456789ABCDEF";
         if (contentBytes == null) {
             return "";
         }
         StringBuffer result = new StringBuffer(contentBytes.length * 2);
         for (int i = 0; i < contentBytes.length; i++) {
             // byte数组的每个元素为8位，前四位right shift 4 后与 00001111与运算 ，后四位 直接与00001111与运算
-            result.append(HEX.charAt((contentBytes[i] >> 4) & 0x0f)).append(HEX.charAt(contentBytes[i] & 0x0f));
+            result.append(hex.charAt((contentBytes[i] >> 4) & 0x0f)).append(hex.charAt(contentBytes[i] & 0x0f));
         }
         return String.valueOf(result);
     }

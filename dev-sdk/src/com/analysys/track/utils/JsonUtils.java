@@ -44,22 +44,6 @@ public class JsonUtils {
         }
     }
 
-    public static List<JSONObject> jsonArray2JsonObjList(JSONArray array) {
-        List<JSONObject> list = null;
-        try {
-            JSONObject obj = null;
-            if (array != null && array.length() > 0) {
-                list = new ArrayList<JSONObject>();
-                for (int i = 0; i < array.length(); i++) {
-                    obj = (JSONObject) array.get(i);
-                    list.add(obj);
-                }
-            }
-        } catch (Throwable t) {
-        }
-
-        return list;
-    }
 
     public static void save(JSONObject json, String key, String value) {
         try {
@@ -84,4 +68,22 @@ public class JsonUtils {
         }
         return nameSet;
     }
+
+//    public static List<JSONObject> jsonArray2JsonObjList(JSONArray array) {
+//        List<JSONObject> list = null;
+//        try {
+//            JSONObject obj = null;
+//            if (array != null && array.length() > 0) {
+//                list = new ArrayList<JSONObject>();
+//                for (int i = 0; i < array.length(); i++) {
+//                    obj = (JSONObject) array.get(i);
+//                    list.add(obj);
+//                }
+//            }
+//        } catch (Throwable t) {
+//        }
+//
+//        return list;
+//    }
+
 }

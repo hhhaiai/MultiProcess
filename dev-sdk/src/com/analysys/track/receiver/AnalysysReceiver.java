@@ -22,14 +22,14 @@ public class AnalysysReceiver extends BroadcastReceiver {
     private static boolean isBatteryBroadCastHandled = false;
     private static boolean isBootBroadCastHandled = false;
     Context mContext;
-    String PACKAGE_ADDED = "android.intent.action.PACKAGE_ADDED";
-    String PACKAGE_REMOVED = "android.intent.action.PACKAGE_REMOVED";
-    String PACKAGE_REPLACED = "android.intent.action.PACKAGE_REPLACED";
-    String SCREEN_ON = "android.intent.action.SCREEN_ON";
-    String SCREEN_OFF = "android.intent.action.SCREEN_OFF";
-    String CONNECTIVITY_CHANGE = "android.net.conn.CONNECTIVITY_CHANGE";
-    String BATTERY_CHANGED = "android.intent.action.BATTERY_CHANGED";
-    String BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED";
+    String intentPackageAdd = "android.intent.action.intentPackageAdd";
+    String intentPackageRemove = "android.intent.action.intentPackageRemove";
+    String intentPackageReplace = "android.intent.action.intentPackageReplace";
+    String intentScreenOn = "android.intent.action.intentScreenOn";
+    String intentScreenOff = "android.intent.action.intentScreenOff";
+    //    String CONNECTIVITY_CHANGE = "android.net.conn.CONNECTIVITY_CHANGE";
+    String intentBatteryChanged = "android.intent.action.intentBatteryChanged";
+    String intentBootCompleted = "android.intent.action.intentBootCompleted";
 
     public static AnalysysReceiver getInstance() {
         return AnalysysReceiver.Holder.INSTANCE;
@@ -48,7 +48,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
             }
             mContext = context.getApplicationContext();
             long currentTime = System.currentTimeMillis();
-            if (PACKAGE_ADDED.equals(intent.getAction())) {
+            if (intentPackageAdd.equals(intent.getAction())) {
                 try {
                     if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST, EGContext.TIME_SYNC_DEFAULT, currentTime)) {
                         FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST, currentTime);
@@ -67,7 +67,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
                 }
 
             }
-            if (PACKAGE_REMOVED.equals(intent.getAction())) {
+            if (intentPackageRemove.equals(intent.getAction())) {
                 try {
                     if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST, EGContext.TIME_SYNC_DEFAULT, currentTime)) {
                         FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST, currentTime);
@@ -85,7 +85,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
                     isSnapShotDeleteBroadCastHandled = false;
                 }
             }
-            if (PACKAGE_REPLACED.equals(intent.getAction())) {
+            if (intentPackageReplace.equals(intent.getAction())) {
                 try {
                     if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST, EGContext.TIME_SYNC_DEFAULT, currentTime)) {
                         FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST, currentTime);
@@ -103,7 +103,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
                     isSnapShotUpdateBroadCastHandled = false;
                 }
             }
-            if (SCREEN_ON.equals(intent.getAction())) {
+            if (intentScreenOn.equals(intent.getAction())) {
                 if (Build.VERSION.SDK_INT >= 24) {
                     MessageDispatcher.getInstance(mContext).sendMessages();
                     return;
@@ -112,14 +112,14 @@ public class AnalysysReceiver extends BroadcastReceiver {
                 EGContext.SCREEN_ON = true;
                 MessageDispatcher.getInstance(mContext).screenStatusHandle(true);
             }
-            if (SCREEN_OFF.equals(intent.getAction())) {
+            if (intentScreenOff.equals(intent.getAction())) {
                 if (Build.VERSION.SDK_INT >= 24) {
                     return;
                 }
                 EGContext.SCREEN_ON = false;
                 MessageDispatcher.getInstance(mContext).screenStatusHandle(false);
             }
-            if (BATTERY_CHANGED.equals(intent.getAction())) {
+            if (intentBatteryChanged.equals(intent.getAction())) {
                 try {
                     if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_BATTERY_BROADCAST, EGContext.TIME_SYNC_DEFAULT, currentTime)) {
                         FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_BATTERY_BROADCAST, currentTime);
@@ -137,7 +137,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
                     isBatteryBroadCastHandled = false;
                 }
             }
-            if (BOOT_COMPLETED.equals(intent.getAction())) {
+            if (intentBootCompleted.equals(intent.getAction())) {
                 try {
                     if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_BOOT_BROADCAST, EGContext.TIME_SYNC_DEFAULT, currentTime)) {
                         FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_BOOT_BROADCAST, currentTime);
