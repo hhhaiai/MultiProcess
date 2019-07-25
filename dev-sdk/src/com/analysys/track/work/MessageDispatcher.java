@@ -670,9 +670,6 @@ public class MessageDispatcher {
                 locationInfo(0);
                 uploadInfo(0);
                 sendMessages();
-                if (ELOG.USER_DEBUG) {
-                    ELOG.info("初始化完成");
-                }
             } catch (Throwable t) {
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.e(t);

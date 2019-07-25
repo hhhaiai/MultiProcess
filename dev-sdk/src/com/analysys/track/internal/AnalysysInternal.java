@@ -99,6 +99,10 @@ public class AnalysysInternal {
                 ReceiverUtils.getInstance().setWork(false);
             }
         }
+
+        if (ELOG.USER_DEBUG) {
+            ELOG.info( "[%s] init SDK (%s) success! " ,SystemUtils.getCurrentProcessName(mContextRef.get()) , EGContext.SDK_VERSION );
+        }
     }
 
     /**
