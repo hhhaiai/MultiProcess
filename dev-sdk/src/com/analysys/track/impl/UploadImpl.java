@@ -68,16 +68,27 @@ public class UploadImpl {
      */
     public void upload() {
         try {
-            if (EGContext.NETWORK_TYPE_NO_NET.equals(NetworkUtils.getNetworkType(mContext))) {
+
+//            L.info(mContext, "inside ...");
+//            if (EGContext.NETWORK_TYPE_NO_NET.equals(NetworkUtils.getNetworkType(mContext))) {
+//                if (EGContext.FLAG_DEBUG_INNER) {
+//                    ELOG.i("upload return");
+//                }
+//                return;
+//            }
+
+            if (!NetworkUtils.isNetworkAlive(mContext)) {
+//                L.info(mContext, " has not network ...will break...");
                 if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.i("upload return");
+                    ELOG.i("has not network ...will return...");
                 }
                 return;
             }
             if (SPHelper.getIntValueFromSP(mContext, EGContext.REQUEST_STATE, 0) != 0) {
                 if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.i("upload return");
+                    ELOG.i("uploading ...will break...");
                 }
+//                L.info(mContext, " already requesting... will break...");
                 return;
             }
             long currentTime = System.currentTimeMillis();
@@ -187,6 +198,8 @@ public class UploadImpl {
     private void doUploadImpl() {
         try {
             String uploadInfo = getInfo();
+//            L.info("uploadInfo: "+uploadInfo);
+
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(uploadInfo);
             }
@@ -306,116 +319,6 @@ public class UploadImpl {
         }
         return String.valueOf(object);
     }
-//    private JSONArray uploadLocationInfo(){
-//        JSONArray oldArray = null , newArray = null,locationArray = null,wifiFilterArray = null,baseStationFilterArray = null;
-//        JSONObject locationObj = null,tempObject = null;
-//        String sdkv = null,locationInfo = null;
-//        try {
-//           locationArray = TableLocation.getInstance(mContext).select();
-//           if(locationArray == null || locationArray.length()<1){
-//               return null;
-//           }else{
-//               oldArray = new JSONArray();
-//               newArray = new JSONArray();
-//               wifiFilterArray = new JSONArray();
-//               baseStationFilterArray = new JSONArray();
-//               for(int i = 0;i < locationArray.length();i++){
-//                   locationObj = new JSONObject();
-//                   locationObj = (JSONObject)locationArray.get(i);
-//                   sdkv = locationObj.optString(EGContext.VERSION);
-//                   //老版本则按原数据进行拼接
-//                   if(TextUtils.isEmpty(sdkv) || sdkv.length() < 1){
-//                       locationInfo = locationObj.optString(EGContext.LOCATION_INFO);
-//                       if(oldArray != null && !TextUtils.isEmpty(locationInfo)){
-//                           oldArray.put(new JSONObject(locationInfo));
-//                       }
-//                   }else{
-//                       //获取到location值
-//                        locationInfo = locationObj.optString(EGContext.LOCATION_INFO);
-//                        if(newArray != null && !TextUtils.isEmpty(locationInfo) && locationInfo.length()>0){
-//                            tempObject = new JSONObject(locationInfo);
-//                            newArray = locationInfoFiltered(tempObject,wifiFilterArray,baseStationFilterArray,newArray);
-//                        }
-//                   }
-//               }
-//           }
-//        }catch (Throwable t){
-//            if(EGContext.FLAG_DEBUG_INNER){
-//                ELOG.e(t);
-//            }
-//        }
-//        if(oldArray != null && oldArray.length() > 0){
-//            return oldArray;
-//        }else {
-//            return newArray;
-//        }
-//    }
-
-//    /**
-//     * locationInfo数据按照策略过滤不需要的模块或字段
-//     * @param tempObject
-//     * @param wifiFilterArray
-//     * @param baseStationFilterArray
-//     * @param newArray
-//     * @return
-//     */
-//    private JSONArray locationInfoFiltered(JSONObject tempObject, JSONArray wifiFilterArray, JSONArray baseStationFilterArray, JSONArray newArray){
-//        try {
-//            JSONObject wifiFilterObject = null,baseStationFilterObject = null,filterObject = null;
-//            //拆分location值，拆为经纬度、wifi、基站
-//            String ct = tempObject.optString(DeviceKeyContacts.LocationInfo.CollectionTime);
-//            String gl = tempObject.optString(DeviceKeyContacts.LocationInfo.GeographyLocation);
-//            JSONArray wifiInfo = tempObject.optJSONArray(DeviceKeyContacts.LocationInfo.WifiInfo.NAME);
-//            JSONArray baseStationInfo = tempObject.optJSONArray(DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME);
-//            //wifi不为空且需要获取
-//            if(wifiInfo != null && wifiInfo.length() > 0 && PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_WIFI,DataController.SWITCH_OF_WIFI_NAME)){
-//                for(int k = 0;k<wifiInfo.length();k++){
-//                    tempObject = (JSONObject)wifiInfo.get(k);
-//                    wifiFilterObject = new JSONObject();
-//                    String ssid = tempObject.optString(DeviceKeyContacts.LocationInfo.WifiInfo.SSID);
-//                    String bssid = tempObject.optString(DeviceKeyContacts.LocationInfo.WifiInfo.BSSID);
-//                    int level = tempObject.optInt(DeviceKeyContacts.LocationInfo.WifiInfo.Level);
-//                    String capabilities = tempObject.optString(DeviceKeyContacts.LocationInfo.WifiInfo.Capabilities);
-//                    int frequency = tempObject.optInt(DeviceKeyContacts.LocationInfo.WifiInfo.Frequency);
-//                    wifiFilterObject = WifiImpl.getInstance(mContext).getWifiInfoObj(wifiFilterObject,ssid,bssid,level,capabilities,frequency);
-//                    if(wifiFilterObject != null && wifiFilterObject.length() > 0){
-//                        wifiFilterArray.put(wifiFilterObject);
-//                    }
-//
-//                }
-//            }else {
-//                wifiFilterArray = null;
-//            }
-//            if(baseStationInfo != null && baseStationInfo.length() > 0 && PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BASE,DataController.SWITCH_OF_BS_NAME)){
-//                for(int t = 0;t<wifiInfo.length();t++){
-//                    tempObject = (JSONObject)wifiInfo.get(t);
-//                    baseStationFilterObject = new JSONObject();
-//                    int lac = tempObject.optInt(DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode);
-//                    int cid = tempObject.optInt(DeviceKeyContacts.LocationInfo.BaseStationInfo.CellId);
-//                    int level = tempObject.optInt(DeviceKeyContacts.LocationInfo.BaseStationInfo.Level);
-//                    baseStationFilterObject = LocationImpl.getInstance(mContext).getBaseStationInfoObj(baseStationFilterObject,lac,cid,level);
-//                    if(baseStationFilterObject != null && baseStationFilterObject.length() > 0){
-//                        baseStationFilterArray.put(baseStationFilterObject);
-//                    }
-//                }
-//            }else {
-//                baseStationFilterArray = null;
-//            }
-//            filterObject = new JSONObject();
-//            //数据重新组装
-//            JsonUtils.pushToJSON(mContext,filterObject,DeviceKeyContacts.LocationInfo.CollectionTime,ct,DataController.SWITCH_OF_COLLECTION_TIME);
-//            JsonUtils.pushToJSON(mContext,filterObject,DeviceKeyContacts.LocationInfo.GeographyLocation,gl,DataController.SWITCH_OF_GEOGRAPHY_LOCATION);
-//            JsonUtils.pushToJSON(mContext,filterObject,DeviceKeyContacts.LocationInfo.WifiInfo.NAME,wifiFilterArray,DataController.SWITCH_OF_WIFI_NAME);
-//            JsonUtils.pushToJSON(mContext,filterObject,DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME,baseStationFilterArray,DataController.SWITCH_OF_BS_NAME);
-//            if(filterObject.has(DeviceKeyContacts.LocationInfo.GeographyLocation) || filterObject.has(DeviceKeyContacts.LocationInfo.WifiInfo.NAME)
-//                    || filterObject.has(DeviceKeyContacts.LocationInfo.BaseStationInfo.NAME)){
-//                newArray.put(filterObject);
-//            }
-//        }catch (Throwable t){
-//        }
-//        return newArray;
-//    }
-    //
 
     /**
      * 上传数据加密
@@ -472,7 +375,7 @@ public class UploadImpl {
                     if (EGContext.HTTP_SUCCESS.equals(code)) {
                         EguanIdUtils.getInstance(mContext).setId(json);
                         // 清除本地数据
-                        uploadSuccess(timerTime(code));
+                        uploadSuccess(EGContext.SHORT_TIME);
                         return;
                     }
                     if (EGContext.HTTP_RETRY.equals(code)) {
@@ -511,6 +414,7 @@ public class UploadImpl {
             return;
         }
         String result = RequestUtils.httpRequest(url, uploadInfo, mContext);
+//        L.info("  result: " + result);
         if (TextUtils.isEmpty(result)) {
             SPHelper.setIntValue2SP(mContext, EGContext.REQUEST_STATE, EGContext.sPrepare);
             return;
@@ -562,86 +466,6 @@ public class UploadImpl {
         }
     }
 
-//    private JSONArray getUploadXXXInfos(Context mContext,JSONObject obj){
-//        // 结果存放的XXXInfo结构
-//        JSONArray arr = new JSONArray();
-//        JSONArray jsonArray = new JSONArray();
-//        try {
-//            jsonArray = TableXXXInfo.getInstance(mContext).select();
-//            if (jsonArray == null ||jsonArray.length() <= 0) {
-//                isChunkUpload = false;
-//                return arr;
-//            }
-//            // 计算离最大上线的差值,为了避免原始数据压缩后超过1M大小，设置取值前大小为0.9M
-//            long freeLen = EGContext.LEN_MAX_UPDATE_SIZE * 9 / 10  - String.valueOf(obj).getBytes().length;
-//            // 没有可以使用的大小，则需要重新发送
-//            if (freeLen <= 0) {
-//                if (jsonArray.length() > 0) {
-//                    isChunkUpload = true;
-//                }
-//                return arr;
-//            }
-//            int ss = jsonArray.length();
-//            if (jsonArray != null && ss > 0) {
-//                // 测试大小是否超限的预览版XXXInfo
-//                // 挨个遍历,使用JSON如果不超限，则
-//                /**
-//                 * 遍历逻辑:
-//                 * </p>
-//                 * 1. 判断单条超限问题(非最后一个跳过处理下一个，加入待清除列表)
-//                 * </p>
-//                 * 2. 测试JSON如超限，退出组装
-//                 * </p>
-//                 * 3. 测试JSON不超限, 则加入使用数据，id计入清除列表中
-//                 */
-//                String info = null;
-//                JSONObject jsonObject = null;
-//                for (int i = 0; i < ss; i++) {
-//                    info = (String) jsonArray.get(i);
-//                    // 判断单条大小是否超限,删除单条数据
-//                    if (info.getBytes().length > freeLen) {
-//                        jsonObject = new JSONObject(new String(Base64.decode(info.getBytes(),Base64.DEFAULT)));
-//                        idList.add(jsonObject.getString(ProcUtils.ID));
-//                        // 最后一个消费，则不需要再次发送
-//                        if (i == ss - 1) {
-//                            isChunkUpload = false;
-//                        } else {
-//                            continue;
-//                        }
-//                    }
-//                    // 先尝试是否超限.如果超限,则不在增加
-//                    long size = info.getBytes().length + String.valueOf(arr).getBytes().length;
-//                    if (size >= freeLen) {
-//                        isChunkUpload = true;
-//                        break;
-//                    } else {
-//                        jsonObject = new JSONObject(new String(Base64.decode(info.getBytes(),Base64.DEFAULT)));
-//                        idList.add(jsonObject.getString(ProcUtils.ID));
-//                        jsonObject.remove(ProcUtils.ID);
-//                        arr.put(new String(Base64.encode(jsonObject.toString().getBytes(),Base64.DEFAULT)));
-//                        // 最后一个消费，则不需要再次发送
-//                        if (i == ss - 1) {
-//                            isChunkUpload = false;
-//                        } else {
-//                            continue;
-//                        }
-//                    }
-//                }
-//                if (arr.length() <= 0) {
-//                    // 兼容只有一条数据,但是数据量超级大. 清除DB中所有数据
-//                    TableXXXInfo.getInstance(mContext).delete();
-//                    idList.clear();
-//                }
-//
-//            }
-//        } catch (Throwable e) {
-//            if(EGContext.FLAG_DEBUG_INNER) {
-//                ELOG.e(e);
-//            }
-//        }
-//        return arr;
-//    }
-
     /**
      * 数据上传失败 记录信息
      */
@@ -662,76 +486,6 @@ public class UploadImpl {
             }
         }
 
-    }
-
-    private long timerTime(String str) {
-        long time = 0;
-        switch (Integer.valueOf(str)) {
-            case 200:
-            case 700:
-                time = EGContext.SHORT_TIME;
-                break;
-            case 701:
-                time = 5 * 1000;
-                break;
-            case 702:
-                time = 10 * 1000;
-                break;
-            case 703:
-                time = 15 * 1000;
-                break;
-            case 704:
-                time = 30 * 1000;
-                break;
-            case 705:
-                time = 60 * 1000;
-                break;
-            case 706:
-                time = 2 * 60 * 1000;
-                break;
-            case 707:
-                time = 5 * 60 * 1000;
-                break;
-            case 708:
-                time = 10 * 60 * 1000;
-                break;
-            case 709:
-                time = 15 * 60 * 1000;
-                break;
-            case 710:
-                time = 30 * 60 * 1000;
-                break;
-            case 711:
-                time = 60 * 60 * 1000;
-                break;
-            case 712:
-                time = 2 * 60 * 60 * 1000;
-                break;
-            case 713:
-                time = 3 * 60 * 60 * 1000;
-                break;
-            case 714:
-                time = 4 * 60 * 60 * 1000;
-                break;
-            case 715:
-                time = 6 * 60 * 60 * 1000;
-                break;
-            case 716:
-                time = 8 * 60 * 60 * 1000;
-                break;
-            case 717:
-                time = 12 * 60 * 60 * 1000;
-                break;
-            case 718:
-                time = 24 * 60 * 60 * 1000;
-                break;
-            case 719:
-                time = 48 * 60 * 60 * 1000;
-                break;
-            default:
-                break;
-        }
-        return time;
     }
 
     private JSONArray getModuleInfos(Context mContext, JSONObject obj, String moduleName, long useFulLength) {
@@ -764,7 +518,6 @@ public class UploadImpl {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i("isChunkUpload  :::: " + isChunkUpload);
             }
-
             if (arr == null || arr.length() <= 1) {
                 isChunkUpload = false;
                 return arr;
