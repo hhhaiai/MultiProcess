@@ -27,7 +27,7 @@ public class FileUtils {
      *
      * @param cxt
      * @param fileName 锁文件名称
-     * @param time 锁使用间隔，为了不影响首次使用,时间前移一秒
+     * @param time     锁使用间隔，为了不影响首次使用,时间前移一秒
      * @return
      */
     public static boolean createLockFile(Context cxt, String fileName, long time) {
@@ -126,10 +126,10 @@ public class FileUtils {
     /**
      * 根据锁文件时间，判断是否达到触发时间
      *
-     * @param cxt 上下文
+     * @param cxt  上下文
      * @param lock 文件名
      * @param time 轮询间隔
-     * @param now 本次时间
+     * @param now  本次时间
      * @return
      */
     public static boolean isNeedWorkByLockFile(Context cxt, String lock, long time, long now) {
@@ -296,7 +296,7 @@ public class FileUtils {
 
     /**
      * @param filePath$Name 要写入文件夹和文件名，如：data/data/com.test/files/abc.txt
-     * @param string 要写文件的文件内容
+     * @param string        要写文件的文件内容
      */
     public static void write(String filePath$Name, String string) throws IOException {
         File file = new File(filePath$Name);
