@@ -13,7 +13,7 @@ public class NetworkUtils {
 
     private static ConnectivityManager getConnectivityManager(Context ctx) {
         if (connManager == null) {
-            connManager = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+            connManager = (ConnectivityManager) ctx.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         }
         return connManager;
     }
@@ -40,6 +40,10 @@ public class NetworkUtils {
                 netType = EGContext.NETWORK_TYPE_2G;
             } else {
                 switch (nSubType) {
+//                    case TelephonyManager.NETWORK_TYPE_NR:
+                    case 20:
+                        netType = EGContext.NETWORK_TYPE_5G;
+                        break;
                     case TelephonyManager.NETWORK_TYPE_LTE:
                         netType = EGContext.NETWORK_TYPE_4G;
                         break;

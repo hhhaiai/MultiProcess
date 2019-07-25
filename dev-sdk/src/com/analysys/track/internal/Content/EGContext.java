@@ -69,6 +69,7 @@ public class EGContext {
     public static final String NETWORK_TYPE_2G = "2G";
     public static final String NETWORK_TYPE_3G = "3G";
     public static final String NETWORK_TYPE_4G = "4G";
+    public static final String NETWORK_TYPE_5G = "5G";
     public static final String NETWORK_TYPE_WIFI = "WIFI";
     public static final String NETWORK_TYPE_NO_NET = "无网络";
     public static final String SP_NAME = "eg_policy";
