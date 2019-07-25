@@ -25,7 +25,6 @@ import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONObject;
 
-
 public class MessageDispatcher {
     protected static final int MSG_INIT_MODULE = 0x01;
     protected static final int MSG_CHECK_HEARTBEAT = 0x02;
@@ -50,7 +49,7 @@ public class MessageDispatcher {
     private static long snapShotCycle = 0;
     private static long uploadCycle = 0;
 
-//    // 屏幕开关
+    // // 屏幕开关
 //    public void screenReceiver() {
 //        try {
 //            Message msg = new Message();
@@ -123,9 +122,7 @@ public class MessageDispatcher {
     }
 
     /**
-     * 重发数据轮询检查
-     * 确保Handler有任务，
-     * 如果没有进行初始化各个模块
+     * 重发数据轮询检查 确保Handler有任务， 如果没有进行初始化各个模块
      */
     public void isNeedRetry(long delayTime) {
         try {
@@ -153,11 +150,13 @@ public class MessageDispatcher {
 
     private void reTryUpload() {
         try {
-            long upLoadCycle = PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL, EGContext.UPLOAD_CYCLE);
+            long upLoadCycle = PolicyImpl.getInstance(mContext).getSP()
+                    .getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL, EGContext.UPLOAD_CYCLE);
             if (uploadCycle != upLoadCycle) {
                 uploadCycle = upLoadCycle;
             }
-            int failCount = SPHelper.getIntValueFromSP(mContext, DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT, EGContext.FAIL_COUNT_DEFALUT);
+            int failCount = SPHelper.getIntValueFromSP(mContext, DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT,
+                    EGContext.FAIL_COUNT_DEFALUT);
             if (failCount > 0) {
                 UploadImpl.getInstance(mContext).reTryAndUpload(false);
             }
@@ -310,7 +309,6 @@ public class MessageDispatcher {
             }
         }
 
-
     }
 
     // 数据上传
@@ -346,13 +344,15 @@ public class MessageDispatcher {
         try {
             long currentTime = System.currentTimeMillis();
             if (on) {
-                if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SCREEN_ON_BROADCAST, EGContext.TIME_SYNC_BROADCAST, currentTime)) {
+                if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SCREEN_ON_BROADCAST,
+                        EGContext.TIME_SYNC_BROADCAST, currentTime)) {
                     FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SCREEN_ON_BROADCAST, currentTime);
                 } else {
                     return;
                 }
             } else {
-                if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST, EGContext.TIME_SYNC_BROADCAST, currentTime)) {
+                if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST,
+                        EGContext.TIME_SYNC_BROADCAST, currentTime)) {
                     FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST, currentTime);
                 } else {
                     return;
@@ -393,17 +393,19 @@ public class MessageDispatcher {
     private void screenOnOffHandle(boolean on) {
         try {
             // 补充时间
-            if (AnalysysReceiver.mLastCloseTime == 0) {//第一次时间为空，则取sp时间
+            if (AnalysysReceiver.mLastCloseTime == 0) {// 第一次时间为空，则取sp时间
                 long spLastVisitTime = FileUtils.getLockFileLastModifyTime(mContext, EGContext.FILES_SYNC_SP_WRITER);
-                if (System.currentTimeMillis() - spLastVisitTime > EGContext.TIME_SYNC_SP) {//即便频繁开关屏也不能频繁操作sp
-                    AnalysysReceiver.mLastCloseTime = SPHelper.getLongValueFromSP(mContext, EGContext.LAST_AVAILABLE_TIME, 0);
-                    FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SP_WRITER, System.currentTimeMillis());
+                if (System.currentTimeMillis() - spLastVisitTime > EGContext.TIME_SYNC_SP) {// 即便频繁开关屏也不能频繁操作sp
+                    AnalysysReceiver.mLastCloseTime = SPHelper.getLongValueFromSP(mContext,
+                            EGContext.LAST_AVAILABLE_TIME, 0);
+                    FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SP_WRITER,
+                            System.currentTimeMillis());
                 } else {
                     return;
                 }
 
             }
-            if (AnalysysReceiver.mLastCloseTime == 0) {//取完sp时间后依然为空，则为第一次锁屏，设置closeTime,准备入库
+            if (AnalysysReceiver.mLastCloseTime == 0) {// 取完sp时间后依然为空，则为第一次锁屏，设置closeTime,准备入库
                 AnalysysReceiver.mLastCloseTime = System.currentTimeMillis();
                 SPHelper.setLongValue2SP(mContext, EGContext.LAST_AVAILABLE_TIME, AnalysysReceiver.mLastCloseTime);
                 if (on) {
@@ -411,7 +413,7 @@ public class MessageDispatcher {
                 }
                 OCImpl.mLastAvailableOpenOrCloseTime = AnalysysReceiver.mLastCloseTime;
                 OCImpl.getInstance(mContext).closeOC(false, AnalysysReceiver.mLastCloseTime);
-            } else {//sp里取到了数据，即，非第一次锁屏，则判断是否有效数据来设置closeTime,准备入库
+            } else {// sp里取到了数据，即，非第一次锁屏，则判断是否有效数据来设置closeTime,准备入库
                 long currentTime = System.currentTimeMillis();
                 try {
                     if (Build.VERSION.SDK_INT < 21) {
@@ -461,7 +463,8 @@ public class MessageDispatcher {
     }
 
     private Handler startWorkHandler() {
-        final HandlerThread thread = new HandlerThread(EGContext.THREAD_NAME, android.os.Process.THREAD_PRIORITY_BACKGROUND);
+        final HandlerThread thread = new HandlerThread(EGContext.THREAD_NAME,
+                android.os.Process.THREAD_PRIORITY_BACKGROUND);
         thread.start();
         final Handler ret = new AnalysyHandler(thread.getLooper());
         return ret;
@@ -528,7 +531,8 @@ public class MessageDispatcher {
                     case MSG_APP_CHANGE_RECEIVER:
                         JSONObject js = null;
                         js = (JSONObject) msg.obj;
-                        AppSnapshotImpl.getInstance(mContext).changeActionType(js.optString("pkgName"), msg.arg1, js.optLong("time"));
+                        AppSnapshotImpl.getInstance(mContext).changeActionType(js.optString("pkgName"), msg.arg1,
+                                js.optLong("time"));
                         break;
                     case MSG_SCREEN_RECEIVER:
                         break;
@@ -568,9 +572,9 @@ public class MessageDispatcher {
                             ELOG.i(SystemUtils.getCurrentProcessName(mContext) + "心跳检查");
                         }
 //                    SPHelper.setLongValue2SP(mContext,EGContext.HEARTBEAT_LAST_TIME,System.currentTimeMillis());
-                        //本次发送
+                        // 本次发送
                         MessageDispatcher.getInstance(mContext).checkHeartbeat(EGContext.CHECK_HEARTBEAT_CYCLE);
-                        //本次delay,用于轮询
+                        // 本次delay,用于轮询
                         sendMessages();
                         break;
                     case MSG_RETRY:
@@ -603,24 +607,18 @@ public class MessageDispatcher {
         }
 
         /**
-         * 心跳检测，
-         * 确保Handler有任务，
-         * 如果没有进行初始化各个模块
+         * 心跳检测， 确保Handler有任务， 如果没有进行初始化各个模块
          *
          * @param handler
          */
         public void isHasMessage(Handler handler) {
             try {
                 if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.i(handler.hasMessages(MSG_SNAPSHOT)
-                            + "  :  " + handler.hasMessages(MSG_LOCATION)
-                            + "  :  " + handler.hasMessages(MSG_OC_INFO)
-                            + "  :  " + handler.hasMessages(MSG_UPLOAD));
+                    ELOG.i(handler.hasMessages(MSG_SNAPSHOT) + "  :  " + handler.hasMessages(MSG_LOCATION) + "  :  "
+                            + handler.hasMessages(MSG_OC_INFO) + "  :  " + handler.hasMessages(MSG_UPLOAD));
                 }
-                if (handler.hasMessages(MSG_SNAPSHOT)
-                        || handler.hasMessages(MSG_LOCATION)
-                        || handler.hasMessages(MSG_OC_INFO)
-                        || handler.hasMessages(MSG_UPLOAD)) {
+                if (handler.hasMessages(MSG_SNAPSHOT) || handler.hasMessages(MSG_LOCATION)
+                        || handler.hasMessages(MSG_OC_INFO) || handler.hasMessages(MSG_UPLOAD)) {
                     if (handler.hasMessages(MSG_UPLOAD)) {
                         if (System.currentTimeMillis() - uploadLastTime >= uploadCycle) {
                             uploadInfo(uploadCycle);
@@ -663,9 +661,7 @@ public class MessageDispatcher {
         }
 
         /**
-         * 用于启动各个模块，
-         * OC模块，snapshot模块，Location模块，
-         * 注册动态广播，启动心跳检测
+         * 用于启动各个模块， OC模块，snapshot模块，Location模块， 注册动态广播，启动心跳检测
          */
         private void msgInitModule() {
             try {
@@ -683,7 +679,6 @@ public class MessageDispatcher {
                 }
             }
         }
-
 
         public void exitRetryHandler() {
             try {

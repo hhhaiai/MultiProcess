@@ -17,7 +17,6 @@ public class DataController {
     // 更多设备信息控制，手机中一些系统信息.默认不上传，可控制上传
     public static boolean SWITCH_OF_MODULE_CL_MORE_INFO = true;
 
-
     /*
      * 控制ProcessInfo模块的采集
      */
@@ -113,21 +112,20 @@ public class DataController {
     public static boolean SWITCH_OF_WIFI_NAME = true;
     public static boolean SWITCH_OF_SSID = true;
     public static boolean SWITCH_OF_BSSID = true;
-    public static boolean SWITCH_OF_LEVEL = true;//wifi信号强度
+    public static boolean SWITCH_OF_LEVEL = true;// wifi信号强度
     public static boolean SWITCH_OF_CAPABILITIES = true;
     public static boolean SWITCH_OF_FREQUENCY = true;
     public static boolean SWITCH_OF_BS_NAME = true;
     public static boolean SWITCH_OF_LOCATION_AREA_CODE = true;
     public static boolean SWITCH_OF_CELL_ID = true;
-    public static boolean SWITCH_OF_BS_LEVEL = true;//基站信号强度
-    public static boolean SWITCH_OF_BS_PCI = true;//PCI
-    public static boolean SWITCH_OF_BS_RSRP = true;//RSRP
-    public static boolean SWITCH_OF_BS_ECIO = true;//ECIO
-    public static boolean SWITCH_OF_BS_RSRQ = true;//RSRQ
+    public static boolean SWITCH_OF_BS_LEVEL = true;// 基站信号强度
+    public static boolean SWITCH_OF_BS_PCI = true;// PCI
+    public static boolean SWITCH_OF_BS_RSRP = true;// RSRP
+    public static boolean SWITCH_OF_BS_ECIO = true;// ECIO
+    public static boolean SWITCH_OF_BS_RSRQ = true;// RSRQ
 //    public static boolean SWITCH_OF_BS_CID_LIST = true;//cid
 //    public static boolean SWITCH_OF_BS_LAC_LIST = true;//lac
 //    public static boolean SWITCH_OF_BS_RSRP_LIST = true;//lac
 //    public static boolean SWITCH_OF_BS_ECIO_LIST = true;//lac
-
 
 }

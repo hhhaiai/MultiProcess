@@ -38,7 +38,8 @@ public class Process implements Parcelable {
      * Process constructor
      *
      * @param pid the process id
-     * @throws IOException if /proc/[pid] does not exist or we don't have read access.
+     * @throws IOException if /proc/[pid] does not exist or we don't have read
+     * access.
      */
     public Process(String pid, String pname) throws IOException {
         this.pid = pid;

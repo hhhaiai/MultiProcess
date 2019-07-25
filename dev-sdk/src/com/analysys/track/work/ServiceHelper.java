@@ -57,6 +57,7 @@ public class ServiceHelper {
     /**
      * 判断服务是否启动
      */
+    @SuppressWarnings("deprecation")
     public static boolean isServiceWorking(Context mContext, String serviceName) {
         boolean isWork = false;
         try {
@@ -103,7 +104,8 @@ public class ServiceHelper {
                         if (Build.VERSION.SDK_INT >= 26) {
                             if (EGContext.IS_SHOW_NOTIFITION) {// 允许显示通知
                                 if (Build.VERSION.SDK_INT > 27) {
-                                    if (PermissionUtils.checkPermission(mContext, "android.permission.FOREGROUND_SERVICE")) {
+                                    if (PermissionUtils.checkPermission(mContext,
+                                            "android.permission.FOREGROUND_SERVICE")) {
                                         startForegroundService(mContext, intent);
                                     } else {
                                         MessageDispatcher.getInstance(mContext).initModule();
@@ -132,7 +134,7 @@ public class ServiceHelper {
      * 判断是否可以启动服务
      */
     private boolean canStartService() {
-        if (Build.VERSION.SDK_INT < 26) {//8以下
+        if (Build.VERSION.SDK_INT < 26) {// 8以下
             return true;
         } else {
             if (PermissionUtils.checkPermission(mContext, "android.permission.FOREGROUND_SERVICE")) {
@@ -211,6 +213,7 @@ public class ServiceHelper {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private void start() {
         try {
             if (mContext == null) {

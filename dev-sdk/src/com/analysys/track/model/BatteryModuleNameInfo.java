@@ -35,6 +35,7 @@ public class BatteryModuleNameInfo implements Serializable {
      * BTP电池温度，如270
      */
     private String BatteryTemperature;
+
     private BatteryModuleNameInfo() {
     }
 

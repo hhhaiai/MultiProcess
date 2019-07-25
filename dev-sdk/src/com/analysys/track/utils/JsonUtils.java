@@ -8,12 +8,9 @@ import com.analysys.track.impl.PolicyImpl;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.sp.SPHelper;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class JsonUtils {
@@ -32,7 +29,10 @@ public class JsonUtils {
             if (sp == null) {
                 sp = PolicyImpl.getInstance(mContext).getSP();
             }
-            if (value != null && (SPHelper.getBooleanValueFromSP(mContext, key, SPDefaultValue) && sp.getBoolean(key, SPDefaultValue)) && !TextUtils.isEmpty(value.toString()) && !"unknown".equalsIgnoreCase(value.toString())) {
+            if (value != null
+                    && (SPHelper.getBooleanValueFromSP(mContext, key, SPDefaultValue)
+                            && sp.getBoolean(key, SPDefaultValue))
+                    && !TextUtils.isEmpty(value.toString()) && !"unknown".equalsIgnoreCase(value.toString())) {
                 if (!json.has(key)) {
                     json.put(key, value);
                 }
@@ -43,7 +43,6 @@ public class JsonUtils {
             }
         }
     }
-
 
     public static void save(JSONObject json, String key, String value) {
         try {

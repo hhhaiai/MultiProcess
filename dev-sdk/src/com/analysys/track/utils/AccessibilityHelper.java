@@ -11,7 +11,6 @@ import com.analysys.track.internal.Content.EGContext;
 
 import java.util.Arrays;
 
-
 public class AccessibilityHelper {
     /**
      * 检测辅助功能是否开启<br>

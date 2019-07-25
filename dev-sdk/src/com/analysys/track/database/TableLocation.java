@@ -20,8 +20,8 @@ import org.json.JSONObject;
 public class TableLocation {
 
     Context mContext;
-    String INSERT_STATUS_DEFAULT = "0";
-    String INSERT_STATUS_READ_OVER = "1";
+    String mInsertStatusDefault = "0";
+    String mInsertStatusReadOver = "1";
 
     private TableLocation() {
     }
@@ -51,7 +51,7 @@ public class TableLocation {
                     cv = new ContentValues();
                     cv.put(DBConfig.Location.Column.LI, EncryptUtils.encrypt(mContext, encryptLocation));
                     cv.put(DBConfig.Location.Column.IT, locationTime);
-                    cv.put(DBConfig.Location.Column.ST, INSERT_STATUS_DEFAULT);
+                    cv.put(DBConfig.Location.Column.ST, mInsertStatusDefault);
                     SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
                     if (db == null) {
                         return;
@@ -87,8 +87,7 @@ public class TableLocation {
                 db = DBManager.getInstance(mContext).openDB();
             }
             db.beginTransaction();
-            cursor = db.query(DBConfig.Location.TABLE_NAME, null,
-                    null, null, null, null, null, "2000");
+            cursor = db.query(DBConfig.Location.TABLE_NAME, null, null, null, null, null, null, "2000");
             String encryptLocation = "", time = "";
             int id = 0;
             long timeStamp = 0;
@@ -103,7 +102,8 @@ public class TableLocation {
                 if (!TextUtils.isEmpty(time)) {
                     timeStamp = Long.parseLong(time);
                 }
-                String decryptLocation = Base64Utils.decrypt(EncryptUtils.decrypt(mContext, encryptLocation), timeStamp);
+                String decryptLocation = Base64Utils.decrypt(EncryptUtils.decrypt(mContext, encryptLocation),
+                        timeStamp);
                 if (!TextUtils.isEmpty(decryptLocation)) {
                     if (countNum / 200 > 0) {
                         countNum = countNum % 200;
@@ -114,14 +114,16 @@ public class TableLocation {
                             break;
                         } else {
                             ContentValues cv = new ContentValues();
-                            cv.put(DBConfig.Location.Column.ST, INSERT_STATUS_READ_OVER);
-                            db.update(DBConfig.Location.TABLE_NAME, cv, DBConfig.Location.Column.ID + "=?", new String[]{String.valueOf(id)});
+                            cv.put(DBConfig.Location.Column.ST, mInsertStatusReadOver);
+                            db.update(DBConfig.Location.TABLE_NAME, cv, DBConfig.Location.Column.ID + "=?",
+                                    new String[] { String.valueOf(id) });
                             array.put(new JSONObject(decryptLocation));
                         }
                     } else {
                         ContentValues cv = new ContentValues();
-                        cv.put(DBConfig.Location.Column.ST, INSERT_STATUS_READ_OVER);
-                        db.update(DBConfig.Location.TABLE_NAME, cv, DBConfig.Location.Column.ID + "=?", new String[]{String.valueOf(id)});
+                        cv.put(DBConfig.Location.Column.ST, mInsertStatusReadOver);
+                        db.update(DBConfig.Location.TABLE_NAME, cv, DBConfig.Location.Column.ID + "=?",
+                                new String[] { String.valueOf(id) });
                         array.put(new JSONObject(decryptLocation));
                     }
 
@@ -155,7 +157,8 @@ public class TableLocation {
             if (!db.isOpen()) {
                 db = DBManager.getInstance(mContext).openDB();
             }
-            db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?", new String[]{INSERT_STATUS_READ_OVER});
+            db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?",
+                    new String[] { mInsertStatusReadOver });
 //            ELOG.e("LOCATION删除的行数：：："+co);
         } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {

@@ -3,7 +3,6 @@ package com.analysys.track.utils.reflectinon;
 import android.app.Application;
 import android.content.Context;
 
-
 public class EContextHelper {
 
     public static Context getContext(Context context) {

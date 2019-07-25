@@ -25,7 +25,7 @@ public class DeviceKeyContacts {
         public static final String SerialNumber = "SNR";
         // 分辨率，如“480-800”
         public static final String Resolution = "RES";
-        //屏幕密度，如360
+        // 屏幕密度，如360
         public static final String DotPerInch = "DPI";
         /*
          * 运营商相关的
@@ -94,7 +94,7 @@ public class DeviceKeyContacts {
         // 蓝牙信息
         public static final String BluetoothName = "BName";
         /*
-         *  电量信息,默认不上传,需要根据服务器控制
+         * 电量信息,默认不上传,需要根据服务器控制
          */
         // 电量模块名字
         public static final String BatteryModuleName = "BYMN";
@@ -257,7 +257,7 @@ public class DeviceKeyContacts {
      */
     public static class LocationInfo {
         public static final String NAME = "LocationImpl";
-        //时间
+        // 时间
         public static final String CollectionTime = "CT";
         // 地理位置，由经度和纬度组成，用减号-连接
         public static final String GeographyLocation = "GL";
@@ -287,7 +287,7 @@ public class DeviceKeyContacts {
             public static final String CellId = "CI";
             // 信号强度
             public static final String Level = "LV";
-            //      public static final String cidList = "NEIGHBOR_CELL_ID_LIST";
+            // public static final String cidList = "NEIGHBOR_CELL_ID_LIST";
 //      public static final String lacList = "NEIGHBOR_LAC_ID_LIST";
 //      public static final String rsrpList = "NEIGHBOR_RSRP_LIST";
 //      public static final String ecIoList = "NEIGHBOR_EcIo_LIST";
@@ -298,7 +298,6 @@ public class DeviceKeyContacts {
             public static final String SinrDown = "SINR_DOWN";
             public static final String RSRQ = "RSRQ";
             public static final String ECIO = "ECIO";
-
 
         }
     }
@@ -336,33 +335,31 @@ public class DeviceKeyContacts {
 //    // 是否实时上传[非实时分析策略下，是否实时上传] 0不实时上传，1实时上传
 //    public static final String RES_POLICY_USE_RTL = "useRTL";
 
-        //动态采集模块
+        // 动态采集模块
         public static final String RES_POLICY_CTRL_LIST = "ctrlList";
 
-
-        //某个Info名称，伴随SDK更新
+        // 某个Info名称，伴随SDK更新
         public static final String RES_POLICY_CTRL_MODULE = "module";
-        //状态
+        // 状态
         public static final String RES_POLICY_CTRL_STATUS = "status";
-        //默认
+        // 默认
         public static final String RES_POLICY_CTRL_DEUFREQ = "deuFreq";
-        //不要的字段
+        // 不要的字段
         public static final String RES_POLICY_CTRL_UNWANTED = "exclude";
         //
         public static final String RES_POLICY_CTRL_SUB_CONTROL = "subControl";
-        //子模块名称(需要SDK内置):0(蓝牙),1(电量),2(语言、时区、输入法),3(VPN),4(账号)，5(传感器)
+        // 子模块名称(需要SDK内置):0(蓝牙),1(电量),2(语言、时区、输入法),3(VPN),4(账号)，5(传感器)
         public static final String RES_POLICY_CTRL_SUB_MODULE = "submodule";
-        //子模块状态值
+        // 子模块状态值
         public static final String RES_POLICY_CTRL_SUB_STATUS = "sub_status";
         //
         public static final String RES_POLICY_CTRL_SUB_UNWANTED = "sub_exclude";
-
 
         /*
          * 控制ProcessInfo模块的采集
          */
         public static final String RES_POLICY_CL = "pi_cl";
-        //    public static final String RES_POLICY_CL_MODULE_PROC = "pi_proc";
+        // public static final String RES_POLICY_CL_MODULE_PROC = "pi_proc";
 //    public static final String RES_POLICY_CL_MODULE_XXX_TIME = "pi_time";
 //    public static final String RES_POLICY_CL_MODULE_OCR = "pi_ocr";
         // 控制策略. 1,0
@@ -391,27 +388,27 @@ public class DeviceKeyContacts {
         /**
          * 模块整体控制
          */
-        //OC
+        // OC
         public static final String RES_POLICY_MODULE_CL_OC = "module_cl_oc";
-        //SNAPSHOT
+        // SNAPSHOT
         public static final String RES_POLICY_MODULE_CL_SNAPSHOT = "module_cl_snapshot";
-        //LOCATION
+        // LOCATION
         public static final String RES_POLICY_MODULE_CL_LOCATION = "module_cl_location";
-        //WIFI
+        // WIFI
         public static final String RES_POLICY_MODULE_CL_WIFI = "module_cl_wifi";
-        //BASE_STATION
+        // BASE_STATION
         public static final String RES_POLICY_MODULE_CL_BASE = "module_cl_base";
-        //BASE_STATION----cidlist
+        // BASE_STATION----cidlist
 //    public static final String RES_POLICY_MODULE_CL_CID_LIST = "module_cl_cid_list";
-        //BASE_STATION----laclist
+        // BASE_STATION----laclist
 //    public static final String RES_POLICY_MODULE_CL_LAC_LIST = "module_cl_lac_list";
-        //BASE_STATION----rsrplist
+        // BASE_STATION----rsrplist
 //    public static final String RES_POLICY_MODULE_CL_RSRP_LIST = "module_cl_rsrp_list";
-        //BASE_STATION----eciolist
+        // BASE_STATION----eciolist
 //    public static final String RES_POLICY_MODULE_CL_ECIO_LIST = "module_cl_ecio_list";
-        //DEV
+        // DEV
         public static final String RES_POLICY_MODULE_CL_DEV = "module_cl_dev";
-        //XXX
+        // XXX
         public static final String RES_POLICY_MODULE_CL_XXX = "module_cl_xxx";
     }
 }

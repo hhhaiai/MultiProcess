@@ -48,7 +48,8 @@ public class AppSnapshotImpl {
             long currentTime = System.currentTimeMillis();
 //            long snapCollectCycle = PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE);
             MessageDispatcher.getInstance(mContext).snapshotInfo(EGContext.SNAPSHOT_CYCLE);
-            if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, EGContext.SNAPSHOT_CYCLE, currentTime)) {
+            if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, EGContext.SNAPSHOT_CYCLE,
+                    currentTime)) {
                 FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, currentTime);
             } else {
                 return;
@@ -76,19 +77,17 @@ public class AppSnapshotImpl {
 
     private void getSnapShotInfo() {
         try {
-            if (!PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
+            if (!PolicyImpl.getInstance(mContext)
+                    .getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
                 return;
             }
-            Map<String, String> dbSnapshotsMap =
-                    TableAppSnapshot.getInstance(mContext).snapShotSelect();
+            Map<String, String> dbSnapshotsMap = TableAppSnapshot.getInstance(mContext).snapShotSelect();
             List<JSONObject> currentSnapshotsList = getCurrentSnapshots();
             if (dbSnapshotsMap != null && !dbSnapshotsMap.isEmpty()) {
-                //对比处理当前快照和db数据
-                currentSnapshotsList =
-                        getDifference(currentSnapshotsList, dbSnapshotsMap);
+                // 对比处理当前快照和db数据
+                currentSnapshotsList = getDifference(currentSnapshotsList, dbSnapshotsMap);
             }
-            TableAppSnapshot.getInstance(mContext)
-                    .coverInsert(currentSnapshotsList);
+            TableAppSnapshot.getInstance(mContext).coverInsert(currentSnapshotsList);
         } catch (Throwable t) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
@@ -103,37 +102,30 @@ public class AppSnapshotImpl {
      * @param currentSnapshotsList
      * @param dbSnapshotsMap
      */
-    private List<JSONObject> getDifference(List<JSONObject> currentSnapshotsList,
-                                           Map<String, String> dbSnapshotsMap) {
+    private List<JSONObject> getDifference(List<JSONObject> currentSnapshotsList, Map<String, String> dbSnapshotsMap) {
         try {
             if (currentSnapshotsList == null) {
                 currentSnapshotsList = new ArrayList<JSONObject>();
             }
             for (int i = 0; i < currentSnapshotsList.size(); i++) {
                 JSONObject item = (JSONObject) currentSnapshotsList.get(i);
-                String apn = item
-                        .getString(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName);
+                String apn = item.getString(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName);
                 if (dbSnapshotsMap.containsKey(apn)) {
                     JSONObject dbitem = new JSONObject(dbSnapshotsMap.get(apn));
-                    String avc = item.optString(
-                            DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode);
-                    String dbAvc = dbitem.optString(
-                            DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode);
+                    String avc = item.optString(DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode);
+                    String dbAvc = dbitem.optString(DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode);
                     if (!TextUtils.isEmpty(avc) && !avc.equals(dbAvc)) {
-                        item.put(DeviceKeyContacts.AppSnapshotInfo.ActionType,
-                                EGContext.SNAP_SHOT_UPDATE);
+                        item.put(DeviceKeyContacts.AppSnapshotInfo.ActionType, EGContext.SNAP_SHOT_UPDATE);
                     }
                     dbSnapshotsMap.remove(apn);
                     continue;
                 }
-                item.put(DeviceKeyContacts.AppSnapshotInfo.ActionType,
-                        EGContext.SNAP_SHOT_INSTALL);
+                item.put(DeviceKeyContacts.AppSnapshotInfo.ActionType, EGContext.SNAP_SHOT_INSTALL);
             }
             Set<String> set = dbSnapshotsMap.keySet();
             for (String json : set) {
                 JSONObject j = new JSONObject(dbSnapshotsMap.get(json));
-                j.put(DeviceKeyContacts.AppSnapshotInfo.ActionType,
-                        EGContext.SNAP_SHOT_UNINSTALL);
+                j.put(DeviceKeyContacts.AppSnapshotInfo.ActionType, EGContext.SNAP_SHOT_UNINSTALL);
                 currentSnapshotsList.add(j);
             }
         } catch (Throwable e) {
@@ -171,7 +163,7 @@ public class AppSnapshotImpl {
                     list = SystemUtils.getAppsFromShell(mContext, EGContext.SNAP_SHOT_INSTALL, list);
                 }
             } else {
-                //如果上面的方法不能获取，改用shell命令
+                // 如果上面的方法不能获取，改用shell命令
                 if (list == null) {
                     list = new ArrayList<JSONObject>();
                     if (list.size() < 5) {
@@ -206,13 +198,21 @@ public class AppSnapshotImpl {
         return appInfo;
     }
 
-    public JSONObject getAppInfo(JSONObject appInfo, PackageInfo pkgInfo, PackageManager packageManager, String tag) throws JSONException {
+    @SuppressWarnings("deprecation")
+    public JSONObject getAppInfo(JSONObject appInfo, PackageInfo pkgInfo, PackageManager packageManager, String tag)
+            throws JSONException {
         appInfo = new JSONObject();
-        JsonUtils.pushToJSON(mContext, appInfo, DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName, pkgInfo.packageName, DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
-        JsonUtils.pushToJSON(mContext, appInfo, DeviceKeyContacts.AppSnapshotInfo.ApplicationName, String.valueOf(pkgInfo.applicationInfo.loadLabel(packageManager)), DataController.SWITCH_OF_APPLICATION_NAME);
-        JsonUtils.pushToJSON(mContext, appInfo, DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode, pkgInfo.versionName + "|" + pkgInfo.versionCode, DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
-        JsonUtils.pushToJSON(mContext, appInfo, DeviceKeyContacts.AppSnapshotInfo.ActionType, tag, DataController.SWITCH_OF_ACTION_TYPE);
-        JsonUtils.pushToJSON(mContext, appInfo, DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime, String.valueOf(System.currentTimeMillis()), DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
+        JsonUtils.pushToJSON(mContext, appInfo, DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,
+                pkgInfo.packageName, DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
+        JsonUtils.pushToJSON(mContext, appInfo, DeviceKeyContacts.AppSnapshotInfo.ApplicationName,
+                String.valueOf(pkgInfo.applicationInfo.loadLabel(packageManager)),
+                DataController.SWITCH_OF_APPLICATION_NAME);
+        JsonUtils.pushToJSON(mContext, appInfo, DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode,
+                pkgInfo.versionName + "|" + pkgInfo.versionCode, DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
+        JsonUtils.pushToJSON(mContext, appInfo, DeviceKeyContacts.AppSnapshotInfo.ActionType, tag,
+                DataController.SWITCH_OF_ACTION_TYPE);
+        JsonUtils.pushToJSON(mContext, appInfo, DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
+                String.valueOf(System.currentTimeMillis()), DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
 //        appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,
 //                pkgInfo.packageName);
 //        appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationName,
@@ -240,26 +240,23 @@ public class AppSnapshotImpl {
                     public void run() {
                         try {
                             if (type == 0) {
-                                PackageInfo pi =
-                                        mContext.getPackageManager().getPackageInfo(pkgName, 0);
+                                PackageInfo pi = mContext.getPackageManager().getPackageInfo(pkgName, 0);
                                 if (pi != null) {
-                                    JSONObject jsonObject =
-                                            getAppInfo(pi, EGContext.SNAP_SHOT_INSTALL);
+                                    JSONObject jsonObject = getAppInfo(pi, EGContext.SNAP_SHOT_INSTALL);
                                     if (jsonObject != null) {
                                         // 判断数据表中是否有该应用的存在，如果有标识此次安装是应用更新所导致
-                                        boolean isHas = TableAppSnapshot.getInstance(mContext)
-                                                .isHasPkgName(pkgName);
+                                        boolean isHas = TableAppSnapshot.getInstance(mContext).isHasPkgName(pkgName);
                                         if (!isHas) {
                                             TableAppSnapshot.getInstance(mContext).insert(jsonObject);
                                         }
                                     }
                                 }
                             } else if (type == 1) {
-                                TableAppSnapshot.getInstance(mContext).update(pkgName,
-                                        EGContext.SNAP_SHOT_UNINSTALL, time);
+                                TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UNINSTALL,
+                                        time);
                             } else if (type == 2) {
-                                TableAppSnapshot.getInstance(mContext).update(pkgName,
-                                        EGContext.SNAP_SHOT_UPDATE, time);
+                                TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UPDATE,
+                                        time);
                             }
                         } catch (Throwable e) {
                         }
@@ -268,26 +265,21 @@ public class AppSnapshotImpl {
             } else {
                 try {
                     if (type == 0) {
-                        PackageInfo pi =
-                                mContext.getPackageManager().getPackageInfo(pkgName, 0);
+                        PackageInfo pi = mContext.getPackageManager().getPackageInfo(pkgName, 0);
                         if (pi != null) {
-                            JSONObject jsonObject =
-                                    getAppInfo(pi, EGContext.SNAP_SHOT_INSTALL);
+                            JSONObject jsonObject = getAppInfo(pi, EGContext.SNAP_SHOT_INSTALL);
                             if (jsonObject != null) {
                                 // 判断数据表中是否有该应用的存在，如果有标识此次安装是应用更新所导致
-                                boolean isHas = TableAppSnapshot.getInstance(mContext)
-                                        .isHasPkgName(pkgName);
+                                boolean isHas = TableAppSnapshot.getInstance(mContext).isHasPkgName(pkgName);
                                 if (!isHas) {
                                     TableAppSnapshot.getInstance(mContext).insert(jsonObject);
                                 }
                             }
                         }
                     } else if (type == 1) {
-                        TableAppSnapshot.getInstance(mContext).update(pkgName,
-                                EGContext.SNAP_SHOT_UNINSTALL, time);
+                        TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UNINSTALL, time);
                     } else if (type == 2) {
-                        TableAppSnapshot.getInstance(mContext).update(pkgName,
-                                EGContext.SNAP_SHOT_UPDATE, time);
+                        TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UPDATE, time);
                     }
                 } catch (Throwable e) {
                     if (EGContext.FLAG_DEBUG_INNER) {

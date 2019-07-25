@@ -54,7 +54,7 @@ public class EguanIdUtils {
             String setting = readSetting();
             String shard = readShared();
             String database = readDatabase();
-            //四个文件作对比
+            // 四个文件作对比
             tmpId = getContrastId(file, setting, shard, database);
         } catch (Throwable t) {
             tmpId = "";
@@ -92,14 +92,14 @@ public class EguanIdUtils {
      * @param databaseId
      * @return
      */
-    private String getContrastId(String fileId, String settingId, String shardId,
-                                 String databaseId) {
+    private String getContrastId(String fileId, String settingId, String shardId, String databaseId) {
         String id = "";
-        //4个全空返回空
-        if (TextUtils.isEmpty(fileId) && TextUtils.isEmpty(settingId) && TextUtils.isEmpty(shardId) && TextUtils.isEmpty(databaseId)) {
+        // 4个全空返回空
+        if (TextUtils.isEmpty(fileId) && TextUtils.isEmpty(settingId) && TextUtils.isEmpty(shardId)
+                && TextUtils.isEmpty(databaseId)) {
             return id;
         } else {
-            //不全为空则不空的值相等可传，不等不传
+            // 不全为空则不空的值相等可传，不等不传
             if (!TextUtils.isEmpty(fileId)) {
                 id = fileId;
             }
@@ -240,7 +240,6 @@ public class EguanIdUtils {
 
         }
     }
-
 
     /**
      * 从SD卡读数据

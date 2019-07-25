@@ -17,13 +17,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 public class AndroidManifestHelper {
     /**
      * 判断AndroidManifest中是否声明Activity
      *
      * @param context
-     * @param clazz   判断的Activity
+     * @param clazz 判断的Activity
      * @return
      */
     public static boolean isActivityDefineInManifest(Context context, Class<?> clazz) {
@@ -49,7 +48,7 @@ public class AndroidManifestHelper {
      * 判断AndroidManifest中是否声明BroadcastReceiver
      *
      * @param context
-     * @param clazz   判断的BroadcastReceiver
+     * @param clazz 判断的BroadcastReceiver
      * @return
      */
     public static boolean isBroadcastReceiverDefineInManifest(Context context, Class<?> clazz) {
@@ -73,7 +72,7 @@ public class AndroidManifestHelper {
      * 判断AndroidManifest中是否声明contextResolver
      *
      * @param context
-     * @param clazz   判断的contextResolver
+     * @param clazz 判断的contextResolver
      * @return
      */
     public static boolean isContentResolverDefineInManifest(Context context, Class<?> clazz) {
@@ -97,7 +96,7 @@ public class AndroidManifestHelper {
      * 判断AndroidManifest中是否声明该服务
      *
      * @param context
-     * @param clazz   判断的服务
+     * @param clazz 判断的服务
      * @return
      */
     public static boolean isServiceDefineInManifest(Context context, Class<?> clazz) {
@@ -185,8 +184,8 @@ public class AndroidManifestHelper {
             context = EContextHelper.getContext(context);
             if (context != null) {
                 PackageManager manager = context.getPackageManager();
-                ApplicationInfo info = manager.getApplicationInfo(
-                        context.getPackageName(), PackageManager.GET_META_DATA);
+                ApplicationInfo info = manager.getApplicationInfo(context.getPackageName(),
+                        PackageManager.GET_META_DATA);
                 if (info != null) {
                     return info.metaData;
                 }

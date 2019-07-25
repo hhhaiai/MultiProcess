@@ -30,10 +30,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
 
-
 /**
  * @Copyright © 2017 sanbo Inc. All rights reserved.
- * @Description:               <pre>
+ * @Description:
+ * 
+ * <pre>
  *               重写的两个主要原因：
  *               1.实现多进程数据安全
  *               2.优化IO性能，解决IO卡顿.
@@ -43,7 +44,8 @@ import java.util.Vector;
  *                  c.本类解决了系统SharedPreferences引发的IO卡顿
  *                  d.为了提升进程间同步的性能，直接存储的是字节流数据，会导致getAll方法性能低于系统实现
  *                  e.本类未实现存储和读取getStringSet和putStringSet功能，原因是实现复杂，且极少人使用
- *               </pre>
+ * </pre>
+ * 
  * @Version: 1.0
  * @Create: 2017年6月12日 下午2:27:52
  * @author: cqs
@@ -84,8 +86,7 @@ class SPImpl implements SharedPreferences {
     private static final String SPECIAL_KEY = "@sp_sp_key@";
     private static final String SPECIAL_VALUE = "@_@";
     private final LinkedHashMap<String, Object> mMap = new LinkedHashMap<String, Object>();
-    private final ArrayList<OnSharedPreferenceChangeListener> mListeners =
-            new ArrayList<OnSharedPreferenceChangeListener>();
+    private final ArrayList<OnSharedPreferenceChangeListener> mListeners = new ArrayList<OnSharedPreferenceChangeListener>();
     private final Object mSyncObj = new Object();
     private final Object mSyncSaveObj = new Object();
     private FileMonitor mFileMonitor;
@@ -271,8 +272,8 @@ class SPImpl implements SharedPreferences {
     }
 
     @Override
-    public void
-    registerOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener onSharedPreferenceChangeListener) {
+    public void registerOnSharedPreferenceChangeListener(
+            OnSharedPreferenceChangeListener onSharedPreferenceChangeListener) {
         if (onSharedPreferenceChangeListener != null) {
             mListeners.add(onSharedPreferenceChangeListener);
             if (mFileMonitor != null) {
@@ -282,7 +283,8 @@ class SPImpl implements SharedPreferences {
     }
 
     @Override
-    public void unregisterOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener onSharedPreferenceChangeListener) {
+    public void unregisterOnSharedPreferenceChangeListener(
+            OnSharedPreferenceChangeListener onSharedPreferenceChangeListener) {
         if (onSharedPreferenceChangeListener != null && mListeners != null) {
             mListeners.remove(onSharedPreferenceChangeListener);
             if (mFileMonitor != null && mListeners.size() <= 0) {
@@ -839,7 +841,7 @@ class SPImpl implements SharedPreferences {
         }
 
         synchronized (mMap) {
-            for (int cur = 0; cur < totalBytes.length; ) {
+            for (int cur = 0; cur < totalBytes.length;) {
                 try {
                     Pair<byte[], Integer> key = getOneString(totalBytes, cur);
                     cur = key.second;
@@ -852,7 +854,7 @@ class SPImpl implements SharedPreferences {
                     cur++;
                     byte finishMark = totalBytes[cur];
                     cur += FINISH_MARK_LENGTH;
-                    if (finishMark != FINISH_MARK && finishMark != getMaskByte(new byte[]{typeByte})) {
+                    if (finishMark != FINISH_MARK && finishMark != getMaskByte(new byte[] { typeByte })) {
                         if (mErrorListener != null) {
                             mErrorListener.onError(mFile != null ? mFile.getAbsolutePath() : null, DATA_TYPE_ERROR,
                                     totalBytes.length);
@@ -1050,7 +1052,7 @@ class SPImpl implements SharedPreferences {
                     return ((String) obj).getBytes();
                 } else if (obj instanceof Boolean) {
                     boolean b = (Boolean) obj;
-                    return new byte[]{(byte) (b ? 1 : 0)};
+                    return new byte[] { (byte) (b ? 1 : 0) };
                 } else if (obj instanceof Float) {
                     return ByteFloatUtils.floatToBytes((Float) obj);
                 } else if (obj instanceof Integer) {

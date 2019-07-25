@@ -42,7 +42,9 @@ import javax.xml.transform.stream.StreamSource;
 
 /**
  * @Copyright © 2015 Sanbo Inc. All rights reserved.
- * @Description <pre>
+ * @Description
+ * 
+ * <pre>
  * Log统一管理类,提供功能：
  * 1.log工具类支持全部打印   「支持Log的所有功能.」
  * 2.支持类似C的格式化输出或Java的String.format「%个数和参数个数需要一直才能格式化」
@@ -53,7 +55,8 @@ import javax.xml.transform.stream.StreamSource;
  *          log等级：VERBOSE/DEBUG/INFO/WARN/ERROR/ASSERT
  * 6.格式化输出.
  * 7.支持XML/JSON/Map/Array等更多对象打印
- *              </pre>
+ * </pre>
+ * 
  * @Version: 6.1
  * @Create: 2015年6月18日 下午4:14:01
  * @Author: sanbo
@@ -79,7 +82,7 @@ public class ELOG {
     private static boolean isFormat = false;
     // 默认tag
     private static String DEFAULT_TAG = EGContext.LOGTAG_DEBUG;
-    //user tag
+    // user tag
     private static String USER_TAG = EGContext.USER_TAG_DEBUG;
     // 临时tag.用法：调用log中大于1个参数,且第一个参数为字符串,且不是format用法,字符串长度没超过协议值,此时启用临时tag
     private static String TEMP_TAG = "";
@@ -95,18 +98,13 @@ public class ELOG {
     private static String CONTENT_SPACE = "  ";
     private static String CONTENT_LOG_INFO = "log info:";
     private static String CONTENT_LOG_EMPTY = "打印的日志信息为空!";
-    private static String content_title_begin =
-            "╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
-    private static String content_title_info_callstack =
-            "╔══════════════════════════════════════════════════════════════调用详情══════════════════════════════════════════════════════════════";
-    private static String content_title_info_log =
-            "╔══════════════════════════════════════════════════════════════日志详情══════════════════════════════════════════════════════════════";
-    private static String content_title_info_error =
-            "╔══════════════════════════════════════════════════════════════异常详情══════════════════════════════════════════════════════════════";
+    private static String content_title_begin = "╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
+    private static String content_title_info_callstack = "╔══════════════════════════════════════════════════════════════调用详情══════════════════════════════════════════════════════════════";
+    private static String content_title_info_log = "╔══════════════════════════════════════════════════════════════日志详情══════════════════════════════════════════════════════════════";
+    private static String content_title_info_error = "╔══════════════════════════════════════════════════════════════异常详情══════════════════════════════════════════════════════════════";
     private static String content_title_info_type = "╔════════════════════════════════════════════════════「%s"
             + "」════════════════════════════════════════════════════";
-    private static String content_title_end =
-            "╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
+    private static String content_title_end = "╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
     /**
      * 行首为该符号时，不增加行首封闭符
      */
@@ -125,16 +123,16 @@ public class ELOG {
     /**
      * 初始化接口
      *
-     * @param showLog           是否展示log，默认展示
-     * @param shellControl      是否使用shell控制log动态打印.默认不使用. shell设置方式：setprop log.tag.sanbo INFO
-     *                          最后一个参数为log等级,可选项目：VERBOSE/DEBUG/INFO/WARN/ERROR/ASSERT
-     * @param needWarpper       是否需要格式化输出
+     * @param showLog 是否展示log，默认展示
+     * @param shellControl 是否使用shell控制log动态打印.默认不使用. shell设置方式：setprop log.tag.sanbo
+     * INFO 最后一个参数为log等级,可选项目：VERBOSE/DEBUG/INFO/WARN/ERROR/ASSERT
+     * @param needWarpper 是否需要格式化输出
      * @param needCallStackInfo 是否需要打印详细的堆栈调用信息.
-     * @param format            是否需要格式化.
-     * @param defaultTag        android logcat的tag一个意义,不设置默认的tag为"sanbo"
+     * @param format 是否需要格式化.
+     * @param defaultTag android logcat的tag一个意义,不设置默认的tag为"sanbo"
      */
     public static void init(boolean showLog, boolean shellControl, boolean needWarpper, boolean needCallStackInfo,
-                            boolean format, String defaultTag) {
+            boolean format, String defaultTag) {
         USER_DEBUG = showLog;
         isShellControl = shellControl;
         isNeedWrapper = needWarpper;
@@ -235,7 +233,8 @@ public class ELOG {
     }
 
     /**
-     * 解析参数入口.这步骤开始忽略类型.解析所有参数,参数检查逻辑： 1.是否为String,若为String,则先判断是否格式化输出,不是再进行字符串转换格式尝试 2.对象其他类型判断:
+     * 解析参数入口.这步骤开始忽略类型.解析所有参数,参数检查逻辑：
+     * 1.是否为String,若为String,则先判断是否格式化输出,不是再进行字符串转换格式尝试 2.对象其他类型判断:
      * StringBuffer>StringBuild>Throwable>Intent>List>Map
      *
      * @param isUserDebug 是否用户控制的debug true 用户控制;false 开发者控制
@@ -244,7 +243,7 @@ public class ELOG {
      */
     private static void parserArgsMain(boolean isUserDebug, int level, Object[] args) {
         String tag = DEFAULT_TAG;
-        //用户级别的log打印
+        // 用户级别的log打印
         if (isUserDebug) {
             tag = USER_TAG;
             if (!USER_DEBUG) {
@@ -487,8 +486,8 @@ public class ELOG {
                                     .append(wrapperString(cc));
                         } else {
                             sb.append("\n").append(content_title_begin).append("\n").append(CONTENT_LINE)
-                                    .append(String.format(content_simple_callstack, ste.getClassName(), ste.getMethodName(),
-                                            ste.getLineNumber()));
+                                    .append(String.format(content_simple_callstack, ste.getClassName(),
+                                            ste.getMethodName(), ste.getLineNumber()));
                             // 上一层会处理
                             // .append("\n");
                         }
@@ -624,7 +623,7 @@ public class ELOG {
      *
      * @param cla
      * @param obj
-     * @param o           对象
+     * @param o 对象
      * @param childOffset 递归解析属性的层级
      */
     private static void getClassFields(Class<?> cla, JSONObject obj, Object o, int childOffset) {
@@ -1176,7 +1175,7 @@ public class ELOG {
             sb.append(CONTENT_LOG_EMPTY);
             return String.valueOf(sb);
         }
-        String ss[] = new String[]{};
+        String ss[] = new String[] {};
         String temp = null;
         if (log.contains("\n")) {
             ss = log.split("\n");

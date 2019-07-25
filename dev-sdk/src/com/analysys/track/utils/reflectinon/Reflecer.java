@@ -6,7 +6,6 @@ import com.analysys.track.impl.proc.DoubleCardSupport;
 
 import java.lang.reflect.Field;
 
-
 public class Reflecer {
     /**
      * make sure hook getApplication success

@@ -81,7 +81,8 @@ public class UploadImpl {
                 return;
             }
             long currentTime = System.currentTimeMillis();
-            long upLoadCycle = PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL, EGContext.UPLOAD_CYCLE);
+            long upLoadCycle = PolicyImpl.getInstance(mContext).getSP()
+                    .getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL, EGContext.UPLOAD_CYCLE);
             MessageDispatcher.getInstance(mContext).uploadInfo(upLoadCycle);
             if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_UPLOAD, upLoadCycle, currentTime)) {
                 FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_UPLOAD, currentTime);
@@ -94,7 +95,7 @@ public class UploadImpl {
             if (f.exists()) {
                 long time = f.lastModified();
                 long dur = now - time;
-                //Math.abs(dur)
+                // Math.abs(dur)
                 if (dur <= upLoadCycle) {
                     return;
                 }
@@ -117,7 +118,8 @@ public class UploadImpl {
 
     public void reTryAndUpload(boolean isNormalUpload) {
         int failNum = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);
-        int maxFailCount = PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT, EGContext.FAIL_COUNT_DEFALUT);
+        int maxFailCount = PolicyImpl.getInstance(mContext).getSP()
+                .getInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT, EGContext.FAIL_COUNT_DEFALUT);
         long faildTime = SPHelper.getLongValueFromSP(mContext, EGContext.FAILEDTIME, 0);
         long retryTime = SystemUtils.intervalTime(mContext);
         if (isNormalUpload) {
@@ -125,9 +127,10 @@ public class UploadImpl {
         } else if (!isNormalUpload && failNum > 0 && (failNum < maxFailCount)
                 && (System.currentTimeMillis() - faildTime > retryTime)) {
             doUpload();
-        } else if (!isNormalUpload && failNum > 0 && (failNum == maxFailCount) && (System.currentTimeMillis() - faildTime > retryTime)) {
+        } else if (!isNormalUpload && failNum > 0 && (failNum == maxFailCount)
+                && (System.currentTimeMillis() - faildTime > retryTime)) {
             doUpload();
-            //上传失败次数
+            // 上传失败次数
             MessageDispatcher.getInstance(mContext).killRetryWorker();
             SPHelper.setIntValue2SP(mContext, EGContext.FAILEDNUMBER, 0);
             SPHelper.setLongValue2SP(mContext, EGContext.LASTQUESTTIME, System.currentTimeMillis());
@@ -142,7 +145,8 @@ public class UploadImpl {
         try {
             // 如果时间超过一天，并且当前是可网络请求状态，则先上传开发者配置请求，然后上传数据
             SPHelper.setIntValue2SP(mContext, EGContext.REQUEST_STATE, EGContext.sBeginResuest);
-            final int serverDelayTime = PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_SERVER_DELAY, EGContext.SERVER_DELAY_DEFAULT);
+            final int serverDelayTime = PolicyImpl.getInstance(mContext).getSP()
+                    .getInt(DeviceKeyContacts.Response.RES_POLICY_SERVER_DELAY, EGContext.SERVER_DELAY_DEFAULT);
             if (SystemUtils.isMainThread()) {
                 if (serverDelayTime > 0) {
                     // 策略处理
@@ -201,9 +205,11 @@ public class UploadImpl {
                 SPHelper.setIntValue2SP(mContext, EGContext.REQUEST_STATE, EGContext.sPrepare);
                 return;
             }
+//            url = "http://192.168.220.167:8089";
             handleUpload(url, messageEncrypt(uploadInfo));
             int failNum = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);
-            int maxFailCount = PolicyImpl.getInstance(mContext).getSP().getInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT, EGContext.FAIL_COUNT_DEFALUT);
+            int maxFailCount = PolicyImpl.getInstance(mContext).getSP()
+                    .getInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT, EGContext.FAIL_COUNT_DEFALUT);
             // 3. 兼容多次分包的上传
             while (isChunkUpload && failNum < maxFailCount) {
                 if (EGContext.FLAG_DEBUG_INNER) {
@@ -231,7 +237,7 @@ public class UploadImpl {
         JSONObject object = null;
         try {
             object = new JSONObject();
-            //发送的时候，临时组装devInfo,有大模块控制的优先控制大模块，大模块收集，针对字段级别进行控制
+            // 发送的时候，临时组装devInfo,有大模块控制的优先控制大模块，大模块收集，针对字段级别进行控制
             JSONObject devJson = null;
             try {
                 devJson = DataPackaging.getDevInfo(mContext);
@@ -240,8 +246,9 @@ public class UploadImpl {
             if (devJson != null && devJson.length() > 0) {
                 object.put(DI, devJson);
             }
-            //从oc表查询closeTime不为空的整条信息，组装上传
-            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC, true)) {
+            // 从oc表查询closeTime不为空的整条信息，组装上传
+            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC,
+                    true)) {
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray ocJson = getModuleInfos(mContext, object, "OC", useFulLength);
@@ -252,8 +259,9 @@ public class UploadImpl {
             } else {
                 TableOC.getInstance(mContext).deleteAll();
             }
-            //策略控制大模块收集则进行数据组装，不收集则删除数据
-            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
+            // 策略控制大模块收集则进行数据组装，不收集则删除数据
+            if (PolicyImpl.getInstance(mContext)
+                    .getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray locationInfo = getModuleInfos(mContext, object, "LOCATION", useFulLength);
@@ -264,8 +272,9 @@ public class UploadImpl {
             } else {
                 TableLocation.getInstance(mContext).deleteAll();
             }
-            //策略控制大模块收集则进行数据组装，不收集则删除数据
-            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
+            // 策略控制大模块收集则进行数据组装，不收集则删除数据
+            if (PolicyImpl.getInstance(mContext)
+                    .getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray snapshotJar = getModuleInfos(mContext, object, "SNAPSHOT", useFulLength);
@@ -276,8 +285,9 @@ public class UploadImpl {
             } else {
                 TableAppSnapshot.getInstance(mContext).deleteAll();
             }
-            //策略控制大模块收集则进行数据组装，不收集则删除数据
-            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_XXX, true)) {
+            // 策略控制大模块收集则进行数据组装，不收集则删除数据
+            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_XXX,
+                    true)) {
                 // 计算离最大上线的差值
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                 if (useFulLength > 0 && !isChunkUpload) {
@@ -410,6 +420,7 @@ public class UploadImpl {
     /**
      * 上传数据加密
      */
+    @SuppressWarnings("deprecation")
     public String messageEncrypt(String msg) {
         try {
             String key = "";
@@ -525,19 +536,19 @@ public class UploadImpl {
             // 上传成功，更改本地缓存
             /*-----------------缓存这次上传成功的时间-------------------------*/
             SPHelper.setLongValue2SP(mContext, EGContext.LASTQUESTTIME, System.currentTimeMillis());
-            //重置发送失败次数与时间
+            // 重置发送失败次数与时间
             SPHelper.setIntValue2SP(mContext, EGContext.FAILEDNUMBER, 0);
             SPHelper.setLongValue2SP(mContext, EGContext.FAILEDTIME, 0);
             SPHelper.setLongValue2SP(mContext, EGContext.RETRYTIME, 0);
             TableOC.getInstance(mContext).delete();
-            //上传完成回来清理数据的时候，snapshot删除卸载的，其余的统一恢复成正常值
+            // 上传完成回来清理数据的时候，snapshot删除卸载的，其余的统一恢复成正常值
             TableAppSnapshot.getInstance(mContext).delete();
             TableAppSnapshot.getInstance(mContext).update();
 
-            //location全部删除已读的数据，最后一条无需保留，sp里有
+            // location全部删除已读的数据，最后一条无需保留，sp里有
             TableLocation.getInstance(mContext).delete();
 
-            //按time值delete xxxinfo表和proc表
+            // 按time值delete xxxinfo表和proc表
             TableXXXInfo.getInstance(mContext).deleteByID(idList);
             if (idList != null && idList.size() > 0) {
                 idList.clear();
@@ -637,12 +648,12 @@ public class UploadImpl {
     private void uploadFailure(Context mContext) {
         try {
             SPHelper.setIntValue2SP(mContext, EGContext.REQUEST_STATE, EGContext.sPrepare);
-            //上传失败记录上传次数
+            // 上传失败记录上传次数
             int numb = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0) + 1;
-            //上传失败次数、时间
+            // 上传失败次数、时间
             SPHelper.setIntValue2SP(mContext, EGContext.FAILEDNUMBER, numb);
             SPHelper.setLongValue2SP(mContext, EGContext.FAILEDTIME, System.currentTimeMillis());
-            //多久重试
+            // 多久重试
             long time = SystemUtils.intervalTime(mContext);
             SPHelper.setLongValue2SP(mContext, EGContext.RETRYTIME, time);
         } catch (Throwable t) {

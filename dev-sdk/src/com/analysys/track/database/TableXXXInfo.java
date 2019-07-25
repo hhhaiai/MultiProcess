@@ -74,10 +74,11 @@ public class TableXXXInfo {
                 result = String.valueOf(xxxInfo.opt(ProcUtils.RUNNING_RESULT));
                 if (!TextUtils.isEmpty(result) && !"null".equalsIgnoreCase(result)) {
                     cv = new ContentValues();
-                    cv.put(DBConfig.XXXInfo.Column.TIME, EncryptUtils.encrypt(mContext, String.valueOf(xxxInfo.opt(ProcUtils.RUNNING_TIME))));
+                    cv.put(DBConfig.XXXInfo.Column.TIME,
+                            EncryptUtils.encrypt(mContext, String.valueOf(xxxInfo.opt(ProcUtils.RUNNING_TIME))));
 //                    cv.put(DBConfig.XXXInfo.Column.TOP, EncryptUtils.encrypt(mContext,String.valueOf(object.opt(ProcParser.RUNNING_TOP))));
 //                    cv.put(DBConfig.XXXInfo.Column.PS, EncryptUtils.encrypt(mContext,String.valueOf(object.opt(ProcParser.RUNNING_PS))));
-                    //PROC
+                    // PROC
                     cv.put(DBConfig.XXXInfo.Column.PROC, EncryptUtils.encrypt(mContext, result));
                 }
             }
@@ -89,7 +90,7 @@ public class TableXXXInfo {
         return cv;
     }
 
-    //连表查询
+    // 连表查询
 //    public JSONArray select(){
 //        JSONArray  array = null;
 //        Cursor cursor = null;
@@ -187,7 +188,7 @@ public class TableXXXInfo {
                 if (TextUtils.isEmpty(id)) {
                     return;
                 }
-                db.delete(DBConfig.XXXInfo.TABLE_NAME, DBConfig.XXXInfo.Column.ID + "=?", new String[]{id});
+                db.delete(DBConfig.XXXInfo.TABLE_NAME, DBConfig.XXXInfo.Column.ID + "=?", new String[] { id });
             }
         } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {
@@ -198,7 +199,7 @@ public class TableXXXInfo {
         }
     }
 
-    //连表查询
+    // 连表查询
     public JSONArray select(long maxLength) {
         JSONArray array = null;
         Cursor cursor = null;
@@ -212,9 +213,7 @@ public class TableXXXInfo {
                 db = DBManager.getInstance(mContext).openDB();
             }
             array = new JSONArray();
-            cursor = db.query(DBConfig.XXXInfo.TABLE_NAME,
-                    null, null, null,
-                    null, null, null, "2000");
+            cursor = db.query(DBConfig.XXXInfo.TABLE_NAME, null, null, null, null, null, null, "2000");
             JSONObject jsonObject = null;
             String proc = null;
             while (cursor.moveToNext()) {
@@ -227,14 +226,18 @@ public class TableXXXInfo {
                 if (TextUtils.isEmpty(id)) {
                     blankCount += 1;
                 }
-                proc = EncryptUtils.decrypt(mContext, cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PROC)));
+                proc = EncryptUtils.decrypt(mContext,
+                        cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PROC)));
                 if (!TextUtils.isEmpty(proc) && !"null".equalsIgnoreCase(proc)) {
-                    JsonUtils.pushToJSON(mContext, jsonObject, ProcUtils.RUNNING_RESULT, new JSONArray(proc), DataController.SWITCH_OF_CL_MODULE_PROC);
+                    JsonUtils.pushToJSON(mContext, jsonObject, ProcUtils.RUNNING_RESULT, new JSONArray(proc),
+                            DataController.SWITCH_OF_CL_MODULE_PROC);
                     if (jsonObject == null || jsonObject.length() < 1) {
                         return array;
                     } else {
-                        String time = EncryptUtils.decrypt(mContext, cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TIME)));
-                        JsonUtils.pushToJSON(mContext, jsonObject, ProcUtils.RUNNING_TIME, time, DataController.SWITCH_OF_RUNNING_TIME);
+                        String time = EncryptUtils.decrypt(mContext,
+                                cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TIME)));
+                        JsonUtils.pushToJSON(mContext, jsonObject, ProcUtils.RUNNING_TIME, time,
+                                DataController.SWITCH_OF_RUNNING_TIME);
                         if (countNum / 300 > 0) {
                             countNum = countNum % 300;
                             long size = String.valueOf(array).getBytes().length;
@@ -244,7 +247,8 @@ public class TableXXXInfo {
                                 break;
                             } else {
                                 UploadImpl.idList.add(id);
-                                array.put(new String(Base64.encode(String.valueOf(jsonObject).getBytes(), Base64.DEFAULT)));
+                                array.put(new String(
+                                        Base64.encode(String.valueOf(jsonObject).getBytes(), Base64.DEFAULT)));
                             }
                         } else {
                             UploadImpl.idList.add(id);
@@ -275,4 +279,3 @@ public class TableXXXInfo {
         private static final TableXXXInfo INSTANCE = new TableXXXInfo();
     }
 }
-

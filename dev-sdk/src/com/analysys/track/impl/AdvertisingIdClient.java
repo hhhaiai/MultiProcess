@@ -34,8 +34,7 @@ public class AdvertisingIdClient {
         if (context.bindService(intent, connection, Context.BIND_AUTO_CREATE)) {
             try {
                 AdvertisingInterface adInterface = new AdvertisingInterface(connection.getBinder());
-                AdInfo adInfo = new AdInfo(adInterface.getId(),
-                        adInterface.isLimitAdTrackingEnabled(true));
+                AdInfo adInfo = new AdInfo(adInterface.getId(), adInterface.isLimitAdTrackingEnabled(true));
                 return adInfo;
             } catch (Exception exception) {
                 throw exception;
@@ -66,8 +65,7 @@ public class AdvertisingIdClient {
 
     private static final class AdvertisingConnection implements ServiceConnection {
 
-        private
-        final LinkedBlockingQueue<IBinder> queue = new LinkedBlockingQueue<IBinder>(1);
+        private final LinkedBlockingQueue<IBinder> queue = new LinkedBlockingQueue<IBinder>(1);
         boolean retrieved = false;
 
         @Override
@@ -119,7 +117,6 @@ public class AdvertisingIdClient {
             }
             return id;
         }
-
 
         public boolean isLimitAdTrackingEnabled(boolean paramBoolean) throws RemoteException {
             Parcel data = Parcel.obtain();

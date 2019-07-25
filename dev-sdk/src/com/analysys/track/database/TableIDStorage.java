@@ -33,7 +33,7 @@ public class TableIDStorage {
         SQLiteDatabase db = null;
         try {
             db = DBManager.getInstance(mContext).openDB();
-            //如果db对象为空，或者tmpId为空，则return
+            // 如果db对象为空，或者tmpId为空，则return
             if (db == null || TextUtils.isEmpty(tmpId)) {
                 return;
             }
@@ -66,8 +66,7 @@ public class TableIDStorage {
             if (!db.isOpen()) {
                 db = DBManager.getInstance(mContext).openDB();
             }
-            cursor = db.query(DBConfig.IDStorage.TABLE_NAME, null, null, null, null,
-                    null, null);
+            cursor = db.query(DBConfig.IDStorage.TABLE_NAME, null, null, null, null, null, null);
             if (cursor == null) {
                 return tmpid;
             }
@@ -75,7 +74,8 @@ public class TableIDStorage {
                 if (blankCount >= EGContext.BLANK_COUNT_MAX) {
                     return tmpid;
                 }
-                tmpid = EncryptUtils.decrypt(mContext, cursor.getString(cursor.getColumnIndex(DBConfig.IDStorage.Column.TEMPID)));
+                tmpid = EncryptUtils.decrypt(mContext,
+                        cursor.getString(cursor.getColumnIndex(DBConfig.IDStorage.Column.TEMPID)));
                 if (TextUtils.isEmpty(tmpid)) {
                     blankCount += 1;
                     continue;

@@ -2,15 +2,19 @@ package com.analysys.track.database;
 
 public class DBConfig {
 
-
     public static class OC {
         // 表名
         public static final String TABLE_NAME = "e_occ";
-        //建表
-        public static final String CREATE_TABLE = String.format("create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)",
-                TABLE_NAME, Column.ID, DBType.AUTOINCREMENT, Column.APN, DBType.VARCHAR_HUNDRED, Column.AN, DBType.VARCHAR_TWENTY, Column.AOT, DBType.VARCHAR_TWENTY, Column.ACT, DBType.VARCHAR_TWENTY_NULL, Column.CU, DBType.INT_NOT_NULL,
-                Column.DY, DBType.VARCHAR_TWENTY, Column.IT, DBType.VARCHAR_TWENTY, Column.AVC, DBType.VARCHAR_TWENTY, Column.NT, DBType.VARCHAR_TEN, Column.AST, DBType.VARCHAR_TEN_NULL, Column.AT, DBType.VARCHAR_TEN,
-                Column.CT, DBType.VARCHAR_TEN, Column.TI, DBType.VARCHAR_TEN, Column.ST, DBType.VARCHAR_TEN, Column.RS, DBType.VARCHAR_TEN, Column.OCT_RA, DBType.TEXT, Column.OCT_RB, DBType.TEXT, Column.OCT_RC, DBType.TEXT);
+        // 建表
+        public static final String CREATE_TABLE = String.format(
+                "create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)",
+                TABLE_NAME, Column.ID, DBType.AUTOINCREMENT, Column.APN, DBType.VARCHAR_HUNDRED, Column.AN,
+                DBType.VARCHAR_TWENTY, Column.AOT, DBType.VARCHAR_TWENTY, Column.ACT, DBType.VARCHAR_TWENTY_NULL,
+                Column.CU, DBType.INT_NOT_NULL, Column.DY, DBType.VARCHAR_TWENTY, Column.IT, DBType.VARCHAR_TWENTY,
+                Column.AVC, DBType.VARCHAR_TWENTY, Column.NT, DBType.VARCHAR_TEN, Column.AST, DBType.VARCHAR_TEN_NULL,
+                Column.AT, DBType.VARCHAR_TEN, Column.CT, DBType.VARCHAR_TEN, Column.TI, DBType.VARCHAR_TEN, Column.ST,
+                DBType.VARCHAR_TEN, Column.RS, DBType.VARCHAR_TEN, Column.OCT_RA, DBType.TEXT, Column.OCT_RB,
+                DBType.TEXT, Column.OCT_RC, DBType.TEXT);
 
         public static class Column {
             public static final String ID = "id";
@@ -55,10 +59,11 @@ public class DBConfig {
     public static class AppSnapshot {
         // 表名
         public static final String TABLE_NAME = "e_asi";
-        //建表
-        public static final String CREATE_TABLE = String.format("create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)",
-                TABLE_NAME, Column.ID, DBType.AUTOINCREMENT, Column.APN, DBType.VARCHAR_HUNDRED, Column.AN, DBType.VARCHAR_HUNDRED,
-                Column.AVC, DBType.VARCHAR_TWENTY, Column.AT, DBType.VARCHAR_TWENTY, Column.AHT, DBType.VARCHAR_TWENTY,
+        // 建表
+        public static final String CREATE_TABLE = String.format(
+                "create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)", TABLE_NAME, Column.ID,
+                DBType.AUTOINCREMENT, Column.APN, DBType.VARCHAR_HUNDRED, Column.AN, DBType.VARCHAR_HUNDRED, Column.AVC,
+                DBType.VARCHAR_TWENTY, Column.AT, DBType.VARCHAR_TWENTY, Column.AHT, DBType.VARCHAR_TWENTY,
                 Column.ASI_RA, DBType.TEXT, Column.ASI_RB, DBType.TEXT, Column.ASI_RC, DBType.TEXT);
 
         public static class Column {
@@ -83,10 +88,11 @@ public class DBConfig {
     public static class Location {
         // 表名
         public static final String TABLE_NAME = "e_l";
-        //建表
-        public static final String CREATE_TABLE = String.format("create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)",
-                TABLE_NAME, Column.ID, DBType.AUTOINCREMENT, Column.LI, DBType.TEXT, Column.IT, DBType.VARCHAR_TWENTY,
-                Column.ST, DBType.VARCHAR_TEN, Column.L_RA, DBType.TEXT, Column.L_RB, DBType.TEXT, Column.L_RC, DBType.TEXT);
+        // 建表
+        public static final String CREATE_TABLE = String.format(
+                "create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)", TABLE_NAME, Column.ID,
+                DBType.AUTOINCREMENT, Column.LI, DBType.TEXT, Column.IT, DBType.VARCHAR_TWENTY, Column.ST,
+                DBType.VARCHAR_TEN, Column.L_RA, DBType.TEXT, Column.L_RB, DBType.TEXT, Column.L_RC, DBType.TEXT);
 
         public static class Column {
             public static final String ID = "id";
@@ -107,16 +113,17 @@ public class DBConfig {
     public static class XXXInfo {
         // 表名
         public static final String TABLE_NAME = "e_xxx";
-        //建表
-        public static final String CREATE_TABLE = String.format("create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)",
-                TABLE_NAME, Column.ID, DBType.AUTOINCREMENT, Column.TIME, DBType.VARCHAR_TWENTY,
-                Column.PROC, DBType.TEXT, Column.L_RA, DBType.TEXT, Column.L_RB, DBType.TEXT, Column.L_RC, DBType.TEXT);
+        // 建表
+        public static final String CREATE_TABLE = String.format(
+                "create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)", TABLE_NAME, Column.ID,
+                DBType.AUTOINCREMENT, Column.TIME, DBType.VARCHAR_TWENTY, Column.PROC, DBType.TEXT, Column.L_RA,
+                DBType.TEXT, Column.L_RB, DBType.TEXT, Column.L_RC, DBType.TEXT);
 
         public static class Column {
             public static final String ID = "id";
             // RESULT
             public static final String TIME = "xxx_a";
-            //TOP
+            // TOP
 //      public static final String TOP = "xxx_b";
 //      // PS
 //      public static final String PS = "xxx_c";
@@ -132,14 +139,14 @@ public class DBConfig {
         }
     }
 
-
     public static class IDStorage {
         // 表名
         public static final String TABLE_NAME = "e_stor";
-        //建表
-        public static final String CREATE_TABLE = String.format("create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)",
-                TABLE_NAME, Column.ID, DBType.AUTOINCREMENT, Column.TEMPID, DBType.VARCHAR_TWENTY,
-                Column.ST, DBType.VARCHAR_TEN, Column.L_RA, DBType.TEXT, Column.L_RB, DBType.TEXT, Column.L_RC, DBType.TEXT);
+        // 建表
+        public static final String CREATE_TABLE = String.format(
+                "create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)", TABLE_NAME, Column.ID,
+                DBType.AUTOINCREMENT, Column.TEMPID, DBType.VARCHAR_TWENTY, Column.ST, DBType.VARCHAR_TEN, Column.L_RA,
+                DBType.TEXT, Column.L_RB, DBType.TEXT, Column.L_RC, DBType.TEXT);
 
         public static class Column {
             public static final String ID = "id";

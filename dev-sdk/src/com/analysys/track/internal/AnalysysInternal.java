@@ -45,11 +45,11 @@ public class AnalysysInternal {
      */
     public void initEguan(final String key, final String channel) {
         try {
-            //单进程内防止重复注册
+            // 单进程内防止重复注册
             if (hasInit) {
                 return;
             }
-            //防止影响宿主线程中的任务
+            // 防止影响宿主线程中的任务
             EThreadPool.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -64,12 +64,12 @@ public class AnalysysInternal {
     }
 
     /**
-     * key支持参数设置、XML文件设置，
-     * 参数设置优先级大于XML设置
+     * key支持参数设置、XML文件设置， 参数设置优先级大于XML设置
      *
      * @param key
      * @param channel
      */
+    @SuppressWarnings("deprecation")
     private void init(String key, String channel) {
         hasInit = true;
         // 0.首先检查是否有Context
@@ -80,11 +80,11 @@ public class AnalysysInternal {
 //        if (mContextRef == null) {
 //            mContextRef = new WeakReference<Context>(ctx);
 //        }
-        SystemUtils.updateAppkeyAndChannel(ctx, key, channel);//update sp
+        SystemUtils.updateAppkeyAndChannel(ctx, key, channel);// update sp
 
         // 1. 设置错误回调
-        CrashHandler.getInstance().setCallback(null);//不依赖ctx
-        //2.初始化加密
+        CrashHandler.getInstance().setCallback(null);// 不依赖ctx
+        // 2.初始化加密
         EncryptUtils.init(ctx);
         // 3.初始化多进程
         initSupportMultiProcess(ctx);

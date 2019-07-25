@@ -104,12 +104,12 @@
             </intent-filter>
         </service>
 
-        <meta-data
-            android:name="ANALYSYS_APPKEY"
-            android:value="qwertyuiop123" />
-        <meta-data
-            android:name="ANALYSYS_CHANNEL"
-            android:value="WanDouJia" />
+        <!--<meta-data-->
+        <!--android:name="ANALYSYS_APPKEY"-->
+        <!--android:value="qwertyuiop123" />-->
+        <!--<meta-data-->
+        <!--android:name="ANALYSYS_CHANNEL"-->
+        <!--android:value="WanDouJia" />-->
     </application>
 
 </manifest>

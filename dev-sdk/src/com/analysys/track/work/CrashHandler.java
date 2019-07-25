@@ -46,8 +46,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         // 增加内部处理
         handleException(ex);
         // 系统处理
-        if (mDefaultHandler != null
-                && (mDefaultHandler != Thread.getDefaultUncaughtExceptionHandler())) {
+        if (mDefaultHandler != null && (mDefaultHandler != Thread.getDefaultUncaughtExceptionHandler())) {
             mDefaultHandler.uncaughtException(thread, ex);
         }
     }

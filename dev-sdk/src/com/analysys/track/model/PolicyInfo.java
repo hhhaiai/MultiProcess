@@ -43,11 +43,11 @@ public class PolicyInfo implements Serializable {
     private String Module;
     private String Status;
     /**
-     *是否使用实时策略，1不使用0使用
+     * 是否使用实时策略，1不使用0使用
      */
 //    private int UseRTP = EGContext.DEFAULT;
     /**
-     *是否实时上传[非实时分析策略下，是否实时上传]0不实时上传，1实时上传
+     * 是否实时上传[非实时分析策略下，是否实时上传]0不实时上传，1实时上传
      */
 //    private int UseRTL = EGContext.DEFAULT;
     private String SecModule;
@@ -65,6 +65,7 @@ public class PolicyInfo implements Serializable {
     private String Count;
     private String SecSubModule;
     private String SecSubStatus;
+
     private PolicyInfo() {
     }
 

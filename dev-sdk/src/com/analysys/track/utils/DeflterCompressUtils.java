@@ -9,7 +9,6 @@ import com.analysys.track.utils.sp.SPHelper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.zip.Deflater;
-import java.util.zip.Inflater;
 
 public class DeflterCompressUtils {
 
@@ -61,10 +60,10 @@ public class DeflterCompressUtils {
         } else {
             sdkv = sdkv.replace(".", "");
         }
-        sb.append(sdkv);//版本号-主版本号去掉点---规则变动，不需要处理了
+        sb.append(sdkv);// 版本号-主版本号去掉点---规则变动，不需要处理了
 
-        sb.append(DeviceImpl.getInstance(ctx).getDebug());//是否debug模式，0/1值
-        sb.append(value);//前三位
+        sb.append(DeviceImpl.getInstance(ctx).getDebug());// 是否debug模式，0/1值
+        sb.append(value);// 前三位
         long time = System.currentTimeMillis();
         SPHelper.setStringValue2SP(ctx, EGContext.TIME, String.valueOf(time));
         sb.append(time);

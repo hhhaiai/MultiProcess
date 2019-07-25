@@ -21,6 +21,7 @@ public class NetworkUtils {
     /**
      * 获取当前的网络状态
      */
+    @SuppressWarnings("deprecation")
     public static String getNetworkType(Context context) {
         String netType = EGContext.NETWORK_TYPE_NO_NET;
 
@@ -64,10 +65,12 @@ public class NetworkUtils {
         return netType;
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isWifiAlive(Context mContext) {
         if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_NETWORK_STATE)) {
             if (getConnectivityManager(mContext) != null) {
-                NetworkInfo wifiNetwork = getConnectivityManager(mContext).getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                NetworkInfo wifiNetwork = getConnectivityManager(mContext)
+                        .getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 if (wifiNetwork != null) {
                     if (wifiNetwork.getState() == NetworkInfo.State.CONNECTED) {
                         return true;

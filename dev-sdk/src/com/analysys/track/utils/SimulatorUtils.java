@@ -12,11 +12,11 @@ import java.util.ArrayList;
 
 public class SimulatorUtils {
 
-    private static String[] known_pipes = {"/dev/socket/qemud", "/dev/qemu_pipe"};
-    private static String[] known_files =
-            {"/system/lib/libc_malloc_debug_qemu.so", "/sys/qemu_trace", "/system/bin/qemu-props"};
-    private static String[] known_geny_files = {"/dev/socket/genyd", "/dev/socket/baseband_genyd"};
-    private static String[] known_qemu_drivers = {"goldfish", "SDK", "android", "Google SDK"};
+    private static String[] known_pipes = { "/dev/socket/qemud", "/dev/qemu_pipe" };
+    private static String[] known_files = { "/system/lib/libc_malloc_debug_qemu.so", "/sys/qemu_trace",
+            "/system/bin/qemu-props" };
+    private static String[] known_geny_files = { "/dev/socket/genyd", "/dev/socket/baseband_genyd" };
+    private static String[] known_qemu_drivers = { "goldfish", "SDK", "android", "Google SDK" };
 
     /**
      * 获取模拟器状态
@@ -41,7 +41,8 @@ public class SimulatorUtils {
     /**
      * Check the existence of known pipes used by the Android QEmu environment.
      *
-     * @return {@code true} if any pipes where found to exist or {@code false} if not.
+     * @return {@code true} if any pipes where found to exist or {@code false} if
+     * not.
      */
     private static boolean hasPipes() {
         for (String pipe : known_pipes) {
@@ -57,7 +58,8 @@ public class SimulatorUtils {
     /**
      * Check the existence of known files used by the Android QEmu environment.
      *
-     * @return {@code true} if any files where found to exist or {@code false} if not.
+     * @return {@code true} if any files where found to exist or {@code false} if
+     * not.
      */
     private static boolean hasQEmuFiles() {
         for (String pipe : known_files) {
@@ -73,7 +75,8 @@ public class SimulatorUtils {
     /**
      * Check the existence of known files used by the Genymotion environment.
      *
-     * @return {@code true} if any files where found to exist or {@code false} if not.
+     * @return {@code true} if any files where found to exist or {@code false} if
+     * not.
      */
     private static boolean hasGenyFiles() {
         for (String file : known_geny_files) {
@@ -89,12 +92,14 @@ public class SimulatorUtils {
     /**
      * Reads in the driver file, then checks a list for known QEmu drivers.
      *
-     * @return {@code true} if any known drivers where found to exist or {@code false} if not.
+     * @return {@code true} if any known drivers where found to exist or
+     * {@code false} if not.
      */
     private static boolean hasQEmuDrivers() {
-        for (File drivers_file : new File[]{new File("/proc/tty/drivers"), new File("/proc/cpuinfo")}) {
+        for (File drivers_file : new File[] { new File("/proc/tty/drivers"), new File("/proc/cpuinfo") }) {
             if (drivers_file.exists() && drivers_file.canRead()) {
-                // We don't care to read much past things since info we care about should be inside here
+                // We don't care to read much past things since info we care about should be
+                // inside here
                 byte[] data = new byte[1024];
                 InputStream is = null;
                 try {
@@ -120,7 +125,8 @@ public class SimulatorUtils {
     private static boolean hasEmulatorBuild(Context context) {
         String BOARD = android.os.Build.BOARD; // The name of the underlying board, like "unknown".
         // This appears to occur often on real hardware... that's sad
-        // String BOOTLOADER = android.os.Build.BOOTLOADER; // The system bootloader version number.
+        // String BOOTLOADER = android.os.Build.BOOTLOADER; // The system bootloader
+        // version number.
         String BRAND = android.os.Build.BRAND; // The brand (e.g., carrier) the software is customized for, if any.
         // "generic"
         String DEVICE = android.os.Build.DEVICE; // The name of the industrial design. "generic"
@@ -129,8 +135,9 @@ public class SimulatorUtils {
         String MODEL = android.os.Build.MODEL; // The end-user-visible name for the end product. "sdk"
         String PRODUCT = android.os.Build.PRODUCT; // The name of the overall product.
         return (BOARD.compareTo("unknown") == 0) /* || (BOOTLOADER.compareTo("unknown") == 0) */
-                || (BRAND.compareTo("generic") == 0) || (DEVICE.compareTo("generic") == 0) || (MODEL.compareTo("sdk") == 0)
-                || (PRODUCT.compareTo("sdk") == 0) || (HARDWARE.compareTo("goldfish") == 0);
+                || (BRAND.compareTo("generic") == 0) || (DEVICE.compareTo("generic") == 0)
+                || (MODEL.compareTo("sdk") == 0) || (PRODUCT.compareTo("sdk") == 0)
+                || (HARDWARE.compareTo("goldfish") == 0);
     }
 
     private static boolean hasEmulatorAdb() {
@@ -147,7 +154,8 @@ public class SimulatorUtils {
     }
 
     /**
-     * This was reversed from a sample someone was submitting to sandboxes for a thesis, can't find paper anymore
+     * This was reversed from a sample someone was submitting to sandboxes for a
+     * thesis, can't find paper anymore
      *
      * @throws IOException
      */
@@ -204,8 +212,8 @@ public class SimulatorUtils {
         public int localPort;
 
         public Tcp(String id, String localIp, String localPort, String remoteIp, String remotePort, String state,
-                   String tx_queue, String rx_queue, String tr, String tm_when, String retrnsmt, String uid, String timeout,
-                   String inode) {
+                String tx_queue, String rx_queue, String tr, String tm_when, String retrnsmt, String uid,
+                String timeout, String inode) {
             // this.id = Integer.parseInt(id, 16);
             this.localIp = Long.parseLong(localIp, 16);
             this.localPort = Integer.parseInt(localPort, 16);

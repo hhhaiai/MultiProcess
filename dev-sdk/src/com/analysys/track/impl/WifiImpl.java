@@ -43,7 +43,8 @@ public class WifiImpl {
             if (!PermissionUtils.checkPermission(mContext, Manifest.permission.CHANGE_WIFI_STATE)) {
                 return null;
             }
-            if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_WIFI_STATE) && PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_WIFI_STATE)
+                    && PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 WifiManager wm = (WifiManager) mContext.getSystemService(WIFI_SERVICE);
                 if (wm.getWifiState() == WifiManager.WIFI_STATE_ENABLED) {
                     List<ScanResult> list = wm.getScanResults();
@@ -54,7 +55,8 @@ public class WifiImpl {
                         if (i < 5) {
                             s = list.get(i);
                             jsonObject = new JSONObject();
-                            jsonObject = getWifiInfoObj(jsonObject, s.SSID, s.BSSID, s.level, s.capabilities, s.frequency);
+                            jsonObject = getWifiInfoObj(jsonObject, s.SSID, s.BSSID, s.level, s.capabilities,
+                                    s.frequency);
                             if (jsonObject != null && jsonObject.length() > 0) {
                                 jar.put(jsonObject);
                             }
@@ -85,16 +87,22 @@ public class WifiImpl {
         }
     }
 
-    public JSONObject getWifiInfoObj(JSONObject jsonObject, String ssid, String bssid, int level, String capabilities, int frequency) {
+    public JSONObject getWifiInfoObj(JSONObject jsonObject, String ssid, String bssid, int level, String capabilities,
+            int frequency) {
         try {
             if (jsonObject == null) {
                 jsonObject = new JSONObject();
             }
-            JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.WifiInfo.SSID, ssid, DataController.SWITCH_OF_SSID);
-            JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.WifiInfo.BSSID, bssid, DataController.SWITCH_OF_BSSID);
-            JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.WifiInfo.Level, level, DataController.SWITCH_OF_LEVEL);
-            JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.WifiInfo.Capabilities, capabilities, DataController.SWITCH_OF_CAPABILITIES);
-            JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.WifiInfo.Frequency, frequency, DataController.SWITCH_OF_FREQUENCY);
+            JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.WifiInfo.SSID, ssid,
+                    DataController.SWITCH_OF_SSID);
+            JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.WifiInfo.BSSID, bssid,
+                    DataController.SWITCH_OF_BSSID);
+            JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.WifiInfo.Level, level,
+                    DataController.SWITCH_OF_LEVEL);
+            JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.WifiInfo.Capabilities,
+                    capabilities, DataController.SWITCH_OF_CAPABILITIES);
+            JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.WifiInfo.Frequency, frequency,
+                    DataController.SWITCH_OF_FREQUENCY);
         } catch (Throwable t) {
         }
         return jsonObject;

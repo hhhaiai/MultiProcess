@@ -54,18 +54,18 @@ public class ProcUtils {
             uploadInfo.put(RUNNING_TIME, System.currentTimeMillis());
 
             // 1.获取top数据
-            String top = ShellUtils.exec(new String[]{RUNNING_TOP, "-n", "1"});
+            String top = ShellUtils.exec(new String[] { RUNNING_TOP, "-n", "1" });
             top = filterData(top);
 //            JsonUtils.save(uploadInfo, RUNNING_TOP, top);
 
             // 2.获取ps数据，方式一
-            String ps = ShellUtils.exec(new String[]{RUNNING_PS, "-P", "-p", "-x", "-c"});
+            String ps = ShellUtils.exec(new String[] { RUNNING_PS, "-P", "-p", "-x", "-c" });
             ps = filterData(ps);
             if (!TextUtils.isEmpty(ps)) {
 //                JsonUtils.save(uploadInfo, RUNNING_PS, ps);
             } else {
                 // 3.获取ps数据，方式二
-                ps = ShellUtils.exec(new String[]{RUNNING_PS});
+                ps = ShellUtils.exec(new String[] { RUNNING_PS });
                 ps = filterData(ps);
 //                if (!TextUtils.isEmpty(ps)) {
 //                    JsonUtils.save(uploadInfo, RUNNING_PS, ps);
@@ -78,7 +78,7 @@ public class ProcUtils {
             // Log.i("PROC", "原始的infos[" + infos.size() + "]: " + infos.toString());
 
             if (infos != null && infos.size() > 0) {
-                //解析Proc和result
+                // 解析Proc和result
                 JSONObject jsonObject = processInfos(infos);
 //                print("解析后", jsonObject.toString());
 
@@ -124,7 +124,6 @@ public class ProcUtils {
         return uploadInfo;
     }
 
-
     /**
      * 过滤有效数据
      *
@@ -137,7 +136,7 @@ public class ProcUtils {
         if (tts != null && tts.length > 0) {
             for (int i = 0; i < tts.length; i++) {
                 String line = tts[i].trim();
-                // 兼容   ps 多参数命令，去除()中的用户信息. TODO 可以考虑使用
+                // 兼容 ps 多参数命令，去除()中的用户信息. TODO 可以考虑使用
 //system    17575 780   1589612 30916 4  20    0     0     0     fg  SyS_epoll_ 0000000000 S com.oppo.oppopowermonitor (u:4, s:2)
                 if (line.contains("(")) {
                     line = line.substring(0, line.indexOf("("));
@@ -165,10 +164,10 @@ public class ProcUtils {
         JSONObject object = new JSONObject();
         Set<String> temp = new HashSet<String>();
         Set<String> ocr = new HashSet<String>();
-        //for proc
+        // for proc
 //        JSONObject procItemJson = null;
 //        JSONArray procInfoArray = new JSONArray();
-        //for result
+        // for result
         JSONObject resultItemJson = null;
         JSONArray resultArray = new JSONArray();
         PackageManager pm = null;
@@ -213,15 +212,15 @@ public class ProcUtils {
 //                            appendToProc(procItemJson, pid, pkg, procInfoArray, intent, oomScore, cpuset, cgroup, stat, status, cmdline
 //                                    , statm, current, oomAdj, oomScoreAdj, sched, wchan, dev, snmp);
                             // add item to result
-                            tryAddItemToResult(resultItemJson, resultArray, pid, pkg, intent
-                                    , oomScore, cpuset, cgroup, oomAdj);
+                            tryAddItemToResult(resultItemJson, resultArray, pid, pkg, intent, oomScore, cpuset, cgroup,
+                                    oomAdj);
                         }
                     } catch (Throwable e) {
                         // sb.append("发生异常。。。。。。。");
                     }
 
-                    checkForOcr(ocr, pkg, intent, oomScore, cpuset, cgroup, stat, status, cmdline
-                            , statm, current, oomAdj, oomScoreAdj, sched, wchan, dev, snmp);
+                    checkForOcr(ocr, pkg, intent, oomScore, cpuset, cgroup, stat, status, cmdline, statm, current,
+                            oomAdj, oomScoreAdj, sched, wchan, dev, snmp);
                 } catch (Throwable ttt) {
                     // Log.e("PROC", Log.getStackTraceString(ttt));
                 }
@@ -238,7 +237,8 @@ public class ProcUtils {
         return object;
     }
 
-    private void tryAddItemToResult(JSONObject resultItemJson, JSONArray resultArray, int pid, String pkg, Intent intent, int oomScore, String cpuset, String cgroup, String oomAdj) throws JSONException {
+    private void tryAddItemToResult(JSONObject resultItemJson, JSONArray resultArray, int pid, String pkg,
+            Intent intent, int oomScore, String cpuset, String cgroup, String oomAdj) throws JSONException {
         if (intent == null) {
             return;
         }
@@ -255,37 +255,38 @@ public class ProcUtils {
         resultArray.put(resultItemJson);
     }
 
+//    private void appendToProc(JSONObject jsonResult, int pid, String pkg, JSONArray resultInfo, Intent intent,
+//            int oomScore, String cpuset, String cgroup, String stat, String status, String cmdline, String statm,
+//            String current, String oomAdj, String oomScoreAdj, String sched, String wchan, String dev, String snmp)
+//            throws JSONException {
+//
+//        if (oomScore != -1) {
+//            jsonResult.put("oomScore", oomScore);
+//        }
+//        jsonResult.put("pid", pid);
+//        JsonUtils.save(jsonResult, "pkg", pkg);
+//        JsonUtils.save(jsonResult, "cpuset", cpuset);
+//        JsonUtils.save(jsonResult, "cgroup", cgroup);
+//        JsonUtils.save(jsonResult, "stat", stat);
+//        JsonUtils.save(jsonResult, "status", status);
+//        JsonUtils.save(jsonResult, "cmdline", cmdline);
+//        JsonUtils.save(jsonResult, "statm", statm);
+//        JsonUtils.save(jsonResult, "current", current);
+//        JsonUtils.save(jsonResult, "oomAdj", oomAdj);
+//        JsonUtils.save(jsonResult, "oomScoreAdj", oomScoreAdj);
+//        JsonUtils.save(jsonResult, "wchan", wchan);
+//        JsonUtils.save(jsonResult, "sched", sched);
+//        JsonUtils.save(jsonResult, "dev", dev);
+//        JsonUtils.save(jsonResult, "snmp", snmp);
+//
+//        jsonResult.put("canLanch", intent == null ? 0 : 1);// 0不可以，1可以
+//        resultInfo.put(jsonResult);
+//
+//    }
 
-    private void appendToProc(JSONObject jsonResult, int pid, String pkg, JSONArray resultInfo, Intent intent, int oomScore, String cpuset, String cgroup, String stat, String status, String cmdline, String statm, String current, String oomAdj, String oomScoreAdj, String sched, String wchan, String dev, String snmp) throws JSONException {
-
-        if (oomScore != -1) {
-            jsonResult.put("oomScore", oomScore);
-        }
-        jsonResult.put("pid", pid);
-        JsonUtils.save(jsonResult, "pkg", pkg);
-        JsonUtils.save(jsonResult, "cpuset", cpuset);
-        JsonUtils.save(jsonResult, "cgroup", cgroup);
-        JsonUtils.save(jsonResult, "stat", stat);
-        JsonUtils.save(jsonResult, "status", status);
-        JsonUtils.save(jsonResult, "cmdline", cmdline);
-        JsonUtils.save(jsonResult, "statm", statm);
-        JsonUtils.save(jsonResult, "current", current);
-        JsonUtils.save(jsonResult, "oomAdj", oomAdj);
-        JsonUtils.save(jsonResult, "oomScoreAdj", oomScoreAdj);
-        JsonUtils.save(jsonResult, "wchan", wchan);
-        JsonUtils.save(jsonResult, "sched", sched);
-        JsonUtils.save(jsonResult, "dev", dev);
-        JsonUtils.save(jsonResult, "snmp", snmp);
-
-        jsonResult.put("canLanch", intent == null ? 0 : 1);// 0不可以，1可以
-        resultInfo.put(jsonResult);
-
-    }
-
-    private void checkForOcr(Set<String> ocr, String pkg, Intent intent, int oomScore
-            , String cpuset, String cgroup, String stat, String status
-            , String cmdline, String statm, String current, String oomAdj, String oomScoreAdj
-            , String sched, String wchan, String dev, String snmp) {
+    private void checkForOcr(Set<String> ocr, String pkg, Intent intent, int oomScore, String cpuset, String cgroup,
+            String stat, String status, String cmdline, String statm, String current, String oomAdj, String oomScoreAdj,
+            String sched, String wchan, String dev, String snmp) {
         boolean a = isForeGroundByOOMScore(oomScore);
         boolean b = isForeGroundByCpuset(cpuset);
         boolean c = isForeGroundByCgroup(cgroup);
@@ -406,7 +407,8 @@ public class ProcUtils {
      * @return
      */
     private boolean isForeGroundByCmdline(String cmdline, String pkg) {
-        // if (!TextUtils.isEmpty(cmdline) && cmdline.contains(pkg) && !cmdline.contains(":") && !cmdline.contains("/"))
+        // if (!TextUtils.isEmpty(cmdline) && cmdline.contains(pkg) &&
+        // !cmdline.contains(":") && !cmdline.contains("/"))
         // {
         // if (!TextUtils.isEmpty(cmdline) && cmdline.equals(pkg)) {
         // Log.i("PROC", "CMDLINE: " + cmdline + "==" + pkg);
@@ -501,7 +503,7 @@ public class ProcUtils {
     // 前台：Cpus_allowed: 3f 后台：Cpus_allowed: 01
     // 前台：Cpus_allowed: f 后台：Cpus_allowed: 01
     private String getStatus(int pid, String pkg) {
-        String status = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/status"});
+        String status = ShellUtils.exec(new String[] { "cat", "/proc/" + pid + "/status" });
         // if (isDebug) {
         // L.i("status [" + pkg + "]-----" + status);
         // }
@@ -513,7 +515,7 @@ public class ProcUtils {
 
     // 前台：第36列不等于0 后台：第36列为0 [android shell执行的时候出现pid和包名，多了两位]
     private String getStat(int pid, String pkg) {
-        String stat = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/stat"});
+        String stat = ShellUtils.exec(new String[] { "cat", "/proc/" + pid + "/stat" });
         // if (isDebug) {
         // L.i("stat [" + pkg + "]-----" + stat);
         // }
@@ -524,7 +526,7 @@ public class ProcUtils {
     // 前台：cpuset:/foreground 后台：cpuset:/background
     // 前台：cpu:/ 后台：cpu:/bg_non_interactive
     private String getCgroup(int pid, String pkg) {
-        String cgroup = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/cgroup"});
+        String cgroup = ShellUtils.exec(new String[] { "cat", "/proc/" + pid + "/cgroup" });
         // if (isDebug) {
         // L.i("cgroup [" + pkg + "]-----" + cgroup);
         // }
@@ -533,7 +535,7 @@ public class ProcUtils {
 
     // 前台：/foreground 后台：/background
     private String getCpuset(int pid, String pkg) {
-        String cpuset = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/cpuset"});
+        String cpuset = ShellUtils.exec(new String[] { "cat", "/proc/" + pid + "/cpuset" });
         // if (isDebug) {
         // L.i("cpuset [" + pkg + "] -----" + cpuset);
         // }
@@ -542,7 +544,7 @@ public class ProcUtils {
 
     // 前台：小于100 后台：大于100
     private int getOOMScore(int pid, String pkg) {
-        String oom_score = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/oom_score"});
+        String oom_score = ShellUtils.exec(new String[] { "cat", "/proc/" + pid + "/oom_score" });
         // if (isDebug) {
         // L.i("oom_score [" + pkg + "]-----" + oom_score);
         // }
@@ -555,7 +557,7 @@ public class ProcUtils {
 
     // cmdline
     private String getCmdline(int pid, String pkg) {
-        String cmdline = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/cmdline"});
+        String cmdline = ShellUtils.exec(new String[] { "cat", "/proc/" + pid + "/cmdline" });
         // if (isDebug) {
         // L.i("cmdline [" + pkg + "]-----" + cmdline);
         // }
@@ -564,7 +566,7 @@ public class ProcUtils {
 
     // statm
     private String getStatm(int pid, String pkg) {
-        String statm = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/statm"});
+        String statm = ShellUtils.exec(new String[] { "cat", "/proc/" + pid + "/statm" });
         // if (isDebug) {
         // L.i("statm [" + pkg + "]-----" + statm);
         // }
@@ -573,7 +575,7 @@ public class ProcUtils {
 
     // oom_adj
     private String getOOMAdj(int pid, String pkg) {
-        String oom_adj = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/oom_adj"});
+        String oom_adj = ShellUtils.exec(new String[] { "cat", "/proc/" + pid + "/oom_adj" });
         // if (isDebug) {
         // L.i("oom_adj [" + pkg + "]-----" + oom_adj);
         // }
@@ -582,7 +584,7 @@ public class ProcUtils {
 
     // oom_score_adj
     private String getOOMScoreAdj(int pid, String pkg) {
-        String oom_score_adj = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/oom_score_adj"});
+        String oom_score_adj = ShellUtils.exec(new String[] { "cat", "/proc/" + pid + "/oom_score_adj" });
         // if (isDebug) {
         // L.i("oom_score_adj [" + pkg + "]-----" + oom_score_adj);
         // }
@@ -591,7 +593,7 @@ public class ProcUtils {
 
     // current
     private String getCurrent(int pid, String pkg) {
-        String current = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/attr/current"});
+        String current = ShellUtils.exec(new String[] { "cat", "/proc/" + pid + "/attr/current" });
         // if (isDebug) {
         // L.i("current [" + pkg + "]-----" + current);
         // }
@@ -600,7 +602,7 @@ public class ProcUtils {
 
     // wchan
     private String getWchan(int pid, String pkg) {
-        String wchan = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/wchan"});
+        String wchan = ShellUtils.exec(new String[] { "cat", "/proc/" + pid + "/wchan" });
         // if (isDebug) {
         // L.i("wchan [" + pkg + "]-----" + wchan);
         // }
@@ -609,7 +611,7 @@ public class ProcUtils {
 
     // sched
     private String getSched(int pid, String pkg) {
-        String sched = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/sched"});
+        String sched = ShellUtils.exec(new String[] { "cat", "/proc/" + pid + "/sched" });
         // if (isDebug) {
         // L.i("sched [" + pkg + "]-----" + sched);
         // }
@@ -618,7 +620,7 @@ public class ProcUtils {
 
     // dev
     private String getDev(int pid, String pkg) {
-        String dev = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/net/dev"});
+        String dev = ShellUtils.exec(new String[] { "cat", "/proc/" + pid + "/net/dev" });
         // if (isDebug) {
         // L.i("dev [" + pkg + "]-----" + dev);
         // }
@@ -627,7 +629,7 @@ public class ProcUtils {
 
     // snmp
     private String getSnmp(int pid, String pkg) {
-        String snmp = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/net/snmp"});
+        String snmp = ShellUtils.exec(new String[] { "cat", "/proc/" + pid + "/net/snmp" });
         // if (isDebug) {
         // L.i("snmp [" + pkg + "]-----" + snmp);
         // }
@@ -677,7 +679,6 @@ public class ProcUtils {
             }
         }
 
-
         return infos;
     }
 
@@ -699,7 +700,7 @@ public class ProcUtils {
                     } catch (NumberFormatException e) {
                         continue;
                     }
-                    String pkgName = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/cmdline"});
+                    String pkgName = ShellUtils.exec(new String[] { "cat", "/proc/" + pid + "/cmdline" });
                     if (!TextUtils.isEmpty(pkgName) && pkgName.contains(".") && !pkgName.contains(":")
                             && !pkgName.contains("/")) {
                         infos.add(new Process(String.valueOf(pid), pkgName.trim()));
@@ -717,4 +718,3 @@ public class ProcUtils {
     }
 
 }
-

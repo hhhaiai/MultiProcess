@@ -13,7 +13,7 @@ import com.analysys.track.utils.FileUtils;
 import com.analysys.track.work.MessageDispatcher;
 
 public class AnalysysReceiver extends BroadcastReceiver {
-    //上次结束时间
+    // 上次结束时间
     public static long mLastCloseTime = 0;
     public static boolean isScreenOnOffBroadCastHandled = false;
     private static boolean isSnapShotAddBroadCastHandled = false;
@@ -27,7 +27,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
     String intentPackageReplace = "android.intent.action.intentPackageReplace";
     String intentScreenOn = "android.intent.action.intentScreenOn";
     String intentScreenOff = "android.intent.action.intentScreenOff";
-    //    String CONNECTIVITY_CHANGE = "android.net.conn.CONNECTIVITY_CHANGE";
+    // String CONNECTIVITY_CHANGE = "android.net.conn.CONNECTIVITY_CHANGE";
     String intentBatteryChanged = "android.intent.action.intentBatteryChanged";
     String intentBootCompleted = "android.intent.action.intentBootCompleted";
 
@@ -50,7 +50,8 @@ public class AnalysysReceiver extends BroadcastReceiver {
             long currentTime = System.currentTimeMillis();
             if (intentPackageAdd.equals(intent.getAction())) {
                 try {
-                    if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST, EGContext.TIME_SYNC_DEFAULT, currentTime)) {
+                    if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST,
+                            EGContext.TIME_SYNC_DEFAULT, currentTime)) {
                         FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST, currentTime);
                     } else {
                         return;
@@ -60,7 +61,8 @@ public class AnalysysReceiver extends BroadcastReceiver {
                     } else {
                         return;
                     }
-                    MessageDispatcher.getInstance(mContext).appChangeReceiver(packageName, Integer.parseInt(EGContext.SNAP_SHOT_INSTALL), currentTime);
+                    MessageDispatcher.getInstance(mContext).appChangeReceiver(packageName,
+                            Integer.parseInt(EGContext.SNAP_SHOT_INSTALL), currentTime);
                 } catch (Throwable t) {
                 } finally {
                     isSnapShotAddBroadCastHandled = false;
@@ -69,8 +71,10 @@ public class AnalysysReceiver extends BroadcastReceiver {
             }
             if (intentPackageRemove.equals(intent.getAction())) {
                 try {
-                    if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST, EGContext.TIME_SYNC_DEFAULT, currentTime)) {
-                        FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST, currentTime);
+                    if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST,
+                            EGContext.TIME_SYNC_DEFAULT, currentTime)) {
+                        FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST,
+                                currentTime);
                     } else {
                         return;
                     }
@@ -79,7 +83,8 @@ public class AnalysysReceiver extends BroadcastReceiver {
                     } else {
                         return;
                     }
-                    MessageDispatcher.getInstance(mContext).appChangeReceiver(packageName, Integer.parseInt(EGContext.SNAP_SHOT_UNINSTALL), currentTime);
+                    MessageDispatcher.getInstance(mContext).appChangeReceiver(packageName,
+                            Integer.parseInt(EGContext.SNAP_SHOT_UNINSTALL), currentTime);
                 } catch (Throwable t) {
                 } finally {
                     isSnapShotDeleteBroadCastHandled = false;
@@ -87,8 +92,10 @@ public class AnalysysReceiver extends BroadcastReceiver {
             }
             if (intentPackageReplace.equals(intent.getAction())) {
                 try {
-                    if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST, EGContext.TIME_SYNC_DEFAULT, currentTime)) {
-                        FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST, currentTime);
+                    if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST,
+                            EGContext.TIME_SYNC_DEFAULT, currentTime)) {
+                        FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST,
+                                currentTime);
                     } else {
                         return;
                     }
@@ -97,7 +104,8 @@ public class AnalysysReceiver extends BroadcastReceiver {
                     } else {
                         return;
                     }
-                    MessageDispatcher.getInstance(mContext).appChangeReceiver(packageName, Integer.parseInt(EGContext.SNAP_SHOT_UPDATE), currentTime);
+                    MessageDispatcher.getInstance(mContext).appChangeReceiver(packageName,
+                            Integer.parseInt(EGContext.SNAP_SHOT_UPDATE), currentTime);
                 } catch (Throwable t) {
                 } finally {
                     isSnapShotUpdateBroadCastHandled = false;
@@ -108,7 +116,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
                     MessageDispatcher.getInstance(mContext).sendMessages();
                     return;
                 }
-                //设置开锁屏的flag 用于补数逻辑
+                // 设置开锁屏的flag 用于补数逻辑
                 EGContext.SCREEN_ON = true;
                 MessageDispatcher.getInstance(mContext).screenStatusHandle(true);
             }
@@ -121,7 +129,8 @@ public class AnalysysReceiver extends BroadcastReceiver {
             }
             if (intentBatteryChanged.equals(intent.getAction())) {
                 try {
-                    if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_BATTERY_BROADCAST, EGContext.TIME_SYNC_DEFAULT, currentTime)) {
+                    if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_BATTERY_BROADCAST,
+                            EGContext.TIME_SYNC_DEFAULT, currentTime)) {
                         FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_BATTERY_BROADCAST, currentTime);
                     } else {
                         return;
@@ -139,7 +148,8 @@ public class AnalysysReceiver extends BroadcastReceiver {
             }
             if (intentBootCompleted.equals(intent.getAction())) {
                 try {
-                    if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_BOOT_BROADCAST, EGContext.TIME_SYNC_DEFAULT, currentTime)) {
+                    if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_BOOT_BROADCAST,
+                            EGContext.TIME_SYNC_DEFAULT, currentTime)) {
                         FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_BOOT_BROADCAST, currentTime);
                     } else {
                         return;

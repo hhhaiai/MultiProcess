@@ -19,6 +19,7 @@ public class EThreadPool {
     private static ScheduledExecutorService ocPools = Executors.newSingleThreadScheduledExecutor();
     private static List<Future<?>> ocTasks = new ArrayList<Future<?>>();
     private static long MAX_WAIT_SECONDS = 5;
+
     /**
      * 上行数据相关的放该线程池
      */
@@ -72,7 +73,8 @@ public class EThreadPool {
             executorUpload = Executors.newSingleThreadScheduledExecutor();
         }
 
-        queue.add(new WeakReference<ScheduledFuture<?>>(executorUpload.schedule(command, delay, TimeUnit.MILLISECONDS)));
+        queue.add(
+                new WeakReference<ScheduledFuture<?>>(executorUpload.schedule(command, delay, TimeUnit.MILLISECONDS)));
     }
 
     public synchronized static void postSync(Runnable command) {

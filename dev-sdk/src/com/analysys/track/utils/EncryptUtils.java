@@ -25,18 +25,19 @@ import static android.provider.Settings.System.AIRPLANE_MODE_ON;
 
 /**
  * @Copyright © 2018 EGuan Inc. All rights reserved.
- * @Description: 加解密工具类。用法: 数据库初始化时,调用checkEncryptKey(Context context)确认之前加解密部分是否正常工作,正常工作可以测试下DB之前数据是否正常解密,根据结果进行相关操作
- * 加密调用接口:encrypt(Context context, String str) 解密调用接口:decrypt(Context context, String str)
+ * @Description: 加解密工具类。用法: 数据库初始化时,调用checkEncryptKey(Context
+ * context)确认之前加解密部分是否正常工作,正常工作可以测试下DB之前数据是否正常解密,根据结果进行相关操作
+ * 加密调用接口:encrypt(Context context, String str) 解密调用接口:decrypt(Context context,
+ * String str)
  * @Version: 1.0
  * @Create: 2018年2月2日 上午11:50:40
  * @Author: sanbo
  */
 public class EncryptUtils {
-    private static final byte[] iv = {0xA, 0xB, 0xC, 0xD, 0xE, 0xF, 3, 11, 42, 9, 1, 6, 8, 33, 21, 91};
+    private static final byte[] iv = { 0xA, 0xB, 0xC, 0xD, 0xE, 0xF, 3, 11, 42, 9, 1, 6, 8, 33, 21, 91 };
     private static final String SP_EK_ID = "track_id";
     private static final String SP_CONTENT = "track";
     private static String mEncryptKey = null;
-
 
     /**
      * 测试key是否可用
@@ -89,7 +90,7 @@ public class EncryptUtils {
      * 加密接口
      *
      * @param context
-     * @param src     加密的字符串
+     * @param src 加密的字符串
      * @return 加密后的字符串，可能为""
      */
     public static String encrypt(Context context, String src) {
@@ -112,7 +113,7 @@ public class EncryptUtils {
      * 解密接口
      *
      * @param context
-     * @param str     待解密的字符串
+     * @param str 待解密的字符串
      * @return 解密后的字符串
      */
     public static String decrypt(Context context, String str) {
@@ -136,7 +137,8 @@ public class EncryptUtils {
             if (isAirplaneModeOn(context)) {
                 return false;
             } else {
-                return !TextUtils.isEmpty(Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID));
+                return !TextUtils
+                        .isEmpty(Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID));
             }
         } catch (Throwable t) {
         }
@@ -148,6 +150,7 @@ public class EncryptUtils {
      *
      * @param context
      */
+    @SuppressWarnings("deprecation")
     public static void init(Context context) {
         try {
             // 1.获取本地参考key
@@ -327,6 +330,7 @@ public class EncryptUtils {
         return result;
     }
 
+    @SuppressWarnings("deprecation")
     private static boolean isAirplaneModeOn(Context context) {
         try {
             if (context == null) {
@@ -344,17 +348,4 @@ public class EncryptUtils {
         return false;
     }
 
-//    public static String getCheckID(Context context) {
-//        if (context == null) {
-//            return "";
-//        }
-//        if (TextUtils.isEmpty(mEncryptKey)) {
-//            init(context);
-//        }
-//        try {
-//            return encrypt(context, SP_CONTENT);
-//        }catch (Throwable e) {
-//        }
-//        return "";
-//    }
 }

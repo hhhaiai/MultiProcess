@@ -45,7 +45,7 @@ import java.util.zip.ZipFile;
  * @Author: sanbo
  */
 public class SystemUtils {
-    private static final String SHELL_PM_LIST_PACKAGES = "pm list packages";//all
+    private static final String SHELL_PM_LIST_PACKAGES = "pm list packages";// all
     private static final String APP_LIST_SYSTEM = "pm list packages -s";// system
     // private final String APP_LIST_USER = "pm list packages -3";// third party
     // 获取系统应用列表
@@ -59,10 +59,10 @@ public class SystemUtils {
      * @param n
      * @return
      */
-    public static ArrayList getDiffNO(int n) {
+    public static ArrayList<Integer> getDiffNO(int n) {
         // 生成 [0-n) 个不重复的随机数
         // list 用来保存这些随机数
-        ArrayList list = new ArrayList();
+        ArrayList<Integer> list = new ArrayList<Integer>();
         Random rand = new Random(System.nanoTime());
         boolean[] bool = new boolean[n];
         int num = 0;
@@ -95,8 +95,8 @@ public class SystemUtils {
      */
     @SuppressWarnings("deprecation")
     public static boolean isScreenOn(Context context) {
-        PowerManager powerManager =
-                (PowerManager) context.getApplicationContext().getSystemService(Context.POWER_SERVICE);
+        PowerManager powerManager = (PowerManager) context.getApplicationContext()
+                .getSystemService(Context.POWER_SERVICE);
         // 锁屏true 开屏false
         return powerManager.isScreenOn();
     }
@@ -107,10 +107,11 @@ public class SystemUtils {
      * @param context
      * @return true:锁屏,有输入密码解锁或者锁屏壁纸页面 false: 进入系统中的任何页面
      */
+    @SuppressWarnings("deprecation")
     public static boolean isScreenLocked(Context context) {
 
-        KeyguardManager manager =
-                (KeyguardManager) context.getApplicationContext().getSystemService(Context.KEYGUARD_SERVICE);
+        KeyguardManager manager = (KeyguardManager) context.getApplicationContext()
+                .getSystemService(Context.KEYGUARD_SERVICE);
         // 锁屏true 开屏false
         boolean inKeyguardRestrictedInputMode = manager.inKeyguardRestrictedInputMode();
         return inKeyguardRestrictedInputMode;
@@ -151,8 +152,8 @@ public class SystemUtils {
             if (context == null || TextUtils.isEmpty(op)) {
                 return false;
             }
-            ApplicationInfo applicationInfo =
-                    context.getPackageManager().getApplicationInfo(context.getPackageName(), 0);
+            ApplicationInfo applicationInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(),
+                    0);
             AppOpsManager appOpsManager = (AppOpsManager) context.getApplicationContext().getSystemService("appops");
             int mode = appOpsManager.checkOpNoThrow(op, applicationInfo.uid, applicationInfo.packageName);
             // return mode == AppOpsManager.MODE_ALLOWED;
@@ -168,10 +169,11 @@ public class SystemUtils {
      * @return
      */
     public static long intervalTime(Context ctx) {
-        long reTryTime = PolicyImpl.getInstance(ctx).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_FAIL_TRY_DELAY, 0);
+        long reTryTime = PolicyImpl.getInstance(ctx).getSP()
+                .getLong(DeviceKeyContacts.Response.RES_POLICY_FAIL_TRY_DELAY, 0);
         if (reTryTime == 0) {
             reTryTime = EGContext.FAIL_TRY_DELAY_DEFALUT;
-            //10s间隔
+            // 10s间隔
             reTryTime = ((int) (Math.random() * 10) * 1000) + reTryTime;
         }
 
@@ -274,8 +276,8 @@ public class SystemUtils {
      */
     public static boolean byLoadXposedClass() {
         try {
-            Object localObject = ClassLoader.getSystemClassLoader()
-                    .loadClass("de.robv.android.xposed.XposedHelpers").newInstance();
+            Object localObject = ClassLoader.getSystemClassLoader().loadClass("de.robv.android.xposed.XposedHelpers")
+                    .newInstance();
             // 如果加载类失败 则表示当前环境没有xposed
             return localObject != null;
         } catch (Throwable localThrowable) {
@@ -293,7 +295,7 @@ public class SystemUtils {
     }
 
     /**
-     * @param key     优先级 传入==>metaData==>XML
+     * @param key 优先级 传入==>metaData==>XML
      * @param channel 多渠道打包==>代码==>XML
      */
     public static void updateAppkeyAndChannel(Context mContext, String key, String channel) {
@@ -431,7 +433,6 @@ public class SystemUtils {
         }
         return channel;
     }
-
 
     public static List<JSONObject> getAppsFromShell(Context mContext, String tag, List<JSONObject> appList) {
 //        JSONArray appList = new JSONArray();

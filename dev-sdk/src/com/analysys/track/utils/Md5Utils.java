@@ -1,6 +1,5 @@
 package com.analysys.track.utils;
 
-
 import com.analysys.track.internal.Content.EGContext;
 
 import java.security.MessageDigest;
@@ -10,7 +9,7 @@ public class Md5Utils {
         try {
             MessageDigest md5 = MessageDigest.getInstance("MD5");
             md5.update(val.getBytes("UTF-8"));
-            byte[] m = md5.digest();//加密
+            byte[] m = md5.digest();// 加密
             return getString(m);
         } catch (Throwable t) {
             if (EGContext.FLAG_DEBUG_INNER) {
@@ -32,6 +31,6 @@ public class Md5Utils {
             }
             buf.append(Integer.toHexString(a));
         }
-        return String.valueOf(buf).substring(8, 24);  //16位; //32位
+        return String.valueOf(buf).substring(8, 24); // 16位; //32位
     }
 }

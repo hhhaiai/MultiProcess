@@ -56,22 +56,17 @@ public class DeviceImpl {
 
     // 应用信息SoftwareInfoImpl
     private static final String UNKNOW = "";
-    public final List<String> minEffectiveValue = Arrays.asList(
-            new String[]{
-                    "00000000000000",
-                    "00000000",
-                    "000000000000000",
-                    "00000",
+    public final List<String> minEffectiveValue = Arrays
+            .asList(new String[] { "00000000000000", "00000000", "000000000000000", "00000",
                     // 三星有1个零的情况
-                    "0"}
-    );
+                    "0" });
     private final String ZERO = "0";
     private final String ONE = "1";
     private final String DEFALT_MAC = "";
-    private final String[] FILE_LIST =
-            {Base64.encodeToString("/sys/class/net/wlan0/address".getBytes(), Base64.DEFAULT),
-                    Base64.encodeToString("/sys/class/net/eth0/address".getBytes(), Base64.DEFAULT),
-                    Base64.encodeToString("/sys/devices/virtual/net/wlan0/address".getBytes(), Base64.DEFAULT)};
+    private final String[] FILE_LIST = {
+            Base64.encodeToString("/sys/class/net/wlan0/address".getBytes(), Base64.DEFAULT),
+            Base64.encodeToString("/sys/class/net/eth0/address".getBytes(), Base64.DEFAULT),
+            Base64.encodeToString("/sys/devices/virtual/net/wlan0/address".getBytes(), Base64.DEFAULT) };
     private Context mContext;
 
     private DeviceImpl() {
@@ -120,6 +115,7 @@ public class DeviceImpl {
     /**
      * 设备Id 由IMEI-IMSI-AndroidId组成
      */
+    @SuppressWarnings("deprecation")
     public String getDeviceId() {
         String deviceId = "";
         try {
@@ -315,6 +311,7 @@ public class DeviceImpl {
     /**
      * 设备序列号,SerialNumber
      */
+    @SuppressWarnings("deprecation")
     public String getSerialNumber() {
         String result = "";
         try {
@@ -636,7 +633,8 @@ public class DeviceImpl {
             }
             if ("".equals(macSerial)) {
                 try {
-                    return FileUtils.loadFileAsString("/sys/class/net/eth0/address").toUpperCase(Locale.getDefault()).substring(0, 17);
+                    return FileUtils.loadFileAsString("/sys/class/net/eth0/address").toUpperCase(Locale.getDefault())
+                            .substring(0, 17);
                 } catch (Exception e) {
                     return macSerial;
                 }
@@ -745,6 +743,7 @@ public class DeviceImpl {
     }
 
     // DevFurtherdetailImpl
+    @SuppressWarnings("deprecation")
     public String getCPUModel() {
         return Build.CPU_ABI + ":" + Build.CPU_ABI2;
     }

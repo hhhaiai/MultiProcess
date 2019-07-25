@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-
 public class SPHelper {
     private final static HashMap<String, Object> SP_CACHE = new HashMap<String, Object>();
     private static final String DEFAULT_PREFERENCE = "ana_sp_xml";
@@ -75,7 +74,8 @@ public class SPHelper {
     }
 
     /**
-     * 获取SharedPreferences的实例，并将实例缓存，一个进程只有一个具体文件的SharedPreferences实例, 并会将相同名字的系统的SP文件旧数据转换到新实现中
+     * 获取SharedPreferences的实例，并将实例缓存，一个进程只有一个具体文件的SharedPreferences实例,
+     * 并会将相同名字的系统的SP文件旧数据转换到新实现中
      */
     private static SharedPreferences getSharedPreferences(Context ctx, String fileName) {
         handleReplace(ctx, fileName);
@@ -108,8 +108,8 @@ public class SPHelper {
      * 通过反射方法获取到系统SP文件所在的目录和名称，一般是在/data/data/com.appname/shared_prefs/name.xml
      */
     private static File getSystemSharedPrefsFile(Context ctx, String name) {
-        File systemFile =
-                (File) invokeObjectMethod(ctx, "getSharedPrefsFile", new Class[]{String.class}, new Object[]{name});
+        File systemFile = (File) invokeObjectMethod(ctx, "getSharedPrefsFile", new Class[] { String.class },
+                new Object[] { name });
         return systemFile;
     }
 

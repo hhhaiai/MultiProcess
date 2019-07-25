@@ -10,6 +10,7 @@ import com.analysys.track.receiver.AnalysysReceiver;
 
 public class ReceiverUtils {
     private AnalysysReceiver aReceiver = null;
+    @SuppressWarnings("unused")
     private boolean sWorkStatus = false;
 
     private ReceiverUtils() {
@@ -19,9 +20,11 @@ public class ReceiverUtils {
         return Holder.INSTANCE;
     }
 
+    @SuppressWarnings("deprecation")
     public void registAllReceiver(Context context) {
         try {
-            // L.i("[%s]----registAllReceiver...begin....", SystemUtils.getCurrentProcessName(mContext));
+            // L.i("[%s]----registAllReceiver...begin....",
+            // SystemUtils.getCurrentProcessName(mContext));
             setWork(true);
             if (aReceiver == null) {
                 aReceiver = AnalysysReceiver.getInstance();
@@ -56,7 +59,8 @@ public class ReceiverUtils {
                 intentFilter.addAction(Intent.ACTION_SCREEN_ON);
                 intentFilter.setPriority(Integer.MAX_VALUE);
                 context.registerReceiver(aReceiver, intentFilter);
-                // L.i("[%s]----registAllReceiver...over....", SystemUtils.getCurrentProcessName(mContext));
+                // L.i("[%s]----registAllReceiver...over....",
+                // SystemUtils.getCurrentProcessName(mContext));
             }
         } catch (Throwable e) {
         }

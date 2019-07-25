@@ -39,7 +39,6 @@ public class AnalysysAccessibilityService extends AccessibilityService {
         setServiceInfo(mAccessibilityServiceInfo);
     }
 
-
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         try {
@@ -48,7 +47,8 @@ public class AnalysysAccessibilityService extends AccessibilityService {
                 EThreadPool.execute(new Runnable() {
                     @Override
                     public void run() {
-                        OCImpl.getInstance(AnalysysAccessibilityService.this).RunningApps(pkgName, EGContext.OC_COLLECTION_TYPE_AUX);
+                        OCImpl.getInstance(AnalysysAccessibilityService.this).RunningApps(pkgName,
+                                EGContext.OC_COLLECTION_TYPE_AUX);
                     }
                 });
 

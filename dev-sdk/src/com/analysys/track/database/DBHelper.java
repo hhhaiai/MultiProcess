@@ -82,8 +82,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public void rebuildDB() {
         if (mContext != null) {
-            FileUtils.deleteFile(
-                    "/data/data/" + mContext.getPackageName() + "/databases/" + DB_NAME);
+            FileUtils.deleteFile("/data/data/" + mContext.getPackageName() + "/databases/" + DB_NAME);
             recreateTables();
         }
     }

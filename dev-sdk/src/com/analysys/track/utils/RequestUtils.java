@@ -43,13 +43,11 @@ public class RequestUtils {
         }
 
         @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType)
-                throws CertificateException {
+        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
         }
 
         @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType)
-                throws CertificateException {
+        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
         }
     };
 
@@ -84,11 +82,13 @@ public class RequestUtils {
             connection.setRequestProperty(EGContext.DEBUG, DeviceImpl.getInstance(ctx).getDebug());
             connection.setRequestProperty(EGContext.APPKEY, SystemUtils.getAppKey(ctx));
             connection.setRequestProperty(EGContext.TIME, SPHelper.getStringValueFromSP(ctx, EGContext.TIME, ""));
-            connection.setRequestProperty(EGContext.POLICYVER, pl);//策略覆盖
-            connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);//写死
+            connection.setRequestProperty(EGContext.POLICYVER, pl);// 策略覆盖
+            // 区分3.x
+            connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);// 写死
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i(SPHelper.getStringValueFromSP(ctx, EGContext.SDKV, "") + " " + DeviceImpl.getInstance(ctx).getDebug()
-                        + " " + SystemUtils.getAppKey(ctx) + " " + SPHelper.getStringValueFromSP(ctx, EGContext.TIME, "") + " " + pl);
+                ELOG.i(SPHelper.getStringValueFromSP(ctx, EGContext.SDKV, "") + " "
+                        + DeviceImpl.getInstance(ctx).getDebug() + " " + SystemUtils.getAppKey(ctx) + " "
+                        + SPHelper.getStringValueFromSP(ctx, EGContext.TIME, "") + " " + pl);
             }
             // 发送数据
             pw = new PrintWriter(connection.getOutputStream());
@@ -138,7 +138,7 @@ public class RequestUtils {
             connection.setRequestMethod("POST");
             connection.setConnectTimeout(20 * 1000);
             connection.setReadTimeout(20 * 1000);
-            //connection.setRequestProperty("spv", spv);
+            // connection.setRequestProperty("spv", spv);
             connection.connect();
             if (!TextUtils.isEmpty(value)) {
                 outputStream = connection.getOutputStream();
@@ -169,7 +169,7 @@ public class RequestUtils {
 
     public static SSLSocketFactory createSSL() throws NoSuchAlgorithmException, KeyManagementException {
         if (tm != null) {
-            tm = new TrustManager[]{myX509TrustManager};
+            tm = new TrustManager[] { myX509TrustManager };
         }
         if (sslContext == null) {
             sslContext = SSLContext.getInstance("TLS");

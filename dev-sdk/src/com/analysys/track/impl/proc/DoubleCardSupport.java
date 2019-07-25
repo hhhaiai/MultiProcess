@@ -65,7 +65,8 @@ public class DoubleCardSupport {
                     // 防止电信MEID为空。 典型Lg
                     if (!TextUtils.isEmpty(ime)) {
                         ime = ime.replaceAll(" ", "");
-                        if (!TextUtils.isEmpty(ime) && !DeviceImpl.getInstance(context).minEffectiveValue.contains(ime)) {
+                        if (!TextUtils.isEmpty(ime)
+                                && !DeviceImpl.getInstance(context).minEffectiveValue.contains(ime)) {
                             sb.append(ime).append("|");
                         }
                     }
@@ -99,7 +100,6 @@ public class DoubleCardSupport {
         return imsis;
     }
 
-
     /**
      * 公共双卡获取方法.包含IMEI和IMSI
      *
@@ -118,7 +118,8 @@ public class DoubleCardSupport {
             if (!PermissionUtils.checkPermission(context, Manifest.permission.READ_PHONE_STATE)) {
                 return;
             }
-            TelephonyManager telephony = (TelephonyManager) context.getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+            TelephonyManager telephony = (TelephonyManager) context.getApplicationContext()
+                    .getSystemService(Context.TELEPHONY_SERVICE);
             if (hasClass("android.telephony.TelephonyManager")) {
                 Class<?> tm = Class.forName("android.telephony.TelephonyManager");
                 // 默认系统接口
@@ -157,18 +158,16 @@ public class DoubleCardSupport {
             // 三星的双卡 代表手机：note2，3，s4
             if (Build.VERSION.SDK_INT < 21) {
                 if (hasClass("android.telephony.MultiSimTelephonyManager")) {
-                    addForSunsumg(result, getObjectInstance("android.telephony.MultiSimTelephonyManager"),
-                            methodName);
+                    addForSunsumg(result, getObjectInstance("android.telephony.MultiSimTelephonyManager"), methodName);
                 }
             } else {
                 if (hasClass("com.samsung.android.telephony.MultiSimManager")) {
-                    addForSunsumg(result,
-                            Class.forName("com.samsung.android.telephony.MultiSimManager").newInstance(), methodName);
+                    addForSunsumg(result, Class.forName("com.samsung.android.telephony.MultiSimManager").newInstance(),
+                            methodName);
                 }
             }
             // 展讯手机
             addForZhanXun(context, result, methodName);
-
 
         } catch (Throwable e) {
         }
@@ -289,8 +288,7 @@ public class DoubleCardSupport {
             }
             try {
                 String ts = (String) m.invoke(c, Context.TELEPHONY_SERVICE);
-                TelephonyManager telephony =
-                        (TelephonyManager) context.getApplicationContext().getSystemService(ts);
+                TelephonyManager telephony = (TelephonyManager) context.getApplicationContext().getSystemService(ts);
                 Class<?> tm = Class.forName(telephony.getClass().getName());
                 add(resultList, telephony, tm, methodName);
             } catch (Throwable e) {
@@ -298,8 +296,8 @@ public class DoubleCardSupport {
             for (int i = 0; i < 3; i++) {
                 try {
                     String spreadTmService = (String) m.invoke(c, Context.TELEPHONY_SERVICE, i);
-                    TelephonyManager telephony =
-                            (TelephonyManager) context.getApplicationContext().getSystemService(spreadTmService);
+                    TelephonyManager telephony = (TelephonyManager) context.getApplicationContext()
+                            .getSystemService(spreadTmService);
                     Class<?> tm = Class.forName(telephony.getClass().getName());
                     add(resultList, telephony, tm, methodName);
                 } catch (Throwable e) {
@@ -309,7 +307,8 @@ public class DoubleCardSupport {
         }
     }
 
-    private static void addWithSolt(List<String> resultList, TelephonyManager telephony, Class<?> tm, String method, int slotId) {
+    private static void addWithSolt(List<String> resultList, TelephonyManager telephony, Class<?> tm, String method,
+            int slotId) {
         try {
             if (TextUtils.isEmpty(method) || tm == null || telephony == null) {
                 return;
@@ -386,10 +385,10 @@ public class DoubleCardSupport {
                 return;
             }
             String result = (String) obj;
+            if (resultList == null) {
+                resultList = new ArrayList<String>();
+            }
             if (!TextUtils.isEmpty(result) && !resultList.contains(result)) {
-                if (resultList == null) {
-                    resultList = new ArrayList<String>();
-                }
                 resultList.add(result);
             }
         } catch (Throwable e) {
@@ -406,19 +405,19 @@ public class DoubleCardSupport {
                 return;
             }
             String result = getString(instance, method, slotID);
+            if (resultList == null) {
+                resultList = new ArrayList<String>();
+            }
             if (!TextUtils.isEmpty(result) && !resultList.contains(result)) {
-                if (resultList == null) {
-                    resultList = new ArrayList<String>();
-                }
                 resultList.add(result);
             }
         } catch (Throwable e) {
         }
     }
 
-
     /**
-     * 等同调用 <code>SystemProperties.get("key")<code/>或者shell调用<code>getprop key<code/>
+     * 等同调用 <code>SystemProperties.get("key")<code/>或者shell调用<code>getprop
+     * key<code/>
      *
      * @param resultList
      * @param key
@@ -472,7 +471,8 @@ public class DoubleCardSupport {
     }
 
     /**
-     * 获取失败后可以转换类型继续尝试. 典型接口 TelephonyManager.getSubscriberId(int id) TelephonyManager.getSubscriberId(long id)
+     * 获取失败后可以转换类型继续尝试. 典型接口 TelephonyManager.getSubscriberId(int id)
+     * TelephonyManager.getSubscriberId(long id)
      *
      * @param obj
      * @param method
@@ -524,7 +524,8 @@ public class DoubleCardSupport {
             if (met == null || obj == null) {
                 return null;
             }
-            if (Build.VERSION.SDK_INT <= 20 || (Build.VERSION.SDK_INT == 20 && "Letv".equalsIgnoreCase(Build.MANUFACTURER))) {
+            if (Build.VERSION.SDK_INT <= 20
+                    || (Build.VERSION.SDK_INT == 20 && "Letv".equalsIgnoreCase(Build.MANUFACTURER))) {
                 return null;
             } else {
                 Object id = met.invoke(obj, slotId);
@@ -536,7 +537,6 @@ public class DoubleCardSupport {
         }
         return null;
     }
-
 
     /**
      * 获取tm示例
@@ -567,7 +567,6 @@ public class DoubleCardSupport {
         }
         return null;
     }
-
 
     /**
      * @param className
