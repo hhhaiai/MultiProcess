@@ -9,7 +9,7 @@ import android.text.TextUtils;
 import com.analysys.track.impl.DeviceImpl;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.FileUtils;
+import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.work.MessageDispatcher;
 
 public class AnalysysReceiver extends BroadcastReceiver {
@@ -50,9 +50,9 @@ public class AnalysysReceiver extends BroadcastReceiver {
             long currentTime = System.currentTimeMillis();
             if (intentPackageAdd.equals(intent.getAction())) {
                 try {
-                    if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST,
+                    if (MultiProcessChecker.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST,
                             EGContext.TIME_SYNC_DEFAULT, currentTime)) {
-                        FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST, currentTime);
+                        MultiProcessChecker.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST, currentTime);
                     } else {
                         return;
                     }
@@ -71,9 +71,9 @@ public class AnalysysReceiver extends BroadcastReceiver {
             }
             if (intentPackageRemove.equals(intent.getAction())) {
                 try {
-                    if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST,
+                    if (MultiProcessChecker.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST,
                             EGContext.TIME_SYNC_DEFAULT, currentTime)) {
-                        FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST,
+                        MultiProcessChecker.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST,
                                 currentTime);
                     } else {
                         return;
@@ -92,9 +92,9 @@ public class AnalysysReceiver extends BroadcastReceiver {
             }
             if (intentPackageReplace.equals(intent.getAction())) {
                 try {
-                    if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST,
+                    if (MultiProcessChecker.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST,
                             EGContext.TIME_SYNC_DEFAULT, currentTime)) {
-                        FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST,
+                        MultiProcessChecker.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST,
                                 currentTime);
                     } else {
                         return;
@@ -129,9 +129,9 @@ public class AnalysysReceiver extends BroadcastReceiver {
             }
             if (intentBatteryChanged.equals(intent.getAction())) {
                 try {
-                    if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_BATTERY_BROADCAST,
+                    if (MultiProcessChecker.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_BATTERY_BROADCAST,
                             EGContext.TIME_SYNC_DEFAULT, currentTime)) {
-                        FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_BATTERY_BROADCAST, currentTime);
+                        MultiProcessChecker.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_BATTERY_BROADCAST, currentTime);
                     } else {
                         return;
                     }
@@ -148,9 +148,9 @@ public class AnalysysReceiver extends BroadcastReceiver {
             }
             if (intentBootCompleted.equals(intent.getAction())) {
                 try {
-                    if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_BOOT_BROADCAST,
+                    if (MultiProcessChecker.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_BOOT_BROADCAST,
                             EGContext.TIME_SYNC_DEFAULT, currentTime)) {
-                        FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_BOOT_BROADCAST, currentTime);
+                        MultiProcessChecker.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_BOOT_BROADCAST, currentTime);
                     } else {
                         return;
                     }

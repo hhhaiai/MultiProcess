@@ -22,7 +22,7 @@ import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
-import com.analysys.track.utils.FileUtils;
+import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PermissionUtils;
@@ -70,9 +70,9 @@ public class LocationImpl {
         try {
             long currentTime = System.currentTimeMillis();
             MessageDispatcher.getInstance(mContext).locationInfo(EGContext.LOCATION_CYCLE);
-            if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_LOCATION, EGContext.LOCATION_CYCLE,
+            if (MultiProcessChecker.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_LOCATION, EGContext.LOCATION_CYCLE,
                     currentTime)) {
-                FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, currentTime);
+                MultiProcessChecker.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, currentTime);
             } else {
                 return;
             }

@@ -17,7 +17,7 @@ import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.receiver.AnalysysReceiver;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
-import com.analysys.track.utils.FileUtils;
+import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -344,16 +344,16 @@ public class MessageDispatcher {
         try {
             long currentTime = System.currentTimeMillis();
             if (on) {
-                if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SCREEN_ON_BROADCAST,
+                if (MultiProcessChecker.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SCREEN_ON_BROADCAST,
                         EGContext.TIME_SYNC_BROADCAST, currentTime)) {
-                    FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SCREEN_ON_BROADCAST, currentTime);
+                    MultiProcessChecker.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SCREEN_ON_BROADCAST, currentTime);
                 } else {
                     return;
                 }
             } else {
-                if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST,
+                if (MultiProcessChecker.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST,
                         EGContext.TIME_SYNC_BROADCAST, currentTime)) {
-                    FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST, currentTime);
+                    MultiProcessChecker.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST, currentTime);
                 } else {
                     return;
                 }
@@ -394,11 +394,11 @@ public class MessageDispatcher {
         try {
             // 补充时间
             if (AnalysysReceiver.mLastCloseTime == 0) {// 第一次时间为空，则取sp时间
-                long spLastVisitTime = FileUtils.getLockFileLastModifyTime(mContext, EGContext.FILES_SYNC_SP_WRITER);
+                long spLastVisitTime = MultiProcessChecker.getLockFileLastModifyTime(mContext, EGContext.FILES_SYNC_SP_WRITER);
                 if (System.currentTimeMillis() - spLastVisitTime > EGContext.TIME_SYNC_SP) {// 即便频繁开关屏也不能频繁操作sp
                     AnalysysReceiver.mLastCloseTime = SPHelper.getLongValueFromSP(mContext,
                             EGContext.LAST_AVAILABLE_TIME, 0);
-                    FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SP_WRITER,
+                    MultiProcessChecker.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SP_WRITER,
                             System.currentTimeMillis());
                 } else {
                     return;

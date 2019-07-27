@@ -129,6 +129,7 @@ public class EGContext {
     // public static final String APP_URL_SP = "app_url_sp";
     public static final int TIME_OUT_TIME = 30 * 1000; // 设置为30秒
     public static final String SDKV = "SDKV";
+    public static final String UPLOAD_HEAD_APPV = "appVer";
     public static final String DEBUG = "DEBUG";
     public static final String APPKEY = "AK";
     public static final String TIME = "TIME";

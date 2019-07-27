@@ -41,15 +41,15 @@ public class DBUtils {
 //    boolean isValid = false;
 //    long time = System.currentTimeMillis();
 //    if(EGContext.FILES_SYNC_APPSNAPSHOT.equals(fileName)){
-//      if(time - FileUtils.getLockFileLastModifyTime(ctx,fileName) > EGContext.SNAPSHOT_CYCLE){
+//      if(time - MultiProcessChecker.getLockFileLastModifyTime(ctx,fileName) > EGContext.SNAPSHOT_CYCLE){
 //          isValid = true;
 //      }
 //    }else if(EGContext.FILES_SYNC_LOCATION.equals(fileName)){
-//      if(time - FileUtils.getLockFileLastModifyTime(ctx,fileName) > EGContext.LOCATION_CYCLE){
+//      if(time - MultiProcessChecker.getLockFileLastModifyTime(ctx,fileName) > EGContext.LOCATION_CYCLE){
 //        isValid = true;
 //      }
 //    }else if(EGContext.FILES_SYNC_OC.equals(fileName)){
-//      if((time - FileUtils.getLockFileLastModifyTime(ctx,fileName) > EGContext.LOCATION_CYCLE)||SystemUtils.isScreenLocked(ctx)){
+//      if((time - MultiProcessChecker.getLockFileLastModifyTime(ctx,fileName) > EGContext.LOCATION_CYCLE)||SystemUtils.isScreenLocked(ctx)){
 //        isValid = true;
 //      }
 //    }

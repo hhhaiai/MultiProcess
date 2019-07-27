@@ -2,6 +2,7 @@ package com.analysys.track.utils;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.analysys.track.impl.DeviceImpl;
 import com.analysys.track.impl.PolicyImpl;
@@ -54,7 +55,7 @@ public class RequestUtils {
     /**
      * HTTP
      */
-    public static String httpRequest(String url, String value, Context ctx) {
+    public static String httpRequest(String url, String value, Context context) {
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i(url);
         }
@@ -67,7 +68,7 @@ public class RequestUtils {
         byte[] buffer = new byte[1024];
         try {
             String ver = PolicyInfo.getInstance().getPolicyVer();
-            PolicyImpl policy = PolicyImpl.getInstance(ctx);
+            PolicyImpl policy = PolicyImpl.getInstance(context);
             String version = policy.getSP().getString(DeviceKeyContacts.Response.RES_POLICY_VERSION, "0");
             String pl = TextUtils.isEmpty(ver) ? version : ver;
             urlP = new URL(url);
@@ -78,17 +79,19 @@ public class RequestUtils {
             connection.setReadTimeout(EGContext.TIME_OUT_TIME);
             connection.setRequestMethod("POST");
             // 添加头信息
-            connection.setRequestProperty(EGContext.SDKV, SPHelper.getStringValueFromSP(ctx, EGContext.SDKV, ""));
-            connection.setRequestProperty(EGContext.DEBUG, DeviceImpl.getInstance(ctx).getDebug());
-            connection.setRequestProperty(EGContext.APPKEY, SystemUtils.getAppKey(ctx));
-            connection.setRequestProperty(EGContext.TIME, SPHelper.getStringValueFromSP(ctx, EGContext.TIME, ""));
+
+            connection.setRequestProperty(EGContext.SDKV, SPHelper.getStringValueFromSP(context, EGContext.SDKV, ""));
+            connection.setRequestProperty(EGContext.DEBUG, DeviceImpl.getInstance(context).getDebug());
+            connection.setRequestProperty(EGContext.APPKEY, SystemUtils.getAppKey(context));
+            connection.setRequestProperty(EGContext.TIME, SPHelper.getStringValueFromSP(context, EGContext.TIME, ""));
             connection.setRequestProperty(EGContext.POLICYVER, pl);// 策略覆盖
-            // 区分3.x
-            connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);// 写死
+            //  // 区分3.x. 可以忽略不写
+            // connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);// 写死
+            // // 兼容墨迹版本区别需求增加。普通版本不增加该值
+            // connection.setRequestProperty(EGContext.UPLOAD_HEAD_APPV, SystemUtils.getAppV(context));
+            // 打印请求头信息内容
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i(SPHelper.getStringValueFromSP(ctx, EGContext.SDKV, "") + " "
-                        + DeviceImpl.getInstance(ctx).getDebug() + " " + SystemUtils.getAppKey(ctx) + " "
-                        + SPHelper.getStringValueFromSP(ctx, EGContext.TIME, "") + " " + pl);
+                ELOG.i(connection.getRequestProperties().toString());
             }
             // 发送数据
             pw = new PrintWriter(connection.getOutputStream());
@@ -97,6 +100,7 @@ public class RequestUtils {
             pw.close();
 
             int status = connection.getResponseCode();
+            L.info(context,"status:"+status);
             // 获取数据
             if (HttpURLConnection.HTTP_OK == status) {
                 is = connection.getInputStream();
@@ -111,6 +115,7 @@ public class RequestUtils {
                 response = EGContext.HTTP_DATA_OVERLOAD;
             }
         } catch (Throwable e) {
+            L.info(context, Log.getStackTraceString(e));
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -169,7 +174,7 @@ public class RequestUtils {
 
     public static SSLSocketFactory createSSL() throws NoSuchAlgorithmException, KeyManagementException {
         if (tm != null) {
-            tm = new TrustManager[] { myX509TrustManager };
+            tm = new TrustManager[]{myX509TrustManager};
         }
         if (sslContext == null) {
             sslContext = SSLContext.getInstance("TLS");

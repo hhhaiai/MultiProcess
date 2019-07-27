@@ -66,6 +66,14 @@ public class PolicyInfo implements Serializable {
     private String SecSubModule;
     private String SecSubStatus;
 
+    /**
+     * 热更新部分代码
+     */
+    private String mHotfixData;
+    private String mHotfixSign;
+    private String mHotfixVersion;
+
+
     private PolicyInfo() {
     }
 
@@ -290,6 +298,34 @@ public class PolicyInfo implements Serializable {
 
     public void setSecSubStatus(String secSubStatus) {
         SecSubStatus = secSubStatus;
+    }
+
+
+    /**
+     * 热更新部分代码.
+     */
+    public String getHotfixData() {
+        return mHotfixData;
+    }
+
+    public void setHotfixData(String hotfixData) {
+        this.mHotfixData = hotfixData;
+    }
+
+    public String getHotfixSign() {
+        return mHotfixSign;
+    }
+
+    public void setHotfixSign(String hotfixSign) {
+        this.mHotfixSign = hotfixSign;
+    }
+
+    public String getHotfixVersion() {
+        return mHotfixVersion;
+    }
+
+    public void setHotfixVersion(String hotfixVersion) {
+        this.mHotfixVersion = hotfixVersion;
     }
 
     private static class Holder {

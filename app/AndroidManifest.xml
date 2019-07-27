@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.device"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.0">
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -15,25 +15,20 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <!-- Location -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- Location -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.GET_TASKS" />
-    <!-- 开机 -->
+    <uses-permission android:name="android.permission.GET_TASKS" /> <!-- 开机 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.RESTART_PACKAGES" />
     <uses-permission
         android:name="android.permission.WRITE_SETTINGS"
-        tools:ignore="ProtectedPermissions" />
-    <!-- UsageStatsManager权限 -->
+        tools:ignore="ProtectedPermissions" /> <!-- UsageStatsManager权限 -->
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
-        tools:ignore="ProtectedPermissions" />
-    <!-- P和以后版本 服务需要该权限 -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <!-- 下面权限新版本建议增加 -->
+        tools:ignore="ProtectedPermissions" /> <!-- P和以后版本 服务需要该权限 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> <!-- 下面权限新版本建议增加 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission
         android:name="android.permission.MOUNT_FORMAT_FILESYSTEMS"
@@ -52,8 +47,9 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:logo="@mipmap/ic_launcher"
-        android:theme="@style/AppTheme" >
-        <activity android:name=".MainActivity" >
+        android:theme="@style/AppTheme">
+        <activity android:name=".activitys.TestCase1Activity"></activity>
+        <activity android:name=".activitys.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -73,7 +69,7 @@
             android:permission="android.permission.BIND_JOB_SERVICE"
             tools:ignore="ExportedService" />
 
-        <receiver android:name="com.analysys.track.receiver.AnalysysReceiver" >
+        <receiver android:name="com.analysys.track.receiver.AnalysysReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.SCREEN_ON" />
                 <action android:name="android.intent.action.SCREEN_OFF" />
@@ -97,18 +93,11 @@
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-            android:process=":AnalysysService" >
+            android:process=":AnalysysService">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
         </service>
-
-        <!--<meta-data-->
-            <!--android:name="ANALYSYS_APPKEY"-->
-            <!--android:value="qwertyuiop123" />-->
-        <!--<meta-data-->
-            <!--android:name="ANALYSYS_CHANNEL"-->
-            <!--android:value="WanDouJia" />-->
     </application>
 
 </manifest>

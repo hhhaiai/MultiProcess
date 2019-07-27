@@ -78,6 +78,20 @@ public class SystemUtils {
     }
 
     /**
+     * 获取APP版本
+     *
+     * @param context
+     * @return
+     */
+    public static String getAppV(Context context) {
+        try {
+            return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+        } catch (Throwable e) {
+            return "0";
+        }
+    }
+
+    /**
      * 获取日期
      */
     public static String getDay() {
@@ -295,7 +309,7 @@ public class SystemUtils {
     }
 
     /**
-     * @param key 优先级 传入==>metaData==>XML
+     * @param key     优先级 传入==>metaData==>XML
      * @param channel 多渠道打包==>代码==>XML
      */
     public static void updateAppkeyAndChannel(Context mContext, String key, String channel) {
@@ -501,10 +515,10 @@ public class SystemUtils {
 
 //    public static boolean duringTimeCycle(Context mContext, String fileName,int cycleTime){
 //        try {
-//            long time = FileUtils.getLockFileLastModifyTime(mContext,fileName);
+//            long time = MultiProcessChecker.getLockFileLastModifyTime(mContext,fileName);
 //            long now = System.currentTimeMillis();
 //            if( now - time > cycleTime){
-//                FileUtils.setLockLastModifyTime(mContext, fileName, now);
+//                MultiProcessChecker.setLockLastModifyTime(mContext, fileName, now);
 //                return true;
 //            }
 //        }catch (Throwable t){

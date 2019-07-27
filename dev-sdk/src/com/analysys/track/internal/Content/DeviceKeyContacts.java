@@ -227,6 +227,19 @@ public class DeviceKeyContacts {
         public static final String DY = "DY";
     }
 
+
+    /**
+     * @Copyright © 2019 sanbo Inc. All rights reserved.
+     * @Description: 内部使用的XXXinfo
+     * @Version: 1.0
+     * @Create: 2019-07-27 15:28:36
+     * @author: sanbo
+     * @mail: xueyongfu@analysys.com.cn
+     */
+    public static class XXXInfo {
+        public static final String NAME = "XXXInfo";
+    }
+
     /**
      * @Copyright © 2018 Analysys Inc. All rights reserved.
      * @Description: app安装/卸载/更新详情.
@@ -235,7 +248,7 @@ public class DeviceKeyContacts {
      * @Author: sanbo
      */
     public static class AppSnapshotInfo {
-        public static final String NAME = "AppSnapshotImpl";
+        public static final String NAME = "AppSnapshotInfo";
         // 应用包名. eg:com.hello
         public static final String ApplicationPackageName = "APN";
         // 应用程序名.eg: QQ
@@ -256,7 +269,7 @@ public class DeviceKeyContacts {
      * @Author: sanbo
      */
     public static class LocationInfo {
-        public static final String NAME = "LocationImpl";
+        public static final String NAME = "LocationInfo";
         // 时间
         public static final String CollectionTime = "CT";
         // 地理位置，由经度和纬度组成，用减号-连接
@@ -410,5 +423,16 @@ public class DeviceKeyContacts {
         public static final String RES_POLICY_MODULE_CL_DEV = "module_cl_dev";
         // XXX
         public static final String RES_POLICY_MODULE_CL_XXX = "module_cl_xxx";
+
+
+        /**
+         * 热更新部分
+         */
+        public static class HotFixResp {
+            public static final String HOTFIX_RESP_NAME = "patch";
+            public static final String HOTFIX_RESP_PATCH_VERSION = "version";
+            public static final String HOTFIX_RESP_PATCH_SIGN = "sign";
+            public static final String HOTFIX_RESP_PATCH_DATA = "data";
+        }
     }
 }

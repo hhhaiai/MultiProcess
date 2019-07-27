@@ -26,7 +26,7 @@ import com.analysys.track.impl.proc.DoubleCardSupport;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.model.BatteryModuleNameInfo;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.FileUtils;
+import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.SystemUtils;
@@ -633,7 +633,7 @@ public class DeviceImpl {
             }
             if ("".equals(macSerial)) {
                 try {
-                    return FileUtils.loadFileAsString("/sys/class/net/eth0/address").toUpperCase(Locale.getDefault())
+                    return MultiProcessChecker.loadFileAsString("/sys/class/net/eth0/address").toUpperCase(Locale.getDefault())
                             .substring(0, 17);
                 } catch (Exception e) {
                     return macSerial;

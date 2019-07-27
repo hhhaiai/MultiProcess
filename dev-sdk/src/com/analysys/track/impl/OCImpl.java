@@ -20,7 +20,7 @@ import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.utils.AccessibilityHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
-import com.analysys.track.utils.FileUtils;
+import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PermissionUtils;
@@ -74,17 +74,17 @@ public class OCImpl {
             long currentTime = System.currentTimeMillis();
             if (Build.VERSION.SDK_INT < 21) {
                 MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE);
-                if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_OC, EGContext.OC_CYCLE,
+                if (MultiProcessChecker.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_OC, EGContext.OC_CYCLE,
                         currentTime)) {
-                    FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_OC, currentTime);
+                    MultiProcessChecker.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_OC, currentTime);
                 } else {
                     return;
                 }
             } else if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {
                 MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE_OVER_5);
-                if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_OC, EGContext.OC_CYCLE_OVER_5,
+                if (MultiProcessChecker.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_OC, EGContext.OC_CYCLE_OVER_5,
                         currentTime)) {
-                    FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_OC, currentTime);
+                    MultiProcessChecker.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_OC, currentTime);
                 } else {
                     return;
                 }

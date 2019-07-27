@@ -20,7 +20,7 @@ import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileUtils {
+public class MultiProcessChecker {
 
     /**
      * 创建锁文件
@@ -62,9 +62,6 @@ public class FileUtils {
     public static long getLockFileLastModifyTime(Context cxt, String fileName) {
         try {
             cxt = EContextHelper.getContext(cxt);
-//            RandomAccessFile randomFile = null;
-//            FileChannel fileChannel = null;
-//            try {
             if (cxt != null) {
                 File dev = new File(cxt.getFilesDir(), fileName);
                 if (!dev.exists()) {
@@ -72,19 +69,6 @@ public class FileUtils {
                 }
                 return dev.lastModified();
             }
-//                    randomFile = new RandomAccessFile(dev, "rw");
-//                    fileChannel = randomFile.getChannel();
-//                    FileLock fl = fileChannel.tryLock();
-//                    if (fl != null) {
-//                return dev.lastModified();
-//                    }
-//            }
-//            } catch (Throwable t) {
-//                ELOG.e("多进程问题：：" + t);
-//            } finally {
-//                StreamerUtils.safeClose(randomFile);
-//                StreamerUtils.safeClose(fileChannel);
-//            }
 
         } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {
@@ -265,11 +249,11 @@ public class FileUtils {
     public static void writeFile(String egId, String tmpId, String filePath) {
 
         try {
-            if (!FileUtils.permisJudgment()) {
+            if (!MultiProcessChecker.permisJudgment()) {
                 return;
             }
             String id = "", egid = "", tmpid = "";
-            List<String> idInfo = FileUtils.readFile(filePath);
+            List<String> idInfo = MultiProcessChecker.readFile(filePath);
             if (idInfo.size() == 2) {
                 egid = idInfo.get(0);
                 tmpid = idInfo.get(1);

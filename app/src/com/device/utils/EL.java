@@ -1,8 +1,7 @@
-package com.analysys.track.utils;
+package com.device.utils;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.BaseBundle;
 import android.os.Build;
@@ -54,14 +53,13 @@ import javax.xml.transform.stream.StreamSource;
  *          log等级：VERBOSE/DEBUG/INFO/WARN/ERROR/ASSERT
  * 6.格式化输出.
  * 7.支持XML/JSON/Map/Array等更多对象打印
- * </pre>
+ *              </pre>
  * @Version: 6.1
  * @Create: 2015年6月18日 下午4:14:01
  * @Author: sanbo
  */
-public class L {
+public class EL {
 
-    private static String mCurrentName = L.class.getName();
     // 解析属性最大层级
     public static final int MAX_CHILD_LEVEL = 3;
     // 换行符
@@ -91,14 +89,19 @@ public class L {
     // 空格
     private static String CONTENT_SPACE = "  ";
     private static String CONTENT_LOG_INFO = "log info:";
-    // private static String CONTENT_LOG_EMPTY = "打印的日志信息为空!";
-    private static String CONTENT_LOG_EMPTY = "";
-    private static String content_title_begin = "╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
-    private static String content_title_info_callstack = "╔══════════════════════════════════════════════════════════════调用详情══════════════════════════════════════════════════════════════";
-    private static String content_title_info_log = "╔══════════════════════════════════════════════════════════════日志详情══════════════════════════════════════════════════════════════";
-    private static String content_title_info_error = "╔══════════════════════════════════════════════════════════════异常详情══════════════════════════════════════════════════════════════";
-    private static String content_title_info_type = "╔════════════════════════════════════════════════════「%s」════════════════════════════════════════════════════";
-    private static String content_title_end = "╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
+    private static String CONTENT_LOG_EMPTY = "打印的日志信息为空!";
+    private static String content_title_begin =
+            "╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
+    private static String content_title_info_callstack =
+            "╔══════════════════════════════════════════════════════════════调用详情══════════════════════════════════════════════════════════════";
+    private static String content_title_info_log =
+            "╔══════════════════════════════════════════════════════════════日志详情══════════════════════════════════════════════════════════════";
+    private static String content_title_info_error =
+            "╔══════════════════════════════════════════════════════════════异常详情══════════════════════════════════════════════════════════════";
+    private static String content_title_info_type =
+            "╔════════════════════════════════════════════════════「%s」════════════════════════════════════════════════════";
+    private static String content_title_end =
+            "╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
     /**
      * 行首为该符号时，不增加行首封闭符
      */
@@ -107,19 +110,19 @@ public class L {
     private static String CONTENT_C = "╚";
     private static String CONTENT_D = " ╔";
     private static String CONTENT_E = " ╚";
-    private static String CONTENT_WARNNING_SHELL = "Wranning....不够打印级别,请在命令行设置指令后重新尝试打印,命令行指令: adb shell setprop log.tag."
-            + DEFAULT_TAG + " ";
+    private static String CONTENT_WARNNING_SHELL =
+            "Wranning....不够打印级别,请在命令行设置指令后重新尝试打印,命令行指令: adb shell setprop log.tag." + DEFAULT_TAG + " ";
     private static Character FORMATER = '%';
 
-    private L() {
+    private EL() {
     }
 
     /**
      * 初始化接口
      *
      * @param showLog           是否展示log，默认展示
-     * @param shellControl      是否使用shell控制log动态打印.默认不使用. shell设置方式：setprop log.tag.sanbo
-     *                          INFO 最后一个参数为log等级,可选项目：VERBOSE/DEBUG/INFO/WARN/ERROR/ASSERT
+     * @param shellControl      是否使用shell控制log动态打印.默认不使用. shell设置方式：setprop log.tag.sanbo INFO
+     *                          最后一个参数为log等级,可选项目：VERBOSE/DEBUG/INFO/WARN/ERROR/ASSERT
      * @param needWarpper       是否需要格式化输出
      * @param needCallStackInfo 是否需要打印详细的堆栈调用信息.
      * @param format            是否需要格式化.
@@ -203,8 +206,7 @@ public class L {
     }
 
     /**
-     * 解析参数入口.这步骤开始忽略类型.解析所有参数,参数检查逻辑：
-     * 1.是否为String,若为String,则先判断是否格式化输出,不是再进行字符串转换格式尝试 2.对象其他类型判断:
+     * 解析参数入口.这步骤开始忽略类型.解析所有参数,参数检查逻辑： 1.是否为String,若为String,则先判断是否格式化输出,不是再进行字符串转换格式尝试 2.对象其他类型判断:
      * StringBuffer>StringBuild>Throwable>Intent>List>Map
      *
      * @param level
@@ -356,8 +358,8 @@ public class L {
      * <pre>
      * 只有第一个参数为字符串且不是格式化的情况下才会进入该方法.
      * 该方法是负责处理tag或者message的情况. 主要要支持多重格式：
-     * 1.x(TAG,Object);
-     * 2.x(msg,Object);
+     * 1.L.x(TAG,Object);
+     * 2.L.x(msg,Object);
      * 默认第一个参数为字符串且参数大于2个，第一个参数就为tag
      * </pre>
      *
@@ -409,7 +411,7 @@ public class L {
             if (currentFile && !isKeeping) {
                 break;
             }
-            if (ste.getClassName().equals(mCurrentName)) {
+            if (ste.getClassName().equals(EL.class.getName())) {
                 if (!currentFile) {
                     currentFile = true;
                 }
@@ -449,8 +451,8 @@ public class L {
                                     .append(wrapperString(cc));
                         } else {
                             sb.append("\n").append(content_title_begin).append("\n").append(CONTENT_LINE)
-                                    .append(String.format(content_simple_callstack, ste.getClassName(),
-                                            ste.getMethodName(), ste.getLineNumber()));
+                                    .append(String.format(content_simple_callstack, ste.getClassName(), ste.getMethodName(),
+                                            ste.getLineNumber()));
                             // 上一层会处理
                             // .append("\n");
                         }
@@ -993,6 +995,7 @@ public class L {
             }
         } catch (Throwable error) {
         } finally {
+
             if (sw != null) {
                 try {
                     sw.close();
@@ -1256,13 +1259,8 @@ public class L {
                 if (sb == null) {
                     sb = new StringBuilder();
                 }
-                if (sb.toString().getBytes().length + line.getBytes().length >= LOG_MAXLENGTH) {
-                    // 处理历史遗留数据
-                    String str = sb.toString();
-                    if (!TextUtils.isEmpty(str)) {
-                        realPrint(level, tag, wrapperString(str));
-                    }
-                    // 兼容首次首行过大问题。
+                if (sb.length() + line.length() >= LOG_MAXLENGTH) {
+                    realPrint(level, tag, wrapperString(sb.toString()));
                     sb = new StringBuilder();
                     if (line.length() >= LOG_MAXLENGTH) {
                         realPrint(level, tag, wrapperString(line));
@@ -1272,7 +1270,6 @@ public class L {
                     if (i != splitStr.size() - 1) {
                         sb.append("\n");
                     }
-
                 } else {
                     sb.append(line);
                     if (i != splitStr.size() - 1) {
@@ -1369,7 +1366,7 @@ public class L {
      * @param line
      */
     private static void processLine(int maxLen, List<String> result, String line) {
-        if (line.getBytes().length > maxLen) {
+        if (line.length() > maxLen) {
             int current = 0;
             String str;
             while (true) {
@@ -1386,16 +1383,6 @@ public class L {
         } else {
             result.add(line);
         }
-    }
-
-    public static void info(Context context, String info) {
-        try {
-            StackTraceElement[] eles = Thread.currentThread().getStackTrace();
-            i("[%s]------[%s.%s---%d]  %s ", SystemUtils.getCurrentProcessName(context), eles[3].getClassName(), eles[3].getMethodName(), eles[3].getLineNumber() + 1, info);
-        } catch (Throwable e) {
-            e(e);
-        }
-
     }
 
     public static final class MLEVEL {

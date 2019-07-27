@@ -17,7 +17,8 @@ import com.analysys.track.utils.DeflterCompressUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.EguanIdUtils;
-import com.analysys.track.utils.FileUtils;
+import com.analysys.track.utils.MultiProcessChecker;
+import com.analysys.track.utils.L;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.RequestUtils;
 import com.analysys.track.utils.SystemUtils;
@@ -45,11 +46,11 @@ public class UploadImpl {
      * 本条记录的时间
      */
     public static List<String> idList = new ArrayList<String>();
-    public final String DI = "DevInfo";
-    private final String ASI = "AppSnapshotInfo";
-    private final String LI = "LocationInfo";
-    private final String OCI = "OCInfo";
-    private final String XXXInfo = "XXXInfo";
+    //    public final String DI = "DevInfo";
+//    private final String ASI = "AppSnapshotInfo";
+//    private final String LI = "LocationInfo";
+//    private final String OCI = "OCInfo";
+//    private final String XXXInfo = "XXXInfo";
     Context mContext;
     String fail = "-1";
 
@@ -69,13 +70,7 @@ public class UploadImpl {
     public void upload() {
         try {
 
-//            L.info(mContext, "inside ...");
-//            if (EGContext.NETWORK_TYPE_NO_NET.equals(NetworkUtils.getNetworkType(mContext))) {
-//                if (EGContext.FLAG_DEBUG_INNER) {
-//                    ELOG.i("upload return");
-//                }
-//                return;
-//            }
+//            L.info(mContext, "inside upload...");
 
             if (!NetworkUtils.isNetworkAlive(mContext)) {
 //                L.info(mContext, " has not network ...will break...");
@@ -95,8 +90,8 @@ public class UploadImpl {
             long upLoadCycle = PolicyImpl.getInstance(mContext).getSP()
                     .getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL, EGContext.UPLOAD_CYCLE);
             MessageDispatcher.getInstance(mContext).uploadInfo(upLoadCycle);
-            if (FileUtils.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_UPLOAD, upLoadCycle, currentTime)) {
-                FileUtils.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_UPLOAD, currentTime);
+            if (MultiProcessChecker.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_UPLOAD, upLoadCycle, currentTime)) {
+                MultiProcessChecker.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_UPLOAD, currentTime);
             } else {
                 return;
             }
@@ -195,10 +190,10 @@ public class UploadImpl {
         }
     }
 
-    private void doUploadImpl() {
+    public void doUploadImpl() {
         try {
             String uploadInfo = getInfo();
-//            L.info("uploadInfo: "+uploadInfo);
+            L.info(mContext, "uploadInfo: " + uploadInfo);
 
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(uploadInfo);
@@ -207,7 +202,7 @@ public class UploadImpl {
                 SPHelper.setIntValue2SP(mContext, EGContext.REQUEST_STATE, EGContext.sPrepare);
                 return;
             }
-//            boolean isDebugMode = SPHelper.getBooleanValueFromSP(mContext,EGContext.DEBUG, false);
+            // boolean isDebugMode = SPHelper.getBooleanValueFromSP(mContext,EGContext.DEBUG, false);
             // 重置url
             PolicyImpl.getInstance(mContext).updateUpLoadUrl(EGContext.FLAG_DEBUG_USER);
             String url = EGContext.NORMAL_APP_URL;
@@ -218,7 +213,9 @@ public class UploadImpl {
                 SPHelper.setIntValue2SP(mContext, EGContext.REQUEST_STATE, EGContext.sPrepare);
                 return;
             }
-//            url = "http://192.168.220.167:8089";
+            url = "http://192.168.220.167:8089";
+            // L.info(mContext,"url: "+url);
+
             handleUpload(url, messageEncrypt(uploadInfo));
             int failNum = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);
             int maxFailCount = PolicyImpl.getInstance(mContext).getSP()
@@ -257,7 +254,7 @@ public class UploadImpl {
             } catch (Throwable t) {
             }
             if (devJson != null && devJson.length() > 0) {
-                object.put(DI, devJson);
+                object.put(DeviceKeyContacts.DevInfo.NAME, devJson);
             }
             // 从oc表查询closeTime不为空的整条信息，组装上传
             if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC,
@@ -266,7 +263,7 @@ public class UploadImpl {
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray ocJson = getModuleInfos(mContext, object, "OC", useFulLength);
                     if (ocJson != null && ocJson.length() > 0) {
-                        object.put(OCI, ocJson);
+                        object.put(DeviceKeyContacts.OCInfo.NAME, ocJson);
                     }
                 }
             } else {
@@ -279,7 +276,7 @@ public class UploadImpl {
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray locationInfo = getModuleInfos(mContext, object, "LOCATION", useFulLength);
                     if (locationInfo != null && locationInfo.length() > 0) {
-                        object.put(LI, locationInfo);
+                        object.put(DeviceKeyContacts.AppSnapshotInfo.NAME, locationInfo);
                     }
                 }
             } else {
@@ -292,7 +289,7 @@ public class UploadImpl {
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray snapshotJar = getModuleInfos(mContext, object, "SNAPSHOT", useFulLength);
                     if (snapshotJar != null && snapshotJar.length() > 0) {
-                        object.put(ASI, snapshotJar);
+                        object.put(DeviceKeyContacts.AppSnapshotInfo.NAME, snapshotJar);
                     }
                 }
             } else {
@@ -306,7 +303,7 @@ public class UploadImpl {
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray xxxInfo = getModuleInfos(mContext, object, "XXX", useFulLength);
                     if (xxxInfo != null && xxxInfo.length() > 0) {
-                        object.put(XXXInfo, xxxInfo);
+                        object.put(DeviceKeyContacts.XXXInfo.NAME, xxxInfo);
                     }
                 }
             } else {
@@ -408,21 +405,25 @@ public class UploadImpl {
         }
     }
 
+    //{"code": 500,"policy": {"policyVer": "20190725185335","patch": {"version": "002","sign": "1245ac90db2fc1cb2106172559657804","data": "UEsDBBQACAgIAO6O+U4AAAAAAAAAAAAAAAAUAAQATUVUQS1JTkYvTUFOSUZFU1QuTUb+ygAA803My0xLLS7RDUstKs7Mz7NSMNQz4OVySa3Q9clPTiwBCyXnJBYXpxbrpaRW8HI5F6UmlqSm6DpVWimkVACVG5rxcvFyAQBQSwcI8N6zmEcAAABJAAAAUEsDBBQACAgIAO6O+U4AAAAAAAAAAAAAAAALAAAAY2xhc3Nlcy5kZXidlE1oE0EUx9/MbnaTWtPY2prmtJprSQrqxYhYKX7Aig1CQHvatmvYkmxC3Jb05MfBu3jTCoKChXrRg149VulFvRSh0EsVQUHwLPp/M9MPqyc3+c2bffPezHsz83Ym7PaMHj1ODx/9TH4sr18Yma+tyqf0tbSZ3L97b3VlySZqE1G3dqyfzJOGrkBa3wPWgMMDQv3pPJp9kBPmfQnNhiRagXwB+Ra8Bx/ButRjm+AL+AZsiygPRsA5MAnmwQK4AW6DO+ABeAyWwXPwErwGbwD+lOJYQcbEyTH1gv0gBzgh20AmB+4vIgbX+D+R2jZtbA6YPuu3+s8k+0oaUltgqZwFZsoqmaJBoz8EKaHPE8en7VLbUtKAWXOYeH1b6V20B/XWKiwThzTyu1EI9SP6YOkc2jmeKYv5hPJZQ8PxHcGMBRi2vQzyysv6u4uvPrlXTsejPeRZvTSFsdjjtbNqHvbd+A9fzodj/GzpfKbYX6QQl4PxguyDpUuHqVewHGOZS2OE323MnjX5mmulYhHqLIeKxeKIoVTcfsg5GcVRcoqcsdJsMB+QGCfhk+WPVUj648CnQZ9HylGrPNGJ4uRy0gmDZoX6tboRxPXypanZcDr5Uwe7KK5XaPgv3Zm5qDETdvaYL1xPwua2eRJ2k/J4OB01g8bZVqcZYHZRJbtarZ4gUSNZ82lg8h/LOUG7HcYz5FxTXmQ3gygmqzWXULrNJn6rTi73kkZM6aSlHXFkLvZfoP11FfdeiT5+Ffk+PlFBt27aK5bMbFgis2gLsWbrmqA9e75V43JXnVu7an3rTLjeU7RT8w7t1L3wtB3Xvshpf64v6en5+XtgGRu+u+RpX3Wvc7rP35vfUEsHCFo9p8uGAgAAqAQAAFBLAQIUABQACAgIAO6O+U7w3rOYRwAAAEkAAAAUAAQAAAAAAAAAAAAAAAAAAABNRVRBLUlORi9NQU5JRkVTVC5NRv7KAABQSwECFAAUAAgICADujvlOWj2ny4YCAACoBAAACwAAAAAAAAAAAAAAAACNAAAAY2xhc3Nlcy5kZXhQSwUGAAAAAAIAAgB/AAAATAMAAAAA"}},"tmpid":"","egid":""}
+    //
     private void handleUpload(final String url, final String uploadInfo) {
+        L.info(mContext, " inside  url: " + url);
+
         if (TextUtils.isEmpty(url)) {
             SPHelper.setIntValue2SP(mContext, EGContext.REQUEST_STATE, EGContext.sPrepare);
             return;
         }
         String result = RequestUtils.httpRequest(url, uploadInfo, mContext);
-//        L.info("  result: " + result);
+        L.info(mContext, " result: " + result);
         if (TextUtils.isEmpty(result)) {
             SPHelper.setIntValue2SP(mContext, EGContext.REQUEST_STATE, EGContext.sPrepare);
             return;
         } else if (fail.equals(result)) {
             SPHelper.setIntValue2SP(mContext, EGContext.REQUEST_STATE, EGContext.sPrepare);
-//            //上传失败次数
-//            SPHelper.setIntValue2SP(mContext,EGContext.FAILEDNUMBER,SPHelper.getIntValueFromSP(mContext,EGContext.FAILEDNUMBER,0)+1);
-//            MessageDispatcher.getInstance(mContext).checkRetry();
+            // //上传失败次数
+            // SPHelper.setIntValue2SP(mContext,EGContext.FAILEDNUMBER,SPHelper.getIntValueFromSP(mContext,EGContext.FAILEDNUMBER,0)+1);
+            // MessageDispatcher.getInstance(mContext).checkRetry();
             return;
         }
         analysysReturnJson(result);
