@@ -9,9 +9,6 @@ import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import java.io.File;
 
-/**
- *
- */
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "e.data";

@@ -1,5 +1,13 @@
 package com.analysys.track.internal.Content;
 
+/**
+ * @Copyright 2019 sanbo Inc. All rights reserved.
+ * @Description: 服务器策略控制.那部分不能上传那部分能上传
+ * @Version: 1.0
+ * @Create: 2019-08-04 17:36:20
+ * @author: sanbo
+ * @mail: xueyongfu@analysys.com.cn
+ */
 public class DataController {
     /*
      * 模块的采集控制

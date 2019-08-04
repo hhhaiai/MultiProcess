@@ -1,5 +1,13 @@
 package com.analysys.track.internal.Content;
 
+
+/**
+ * @Copyright 2019 sanbo Inc. All rights reserved.
+ * @Description: 上传字段
+ * @Version: 1.0
+ * @Create: 2019-08-04 17:36:53
+ * @author: sanbo
+ */
 public class DeviceKeyContacts {
     /**
      * 设备相关信息

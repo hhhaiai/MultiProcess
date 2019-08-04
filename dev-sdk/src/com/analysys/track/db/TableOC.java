@@ -25,19 +25,6 @@ import java.util.List;
 
 public class TableOC {
 
-    private final String ZERO = "0";
-    private final String ONE = "1";
-    Context mContext;
-
-    private TableOC() {
-    }
-
-    public static TableOC getInstance(Context context) {
-        if (Holder.INSTANCE.mContext == null) {
-            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
-        }
-        return Holder.INSTANCE;
-    }
 
     /**
      * 存储数据
@@ -489,4 +476,18 @@ public class TableOC {
         private static final TableOC INSTANCE = new TableOC();
     }
 
+
+    private TableOC() {
+    }
+
+    public static TableOC getInstance(Context context) {
+        if (Holder.INSTANCE.mContext == null) {
+            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
+        }
+        return Holder.INSTANCE;
+    }
+
+    private final String ZERO = "0";
+    private final String ONE = "1";
+    private Context mContext;
 }

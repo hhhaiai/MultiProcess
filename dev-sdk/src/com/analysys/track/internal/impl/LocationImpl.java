@@ -111,7 +111,8 @@ public class LocationImpl {
 
             }
             if (mTelephonyManager == null) {
-                mTelephonyManager = AnalysysPhoneStateListener.getInstance(mContext).getTelephonyManager();
+                mTelephonyManager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+//                mTelephonyManager = AnalysysPhoneStateListener.getInstance(mContext).getTelephonyManager();
             }
             JSONObject location = getLocation();
             if (location != null && (location.has(DeviceKeyContacts.LocationInfo.GeographyLocation)

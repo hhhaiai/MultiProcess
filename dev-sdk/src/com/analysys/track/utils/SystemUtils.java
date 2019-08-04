@@ -356,7 +356,7 @@ public class SystemUtils {
             }
         }
         if (!TextUtils.isEmpty(key)) {
-            EGContext.APP_KEY_VALUE = key;
+            EGContext.VALUE_APPKEY = key;
             SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_KEY, key);
         }
         // 此处需要进行channel优先级处理,优先处理多渠道打包过来的channel,配置文件次之,接口传入的channel优先级最低
@@ -368,7 +368,7 @@ public class SystemUtils {
                 String xmlChannel = appInfo.metaData.getString(EGContext.XML_METADATA_CHANNEL);
                 if (!TextUtils.isEmpty(xmlChannel)) {
                     // 赋值为空
-                    EGContext.APP_CHANNEL_VALUE = xmlChannel;
+                    EGContext.VALUE_APP_CHANNEL = xmlChannel;
                     SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_CHANNEL, xmlChannel);
                     return;
                 }
@@ -376,12 +376,12 @@ public class SystemUtils {
             }
             if (!TextUtils.isEmpty(channel)) {
                 // 赋值接口传入的channel
-                EGContext.APP_CHANNEL_VALUE = channel;
+                EGContext.VALUE_APP_CHANNEL = channel;
                 SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_CHANNEL, channel);
             }
         } else {
             // 赋值多渠道打包的channel
-            EGContext.APP_CHANNEL_VALUE = channelFromApk;
+            EGContext.VALUE_APP_CHANNEL = channelFromApk;
             SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_CHANNEL, channelFromApk);
         }
     }
@@ -430,7 +430,7 @@ public class SystemUtils {
      */
     public static String getAppKey(Context context) {
         Context cxt = EContextHelper.getContext(context);
-        String appkey = EGContext.APP_KEY_VALUE;
+        String appkey = EGContext.VALUE_APPKEY;
         if (!TextUtils.isEmpty(appkey)) {
             return appkey;
         }
@@ -474,8 +474,8 @@ public class SystemUtils {
             }
         } catch (Throwable e) {
         }
-        if (!TextUtils.isEmpty(EGContext.APP_CHANNEL_VALUE)) {
-            return EGContext.APP_CHANNEL_VALUE;
+        if (!TextUtils.isEmpty(EGContext.VALUE_APP_CHANNEL)) {
+            return EGContext.VALUE_APP_CHANNEL;
         }
         channel = SPHelper.getStringValueFromSP(context, EGContext.SP_APP_CHANNEL, "");
         if (!TextUtils.isEmpty(channel)) {

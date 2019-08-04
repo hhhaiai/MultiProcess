@@ -22,17 +22,6 @@ import org.json.JSONObject;
 import java.util.List;
 
 public class TableXXXInfo {
-    Context mContext;
-
-    private TableXXXInfo() {
-    }
-
-    public static TableXXXInfo getInstance(Context context) {
-        if (Holder.INSTANCE.mContext == null) {
-            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
-        }
-        return Holder.INSTANCE;
-    }
 
     /**
      * 存储数据
@@ -40,9 +29,6 @@ public class TableXXXInfo {
     public void insert(JSONObject xxxInfo) {
         SQLiteDatabase db = null;
         try {
-//            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_OC)){
-//                return;
-//            }
             db = DBManager.getInstance(mContext).openDB();
             if (db == null || xxxInfo == null) {
                 return;
@@ -90,62 +76,6 @@ public class TableXXXInfo {
         return cv;
     }
 
-    // 连表查询
-//    public JSONArray select(){
-//        JSONArray  array = null;
-//        Cursor cursor = null;
-//        int blankCount = 0;
-//        try {
-//            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-//            if (db == null){
-//                return array;
-//            }
-//            if(!db.isOpen()){
-//                db = DBManager.getInstance(mContext).openDB();
-//            }
-//            array = new JSONArray();
-//            cursor = db.query(DBConfig.XXXInfo.TABLE_NAME,
-//                    null, null, null,
-//                    null, null, null);
-//            JSONObject jsonObject = null;
-//            String proc = null;
-//            while (cursor.moveToNext()) {
-//                if(blankCount >= EGContext.BLANK_COUNT_MAX){
-//                    return array;
-//                }
-//                jsonObject = new JSONObject();
-//                String id = cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.ID));
-//                if(TextUtils.isEmpty(id)){
-//                    blankCount += 1;
-//                }
-//                proc = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PROC)));
-//                if(!TextUtils.isEmpty(proc) && !"null".equalsIgnoreCase(proc)){
-//                    JsonUtils.pushToJSON(mContext,jsonObject,ProcUtils.RUNNING_RESULT,new JSONArray(proc),DataController.SWITCH_OF_CL_MODULE_PROC);
-//                    if(jsonObject == null || jsonObject.length() < 1){
-//                        return array;
-//                    }else {
-//                        String time = EncryptUtils.decrypt(mContext,cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TIME)));
-//                        JsonUtils.pushToJSON(mContext,jsonObject,ProcUtils.RUNNING_TIME,time,DataController.SWITCH_OF_RUNNING_TIME);
-//                        jsonObject.put(ProcUtils.ID,id);
-//                    }
-//                }else {
-//                    return array;
-//                }
-//                array.put(new String(Base64.encode(String.valueOf(jsonObject).getBytes(),Base64.DEFAULT)));
-//            }
-//        } catch (Throwable e) {
-//            if(EGContext.FLAG_DEBUG_INNER) {
-//                ELOG.e(e);
-//            }
-//            array = null;
-//        }finally {
-//            if(cursor != null){
-//                cursor.close();
-//            }
-//            DBManager.getInstance(mContext).closeDB();
-//        }
-//        return array;
-//    }
     public void delete() {
         SQLiteDatabase db = null;
         try {
@@ -278,4 +208,17 @@ public class TableXXXInfo {
     private static class Holder {
         private static final TableXXXInfo INSTANCE = new TableXXXInfo();
     }
+
+    private Context mContext;
+
+    private TableXXXInfo() {
+    }
+
+    public static TableXXXInfo getInstance(Context context) {
+        if (Holder.INSTANCE.mContext == null) {
+            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
+        }
+        return Holder.INSTANCE;
+    }
+
 }

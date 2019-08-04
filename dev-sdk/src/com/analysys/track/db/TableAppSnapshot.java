@@ -24,17 +24,6 @@ import java.util.Map;
 
 public class TableAppSnapshot {
 
-    Context mContext;
-
-    private TableAppSnapshot() {
-    }
-
-    public static TableAppSnapshot getInstance(Context context) {
-        if (Holder.INSTANCE.mContext == null) {
-            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
-        }
-        return Holder.INSTANCE;
-    }
 
     /**
      * 覆盖新增数据，多条
@@ -369,4 +358,17 @@ public class TableAppSnapshot {
     private static class Holder {
         private static final TableAppSnapshot INSTANCE = new TableAppSnapshot();
     }
+
+    public static TableAppSnapshot getInstance(Context context) {
+        if (Holder.INSTANCE.mContext == null) {
+            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
+        }
+        return Holder.INSTANCE;
+    }
+
+    private TableAppSnapshot() {
+    }
+
+    private Context mContext;
+
 }

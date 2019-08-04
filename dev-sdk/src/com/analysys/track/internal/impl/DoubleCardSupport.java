@@ -14,6 +14,13 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @Copyright © 2019 Analysys Inc. All rights reserved.
+ * @Description 双卡获取方案
+ * @Version 1.0
+ * @Create 2019/3/21 09:40
+ * @Author sanbo
+ */
 public class DoubleCardSupport {
 
     /**

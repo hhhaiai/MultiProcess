@@ -19,19 +19,6 @@ import org.json.JSONObject;
 
 public class TableLocation {
 
-    Context mContext;
-    String mInsertStatusDefault = "0";
-    String mInsertStatusReadOver = "1";
-
-    private TableLocation() {
-    }
-
-    public static TableLocation getInstance(Context context) {
-        if (Holder.INSTANCE.mContext == null) {
-            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
-        }
-        return Holder.INSTANCE;
-    }
 
     public void insert(JSONObject locationInfo) {
         try {
@@ -191,4 +178,19 @@ public class TableLocation {
     private static class Holder {
         private static final TableLocation INSTANCE = new TableLocation();
     }
+
+
+    private TableLocation() {
+    }
+
+    public static TableLocation getInstance(Context context) {
+        if (Holder.INSTANCE.mContext == null) {
+            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
+        }
+        return Holder.INSTANCE;
+    }
+
+    private Context mContext;
+    private String mInsertStatusDefault = "0";
+    private String mInsertStatusReadOver = "1";
 }

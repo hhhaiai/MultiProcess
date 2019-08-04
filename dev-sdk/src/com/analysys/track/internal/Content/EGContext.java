@@ -119,7 +119,7 @@ public class EGContext {
 
     // public static final String RT_DOMAIN_NAME = "rt101.analysys.cn";
 //    public static final String USERTP_URL = URL_SCHEME + RT_DOMAIN_NAME + RT_PORT;
-    public static final String EGIDKEY = "egid";
+//    public static final String EGIDKEY = "egid";
     // public static final String TEST_CALLBACK_DOMAIN_NAME = "192.168.8.150";
     public static final String TMPIDKEY = "tmpid";
     // 用于jobservice
@@ -129,7 +129,6 @@ public class EGContext {
     // public static final String APP_URL_SP = "app_url_sp";
     public static final int TIME_OUT_TIME = 30 * 1000; // 设置为30秒
     public static final String SDKV = "SDKV";
-    public static final String UPLOAD_HEAD_APPV = "appVer";
     public static final String DEBUG = "DEBUG";
     public static final String APPKEY = "AK";
     public static final String TIME = "TIME";
@@ -142,8 +141,7 @@ public class EGContext {
     public static final String HTTP_STATUS_200 = "200";
     // 500 策略。返回值内部状态
     public static final String HTTP_STATUS_500 = "500";
-    // int default 值
-    public static final int DEFAULT = 0;
+
     // OCINFO
     public static final String LAST_APP_NAME = "lastAppName";
     public static final String LAST_PACKAGE_NAME = "lastPackageName";
@@ -151,25 +149,17 @@ public class EGContext {
     public static final String LAST_APP_VERSION = "lastAppVersion";
     public static final String LAST_OPEN_TIME = "lastOpenTime";
     public static final String LAST_AVAILABLE_TIME = "lastAvailableTime";
-    // public static final String MIN_DURATION_TIME = "minDuration";
-//    public static final String MAX_DURATION_TIME = "maxDuration";
     public static final String APP_TYPE = "applicationType";
     public static final int SHORT_TIME = 5 * 1000;// 计时器时间间隔毫秒数
-    public static final long LONGEST_TIME = 5 * 60 * 60 * 1000;
     public static final long DEFAULT_SPACE_TIME = 30 * 1000;// 默认开关屏时间间隔在30s以上，才算一次有效的时间闭合事件
     public static final String CLOSE_SCREEN = "2";
     public static final String APP_SWITCH = "1";
     public static final String SERVICE_RESTART = "3";
-    public static final String NORMAL = "0";
     public static final String THREAD_NAME = "com.eguan";
-    // public static long HEARTBEAT_LAST_TIME_STMP = -1;
-//    public static long SNAPSHOT_LAST_TIME_STMP = -1;
-//    public static long LOCATION_LAST_TIME_STMP = -1;
-//    public static long OC_LAST_TIME_STMP = -1;
-//    public static long UPLOAD_LAST_TIME_STMP = -1;
     public static final String UPLOAD_KEY_WORDS = "facility4";
     public static final String EXTRA_DATA = "ETDM";
     public static final int BLANK_COUNT_MAX = 10;
+
     /************************************************************************************/
     // SDK发送同步文件,首次SDK初始化时创建
     public static final String FILES_SYNC_UPLOAD = "SNET.TAG";
@@ -230,8 +220,9 @@ public class EGContext {
      * 用户debug控制
      */
     public static boolean FLAG_DEBUG_USER = false;
-    public static String APP_KEY_VALUE = "";
-    public static String APP_CHANNEL_VALUE = "";
+
+    public static String VALUE_APPKEY = "";
+    public static String VALUE_APP_CHANNEL = "";
     public static String EGUAN_CHANNEL_PREFIX = "EGUAN_CHANNEL_";
     public static String APP_URL = "";
     public static String NORMAL_APP_URL = EGContext.URL_SCHEME + EGContext.NORMAL_UPLOAD_URL[0] + EGContext.ORI_PORT;
@@ -247,7 +238,7 @@ public class EGContext {
     /**
      * 判断是否debug App列表
      */
-    public static String TEXT_DEBUG_APP = "packageName";
-    public static String TEXT_DEBUG_STATUS = "debugable";
+    public static final String TEXT_DEBUG_APP = "packageName";
+    public static final String TEXT_DEBUG_STATUS = "debugable";
 
 }

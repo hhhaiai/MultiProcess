@@ -28,7 +28,6 @@ import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PermissionUtils;
-import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -349,20 +348,25 @@ public class DeviceImpl {
      */
     @SuppressWarnings("deprecation")
     public String getSerialNumber() {
-        String result = "";
+        String serialNo = "";
         try {
             if (Build.VERSION.SDK_INT > 26) {
-
                 Class<?> clazz = Class.forName("android.os");
                 Method method = clazz.getMethod("getSerial");
-                result = (String) method.invoke(null);
+                serialNo = (String) method.invoke(null);
             } else {
-                result = Build.SERIAL;
+                if (android.os.Build.VERSION.SDK_INT >= 9) {
+                    serialNo = android.os.Build.SERIAL;
+                }
+            }
+            if (TextUtils.isEmpty(serialNo)) {
+                Class<?> c = Class.forName("android.os.SystemProperties");
+                Method get = c.getMethod("get", String.class);
+                serialNo = (String) get.invoke(c, "ro.serialnocustom");
             }
         } catch (Throwable e) {
-            result = "";
         }
-        return result;
+        return serialNo;
     }
 
     private DisplayMetrics getDisplayMetrics() {
@@ -486,19 +490,6 @@ public class DeviceImpl {
         return "";
     }
 
-    /**
-     * 推广渠道
-     */
-    public String getApplicationChannel() {
-        return SystemUtils.getAppChannel(mContext);
-    }
-
-    /**
-     * 样本应用key
-     */
-    public String getApplicationKey() {
-        return SystemUtils.getAppKey(mContext);
-    }
 
     /**
      * 应用名称
@@ -513,12 +504,6 @@ public class DeviceImpl {
         return UNKNOW;
     }
 
-    /**
-     * API等级
-     */
-    public String getAPILevel() {
-        return String.valueOf(Build.VERSION.SDK_INT);
-    }
 
     /**
      * 应用包名
@@ -725,39 +710,6 @@ public class DeviceImpl {
         builder.append(string);
     }
 
-    // DevFurtherdetailImpl
-    @SuppressWarnings("deprecation")
-    public String getCPUModel() {
-        return Build.CPU_ABI + ":" + Build.CPU_ABI2;
-    }
-
-    public String getBuildId() {
-        return Build.ID;
-    }
-
-    public String getBuildDisplay() {
-        return Build.DISPLAY;
-    }
-
-    public String getBuildProduct() {
-        return Build.PRODUCT;
-    }
-
-    public String getBuildDevice() {
-        return Build.DEVICE;
-    }
-
-    public String getBuildBoard() {
-        return Build.BOARD;
-    }
-
-    public String getBuildBootloader() {
-        return Build.BOOTLOADER;
-    }
-
-    public String getBuildHardware() {
-        return Build.HARDWARE;
-    }
 
     public String getBuildSupportedAbis() {
         try {
@@ -774,7 +726,6 @@ public class DeviceImpl {
         } catch (Throwable t) {
             return "";
         }
-
     }
 
     public String getBuildSupportedAbis64() {
@@ -783,100 +734,8 @@ public class DeviceImpl {
         } catch (Throwable t) {
             return "";
         }
-
     }
 
-    public String getBuildType() {
-        try {
-            return Build.TYPE;
-        } catch (Throwable t) {
-            return "";
-        }
-
-    }
-
-    public String getBuildTags() {
-        try {
-            return Build.TAGS;
-        } catch (Throwable t) {
-            return "";
-        }
-
-    }
-
-    public String getBuildFingerPrint() {
-        try {
-            return Build.FINGERPRINT;
-        } catch (Throwable t) {
-            return "";
-        }
-
-    }
-
-    public String getBuildRadioVersion() {
-        try {
-            return Build.getRadioVersion();
-        } catch (Throwable t) {
-            return "";
-        }
-
-    }
-
-    public String getBuildIncremental() {
-        try {
-            return Build.VERSION.INCREMENTAL;
-        } catch (Throwable t) {
-            return "";
-        }
-
-    }
-
-    public String getBuildBaseOS() {
-        try {
-            return Build.VERSION.BASE_OS;
-        } catch (Throwable t) {
-            return "";
-        }
-
-    }
-
-    public String getBuildSecurityPatch() {
-        try {
-            return Build.VERSION.SECURITY_PATCH;
-        } catch (Throwable t) {
-            return "";
-        }
-
-    }
-
-    public String getBuildSdkInt() {
-        try {
-            return String.valueOf(Build.VERSION.SDK_INT);
-        } catch (Throwable t) {
-            return "";
-        }
-
-    }
-
-    public String getBuildPreviewSdkInt() {
-        String value = "";
-        try {
-            value = String.valueOf(Build.VERSION.PREVIEW_SDK_INT);
-        } catch (Throwable t) {
-            value = "";
-        }
-        return value;
-    }
-
-    public String getBuildCodename() {
-        String codeName = "";
-        try {
-            codeName = Build.VERSION.CODENAME;
-        } catch (Throwable t) {
-            codeName = "";
-        }
-        return codeName;
-    }
 
     public String getIDFA() {
         String idfa = "";

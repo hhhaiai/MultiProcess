@@ -56,9 +56,6 @@ public class DBManager {
             }
 
         }
-//        finally {
-//            db = null;
-//        }
     }
 
     private static class Holder {

@@ -29,31 +29,4 @@ public class DBUtils {
         }
         return result;
     }
-
-    /**
-     * 保证同一时间间隔内只操作一次数据库，防止重复操作
-     *
-     * @param ctx
-     * @param fileName
-     * @return
-     */
-//  public static boolean isValidData(Context ctx,String fileName){
-//    boolean isValid = false;
-//    long time = System.currentTimeMillis();
-//    if(EGContext.FILES_SYNC_APPSNAPSHOT.equals(fileName)){
-//      if(time - MultiProcessChecker.getLockFileLastModifyTime(ctx,fileName) > EGContext.SNAPSHOT_CYCLE){
-//          isValid = true;
-//      }
-//    }else if(EGContext.FILES_SYNC_LOCATION.equals(fileName)){
-//      if(time - MultiProcessChecker.getLockFileLastModifyTime(ctx,fileName) > EGContext.LOCATION_CYCLE){
-//        isValid = true;
-//      }
-//    }else if(EGContext.FILES_SYNC_OC.equals(fileName)){
-//      if((time - MultiProcessChecker.getLockFileLastModifyTime(ctx,fileName) > EGContext.LOCATION_CYCLE)||SystemUtils.isScreenLocked(ctx)){
-//        isValid = true;
-//      }
-//    }
-//  return isValid;
-//  }
-
 }

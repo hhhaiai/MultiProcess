@@ -21,26 +21,6 @@ import java.io.OutputStream;
 
 public class EguanIdUtils {
 
-    private final String EGUANFILE = "eg.a";
-    //    private final String TMPIDKEY = "tmpid";
-    private Context mContext;
-
-    private EguanIdUtils() {
-    }
-
-    public static EguanIdUtils getInstance(Context context) {
-        Holder.Instance.init(context);
-        return Holder.Instance;
-    }
-
-    private void init(Context cxt) {
-        cxt = EContextHelper.getContext(cxt);
-        if (cxt != null) {
-            if (mContext == null) {
-                mContext = cxt;
-            }
-        }
-    }
 
     /**
      * 获取tempid
@@ -214,7 +194,7 @@ public class EguanIdUtils {
      * 向SD卡存储数据
      */
     private void writeFile(String tmpId) {
-
+        OutputStream out = null;
         try {
             if (!permisJudgment()) {
                 return;
@@ -232,12 +212,12 @@ public class EguanIdUtils {
             }
 
             String st = new String(id.getBytes(), "utf-8");
-            File file = new File(Environment.getExternalStorageDirectory(), EGUANFILE);
-            OutputStream out = new FileOutputStream(file, false);
+            File file = new File(Environment.getExternalStorageDirectory(), EGContext.EGUANFILE);
+            out = new FileOutputStream(file, false);
             out.write(st.getBytes());
-            out.close();
         } catch (Throwable e) {
-
+        } finally {
+            StreamerUtils.safeClose(out);
         }
     }
 
@@ -247,20 +227,22 @@ public class EguanIdUtils {
      * @return
      */
     private String readIdFile() {
+        BufferedReader br = null;
+        String readline = null;
         try {
             if (fileJudgment() && !permisJudgment()) {
                 return "";
             }
-            File file = new File(Environment.getExternalStorageDirectory(), EGUANFILE);
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String readline;
+            File file = new File(Environment.getExternalStorageDirectory(), EGContext.EGUANFILE);
+            br = new BufferedReader(new FileReader(file));
             StringBuffer sb = new StringBuffer();
             while ((readline = br.readLine()) != null) {
                 sb.append(readline);
             }
-            br.close();
             return String.valueOf(sb);
         } catch (Throwable e) {
+        } finally {
+            StreamerUtils.safeClose(br);
         }
         return "";
     }
@@ -282,8 +264,8 @@ public class EguanIdUtils {
      * 判断文件是否存在 ，true 存在 false 不存在
      */
     private boolean fileJudgment() {
-        String address = String.valueOf(Environment.getExternalStorageDirectory()) + "/" + EGUANFILE;
-        File file = new File(address);
+//        String address = String.valueOf(Environment.getExternalStorageDirectory()) + "/" + EGContext.EGUANFILE;
+        File file = new File(Environment.getExternalStorageDirectory(), EGContext.EGUANFILE);
         if (file.exists()) {
             return true;
         } else {
@@ -295,35 +277,24 @@ public class EguanIdUtils {
         private static EguanIdUtils Instance = new EguanIdUtils();
     }
 
-//    private List<String> readFile() {
-//
-//        String idInfo = readIdFile();
-//        List<String> list = new ArrayList<String>();
-//        try {
-//            if (!TextUtils.isEmpty(idInfo)) {
-//                int index = idInfo.indexOf("$");
-//                int lastIndex = idInfo.lastIndexOf("$");
-//                if (idInfo.length() > 2 && index == lastIndex) {
-//                    if (index == 0 && idInfo.length() - 1 > 0) {
-//                        list.add("");
-//                        list.add(idInfo.substring(1, idInfo.length()));
-//                        return list;
-//                    }
-//                    if (index != 0 && index == idInfo.length() - 1) {
-//                        list.add(idInfo.substring(0, index));
-//                        list.add("");
-//                    } else {
-//                        String[] ids = idInfo.split("\\$");
-//                        if (ids.length == 2) {
-//                            list.add(ids[0]);
-//                            list.add(ids[1]);
-//                        }
-//                    }
-//                }
-//            }
-//        } catch (Throwable e) {
-//
-//        }
-//        return list;
-//    }
+
+    private EguanIdUtils() {
+    }
+
+    public static EguanIdUtils getInstance(Context context) {
+        Holder.Instance.init(context);
+        return Holder.Instance;
+    }
+
+    private void init(Context cxt) {
+        if (mContext == null) {
+            cxt = EContextHelper.getContext(cxt);
+            if (cxt != null) {
+                mContext = cxt;
+            }
+        }
+
+    }
+
+    private Context mContext;
 }

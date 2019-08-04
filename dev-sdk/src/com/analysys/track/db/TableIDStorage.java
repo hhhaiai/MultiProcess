@@ -12,17 +12,6 @@ import com.analysys.track.utils.reflectinon.EContextHelper;
 
 public class TableIDStorage {
 
-    Context mContext;
-
-    private TableIDStorage() {
-    }
-
-    public static TableIDStorage getInstance(Context context) {
-        if (Holder.INSTANCE.mContext == null) {
-            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
-        }
-        return Holder.INSTANCE;
-    }
 
     /**
      * 存储eguanid tempid
@@ -112,4 +101,15 @@ public class TableIDStorage {
         private static final TableIDStorage INSTANCE = new TableIDStorage();
     }
 
+    private Context mContext;
+
+    private TableIDStorage() {
+    }
+
+    public static TableIDStorage getInstance(Context context) {
+        if (Holder.INSTANCE.mContext == null) {
+            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
+        }
+        return Holder.INSTANCE;
+    }
 }

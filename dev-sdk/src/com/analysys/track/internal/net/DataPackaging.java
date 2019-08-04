@@ -1,6 +1,7 @@
 package com.analysys.track.internal.net;
 
 import android.content.Context;
+import android.os.Build;
 
 import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
@@ -73,12 +74,12 @@ public class DataPackaging {
             } catch (Throwable t) {
             }
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationChannel,
-                    devImpl.getApplicationChannel(), DataController.SWITCH_OF_APPLICATION_CHANNEL);
+                    SystemUtils.getAppChannel(mContext), DataController.SWITCH_OF_APPLICATION_CHANNEL);
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationKey,
-                    devImpl.getApplicationKey(), DataController.SWITCH_OF_APPLICATION_KEY);
+                    SystemUtils.getAppKey(mContext), DataController.SWITCH_OF_APPLICATION_KEY);
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationName,
                     devImpl.getApplicationName(), DataController.SWITCH_OF_APPLICATION_NAME);
-            JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.APILevel, devImpl.getAPILevel(),
+            JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.APILevel, String.valueOf(Build.VERSION.SDK_INT),
                     DataController.SWITCH_OF_APILEVEL);
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationPackageName,
                     devImpl.getApplicationPackageName(), DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
@@ -158,48 +159,48 @@ public class DataPackaging {
             if (PolicyImpl.getInstance(mContext).getValueFromSp(
                     DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_MORE_INFO,
                     DataController.SWITCH_OF_MODULE_CL_MORE_INFO)) {
-                JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.CPUModel, devImpl.getCPUModel(),
+                JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.CPUModel, String.format("%s:%s",Build.CPU_ABI,Build.CPU_ABI2),
                         DataController.SWITCH_OF_CPU_MODEL);
-                JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildId, devImpl.getBuildId(),
+                JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildId, Build.ID,
                         DataController.SWITCH_OF_BUILD_ID);
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildDisplay,
-                        devImpl.getBuildDisplay(), DataController.SWITCH_OF_BUILD_DISPLAY);
+                        Build.DISPLAY, DataController.SWITCH_OF_BUILD_DISPLAY);
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildProduct,
-                        devImpl.getBuildProduct(), DataController.SWITCH_OF_BUILD_PRODUCT);
+                        Build.PRODUCT, DataController.SWITCH_OF_BUILD_PRODUCT);
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildDevice,
-                        devImpl.getBuildDevice(), DataController.SWITCH_OF_BUILD_DEVICE);
+                        Build.DEVICE, DataController.SWITCH_OF_BUILD_DEVICE);
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildBoard,
-                        devImpl.getBuildBoard(), DataController.SWITCH_OF_BUILD_BOARD);
+                        Build.BOARD, DataController.SWITCH_OF_BUILD_BOARD);
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildBootloader,
-                        devImpl.getBuildBootloader(), DataController.SWITCH_OF_BUILD_BOOT_LOADER);
+                        Build.BOOTLOADER, DataController.SWITCH_OF_BUILD_BOOT_LOADER);
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildHardware,
-                        devImpl.getBuildHardware(), DataController.SWITCH_OF_BUILD_HARDWARE);
+                        Build.HARDWARE, DataController.SWITCH_OF_BUILD_HARDWARE);
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildSupportedAbis,
                         devImpl.getBuildSupportedAbis(), DataController.SWITCH_OF_BUILD_SUPPORTED_ABIS);
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildSupportedAbis32,
                         devImpl.getBuildSupportedAbis32(), DataController.SWITCH_OF_BUILD_SUPPORTED_ABIS_32);
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildSupportedAbis64,
                         devImpl.getBuildSupportedAbis64(), DataController.SWITCH_OF_BUILD_SUPPORTED_ABIS_64);
-                JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildType, devImpl.getBuildType(),
+                JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildType, Build.TYPE,
                         DataController.SWITCH_OF_BUILD_TYPE);
-                JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildTags, devImpl.getBuildTags(),
+                JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildTags, Build.TAGS,
                         DataController.SWITCH_OF_BUILD_TAGS);
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildFingerPrint,
-                        devImpl.getBuildFingerPrint(), DataController.SWITCH_OF_BUILD_FINGER_PRINT);
+                        Build.FINGERPRINT, DataController.SWITCH_OF_BUILD_FINGER_PRINT);
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildRadioVersion,
-                        devImpl.getBuildRadioVersion(), DataController.SWITCH_OF_BUILD_RADIO_VERSION);
+                        Build.getRadioVersion(), DataController.SWITCH_OF_BUILD_RADIO_VERSION);
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildIncremental,
-                        devImpl.getBuildIncremental(), DataController.SWITCH_OF_BUILD_INCREMENTAL);
+                        Build.VERSION.INCREMENTAL, DataController.SWITCH_OF_BUILD_INCREMENTAL);
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildBaseOS,
-                        devImpl.getBuildBaseOS(), DataController.SWITCH_OF_BUILD_BASE_OS);
+                        Build.VERSION.BASE_OS, DataController.SWITCH_OF_BUILD_BASE_OS);
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildSecurityPatch,
-                        devImpl.getBuildSecurityPatch(), DataController.SWITCH_OF_BUILD_SECURITY_PATCH);
+                        Build.VERSION.SECURITY_PATCH, DataController.SWITCH_OF_BUILD_SECURITY_PATCH);
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildSdkInt,
-                        devImpl.getBuildSdkInt(), DataController.SWITCH_OF_BUILD_SDK_INT);
+                        String.valueOf(Build.VERSION.SDK_INT), DataController.SWITCH_OF_BUILD_SDK_INT);
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildPreviewSdkInt,
-                        devImpl.getBuildPreviewSdkInt(), DataController.SWITCH_OF_BUILD_PREVIEW_SDK_INT);
+                        String.valueOf(Build.VERSION.PREVIEW_SDK_INT), DataController.SWITCH_OF_BUILD_PREVIEW_SDK_INT);
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildCodename,
-                        devImpl.getBuildCodename(), DataController.SWITCH_OF_BUILD_CODE_NAME);
+                        Build.VERSION.CODENAME, DataController.SWITCH_OF_BUILD_CODE_NAME);
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.IDFA, devImpl.getIDFA(),
                         DataController.SWITCH_OF_BUILD_IDFA);
             }
