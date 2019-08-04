@@ -34,7 +34,7 @@ import static android.provider.Settings.System.AIRPLANE_MODE_ON;
  * @Author: sanbo
  */
 public class EncryptUtils {
-    private static final byte[] iv = { 0xA, 0xB, 0xC, 0xD, 0xE, 0xF, 3, 11, 42, 9, 1, 6, 8, 33, 21, 91 };
+    private static final byte[] iv = {0xA, 0xB, 0xC, 0xD, 0xE, 0xF, 3, 11, 42, 9, 1, 6, 8, 33, 21, 91};
     private static final String SP_EK_ID = "track_id";
     private static final String SP_CONTENT = "track";
     private static String mEncryptKey = null;
@@ -90,7 +90,7 @@ public class EncryptUtils {
      * 加密接口
      *
      * @param context
-     * @param src 加密的字符串
+     * @param src     加密的字符串
      * @return 加密后的字符串，可能为""
      */
     public static String encrypt(Context context, String src) {
@@ -113,7 +113,7 @@ public class EncryptUtils {
      * 解密接口
      *
      * @param context
-     * @param str 待解密的字符串
+     * @param str     待解密的字符串
      * @return 解密后的字符串
      */
     public static String decrypt(Context context, String str) {

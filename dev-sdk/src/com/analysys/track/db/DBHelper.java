@@ -5,8 +5,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.reflectinon.EContextHelper;
+
+import java.io.File;
 
 /**
  *
@@ -82,7 +83,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public void rebuildDB() {
         if (mContext != null) {
-            MultiProcessChecker.deleteFile("/data/data/" + mContext.getPackageName() + "/databases/" + DB_NAME);
+//            MultiProcessChecker.deleteFile("/data/data/" + mContext.getPackageName() + "/databases/" + DB_NAME);
+            File f = mContext.getDatabasePath(DB_NAME);
+            if (f.exists()) {
+                f.delete();
+            }
             recreateTables();
         }
     }

@@ -11,6 +11,7 @@ import com.analysys.track.db.TableOC;
 import com.analysys.track.db.TableXXXInfo;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.AESUtils;
 import com.analysys.track.utils.DeflterCompressUtils;
 import com.analysys.track.utils.ELOG;
@@ -23,7 +24,6 @@ import com.analysys.track.utils.RequestUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
-import com.analysys.track.internal.work.MessageDispatcher;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -212,7 +212,7 @@ public class UploadImpl {
                 SPHelper.setIntValue2SP(mContext, EGContext.REQUEST_STATE, EGContext.sPrepare);
                 return;
             }
-            url = "http://192.168.220.167:8089";
+//            url = "http://192.168.220.167:8089";
             // L.info(mContext,"url: "+url);
 
             handleUpload(url, messageEncrypt(uploadInfo));

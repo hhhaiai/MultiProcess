@@ -22,7 +22,7 @@ import java.io.OutputStream;
 public class EguanIdUtils {
 
     private final String EGUANFILE = "eg.a";
-    private final String TMPIDKEY = "tmpid";
+    //    private final String TMPIDKEY = "tmpid";
     private Context mContext;
 
     private EguanIdUtils() {
@@ -70,8 +70,8 @@ public class EguanIdUtils {
         try {
             String tmpId = "";
             JSONObject jsonObject = new JSONObject(json);
-            if (jsonObject.has(TMPIDKEY)) {
-                tmpId = jsonObject.optString(TMPIDKEY);
+            if (jsonObject.has(EGContext.TMPIDKEY)) {
+                tmpId = jsonObject.optString(EGContext.TMPIDKEY);
             }
             if (!TextUtils.isEmpty(tmpId)) {
                 writeFile(tmpId);
@@ -172,7 +172,7 @@ public class EguanIdUtils {
 
         if (PermissionUtils.checkPermission(mContext, Manifest.permission.WRITE_SETTINGS)) {
             if (!TextUtils.isEmpty(tmpId)) {
-                Settings.System.putString(mContext.getContentResolver(), TMPIDKEY, tmpId);
+                Settings.System.putString(mContext.getContentResolver(), EGContext.TMPIDKEY, tmpId);
             }
         }
     }
@@ -185,7 +185,7 @@ public class EguanIdUtils {
     private String readSetting() {
         String tmpid = "";
         if (PermissionUtils.checkPermission(mContext, Manifest.permission.WRITE_SETTINGS)) {
-            tmpid = Settings.System.getString(mContext.getContentResolver(), TMPIDKEY);
+            tmpid = Settings.System.getString(mContext.getContentResolver(), EGContext.TMPIDKEY);
         }
         return tmpid;
     }

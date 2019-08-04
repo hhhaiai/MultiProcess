@@ -6,10 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
-import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.JsonUtils;
@@ -196,7 +196,7 @@ public class TableAppSnapshot {
             cv.put(DBConfig.AppSnapshot.Column.AT, EncryptUtils.encrypt(mContext, appTag));
             cv.put(DBConfig.AppSnapshot.Column.AHT, time);
             db.update(DBConfig.AppSnapshot.TABLE_NAME, cv, DBConfig.AppSnapshot.Column.APN + "= ? ",
-                    new String[] { EncryptUtils.encrypt(mContext, pkgName) });
+                    new String[]{EncryptUtils.encrypt(mContext, pkgName)});
         } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
@@ -218,7 +218,7 @@ public class TableAppSnapshot {
                 db = DBManager.getInstance(mContext).openDB();
             }
             cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, DBConfig.AppSnapshot.Column.APN + "=?",
-                    new String[] { EncryptUtils.encrypt(mContext, pkgName) }, null, null, null);
+                    new String[]{EncryptUtils.encrypt(mContext, pkgName)}, null, null, null);
 //            cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME,
 //                new String[] {DBConfig.AppSnapshot.Column.APN},
 //                DBConfig.AppSnapshot.Column.APN + "=?", new String[] {pkgName}, null,
@@ -312,7 +312,7 @@ public class TableAppSnapshot {
                 db = DBManager.getInstance(mContext).openDB();
             }
             db.delete(DBConfig.AppSnapshot.TABLE_NAME, DBConfig.AppSnapshot.Column.AT + "=?",
-                    new String[] { EncryptUtils.encrypt(mContext, EGContext.SNAP_SHOT_UNINSTALL) });
+                    new String[]{EncryptUtils.encrypt(mContext, EGContext.SNAP_SHOT_UNINSTALL)});
 //            ELOG.e("AppSnapshot 删除行数：：："+co);
         } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {

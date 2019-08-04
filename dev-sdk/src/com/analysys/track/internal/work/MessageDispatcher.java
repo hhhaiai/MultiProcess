@@ -7,13 +7,13 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 
+import com.analysys.track.internal.Content.DeviceKeyContacts;
+import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.net.UploadImpl;
-import com.analysys.track.internal.Content.DeviceKeyContacts;
-import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.receiver.AnalysysReceiver;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;

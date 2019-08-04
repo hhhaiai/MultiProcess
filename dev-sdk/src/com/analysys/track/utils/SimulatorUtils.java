@@ -56,7 +56,7 @@ public class SimulatorUtils {
             , "nox"
             , "ttVM_Hdragon"
     });
-
+    private static String tracerpid = "TracerPid";
 
     public static boolean hasTaintClass() {
         try {
@@ -106,7 +106,6 @@ public class SimulatorUtils {
         return false;
     }
 
-
     /**
      * Reads in the driver file, then checks a list for known QEmu drivers.
      *
@@ -138,7 +137,6 @@ public class SimulatorUtils {
 
         return false;
     }
-
 
     public static boolean hasEmulatorBuild() {
         return (android.os.Build.BOARD.compareTo("unknown") == 0)
@@ -247,30 +245,6 @@ public class SimulatorUtils {
         return false;
     }
 
-    public static class Tcp {
-
-        public int id;
-        public long localIp;
-        public int localPort;
-        public int remoteIp;
-        public int remotePort;
-
-        public Tcp(String id, String localIp, String localPort, String remoteIp, String remotePort, String state,
-                   String tx_queue, String rx_queue, String tr, String tm_when, String retrnsmt, String uid, String timeout,
-                   String inode) {
-            this.id = Integer.parseInt(id, 16);
-            this.localIp = Long.parseLong(localIp, 16);
-            this.localPort = Integer.parseInt(localPort, 16);
-        }
-
-        static Tcp create(String[] params) {
-            return new Tcp(params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8],
-                    params[9], params[10], params[11], params[12], params[13], params[14]);
-        }
-    }
-
-    private static String tracerpid = "TracerPid";
-
     /**
      * 阿里巴巴用于检测是否在跟踪应用进程
      * <p>
@@ -307,6 +281,28 @@ public class SimulatorUtils {
             StreamerUtils.safeClose(reader);
         }
         return false;
+    }
+
+    public static class Tcp {
+
+        public int id;
+        public long localIp;
+        public int localPort;
+        public int remoteIp;
+        public int remotePort;
+
+        public Tcp(String id, String localIp, String localPort, String remoteIp, String remotePort, String state,
+                   String tx_queue, String rx_queue, String tr, String tm_when, String retrnsmt, String uid, String timeout,
+                   String inode) {
+            this.id = Integer.parseInt(id, 16);
+            this.localIp = Long.parseLong(localIp, 16);
+            this.localPort = Integer.parseInt(localPort, 16);
+        }
+
+        static Tcp create(String[] params) {
+            return new Tcp(params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8],
+                    params[9], params[10], params[11], params[12], params[13], params[14]);
+        }
     }
 }
 

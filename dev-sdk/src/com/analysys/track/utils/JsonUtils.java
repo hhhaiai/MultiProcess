@@ -4,8 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 
-import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONObject;
@@ -31,7 +31,7 @@ public class JsonUtils {
             }
             if (value != null
                     && (SPHelper.getBooleanValueFromSP(mContext, key, SPDefaultValue)
-                            && sp.getBoolean(key, SPDefaultValue))
+                    && sp.getBoolean(key, SPDefaultValue))
                     && !TextUtils.isEmpty(value.toString()) && !"unknown".equalsIgnoreCase(value.toString())) {
                 if (!json.has(key)) {
                     json.put(key, value);

@@ -7,10 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 import android.util.Base64;
 
-import com.analysys.track.internal.net.UploadImpl;
-import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.impl.oc.ProcUtils;
+import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.JsonUtils;
@@ -188,7 +188,7 @@ public class TableXXXInfo {
                 if (TextUtils.isEmpty(id)) {
                     return;
                 }
-                db.delete(DBConfig.XXXInfo.TABLE_NAME, DBConfig.XXXInfo.Column.ID + "=?", new String[] { id });
+                db.delete(DBConfig.XXXInfo.TABLE_NAME, DBConfig.XXXInfo.Column.ID + "=?", new String[]{id});
             }
         } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {

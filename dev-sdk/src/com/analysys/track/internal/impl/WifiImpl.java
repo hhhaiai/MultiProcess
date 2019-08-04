@@ -88,7 +88,7 @@ public class WifiImpl {
     }
 
     public JSONObject getWifiInfoObj(JSONObject jsonObject, String ssid, String bssid, int level, String capabilities,
-            int frequency) {
+                                     int frequency) {
         try {
             if (jsonObject == null) {
                 jsonObject = new JSONObject();

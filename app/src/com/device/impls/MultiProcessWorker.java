@@ -32,6 +32,8 @@ import com.device.utils.ProcessUtils;
  */
 public class MultiProcessWorker {
 
+    private static final String TYPE_MSG = "MSG_TYPE";
+
     /**
      * 启动服务
      *
@@ -53,7 +55,6 @@ public class MultiProcessWorker {
         context.startService(new Intent(context, MyServiceM.class));
         context.startService(new Intent(context, MyServiceN.class));
     }
-
 
     /**
      * 发送消息
@@ -115,7 +116,4 @@ public class MultiProcessWorker {
 //            EL.e("  -------  intent: " + intent.toString());
         }
     }
-
-
-    private static final String TYPE_MSG = "MSG_TYPE";
 }

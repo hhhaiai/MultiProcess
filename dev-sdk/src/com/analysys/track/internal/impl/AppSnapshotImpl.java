@@ -10,14 +10,14 @@ import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.net.PolicyImpl;
+import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
-import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.JsonUtils;
+import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
-import com.analysys.track.internal.work.MessageDispatcher;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,6 +29,14 @@ import java.util.Map;
 import java.util.Set;
 
 public class AppSnapshotImpl {
+
+    private final String SHELL_PM_LIST_PACKAGES = "pm list packages";// all
+    private final String APP_LIST_SYSTEM = "pm list packages -s";// system
+    // private final String APP_LIST_USER = "pm list packages -3";// third party
+    // 获取系统应用列表
+    private final Set<String> mSystemAppSet = new HashSet<String>();
+    private boolean isSnapShotBlockRunning = false;
+    private Context mContext;
 
     private AppSnapshotImpl() {
 
@@ -181,7 +189,6 @@ public class AppSnapshotImpl {
         }
         return list;
     }
-
 
     //获取单个安装列表
     public List<JSONObject> getAppDebugStatus() {
@@ -354,7 +361,6 @@ public class AppSnapshotImpl {
         return false;
     }
 
-
     /**
      * 单个应用json信息
      *
@@ -462,12 +468,4 @@ public class AppSnapshotImpl {
     private static class Holder {
         private static final AppSnapshotImpl INSTANCE = new AppSnapshotImpl();
     }
-
-    private final String SHELL_PM_LIST_PACKAGES = "pm list packages";// all
-    private final String APP_LIST_SYSTEM = "pm list packages -s";// system
-    // private final String APP_LIST_USER = "pm list packages -3";// third party
-    // 获取系统应用列表
-    private final Set<String> mSystemAppSet = new HashSet<String>();
-    private boolean isSnapShotBlockRunning = false;
-    private Context mContext;
 }

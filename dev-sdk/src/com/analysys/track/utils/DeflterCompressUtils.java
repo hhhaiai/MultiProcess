@@ -2,9 +2,9 @@ package com.analysys.track.utils;
 
 import android.content.Context;
 
+import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.impl.DevStatusChecker;
 import com.analysys.track.internal.impl.DeviceImpl;
-import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.ByteArrayOutputStream;

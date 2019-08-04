@@ -13,7 +13,6 @@ import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EguanIdUtils;
 import com.analysys.track.utils.JsonUtils;
-import com.analysys.track.utils.SimulatorUtils;
 import com.analysys.track.utils.SystemUtils;
 
 import org.json.JSONArray;
@@ -111,7 +110,7 @@ public class DataPackaging {
                     DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_BLUETOOTH,
                     DataController.SWITCH_OF_MODULE_CL_BLUETOOTH)) {
                 JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.BluetoothMac,
-                        devImpl.getBluetoothMac(), DataController.SWITCH_OF_BLUETOOTH_MAC);
+                        devImpl.getBluetoothAddress(mContext), DataController.SWITCH_OF_BLUETOOTH_MAC);
                 JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.BluetoothName,
                         devImpl.getBluetoothName(), DataController.SWITCH_OF_BLUETOOTH_NAME);
             }

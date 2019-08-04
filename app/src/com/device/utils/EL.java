@@ -63,7 +63,6 @@ import javax.xml.transform.stream.StreamSource;
  */
 public class EL {
 
-    private static String mCurrentName = EL.class.getName();
     // 解析属性最大层级
     public static final int MAX_CHILD_LEVEL = 3;
     // 换行符
@@ -71,6 +70,7 @@ public class EL {
     private static final int JSON_INDENT = 2;
     // 是否打印bug.建议在application中调用init接口初始化
     public static boolean USER_DEBUG = true;
+    private static String mCurrentName = EL.class.getName();
     // 是否接受shell控制打印
     private static boolean isShellControl = true;
     // 是否打印详细log,详细打印调用的堆栈

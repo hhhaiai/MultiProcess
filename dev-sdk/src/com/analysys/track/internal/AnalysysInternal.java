@@ -8,6 +8,8 @@ import android.text.TextUtils;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.impl.DevStatusChecker;
+import com.analysys.track.internal.work.CrashHandler;
+import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.EncryptUtils;
@@ -17,13 +19,10 @@ import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.reflectinon.Reflecer;
-import com.analysys.track.internal.work.CrashHandler;
-import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.InvocationTargetException;
 
 public class AnalysysInternal {
     private static boolean hasInit = false;
@@ -79,7 +78,7 @@ public class AnalysysInternal {
      * @param channel
      */
     @SuppressWarnings("deprecation")
-    private void init(String key, String channel)  {
+    private void init(String key, String channel) {
 
         // 0.首先检查是否有Context
         Context ctx = EContextHelper.getContext(mContextRef == null ? null : mContextRef.get());

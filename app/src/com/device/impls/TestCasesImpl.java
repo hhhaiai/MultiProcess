@@ -2,8 +2,6 @@ package com.device.impls;
 
 import android.content.Context;
 
-import com.analysys.track.db.TableAppSnapshot;
-import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.PolicyImpl;
@@ -13,7 +11,6 @@ import com.device.utils.EL;
 import com.device.utils.MyLooper;
 import com.device.utils.ProcessUtils;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 

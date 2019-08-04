@@ -4,8 +4,8 @@ import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.view.accessibility.AccessibilityEvent;
 
-import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.SystemUtils;

@@ -6,9 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
-import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.Base64Utils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EncryptUtils;
@@ -116,14 +116,14 @@ public class TableLocation {
                             ContentValues cv = new ContentValues();
                             cv.put(DBConfig.Location.Column.ST, mInsertStatusReadOver);
                             db.update(DBConfig.Location.TABLE_NAME, cv, DBConfig.Location.Column.ID + "=?",
-                                    new String[] { String.valueOf(id) });
+                                    new String[]{String.valueOf(id)});
                             array.put(new JSONObject(decryptLocation));
                         }
                     } else {
                         ContentValues cv = new ContentValues();
                         cv.put(DBConfig.Location.Column.ST, mInsertStatusReadOver);
                         db.update(DBConfig.Location.TABLE_NAME, cv, DBConfig.Location.Column.ID + "=?",
-                                new String[] { String.valueOf(id) });
+                                new String[]{String.valueOf(id)});
                         array.put(new JSONObject(decryptLocation));
                     }
 
@@ -158,7 +158,7 @@ public class TableLocation {
                 db = DBManager.getInstance(mContext).openDB();
             }
             db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?",
-                    new String[] { mInsertStatusReadOver });
+                    new String[]{mInsertStatusReadOver});
 //            ELOG.e("LOCATION删除的行数：：："+co);
         } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {

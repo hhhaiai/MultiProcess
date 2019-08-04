@@ -18,17 +18,17 @@ import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.net.PolicyImpl;
+import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
-import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.JsonUtils;
+import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
-import com.analysys.track.internal.work.MessageDispatcher;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -132,7 +132,7 @@ public class LocationImpl {
          */
         if (!AndroidManifestHelper.isPermissionDefineInManifest(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
                 && !AndroidManifestHelper.isPermissionDefineInManifest(mContext,
-                        Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                Manifest.permission.ACCESS_COARSE_LOCATION)) {
             return false;
         }
         // 是否可以去获取权限
@@ -620,7 +620,7 @@ public class LocationImpl {
     }
 
     public JSONObject getBaseStationInfoObj(JSONObject jsonObject, int lac, int cid, int stren, String psc, int rsrp,
-            int ecio, int rsrq) {
+                                            int ecio, int rsrq) {
         try {
             JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.BaseStationInfo.LocationAreaCode,
                     lac, DataController.SWITCH_OF_LOCATION_AREA_CODE);

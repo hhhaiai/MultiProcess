@@ -26,7 +26,6 @@ import android.util.DisplayMetrics;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.SystemUtils;
@@ -39,7 +38,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.LineNumberReader;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -81,6 +80,39 @@ public class DeviceImpl {
             Holder.INSTANCE.mContext = EContextHelper.getContext(context);
         }
         return Holder.INSTANCE;
+    }
+
+    /**
+     * 蓝牙的mac地址获取
+     *
+     * @param context
+     * @return
+     */
+    public static String getBluetoothAddress(Context context) {
+        String bluetoothMacAddress = "02:00:00:00:00:00";
+        try {
+
+            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (android.os.Build.VERSION.SDK_INT >= 23) {
+                if (!PermissionUtils.checkPermission(context, Manifest.permission.BLUETOOTH)) {
+                    return bluetoothMacAddress;
+                }
+                Field mServiceField = bluetoothAdapter.getClass().getDeclaredField("mService");
+                mServiceField.setAccessible(true);
+                Object btManagerService = mServiceField.get(bluetoothAdapter);
+                if (btManagerService != null) {
+                    bluetoothMacAddress = (String) btManagerService.getClass().getMethod("getAddress").invoke(btManagerService);
+                }
+            }
+            if (TextUtils.isEmpty(bluetoothMacAddress) || "02:00:00:00:00:00".equals(bluetoothMacAddress)) {
+                bluetoothMacAddress = bluetoothAdapter.getAddress();
+            }
+            if (TextUtils.isEmpty(bluetoothMacAddress) || "02:00:00:00:00:00".equals(bluetoothMacAddress)) {
+                bluetoothMacAddress = Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
+            }
+        } catch (Throwable e) {
+        }
+        return bluetoothMacAddress;
     }
 
     /**
@@ -356,6 +388,8 @@ public class DeviceImpl {
         return res;
     }
 
+    // 运营商信息
+
     public String getDotPerInch() {
         String dpi = "";
         try {
@@ -365,8 +399,6 @@ public class DeviceImpl {
         }
         return dpi;
     }
-
-    // 运营商信息
 
     /**
      * 运营商名称（中文）,如:中国联通
@@ -426,6 +458,7 @@ public class DeviceImpl {
         }
         return operatorCode;
     }
+    // SettingInfoImpl
 
     /**
      * 多卡IMSI
@@ -452,7 +485,6 @@ public class DeviceImpl {
         }
         return "";
     }
-    // SettingInfoImpl
 
     /**
      * 推广渠道
@@ -574,77 +606,6 @@ public class DeviceImpl {
         } catch (Throwable e) {
         }
         return null;
-    }
-
-//    /**
-//     * 判断设备本身、APP、以及工作环境是否是被调试状态，“0”= 不在调试状态“1”= 在调试状态
-//     */
-//    public String getDebug() {
-//        try {
-//            PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0);
-//            ApplicationInfo appinfo = packageInfo.applicationInfo;
-//            if (0 != (appinfo.flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
-//                return ZERO;
-//            }
-//        } catch (Exception e) {
-//            return ONE;
-//        }
-//        return ONE;
-//    }
-//
-//    /**
-//     * 判断设备的OS是否被劫持，"0”= 没有被劫持“1”= 被劫持
-//     */
-//    public String isHijack() {
-//        // 是否装xpose等
-//        return SystemUtils.byLoadXposedClass() == true ? "1" : "0";
-//    }
-//
-//    /**
-//     * 是否root，值为1表示获取root权限；值为0表示没获取root权限
-//     */
-//    public String IsRoot() {
-//        try {
-//            if ((!new File("/system/bin/su").exists()) && (!new File("/system/xbin/su").exists())) {
-//                return ZERO;
-//            }
-//        } catch (Throwable e) {
-//            return ZERO;
-//        }
-//        return ONE;
-//    }
-
-    /**
-     * 蓝牙MAC，如“6c:5c:14:25:be:ba”
-     */
-    public String getBluetoothMac() {
-        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-        if (Build.VERSION.SDK_INT < 23) {
-            return adapter.getAddress();
-        } else {
-            String macSerial = "";
-            try {
-                Process pp = Runtime.getRuntime().exec("cat /sys/class/net/wlan0/address ");
-                InputStreamReader ir = new InputStreamReader(pp.getInputStream());
-                LineNumberReader input = new LineNumberReader(ir);
-                String str = "";
-                while ((str = input.readLine()) != null) {
-                    macSerial = str.trim();// 去空格
-                    break;
-                }
-            } catch (Exception ex) {
-                return "02:00:00:00:00:00";
-            }
-            if ("".equals(macSerial)) {
-                try {
-                    return MultiProcessChecker.loadFileAsString("/sys/class/net/eth0/address").toUpperCase(Locale.getDefault())
-                            .substring(0, 17);
-                } catch (Exception e) {
-                    return macSerial;
-                }
-            }
-            return macSerial;
-        }
     }
 
     /**

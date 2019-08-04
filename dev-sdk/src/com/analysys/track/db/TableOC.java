@@ -6,10 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
-import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.Base64Utils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EncryptUtils;
@@ -187,7 +187,7 @@ public class TableOC {
                 cv.put(DBConfig.OC.Column.ACT, act);
                 cv.put(DBConfig.OC.Column.ST, switchType);
 //                db.execSQL("update e_occ set occ_e = occ_e + 1 where occ_a = '" + pkgName + "'");不做打开关闭次数统计，可忽略
-                db.update(DBConfig.OC.TABLE_NAME, cv, DBConfig.OC.Column.APN + "=?", new String[] { pkgName });
+                db.update(DBConfig.OC.TABLE_NAME, cv, DBConfig.OC.Column.APN + "=?", new String[]{pkgName});
             }
             db.setTransactionSuccessful();
         } catch (Throwable e) {
@@ -220,10 +220,10 @@ public class TableOC {
             }
             String day = SystemUtils.getDay();
             int timeInterval = Base64Utils.getTimeTag(System.currentTimeMillis());
-            cursor = db.query(DBConfig.OC.TABLE_NAME, new String[] { DBConfig.OC.Column.APN },
+            cursor = db.query(DBConfig.OC.TABLE_NAME, new String[]{DBConfig.OC.Column.APN},
                     DBConfig.OC.Column.DY + "=? and " + DBConfig.OC.Column.TI + "=?", // and " + DBConfig.OC.Column.RS +
                     // "=? , ZERO}, null
-                    new String[] { day, String.valueOf(timeInterval) }, null, null, null);
+                    new String[]{day, String.valueOf(timeInterval)}, null, null, null);
             list = new ArrayList<String>();
             while (cursor.moveToNext()) {
                 if (blankCount >= EGContext.BLANK_COUNT_MAX) {// 防止空数据导致死循环
@@ -331,14 +331,14 @@ public class TableOC {
                         ContentValues contentValues = new ContentValues();
                         contentValues.put(DBConfig.OC.Column.ST, ONE);
                         db.update(DBConfig.OC.TABLE_NAME, contentValues, DBConfig.OC.Column.ID + "=?",
-                                new String[] { String.valueOf(id) });
+                                new String[]{String.valueOf(id)});
                     }
                 } else {
                     ocJar.put(jsonObject);
                     ContentValues cv = new ContentValues();
                     cv.put(DBConfig.OC.Column.ST, ONE);
                     db.update(DBConfig.OC.TABLE_NAME, cv, DBConfig.OC.Column.ID + "=?",
-                            new String[] { String.valueOf(id) });
+                            new String[]{String.valueOf(id)});
                 }
 
 //                ELOG.e(" size值：："+size+" maxLength = "+maxLength);
@@ -427,7 +427,7 @@ public class TableOC {
                 cv = new ContentValues();
                 cv.put(DBConfig.OC.Column.ST, ONE);
                 db.update(DBConfig.OC.TABLE_NAME, cv, DBConfig.OC.Column.ID + "=?",
-                        new String[] { String.valueOf(cursor.getInt(cursor.getColumnIndex(DBConfig.OC.Column.ID))) });
+                        new String[]{String.valueOf(cursor.getInt(cursor.getColumnIndex(DBConfig.OC.Column.ID)))});
             }
             db.setTransactionSuccessful();
         } catch (Exception e) {
@@ -455,7 +455,7 @@ public class TableOC {
             if (!db.isOpen()) {
                 db = DBManager.getInstance(mContext).openDB();
             }
-            db.delete(DBConfig.OC.TABLE_NAME, DBConfig.OC.Column.ST + "=?", new String[] { ONE });
+            db.delete(DBConfig.OC.TABLE_NAME, DBConfig.OC.Column.ST + "=?", new String[]{ONE});
 //            ELOG.e("删除的行数：：：  "+count);
         } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {

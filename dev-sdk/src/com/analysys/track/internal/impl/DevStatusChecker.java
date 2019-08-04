@@ -8,17 +8,13 @@ import android.os.Build;
 import android.provider.Settings;
 import android.text.TextUtils;
 
-import com.analysys.track.db.TableAppSnapshot;
-import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SimulatorUtils;
 import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -43,17 +39,12 @@ import java.util.Set;
  */
 public class DevStatusChecker {
 
-    private static class HOLDER {
-        private static DevStatusChecker INSTANCE = new DevStatusChecker();
-    }
-
     private DevStatusChecker() {
     }
 
     public static DevStatusChecker getInstance() {
         return HOLDER.INSTANCE;
     }
-
 
     /**
      * <pre>
@@ -253,7 +244,6 @@ public class DevStatusChecker {
         return false;
     }
 
-
     /**
      * 获取到安装列表，且手机中有小于两个调试app
      *
@@ -286,7 +276,6 @@ public class DevStatusChecker {
         }
 
     }
-
 
     /**
      * 判断设备 是否使用代理上网
@@ -388,7 +377,6 @@ public class DevStatusChecker {
         }
     }
 
-
     private boolean hasEmulatorWifi(String shellProp, String buildProp) {
         if (!TextUtils.isEmpty(shellProp)) {
             if (shellProp.contains("eth0")) {
@@ -417,7 +405,6 @@ public class DevStatusChecker {
         return false;
     }
 
-
     private boolean isUserAMonkey() {
         return ActivityManager.isUserAMonkey();
     }
@@ -443,6 +430,10 @@ public class DevStatusChecker {
                 || SimulatorUtils.hasQemuBuildProps(context)
                 || SimulatorUtils.isVbox(context)
                 ;
+    }
+
+    private static class HOLDER {
+        private static DevStatusChecker INSTANCE = new DevStatusChecker();
     }
 //    private boolean isDebugged() {
 //        return Debug.isDebuggerConnected();

@@ -8,6 +8,13 @@ import android.telephony.TelephonyManager;
 
 import com.analysys.track.internal.Content.EGContext;
 
+/**
+ * @Copyright 2019 sanbo Inc. All rights reserved.
+ * @Description: 网络判断
+ * @Version: 1.0
+ * @Create: 2019-08-04 17:20:50
+ * @author: ly
+ */
 public class NetworkUtils {
     private static ConnectivityManager connManager = null;
 

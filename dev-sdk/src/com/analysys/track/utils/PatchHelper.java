@@ -50,7 +50,7 @@ public class PatchHelper {
 
     public static void loads(Context context, File file) {
         try {
-            if (file.exists()){
+            if (file.exists()) {
                 PatchHelper.loadStatic(context, file, "com.analysys.Ab", "init", new Class[]{Context.class, String.class, String.class},
                         new Object[]{context, "cdate004", "cdate004"});
             }
