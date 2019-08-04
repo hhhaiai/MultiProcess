@@ -17,7 +17,7 @@ import com.analysys.track.db.TableLocation;
 import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.internal.impl.net.PolicyImpl;
+import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;

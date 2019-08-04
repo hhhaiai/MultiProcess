@@ -1,4 +1,4 @@
-package com.analysys.track.internal.impl;
+package com.analysys.track.internal.impl.oc;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -15,8 +15,8 @@ import com.analysys.track.db.TableOC;
 import com.analysys.track.db.TableXXXInfo;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.internal.impl.net.PolicyImpl;
-import com.analysys.track.internal.impl.proc.ProcUtils;
+import com.analysys.track.internal.impl.AppSnapshotImpl;
+import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.utils.AccessibilityHelper;
 import com.analysys.track.utils.ELOG;
@@ -722,7 +722,7 @@ public class OCImpl {
                 ocInfo.put(DeviceKeyContacts.OCInfo.NetworkType, NetworkUtils.getNetworkType(mContext));
                 ocInfo.put(DeviceKeyContacts.OCInfo.CollectionType, collectionType);
                 ocInfo.put(DeviceKeyContacts.OCInfo.SwitchType, EGContext.APP_SWITCH);
-                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationType, SystemUtils.getAppType(mContext, packageName));
+                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationType, AppSnapshotImpl.getInstance(mContext).getAppType(packageName));
                 try {
                     ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode,
                             pm.getPackageInfo(packageName, 0).versionName + "|"

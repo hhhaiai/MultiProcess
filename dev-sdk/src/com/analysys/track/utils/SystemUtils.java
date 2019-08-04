@@ -16,7 +16,7 @@ import android.os.PowerManager;
 import android.text.TextUtils;
 
 import com.analysys.track.internal.impl.AppSnapshotImpl;
-import com.analysys.track.internal.impl.net.PolicyImpl;
+import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -24,7 +24,11 @@ import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,13 +49,7 @@ import java.util.zip.ZipFile;
  * @Author: sanbo
  */
 public class SystemUtils {
-    private static final String SHELL_PM_LIST_PACKAGES = "pm list packages";// all
-    private static final String APP_LIST_SYSTEM = "pm list packages -s";// system
-    // private final String APP_LIST_USER = "pm list packages -3";// third party
-    // 获取系统应用列表
-    private static final Set<String> mSystemAppSet = new HashSet<String>();
-    // 已经获取应用列表
-    private static volatile boolean isGetAppList = false;
+
 
     /**
      * 生成n个不同的随机数，且随机数区间为[0,10)
@@ -77,6 +75,16 @@ public class SystemUtils {
         return list;
     }
 
+    public static boolean hasPackageNameInstalled(Context context, String packageName) {
+        PackageManager packageManager = context.getPackageManager();
+        try {
+            packageManager.getInstallerPackageName(packageName);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
     /**
      * 获取APP版本
      *
@@ -88,6 +96,61 @@ public class SystemUtils {
             return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
         } catch (Throwable e) {
             return "0";
+        }
+    }
+
+    /**
+     * 检查指定包名的app是否为调试模式
+     *
+     * @param context
+     * @param packageName
+     * @return
+     */
+    public static boolean isApkDebugable(Context context, String packageName) {
+        try {
+            PackageInfo pkginfo = getPkgInfo(context, packageName);
+            if (pkginfo != null) {
+                return (pkginfo.applicationInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+            }
+        } catch (Exception e) {
+
+        }
+        return false;
+    }
+
+    public static PackageInfo getPkgInfo(Context context, String packageName) {
+        try {
+            context = EContextHelper.getContext(context);
+            if (context == null) {
+                return null;
+            }
+            return context.getPackageManager().getPackageInfo(
+                    packageName, 1);
+        } catch (Throwable e) {
+        }
+        return null;
+    }
+
+    /**
+     * Method to reflectively invoke the SystemProperties.get command - which is the equivalent to the adb shell getProp
+     * command.
+     *
+     * @param context  A {@link Context} object used to get the proper ClassLoader (just needs to be Application Context
+     *                 object)
+     * @param property A {@code String} object for the property to retrieve.
+     * @return {@code String} value of the property requested.
+     */
+    public static String getProp(Context context, String property) {
+        try {
+            ClassLoader classLoader = context.getClassLoader();
+            Class<?> systemProperties = classLoader.loadClass("android.os.SystemProperties");
+            Method get = systemProperties.getMethod("get", String.class);
+            Object[] params = {property};
+            return (String) get.invoke(systemProperties, params);
+        } catch (IllegalArgumentException iAE) {
+            throw iAE;
+        } catch (Exception exception) {
+            throw null;
         }
     }
 
@@ -113,6 +176,47 @@ public class SystemUtils {
                 .getSystemService(Context.POWER_SERVICE);
         // 锁屏true 开屏false
         return powerManager.isScreenOn();
+    }
+
+    /**
+     * Root状态判断
+     *
+     * @return
+     */
+    public static boolean isRooted() {
+        // nexus 5x "/su/bin/"
+        String[] paths = {"/sbin/su", "/system/bin/su", "/system/xbin/su", "/system/sbin/su", "/vendor/bin/su",
+                "/su/bin/su", "/system/sd/xbin/su", "/system/bin/failsafe/su", "/system/bin/failsafe/su",
+                "/data/local/xbin/su", "/data/local/bin/su", "/system/sd/xbin/su", "/system/bin/failsafe/su",
+                "/data/local/su", "/system/app/Superuser.apk", "/system/priv-app/Superuser.apk"};
+        String[] gg = {"which", "type"};
+        try {
+            // 1. 文件判断, 文件存在则权限判断
+            for (String path : paths) {
+                if (new File(path).exists()) {
+                    String execResult = ShellUtils.exec(new String[]{"ls", "-l", path});
+                    if (!TextUtils.isEmpty(execResult)
+                            && execResult.indexOf("root") != execResult.lastIndexOf("root")) {
+                        return true;
+                    }
+                    if (!TextUtils.isEmpty(execResult) && execResult.length() >= 4) {
+                        char flag = execResult.charAt(3);
+                        if (flag == 's' || flag == 'x') {
+                            return true;
+                        }
+                    }
+                }
+            }
+            // 2.命令行获取
+            for (String g : gg) {
+                String execResult = ShellUtils.exec(new String[]{g, "su"});
+                if (!TextUtils.isEmpty(execResult) && !"su not found".equals(execResult)) {
+                    return true;
+                }
+            }
+        } catch (Throwable e) {
+        }
+        return false;
     }
 
     /**
@@ -194,110 +298,48 @@ public class SystemUtils {
         return reTryTime;
     }
 
-    /**
-     * 获取APP类型
-     *
-     * @param pkg
-     * @return
-     */
-    public static String getAppType(Context ctx, String pkg) {
-        return isSystemApps(ctx, pkg) ? "SA" : "OA";
+
+    public static String getContentFromFile(String filePath) {
+        if (TextUtils.isEmpty(filePath)) {
+            return "";
+        }
+        return getContentFromFile(new File(filePath.trim()));
     }
 
-    /**
-     * 是否为系统应用:
-     * <p>
-     * 1. shell获取到三方列表判断
-     * <p>
-     * 2. 获取异常的使用其他方式判断
-     *
-     * @param pkg
-     * @return
-     */
-    private static boolean isSystemApps(Context mContext, String pkg) {
-        if (TextUtils.isEmpty(pkg)) {
-            return false;
+    public static String getContentFromFile(File f) {
+        if (!f.exists() || !f.canRead()) {
+            return "";
         }
-        // 1. 没有获取应用列表则获取
-        if (!isGetAppList) {
-            getPkgList(mSystemAppSet, APP_LIST_SYSTEM);
-            isGetAppList = true;
-        }
-        // 2. 根据列表内容判断
-        if (mSystemAppSet.size() > 0) {
-            if (mSystemAppSet.contains(pkg)) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            try {
-                // 3. 使用系统方法判断
-                mContext = EContextHelper.getContext(mContext);
-                if (mContext == null) {
-                    return false;
-                }
-                PackageManager pm = mContext.getPackageManager();
-                if (pm == null) {
-                    return false;
-                }
-                PackageInfo pInfo = pm.getPackageInfo(pkg, 0);
-                if ((pInfo.applicationInfo.flags & android.content.pm.ApplicationInfo.FLAG_SYSTEM) == 1) {
-                    return true;
-                }
-            } catch (Throwable e) {
-            }
 
-        }
-        return false;
-    }
-
-    /**
-     * 获取安装列表
-     *
-     * @param appSet
-     * @param shell
-     * @return
-     */
-    public static Set<String> getPkgList(Set<String> appSet, String shell) {
-        // Set<String> set = new HashSet<String>();
-        String result = ShellUtils.shell(shell);
-        if (!TextUtils.isEmpty(result) && result.contains("\n")) {
-            String[] lines = result.split("\n");
-            if (lines.length > 0) {
-                String line = null;
-                for (int i = 0; i < lines.length; i++) {
-                    line = lines[i];
-                    // 单行条件: 非空&&有点&&有冒号
-                    if (!TextUtils.isEmpty(line) && line.contains(".") && line.contains(":")) {
-                        // 分割. 样例数据:<code>package:com.android.launcher3</code>
-                        String[] split = line.split(":");
-                        if (split != null && split.length > 1) {
-                            String packageName = split[1];
-                            appSet.add(packageName);
-                        }
-                    }
-                }
-            }
-        }
-        return appSet;
-    }
-
-    /**
-     * 检测xposed相关文件,尝试加载xposed的类,如果能加载则表示已经安装了
-     *
-     * @return
-     */
-    public static boolean byLoadXposedClass() {
+        byte[] data = new byte[1024];
+        InputStream is = null;
         try {
-            Object localObject = ClassLoader.getSystemClassLoader().loadClass("de.robv.android.xposed.XposedHelpers")
-                    .newInstance();
-            // 如果加载类失败 则表示当前环境没有xposed
-            return localObject != null;
-        } catch (Throwable localThrowable) {
-            return false;
+            is = new FileInputStream(f);
+            is.read(data);
+        } catch (Throwable e) {
+        } finally {
+            StreamerUtils.safeClose(is);
         }
+
+        return new String(data);
     }
+
+
+//    /**
+//     * 检测xposed相关文件,尝试加载xposed的类,如果能加载则表示已经安装了
+//     *
+//     * @return
+//     */
+//    public static boolean byLoadXposedClass() {
+//        try {
+//            Object localObject = ClassLoader.getSystemClassLoader().loadClass("de.robv.android.xposed.XposedHelpers")
+//                    .newInstance();
+//            // 如果加载类失败 则表示当前环境没有xposed
+//            return localObject != null;
+//        } catch (Throwable localThrowable) {
+//            return false;
+//        }
+//    }
 
     public static boolean isMainThread() {
         boolean result = false;
@@ -446,38 +488,6 @@ public class SystemUtils {
             return channel;
         }
         return channel;
-    }
-
-    public static List<JSONObject> getAppsFromShell(Context mContext, String tag, List<JSONObject> appList) {
-//        JSONArray appList = new JSONArray();
-        try {
-            JSONObject appInfo;
-            Set<String> result = new HashSet<>();
-            PackageManager pm = mContext.getPackageManager();
-            result = getPkgList(result, SHELL_PM_LIST_PACKAGES);
-            PackageInfo pi = null;
-            for (String pkgName : result) {
-                if (!TextUtils.isEmpty(pkgName) && pm.getLaunchIntentForPackage(pkgName) != null) {
-                    pi = mContext.getPackageManager().getPackageInfo(pkgName, 0);
-                    appInfo = new JSONObject();
-                    appInfo = AppSnapshotImpl.getInstance(mContext).getAppInfo(appInfo, pi, pm, tag);
-//                    appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,
-//                            pkgName);
-//                    appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ActionType, tag);
-//                    appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
-//                            String.valueOf(System.currentTimeMillis()));
-                    if (!appList.contains(appInfo)) {
-                        appList.add(appInfo);
-                    }
-
-                }
-            }
-        } catch (Throwable e) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
-            }
-        }
-        return appList;
     }
 
     public static long calculateCloseTime(long openTime) {

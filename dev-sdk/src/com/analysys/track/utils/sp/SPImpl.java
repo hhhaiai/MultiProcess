@@ -33,7 +33,7 @@ import java.util.Vector;
 /**
  * @Copyright © 2017 sanbo Inc. All rights reserved.
  * @Description:
- * 
+ *
  * <pre>
  *               重写的两个主要原因：
  *               1.实现多进程数据安全
@@ -45,7 +45,7 @@ import java.util.Vector;
  *                  d.为了提升进程间同步的性能，直接存储的是字节流数据，会导致getAll方法性能低于系统实现
  *                  e.本类未实现存储和读取getStringSet和putStringSet功能，原因是实现复杂，且极少人使用
  * </pre>
- * 
+ *
  * @Version: 1.0
  * @Create: 2017年6月12日 下午2:27:52
  * @author: cqs

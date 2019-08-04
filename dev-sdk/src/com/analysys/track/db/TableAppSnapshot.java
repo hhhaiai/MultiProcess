@@ -6,7 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
-import com.analysys.track.internal.impl.net.UploadImpl;
+import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;

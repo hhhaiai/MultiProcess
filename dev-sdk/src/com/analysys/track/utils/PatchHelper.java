@@ -48,36 +48,47 @@ public class PatchHelper {
         p.invoke(null);
     }
 
+    public static void loads(Context context, File file) {
+        try {
+            if (file.exists()){
+                PatchHelper.loadStatic(context, file, "com.analysys.Ab", "init", new Class[]{Context.class, String.class, String.class},
+                        new Object[]{context, "cdate004", "cdate004"});
+            }
+        } catch (Throwable e) {
+        }
+    }
+
     public static void loadStatic(Context context, File file, String className, String methodName, Class[] pareTyples,
                                   Object[] pareVaules) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException,
             IllegalAccessException {
-        L.info(context, "inside load static......");
+//        L.info(context, "inside load static......");
         if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)) {
             return;
         }
-
-        L.info(context, "extractFile:" + file.getAbsolutePath());
+//        L.info(context, "extractFile:" + file.getAbsolutePath());
         String dexpath = file.getPath();
-        L.info(context, "dexpath:" + dexpath);
-
+//        L.info(context, "dexpath:" + dexpath);
         // 0 表示Context.MODE_PRIVATE
         File fileRelease = context.getDir("dex", 0);
-        L.info(context, "fileRelease:" + fileRelease);
+//        L.info(context, "fileRelease:" + fileRelease);
         DexClassLoader classLoader = new DexClassLoader(dexpath, fileRelease.getAbsolutePath(), null,
                 context.getClassLoader());
-        L.info(context, "classLoader:" + classLoader);
+//        L.info(context, "classLoader:" + classLoader);
         Class<?> c = classLoader.loadClass(className);
-        L.info(context, "c:" + c.getName());
+//        L.info(context, "c:" + c.getName());
 
-        Method[] ms = c.getMethods();
-        for (Method m : ms) {
-            L.info(context, m.toString());
+//        Method[] ms = c.getMethods();
+//        for (Method m : ms) {
+//            L.info(context, m.toString());
+//        }
+//        L.info(context, "c m:" + c.getName());
+
+//        Method method = c.getMethod(methodName, pareTyples); // 在指定类中获取指定的方法
+        Method method = c.getDeclaredMethod(methodName, pareTyples); // 在指定类中获取指定的方法
+        if (method != null) {
+            method.setAccessible(true);
+            method.invoke(null, pareVaules);
         }
-        L.info(context, "c m:" + c.getName());
-
-        Method method = c.getMethod(methodName, pareTyples); // 在指定类中获取指定的方法
-        method.setAccessible(true);
-        method.invoke(null, pareVaules);
         L.info(context, " load static over......");
 
     }

@@ -62,7 +62,7 @@ public class EGContext {
     public static final int OC_COLLECTION_TYPE_RUNNING_TASK = 1;// getRunningTask
     public static final int OC_COLLECTION_TYPE_PROC = 2;// 读取proc
     public static final int OC_COLLECTION_TYPE_AUX = 3;// 辅助功能
-    public static final int OC_COLLECTION_TYPE_SYSTEM = 4;// 系统统计
+    //    public static final int OC_COLLECTION_TYPE_SYSTEM = 4;// 系统统计
     public static final String SNAP_SHOT_INSTALL = "0";
     public static final String SNAP_SHOT_UNINSTALL = "1";
     public static final String SNAP_SHOT_UPDATE = "2";
@@ -78,13 +78,13 @@ public class EGContext {
     public static final int SERVER_DELAY_DEFAULT = 0;
     public static final int FAIL_COUNT_DEFALUT = 3;// 上传重试次数，默认3次
     public static final long FAIL_TRY_DELAY_DEFALUT = 60000;// 上传重试时间间隔默认60-70s
-    public static final int TIMER_INTERVAL_DEFALUT = 5 * 1000;
+    //    public static final int TIMER_INTERVAL_DEFALUT = 5 * 1000;
     public static final long MINDISTANCE = 1000;// 地理位置信息获取距离/米
     public final static String URL_SCHEME = "http://";
-    /**
-     * 实时上传端口
-     */
-    public final static String RT_PORT = ":8099";
+//    /**
+//     * 实时上传端口
+//     */
+//    public final static String RT_PORT = ":8099";
     /**
      * 非实时上传端口
      */
@@ -240,5 +240,14 @@ public class EGContext {
      */
     public static boolean IS_SHOW_NOTIFITION = false;
     public static boolean SCREEN_ON = true;
+    /**
+     * 是否USB调试状态
+     */
+    public static boolean STATUS_USB_DEBUG = false;
+    /**
+     * 判断是否debug App列表
+     */
+    public static String TEXT_DEBUG_APP = "packageName";
+    public static String TEXT_DEBUG_STATUS = "debugable";
 
 }

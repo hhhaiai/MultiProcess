@@ -11,7 +11,7 @@ import android.os.Build;
 import android.os.PowerManager;
 import android.text.TextUtils;
 
-import com.analysys.track.internal.impl.OCImpl;
+import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.service.AnalysysJobService;
 import com.analysys.track.service.AnalysysService;

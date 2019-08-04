@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 
-import com.analysys.track.internal.impl.net.PolicyImpl;
+import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.sp.SPHelper;
 

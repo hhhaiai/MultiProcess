@@ -1,4 +1,4 @@
-package com.analysys.track.internal.impl.net;
+package com.analysys.track.internal.net;
 
 import android.content.Context;
 import android.os.Handler;
@@ -246,7 +246,7 @@ public class UploadImpl {
         JSONObject object = null;
         try {
             object = new JSONObject();
-            // 发送的时候，临时组装devInfo,有大模块控制的优先控制大模块，大模块收集，针对字段级别进行控制
+            // 组装DevInfo数据
             JSONObject devJson = null;
             try {
                 devJson = DataPackaging.getDevInfo(mContext);
@@ -255,7 +255,7 @@ public class UploadImpl {
             if (devJson != null && devJson.length() > 0) {
                 object.put(DeviceKeyContacts.DevInfo.NAME, devJson);
             }
-            // 从oc表查询closeTime不为空的整条信息，组装上传
+            //  组装OC数据
             if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC,
                     true)) {
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
@@ -268,7 +268,7 @@ public class UploadImpl {
             } else {
                 TableOC.getInstance(mContext).deleteAll();
             }
-            // 策略控制大模块收集则进行数据组装，不收集则删除数据
+            // 组装位置数据
             if (PolicyImpl.getInstance(mContext)
                     .getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
@@ -281,7 +281,7 @@ public class UploadImpl {
             } else {
                 TableLocation.getInstance(mContext).deleteAll();
             }
-            // 策略控制大模块收集则进行数据组装，不收集则删除数据
+            //  组装安装列表数据
             if (PolicyImpl.getInstance(mContext)
                     .getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
@@ -294,7 +294,7 @@ public class UploadImpl {
             } else {
                 TableAppSnapshot.getInstance(mContext).deleteAll();
             }
-            // 策略控制大模块收集则进行数据组装，不收集则删除数据
+            // 组装XXXInfo数据
             if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_XXX,
                     true)) {
                 // 计算离最大上线的差值

@@ -1,10 +1,11 @@
-package com.analysys.track.internal.impl.net;
+package com.analysys.track.internal.net;
 
 import android.content.Context;
 
 import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.impl.DevStatusChecker;
 import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.impl.DoubleCardSupport;
 import com.analysys.track.internal.impl.SenSorModuleNameImpl;
@@ -13,6 +14,7 @@ import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EguanIdUtils;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.SimulatorUtils;
+import com.analysys.track.utils.SystemUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -96,12 +98,12 @@ public class DataPackaging {
                     DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_DEV_CHECK,
                     DataController.SWITCH_OF_MODULE_CL_DEV_CHECK)) {
                 JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Simulator,
-                        SimulatorUtils.getSimulatorStatus(mContext), DataController.SWITCH_OF_SIMULATOR);
-                JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Debug, devImpl.getDebug(),
+                        DevStatusChecker.getInstance().isSimulator(mContext) ? "1" : "0", DataController.SWITCH_OF_SIMULATOR);
+                JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Debug, DevStatusChecker.getInstance().isSelfDebugApp(mContext) ? "1" : "0",
                         DataController.SWITCH_OF_DEBUG);
-                JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Hijack, devImpl.isHijack(),
+                JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.Hijack, DevStatusChecker.getInstance().isHook(mContext) ? "1" : "0",
                         DataController.SWITCH_OF_HIJACK);
-                JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.IsRoot, devImpl.IsRoot(),
+                JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.IsRoot, SystemUtils.isRooted() ? "1" : "0",
                         DataController.SWITCH_OF_IS_ROOT);
             }
 

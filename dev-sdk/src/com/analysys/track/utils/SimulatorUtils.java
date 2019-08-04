@@ -1,118 +1,135 @@
 package com.analysys.track.utils;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import javax.crypto.Cipher;
+
+/**
+ * @Copyright © 2018 Analysys Inc. All rights reserved.
+ * @Description 模拟器判断.参考:https://github.com/strazzere/anti-emulator
+ * @Version 1.0
+ * @Create 2018年12月31日 下午3:28:49
+ * @Author tstrazzere
+ */
 public class SimulatorUtils {
 
-    private static String[] known_pipes = { "/dev/socket/qemud", "/dev/qemu_pipe" };
-    private static String[] known_files = { "/system/lib/libc_malloc_debug_qemu.so", "/sys/qemu_trace",
-            "/system/bin/qemu-props" };
-    private static String[] known_geny_files = { "/dev/socket/genyd", "/dev/socket/baseband_genyd" };
-    private static String[] known_qemu_drivers = { "goldfish", "SDK", "android", "Google SDK" };
+    private static String[] known_files =
+            {
+                    //-------------------PP管道------------
+                    "/dev/socket/qemud"
+                    , "/dev/qemu_pipe"
+                    //-------------文件判断------------
+                    , "/init.goldfish.rc"
+                    , "/system/lib/libc_malloc_debug_qemu.so"
+                    , "/sys/qemu_trace"
+                    , "/system/bin/qemu-props"
+                    , "/system/lib/libdroid4x.so"//文卓爷
+                    , "/system/bin/windroyed"//文卓爷
+                    , "/system/bin/microvirtd"//逍遥
+                    , "/system/bin/nox-prop"//夜神
+                    , "/system/bin/ttVM-prop"//天天模拟器
+                    //-------------------Genymotion模拟器环境------------
+                    , "/dev/socket/genyd"
+                    , "/dev/socket/baseband_genyd"
+
+            };
+    private static String[] knownQemuDrivers = {"goldfish", "SDK", "android", "Google SDK"};
+    private static List<String> models = Arrays.asList(new String[]{
+            "sdk"
+            , "Emulator"
+            , "google_sdk"
+            , "Android SDK built for x86"
+            , "Droid4X"
+            , "lgshouyou"
+            , "nox"
+            , "ttVM_Hdragon"
+    });
+
+
+    public static boolean hasTaintClass() {
+        try {
+            Class.forName("dalvik.system.Taint");
+            return true;
+        } catch (ClassNotFoundException exception) {
+            return false;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static boolean hasTaintMemberVariables() {
+        boolean taintDetected = false;
+        Class<FileDescriptor> fileDescriptorClass = FileDescriptor.class;
+        try {
+            Field field = fileDescriptorClass.getField("name");
+            taintDetected = true;
+        } catch (NoSuchFieldException nsfe) {
+            // This is normal - no need to do anything here, possibly add logging?
+        }
+
+        Class<?> cipher = Cipher.class;
+        try {
+            Field key = cipher.getField("key");
+            taintDetected = true;
+        } catch (NoSuchFieldException nsfe) {
+        }
+
+        return taintDetected;
+    }
+
+    public static boolean hasAppAnalysisPackage(Context context) {
+        return SystemUtils.hasPackageNameInstalled(context, "org.appanalysis");
+    }
 
     /**
-     * 获取模拟器状态
+     * 文件是否存在
      *
-     * @param context
      * @return
      */
-    public static String getSimulatorStatus(Context context) {
-        if (SimulatorUtils.hasEmulatorBuild(context) // 检查设备的板载,品牌,工业设计,硬件等信息是否匹配模拟器的信息,如果相同,则为模拟器
-                || SimulatorUtils.hasPipes() // 检查设备是否有模拟器特有的pipe目录,如果有,则为模拟器
-                || SimulatorUtils.hasQEmuFiles() // 同上,检查设备是否有模拟器特有的QEmu目录,如果有,则为模拟器
-                || SimulatorUtils.hasQEmuDrivers() // 同上,检查设备是否有模拟器特有对应的QEmu设备对应的目录,如果有则为模拟器
-                || SimulatorUtils.hasEmulatorAdb() // 通过读取proc/net/tcp查看adb是否对应模拟器,如果对应,则为模拟器
-                || SimulatorUtils.hasGenyFiles() // 检查设备上是否有模拟器目录,如果有,则为模拟器
-                || SimulatorUtils.hasEmulatorWifi()) {
-            return "1";
-        } else {
-            return "0";
-        }
-    }
-
-    /**
-     * Check the existence of known pipes used by the Android QEmu environment.
-     *
-     * @return {@code true} if any pipes where found to exist or {@code false} if
-     * not.
-     */
-    private static boolean hasPipes() {
-        for (String pipe : known_pipes) {
-            File qemu_socket = new File(pipe);
-            if (qemu_socket.exists()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Check the existence of known files used by the Android QEmu environment.
-     *
-     * @return {@code true} if any files where found to exist or {@code false} if
-     * not.
-     */
-    private static boolean hasQEmuFiles() {
+    public static boolean hasQEmuFiles() {
         for (String pipe : known_files) {
-            File qemu_file = new File(pipe);
-            if (qemu_file.exists()) {
+            if (new File(pipe).exists()) {
                 return true;
             }
         }
-
         return false;
     }
 
-    /**
-     * Check the existence of known files used by the Genymotion environment.
-     *
-     * @return {@code true} if any files where found to exist or {@code false} if
-     * not.
-     */
-    private static boolean hasGenyFiles() {
-        for (String file : known_geny_files) {
-            File geny_file = new File(file);
-            if (geny_file.exists()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     /**
      * Reads in the driver file, then checks a list for known QEmu drivers.
      *
-     * @return {@code true} if any known drivers where found to exist or
-     * {@code false} if not.
+     * @return {@code true} if any known drivers where found to exist or {@code false} if not.
      */
-    private static boolean hasQEmuDrivers() {
-        for (File drivers_file : new File[] { new File("/proc/tty/drivers"), new File("/proc/cpuinfo") }) {
+    public static boolean hasQEmuDrivers() {
+        for (File drivers_file : new File[]{new File("/proc/tty/drivers"), new File("/proc/cpuinfo")}) {
             if (drivers_file.exists() && drivers_file.canRead()) {
-                // We don't care to read much past things since info we care about should be
-                // inside here
-                byte[] data = new byte[1024];
-                InputStream is = null;
-                try {
-                    is = new FileInputStream(drivers_file);
-                    is.read(data);
-                } catch (Exception exception) {
-                } finally {
-                    StreamerUtils.safeClose(is);
-                }
+//                // We don't care to read much past things since info we care about should be inside here
+//                byte[] data = new byte[1024];
+//                InputStream is = null;
+//                try {
+//                    is = new FileInputStream(drivers_file);
+//                    is.read(data);
+//                } catch (Throwable e) {
+//                } finally {
+//                    Streamer.safeClose(is);
+//                }
+//                String driver_data = new String(data);
 
-                String driver_data = new String(data);
-                for (String known_qemu_driver : SimulatorUtils.known_qemu_drivers) {
-                    if (driver_data.indexOf(known_qemu_driver) != -1) {
+                String driverData = SystemUtils.getContentFromFile(drivers_file);
+                for (String qemuDriver : knownQemuDrivers) {
+                    if (driverData.indexOf(qemuDriver) != -1) {
                         return true;
                     }
                 }
@@ -122,99 +139,126 @@ public class SimulatorUtils {
         return false;
     }
 
-    private static boolean hasEmulatorBuild(Context context) {
-        String BOARD = android.os.Build.BOARD; // The name of the underlying board, like "unknown".
-        // This appears to occur often on real hardware... that's sad
-        // String BOOTLOADER = android.os.Build.BOOTLOADER; // The system bootloader
-        // version number.
-        String BRAND = android.os.Build.BRAND; // The brand (e.g., carrier) the software is customized for, if any.
-        // "generic"
-        String DEVICE = android.os.Build.DEVICE; // The name of the industrial design. "generic"
-        String HARDWARE = android.os.Build.HARDWARE; // The name of the hardware (from the kernel command line or
-        // /proc). "goldfish"
-        String MODEL = android.os.Build.MODEL; // The end-user-visible name for the end product. "sdk"
-        String PRODUCT = android.os.Build.PRODUCT; // The name of the overall product.
-        return (BOARD.compareTo("unknown") == 0) /* || (BOOTLOADER.compareTo("unknown") == 0) */
-                || (BRAND.compareTo("generic") == 0) || (DEVICE.compareTo("generic") == 0)
-                || (MODEL.compareTo("sdk") == 0) || (PRODUCT.compareTo("sdk") == 0)
-                || (HARDWARE.compareTo("goldfish") == 0);
+
+    public static boolean hasEmulatorBuild() {
+        return (android.os.Build.BOARD.compareTo("unknown") == 0)
+                || (android.os.Build.BRAND.compareTo("generic") == 0)
+                || (android.os.Build.DEVICE.compareTo("generic") == 0)
+                || models.contains(android.os.Build.MODEL)
+                || (android.os.Build.PRODUCT.compareTo("sdk") == 0)
+                || android.os.Build.FINGERPRINT.startsWith("unknown")
+                || (android.os.Build.HARDWARE.compareTo("goldfish") == 0);
     }
 
-    private static boolean hasEmulatorAdb() {
-        try {
-            return hasAdbInEmulator();
-        } catch (Exception exception) {
-            return false;
-        }
-    }
-
-    private static boolean hasEmulatorWifi() {
-        String netType = ShellUtils.shell("getprop wifi.interface");
-        return "eth0".equals(netType);
+    public static boolean hasQemuBuildProps(Context context) {
+        return "goldfish".equals(SystemUtils.getProp(context, "ro.hardware"))
+                || "ranchu".equals(SystemUtils.getProp(context, "ro.hardware"))
+                || "generic".equals(SystemUtils.getProp(context, "ro.product.device"))
+                || "1".equals(SystemUtils.getProp(context, "ro.kernel.qemu"))
+                || "0".equals(SystemUtils.getProp(context, "ro.secure"));
     }
 
     /**
-     * This was reversed from a sample someone was submitting to sandboxes for a
-     * thesis, can't find paper anymore
+     * 通过读取/proc/net/tcp的信息来判断是否存在adb. 比如真机的的信息为0: 4604D20A:B512 A3D13AD8..., 而模拟器上的对应信息就是0: 00000000:0016 00000000:0000, 因为adb通常是反射到0.0.0.0这个ip上, 虽然端口有可能改变, 但确实是可行的.
      *
-     * @throws IOException
+     * @return
      */
-    private static boolean hasAdbInEmulator() throws IOException {
-        boolean adbInEmulator = false;
-        BufferedReader reader = null;
+    public static boolean hasEmulatorAdb() {
+
+        String[] tcps = new String[]{"/proc/net/Tcp", "/proc/net/tcp", "/proc/net/tcp6"};
         try {
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream("/proc/net/Tcp")), 1000);
-            String line;
-            // Skip column names
-            reader.readLine();
 
-            ArrayList<Tcp> tcpList = new ArrayList<Tcp>();
+            for (String tcp : tcps) {
+                File f = new File(tcp);
+                if (f.exists() && f.canRead()) {
+                    FileInputStream fis = null;
+                    InputStreamReader isr = null;
+                    BufferedReader reader = null;
+                    try {
+                        fis = new FileInputStream(f);
+                        isr = new InputStreamReader(fis);
+                        reader = new BufferedReader(isr, 1000);
+                        String line;
+                        // Skip column names
+                        reader.readLine();
 
-            while ((line = reader.readLine()) != null) {
-                tcpList.add(Tcp.create(line.split("\\W+")));
-            }
+                        ArrayList<Tcp> tcpList = new ArrayList<Tcp>();
 
-            reader.close();
+                        while ((line = reader.readLine()) != null) {
+                            tcpList.add(Tcp.create(line.split("\\W+")));
+                        }
 
-            // Adb is always bounce to 0.0.0.0 - though the port can change
-            // real devices should be != 127.0.0.1
-            int adbPort = -1;
-            for (Tcp tcpItem : tcpList) {
-                if (tcpItem.localIp == 0) {
-                    adbPort = tcpItem.localPort;
-                    break;
-                }
-            }
+                        // Adb is always bounce to 0.0.0.0 - though the port can change
+                        // real devices should be != 127.0.0.1
+                        int adbPort = -1;
+                        for (Tcp tcpItem : tcpList) {
+                            if (tcpItem.localIp == 0) {
+                                adbPort = tcpItem.localPort;
+                                break;
+                            }
+                        }
 
-            if (adbPort != -1) {
-                for (Tcp tcpItem : tcpList) {
-                    if ((tcpItem.localIp != 0) && (tcpItem.localPort == adbPort)) {
-                        adbInEmulator = true;
+                        if (adbPort != -1) {
+                            for (Tcp tcpItem : tcpList) {
+                                if ((tcpItem.localIp != 0) && (tcpItem.localPort == adbPort)) {
+                                    return true;
+                                }
+                            }
+                        }
+                    } catch (Throwable e) {
+                    } finally {
+                        StreamerUtils.safeClose(fis);
+                        StreamerUtils.safeClose(isr);
+                        StreamerUtils.safeClose(reader);
                     }
                 }
             }
+
         } catch (Throwable e) {
-        } finally {
-            if (reader != null) {
-                reader.close();
-            }
+
         }
 
-        return adbInEmulator;
+        return false;
     }
 
-    private static class Tcp {
+    public static boolean isVbox(Context context) {
 
-        // public int id;
-        // public int remoteIp;
-        // public int remotePort;
+        try {
+            String getProp = ShellUtils.shell("getprop");
+            if (TextUtils.isEmpty(getProp)) {
+                if (getProp.contains("vbox86p")
+                        || getProp.contains("vbox")
+                        || getProp.contains("Genymotion")
+                ) {
+                    return true;
+                }
+            }
+            getProp = SystemUtils.getContentFromFile("/system/build.prop");
+            if (TextUtils.isEmpty(getProp)) {
+                if (getProp.contains("vbox86p")
+                        || getProp.contains("vbox")
+                        || getProp.contains("Genymotion")
+                ) {
+                    return true;
+                }
+            }
+        } catch (Throwable e) {
+        }
+        return false;
+    }
+
+    public static class Tcp {
+
+        public int id;
         public long localIp;
         public int localPort;
+        public int remoteIp;
+        public int remotePort;
 
         public Tcp(String id, String localIp, String localPort, String remoteIp, String remotePort, String state,
-                String tx_queue, String rx_queue, String tr, String tm_when, String retrnsmt, String uid,
-                String timeout, String inode) {
-            // this.id = Integer.parseInt(id, 16);
+                   String tx_queue, String rx_queue, String tr, String tm_when, String retrnsmt, String uid, String timeout,
+                   String inode) {
+            this.id = Integer.parseInt(id, 16);
             this.localIp = Long.parseLong(localIp, 16);
             this.localPort = Integer.parseInt(localPort, 16);
         }
@@ -225,4 +269,44 @@ public class SimulatorUtils {
         }
     }
 
+    private static String tracerpid = "TracerPid";
+
+    /**
+     * 阿里巴巴用于检测是否在跟踪应用进程
+     * <p>
+     * 容易规避, 用法是创建一个线程每3秒检测一次, 如果检测到则程序崩溃
+     *
+     * @return
+     * @throws IOException
+     */
+    public static boolean hasTracerPid() {
+        BufferedReader reader = null;
+        InputStreamReader isr = null;
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream("/proc/self/status");
+            isr = new InputStreamReader(fis);
+            reader = new BufferedReader(isr, 1000);
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                if (line.length() > tracerpid.length()) {
+                    if (line.substring(0, tracerpid.length()).equalsIgnoreCase(tracerpid)) {
+                        if (Integer.decode(line.substring(tracerpid.length() + 1).trim()) > 0) {
+                            return true;
+                        }
+                        break;
+                    }
+                }
+            }
+
+        } catch (Throwable e) {
+        } finally {
+            StreamerUtils.safeClose(fis);
+            StreamerUtils.safeClose(isr);
+            StreamerUtils.safeClose(reader);
+        }
+        return false;
+    }
 }
+

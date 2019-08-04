@@ -3,20 +3,27 @@ package com.analysys.track.internal;
 import android.content.Context;
 import android.os.Build;
 import android.os.PowerManager;
+import android.text.TextUtils;
 
+import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.impl.DevStatusChecker;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.MultiProcessChecker;
+import com.analysys.track.utils.PatchHelper;
 import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.reflectinon.Reflecer;
 import com.analysys.track.internal.work.CrashHandler;
 import com.analysys.track.internal.work.MessageDispatcher;
+import com.analysys.track.utils.sp.SPHelper;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationTargetException;
 
 public class AnalysysInternal {
     private static boolean hasInit = false;
@@ -44,23 +51,25 @@ public class AnalysysInternal {
      * @param channel
      */
     public void initEguan(final String key, final String channel) {
-        try {
-            // 单进程内防止重复注册
-            if (hasInit) {
-                return;
-            }
-            // 防止影响宿主线程中的任务
-            EThreadPool.execute(new Runnable() {
-                @Override
-                public void run() {
-                    init(key, channel);
-                }
-            });
-        } catch (Throwable t) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
-            }
+        // 单进程内防止重复注册
+        if (hasInit) {
+            return;
         }
+        // 防止影响宿主线程中的任务
+        EThreadPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                hasInit = true;
+                try {
+                    init(key, channel);
+                } catch (Throwable e) {
+                    if (EGContext.FLAG_DEBUG_INNER) {
+                        ELOG.e(e);
+                    }
+                }
+
+            }
+        });
     }
 
     /**
@@ -70,16 +79,13 @@ public class AnalysysInternal {
      * @param channel
      */
     @SuppressWarnings("deprecation")
-    private void init(String key, String channel) {
-        hasInit = true;
+    private void init(String key, String channel)  {
+
         // 0.首先检查是否有Context
         Context ctx = EContextHelper.getContext(mContextRef == null ? null : mContextRef.get());
         if (ctx == null) {
             return;
         }
-//        if (mContextRef == null) {
-//            mContextRef = new WeakReference<Context>(ctx);
-//        }
         SystemUtils.updateAppkeyAndChannel(ctx, key, channel);// update sp
 
         // 1. 设置错误回调
@@ -90,7 +96,7 @@ public class AnalysysInternal {
         initSupportMultiProcess(ctx);
         // 4. 启动工作机制
         MessageDispatcher.getInstance(ctx).startService();
-        // 4. 根据屏幕调整工作状态
+        // 5. 根据屏幕调整工作状态
         PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
         if (pm != null) {
             boolean isScreenOn = pm.isScreenOn();
@@ -99,10 +105,21 @@ public class AnalysysInternal {
                 ReceiverUtils.getInstance().setWork(false);
             }
         }
-
         if (ELOG.USER_DEBUG) {
-            ELOG.info( "[%s] init SDK (%s) success! " ,SystemUtils.getCurrentProcessName(mContextRef.get()) , EGContext.SDK_VERSION );
+            ELOG.info("[%s] init SDK (%s) success! ", SystemUtils.getCurrentProcessName(mContextRef.get()), EGContext.SDK_VERSION);
         }
+        // 6.是否启动工作
+        if (!DevStatusChecker.getInstance().isDebugDevice(mContextRef.get())) {
+            String version = SPHelper.getStringValueFromSP(mContextRef.get(), DeviceKeyContacts.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, "");
+            if (!TextUtils.isEmpty(version)) {
+                File file = new File(mContextRef.get().getFilesDir(), version + ".jar");
+                if (file.exists()) {
+                    PatchHelper.loads(mContextRef.get(), file);
+                }
+            }
+
+        }
+
     }
 
     /**

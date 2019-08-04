@@ -9,11 +9,12 @@ import com.analysys.track.db.TableAppSnapshot;
 import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.internal.impl.net.PolicyImpl;
+import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.JsonUtils;
+import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.internal.work.MessageDispatcher;
@@ -22,13 +23,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class AppSnapshotImpl {
-    private static boolean isSnapShotBlockRunning = false;
-    Context mContext;
 
     private AppSnapshotImpl() {
 
@@ -161,14 +161,14 @@ public class AppSnapshotImpl {
                     }
                 }
                 if (list.size() < 5) {
-                    list = SystemUtils.getAppsFromShell(mContext, EGContext.SNAP_SHOT_INSTALL, list);
+                    list = getAppsFromShell(mContext, EGContext.SNAP_SHOT_INSTALL, list);
                 }
             } else {
                 // 如果上面的方法不能获取，改用shell命令
                 if (list == null) {
                     list = new ArrayList<JSONObject>();
                     if (list.size() < 5) {
-                        list = SystemUtils.getAppsFromShell(mContext, EGContext.SNAP_SHOT_INSTALL, list);
+                        list = getAppsFromShell(mContext, EGContext.SNAP_SHOT_INSTALL, list);
                     }
                 }
             }
@@ -181,6 +181,179 @@ public class AppSnapshotImpl {
         }
         return list;
     }
+
+
+    //获取单个安装列表
+    public List<JSONObject> getAppDebugStatus() {
+        List<JSONObject> list = new ArrayList<JSONObject>();
+        try {
+            PackageManager packageManager = mContext.getPackageManager();
+            List<PackageInfo> packageInfo = packageManager.getInstalledPackages(0);
+            if (packageInfo != null && packageInfo.size() > 0) {
+                for (int i = 0; i < packageInfo.size(); i++) {
+                    try {
+                        JSONObject appInfo = new JSONObject();
+                        String packageName = packageInfo.get(i).packageName;
+                        appInfo.put(EGContext.TEXT_DEBUG_APP, packageName);
+                        appInfo.put(EGContext.TEXT_DEBUG_STATUS, SystemUtils.isApkDebugable(mContext, packageName));
+                        list.add(appInfo);
+                    } catch (Throwable t) {
+                    }
+                }
+                if (list.size() < 5) {
+                    Set<String> result = new HashSet<String>();
+                    result = getPkgList(result, SHELL_PM_LIST_PACKAGES);
+
+                    for (String packageName : result) {
+                        JSONObject appInfo = new JSONObject();
+                        appInfo.put(EGContext.TEXT_DEBUG_APP, packageName);
+                        appInfo.put(EGContext.TEXT_DEBUG_STATUS, SystemUtils.isApkDebugable(mContext, packageName));
+                        list.add(appInfo);
+                    }
+                }
+            } else {
+                // 如果上面的方法不能获取，改用shell命令
+                Set<String> result = new HashSet<String>();
+                result = getPkgList(result, SHELL_PM_LIST_PACKAGES);
+
+                for (String packageName : result) {
+                    JSONObject appInfo = new JSONObject();
+                    appInfo.put("packageName", packageName);
+                    appInfo.put("debug", SystemUtils.isApkDebugable(mContext, packageName));
+                    list.add(appInfo);
+                }
+            }
+
+        } catch (Exception e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
+
+        }
+        return list;
+    }
+
+    private List<JSONObject> getAppsFromShell(Context mContext, String tag, List<JSONObject> appList) {
+//        JSONArray appList = new JSONArray();
+        try {
+            JSONObject appInfo;
+            Set<String> result = new HashSet<>();
+            PackageManager pm = mContext.getPackageManager();
+            result = getPkgList(result, SHELL_PM_LIST_PACKAGES);
+            PackageInfo pi = null;
+            for (String pkgName : result) {
+                if (!TextUtils.isEmpty(pkgName) && pm.getLaunchIntentForPackage(pkgName) != null) {
+                    pi = mContext.getPackageManager().getPackageInfo(pkgName, 0);
+                    appInfo = new JSONObject();
+                    appInfo = AppSnapshotImpl.getInstance(mContext).getAppInfo(appInfo, pi, pm, tag);
+//                    appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,
+//                            pkgName);
+//                    appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ActionType, tag);
+//                    appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
+//                            String.valueOf(System.currentTimeMillis()));
+                    if (!appList.contains(appInfo)) {
+                        appList.add(appInfo);
+                    }
+
+                }
+            }
+        } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
+        }
+        return appList;
+    }
+
+    /**
+     * 获取安装列表
+     *
+     * @param appSet
+     * @param shell
+     * @return
+     */
+    private Set<String> getPkgList(Set<String> appSet, String shell) {
+        // Set<String> set = new HashSet<String>();
+        String result = ShellUtils.shell(shell);
+        if (!TextUtils.isEmpty(result) && result.contains("\n")) {
+            String[] lines = result.split("\n");
+            if (lines.length > 0) {
+                String line = null;
+                for (int i = 0; i < lines.length; i++) {
+                    line = lines[i];
+                    // 单行条件: 非空&&有点&&有冒号
+                    if (!TextUtils.isEmpty(line) && line.contains(".") && line.contains(":")) {
+                        // 分割. 样例数据:<code>package:com.android.launcher3</code>
+                        String[] split = line.split(":");
+                        if (split != null && split.length > 1) {
+                            String packageName = split[1];
+                            appSet.add(packageName);
+                        }
+                    }
+                }
+            }
+        }
+        return appSet;
+    }
+
+    /**
+     * 获取APP类型
+     *
+     * @param pkg
+     * @return
+     */
+    public String getAppType(String pkg) {
+        if (TextUtils.isEmpty(pkg)) {
+            return "OA";
+        }
+        return isSystemApps(pkg) ? "SA" : "OA";
+    }
+
+    /**
+     * 是否为系统应用:
+     * <p>
+     * 1. shell获取到三方列表判断
+     * <p>
+     * 2. 获取异常的使用其他方式判断
+     *
+     * @param pkg
+     * @return
+     */
+    private boolean isSystemApps(String pkg) {
+
+        // 1. 没有获取应用列表则获取
+        if (mSystemAppSet.size() < 1) {
+            getPkgList(mSystemAppSet, APP_LIST_SYSTEM);
+        }
+        // 2. 根据列表内容判断
+        if (mSystemAppSet.size() > 0) {
+            if (mSystemAppSet.contains(pkg)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            try {
+                // 3. 使用系统方法判断
+                mContext = EContextHelper.getContext(mContext);
+                if (mContext == null) {
+                    return false;
+                }
+                PackageManager pm = mContext.getPackageManager();
+                if (pm == null) {
+                    return false;
+                }
+                PackageInfo pInfo = pm.getPackageInfo(pkg, 0);
+                if ((pInfo.applicationInfo.flags & android.content.pm.ApplicationInfo.FLAG_SYSTEM) == 1) {
+                    return true;
+                }
+            } catch (Throwable e) {
+            }
+
+        }
+        return false;
+    }
+
 
     /**
      * 单个应用json信息
@@ -214,15 +387,6 @@ public class AppSnapshotImpl {
                 DataController.SWITCH_OF_ACTION_TYPE);
         JsonUtils.pushToJSON(mContext, appInfo, DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
                 String.valueOf(System.currentTimeMillis()), DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
-//        appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,
-//                pkgInfo.packageName);
-//        appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationName,
-//                String.valueOf(pkgInfo.applicationInfo.loadLabel(packageManager)));
-//        appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode,
-//                pkgInfo.versionName + "|" + pkgInfo.versionCode);
-//        appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ActionType, tag);
-//        appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
-//                String.valueOf(System.currentTimeMillis()));
         return appInfo;
     }
 
@@ -299,4 +463,11 @@ public class AppSnapshotImpl {
         private static final AppSnapshotImpl INSTANCE = new AppSnapshotImpl();
     }
 
+    private final String SHELL_PM_LIST_PACKAGES = "pm list packages";// all
+    private final String APP_LIST_SYSTEM = "pm list packages -s";// system
+    // private final String APP_LIST_USER = "pm list packages -3";// third party
+    // 获取系统应用列表
+    private final Set<String> mSystemAppSet = new HashSet<String>();
+    private boolean isSnapShotBlockRunning = false;
+    private Context mContext;
 }

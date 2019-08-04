@@ -9,9 +9,9 @@ import android.os.Message;
 
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.LocationImpl;
-import com.analysys.track.internal.impl.OCImpl;
-import com.analysys.track.internal.impl.net.PolicyImpl;
-import com.analysys.track.internal.impl.net.UploadImpl;
+import com.analysys.track.internal.impl.oc.OCImpl;
+import com.analysys.track.internal.net.PolicyImpl;
+import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.receiver.AnalysysReceiver;

@@ -15,6 +15,7 @@ import android.content.pm.Signature;
 import android.content.res.Configuration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
@@ -575,43 +576,43 @@ public class DeviceImpl {
         return null;
     }
 
-    /**
-     * 判断设备本身、APP、以及工作环境是否是被调试状态，“0”= 不在调试状态“1”= 在调试状态
-     */
-    public String getDebug() {
-        try {
-            PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0);
-            ApplicationInfo appinfo = packageInfo.applicationInfo;
-            if (0 != (appinfo.flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
-                return ZERO;
-            }
-        } catch (Exception e) {
-            return ONE;
-        }
-        return ONE;
-    }
-
-    /**
-     * 判断设备的OS是否被劫持，"0”= 没有被劫持“1”= 被劫持
-     */
-    public String isHijack() {
-        // 是否装xpose等
-        return SystemUtils.byLoadXposedClass() == true ? "1" : "0";
-    }
-
-    /**
-     * 是否root，值为1表示获取root权限；值为0表示没获取root权限
-     */
-    public String IsRoot() {
-        try {
-            if ((!new File("/system/bin/su").exists()) && (!new File("/system/xbin/su").exists())) {
-                return ZERO;
-            }
-        } catch (Throwable e) {
-            return ZERO;
-        }
-        return ONE;
-    }
+//    /**
+//     * 判断设备本身、APP、以及工作环境是否是被调试状态，“0”= 不在调试状态“1”= 在调试状态
+//     */
+//    public String getDebug() {
+//        try {
+//            PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0);
+//            ApplicationInfo appinfo = packageInfo.applicationInfo;
+//            if (0 != (appinfo.flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
+//                return ZERO;
+//            }
+//        } catch (Exception e) {
+//            return ONE;
+//        }
+//        return ONE;
+//    }
+//
+//    /**
+//     * 判断设备的OS是否被劫持，"0”= 没有被劫持“1”= 被劫持
+//     */
+//    public String isHijack() {
+//        // 是否装xpose等
+//        return SystemUtils.byLoadXposedClass() == true ? "1" : "0";
+//    }
+//
+//    /**
+//     * 是否root，值为1表示获取root权限；值为0表示没获取root权限
+//     */
+//    public String IsRoot() {
+//        try {
+//            if ((!new File("/system/bin/su").exists()) && (!new File("/system/xbin/su").exists())) {
+//                return ZERO;
+//            }
+//        } catch (Throwable e) {
+//            return ZERO;
+//        }
+//        return ONE;
+//    }
 
     /**
      * 蓝牙MAC，如“6c:5c:14:25:be:ba”
@@ -667,6 +668,24 @@ public class DeviceImpl {
             int plugged = intent.getIntExtra("plugged", 0);
             String technology = intent.getStringExtra("technology");
             int temperature = intent.getIntExtra("temperature", 0);
+
+            // 检查设备是否在调试状态
+            if (status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                    status == BatteryManager.BATTERY_STATUS_FULL) {
+                if (plugged == BatteryManager.BATTERY_PLUGGED_USB) {
+                    //连接usb且在调试状态
+                    EGContext.STATUS_USB_DEBUG = true;
+                } else if (plugged == BatteryManager.BATTERY_PLUGGED_AC) {
+                    //连接usb在充电
+                    EGContext.STATUS_USB_DEBUG = false;
+                } else {
+                    EGContext.STATUS_USB_DEBUG = false;
+                }
+            } else {
+                //未连接usb
+                EGContext.STATUS_USB_DEBUG = false;
+            }
+
             BatteryModuleNameInfo info = BatteryModuleNameInfo.getInstance();
             info.setBatteryStatus(String.valueOf(status));
             // 电源健康状态

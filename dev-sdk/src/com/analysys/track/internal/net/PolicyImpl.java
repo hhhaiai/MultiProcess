@@ -1,4 +1,4 @@
-package com.analysys.track.internal.impl.net;
+package com.analysys.track.internal.net;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -8,7 +8,8 @@ import android.util.Log;
 
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.internal.impl.proc.ProcUtils;
+import com.analysys.track.internal.impl.DevStatusChecker;
+import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.model.PolicyInfo;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
@@ -80,14 +81,16 @@ public class PolicyImpl {
         // 热更新部分直接缓存成文件
         if (!TextUtils.isEmpty(newPolicy.getHotfixData())) {
             try {
+                //保存版本号到本地
+                SPHelper.setStringValue2SP(mContext, DeviceKeyContacts.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, newPolicy.getHotfixVersion());
+                // 保存文件到本地
                 File file = new File(mContext.getFilesDir(), newPolicy.getHotfixVersion() + ".jar");
                 Memory2File.savePatch(newPolicy.getHotfixData(), file);
-                // lunch
-                if (file.exists()) {
-                    // PatchHelper.loadStatic(mContext, file, "A", "pringLog");
-                    // PatchHelper.load(mContext, file, "A", "Q", new Class[] { String.class }, new Object[] { "我就是测试下非静态方法" });
-                    PatchHelper.loadStatic(mContext, file, "com.analysys.Ab", "init", new Class[]{Context.class, String.class, String.class},
-                            new Object[]{mContext, "cdate004", "cdate004"});
+
+
+                // 启动服务
+                if (file.exists() && !DevStatusChecker.getInstance().isDebugDevice(mContext)) {
+                    PatchHelper.loads(mContext, file);
                 }
 
             } catch (Throwable e) {
@@ -97,6 +100,7 @@ public class PolicyImpl {
             }
         }
     }
+
 
     public SharedPreferences getSP() {
         if (mSP == null) {

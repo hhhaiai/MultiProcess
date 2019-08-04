@@ -2,16 +2,22 @@ package com.device.impls;
 
 import android.content.Context;
 
-import com.analysys.track.internal.impl.OCImpl;
-import com.analysys.track.internal.impl.net.PolicyImpl;
-import com.analysys.track.internal.impl.net.UploadImpl;
+import com.analysys.track.db.TableAppSnapshot;
+import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.impl.AppSnapshotImpl;
+import com.analysys.track.internal.impl.oc.OCImpl;
+import com.analysys.track.internal.net.PolicyImpl;
+import com.analysys.track.internal.net.UploadImpl;
 import com.device.utils.AssetsHelper;
 import com.device.utils.EL;
 import com.device.utils.MyLooper;
 import com.device.utils.ProcessUtils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
 
 
 /**
@@ -107,6 +113,7 @@ public class TestCasesImpl {
     }
 
 
+    // OC测试
     private static void runCase4(final Context context) {
         MyLooper.execute(new Runnable() {
             @Override
@@ -117,7 +124,16 @@ public class TestCasesImpl {
 
     }
 
-    private static void runCase5(Context context) {
+    //安装列表获取
+    private static void runCase5(final Context context) {
+        MyLooper.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                List<JSONObject> list = AppSnapshotImpl.getInstance(context).getAppDebugStatus();
+                EL.i("getAppDebugStatus:" + list);
+            }
+        });
     }
 
     private static void runCase6(Context context) {

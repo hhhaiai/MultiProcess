@@ -7,8 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 import android.util.Base64;
 
-import com.analysys.track.internal.impl.net.UploadImpl;
-import com.analysys.track.internal.impl.proc.ProcUtils;
+import com.analysys.track.internal.net.UploadImpl;
+import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.ELOG;

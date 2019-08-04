@@ -4,8 +4,9 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.analysys.track.internal.impl.DevStatusChecker;
 import com.analysys.track.internal.impl.DeviceImpl;
-import com.analysys.track.internal.impl.net.PolicyImpl;
+import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.model.PolicyInfo;
@@ -81,7 +82,8 @@ public class RequestUtils {
             // 添加头信息
 
             connection.setRequestProperty(EGContext.SDKV, SPHelper.getStringValueFromSP(context, EGContext.SDKV, ""));
-            connection.setRequestProperty(EGContext.DEBUG, DeviceImpl.getInstance(context).getDebug());
+//            connection.setRequestProperty(EGContext.DEBUG, DeviceImpl.getInstance(context).getDebug());
+            connection.setRequestProperty(EGContext.DEBUG, DevStatusChecker.getInstance().isSelfDebugApp(context) ? "1" : "0");
             connection.setRequestProperty(EGContext.APPKEY, SystemUtils.getAppKey(context));
             connection.setRequestProperty(EGContext.TIME, SPHelper.getStringValueFromSP(context, EGContext.TIME, ""));
             connection.setRequestProperty(EGContext.POLICYVER, pl);// 策略覆盖
