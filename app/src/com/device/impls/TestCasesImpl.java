@@ -2,6 +2,7 @@ package com.device.impls;
 
 import android.content.Context;
 
+import com.analysys.track.impl.OCImpl;
 import com.analysys.track.impl.PolicyImpl;
 import com.analysys.track.impl.UploadImpl;
 import com.device.utils.AssetsHelper;
@@ -106,7 +107,14 @@ public class TestCasesImpl {
     }
 
 
-    private static void runCase4(Context context) {
+    private static void runCase4(final Context context) {
+        MyLooper.execute(new Runnable() {
+            @Override
+            public void run() {
+                OCImpl.getInstance(context).processOC();
+            }
+        });
+
     }
 
     private static void runCase5(Context context) {
@@ -148,7 +156,7 @@ public class TestCasesImpl {
 
         String policy = AssetsHelper.getFromAssetsToString(context, "patchPolicy.txt");
         EL.i("testReceiverPolocy。。。。policy：" + policy);
-        UploadImpl.getInstance(context).handleUpload("http://192.168.220.167:8089",policy);
+        UploadImpl.getInstance(context).handleUpload("http://192.168.220.167:8089", policy);
         EL.i("testReceiverPolocy。。。。process over");
     }
 

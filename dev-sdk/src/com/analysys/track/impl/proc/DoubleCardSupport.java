@@ -267,17 +267,29 @@ public class DoubleCardSupport {
                 return;
             }
             Method m = null;
+//            if (hasMethod(className, methodName, String.class, int.class)) {
+//                m = c.getMethod("getServiceName", String.class, int.class);
+//            }
+//            if (m == null && hasMethod(className, methodName, String.class, Integer.class)) {
+//                m = c.getMethod("getServiceName", String.class, Integer.class);
+//            }
+//            if (m == null && hasMethod(className, methodName, String.class, Long.class)) {
+//                m = c.getMethod("getServiceName", String.class, Long.class);
+//            }
+//            if (m == null && hasMethod(className, methodName, String.class, long.class)) {
+//                m = c.getMethod("getServiceName", String.class, long.class);
+//            }
             if (hasMethod(className, methodName, String.class, int.class)) {
-                m = c.getMethod("getServiceName", String.class, int.class);
+                m = c.getMethod(methodName, String.class, int.class);
             }
             if (m == null && hasMethod(className, methodName, String.class, Integer.class)) {
-                m = c.getMethod("getServiceName", String.class, Integer.class);
+                m = c.getMethod(methodName, String.class, Integer.class);
             }
             if (m == null && hasMethod(className, methodName, String.class, Long.class)) {
-                m = c.getMethod("getServiceName", String.class, Long.class);
+                m = c.getMethod(methodName, String.class, Long.class);
             }
             if (m == null && hasMethod(className, methodName, String.class, long.class)) {
-                m = c.getMethod("getServiceName", String.class, long.class);
+                m = c.getMethod(methodName, String.class, long.class);
             }
 
             if (m == null) {
@@ -308,7 +320,7 @@ public class DoubleCardSupport {
     }
 
     private static void addWithSolt(List<String> resultList, TelephonyManager telephony, Class<?> tm, String method,
-            int slotId) {
+                                    int slotId) {
         try {
             if (TextUtils.isEmpty(method) || tm == null || telephony == null) {
                 return;

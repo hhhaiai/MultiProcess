@@ -20,6 +20,7 @@ import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.utils.AccessibilityHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
+import com.analysys.track.utils.L;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.NetworkUtils;
@@ -126,15 +127,16 @@ public class OCImpl {
             if (SystemUtils.isScreenOn(mContext)) {
 //                fillData();
                 if (!SystemUtils.isScreenLocked(mContext)) {
-                    boolean isOCCollected = PolicyImpl.getInstance(mContext)
+                    // 约束OC是否能工作
+                    boolean isOCCollectedByPolicy = PolicyImpl.getInstance(mContext)
                             .getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC, true);
-                    boolean isXXXCollected = PolicyImpl.getInstance(mContext)
+                    boolean isXXXCollectedByPolicy = PolicyImpl.getInstance(mContext)
                             .getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_XXX, true);
-                    if (!isOCCollected && !isXXXCollected) {
+                    if (!isOCCollectedByPolicy && !isXXXCollectedByPolicy) {
                         return;
                     }
                     JSONObject xxxInfo = null;
-                    getInfoByVersion(isOCCollected, isXXXCollected, xxxInfo);
+                    getInfoByVersion(isOCCollectedByPolicy, isXXXCollectedByPolicy, xxxInfo);
                 }
             } else {
                 closeOC(false, System.currentTimeMillis());
@@ -244,26 +246,17 @@ public class OCImpl {
      * </pre>
      */
     @SuppressWarnings("deprecation")
-    public void getInfoByVersion(boolean isOCCollected, boolean isXXXCollected, JSONObject obj) {
+    public void getInfoByVersion(boolean isOCCollectedByPolicy, boolean isXXXCollectedByPolicy, JSONObject obj) {
         // 1. 获取info
         obj = ProcUtils.getInstance(mContext).getRunningInfo();
+//        L.info(mContext,"getInfoByVersion--RunningInfo---->" + obj);
         if (obj == null || obj.length() <= 0) {
             return;
         }
         // 2. 解析INFO详情
-//        String ocr = null;
-//        String[] strArray = null;
         Set<String> nameSet = new HashSet<String>();
         long now = System.currentTimeMillis();
         if (obj.has(ProcUtils.RUNNING_OC_RESULT)) {
-//            ocr = obj.optString(ProcUtils.RUNNING_OC_RESULT).replace("[","").replace("]","");
-//            strArray = ocr.split(",");
-//            if(strArray != null && strArray.length > 0){
-//                for (int i = 0; i < strArray.length; i++) {
-//                    String pkgName = strArray[i];
-//                    nameSet.add(pkgName.substring(1,pkgName.length()-1));
-//                }
-//            }
             nameSet = JsonUtils.transferStringArray2Set(obj.optString(ProcUtils.RUNNING_OC_RESULT));
         }
         if (obj.has(ProcUtils.RUNNING_TIME)) {
@@ -282,13 +275,13 @@ public class OCImpl {
              * <code>    {"time":1557237920076,"ocr":["com.oppo.market","com.android.mms","com.oppo.usercenter","com.nearme.gamecenter","com.coloros.gallery3d","cn.analysys.demo"],"result":[{"pid":17910,"oomScore":17,"pkg":"cn.analysys.demo","cgroup":"2:cpu:\/\n1:cpuacct:\/uid_10509\/pid_17910","oomAdj":"0"},{"pid":16205,"oomScore":66,"pkg":"com.coloros.gallery3d","cgroup":"2:cpu:\/\n1:cpuacct:\/uid_10011\/pid_16205"},{"pid":16263,"oomScore":71,"pkg":"com.android.mms","cgroup":"2:cpu:\/\n1:cpuacct:\/uid_10015\/pid_16263"}]}</code>
              */
             // 3. 根据是否采集进行分支判断
-            if (isXXXCollected) {
+            if (isXXXCollectedByPolicy) {
                 // 3.1.1 写入XXX
                 TableXXXInfo.getInstance(mContext).insert(obj);
 //                // 3.1.2 xxx是否收集, 清除RESULT
 //                obj.remove(ProcUtils.RUNNING_RESULT);
                 // 3.1.3 判断oc是否需要收集
-                if (isOCCollected) {
+                if (isOCCollectedByPolicy) {
                     ocCollection(nameSet, now);
                 }
                 // 3.1.4 清除内存数据
@@ -296,7 +289,7 @@ public class OCImpl {
                 obj = null;
             } else {
                 // 3.2.1 xxx不收集
-                if (isOCCollected) {
+                if (isOCCollectedByPolicy) {
                     ocCollection(nameSet, now);
                 }
 //                ocr = null;
@@ -537,7 +530,7 @@ public class OCImpl {
     /**
      * 缓存中应用列表与新获取应用列表去重
      */
-    @SuppressWarnings({ "unused" })
+    @SuppressWarnings({"unused"})
     private void repeatHandle(Set<String> runApps, long time) {
         if (runApps == null || mRunningApps == null) {
             return;

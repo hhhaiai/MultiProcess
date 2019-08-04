@@ -24,6 +24,5 @@ public class MultiCase {
      */
     public static void runCase(Context context, int caseNum) {
         EL.i(ProcessUtils.getCurrentProcessName(context) + "--------->收到case" + caseNum);
-
     }
 }

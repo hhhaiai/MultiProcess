@@ -26,7 +26,7 @@ public class MyServiceI extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        EL.i("sanbo.proctest", "。。。。。" + mClassName + "。。。");
+//        EL.i("sanbo.proctest", "。。。。。" + mClassName + "。。。");
         MultiProcessWorker.processCommand(this.getApplicationContext(), intent);
         return START_STICKY;
     }
