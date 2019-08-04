@@ -15,8 +15,8 @@ import android.os.Looper;
 import android.os.PowerManager;
 import android.text.TextUtils;
 
-import com.analysys.track.impl.AppSnapshotImpl;
-import com.analysys.track.impl.PolicyImpl;
+import com.analysys.track.internal.impl.AppSnapshotImpl;
+import com.analysys.track.internal.impl.net.PolicyImpl;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.reflectinon.EContextHelper;

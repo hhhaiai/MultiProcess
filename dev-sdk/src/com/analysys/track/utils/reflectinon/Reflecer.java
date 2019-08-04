@@ -2,7 +2,7 @@ package com.analysys.track.utils.reflectinon;
 
 import android.os.Build;
 
-import com.analysys.track.impl.proc.DoubleCardSupport;
+import com.analysys.track.internal.impl.DoubleCardSupport;
 
 import java.lang.reflect.Field;
 

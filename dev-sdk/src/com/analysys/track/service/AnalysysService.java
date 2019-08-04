@@ -5,8 +5,8 @@ import android.content.Intent;
 import android.os.IBinder;
 
 import com.analysys.track.internal.AnalysysInternal;
-import com.analysys.track.work.MessageDispatcher;
-import com.analysys.track.work.ServiceHelper;
+import com.analysys.track.internal.work.MessageDispatcher;
+import com.analysys.track.internal.work.ServiceHelper;
 
 public class AnalysysService extends Service {
 

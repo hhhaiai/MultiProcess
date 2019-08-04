@@ -13,8 +13,8 @@ import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.reflectinon.Reflecer;
-import com.analysys.track.work.CrashHandler;
-import com.analysys.track.work.MessageDispatcher;
+import com.analysys.track.internal.work.CrashHandler;
+import com.analysys.track.internal.work.MessageDispatcher;
 
 import java.lang.ref.WeakReference;
 

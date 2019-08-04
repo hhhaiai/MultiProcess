@@ -6,11 +6,11 @@ import android.content.Intent;
 import android.os.Build;
 import android.text.TextUtils;
 
-import com.analysys.track.impl.DeviceImpl;
+import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.MultiProcessChecker;
-import com.analysys.track.work.MessageDispatcher;
+import com.analysys.track.internal.work.MessageDispatcher;
 
 public class AnalysysReceiver extends BroadcastReceiver {
     // 上次结束时间

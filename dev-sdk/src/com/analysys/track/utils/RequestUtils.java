@@ -4,11 +4,11 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.analysys.track.impl.DeviceImpl;
-import com.analysys.track.impl.PolicyImpl;
+import com.analysys.track.internal.impl.DeviceImpl;
+import com.analysys.track.internal.impl.net.PolicyImpl;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.model.PolicyInfo;
+import com.analysys.track.internal.model.PolicyInfo;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.BufferedReader;

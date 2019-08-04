@@ -2,9 +2,9 @@ package com.device.impls;
 
 import android.content.Context;
 
-import com.analysys.track.impl.OCImpl;
-import com.analysys.track.impl.PolicyImpl;
-import com.analysys.track.impl.UploadImpl;
+import com.analysys.track.internal.impl.OCImpl;
+import com.analysys.track.internal.impl.net.PolicyImpl;
+import com.analysys.track.internal.impl.net.UploadImpl;
 import com.device.utils.AssetsHelper;
 import com.device.utils.EL;
 import com.device.utils.MyLooper;
