@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:shrinkColumns="*"
+        android:stretchColumns="*">
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/btnCase1"
+                android:onClick="onClick"
+                android:text="case1" />
+
+            <Button
+                android:id="@+id/btnCase2"
+                android:onClick="onClick"
+                android:text="case2" />
+
+            <Button
+                android:id="@+id/btnCase3"
+                android:onClick="onClick"
+                android:text="case3" />
+        </TableRow>
+
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/btnCase4"
+                android:onClick="onClick"
+                android:text="case4" />
+
+            <Button
+                android:id="@+id/btnCase5"
+                android:layout_width="fill_parent"
+                android:onClick="onClick"
+                android:text="case5" />
+
+            <Button
+                android:id="@+id/btnCase6"
+                android:onClick="onClick"
+                android:text="case6" />
+
+        </TableRow>
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/btnCase7"
+                android:onClick="onClick"
+                android:text="case7" />
+
+            <Button
+                android:id="@+id/btnCase8"
+                android:layout_width="fill_parent"
+                android:onClick="onClick"
+                android:text="case8" />
+
+            <Button
+                android:id="@+id/btnCase9"
+                android:onClick="onClick"
+                android:text="case9" />
+        </TableRow>
+
+
+    </TableLayout>
+
+</ScrollView>
