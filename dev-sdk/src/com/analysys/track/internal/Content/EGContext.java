@@ -100,7 +100,7 @@ public class EGContext {
     /**
      * 非实时上传是,使用的域名池,以urd开始的为设备上传接口
      */
-    public final static String[] NORMAL_UPLOAD_URL = { "urd103.analysys.cn", // 0
+    public final static String[] NORMAL_UPLOAD_URL = {"urd103.analysys.cn", // 0
             "urd240.analysys.cn", // 1
             "urd183.analysys.cn", // 2
             "urd409.analysys.cn", // 3
@@ -134,14 +134,14 @@ public class EGContext {
     public static final String APPKEY = "AK";
     public static final String TIME = "TIME";
     public static final String POLICYVER = "policyVer";
-    public static final String PRO = "PRO";
-    public static final String PRO_KEY_WORDS = "QF4";
-    // HTTP Status-Code 413: Request Entity Too Large
-    public static final String HTTP_DATA_OVERLOAD = "413";
-    // 200 SUCCESS
-    public static final String HTTP_SUCCESS = "200";
-    // 500 RETRY
-    public static final String HTTP_RETRY = "500";
+    //    public static final String PRO = "PRO";
+//    public static final String PRO_KEY_WORDS = "QF4";
+    //  Negix 超过最大返回。网络状态，非消息内容
+    public static final String HTTP_STATUS_413 = "413";
+    // 200 请求成功。 返回值内部状态
+    public static final String HTTP_STATUS_200 = "200";
+    // 500 策略。返回值内部状态
+    public static final String HTTP_STATUS_500 = "500";
     // int default 值
     public static final int DEFAULT = 0;
     // OCINFO

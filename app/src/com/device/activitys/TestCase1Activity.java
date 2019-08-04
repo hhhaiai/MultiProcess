@@ -7,7 +7,6 @@ import android.view.View;
 
 import com.device.R;
 import com.device.impls.TestCasesImpl;
-import com.device.utils.EL;
 
 
 /**
@@ -32,8 +31,31 @@ public class TestCase1Activity extends Activity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnCase1:
-                EL.i("click btnCase1");
-                TestCasesImpl.runCase1(mContext);
+                TestCasesImpl.runCase(mContext, 1);
+                break;
+            case R.id.btnCase2:
+                TestCasesImpl.runCase(mContext, 2);
+                break;
+            case R.id.btnCase3:
+                TestCasesImpl.runCase(mContext, 3);
+                break;
+            case R.id.btnCase4:
+                TestCasesImpl.runCase(mContext, 4);
+                break;
+            case R.id.btnCase5:
+                TestCasesImpl.runCase(mContext, 5);
+                break;
+            case R.id.btnCase6:
+                TestCasesImpl.runCase(mContext, 6);
+                break;
+            case R.id.btnCase7:
+                TestCasesImpl.runCase(mContext, 7);
+                break;
+            case R.id.btnCase8:
+                TestCasesImpl.runCase(mContext, 8);
+                break;
+            case R.id.btnCase9:
+                TestCasesImpl.runCase(mContext, 9);
                 break;
             default:
                 break;

@@ -15,20 +15,25 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- Location -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- Location -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.GET_TASKS" /> <!-- 开机 -->
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <!-- 开机 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.RESTART_PACKAGES" />
     <uses-permission
         android:name="android.permission.WRITE_SETTINGS"
-        tools:ignore="ProtectedPermissions" /> <!-- UsageStatsManager权限 -->
+        tools:ignore="ProtectedPermissions" />
+    <!-- UsageStatsManager权限 -->
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
-        tools:ignore="ProtectedPermissions" /> <!-- P和以后版本 服务需要该权限 -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> <!-- 下面权限新版本建议增加 -->
+        tools:ignore="ProtectedPermissions" />
+    <!-- P和以后版本 服务需要该权限 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- 下面权限新版本建议增加 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission
         android:name="android.permission.MOUNT_FORMAT_FILESYSTEMS"
@@ -40,6 +45,9 @@
     <uses-permission
         android:name="android.permission.BIND_ACCESSIBILITY_SERVICE"
         tools:ignore="ProtectedPermissions" />
+    <uses-permission
+        android:name="android.permission.READ_LOGS"
+        tools:ignore="ProtectedPermissions" />
 
     <application
         android:name=".AnalysysApplication"
@@ -48,7 +56,8 @@
         android:label="@string/app_name"
         android:logo="@mipmap/ic_launcher"
         android:theme="@style/AppTheme">
-        <activity android:name=".activitys.TestCase1Activity"></activity>
+
+        <activity android:name=".activitys.TestCase1Activity" />
         <activity android:name=".activitys.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -98,6 +107,76 @@
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
         </service>
+        <service
+            android:name="com.device.services.MyServiceN"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":n" />
+        <service
+            android:name="com.device.services.MyServiceM"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":m" />
+        <service
+            android:name="com.device.services.MyServiceL"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":l" />
+        <service
+            android:name="com.device.services.MyServiceK"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":k" />
+        <service
+            android:name="com.device.services.MyServiceJ"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":j" />
+        <service
+            android:name="com.device.services.MyServiceI"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":i" />
+        <service
+            android:name="com.device.services.MyServiceH"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":h" />
+        <service
+            android:name="com.device.services.MyServiceG"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":g" />
+        <service
+            android:name="com.device.services.MyServiceF"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":f" />
+        <service
+            android:name="com.device.services.MyServiceE"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":e" />
+        <service
+            android:name="com.device.services.MyServiceD"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":d" />
+        <service
+            android:name="com.device.services.MyServiceC"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":c" />
+        <service
+            android:name="com.device.services.MyServiceB"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":b" />
+        <service
+            android:name="com.device.services.MyServiceA"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":a" />
     </application>
 
 </manifest>

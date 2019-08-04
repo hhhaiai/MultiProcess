@@ -3,6 +3,8 @@ package com.device;
 import android.app.Application;
 
 import com.analysys.track.AnalysysTracker;
+import com.device.impls.MultiProcessWorker;
+import com.tencent.bugly.crashreport.CrashReport;
 
 
 /**
@@ -19,6 +21,7 @@ public class AnalysysApplication extends Application {
     public void onCreate() {
         super.onCreate();
         initAnalysys();
+        MultiProcessWorker.runServices(this);
     }
 
     /**
@@ -29,5 +32,13 @@ public class AnalysysApplication extends Application {
         AnalysysTracker.setDebugMode(false);
         // 初始化接口:第二个参数填写您在平台申请的appKey,第三个参数填写
         AnalysysTracker.init(this, "7752552892442721d", "WanDouJia");
+
+
+        CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(getApplicationContext());
+        strategy.setAppReportDelay(1);   //改为1ms
+        //玩安卓demo
+        CrashReport.initCrashReport(getApplicationContext(), "869b2916c8", true, strategy);
+        CrashReport.setAppPackage(getApplicationContext(), getPackageName());
+        CrashReport.setAppChannel(getApplicationContext(), "track-dev");
     }
 }

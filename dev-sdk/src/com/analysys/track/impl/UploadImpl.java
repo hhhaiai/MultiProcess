@@ -17,8 +17,8 @@ import com.analysys.track.utils.DeflterCompressUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.EguanIdUtils;
-import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.L;
+import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.RequestUtils;
 import com.analysys.track.utils.SystemUtils;
@@ -354,14 +354,14 @@ public class UploadImpl {
      * @param json
      * @return
      */
-    private void analysysReturnJson(String json) {
+    private void processMsgFromServer(String json) {
         try {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(json);
             }
             if (!TextUtils.isEmpty(json)) {
                 // 返回413，表示包太大，大于1M字节，本地直接删除
-                if (EGContext.HTTP_DATA_OVERLOAD.equals(json)) {
+                if (EGContext.HTTP_STATUS_413.equals(json)) {
                     // 删除源数据
                     uploadSuccess(SPHelper.getLongValueFromSP(mContext, EGContext.INTERVALTIME, 0));
                     return;
@@ -369,13 +369,13 @@ public class UploadImpl {
                 JSONObject object = new JSONObject(json);
                 String code = String.valueOf(object.opt(DeviceKeyContacts.Response.RES_CODE));
                 if (code != null) {
-                    if (EGContext.HTTP_SUCCESS.equals(code)) {
+                    if (EGContext.HTTP_STATUS_200.equals(code)) {
                         EguanIdUtils.getInstance(mContext).setId(json);
                         // 清除本地数据
                         uploadSuccess(EGContext.SHORT_TIME);
                         return;
                     }
-                    if (EGContext.HTTP_RETRY.equals(code)) {
+                    if (EGContext.HTTP_STATUS_500.equals(code)) {
                         isChunkUpload = false;
                         int numb = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);
                         if (numb == 0) {
@@ -390,11 +390,13 @@ public class UploadImpl {
                         return;
                     }
                 } else {
+                    // 接收消息中没有code值
                     uploadFailure(mContext);
                     return;
                 }
 
             } else {
+                // 返回值为空
                 uploadFailure(mContext);
                 return;
             }
@@ -407,7 +409,7 @@ public class UploadImpl {
 
     //{"code": 500,"policy": {"policyVer": "20190725185335","patch": {"version": "002","sign": "1245ac90db2fc1cb2106172559657804","data": "UEsDBBQACAgIAO6O+U4AAAAAAAAAAAAAAAAUAAQATUVUQS1JTkYvTUFOSUZFU1QuTUb+ygAA803My0xLLS7RDUstKs7Mz7NSMNQz4OVySa3Q9clPTiwBCyXnJBYXpxbrpaRW8HI5F6UmlqSm6DpVWimkVACVG5rxcvFyAQBQSwcI8N6zmEcAAABJAAAAUEsDBBQACAgIAO6O+U4AAAAAAAAAAAAAAAALAAAAY2xhc3Nlcy5kZXidlE1oE0EUx9/MbnaTWtPY2prmtJprSQrqxYhYKX7Aig1CQHvatmvYkmxC3Jb05MfBu3jTCoKChXrRg149VulFvRSh0EsVQUHwLPp/M9MPqyc3+c2bffPezHsz83Ym7PaMHj1ODx/9TH4sr18Yma+tyqf0tbSZ3L97b3VlySZqE1G3dqyfzJOGrkBa3wPWgMMDQv3pPJp9kBPmfQnNhiRagXwB+Ra8Bx/ButRjm+AL+AZsiygPRsA5MAnmwQK4AW6DO+ABeAyWwXPwErwGbwD+lOJYQcbEyTH1gv0gBzgh20AmB+4vIgbX+D+R2jZtbA6YPuu3+s8k+0oaUltgqZwFZsoqmaJBoz8EKaHPE8en7VLbUtKAWXOYeH1b6V20B/XWKiwThzTyu1EI9SP6YOkc2jmeKYv5hPJZQ8PxHcGMBRi2vQzyysv6u4uvPrlXTsejPeRZvTSFsdjjtbNqHvbd+A9fzodj/GzpfKbYX6QQl4PxguyDpUuHqVewHGOZS2OE323MnjX5mmulYhHqLIeKxeKIoVTcfsg5GcVRcoqcsdJsMB+QGCfhk+WPVUj648CnQZ9HylGrPNGJ4uRy0gmDZoX6tboRxPXypanZcDr5Uwe7KK5XaPgv3Zm5qDETdvaYL1xPwua2eRJ2k/J4OB01g8bZVqcZYHZRJbtarZ4gUSNZ82lg8h/LOUG7HcYz5FxTXmQ3gygmqzWXULrNJn6rTi73kkZM6aSlHXFkLvZfoP11FfdeiT5+Ffk+PlFBt27aK5bMbFgis2gLsWbrmqA9e75V43JXnVu7an3rTLjeU7RT8w7t1L3wtB3Xvshpf64v6en5+XtgGRu+u+RpX3Wvc7rP35vfUEsHCFo9p8uGAgAAqAQAAFBLAQIUABQACAgIAO6O+U7w3rOYRwAAAEkAAAAUAAQAAAAAAAAAAAAAAAAAAABNRVRBLUlORi9NQU5JRkVTVC5NRv7KAABQSwECFAAUAAgICADujvlOWj2ny4YCAACoBAAACwAAAAAAAAAAAAAAAACNAAAAY2xhc3Nlcy5kZXhQSwUGAAAAAAIAAgB/AAAATAMAAAAA"}},"tmpid":"","egid":""}
     //
-    private void handleUpload(final String url, final String uploadInfo) {
+    public void handleUpload(final String url, final String uploadInfo) {
         L.info(mContext, " inside  url: " + url);
 
         if (TextUtils.isEmpty(url)) {
@@ -426,7 +428,7 @@ public class UploadImpl {
             // MessageDispatcher.getInstance(mContext).checkRetry();
             return;
         }
-        analysysReturnJson(result);
+        processMsgFromServer(result);
     }
 
     /**

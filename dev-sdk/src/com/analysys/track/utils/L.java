@@ -1391,7 +1391,7 @@ public class L {
     public static void info(Context context, String info) {
         try {
             StackTraceElement[] eles = Thread.currentThread().getStackTrace();
-            i("[%s]------[%s.%s---%d]  %s ", SystemUtils.getCurrentProcessName(context), eles[3].getClassName(), eles[3].getMethodName(), eles[3].getLineNumber() + 1, info);
+            i("[%s]------[%s.%s---%d]  %s ", SystemUtils.getCurrentProcessName(context), eles[3].getClassName(), eles[3].getMethodName(), eles[3].getLineNumber(), info);
         } catch (Throwable e) {
             e(e);
         }

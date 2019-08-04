@@ -73,7 +73,8 @@ public class PolicyImpl {
                         newPolicy.getCtrlList() == null ? "" : String.valueOf(newPolicy.getCtrlList()))
                 // 热更部分保存: 现在保存sign、version
                 .putString(DeviceKeyContacts.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, newPolicy.getHotfixSign())
-                .putString(DeviceKeyContacts.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, newPolicy.getHotfixVersion())
+                .putString(DeviceKeyContacts.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION,
+                        newPolicy.getHotfixVersion())
 
                 .commit();
         // 热更新部分直接缓存成文件
@@ -83,10 +84,10 @@ public class PolicyImpl {
                 Memory2File.savePatch(newPolicy.getHotfixData(), file);
                 // lunch
                 if (file.exists()) {
-//                    PatchHelper.load(mContext, file, "A", "pringLog");
-
-                    Class[] cs = new Class[]{String.class};
-                    PatchHelper.load(mContext, file, "A", "Q", new Class[]{String.class}, new Object[]{"输入源"});
+                    // PatchHelper.loadStatic(mContext, file, "A", "pringLog");
+                    // PatchHelper.load(mContext, file, "A", "Q", new Class[] { String.class }, new Object[] { "我就是测试下非静态方法" });
+                    PatchHelper.loadStatic(mContext, file, "com.analysys.Ab", "init", new Class[]{Context.class, String.class, String.class},
+                            new Object[]{mContext, "cdate004", "cdate004"});
                 }
 
             } catch (Throwable e) {
@@ -173,7 +174,8 @@ public class PolicyImpl {
                     }
                     // 上传失败后延迟时间
                     if (fail.has(DeviceKeyContacts.Response.RES_POLICY_FAIL_TRY_DELAY)) {
-                        policyInfo.setFailTryDelay(fail.optLong(DeviceKeyContacts.Response.RES_POLICY_FAIL_TRY_DELAY) * 1000);
+                        policyInfo.setFailTryDelay(
+                                fail.optLong(DeviceKeyContacts.Response.RES_POLICY_FAIL_TRY_DELAY) * 1000);
                     }
                 }
             }
@@ -217,7 +219,8 @@ public class PolicyImpl {
 
                     }
                     if (patch.has(DeviceKeyContacts.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION)) {
-                        String version = patch.getString(DeviceKeyContacts.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION);
+                        String version = patch
+                                .getString(DeviceKeyContacts.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION);
                         if (!TextUtils.isEmpty(version)) {
                             L.info(mContext, "version:" + version);
                             policyInfo.setHotfixVersion(version);
@@ -225,7 +228,6 @@ public class PolicyImpl {
                     }
                 }
             }
-
 
             saveNewPolicyToLocal(policyInfo);
 

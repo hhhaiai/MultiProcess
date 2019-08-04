@@ -100,7 +100,7 @@ public class RequestUtils {
             pw.close();
 
             int status = connection.getResponseCode();
-            L.info(context,"status:"+status);
+            L.info(context, "status:" + status);
             // 获取数据
             if (HttpURLConnection.HTTP_OK == status) {
                 is = connection.getInputStream();
@@ -112,7 +112,7 @@ public class RequestUtils {
                 bos.flush();
                 return bos.toString("utf-8");
             } else if (HttpURLConnection.HTTP_ENTITY_TOO_LARGE == connection.getResponseCode()) {
-                response = EGContext.HTTP_DATA_OVERLOAD;
+                response = EGContext.HTTP_STATUS_413;
             }
         } catch (Throwable e) {
             L.info(context, Log.getStackTraceString(e));

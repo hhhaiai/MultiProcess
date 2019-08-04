@@ -42,9 +42,7 @@ import javax.xml.transform.stream.StreamSource;
 
 /**
  * @Copyright © 2015 Sanbo Inc. All rights reserved.
- * @Description
- * 
- * <pre>
+ * @Description <pre>
  * Log统一管理类,提供功能：
  * 1.log工具类支持全部打印   「支持Log的所有功能.」
  * 2.支持类似C的格式化输出或Java的String.format「%个数和参数个数需要一直才能格式化」
@@ -56,7 +54,6 @@ import javax.xml.transform.stream.StreamSource;
  * 6.格式化输出.
  * 7.支持XML/JSON/Map/Array等更多对象打印
  * </pre>
- * 
  * @Version: 6.1
  * @Create: 2015年6月18日 下午4:14:01
  * @Author: sanbo
@@ -123,16 +120,16 @@ public class ELOG {
     /**
      * 初始化接口
      *
-     * @param showLog 是否展示log，默认展示
-     * @param shellControl 是否使用shell控制log动态打印.默认不使用. shell设置方式：setprop log.tag.sanbo
-     * INFO 最后一个参数为log等级,可选项目：VERBOSE/DEBUG/INFO/WARN/ERROR/ASSERT
-     * @param needWarpper 是否需要格式化输出
+     * @param showLog           是否展示log，默认展示
+     * @param shellControl      是否使用shell控制log动态打印.默认不使用. shell设置方式：setprop log.tag.sanbo
+     *                          INFO 最后一个参数为log等级,可选项目：VERBOSE/DEBUG/INFO/WARN/ERROR/ASSERT
+     * @param needWarpper       是否需要格式化输出
      * @param needCallStackInfo 是否需要打印详细的堆栈调用信息.
-     * @param format 是否需要格式化.
-     * @param defaultTag android logcat的tag一个意义,不设置默认的tag为"sanbo"
+     * @param format            是否需要格式化.
+     * @param defaultTag        android logcat的tag一个意义,不设置默认的tag为"sanbo"
      */
     public static void init(boolean showLog, boolean shellControl, boolean needWarpper, boolean needCallStackInfo,
-            boolean format, String defaultTag) {
+                            boolean format, String defaultTag) {
         USER_DEBUG = showLog;
         isShellControl = shellControl;
         isNeedWrapper = needWarpper;
@@ -242,116 +239,118 @@ public class ELOG {
      * @param args
      */
     private static void parserArgsMain(boolean isUserDebug, int level, Object[] args) {
-        String tag = DEFAULT_TAG;
-        // 用户级别的log打印
-        if (isUserDebug) {
-            tag = USER_TAG;
-            if (!USER_DEBUG) {
-                Log.e(tag, "请确认Log工具类已经设置打印!");
-                return;
-            }
-        } else {
-            if (!DEV_DEBUG) {
-                Log.e(DEFAULT_TAG, "请确认Log工具类已经设置打印!");
-                return;
-            }
-        }
-        StringBuilder sb = new StringBuilder();
-        // 开始
-
-        if (isFormat) {
-            sb.append(CONTENT_LOG_INFO).append("\n");
-        }
-        String stackinfo = getCallStaceInfo();
-        if (!TextUtils.isEmpty(stackinfo)) {
-            sb.append(stackinfo).append("\n");
-        }
-
-        if (args[0] instanceof String) {
-            // if (isNeedWrapper) {
-            // sb.append(content_title_info_log).append("\n");
-            // }
-            String one = (String) args[0];
-            // 解析fromat
-            if (one.contains(String.valueOf(FORMATER)) && args.length > 1) {
-
-                /*
-                 * 参数解析
-                 */
-                Object[] temp = new Object[args.length - 1];
-                for (int i = 1; i < args.length; i++) {
-                    temp[i - 1] = args[i];
-                }
-
-                Matcher m = mPattern.matcher(one);
-                int count = 0;
-                while (m.find()) {
-                    count++;
-                }
-
-                /**
-                 * %和后面参数一样，则格式化，否则不进行格式化
-                 */
-                if (count == temp.length) {
-                    // 格式化操作
-                    String log = String.format(Locale.getDefault(), one, temp);
-                    if (isNeedWrapper) {
-                        sb.append(content_title_info_log).append("\n");
-                    }
-                    sb.append(wrapperString(log)).append("\n");
-                } else {
-                    if (isNeedWrapper) {
-                        sb.append(content_title_info_log).append("\n");
-                    }
-                    StringBuilder tempSB = new StringBuilder();
-                    for (Object obj : args) {
-                        // 解析成字符串,添加
-                        String tempStr = objectToString(obj);
-                        // Log.i(DEFAULT_TAG, "tempStr:" + tempStr);
-                        if (!TextUtils.isEmpty(tempStr)) {
-                            // sb.append(nativeWrapperString(temp)).append("\n");
-                            tempSB.append(tempStr).append("\t");
-                        }
-                    }
-                    sb.append(wrapperString(tempSB.toString())).append("\n");
+        try {
+            String tag = DEFAULT_TAG;
+            // 用户级别的log打印
+            if (isUserDebug) {
+                tag = USER_TAG;
+                if (!USER_DEBUG) {
+                    Log.e(tag, "请确认Log工具类已经设置打印!");
+                    return;
                 }
             } else {
-                // 不符合format规则数据
-                if (args.length > 1) {
-                    // 大于一次参数，第一个参数是字符串，默认是tag
-                    String log = processTagCase(args);
-                    if (!TextUtils.isEmpty(log)) {
+                if (!DEV_DEBUG) {
+                    Log.e(DEFAULT_TAG, "请确认Log工具类已经设置打印!");
+                    return;
+                }
+            }
+            StringBuilder sb = new StringBuilder();
+            // 开始
+
+            if (isFormat) {
+                sb.append(CONTENT_LOG_INFO).append("\n");
+            }
+            String stackinfo = getCallStaceInfo();
+            if (!TextUtils.isEmpty(stackinfo)) {
+                sb.append(stackinfo).append("\n");
+            }
+
+            if (args[0] instanceof String) {
+                // if (isNeedWrapper) {
+                // sb.append(content_title_info_log).append("\n");
+                // }
+                String one = (String) args[0];
+                // 解析fromat
+                if (one.contains(String.valueOf(FORMATER)) && args.length > 1) {
+
+                    /*
+                     * 参数解析
+                     */
+                    Object[] temp = new Object[args.length - 1];
+                    for (int i = 1; i < args.length; i++) {
+                        temp[i - 1] = args[i];
+                    }
+
+                    Matcher m = mPattern.matcher(one);
+                    int count = 0;
+                    while (m.find()) {
+                        count++;
+                    }
+
+                    /**
+                     * %和后面参数一样，则格式化，否则不进行格式化
+                     */
+                    if (count == temp.length) {
+                        // 格式化操作
+                        String log = String.format(Locale.getDefault(), one, temp);
+                        if (isNeedWrapper) {
+                            sb.append(content_title_info_log).append("\n");
+                        }
                         sb.append(wrapperString(log)).append("\n");
                     } else {
-                        // 需要支持打印""或者null
-                        sb.append(wrapperString("")).append("\n");
+                        if (isNeedWrapper) {
+                            sb.append(content_title_info_log).append("\n");
+                        }
+                        StringBuilder tempSB = new StringBuilder();
+                        for (Object obj : args) {
+                            // 解析成字符串,添加
+                            String tempStr = objectToString(obj);
+                            // Log.i(DEFAULT_TAG, "tempStr:" + tempStr);
+                            if (!TextUtils.isEmpty(tempStr)) {
+                                // sb.append(nativeWrapperString(temp)).append("\n");
+                                tempSB.append(tempStr).append("\t");
+                            }
+                        }
+                        sb.append(wrapperString(tempSB.toString())).append("\n");
                     }
                 } else {
-                    if (isNeedWrapper) {
-                        sb.append(content_title_info_log).append("\n");
+                    // 不符合format规则数据
+                    if (args.length > 1) {
+                        // 大于一次参数，第一个参数是字符串，默认是tag
+                        String log = processTagCase(args);
+                        if (!TextUtils.isEmpty(log)) {
+                            sb.append(wrapperString(log)).append("\n");
+                        } else {
+                            // 需要支持打印""或者null
+                            sb.append(wrapperString("")).append("\n");
+                        }
+                    } else {
+                        if (isNeedWrapper) {
+                            sb.append(content_title_info_log).append("\n");
+                        }
+                        sb.append(wrapperString(one)).append("\n");
                     }
-                    sb.append(wrapperString(one)).append("\n");
+                }
+            } else {
+
+                for (Object obj : args) {
+                    // 解析成字符串,添加
+                    String temp = processObjectCase(obj);
+                    // Log.i(DEFAULT_TAG, "temp:" + temp);
+                    if (!TextUtils.isEmpty(temp)) {
+                        // sb.append(nativeWrapperString(temp)).append("\n");
+                        sb.append(temp).append("\n");
+                    }
                 }
             }
-        } else {
-
-            for (Object obj : args) {
-                // 解析成字符串,添加
-                String temp = processObjectCase(obj);
-                // Log.i(DEFAULT_TAG, "temp:" + temp);
-                if (!TextUtils.isEmpty(temp)) {
-                    // sb.append(nativeWrapperString(temp)).append("\n");
-                    sb.append(temp).append("\n");
-                }
+            // 结束,标记结束符
+            if (isNeedWrapper) {
+                sb.append(content_title_end);
             }
+            // 打印字符
+            preparePrint(tag, level, sb.toString());
+        } catch (Throwable e) {
         }
-        // 结束,标记结束符
-        if (isNeedWrapper) {
-            sb.append(content_title_end);
-        }
-        // 打印字符
-        preparePrint(tag, level, sb.toString());
-
     }
 
     /**
@@ -623,7 +622,7 @@ public class ELOG {
      *
      * @param cla
      * @param obj
-     * @param o 对象
+     * @param o           对象
      * @param childOffset 递归解析属性的层级
      */
     private static void getClassFields(Class<?> cla, JSONObject obj, Object o, int childOffset) {
@@ -1175,7 +1174,7 @@ public class ELOG {
             sb.append(CONTENT_LOG_EMPTY);
             return String.valueOf(sb);
         }
-        String ss[] = new String[] {};
+        String ss[] = new String[]{};
         String temp = null;
         if (log.contains("\n")) {
             ss = log.split("\n");
