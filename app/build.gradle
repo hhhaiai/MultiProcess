@@ -60,6 +60,7 @@ android {
         disable "UnusedResources"
         textOutput "stdout"
         textReport false
+        disable 'RestrictedApi'
     }
 }
 

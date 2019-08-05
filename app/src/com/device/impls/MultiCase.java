@@ -9,6 +9,7 @@ import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.service.AnalysysService;
 import com.analysys.track.utils.AccessibilityHelper;
 import com.analysys.track.utils.AndroidManifestHelper;
+import com.analysys.track.utils.MultiProcessChecker;
 import com.device.utils.EL;
 import com.device.utils.ProcessUtils;
 
@@ -64,18 +65,33 @@ public class MultiCase {
         }
     }
 
+    /**
+     * 多进程上传测试，并发强锁，测试是否可以上传成功
+     *
+     * @param context
+     */
     public static void runCase1(final Context context) {
         EL.i(ProcessUtils.getCurrentProcessName(context) + "----上传测试----");
         UploadImpl.getInstance(context).upload();
     }
 
+    /**
+     * 多进程开关屏处理测试
+     *
+     * @param context
+     */
     public static void runCase2(final Context context) {
-        EL.i(ProcessUtils.getCurrentProcessName(context) + "----处理打开屏幕");
+        EL.i(ProcessUtils.getCurrentProcessName(context) + "-----多进程开关屏处理测试----处理打开屏幕");
         MessageDispatcher.getInstance(context).processScreenOnOff(true);
-        EL.i(ProcessUtils.getCurrentProcessName(context) + "----处理关闭屏幕");
+        EL.i(ProcessUtils.getCurrentProcessName(context) + "-----多进程开关屏处理测试----处理关闭屏幕");
         MessageDispatcher.getInstance(context).processScreenOnOff(false);
     }
 
+    /**
+     * 多进程服务声明探测
+     *
+     * @param context
+     */
     public static void runCase3(final Context context) {
         boolean isS = AndroidManifestHelper.isServiceDefineInManifest(context, AnalysysService.class);
         EL.i(ProcessUtils.getCurrentProcessName(context) + "----声明服务结果:" + isS);
@@ -83,7 +99,29 @@ public class MultiCase {
         EL.i(ProcessUtils.getCurrentProcessName(context) + "----声明辅助功能结果:" + isS);
     }
 
+    /**
+     * 测试思想： 同一个文件2秒一次抢锁操作
+     *
+     * @param context
+     */
     public static void runCase4(final Context context) {
+        EL.e(ProcessUtils.getCurrentProcessName(context) + "----多进程测试。。。。");
+        for (int i = 0; i < 1000; i++) {
+            try {
+                long now = System.currentTimeMillis();
+                boolean is = MultiProcessChecker.isNeedWorkByLockFile(context, "test", 2 * 1000, now);
+                if (is) {
+                    EL.i("[" + ProcessUtils.getCurrentProcessName(context) + "]----多进程测试文件:" + is);
+                    Thread.sleep(800);
+                    MultiProcessChecker.setLockLastModifyTime(context, "test", now);
+                } else {
+                    EL.d("[" + ProcessUtils.getCurrentProcessName(context) + "]----多进程测试文件:" + is);
+                }
+                Thread.sleep(200);
+            } catch (Throwable e) {
+                EL.i(e);
+            }
+        }
     }
 
     public static void runCase5(final Context context) {
@@ -100,4 +138,6 @@ public class MultiCase {
 
     public static void runCase9(final Context context) {
     }
+
+
 }

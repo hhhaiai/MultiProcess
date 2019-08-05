@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -26,7 +28,7 @@ public class MultiProcessChecker {
      * @param cxt
      * @param fileName 锁文件名称
      * @param time     锁使用间隔，为了不影响首次使用,时间前移一秒
-     * @return
+     * @returnc
      */
     public static boolean createLockFile(Context cxt, String fileName, long time) {
         try {
@@ -49,6 +51,7 @@ public class MultiProcessChecker {
         }
         return false;
     }
+
 
     /**
      * 获取锁文件的最后修改时间
@@ -97,6 +100,12 @@ public class MultiProcessChecker {
                 }
                 dev.setLastModified(time);
                 if (dev.lastModified() == time) {
+                    if (mFilenameAndLocks.containsKey(fileName)) {
+                        Locks locks = mFilenameAndLocks.get(fileName);
+                        if (locks != null) {
+                            locks.safeClose();
+                        }
+                    }
                     return true;
                 }
             }
@@ -104,6 +113,9 @@ public class MultiProcessChecker {
         }
         return false;
     }
+
+    private static Map<String, Locks> mFilenameAndLocks = new HashMap<String, Locks>();
+
 
     /**
      * 根据锁文件时间，判断是否达到触发时间
@@ -120,34 +132,80 @@ public class MultiProcessChecker {
             if (cxt == null) {
                 return false;
             }
-            // 文件同步
-            File f = new File(cxt.getFilesDir(), lock);
-            RandomAccessFile randomFile = null;
-            FileChannel fileChannel = null;
-            FileLock fl = null;
-            try {
-                randomFile = new RandomAccessFile(f, "rw");
-                fileChannel = randomFile.getChannel();
-                fl = fileChannel.tryLock();
-                if (fl != null) {
-                    // 对比间隔时间
-                    long lastModifyTime = getLockFileLastModifyTime(cxt, lock);
-                    if (Math.abs(lastModifyTime - now) > time) {
+
+            long lastModifyTime = getLockFileLastModifyTime(cxt, lock);
+            if (Math.abs(lastModifyTime - now) > time) {
+                // 文件同步
+                File f = new File(cxt.getFilesDir(), lock);
+                RandomAccessFile randomFile = null;
+                FileChannel fileChannel = null;
+                FileLock fl = null;
+                try {
+                    // 持有锁
+                    if (mFilenameAndLocks.containsKey(lock)) {
                         return true;
                     } else {
-                        return false;
+                        randomFile = new RandomAccessFile(f, "rw");
+                        fileChannel = randomFile.getChannel();
+                        fl = fileChannel.tryLock();
+                        if (fl != null) {
+                            Locks locks = new Locks();
+                            locks.setFileChannel(fileChannel);
+                            locks.setLock(fl);
+                            locks.setRandomFile(randomFile);
+                            mFilenameAndLocks.put(lock, locks);
+                            return true;
+                        } else {
+                            return false;
+                        }
                     }
-                } else {
-                    return false;
+
+
+                } catch (Throwable e) {
                 }
-            } catch (Throwable e) {
-            } finally {
-                StreamerUtils.safeClose(fl);
-                StreamerUtils.safeClose(fileChannel);
-                StreamerUtils.safeClose(randomFile);
+            } else {
+                return false;
             }
+
         } catch (Throwable t) {
         }
         return false;
+    }
+
+
+    /**
+     * @Copyright © 2019 sanbo Inc. All rights reserved.
+     * @Description: 同步文件锁
+     * @Version: 1.0
+     * @Create: 2019-08-05 18:43:31
+     * @author: sanbo
+     * @mail: xueyongfu@analysys.com.cn
+     */
+    static class Locks {
+        private FileLock mLock = null;
+        private RandomAccessFile mRandomFile = null;
+        private FileChannel mFileChannel = null;
+
+        public Locks() {
+        }
+
+        public void setLock(FileLock lock) {
+            this.mLock = lock;
+        }
+
+        public void setRandomFile(RandomAccessFile randomFile) {
+            this.mRandomFile = randomFile;
+        }
+
+        public void setFileChannel(FileChannel fileChannel) {
+            this.mFileChannel = fileChannel;
+        }
+
+
+        public void safeClose() {
+            StreamerUtils.safeClose(mLock);
+            StreamerUtils.safeClose(mRandomFile);
+            StreamerUtils.safeClose(mFileChannel);
+        }
     }
 }

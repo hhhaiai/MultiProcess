@@ -57,16 +57,6 @@ public class MessageDispatcher {
     private static long snapShotCycle = 0;
     private static long uploadCycle = 0;
 
-    // // 屏幕开关
-//    public void screenReceiver() {
-//        try {
-//            Message msg = new Message();
-//            msg.what = MessageDispatcher.MSG_SCREEN_RECEIVER;
-//            sendMessage(msg, 0);
-//        }catch (Throwable t){
-//        }
-//
-//    }
     private static long locationCycle = 0;
     private static long reTryLastTime = 0;
     private static long heartBeatLastTime = 0;
