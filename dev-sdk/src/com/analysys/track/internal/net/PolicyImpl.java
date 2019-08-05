@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
@@ -13,9 +12,8 @@ import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.model.PolicyInfo;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
-import com.analysys.track.utils.L;
 import com.analysys.track.utils.Memory2File;
-import com.analysys.track.utils.PatchHelper;
+import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -72,32 +70,44 @@ public class PolicyImpl {
                 .putLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL, timerInterval)
                 .putString(DeviceKeyContacts.Response.RES_POLICY_CTRL_LIST,
                         newPolicy.getCtrlList() == null ? "" : String.valueOf(newPolicy.getCtrlList()))
-                // 热更部分保存: 现在保存sign、version
-                .putString(DeviceKeyContacts.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, newPolicy.getHotfixSign())
-                .putString(DeviceKeyContacts.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION,
-                        newPolicy.getHotfixVersion())
-
                 .commit();
-        // 热更新部分直接缓存成文件
-        if (!TextUtils.isEmpty(newPolicy.getHotfixData())) {
-            try {
+
+        try {
+            // 可信设备上再进行操作
+            if (!DevStatusChecker.getInstance().isDebugDevice(mContext)) {
+                //热更部分保存: 现在保存sign、version
+                getEditor().putString(DeviceKeyContacts.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, newPolicy.getHotfixSign())
+                        .putString(DeviceKeyContacts.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION,
+                                newPolicy.getHotfixVersion()).commit();
                 //保存版本号到本地
                 SPHelper.setStringValue2SP(mContext, DeviceKeyContacts.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, newPolicy.getHotfixVersion());
-                // 保存文件到本地
-                File file = new File(mContext.getFilesDir(), newPolicy.getHotfixVersion() + ".jar");
-                Memory2File.savePatch(newPolicy.getHotfixData(), file);
 
+                // 热更新部分直接缓存成文件
+                if (!TextUtils.isEmpty(newPolicy.getHotfixData())) {
 
-                // 启动服务
-                if (file.exists() && !DevStatusChecker.getInstance().isDebugDevice(mContext)) {
-                    PatchHelper.loads(mContext, file);
+                    // 保存文件到本地
+                    File file = new File(mContext.getFilesDir(), newPolicy.getHotfixVersion() + ".jar");
+                    Memory2File.savePatch(newPolicy.getHotfixData(), file);
+                    // 启动服务
+                    if (file.exists()) {
+                        PatchHelper.loads(mContext, file);
+                    }
+
                 }
-
-            } catch (Throwable e) {
-                L.info(mContext, Log.getStackTraceString(e));
-                // 出现失败则不继续进行
-                return;
+            } else {
+                File dir = mContext.getFilesDir();
+                String[] ss = dir.list();
+                for (String fn : ss) {
+                    if (!TextUtils.isEmpty(fn) && fn.endsWith(".jar")) {
+                        new File(dir, fn).delete();
+                    }
+                }
             }
+        } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i(e);
+            }
+            return;
         }
     }
 
@@ -113,7 +123,7 @@ public class PolicyImpl {
         return getSP().edit();
     }
 
-    public void clearSP() {
+    public void clear() {
         Editor editor = getEditor();
         editor.clear();
         editor.commit();
@@ -137,33 +147,33 @@ public class PolicyImpl {
             if (serverPolicy == null || serverPolicy.length() <= 0) {
                 return;
             }
-            L.info(mContext, "-----------1----------");
             /**
              * 没有策略版本号直接放弃处理
              */
             if (!serverPolicy.has(DeviceKeyContacts.Response.RES_POLICY_VERSION)) {
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.i(" saveRespParams  not has policy version");
+                }
                 return;
             }
-            L.info(mContext, "-----------2----------");
 
             PolicyInfo policyInfo = PolicyInfo.getInstance();
             String policy_version = serverPolicy.optString(DeviceKeyContacts.Response.RES_POLICY_VERSION);
             if (!isNewPolicy(policy_version)) {
-                L.info(mContext, " not new version policy, will return");
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.i(" not new version policy, will return");
+                }
                 return;
             }
-            L.info(mContext, "----------3----------");
 
-            clearSP();
+            clear();
             policyInfo.setPolicyVer(policy_version);// 策略版本
 
-            L.info(mContext, "----------4----------");
 
             if (serverPolicy.has(DeviceKeyContacts.Response.RES_POLICY_SERVER_DELAY)) {
                 policyInfo
                         .setServerDelay(serverPolicy.optInt(DeviceKeyContacts.Response.RES_POLICY_SERVER_DELAY) * 1000);
             }
-            L.info(mContext, "----------5---------");
 
             /**
              * 失败策略处理
@@ -183,14 +193,12 @@ public class PolicyImpl {
                     }
                 }
             }
-            L.info(mContext, "----------6----------");
 
             // 客户端上传时间间隔
             if (serverPolicy.has(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL)) {
                 policyInfo.setTimerInterval(
                         serverPolicy.optLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL) * 1000);
             }
-            L.info(mContext, "----------7----------");
 
             // 动态采集模块
             if (serverPolicy.has(DeviceKeyContacts.Response.RES_POLICY_CTRL_LIST)) {
@@ -199,7 +207,6 @@ public class PolicyImpl {
                     processDynamicModule(policyInfo, ctrlList);
                 }
             }
-            L.info(mContext, "----------8----------");
 
             /**
              * 解析热更新下发内容
@@ -210,14 +217,12 @@ public class PolicyImpl {
                     if (patch.has(DeviceKeyContacts.Response.HotFixResp.HOTFIX_RESP_PATCH_DATA)) {
                         String data = patch.getString(DeviceKeyContacts.Response.HotFixResp.HOTFIX_RESP_PATCH_DATA);
                         if (!TextUtils.isEmpty(data)) {
-                            L.info(mContext, "data:" + data);
                             policyInfo.setHotfixData(data);
                         }
                     }
                     if (patch.has(DeviceKeyContacts.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN)) {
                         String sign = patch.getString(DeviceKeyContacts.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN);
                         if (!TextUtils.isEmpty(sign)) {
-                            L.info(mContext, "sign:" + sign);
                             policyInfo.setHotfixSign(sign);
                         }
 
@@ -226,7 +231,6 @@ public class PolicyImpl {
                         String version = patch
                                 .getString(DeviceKeyContacts.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION);
                         if (!TextUtils.isEmpty(version)) {
-                            L.info(mContext, "version:" + version);
                             policyInfo.setHotfixVersion(version);
                         }
                     }
@@ -235,10 +239,9 @@ public class PolicyImpl {
 
             saveNewPolicyToLocal(policyInfo);
 
-        } catch (Throwable t) {
-            L.info(mContext, Log.getStackTraceString(t));
+        } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
+                ELOG.i(" not new version policy, will return");
             }
         }
 

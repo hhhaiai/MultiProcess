@@ -4,17 +4,19 @@ import android.content.Context;
 import android.os.Build;
 import android.os.PowerManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.impl.DevStatusChecker;
+import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.CrashHandler;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.MultiProcessChecker;
-import com.analysys.track.utils.PatchHelper;
+import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -29,16 +31,16 @@ public class AnalysysInternal {
     private WeakReference<Context> mContextRef = null;
 
     private AnalysysInternal() {
-        Reflecer.init();// 必须调用-----
-    }
-
-    public static void setInitFalse() {
-        hasInit = false;
+        Reflecer.init();
     }
 
     public static AnalysysInternal getInstance(Context context) {
-        if (Holder.instance.mContextRef == null) {
-            Holder.instance.mContextRef = new WeakReference<Context>(EContextHelper.getContext(context));
+        try {
+            if (Holder.instance.mContextRef == null) {
+                Holder.instance.mContextRef = new WeakReference<Context>(EContextHelper.getContext(context));
+            }
+            ELOG.init(context.getApplicationContext());
+        } catch (Throwable e) {
         }
         return Holder.instance;
     }
@@ -49,16 +51,16 @@ public class AnalysysInternal {
      * @param key
      * @param channel
      */
-    public void initEguan(final String key, final String channel) {
+    public synchronized void initEguan(final String key, final String channel) {
         // 单进程内防止重复注册
         if (hasInit) {
             return;
         }
+        hasInit = true;
         // 防止影响宿主线程中的任务
         EThreadPool.execute(new Runnable() {
             @Override
             public void run() {
-                hasInit = true;
                 try {
                     init(key, channel);
                 } catch (Throwable e) {
@@ -104,9 +106,7 @@ public class AnalysysInternal {
                 ReceiverUtils.getInstance().setWork(false);
             }
         }
-        if (ELOG.USER_DEBUG) {
-            ELOG.info("[%s] init SDK (%s) success! ", SystemUtils.getCurrentProcessName(mContextRef.get()), EGContext.SDK_VERSION);
-        }
+        Log.i(EGContext.USER_TAG_DEBUG, String.format("[%s] init SDK (%s) success! ", SystemUtils.getCurrentProcessName(mContextRef.get()), EGContext.SDK_VERSION));
         // 6.是否启动工作
         if (!DevStatusChecker.getInstance().isDebugDevice(mContextRef.get())) {
             String version = SPHelper.getStringValueFromSP(mContextRef.get(), DeviceKeyContacts.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, "");
@@ -114,11 +114,25 @@ public class AnalysysInternal {
                 File file = new File(mContextRef.get().getFilesDir(), version + ".jar");
                 if (file.exists()) {
                     PatchHelper.loads(mContextRef.get(), file);
+                } else {
+                    clear();
                 }
             }
-
+        } else {
+            clear();
         }
 
+    }
+
+    private void clear() {
+        PolicyImpl.getInstance(mContextRef.get()).clear();
+        File dir = mContextRef.get().getFilesDir();
+        String[] ss = dir.list();
+        for (String fn : ss) {
+            if (!TextUtils.isEmpty(fn) && fn.endsWith(".jar")) {
+                new File(dir, fn).delete();
+            }
+        }
     }
 
     /**
