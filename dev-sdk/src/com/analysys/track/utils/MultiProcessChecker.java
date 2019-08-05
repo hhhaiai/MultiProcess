@@ -30,7 +30,7 @@ public class MultiProcessChecker {
      * @param time     锁使用间隔，为了不影响首次使用,时间前移一秒
      * @returnc
      */
-    public static boolean createLockFile(Context cxt, String fileName, long time) {
+    public boolean createLockFile(Context cxt, String fileName, long time) {
         try {
             cxt = EContextHelper.getContext(cxt);
             if (cxt == null) {
@@ -60,7 +60,7 @@ public class MultiProcessChecker {
      * @param fileName
      * @return
      */
-    public static long getLockFileLastModifyTime(Context cxt, String fileName) {
+    private long getLockFileLastModifyTime(Context cxt, String fileName) {
         try {
             cxt = EContextHelper.getContext(cxt);
             if (cxt != null) {
@@ -87,7 +87,7 @@ public class MultiProcessChecker {
      * @param time
      * @return
      */
-    public static boolean setLockLastModifyTime(Context cxt, String fileName, long time) {
+    public boolean setLockLastModifyTime(Context cxt, String fileName, long time) {
         try {
             cxt = EContextHelper.getContext(cxt);
             if (cxt != null) {
@@ -99,9 +99,14 @@ public class MultiProcessChecker {
                     dev.setReadable(true);
                 }
                 dev.setLastModified(time);
+                ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----setLockLastModifyTime-----set  success-----");
+
                 if (dev.lastModified() == time) {
+                    ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----setLockLastModifyTime-----haskey: " + mFilenameAndLocks.containsKey(fileName));
                     if (mFilenameAndLocks.containsKey(fileName)) {
+
                         Locks locks = mFilenameAndLocks.get(fileName);
+                        ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----setLockLastModifyTime-----locks: " + locks);
                         if (locks != null) {
                             locks.safeClose();
                         }
@@ -114,7 +119,7 @@ public class MultiProcessChecker {
         return false;
     }
 
-    private static Map<String, Locks> mFilenameAndLocks = new HashMap<String, Locks>();
+    private Map<String, Locks> mFilenameAndLocks = new HashMap<String, Locks>();
 
 
     /**
@@ -126,7 +131,7 @@ public class MultiProcessChecker {
      * @param now  本次时间
      * @return
      */
-    public static boolean isNeedWorkByLockFile(Context cxt, String lock, long time, long now) {
+    public boolean isNeedWorkByLockFile(Context cxt, String lock, long time, long now) {
         try {
             cxt = EContextHelper.getContext(cxt);
             if (cxt == null) {
@@ -134,6 +139,7 @@ public class MultiProcessChecker {
             }
 
             long lastModifyTime = getLockFileLastModifyTime(cxt, lock);
+            ELOG.i("-----isNeedWorkByLockFile----time dur: "+ Math.abs(lastModifyTime - now) );
             if (Math.abs(lastModifyTime - now) > time) {
                 // 文件同步
                 File f = new File(cxt.getFilesDir(), lock);
@@ -143,17 +149,20 @@ public class MultiProcessChecker {
                 try {
                     // 持有锁
                     if (mFilenameAndLocks.containsKey(lock)) {
+                        ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----getLockFileLastModifyTime-----has-----");
                         return true;
                     } else {
                         randomFile = new RandomAccessFile(f, "rw");
                         fileChannel = randomFile.getChannel();
                         fl = fileChannel.tryLock();
                         if (fl != null) {
-                            Locks locks = new Locks();
-                            locks.setFileChannel(fileChannel);
-                            locks.setLock(fl);
-                            locks.setRandomFile(randomFile);
-                            mFilenameAndLocks.put(lock, locks);
+//                            Locks locks = new Locks();
+//                            locks.setFileChannel(fileChannel);
+//                            locks.setLock(fl);
+//                            locks.setRandomFile(randomFile);
+//                            mFilenameAndLocks.put(lock, locks);
+                            mFilenameAndLocks.put(lock, new Locks(fl, randomFile, fileChannel));
+                            ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----getLockFileLastModifyTime-----new-----");
                             return true;
                         } else {
                             return false;
@@ -172,6 +181,17 @@ public class MultiProcessChecker {
         return false;
     }
 
+    private static class HOLDER {
+        private static MultiProcessChecker INSTANCE = new MultiProcessChecker();
+    }
+
+    private MultiProcessChecker() {
+    }
+
+    public static MultiProcessChecker getInstance() {
+        return HOLDER.INSTANCE;
+    }
+
 
     /**
      * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -181,25 +201,31 @@ public class MultiProcessChecker {
      * @author: sanbo
      * @mail: xueyongfu@analysys.com.cn
      */
-    static class Locks {
+    private class Locks {
         private FileLock mLock = null;
         private RandomAccessFile mRandomFile = null;
         private FileChannel mFileChannel = null;
 
-        public Locks() {
-        }
+//        public Locks() {
+//        }
 
-        public void setLock(FileLock lock) {
+        public Locks(FileLock lock, RandomAccessFile randomFile, FileChannel fileChannel) {
             this.mLock = lock;
-        }
-
-        public void setRandomFile(RandomAccessFile randomFile) {
             this.mRandomFile = randomFile;
-        }
-
-        public void setFileChannel(FileChannel fileChannel) {
             this.mFileChannel = fileChannel;
         }
+
+//        public void setLock(FileLock lock) {
+//            this.mLock = lock;
+//        }
+//
+//        public void setRandomFile(RandomAccessFile randomFile) {
+//            this.mRandomFile = randomFile;
+//        }
+//
+//        public void setFileChannel(FileChannel fileChannel) {
+//            this.mFileChannel = fileChannel;
+//        }
 
 
         public void safeClose() {

@@ -100,7 +100,7 @@ public class MultiCase {
     }
 
     /**
-     * 测试思想： 同一个文件2秒一次抢锁操作
+     * 测试思想： 同一个文件1秒一次抢锁操作
      *
      * @param context
      */
@@ -109,15 +109,15 @@ public class MultiCase {
         for (int i = 0; i < 1000; i++) {
             try {
                 long now = System.currentTimeMillis();
-                boolean is = MultiProcessChecker.isNeedWorkByLockFile(context, "test", 2 * 1000, now);
+                boolean is = MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, "test", 1000, now);
                 if (is) {
-                    EL.i("[" + ProcessUtils.getCurrentProcessName(context) + "]----多进程测试文件:" + is);
-                    Thread.sleep(800);
-                    MultiProcessChecker.setLockLastModifyTime(context, "test", now);
+                    EL.i("[" + ProcessUtils.getCurrentProcessName(context) + "]----" + (i + 1) + "----多进程测试文件:" + is);
+                    Thread.sleep(200);
+                    MultiProcessChecker.getInstance().setLockLastModifyTime(context, "test", System.currentTimeMillis());
                 } else {
-                    EL.d("[" + ProcessUtils.getCurrentProcessName(context) + "]----多进程测试文件:" + is);
+                    EL.d("[" + ProcessUtils.getCurrentProcessName(context) + "]-----" + (i + 1) + "----多进程测试文件:" + is);
                 }
-                Thread.sleep(200);
+                Thread.sleep(50);
             } catch (Throwable e) {
                 EL.i(e);
             }

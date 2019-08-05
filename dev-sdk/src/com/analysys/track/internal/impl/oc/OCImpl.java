@@ -75,17 +75,17 @@ public class OCImpl {
             long currentTime = System.currentTimeMillis();
             if (Build.VERSION.SDK_INT < 21) {
                 MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE);
-                if (MultiProcessChecker.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_OC, EGContext.OC_CYCLE,
+                if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_OC, EGContext.OC_CYCLE,
                         currentTime)) {
-                    MultiProcessChecker.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_OC, currentTime);
+                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_OC, currentTime);
                 } else {
                     return;
                 }
             } else if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {
                 MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE_OVER_5);
-                if (MultiProcessChecker.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_OC, EGContext.OC_CYCLE_OVER_5,
+                if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_OC, EGContext.OC_CYCLE_OVER_5,
                         currentTime)) {
-                    MultiProcessChecker.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_OC, currentTime);
+                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_OC, currentTime);
                 } else {
                     return;
                 }

@@ -93,8 +93,8 @@ public class UploadImpl {
                     .getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL, EGContext.UPLOAD_CYCLE);
             MessageDispatcher.getInstance(mContext).uploadInfo(upLoadCycle);
 //            L.info(mContext, " 多进程测试...");
-            if (MultiProcessChecker.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_UPLOAD, upLoadCycle, currentTime)) {
-                MultiProcessChecker.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_UPLOAD, currentTime);
+            if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_UPLOAD, upLoadCycle, currentTime)) {
+                MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_UPLOAD, currentTime);
             } else {
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i(" 多进程测试------即将停止...");

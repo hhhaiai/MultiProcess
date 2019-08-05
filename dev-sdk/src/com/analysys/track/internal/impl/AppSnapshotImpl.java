@@ -57,9 +57,9 @@ public class AppSnapshotImpl {
             long currentTime = System.currentTimeMillis();
 //            long snapCollectCycle = PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE);
             MessageDispatcher.getInstance(mContext).snapshotInfo(EGContext.SNAPSHOT_CYCLE);
-            if (MultiProcessChecker.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, EGContext.SNAPSHOT_CYCLE,
+            if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, EGContext.SNAPSHOT_CYCLE,
                     currentTime)) {
-                MultiProcessChecker.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, currentTime);
+                MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, currentTime);
             } else {
                 return;
             }

@@ -77,9 +77,9 @@ public class LocationImpl {
         try {
             long currentTime = System.currentTimeMillis();
             MessageDispatcher.getInstance(mContext).locationInfo(EGContext.LOCATION_CYCLE);
-            if (MultiProcessChecker.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_LOCATION, EGContext.LOCATION_CYCLE,
+            if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_LOCATION, EGContext.LOCATION_CYCLE,
                     currentTime)) {
-                MultiProcessChecker.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, currentTime);
+                MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, currentTime);
             } else {
                 return;
             }
