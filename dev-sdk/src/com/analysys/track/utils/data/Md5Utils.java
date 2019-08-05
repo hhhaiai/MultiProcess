@@ -1,9 +1,18 @@
-package com.analysys.track.utils;
+package com.analysys.track.utils.data;
 
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.utils.ELOG;
 
 import java.security.MessageDigest;
 
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: MD5工具类
+ * @Version: 1.0
+ * @Create: 2019-08-05 16:33:18
+ * @author: sanbo
+ * @mail: xueyongfu@analysys.com.cn
+ */
 public class Md5Utils {
     public static String getMD5(String val) {
         try {

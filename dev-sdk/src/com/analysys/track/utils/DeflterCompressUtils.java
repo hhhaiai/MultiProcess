@@ -5,12 +5,21 @@ import android.content.Context;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.impl.DevStatusChecker;
 import com.analysys.track.internal.impl.DeviceImpl;
+import com.analysys.track.utils.data.Md5Utils;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.zip.Deflater;
 
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: 数据压缩处理类
+ * @Version: 1.0
+ * @Create: 2019-08-05 16:36:12
+ * @author: sanbo
+ * @mail: xueyongfu@analysys.com.cn
+ */
 public class DeflterCompressUtils {
 
     /**

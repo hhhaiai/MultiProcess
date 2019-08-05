@@ -13,6 +13,15 @@ import org.json.JSONObject;
 import java.util.HashSet;
 import java.util.Set;
 
+
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: JSON工具类
+ * @Version: 1.0
+ * @Create: 2019-08-05 16:33:36
+ * @author: sanbo
+ * @mail: xueyongfu@analysys.com.cn
+ */
 public class JsonUtils {
     /**
      * 过滤掉value为空的数据

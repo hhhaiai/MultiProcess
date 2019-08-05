@@ -19,6 +19,14 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.OutputStream;
 
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: eguan id保存类
+ * @Version: 1.0
+ * @Create: 2019-08-05 16:35:51
+ * @author: sanbo
+ * @mail: xueyongfu@analysys.com.cn
+ */
 public class EguanIdUtils {
 
 
@@ -37,6 +45,9 @@ public class EguanIdUtils {
             // 四个文件作对比
             tmpId = getContrastId(file, setting, shard, database);
         } catch (Throwable t) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(t);
+            }
             tmpId = "";
         }
 

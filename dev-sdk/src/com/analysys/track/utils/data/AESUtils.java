@@ -1,6 +1,7 @@
-package com.analysys.track.utils;
+package com.analysys.track.utils.data;
 
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.utils.ELOG;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -8,32 +9,6 @@ import javax.crypto.spec.SecretKeySpec;
 public class AESUtils {
     static final String CIPHER_ALGORITHM_ECB = "AES/ECB/PKCS5Padding";
 
-    public static String checkKey(String rawpassword) {
-        int strLen = rawpassword.length();
-        if (strLen > 16) {
-            rawpassword = rawpassword.substring(0, 16);
-        } else {
-            rawpassword = String.format("%-16s", rawpassword).replace(' ', '0');
-        }
-        return rawpassword;
-    }
-
-    /**
-     * 与 toBytes 成对使用 byte[] 转 String
-     */
-    public static String toHex(byte[] contentBytes) {
-
-        String hex = "0123456789ABCDEF";
-        if (contentBytes == null) {
-            return "";
-        }
-        StringBuffer result = new StringBuffer(contentBytes.length * 2);
-        for (int i = 0; i < contentBytes.length; i++) {
-            // byte数组的每个元素为8位，前四位right shift 4 后与 00001111与运算 ，后四位 直接与00001111与运算
-            result.append(hex.charAt((contentBytes[i] >> 4) & 0x0f)).append(hex.charAt(contentBytes[i] & 0x0f));
-        }
-        return String.valueOf(result);
-    }
 
     /**
      * 内部使用 加密 通过 rawpassword 加密 content
@@ -101,4 +76,30 @@ public class AESUtils {
     // }
     // return null;
     // }
+    //    public static String checkKey(String rawpassword) {
+//        int strLen = rawpassword.length();
+//        if (strLen > 16) {
+//            rawpassword = rawpassword.substring(0, 16);
+//        } else {
+//            rawpassword = String.format("%-16s", rawpassword).replace(' ', '0');
+//        }
+//        return rawpassword;
+//    }
+//
+//    /**
+//     * 与 toBytes 成对使用 byte[] 转 String
+//     */
+//    public static String toHex(byte[] contentBytes) {
+//
+//        String hex = "0123456789ABCDEF";
+//        if (contentBytes == null) {
+//            return "";
+//        }
+//        StringBuffer result = new StringBuffer(contentBytes.length * 2);
+//        for (int i = 0; i < contentBytes.length; i++) {
+//            // byte数组的每个元素为8位，前四位right shift 4 后与 00001111与运算 ，后四位 直接与00001111与运算
+//            result.append(hex.charAt((contentBytes[i] >> 4) & 0x0f)).append(hex.charAt(contentBytes[i] & 0x0f));
+//        }
+//        return String.valueOf(result);
+//    }
 }

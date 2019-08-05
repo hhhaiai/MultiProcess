@@ -1,9 +1,11 @@
 package com.device;
 
 import android.app.Application;
+import android.os.StrictMode;
 
 import com.analysys.track.AnalysysTracker;
 import com.device.impls.MultiProcessWorker;
+import com.device.utils.EL;
 import com.tencent.bugly.crashreport.CrashReport;
 
 
@@ -19,6 +21,14 @@ public class AnalysysApplication extends Application {
 
     @Override
     public void onCreate() {
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .detectAll()
+                .penaltyLog()
+                .build());
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                .detectAll()
+                .penaltyLog()
+                .build());
         super.onCreate();
         initAnalysys();
         MultiProcessWorker.runServices(this);
@@ -33,12 +43,16 @@ public class AnalysysApplication extends Application {
         // 初始化接口:第二个参数填写您在平台申请的appKey,第三个参数填写
         AnalysysTracker.init(this, "7752552892442721d", "WanDouJia");
 
+        try {
+            CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(getApplicationContext());
+            strategy.setAppReportDelay(1);   //改为1ms
+            CrashReport.setAppPackage(getApplicationContext(), getPackageName());
+            CrashReport.setAppChannel(getApplicationContext(), "track-dev");
+            //玩安卓demo
+            CrashReport.initCrashReport(getApplicationContext(), "869b2916c8", true, strategy);
 
-        CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(getApplicationContext());
-        strategy.setAppReportDelay(1);   //改为1ms
-        //玩安卓demo
-        CrashReport.initCrashReport(getApplicationContext(), "869b2916c8", true, strategy);
-        CrashReport.setAppPackage(getApplicationContext(), getPackageName());
-        CrashReport.setAppChannel(getApplicationContext(), "track-dev");
+        } catch (Throwable e) {
+            EL.e(e);
+        }
     }
 }

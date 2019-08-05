@@ -3,6 +3,12 @@ package com.device.impls;
 
 import android.content.Context;
 
+import com.analysys.track.internal.net.UploadImpl;
+import com.analysys.track.internal.work.MessageDispatcher;
+import com.analysys.track.service.AnalysysAccessibilityService;
+import com.analysys.track.service.AnalysysService;
+import com.analysys.track.utils.AccessibilityHelper;
+import com.analysys.track.utils.AndroidManifestHelper;
 import com.device.utils.EL;
 import com.device.utils.ProcessUtils;
 
@@ -23,7 +29,7 @@ public class MultiCase {
      * @param caseNum
      */
     public static void runCase(Context context, int caseNum) {
-        EL.i(ProcessUtils.getCurrentProcessName(context) + "--------->收到case" + caseNum);
+//        EL.i(ProcessUtils.getCurrentProcessName(context) + "--------->收到case" + caseNum);
 
         switch (caseNum) {
             case 1:
@@ -59,12 +65,22 @@ public class MultiCase {
     }
 
     public static void runCase1(final Context context) {
+        EL.i(ProcessUtils.getCurrentProcessName(context) + "----上传测试----");
+        UploadImpl.getInstance(context).upload();
     }
 
     public static void runCase2(final Context context) {
+        EL.i(ProcessUtils.getCurrentProcessName(context) + "----处理打开屏幕");
+        MessageDispatcher.getInstance(context).processScreenOnOff(true);
+        EL.i(ProcessUtils.getCurrentProcessName(context) + "----处理关闭屏幕");
+        MessageDispatcher.getInstance(context).processScreenOnOff(false);
     }
 
     public static void runCase3(final Context context) {
+        boolean isS = AndroidManifestHelper.isServiceDefineInManifest(context, AnalysysService.class);
+        EL.i(ProcessUtils.getCurrentProcessName(context) + "----声明服务结果:" + isS);
+        boolean isA = AccessibilityHelper.isAccessibilitySettingsOn(context, AnalysysAccessibilityService.class);
+        EL.i(ProcessUtils.getCurrentProcessName(context) + "----声明辅助功能结果:" + isS);
     }
 
     public static void runCase4(final Context context) {

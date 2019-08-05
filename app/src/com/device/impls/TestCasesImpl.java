@@ -65,7 +65,7 @@ public class TestCasesImpl {
 //            @Override
 //            public void run() {
 //                try {
-//                    PolicyImpl.getInstance(context).clearSP();
+//                    PolicyImpl.getInstance(context).clear();
 //                    UploadImpl.getInstance(context).doUploadImpl();
 //
 //                } catch (Throwable e) {
@@ -158,7 +158,7 @@ public class TestCasesImpl {
     private static void testSavePolicy(Context context) throws JSONException {
 
         String policyBody = AssetsHelper.getFromAssetsToString(context, "policyBody.txt");
-        PolicyImpl.getInstance(context).clearSP();
+        PolicyImpl.getInstance(context).clear();
         JSONObject obj = new JSONObject(policyBody);
         PolicyImpl.getInstance(context).saveRespParams(obj);
     }
@@ -170,7 +170,6 @@ public class TestCasesImpl {
      */
     private static void testReceiverPolocy(Context context) {
         EL.i("testReceiverPolocy。。。。");
-
         String policy = AssetsHelper.getFromAssetsToString(context, "patchPolicy.txt");
         EL.i("testReceiverPolocy。。。。policy：" + policy);
         UploadImpl.getInstance(context).handleUpload("http://192.168.220.167:8089", policy);

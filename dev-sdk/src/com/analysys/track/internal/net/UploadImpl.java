@@ -12,12 +12,11 @@ import com.analysys.track.db.TableXXXInfo;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.work.MessageDispatcher;
-import com.analysys.track.utils.AESUtils;
+import com.analysys.track.utils.data.AESUtils;
 import com.analysys.track.utils.DeflterCompressUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.EguanIdUtils;
-import com.analysys.track.utils.L;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.RequestUtils;
@@ -33,8 +32,13 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
- * @author ly
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: 网络上传类
+ * @Version: 1.0
+ * @Create: 2019-08-05 14:47:28
+ * @author: ly
  */
 public class UploadImpl {
     /**
@@ -69,10 +73,10 @@ public class UploadImpl {
     public void upload() {
         try {
 
-//            L.info(mContext, "inside upload...");
-
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i("inside upload...");
+            }
             if (!NetworkUtils.isNetworkAlive(mContext)) {
-//                L.info(mContext, " has not network ...will break...");
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i("has not network ...will return...");
                 }
@@ -80,18 +84,21 @@ public class UploadImpl {
             }
             if (SPHelper.getIntValueFromSP(mContext, EGContext.REQUEST_STATE, 0) != 0) {
                 if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.i("uploading ...will break...");
+                    ELOG.i("already requesting... will break...");
                 }
-//                L.info(mContext, " already requesting... will break...");
                 return;
             }
             long currentTime = System.currentTimeMillis();
             long upLoadCycle = PolicyImpl.getInstance(mContext).getSP()
                     .getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL, EGContext.UPLOAD_CYCLE);
             MessageDispatcher.getInstance(mContext).uploadInfo(upLoadCycle);
+//            L.info(mContext, " 多进程测试...");
             if (MultiProcessChecker.isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_UPLOAD, upLoadCycle, currentTime)) {
                 MultiProcessChecker.setLockLastModifyTime(mContext, EGContext.FILES_SYNC_UPLOAD, currentTime);
             } else {
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.i(" 多进程测试------即将停止...");
+                }
                 return;
             }
             File dir = mContext.getFilesDir();
@@ -102,6 +109,9 @@ public class UploadImpl {
                 long dur = now - time;
                 // Math.abs(dur)
                 if (dur <= upLoadCycle) {
+                    if (EGContext.FLAG_DEBUG_INNER) {
+                        ELOG.i(" 文件间隔不对。即将停止....");
+                    }
                     return;
                 }
             } else {
@@ -109,6 +119,10 @@ public class UploadImpl {
                 f.setLastModified(now);
             }
             boolean isDurOK = (now - SPHelper.getLongValueFromSP(mContext, EGContext.LASTQUESTTIME, 0)) > upLoadCycle;
+
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i("---------isDurOK------" + isDurOK);
+            }
             if (isDurOK) {
                 f.setLastModified(now);
                 reTryAndUpload(true);
@@ -192,8 +206,9 @@ public class UploadImpl {
     public void doUploadImpl() {
         try {
             String uploadInfo = getInfo();
-            L.info(mContext, "uploadInfo: " + uploadInfo);
-
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i("uploadInfo: " + uploadInfo);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(uploadInfo);
             }
@@ -409,14 +424,18 @@ public class UploadImpl {
     //{"code": 500,"policy": {"policyVer": "20190725185335","patch": {"version": "002","sign": "1245ac90db2fc1cb2106172559657804","data": "UEsDBBQACAgIAO6O+U4AAAAAAAAAAAAAAAAUAAQATUVUQS1JTkYvTUFOSUZFU1QuTUb+ygAA803My0xLLS7RDUstKs7Mz7NSMNQz4OVySa3Q9clPTiwBCyXnJBYXpxbrpaRW8HI5F6UmlqSm6DpVWimkVACVG5rxcvFyAQBQSwcI8N6zmEcAAABJAAAAUEsDBBQACAgIAO6O+U4AAAAAAAAAAAAAAAALAAAAY2xhc3Nlcy5kZXidlE1oE0EUx9/MbnaTWtPY2prmtJprSQrqxYhYKX7Aig1CQHvatmvYkmxC3Jb05MfBu3jTCoKChXrRg149VulFvRSh0EsVQUHwLPp/M9MPqyc3+c2bffPezHsz83Ym7PaMHj1ODx/9TH4sr18Yma+tyqf0tbSZ3L97b3VlySZqE1G3dqyfzJOGrkBa3wPWgMMDQv3pPJp9kBPmfQnNhiRagXwB+Ra8Bx/ButRjm+AL+AZsiygPRsA5MAnmwQK4AW6DO+ABeAyWwXPwErwGbwD+lOJYQcbEyTH1gv0gBzgh20AmB+4vIgbX+D+R2jZtbA6YPuu3+s8k+0oaUltgqZwFZsoqmaJBoz8EKaHPE8en7VLbUtKAWXOYeH1b6V20B/XWKiwThzTyu1EI9SP6YOkc2jmeKYv5hPJZQ8PxHcGMBRi2vQzyysv6u4uvPrlXTsejPeRZvTSFsdjjtbNqHvbd+A9fzodj/GzpfKbYX6QQl4PxguyDpUuHqVewHGOZS2OE323MnjX5mmulYhHqLIeKxeKIoVTcfsg5GcVRcoqcsdJsMB+QGCfhk+WPVUj648CnQZ9HylGrPNGJ4uRy0gmDZoX6tboRxPXypanZcDr5Uwe7KK5XaPgv3Zm5qDETdvaYL1xPwua2eRJ2k/J4OB01g8bZVqcZYHZRJbtarZ4gUSNZ82lg8h/LOUG7HcYz5FxTXmQ3gygmqzWXULrNJn6rTi73kkZM6aSlHXFkLvZfoP11FfdeiT5+Ffk+PlFBt27aK5bMbFgis2gLsWbrmqA9e75V43JXnVu7an3rTLjeU7RT8w7t1L3wtB3Xvshpf64v6en5+XtgGRu+u+RpX3Wvc7rP35vfUEsHCFo9p8uGAgAAqAQAAFBLAQIUABQACAgIAO6O+U7w3rOYRwAAAEkAAAAUAAQAAAAAAAAAAAAAAAAAAABNRVRBLUlORi9NQU5JRkVTVC5NRv7KAABQSwECFAAUAAgICADujvlOWj2ny4YCAACoBAAACwAAAAAAAAAAAAAAAACNAAAAY2xhc3Nlcy5kZXhQSwUGAAAAAAIAAgB/AAAATAMAAAAA"}},"tmpid":"","egid":""}
     //
     public void handleUpload(final String url, final String uploadInfo) {
-        L.info(mContext, " inside  url: " + url);
 
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i(" inside  url: " + url);
+        }
         if (TextUtils.isEmpty(url)) {
             SPHelper.setIntValue2SP(mContext, EGContext.REQUEST_STATE, EGContext.sPrepare);
             return;
         }
         String result = RequestUtils.httpRequest(url, uploadInfo, mContext);
-        L.info(mContext, " result: " + result);
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i(" result: " + result);
+        }
         if (TextUtils.isEmpty(result)) {
             SPHelper.setIntValue2SP(mContext, EGContext.REQUEST_STATE, EGContext.sPrepare);
             return;

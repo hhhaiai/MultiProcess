@@ -213,7 +213,7 @@ public class OCImpl {
                 }
                 json = mRunningApps.get(i);
                 String openTime = json.optString(DeviceKeyContacts.OCInfo.ApplicationOpenTime);
-                long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(openTime));
+                long randomCloseTime = SystemUtils.getCloseTime(Long.parseLong(openTime));
                 if (randomCloseTime == -1) {// 小于轮询周期的频繁的开锁屏不做处理
                     continue;
                 }

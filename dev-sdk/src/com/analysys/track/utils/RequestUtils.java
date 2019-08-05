@@ -2,7 +2,6 @@ package com.analysys.track.utils;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
@@ -18,6 +17,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: 网络请求类
+ * @Version: 1.0
+ * @Create: 2019-08-05 15:09:48
+ * @author: sanbo
+ */
 public class RequestUtils {
 
 
@@ -25,9 +31,9 @@ public class RequestUtils {
      * HTTP
      */
     public static String httpRequest(String url, String value, Context context) {
-        L.info(context, "url:" + url + "-----value: " + value);
+
         if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i(url);
+            ELOG.i("httpRequest url:" + url + "-----value: " + value);
         }
         String response = "";
         URL urlP;
@@ -64,7 +70,6 @@ public class RequestUtils {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(connection.getRequestProperties().toString());
             }
-            L.info(context, connection.getRequestProperties().toString());
 
             // 发送数据
             pw = new PrintWriter(connection.getOutputStream());
@@ -72,7 +77,9 @@ public class RequestUtils {
             pw.flush();
 
             int status = connection.getResponseCode();
-            L.info(context, "status:" + status);
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i("httpRequest status:" + status);
+            }
             // 获取数据
             if (HttpURLConnection.HTTP_OK == status) {
                 is = connection.getInputStream();
@@ -87,7 +94,6 @@ public class RequestUtils {
                 response = EGContext.HTTP_STATUS_413;
             }
         } catch (Throwable e) {
-            L.info(context, Log.getStackTraceString(e));
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }

@@ -17,6 +17,15 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: 传感器获取
+ * @Version: 1.0
+ * @Create: 2019-08-05 16:18:18
+ * @author: sanbo
+ * @mail: xueyongfu@analysys.com.cn
+ */
 public class SenSorModuleNameImpl {
     Context mContext;
 

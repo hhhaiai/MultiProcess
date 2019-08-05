@@ -37,7 +37,7 @@ import java.util.zip.ZipFile;
 
 /**
  * @Copyright © 2019 analysys Inc. All rights reserved.
- * @Description: 系统工具方法: 屏幕状态判断/是否授权/用户权限判断/应用版本获取/日期获取/随机数获取
+ * @Description: 系统工具方法
  * @Version: 1.0
  * @Create: Mar 6, 2019 6:35:34 PM
  * @Author: sanbo
@@ -79,19 +79,6 @@ public class SystemUtils {
         }
     }
 
-    /**
-     * 获取APP版本
-     *
-     * @param context
-     * @return
-     */
-    public static String getAppV(Context context) {
-        try {
-            return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
-        } catch (Throwable e) {
-            return "0";
-        }
-    }
 
     /**
      * 检查指定包名的app是否为调试模式
@@ -112,7 +99,14 @@ public class SystemUtils {
         return false;
     }
 
-    public static PackageInfo getPkgInfo(Context context, String packageName) {
+    /**
+     * 获取PackageInfo
+     *
+     * @param context
+     * @param packageName
+     * @return
+     */
+    private static PackageInfo getPkgInfo(Context context, String packageName) {
         try {
             context = EContextHelper.getContext(context);
             if (context == null) {
@@ -151,7 +145,7 @@ public class SystemUtils {
     /**
      * 获取日期
      */
-    public static String getDay() {
+    public static String getDate() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         Date date = new Date(System.currentTimeMillis());
         String time = simpleDateFormat.format(date);
@@ -319,31 +313,6 @@ public class SystemUtils {
     }
 
 
-//    /**
-//     * 检测xposed相关文件,尝试加载xposed的类,如果能加载则表示已经安装了
-//     *
-//     * @return
-//     */
-//    public static boolean byLoadXposedClass() {
-//        try {
-//            Object localObject = ClassLoader.getSystemClassLoader().loadClass("de.robv.android.xposed.XposedHelpers")
-//                    .newInstance();
-//            // 如果加载类失败 则表示当前环境没有xposed
-//            return localObject != null;
-//        } catch (Throwable localThrowable) {
-//            return false;
-//        }
-//    }
-
-    public static boolean isMainThread() {
-        boolean result = false;
-        try {
-            result = Looper.getMainLooper().getThread() == Thread.currentThread();
-        } catch (Throwable t) {
-        }
-        return result;
-    }
-
     /**
      * @param key     优先级 传入==>metaData==>XML
      * @param channel 多渠道打包==>代码==>XML
@@ -484,7 +453,14 @@ public class SystemUtils {
         return channel;
     }
 
-    public static long calculateCloseTime(long openTime) {
+
+    /**
+     * 计算闭合时间
+     *
+     * @param openTime
+     * @return
+     */
+    public static long getCloseTime(long openTime) {
         long currentTime = System.currentTimeMillis();
         long closeTime = -1;
         if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {
@@ -500,6 +476,21 @@ public class SystemUtils {
         return closeTime;
     }
 
+    /**
+     * 是否是主线程
+     *
+     * @return
+     */
+    public static boolean isMainThread() {
+        return Looper.getMainLooper().getThread() == Thread.currentThread();
+    }
+
+    /**
+     * 获取当前进程的名称
+     *
+     * @param context
+     * @return
+     */
     public static String getCurrentProcessName(Context context) {
         try {
             int pid = android.os.Process.myPid();
@@ -510,25 +501,21 @@ public class SystemUtils {
                 }
             }
         } catch (Throwable e) {
-//            if (Config.EG_DEBUG) {
-//                ELog.e(PubConfigInfo.DEVICE_TAG, Log.getStackTraceString(e));
-//            }
         }
         return "";
     }
 
-//    public static boolean duringTimeCycle(Context mContext, String fileName,int cycleTime){
+//    /**
+//     * 获取APP版本，HTTP请求头中使用。墨迹版本时使用
+//     *
+//     * @param context
+//     * @return
+//     */
+//    public static String getAppV(Context context) {
 //        try {
-//            long time = MultiProcessChecker.getLockFileLastModifyTime(mContext,fileName);
-//            long now = System.currentTimeMillis();
-//            if( now - time > cycleTime){
-//                MultiProcessChecker.setLockLastModifyTime(mContext, fileName, now);
-//                return true;
-//            }
-//        }catch (Throwable t){
-//            ELOG.e("location.info",t);
-//            return false;
+//            return getPkgInfo(context, context.getPackageName()).versionName;
+//        } catch (Throwable e) {
+//            return "0";
 //        }
-//        return false;
 //    }
 }

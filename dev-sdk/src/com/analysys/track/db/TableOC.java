@@ -10,7 +10,7 @@ import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.net.UploadImpl;
-import com.analysys.track.utils.Base64Utils;
+import com.analysys.track.utils.data.Base64Utils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.JsonUtils;
@@ -122,7 +122,7 @@ public class TableOC {
                 cv.put(DBConfig.OC.Column.AOT,
                         EncryptUtils.encrypt(mContext, ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationOpenTime)));
                 cv.put(DBConfig.OC.Column.ACT, EncryptUtils.encrypt(mContext, act));
-                cv.put(DBConfig.OC.Column.DY, SystemUtils.getDay());
+                cv.put(DBConfig.OC.Column.DY, SystemUtils.getDate());
                 cv.put(DBConfig.OC.Column.IT, EncryptUtils.encrypt(mContext, String.valueOf(insertTime)));
                 cv.put(DBConfig.OC.Column.AVC, EncryptUtils.encrypt(mContext,
                         ocInfo.optString(DeviceKeyContacts.OCInfo.ApplicationVersionCode)));
@@ -205,7 +205,7 @@ public class TableOC {
             if (!db.isOpen()) {
                 db = DBManager.getInstance(mContext).openDB();
             }
-            String day = SystemUtils.getDay();
+            String day = SystemUtils.getDate();
             int timeInterval = Base64Utils.getTimeTag(System.currentTimeMillis());
             cursor = db.query(DBConfig.OC.TABLE_NAME, new String[]{DBConfig.OC.Column.APN},
                     DBConfig.OC.Column.DY + "=? and " + DBConfig.OC.Column.TI + "=?", // and " + DBConfig.OC.Column.RS +

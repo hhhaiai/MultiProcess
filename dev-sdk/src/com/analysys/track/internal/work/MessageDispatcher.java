@@ -25,6 +25,14 @@ import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONObject;
 
+
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: 消息分发
+ * @Version: 1.0
+ * @Create: 2019-08-05 14:57:53
+ * @author: sanbo
+ */
 public class MessageDispatcher {
     protected static final int MSG_INIT_MODULE = 0x01;
     protected static final int MSG_CHECK_HEARTBEAT = 0x02;
@@ -340,7 +348,7 @@ public class MessageDispatcher {
 
     }
 
-    private void processScreenOnOff(final boolean on) {
+    public void processScreenOnOff(final boolean on) {
         try {
             long currentTime = System.currentTimeMillis();
             if (on) {
@@ -509,19 +517,19 @@ public class MessageDispatcher {
                 switch (msg.what) {
                     case MSG_INIT_MODULE:
                         if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i(SystemUtils.getCurrentProcessName(mContext) + "接收到初始化消息");
+                            ELOG.i("接收到初始化消息");
                         }
                         msgInitModule();
                         break;
                     case MSG_CHECK_HEARTBEAT:
                         if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i(SystemUtils.getCurrentProcessName(mContext) + "接收到心跳检测消息");
+                            ELOG.i("接收到心跳检测消息");
                         }
                         isHasMessage(this);
                         break;
                     case MSG_START_SERVICE_SELF:
                         if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i(SystemUtils.getCurrentProcessName(mContext) + "接收到启动服务消息");
+                            ELOG.i("接收到启动服务消息");
                         }
                         ServiceHelper.getInstance(mContext).startSelfService();
                         break;
@@ -538,38 +546,38 @@ public class MessageDispatcher {
                         break;
                     case MSG_SNAPSHOT:
                         if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i(SystemUtils.getCurrentProcessName(mContext) + "接收到获取应用列表消息");
+                            ELOG.i("接收到获取应用列表消息");
                         }
                         AppSnapshotImpl.getInstance(mContext).snapshotsInfo();
                         break;
                     case MSG_LOCATION:
                         if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i(SystemUtils.getCurrentProcessName(mContext) + "接收到获取地理位置消息");
+                            ELOG.i("接收到获取地理位置消息");
                         }
                         LocationImpl.getInstance(mContext).location();
                         break;
                     case MSG_OC_INFO:
                         if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i(SystemUtils.getCurrentProcessName(mContext) + "接收到获取OC消息,进程 Id：");
+                            ELOG.i("接收到获取OC消息");
                         }
                         OCImpl.getInstance(mContext).ocInfo();
                         break;
                     case MSG_UPLOAD:
                         if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i(SystemUtils.getCurrentProcessName(mContext) + "接收到上传消息");
+                            ELOG.i("接收到上传消息");
                         }
                         UploadImpl.getInstance(mContext).upload();
                         break;
                     case MSG_CHECK_RETRY:
                         if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i(SystemUtils.getCurrentProcessName(mContext) + "接收到重试检测消息");
+                            ELOG.i("接收到重试检测消息");
                         }
                         MessageDispatcher.getInstance(mContext).reTryUpload();
                         break;
 
                     case MSG_CHECK:
                         if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i(SystemUtils.getCurrentProcessName(mContext) + "心跳检查");
+                            ELOG.i("心跳检查");
                         }
 //                    SPHelper.setLongValue2SP(mContext,EGContext.HEARTBEAT_LAST_TIME,System.currentTimeMillis());
                         // 本次发送
@@ -579,20 +587,20 @@ public class MessageDispatcher {
                         break;
                     case MSG_RETRY:
                         if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i(SystemUtils.getCurrentProcessName(mContext) + "数据重发轮询检查");
+                            ELOG.i("数据重发轮询检查");
                         }
                         MessageDispatcher.getInstance(mContext).isNeedRetry(EGContext.CHECK_RETRY_CYCLE);
                         checkRetry();
                         break;
                     case MSG_HANDLE_SCREEN_ON:
                         if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i(SystemUtils.getCurrentProcessName(mContext) + "开屏");
+                            ELOG.i("开屏");
                         }
                         processScreenOnOff(true);
                         break;
                     case MSG_HANDLE_SCREEN_OFF:
                         if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i(SystemUtils.getCurrentProcessName(mContext) + "关屏");
+                            ELOG.i("关屏");
                         }
                         processScreenOnOff(false);
                         break;
@@ -614,8 +622,8 @@ public class MessageDispatcher {
         public void isHasMessage(Handler handler) {
             try {
                 if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.i(handler.hasMessages(MSG_SNAPSHOT) + "  :  " + handler.hasMessages(MSG_LOCATION) + "  :  "
-                            + handler.hasMessages(MSG_OC_INFO) + "  :  " + handler.hasMessages(MSG_UPLOAD));
+                    ELOG.i("-----isHasMessage--检查消息队列-->\n包含MSG_SNAPSHOT: " + handler.hasMessages(MSG_SNAPSHOT) + ";\n包含MSG_LOCATION:  " + handler.hasMessages(MSG_LOCATION) + ";\n包含MSG_OC_INFO:  "
+                            + handler.hasMessages(MSG_OC_INFO) + ";\n包含MSG_UPLOAD:  " + handler.hasMessages(MSG_UPLOAD));
                 }
                 if (handler.hasMessages(MSG_SNAPSHOT) || handler.hasMessages(MSG_LOCATION)
                         || handler.hasMessages(MSG_OC_INFO) || handler.hasMessages(MSG_UPLOAD)) {

@@ -1,7 +1,10 @@
-package com.analysys.track.utils;
+package com.analysys.track.utils.reflectinon;
 
 import android.content.Context;
 import android.text.TextUtils;
+
+import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.utils.ELOG;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -89,8 +92,9 @@ public class PatchHelper {
             method.setAccessible(true);
             method.invoke(null, pareVaules);
         }
-        L.info(context, " load static over......");
-
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i(" load static over......");
+        }
     }
 
 

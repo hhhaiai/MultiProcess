@@ -20,6 +20,14 @@ import java.util.List;
 
 import static android.content.Context.WIFI_SERVICE;
 
+
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: wifi信息获取
+ * @Version: 1.0
+ * @Create: 2019-08-05 16:18:07
+ * @author: sanbo
+ */
 public class WifiImpl {
     Context mContext;
 

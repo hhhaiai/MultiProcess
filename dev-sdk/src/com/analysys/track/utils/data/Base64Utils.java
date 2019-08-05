@@ -1,4 +1,4 @@
-package com.analysys.track.utils;
+package com.analysys.track.utils.data;
 
 import android.text.TextUtils;
 import android.util.Base64;

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ServiceInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -17,80 +16,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: mainfest解析类
+ * @Version: 1.0
+ * @Create: 2019-08-05 16:36:27
+ * @author: sanbo
+ * @mail: xueyongfu@analysys.com.cn
+ */
 public class AndroidManifestHelper {
-    /**
-     * 判断AndroidManifest中是否声明Activity
-     *
-     * @param context
-     * @param clazz   判断的Activity
-     * @return
-     */
-    public static boolean isActivityDefineInManifest(Context context, Class<?> clazz) {
-        try {
-            context = EContextHelper.getContext(context);
-            if (context == null || clazz == null) {
-                return false;
-            }
-            ComponentName cn = new ComponentName(context, clazz);
-            if (cn != null) {
-                context.getPackageManager().getActivityInfo(cn, PackageManager.GET_META_DATA);
-                return true;
-            }
-        } catch (NameNotFoundException e) {
-            // xml没有声明
-        } catch (Throwable e) {
-        }
-
-        return false;
-    }
-
-    /**
-     * 判断AndroidManifest中是否声明BroadcastReceiver
-     *
-     * @param context
-     * @param clazz   判断的BroadcastReceiver
-     * @return
-     */
-    public static boolean isBroadcastReceiverDefineInManifest(Context context, Class<?> clazz) {
-        try {
-            context = EContextHelper.getContext(context);
-            if (context == null || clazz == null) {
-                return false;
-            }
-            ComponentName cn = new ComponentName(context, clazz);
-            if (cn != null) {
-                context.getPackageManager().getReceiverInfo(cn, PackageManager.GET_META_DATA);
-                return true;
-            }
-        } catch (Throwable e) {
-        }
-
-        return false;
-    }
-
-    /**
-     * 判断AndroidManifest中是否声明contextResolver
-     *
-     * @param context
-     * @param clazz   判断的contextResolver
-     * @return
-     */
-    public static boolean isContentResolverDefineInManifest(Context context, Class<?> clazz) {
-        try {
-            context = EContextHelper.getContext(context);
-            if (context == null || clazz == null) {
-                return false;
-            }
-            ComponentName cn = new ComponentName(context, clazz);
-            if (cn != null) {
-                context.getPackageManager().getProviderInfo(cn, PackageManager.GET_META_DATA);
-                return true;
-            }
-        } catch (Throwable e) {
-        }
-
-        return false;
-    }
 
     /**
      * 判断AndroidManifest中是否声明该服务

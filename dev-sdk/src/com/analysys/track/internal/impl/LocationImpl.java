@@ -40,6 +40,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: 位置信息获取
+ * @Version: 1.0
+ * @Create: 2019-08-05 16:17:41
+ * @author: ly
+ */
 public class LocationImpl {
 
     private static boolean isLocationBlockRunning = false;
@@ -177,7 +185,7 @@ public class LocationImpl {
             if (context == null) {
                 return false;
             }
-            String day = SystemUtils.getDay();
+            String day = SystemUtils.getDate();
             String spDay = SPHelper.getStringValueFromSP(context, EGContext.PERMISSION_TIME, "-1");
             if (permissionAskCount == 0) {
                 permissionAskCount = SPHelper.getIntValueFromSP(context, EGContext.PERMISSION_COUNT, 0);

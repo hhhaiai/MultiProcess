@@ -104,16 +104,19 @@ public class MultiProcessWorker {
      * @param intent
      */
     private static void parser(final Context context, final Intent intent) {
-        final Bundle bundle = intent.getExtras();
-        if (bundle != null && bundle.size() > 0) {
+        if (intent != null) {
+            final Bundle bundle = intent.getExtras();
+            if (bundle != null && bundle.size() > 0) {
 //            EL.i("Bundle size:" + bundle.size());
-            if (bundle.containsKey(TYPE_MSG)) {
-                MultiCase.runCase(context, bundle.getInt(TYPE_MSG, -1));
-            } else {
+                if (bundle.containsKey(TYPE_MSG)) {
+                    MultiCase.runCase(context, bundle.getInt(TYPE_MSG, -1));
+                } else {
 //                EL.e("  -------  has not " + TYPE_MSG);
-            }
-        } else {
+                }
+            } else {
 //            EL.e("  -------  intent: " + intent.toString());
+            }
         }
+
     }
 }

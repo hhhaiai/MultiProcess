@@ -1,11 +1,18 @@
 package com.analysys.track;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.utils.ELOG;
 
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: SDK API层接口类
+ * @Version: 1.0
+ * @Create: 2019-08-05 16:13:10
+ * @author: sanbo
+ */
 public class AnalysysTracker {
 
     /**
@@ -26,7 +33,6 @@ public class AnalysysTracker {
      */
     public static void setDebugMode(boolean isDebug) {
         EGContext.FLAG_DEBUG_USER = isDebug;
-        ELOG.info("setDebugMode ::" + isDebug);
-//    SPHelper.setBooleanValue2SP(ctx, EGContext.DEBUG, isDebug);
+        Log.i(EGContext.USER_TAG_DEBUG, "setDebugMode ::" + isDebug);
     }
 }

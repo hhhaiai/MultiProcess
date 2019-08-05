@@ -1,16 +1,23 @@
 package com.analysys.track.internal.Content;
 
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: 内部变量存储
+ * @Version: 1.0
+ * @Create: 2019-08-05 14:54:55
+ * @author: ly
+ */
 public class EGContext {
 
     /**
      * EGuan 内部调试控制. 主要用于控制堆栈打印、错误打印、内部提示信息打印
      */
-    public static final boolean FLAG_DEBUG_INNER = false;
+    public static final boolean FLAG_DEBUG_INNER = true;
     /**
      * SDK版本
      */
     public static final String SDK_VERSION = "4.3.0.2|20190526";
-    public static final String LOGTAG_DEBUG = "xxx";
+    public static final String LOGTAG_DEBUG = "sanbo";
     public static final String USER_TAG_DEBUG = "analysys";
     /**
      * xml 中声明的 appid、channel

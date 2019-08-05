@@ -151,7 +151,7 @@ public class EL {
                 return;
             }
         }
-        parserArgsMain(com.analysys.track.utils.L.MLEVEL.VERBOSE, args);
+        parserArgsMain(EL.MLEVEL.VERBOSE, args);
     }
 
     public static void d(Object... args) {
@@ -161,7 +161,7 @@ public class EL {
                 return;
             }
         }
-        parserArgsMain(com.analysys.track.utils.L.MLEVEL.DEBUG, args);
+        parserArgsMain(EL.MLEVEL.DEBUG, args);
     }
 
     public static void i(Object... args) {
@@ -171,7 +171,7 @@ public class EL {
                 return;
             }
         }
-        parserArgsMain(com.analysys.track.utils.L.MLEVEL.INFO, args);
+        parserArgsMain(EL.MLEVEL.INFO, args);
     }
 
     public static void w(Object... args) {
@@ -181,7 +181,7 @@ public class EL {
                 return;
             }
         }
-        parserArgsMain(com.analysys.track.utils.L.MLEVEL.WARN, args);
+        parserArgsMain(EL.MLEVEL.WARN, args);
     }
 
     public static void e(Object... args) {
@@ -191,7 +191,7 @@ public class EL {
                 return;
             }
         }
-        parserArgsMain(com.analysys.track.utils.L.MLEVEL.ERROR, args);
+        parserArgsMain(EL.MLEVEL.ERROR, args);
     }
 
     public static void wtf(Object... args) {
@@ -201,7 +201,7 @@ public class EL {
                 return;
             }
         }
-        parserArgsMain(com.analysys.track.utils.L.MLEVEL.WTF, args);
+        parserArgsMain(EL.MLEVEL.WTF, args);
     }
 
     /**
@@ -1307,22 +1307,22 @@ public class EL {
      */
     private static void realPrint(int level, String tag, String printStr) {
         switch (level) {
-            case com.analysys.track.utils.L.MLEVEL.DEBUG:
+            case EL.MLEVEL.DEBUG:
                 Log.d(tag, printStr);
                 break;
-            case com.analysys.track.utils.L.MLEVEL.INFO:
+            case EL.MLEVEL.INFO:
                 Log.i(tag, printStr);
                 break;
-            case com.analysys.track.utils.L.MLEVEL.ERROR:
+            case EL.MLEVEL.ERROR:
                 Log.e(tag, printStr);
                 break;
-            case com.analysys.track.utils.L.MLEVEL.VERBOSE:
+            case EL.MLEVEL.VERBOSE:
                 Log.v(tag, printStr);
                 break;
-            case com.analysys.track.utils.L.MLEVEL.WARN:
+            case EL.MLEVEL.WARN:
                 Log.w(tag, printStr);
                 break;
-            case com.analysys.track.utils.L.MLEVEL.WTF:
+            case EL.MLEVEL.WTF:
                 Log.wtf(tag, printStr);
                 break;
             default:

@@ -15,6 +15,7 @@ import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.service.AnalysysJobService;
 import com.analysys.track.service.AnalysysService;
+import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.PermissionUtils;
@@ -131,17 +132,23 @@ public class ServiceHelper {
     }
 
     /**
-     * 判断是否可以启动服务
+     * 判断是否可以启动服务. 定义服务-->区别版本-->判断权限
      */
     private boolean canStartService() {
-        if (Build.VERSION.SDK_INT < 26) {// 8以下
-            return true;
-        } else {
-            if (PermissionUtils.checkPermission(mContext, "android.permission.FOREGROUND_SERVICE")) {
+        if (AndroidManifestHelper.isServiceDefineInManifest(mContext, AnalysysService.class)) {
+            // 8以下
+            if (Build.VERSION.SDK_INT < 26) {
                 return true;
+            } else {
+                if (PermissionUtils.checkPermission(mContext, "android.permission.FOREGROUND_SERVICE")) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
+        } else {
+            return false;
         }
-        return false;
     }
 
     public void startJobService(Context context) {
@@ -224,7 +231,7 @@ public class ServiceHelper {
             if (TextUtils.isEmpty(lastOpenTime)) {
                 lastOpenTime = "0";
             }
-            long randomCloseTime = SystemUtils.calculateCloseTime(Long.parseLong(lastOpenTime));
+            long randomCloseTime = SystemUtils.getCloseTime(Long.parseLong(lastOpenTime));
             SPHelper.setLongValue2SP(mContext, EGContext.END_TIME, randomCloseTime);
             OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.SERVICE_RESTART);
             ReceiverUtils.getInstance().registAllReceiver(mContext);

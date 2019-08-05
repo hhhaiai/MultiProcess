@@ -2,6 +2,7 @@ package com.analysys.track.utils;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.BaseBundle;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.util.SparseArray;
 
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -60,14 +62,14 @@ import javax.xml.transform.stream.StreamSource;
  */
 public class ELOG {
 
+    private static Context mContext = null;
+
     // 解析属性最大层级
     public static final int MAX_CHILD_LEVEL = 3;
     // 换行符
     public static final String BR = System.getProperty("line.separator");
     private static final int JSON_INDENT = 2;
-    // 是否打印bug.建议在application中调用init接口初始化
-    public static boolean USER_DEBUG = EGContext.FLAG_DEBUG_USER;
-    // 是否打印bug.用于开发者自己排查问题打印 TODO
+    // 是否打印bug.用于开发者自己排查问题打印
     public static boolean DEV_DEBUG = EGContext.FLAG_DEBUG_INNER;
     // 是否接受shell控制打印
     private static boolean isShellControl = true;
@@ -75,8 +77,8 @@ public class ELOG {
     private static boolean isNeedCallstackInfo = false;
     // 是否按照条形框输出,有包裹域的输出
     private static boolean isNeedWrapper = false;
-    // 是否格式化展示,主要针对JSON
-    private static boolean isFormat = false;
+    // 是否格式化展示,主要针对JSON+简易调用堆栈的控制
+    private static boolean isFormat = true;
     // 默认tag
     private static String DEFAULT_TAG = EGContext.LOGTAG_DEBUG;
     // user tag
@@ -86,7 +88,7 @@ public class ELOG {
     // 规定每段显示的长度.每行最大日志长度 (Android Studio3.1最多2902字符)
     private static int LOG_MAXLENGTH = 2900;
     // 类名(getClassName).方法名(getMethodName)[行号(getLineNumber)]
-    private static String content_simple_callstack = "简易调用堆栈: %s.%s[%d]";
+    private static String content_simple_callstack = "[%s]  堆栈: %s.%s[%d]";
     // 查找%个数
     private static Pattern mPattern = Pattern.compile("%", Pattern.CASE_INSENSITIVE);
     // 格式化时，行首封闭符
@@ -110,35 +112,17 @@ public class ELOG {
     private static String CONTENT_C = "╚";
     private static String CONTENT_D = " ╔";
     private static String CONTENT_E = " ╚";
-    private static String CONTENT_WARNNING_SHELL = DEFAULT_TAG;
     private static Character FORMATER = '%';
-//            "Wranning....不够打印级别,请在命令行设置指令后重新尝试打印,命令行指令: adb shell setprop log.tag." + DEFAULT_TAG + " ";
+    private static String CONTENT_WARNNING_SHELL =
+            "Wranning....不够打印级别,请在命令行设置指令后重新尝试打印,命令行指令: adb shell setprop log.tag." + DEFAULT_TAG + " ";
 
     private ELOG() {
     }
 
-    /**
-     * 初始化接口
-     *
-     * @param showLog           是否展示log，默认展示
-     * @param shellControl      是否使用shell控制log动态打印.默认不使用. shell设置方式：setprop log.tag.sanbo
-     *                          INFO 最后一个参数为log等级,可选项目：VERBOSE/DEBUG/INFO/WARN/ERROR/ASSERT
-     * @param needWarpper       是否需要格式化输出
-     * @param needCallStackInfo 是否需要打印详细的堆栈调用信息.
-     * @param format            是否需要格式化.
-     * @param defaultTag        android logcat的tag一个意义,不设置默认的tag为"sanbo"
-     */
-    public static void init(boolean showLog, boolean shellControl, boolean needWarpper, boolean needCallStackInfo,
-                            boolean format, String defaultTag) {
-        USER_DEBUG = showLog;
-        isShellControl = shellControl;
-        isNeedWrapper = needWarpper;
-        isNeedCallstackInfo = needCallStackInfo;
-        isFormat = format;
-        if (!TextUtils.isEmpty(defaultTag)) {
-            DEFAULT_TAG = defaultTag;
-        }
+    public static void init(Context context) {
+        mContext = EContextHelper.getContext(context);
     }
+
 
     /*********************************************************************************************************/
     /**
@@ -148,72 +132,61 @@ public class ELOG {
     public static void v(Object... args) {
         if (isShellControl) {
             if (!Log.isLoggable(DEFAULT_TAG, Log.VERBOSE)) {
-//                Log.v(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "VERBOSE");
+                Log.v(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "VERBOSE");
                 return;
             }
         }
         if (EGContext.FLAG_DEBUG_INNER) {
-            parserArgsMain(false, MLEVEL.VERBOSE, args);
+            parserArgsMain(MLEVEL.VERBOSE, args);
         }
     }
 
     public static void d(Object... args) {
         if (isShellControl) {
             if (!Log.isLoggable(DEFAULT_TAG, Log.DEBUG)) {
-//                Log.d(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "DEBUG");
+                Log.d(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "DEBUG");
                 return;
             }
         }
         if (EGContext.FLAG_DEBUG_INNER) {
-            parserArgsMain(false, MLEVEL.DEBUG, args);
+            parserArgsMain(MLEVEL.DEBUG, args);
         }
     }
 
     public static void i(Object... args) {
         if (isShellControl) {
             if (!Log.isLoggable(DEFAULT_TAG, Log.INFO)) {
-//                Log.i(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "INFO");
+                Log.i(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "INFO");
                 return;
             }
         }
         if (EGContext.FLAG_DEBUG_INNER) {
-            parserArgsMain(false, MLEVEL.INFO, args);
+            parserArgsMain(MLEVEL.INFO, args);
         }
     }
 
-    public static void info(Object... args) {
-        if (isShellControl) {
-            if (!Log.isLoggable(USER_TAG, Log.INFO)) {
-//                Log.i(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "INFO");
-                return;
-            }
-        }
-        if (EGContext.FLAG_DEBUG_USER) {
-            parserArgsMain(true, MLEVEL.INFO, args);
-        }
-    }
 
     public static void w(Object... args) {
         if (isShellControl) {
             if (!Log.isLoggable(DEFAULT_TAG, Log.WARN)) {
-//                Log.w(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "WARN");
+                Log.w(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "WARN");
                 return;
             }
         }
         if (EGContext.FLAG_DEBUG_INNER) {
-            parserArgsMain(false, MLEVEL.WARN, args);
+            parserArgsMain(MLEVEL.WARN, args);
         }
     }
 
     public static void e(Object... args) {
         if (isShellControl) {
             if (!Log.isLoggable(DEFAULT_TAG, Log.ERROR)) {
-//                Log.e(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "ERROR");
+                Log.e(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "ERROR");
                 return;
             }
         }
         if (EGContext.FLAG_DEBUG_INNER) {
-            parserArgsMain(false, MLEVEL.ERROR, args);
+            parserArgsMain(MLEVEL.ERROR, args);
         }
     }
 
@@ -225,40 +198,43 @@ public class ELOG {
             }
         }
         if (EGContext.FLAG_DEBUG_INNER) {
-            parserArgsMain(false, MLEVEL.WTF, args);
+            parserArgsMain(MLEVEL.WTF, args);
         }
     }
+
+//    public static void ii(String info) {
+//        try {
+//            mContext = EContextHelper.getContext(mContext);
+//            StackTraceElement[] eles = Thread.currentThread().getStackTrace();
+//            i("[%s]------[%s.%s---%d]  %s ", SystemUtils.getCurrentProcessName(mContext), eles[3].getClassName(), eles[3].getMethodName(), eles[3].getLineNumber(), info);
+//        } catch (Throwable e) {
+//            e(e);
+//        }
+//    }
 
     /**
      * 解析参数入口.这步骤开始忽略类型.解析所有参数,参数检查逻辑：
      * 1.是否为String,若为String,则先判断是否格式化输出,不是再进行字符串转换格式尝试 2.对象其他类型判断:
      * StringBuffer>StringBuild>Throwable>Intent>List>Map
      *
-     * @param isUserDebug 是否用户控制的debug true 用户控制;false 开发者控制
      * @param level
      * @param args
      */
-    private static void parserArgsMain(boolean isUserDebug, int level, Object[] args) {
+    private static void parserArgsMain(int level, Object[] args) {
         try {
             String tag = DEFAULT_TAG;
-            // 用户级别的log打印
-            if (isUserDebug) {
-                tag = USER_TAG;
-                if (!USER_DEBUG) {
-                    Log.e(tag, "请确认Log工具类已经设置打印!");
-                    return;
-                }
-            } else {
-                if (!DEV_DEBUG) {
-                    Log.e(DEFAULT_TAG, "请确认Log工具类已经设置打印!");
-                    return;
-                }
+            if (!DEV_DEBUG) {
+                Log.e(DEFAULT_TAG, "请确认Log工具类已经设置打印!");
+                return;
             }
             StringBuilder sb = new StringBuilder();
             // 开始
 
+//            if (isFormat) {
+//                sb.append(CONTENT_LOG_INFO).append("\n");
+//            }
             if (isFormat) {
-                sb.append(CONTENT_LOG_INFO).append("\n");
+                sb.append("\n");
             }
             String stackinfo = getCallStaceInfo();
             if (!TextUtils.isEmpty(stackinfo)) {
@@ -485,7 +461,7 @@ public class ELOG {
                                     .append(wrapperString(cc));
                         } else {
                             sb.append("\n").append(content_title_begin).append("\n").append(CONTENT_LINE)
-                                    .append(String.format(content_simple_callstack, ste.getClassName(),
+                                    .append(String.format(content_simple_callstack, SystemUtils.getCurrentProcessName(EContextHelper.getContext(mContext)), ste.getClassName(),
                                             ste.getMethodName(), ste.getLineNumber()));
                             // 上一层会处理
                             // .append("\n");
@@ -500,7 +476,7 @@ public class ELOG {
                                     .append("调用堆栈详情:").append("\n").append(wrapperString(cc));
                         } else {
                             if (isFormat) {
-                                sb.append(String.format(content_simple_callstack, ste.getClassName(),
+                                sb.append(String.format(content_simple_callstack, SystemUtils.getCurrentProcessName(EContextHelper.getContext(mContext)), ste.getClassName(),
                                         ste.getMethodName(), ste.getLineNumber()));
                             }
                         }

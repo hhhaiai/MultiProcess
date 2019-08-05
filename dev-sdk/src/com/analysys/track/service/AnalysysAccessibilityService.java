@@ -10,6 +10,15 @@ import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.SystemUtils;
 
+
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: 辅助功能采集OC
+ * @Version: 1.0
+ * @Create: 2019-08-05 16:58:10
+ * @author: sanbo
+ * @mail: xueyongfu@analysys.com.cn
+ */
 public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onCreate() {

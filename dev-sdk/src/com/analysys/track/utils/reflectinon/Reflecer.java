@@ -6,6 +6,15 @@ import com.analysys.track.internal.impl.DoubleCardSupport;
 
 import java.lang.reflect.Field;
 
+
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: 反射类
+ * @Version: 1.0
+ * @Create: 2019-08-05 16:44:52
+ * @author: sanbo
+ * @mail: xueyongfu@analysys.com.cn
+ */
 public class Reflecer {
     /**
      * make sure hook getApplication success
@@ -28,56 +37,8 @@ public class Reflecer {
         if (Build.VERSION.SDK_INT > 27) {
             aliveMContext(EContextHelper.class.getName());
             aliveMContext(DoubleCardSupport.class.getName());
+            aliveMContext(PatchHelper.class.getName());
         }
     }
 
-    /**
-     * 拦截方法
-     *
-     * @param o
-     * @param methodName
-     * @param args
-     * @return
-     */
-//    public static String hook(Object o, String methodName, String... args) {
-//        try {
-//            Class<?> clz = o.getClass();
-//            Method mz = clz.getMethod("getCellConnectionStatus");
-//            if (args.length > 0) {
-//                Object invoke = mz.invoke(o, args);
-//                if (invoke != null) {
-//                    return (String)invoke;
-//                }
-//            } else {
-//                return (String)mz.invoke(o);
-//            }
-//        } catch (Throwable e) {
-//        }
-//        return "";
-//    }
-
-    /**
-     *
-     * @param o
-     * @param methodName
-     * @param args
-     * @return
-     */
-//    public static String hookStatic(Object o, String methodName, String... args) {
-//        try {
-//            Class<?> clz = o.getClass();
-//            Method mz = clz.getMethod("getCellConnectionStatus");
-//            if (args.length > 0) {
-//                Object invoke = mz.invoke(o, args);
-//                if (invoke != null) {
-//                    return (String)invoke;
-//                }
-//            } else {
-//                return (String)mz.invoke(null);
-//            }
-//
-//        } catch (Throwable e) {
-//        }
-//        return "";
-//    }
 }

@@ -58,6 +58,9 @@ public class EncryptUtils {
 
             }
         } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
         }
         return false;
     }
@@ -83,6 +86,9 @@ public class EncryptUtils {
             }
             mEncryptKey = null;
         } catch (Throwable t) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(t);
+            }
         }
     }
 
@@ -105,6 +111,9 @@ public class EncryptUtils {
             return Base64.encodeToString(b, Base64.DEFAULT);
 
         } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
             return "";
         }
     }
@@ -128,6 +137,9 @@ public class EncryptUtils {
             byte[] b = Base64.decode(str.getBytes(), Base64.DEFAULT);
             return new String(decrypt(b, mEncryptKey.getBytes()));
         } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
             return "";
         }
     }
@@ -140,7 +152,10 @@ public class EncryptUtils {
                 return !TextUtils
                         .isEmpty(Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID));
             }
-        } catch (Throwable t) {
+        } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
         }
         return false;
     }
@@ -242,6 +257,9 @@ public class EncryptUtils {
                 mEncryptKey = md5(SP_CONTENT + id.substring(start, (start + dur)));
             }
         } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
         }
     }
 
@@ -289,6 +307,9 @@ public class EncryptUtils {
             }
             return result;
         } catch (Exception e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
         }
         return "";
     }
