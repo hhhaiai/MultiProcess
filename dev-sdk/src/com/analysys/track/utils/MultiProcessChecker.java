@@ -139,7 +139,10 @@ public class MultiProcessChecker {
             }
 
             long lastModifyTime = getLockFileLastModifyTime(cxt, lock);
-            ELOG.i("-----isNeedWorkByLockFile----time dur: "+ Math.abs(lastModifyTime - now) );
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i("-----isNeedWorkByLockFile----time dur: " + Math.abs(lastModifyTime - now));
+
+            }
             if (Math.abs(lastModifyTime - now) > time) {
                 // 文件同步
                 File f = new File(cxt.getFilesDir(), lock);
@@ -149,7 +152,9 @@ public class MultiProcessChecker {
                 try {
                     // 持有锁
                     if (mFilenameAndLocks.containsKey(lock)) {
-                        ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----getLockFileLastModifyTime-----has-----");
+                        if (EGContext.FLAG_DEBUG_INNER) {
+                            ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----getLockFileLastModifyTime-----has-----");
+                        }
                         return true;
                     } else {
                         randomFile = new RandomAccessFile(f, "rw");
@@ -162,7 +167,9 @@ public class MultiProcessChecker {
 //                            locks.setRandomFile(randomFile);
 //                            mFilenameAndLocks.put(lock, locks);
                             mFilenameAndLocks.put(lock, new Locks(fl, randomFile, fileChannel));
-                            ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----getLockFileLastModifyTime-----new-----");
+                            if (EGContext.FLAG_DEBUG_INNER) {
+                                ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----getLockFileLastModifyTime-----new-----");
+                            }
                             return true;
                         } else {
                             return false;
@@ -206,26 +213,12 @@ public class MultiProcessChecker {
         private RandomAccessFile mRandomFile = null;
         private FileChannel mFileChannel = null;
 
-//        public Locks() {
-//        }
 
         public Locks(FileLock lock, RandomAccessFile randomFile, FileChannel fileChannel) {
             this.mLock = lock;
             this.mRandomFile = randomFile;
             this.mFileChannel = fileChannel;
         }
-
-//        public void setLock(FileLock lock) {
-//            this.mLock = lock;
-//        }
-//
-//        public void setRandomFile(RandomAccessFile randomFile) {
-//            this.mRandomFile = randomFile;
-//        }
-//
-//        public void setFileChannel(FileChannel fileChannel) {
-//            this.mFileChannel = fileChannel;
-//        }
 
 
         public void safeClose() {
