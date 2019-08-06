@@ -7,12 +7,20 @@ android {
     compileSdkVersion 26
     buildToolsVersion '26.0.2'
 
+    defaultConfig {
+        testInstrumentationRunner "android.test.InstrumentationTestRunner"
+    }
     buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -57,9 +65,10 @@ tasks.withType(Javadoc) {
     options.addStringOption('charSet', 'UTF-8')
 }
 
-//dependencies {
-//    implementation fileTree(dir: 'libs', include: ['*.jar'])
-//}
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    testImplementation 'junit:junit:4.12'
+}
 
 task generateJar(type: Copy) {
     from("build/intermediates/bundles/release")

@@ -20,6 +20,7 @@ import com.device.services.MyServiceM;
 import com.device.services.MyServiceN;
 import com.device.utils.MyLooper;
 import com.device.utils.ProcessUtils;
+import com.umeng.analytics.MobclickAgent;
 
 
 /**
@@ -104,18 +105,17 @@ public class MultiProcessWorker {
      * @param intent
      */
     private static void parser(final Context context, final Intent intent) {
-        if (intent != null) {
-            final Bundle bundle = intent.getExtras();
-            if (bundle != null && bundle.size() > 0) {
-//            EL.i("Bundle size:" + bundle.size());
-                if (bundle.containsKey(TYPE_MSG)) {
-                    MultiCase.runCase(context, bundle.getInt(TYPE_MSG, -1));
-                } else {
-//                EL.e("  -------  has not " + TYPE_MSG);
+        try {
+            if (intent != null) {
+                final Bundle bundle = intent.getExtras();
+                if (bundle != null && bundle.size() > 0) {
+                    if (bundle.containsKey(TYPE_MSG)) {
+                        MultiCase.runCase(context, bundle.getInt(TYPE_MSG, -1));
+                    }
                 }
-            } else {
-//            EL.e("  -------  intent: " + intent.toString());
             }
+        } catch (Throwable e) {
+            MobclickAgent.reportError(context, e);
         }
 
     }

@@ -1,12 +1,16 @@
 package com.device;
 
+import android.app.ActivityManager;
 import android.app.Application;
+import android.content.Context;
 import android.os.StrictMode;
 
 import com.analysys.track.AnalysysTracker;
 import com.device.impls.MultiProcessWorker;
 import com.device.utils.EL;
 import com.tencent.bugly.crashreport.CrashReport;
+import com.umeng.analytics.MobclickAgent;
+import com.umeng.commonsdk.UMConfigure;
 
 
 /**
@@ -43,16 +47,44 @@ public class AnalysysApplication extends Application {
         // 初始化接口:第二个参数填写您在平台申请的appKey,第三个参数填写
         AnalysysTracker.init(this, "7752552892442721d", "WanDouJia");
 
+        //init umeng
+        if (!getCurrentProcessName().contains(":")) {
+            MobclickAgent.setSessionContinueMillis(10);
+            MobclickAgent.setCatchUncaughtExceptions(true);
+        }
+        UMConfigure.setProcessEvent(true);
+        UMConfigure.setEncryptEnabled(true);
+        UMConfigure.setLogEnabled(true);
+
+
+        UMConfigure.init(this, "5b4c140cf43e4822b3000077", "track-demo-dev", UMConfigure.DEVICE_TYPE_PHONE, "99108ea07f30c2afcafc1c5248576bc5");
+
+        // init  bugly
         try {
             CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(getApplicationContext());
             strategy.setAppReportDelay(1);   //改为1ms
             CrashReport.setAppPackage(getApplicationContext(), getPackageName());
-            CrashReport.setAppChannel(getApplicationContext(), "track-dev");
+            CrashReport.setAppChannel(getApplicationContext(), "track-demo-dev");
             //玩安卓demo
             CrashReport.initCrashReport(getApplicationContext(), "869b2916c8", true, strategy);
 
         } catch (Throwable e) {
             EL.e(e);
         }
+    }
+
+    public String getCurrentProcessName() {
+        try {
+            int pid = android.os.Process.myPid();
+            ActivityManager am = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+            for (ActivityManager.RunningAppProcessInfo info : am.getRunningAppProcesses()) {
+                if (info.pid == pid) {
+                    return info.processName;
+                }
+            }
+        } catch (Throwable e) {
+            MobclickAgent.reportError(this, e);
+        }
+        return "";
     }
 }

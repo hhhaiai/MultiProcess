@@ -106,7 +106,7 @@ public class MultiCase {
      */
     public static void runCase4(final Context context) {
         EL.e(ProcessUtils.getCurrentProcessName(context) + "----多进程测试。。。。");
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 100; i++) {
             try {
                 long now = System.currentTimeMillis();
                 boolean is = MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, "test", 1000, now);

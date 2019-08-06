@@ -10,11 +10,11 @@ import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.net.UploadImpl;
-import com.analysys.track.utils.data.Base64Utils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.data.Base64Utils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;

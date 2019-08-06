@@ -7,6 +7,7 @@ import android.view.View;
 
 import com.device.R;
 import com.device.impls.TestCasesImpl;
+import com.umeng.analytics.MobclickAgent;
 
 
 /**
@@ -27,6 +28,21 @@ public class TestCase1Activity extends Activity {
         mContext = this;
         setContentView(R.layout.activity_test_case1);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MobclickAgent.onResume(this);
+        MobclickAgent.onPageStart("测试");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
+        MobclickAgent.onPageEnd("测试");
+    }
+
 
     public void onClick(View view) {
         switch (view.getId()) {

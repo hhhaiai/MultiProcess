@@ -1,7 +1,6 @@
 package com.analysys.track;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.Content.EGContext;
@@ -33,6 +32,6 @@ public class AnalysysTracker {
      */
     public static void setDebugMode(boolean isDebug) {
         EGContext.FLAG_DEBUG_USER = isDebug;
-        Log.i(EGContext.USER_TAG_DEBUG, "setDebugMode ::" + isDebug);
+//        Log.i(EGContext.USER_TAG_DEBUG, "setDebugMode ::" + isDebug);
     }
 }

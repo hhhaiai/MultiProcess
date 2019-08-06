@@ -11,6 +11,7 @@ import android.view.View;
 import com.device.R;
 import com.device.utils.EL;
 import com.device.utils.PermissionH;
+import com.umeng.analytics.MobclickAgent;
 
 import java.util.List;
 
@@ -35,6 +36,15 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        MobclickAgent.onResume(this);
+        MobclickAgent.onPageStart("主页");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
+        MobclickAgent.onPageEnd("主页");
     }
 
     public void onClick(View view) {

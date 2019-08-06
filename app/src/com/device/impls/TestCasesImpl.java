@@ -7,6 +7,7 @@ import com.analysys.track.internal.net.UploadImpl;
 import com.device.utils.AssetsHelper;
 import com.device.utils.EL;
 import com.device.utils.ProcessUtils;
+import com.umeng.analytics.MobclickAgent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,6 +24,8 @@ import org.json.JSONObject;
 public class TestCasesImpl {
 
     public static void runCase(Context context, int caseNum) {
+
+        MobclickAgent.onEvent(context, "[" + ProcessUtils.getCurrentProcessName(context) + "]测试-case" + caseNum);
 
         EL.d(ProcessUtils.getCurrentProcessName(context) + "--- you click  btnCase" + caseNum);
         switch (caseNum) {

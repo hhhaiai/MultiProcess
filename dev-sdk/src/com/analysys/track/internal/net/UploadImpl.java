@@ -12,7 +12,6 @@ import com.analysys.track.db.TableXXXInfo;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.work.MessageDispatcher;
-import com.analysys.track.utils.data.AESUtils;
 import com.analysys.track.utils.DeflterCompressUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
@@ -21,6 +20,7 @@ import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.RequestUtils;
 import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.data.AESUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 

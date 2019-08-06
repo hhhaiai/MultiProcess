@@ -9,7 +9,9 @@ buildscript {
 //        mavenCentral()
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
         jcenter { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+//        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        // for umeng
+        maven { url 'https://dl.bintray.com/umsdk/release' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
@@ -29,7 +31,9 @@ allprojects {
 //        mavenCentral()
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
         jcenter { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+//        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        // for umeng
+        maven { url 'https://dl.bintray.com/umsdk/release' }
     }
 }
 
