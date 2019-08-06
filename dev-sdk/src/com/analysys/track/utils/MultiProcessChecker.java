@@ -99,14 +99,21 @@ public class MultiProcessChecker {
                     dev.setReadable(true);
                 }
                 dev.setLastModified(time);
-                ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----setLockLastModifyTime-----set  success-----");
+
+//                if (EGContext.FLAG_DEBUG_INNER) {
+//                    ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----setLockLastModifyTime-----set  success-----");
+//                }
 
                 if (dev.lastModified() == time) {
-                    ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----setLockLastModifyTime-----haskey: " + mFilenameAndLocks.containsKey(fileName));
+//                    if (EGContext.FLAG_DEBUG_INNER) {
+//                        ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----setLockLastModifyTime-----haskey: " + mFilenameAndLocks.containsKey(fileName));
+//                    }
                     if (mFilenameAndLocks.containsKey(fileName)) {
 
                         Locks locks = mFilenameAndLocks.get(fileName);
-                        ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----setLockLastModifyTime-----locks: " + locks);
+//                        if (EGContext.FLAG_DEBUG_INNER) {
+//                            ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----setLockLastModifyTime-----locks: " + locks);
+//                        }
                         if (locks != null) {
                             locks.safeClose();
                         }
@@ -139,10 +146,9 @@ public class MultiProcessChecker {
             }
 
             long lastModifyTime = getLockFileLastModifyTime(cxt, lock);
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i("-----isNeedWorkByLockFile----time dur: " + Math.abs(lastModifyTime - now));
-
-            }
+//            if (EGContext.FLAG_DEBUG_INNER) {
+//                ELOG.i("-----isNeedWorkByLockFile----time dur: " + Math.abs(lastModifyTime - now));
+//            }
             if (Math.abs(lastModifyTime - now) > time) {
                 // 文件同步
                 File f = new File(cxt.getFilesDir(), lock);
@@ -152,24 +158,19 @@ public class MultiProcessChecker {
                 try {
                     // 持有锁
                     if (mFilenameAndLocks.containsKey(lock)) {
-                        if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----getLockFileLastModifyTime-----has-----");
-                        }
+//                        if (EGContext.FLAG_DEBUG_INNER) {
+//                            ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----getLockFileLastModifyTime-----has-----");
+//                        }
                         return true;
                     } else {
                         randomFile = new RandomAccessFile(f, "rw");
                         fileChannel = randomFile.getChannel();
                         fl = fileChannel.tryLock();
                         if (fl != null) {
-//                            Locks locks = new Locks();
-//                            locks.setFileChannel(fileChannel);
-//                            locks.setLock(fl);
-//                            locks.setRandomFile(randomFile);
-//                            mFilenameAndLocks.put(lock, locks);
                             mFilenameAndLocks.put(lock, new Locks(fl, randomFile, fileChannel));
-                            if (EGContext.FLAG_DEBUG_INNER) {
-                                ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----getLockFileLastModifyTime-----new-----");
-                            }
+//                            if (EGContext.FLAG_DEBUG_INNER) {
+//                                ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----getLockFileLastModifyTime-----new-----");
+//                            }
                             return true;
                         } else {
                             return false;

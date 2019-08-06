@@ -31,7 +31,7 @@ public class TableOC {
      */
     public void insert(JSONObject ocInfo) {
         try {
-//            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_OC) || ocInfo == null){
+//            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_OC) || processOCMsg == null){
 //                return;
 //            }
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
@@ -59,7 +59,7 @@ public class TableOC {
     public void insertArray(List<JSONObject> ocInfo) {
         SQLiteDatabase db = null;
         try {
-//            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_OC) || ocInfo == null){
+//            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_OC) || processOCMsg == null){
 //                return;
 //            }
             db = DBManager.getInstance(mContext).openDB();

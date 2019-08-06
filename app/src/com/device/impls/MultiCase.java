@@ -125,6 +125,9 @@ public class MultiCase {
     }
 
     public static void runCase5(final Context context) {
+//        EL.i(ProcessUtils.getCurrentProcessName(context) + "----JobService定义测试。。。。");
+//        boolean isAnalysysJobServiceDef = AndroidManifestHelper.isJobServiceDefineInManifest(context, AnalysysJobService.class);
+//        EL.i(ProcessUtils.getCurrentProcessName(context) + "---AnalysysJobService： " + isAnalysysJobServiceDef);
     }
 
     public static void runCase6(final Context context) {

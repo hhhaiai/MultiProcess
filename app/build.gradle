@@ -15,6 +15,10 @@ android {
             storePassword "analysys"
             keyAlias "key0"
             keyPassword "analysys"
+
+            v1SigningEnabled true
+            v2SigningEnabled true
+
         }
     }
     buildTypes {

@@ -6,6 +6,8 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.os.PowerManager;
+import android.text.TextUtils;
 
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
@@ -34,52 +36,7 @@ import org.json.JSONObject;
  * @author: sanbo
  */
 public class MessageDispatcher {
-    protected static final int MSG_INIT_MODULE = 0x01;
-    protected static final int MSG_CHECK_HEARTBEAT = 0x02;
-    protected static final int MSG_START_SERVICE_SELF = 0x03;
-    protected static final int MSG_KILL_RETRY_WORKER = 0x04;
-    protected static final int MSG_APP_CHANGE_RECEIVER = 0x05;
-    protected static final int MSG_SCREEN_RECEIVER = 0x06;
-    protected static final int MSG_SNAPSHOT = 0x07;
-    protected static final int MSG_LOCATION = 0x08;
-    protected static final int MSG_OC_INFO = 0x09;
-    protected static final int MSG_UPLOAD = 0x0a;
-    protected static final int MSG_CHECK_RETRY = 0x0d;
-    protected static final int MSG_HANDLE_SCREEN_ON = 0x0c;
-    protected static final int MSG_HANDLE_SCREEN_OFF = 0x0f;
-    private static final int MSG_CHECK = 0x0b;
-    private static final int MSG_RETRY = 0x0e;
-    private static long ocLastTime = 0;
-    private static long snapShotLastTime = 0;
-    private static long uploadLastTime = 0;
-    private static long locationLastTime = 0;
-    private static long ocCycle = 0;
-    private static long snapShotCycle = 0;
-    private static long uploadCycle = 0;
 
-    private static long locationCycle = 0;
-    private static long reTryLastTime = 0;
-    private static long heartBeatLastTime = 0;
-    private final Object mHandlerLock = new Object();
-    private Context mContext = null;
-    private Handler mHandler;
-
-    private MessageDispatcher() {
-    }
-
-    public static MessageDispatcher getInstance(Context context) {
-        Holder.INSTANCE.init(context);
-        return Holder.INSTANCE;
-    }
-
-    private void init(Context context) {
-        if (Holder.INSTANCE.mContext == null) {
-            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
-            if (mHandler == null) {
-                mHandler = startWorkHandler();
-            }
-        }
-    }
 
     // 初始化各模块
     public void initModule() {
@@ -211,17 +168,18 @@ public class MessageDispatcher {
     public void appChangeReceiver(String pkgName, int type, long time) {
         try {
             Message msg = new Message();
-            msg.what = MessageDispatcher.MSG_APP_CHANGE_RECEIVER;
+            msg.what = MessageDispatcher.MSG_APP_IUU;
             msg.arg1 = type;
             JSONObject o = new JSONObject();
-            o.put("pkgName", pkgName);
-            o.put("time", time);
+            o.put(MSG_CHANGE_PKG, pkgName);
+            o.put(MSG_CHANGE_TIME, time);
             msg.obj = o;
 //            msg.obj = pkgName;
             sendMessage(msg);
         } catch (Throwable t) {
         }
     }
+
 
     // 应用列表
     public void snapshotInfo(long cycleTime) {
@@ -280,15 +238,20 @@ public class MessageDispatcher {
 
     }
 
-    // 应用打开关闭信息
-    public void ocInfo(long cycleTime) {
+
+    /**
+     * oc处理逻辑。
+     *
+     * @param nextProcessDurTime
+     */
+    public void ocInfo(long nextProcessDurTime) {
         try {
             Message msg = new Message();
             msg.what = MessageDispatcher.MSG_OC_INFO;
-            if (cycleTime > 0) {
-                ocCycle = cycleTime;
+            if (nextProcessDurTime > 0) {
+                ocCycle = nextProcessDurTime;
             }
-            if (ocLastTime == 0 || System.currentTimeMillis() - ocLastTime >= cycleTime) {
+            if (ocLastTime == 0 || System.currentTimeMillis() - ocLastTime >= nextProcessDurTime) {
                 ocLastTime = System.currentTimeMillis();
                 if (mHandler.hasMessages(msg.what)) {
                     mHandler.removeMessages(msg.what);
@@ -296,7 +259,7 @@ public class MessageDispatcher {
                 sendMessage(msg);
             } else {
                 if (!mHandler.hasMessages(msg.what)) {
-                    sendMessage(msg, cycleTime);
+                    sendMessage(msg, nextProcessDurTime);
                 } else {
                     return;
                 }
@@ -390,8 +353,8 @@ public class MessageDispatcher {
      */
     private void screenOnOffHandle(boolean on) {
         try {
-            // 补充时间
-            if (AnalysysReceiver.mLastCloseTime == 0) {// 第一次时间为空，则取sp时间
+            //  第一次时间为空，则取sp时间
+            if (AnalysysReceiver.mLastCloseTime == 0) {
 //                long spLastVisitTime = MultiProcessChecker.getLockFileLastModifyTime(mContext, EGContext.FILES_SYNC_SP_WRITER);
 //                if (System.currentTimeMillis() - spLastVisitTime > EGContext.TIME_SYNC_SP) {// 即便频繁开关屏也不能频繁操作sp
 //                    AnalysysReceiver.mLastCloseTime = SPHelper.getLongValueFromSP(mContext,
@@ -467,13 +430,6 @@ public class MessageDispatcher {
         }
     }
 
-    private Handler startWorkHandler() {
-        final HandlerThread thread = new HandlerThread(EGContext.THREAD_NAME,
-                android.os.Process.THREAD_PRIORITY_BACKGROUND);
-        thread.start();
-        final Handler ret = new AnalysyHandler(thread.getLooper());
-        return ret;
-    }
 
     public void checkRetry() {
         Message msg = new Message();
@@ -492,9 +448,6 @@ public class MessageDispatcher {
         }
     }
 
-    private static class Holder {
-        private static final MessageDispatcher INSTANCE = new MessageDispatcher();
-    }
 
     /**
      * @Copyright © 2018 Analysys Inc. All rights reserved.
@@ -522,7 +475,7 @@ public class MessageDispatcher {
                         if (EGContext.FLAG_DEBUG_INNER) {
                             ELOG.i("接收到心跳检测消息");
                         }
-                        isHasMessage(this);
+                        checkMsgInHeatbeat();
                         break;
                     case MSG_START_SERVICE_SELF:
                         if (EGContext.FLAG_DEBUG_INNER) {
@@ -533,11 +486,11 @@ public class MessageDispatcher {
                     case MSG_KILL_RETRY_WORKER:
                         exitRetryHandler();
                         break;
-                    case MSG_APP_CHANGE_RECEIVER:
+                    case MSG_APP_IUU:
                         JSONObject js = null;
                         js = (JSONObject) msg.obj;
-                        AppSnapshotImpl.getInstance(mContext).changeActionType(js.optString("pkgName"), msg.arg1,
-                                js.optLong("time"));
+                        AppSnapshotImpl.getInstance(mContext).processAppModifyMsg(js.optString(MSG_CHANGE_PKG), msg.arg1,
+                                js.optLong(MSG_CHANGE_TIME));
                         break;
                     case MSG_SCREEN_RECEIVER:
                         break;
@@ -557,7 +510,7 @@ public class MessageDispatcher {
                         if (EGContext.FLAG_DEBUG_INNER) {
                             ELOG.i("接收到获取OC消息");
                         }
-                        OCImpl.getInstance(mContext).ocInfo();
+                        OCImpl.getInstance(mContext).processOCMsg();
                         break;
                     case MSG_UPLOAD:
                         if (EGContext.FLAG_DEBUG_INNER) {
@@ -613,25 +566,23 @@ public class MessageDispatcher {
 
         /**
          * 心跳检测， 确保Handler有任务， 如果没有进行初始化各个模块
-         *
-         * @param handler
          */
-        public void isHasMessage(Handler handler) {
+        public void checkMsgInHeatbeat() {
             try {
                 if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.i("-----isHasMessage--检查消息队列-->\n包含MSG_SNAPSHOT: " + handler.hasMessages(MSG_SNAPSHOT) + ";\n包含MSG_LOCATION:  " + handler.hasMessages(MSG_LOCATION) + ";\n包含MSG_OC_INFO:  "
-                            + handler.hasMessages(MSG_OC_INFO) + ";\n包含MSG_UPLOAD:  " + handler.hasMessages(MSG_UPLOAD));
+                    ELOG.i("-----checkMsgInHeatbeat--检查消息队列-->\n包含MSG_SNAPSHOT: " + mHandler.hasMessages(MSG_SNAPSHOT) + ";\n包含MSG_LOCATION:  " + mHandler.hasMessages(MSG_LOCATION) + ";\n包含MSG_OC_INFO:  "
+                            + mHandler.hasMessages(MSG_OC_INFO) + ";\n包含MSG_UPLOAD:  " + mHandler.hasMessages(MSG_UPLOAD));
                 }
-                if (handler.hasMessages(MSG_SNAPSHOT) || handler.hasMessages(MSG_LOCATION)
-                        || handler.hasMessages(MSG_OC_INFO) || handler.hasMessages(MSG_UPLOAD)) {
-                    if (handler.hasMessages(MSG_UPLOAD)) {
+                if (mHandler.hasMessages(MSG_SNAPSHOT) || mHandler.hasMessages(MSG_LOCATION)
+                        || mHandler.hasMessages(MSG_OC_INFO) || mHandler.hasMessages(MSG_UPLOAD)) {
+                    if (mHandler.hasMessages(MSG_UPLOAD)) {
                         if (System.currentTimeMillis() - uploadLastTime >= uploadCycle) {
                             uploadInfo(uploadCycle);
                         }
                     } else {
                         MessageDispatcher.getInstance(mContext).uploadInfo(0);
                     }
-                    if (handler.hasMessages(MSG_OC_INFO)) {
+                    if (mHandler.hasMessages(MSG_OC_INFO)) {
                         if (Build.VERSION.SDK_INT < 24 && (System.currentTimeMillis() - ocLastTime >= ocCycle)) {
                             ocInfo(ocCycle);
                         }
@@ -640,14 +591,14 @@ public class MessageDispatcher {
                             MessageDispatcher.getInstance(mContext).ocInfo(0);
                         }
                     }
-                    if (handler.hasMessages(MSG_LOCATION)) {
+                    if (mHandler.hasMessages(MSG_LOCATION)) {
                         if (System.currentTimeMillis() - locationLastTime >= locationCycle) {
                             locationInfo(locationCycle);
                         }
                     } else {
                         MessageDispatcher.getInstance(mContext).locationInfo(0);
                     }
-                    if (handler.hasMessages(MSG_SNAPSHOT)) {
+                    if (mHandler.hasMessages(MSG_SNAPSHOT)) {
                         if (System.currentTimeMillis() - snapShotLastTime >= snapShotCycle) {
                             snapshotInfo(snapShotCycle);
                         }
@@ -670,6 +621,7 @@ public class MessageDispatcher {
          */
         private void msgInitModule() {
             try {
+                prepareInit();
                 ocInfo(0);
                 snapshotInfo(0);
                 locationInfo(0);
@@ -693,6 +645,95 @@ public class MessageDispatcher {
             }
 
         }
-
     }
+
+
+    /**
+     * 初始化接口
+     */
+    private void prepareInit() {
+        try {
+            if (mContext == null) {
+                return;
+            }
+            // 补充时间
+            String lastOpenTime = SPHelper.getStringValueFromSP(mContext, EGContext.LAST_OPEN_TIME, "");
+            if (TextUtils.isEmpty(lastOpenTime)) {
+                lastOpenTime = "0";
+            }
+            long randomCloseTime = SystemUtils.getCloseTime(Long.parseLong(lastOpenTime));
+            SPHelper.setLongValue2SP(mContext, EGContext.END_TIME, randomCloseTime);
+            OCImpl.getInstance(mContext).filterInsertOCInfo(EGContext.SERVICE_RESTART);
+//            ReceiverUtils.getInstance().registAllReceiver(mContext);
+            PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+            boolean isScreenOn = pm.isScreenOn();
+            // 如果为true，则表示屏幕正在使用，false则屏幕关闭。
+            if (!isScreenOn) {
+                ReceiverUtils.getInstance().setWork(false);
+            }
+        } catch (Throwable e) {
+
+        }
+    }
+
+    /****************************************************************************************************/
+    /************************************* 单例: 初始化************************************************/
+    /****************************************************************************************************/
+
+
+    private MessageDispatcher() {
+        final HandlerThread thread = new HandlerThread(EGContext.THREAD_NAME,
+                android.os.Process.THREAD_PRIORITY_BACKGROUND);
+        thread.start();
+        mHandler = new AnalysyHandler(thread.getLooper());
+    }
+
+    private static class Holder {
+        private static final MessageDispatcher INSTANCE = new MessageDispatcher();
+    }
+
+    public static MessageDispatcher getInstance(Context context) {
+        Holder.INSTANCE.init(context);
+        return Holder.INSTANCE;
+    }
+
+    private void init(Context context) {
+        if (Holder.INSTANCE.mContext == null) {
+            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
+
+        }
+    }
+
+    private final String MSG_CHANGE_PKG = "pkgName";
+    private final String MSG_CHANGE_TIME = "time";
+
+    protected static final int MSG_INIT_MODULE = 0x01;
+    protected static final int MSG_CHECK_HEARTBEAT = 0x02;
+    protected static final int MSG_START_SERVICE_SELF = 0x03;
+    protected static final int MSG_KILL_RETRY_WORKER = 0x04;
+    protected static final int MSG_APP_IUU = 0x05;
+    protected static final int MSG_SCREEN_RECEIVER = 0x06;
+    protected static final int MSG_SNAPSHOT = 0x07;
+    protected static final int MSG_LOCATION = 0x08;
+    protected static final int MSG_OC_INFO = 0x09;
+    protected static final int MSG_UPLOAD = 0x0a;
+    protected static final int MSG_CHECK_RETRY = 0x0d;
+    protected static final int MSG_HANDLE_SCREEN_ON = 0x0c;
+    protected static final int MSG_HANDLE_SCREEN_OFF = 0x0f;
+    private static final int MSG_CHECK = 0x0b;
+    private static final int MSG_RETRY = 0x0e;
+    private static long ocLastTime = 0;
+    private static long snapShotLastTime = 0;
+    private static long uploadLastTime = 0;
+    private static long locationLastTime = 0;
+    private static long ocCycle = 0;
+    private static long snapShotCycle = 0;
+    private static long uploadCycle = 0;
+
+    private static long locationCycle = 0;
+    private static long reTryLastTime = 0;
+    private static long heartBeatLastTime = 0;
+    private final Object mHandlerLock = new Object();
+    private Context mContext = null;
+    private final Handler mHandler;
 }

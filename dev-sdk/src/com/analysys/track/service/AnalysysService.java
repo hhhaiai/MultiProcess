@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.os.IBinder;
 
 import com.analysys.track.internal.AnalysysInternal;
+import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.internal.work.ServiceHelper;
+import com.analysys.track.utils.ELOG;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -26,6 +28,9 @@ public class AnalysysService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i("AnalysysService 。onCreate");
+        }
         AnalysysInternal.getInstance(this);
         MessageDispatcher.getInstance(this).initModule();
     }
@@ -37,7 +42,7 @@ public class AnalysysService extends Service {
 
     @Override
     public void onDestroy() {
-        ServiceHelper.getInstance(this).stopWork();
+        ServiceHelper.getInstance(this).startSelfService();
         super.onDestroy();
     }
 }

@@ -17,7 +17,6 @@ import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.net.PolicyImpl;
-import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.utils.AccessibilityHelper;
 import com.analysys.track.utils.ELOG;
@@ -67,46 +66,50 @@ public class OCImpl {
         return Holder.INSTANCE;
     }
 
+
     /**
-     * OC 信息采集
+     * 处理OC采集信息
      */
-    public void ocInfo() {
+    public void processOCMsg() {
         try {
             long currentTime = System.currentTimeMillis();
+
+            // 获取间隔时间
+            long durTime = -1;
             if (Build.VERSION.SDK_INT < 21) {
-                MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE);
-                if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_OC, EGContext.OC_CYCLE,
-                        currentTime)) {
-                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_OC, currentTime);
-                } else {
-                    return;
-                }
+                durTime = EGContext.OC_CYCLE;
             } else if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {
-                MessageDispatcher.getInstance(mContext).ocInfo(EGContext.OC_CYCLE_OVER_5);
-                if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_OC, EGContext.OC_CYCLE_OVER_5,
-                        currentTime)) {
-                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_OC, currentTime);
-                } else {
-                    return;
-                }
+                durTime = EGContext.OC_CYCLE_OVER_5;
             } else {// 6以上不处理
                 return;
             }
-            if (!isOCBlockRunning) {
-                isOCBlockRunning = true;
-            } else {
-                return;
-            }
-            if (SystemUtils.isMainThread()) {
-                EThreadPool.execute(new Runnable() {
-                    @Override
-                    public void run() {
+            if (durTime > 0) {
+                // 多进程锁定文件工作。
+                if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_OC, durTime,
+                        currentTime)) {
+                    if (!isOCBlockRunning) {
+                        isOCBlockRunning = true;
+                    } else {
+                        return;
+                    }
+                    if (SystemUtils.isMainThread()) {
+                        EThreadPool.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                processOC();
+                            }
+                        });
+                    } else {
                         processOC();
                     }
-                });
-            } else {
-                processOC();
+                    //oc开始处理重置标记位.
+                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_OC, System.currentTimeMillis());
+                } else {
+                    return;
+                }
             }
+
+
         } catch (Throwable t) {
 
         } finally {
@@ -120,9 +123,6 @@ public class OCImpl {
      */
     public void processOC() {
         try {
-//            if(!ProcessManager.getIsCollected()){
-//                return;
-//            }
             // 亮屏幕工作
             if (SystemUtils.isScreenOn(mContext)) {
 //                fillData();
@@ -722,18 +722,18 @@ public class OCImpl {
                 ocInfo.put(DeviceKeyContacts.OCInfo.NetworkType, NetworkUtils.getNetworkType(mContext));
                 ocInfo.put(DeviceKeyContacts.OCInfo.CollectionType, collectionType);
                 ocInfo.put(DeviceKeyContacts.OCInfo.SwitchType, EGContext.APP_SWITCH);
-                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationType, AppSnapshotImpl.getInstance(mContext).getAppType(packageName));
+                ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationType, (AppSnapshotImpl.getInstance(mContext).isSystemApps(packageName) ? "SA" : "OA"));
                 try {
                     ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode,
                             pm.getPackageInfo(packageName, 0).versionName + "|"
                                     + pm.getPackageInfo(packageName, 0).versionCode);
                 } catch (Throwable t) {
-                    // ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode, "");
+                    // processOCMsg.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode, "");
                 }
                 try {
                     ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName, String.valueOf(appInfo.loadLabel(pm)));
                 } catch (Throwable t) {
-//                     ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName, "unknown");
+//                     processOCMsg.put(DeviceKeyContacts.OCInfo.ApplicationName, "unknown");
                 }
 
             }
@@ -771,7 +771,7 @@ public class OCImpl {
                 ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationVersionCode, appVersion);
                 ocInfo.put(DeviceKeyContacts.OCInfo.ApplicationName, appName);
                 if (ocInfo != null && !TextUtils.isEmpty(openTime) && 0L != closeTime) {
-//                    ProcessManager.saveSP(mContext,ocInfo);
+//                    ProcessManager.saveSP(mContext,processOCMsg);
                     JSONArray array = TableOC.getInstance(mContext).selectAll();
                     for (int i = 0; i < array.length(); i++) {
                         JSONObject obj = (JSONObject) array.get(i);

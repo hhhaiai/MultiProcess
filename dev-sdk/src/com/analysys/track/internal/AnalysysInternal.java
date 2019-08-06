@@ -30,6 +30,7 @@ public class AnalysysInternal {
     private static boolean hasInit = false;
     private WeakReference<Context> mContextRef = null;
 
+    // 初始化反射模快
     private AnalysysInternal() {
         Reflecer.init();
     }
@@ -39,7 +40,8 @@ public class AnalysysInternal {
             if (Holder.instance.mContextRef == null) {
                 Holder.instance.mContextRef = new WeakReference<Context>(EContextHelper.getContext(context));
             }
-            ELOG.init(context.getApplicationContext());
+            // 初始化日志
+            ELOG.init(EContextHelper.getContext(context));
         } catch (Throwable e) {
         }
         return Holder.instance;
@@ -95,9 +97,11 @@ public class AnalysysInternal {
         EncryptUtils.init(ctx);
         // 3.初始化多进程
         initSupportMultiProcess(ctx);
-        // 4. 启动工作机制
+        // 4. 只能注册一次，不能注册多次
+        ReceiverUtils.getInstance().registAllReceiver(ctx);
+        // 5. 启动工作机制
         MessageDispatcher.getInstance(ctx).startService();
-        // 5. 根据屏幕调整工作状态
+        // 6. 根据屏幕调整工作状态
         PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
         if (pm != null) {
             boolean isScreenOn = pm.isScreenOn();
@@ -106,8 +110,13 @@ public class AnalysysInternal {
                 ReceiverUtils.getInstance().setWork(false);
             }
         }
+        // 7.检查加密模块是否正常，false重新初始化
+        if (!EncryptUtils.checkEncryptKey(ctx)) {
+            EncryptUtils.reInitKey(ctx);
+        }
+
         Log.i(EGContext.USER_TAG_DEBUG, String.format("[%s] init SDK (%s) success! ", SystemUtils.getCurrentProcessName(mContextRef.get()), EGContext.SDK_VERSION));
-        // 6.是否启动工作
+        // 8.是否启动工作
         if (!DevStatusChecker.getInstance().isDebugDevice(mContextRef.get())) {
             String version = SPHelper.getStringValueFromSP(mContextRef.get(), DeviceKeyContacts.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, "");
             if (!TextUtils.isEmpty(version)) {

@@ -19,7 +19,6 @@ import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -28,26 +27,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: 安装列表获取
+ * @Version: 1.0
+ * @Create: 2019-08-06 19:13:40
+ * @author: ly
+ */
 public class AppSnapshotImpl {
 
-    private final String SHELL_PM_LIST_PACKAGES = "pm list packages";// all
-    private final String APP_LIST_SYSTEM = "pm list packages -s";// system
-    // private final String APP_LIST_USER = "pm list packages -3";// third party
-    // 获取系统应用列表
-    private final Set<String> mSystemAppSet = new HashSet<String>();
-    private boolean isSnapShotBlockRunning = false;
-    private Context mContext;
-
-    private AppSnapshotImpl() {
-
-    }
-
-    public static AppSnapshotImpl getInstance(Context context) {
-        if (Holder.INSTANCE.mContext == null) {
-            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
-        }
-        return Holder.INSTANCE;
-    }
 
     /**
      * 应用列表
@@ -160,7 +149,7 @@ public class AppSnapshotImpl {
                         pi = packageInfo.get(i);
                         if (pi != null) {
                             jsonObject = null;
-                            jsonObject = getAppInfo(pi, EGContext.SNAP_SHOT_INSTALL);
+                            jsonObject = getAppInfo(pi, mContext.getPackageManager(), EGContext.SNAP_SHOT_INSTALL);
                             if (jsonObject != null) {
                                 list.add(jsonObject);
                             }
@@ -169,14 +158,14 @@ public class AppSnapshotImpl {
                     }
                 }
                 if (list.size() < 5) {
-                    list = getAppsFromShell(mContext, EGContext.SNAP_SHOT_INSTALL, list);
+                    list = getAppInfosFromShell(mContext, EGContext.SNAP_SHOT_INSTALL, list);
                 }
             } else {
                 // 如果上面的方法不能获取，改用shell命令
                 if (list == null) {
                     list = new ArrayList<JSONObject>();
                     if (list.size() < 5) {
-                        list = getAppsFromShell(mContext, EGContext.SNAP_SHOT_INSTALL, list);
+                        list = getAppInfosFromShell(mContext, EGContext.SNAP_SHOT_INSTALL, list);
                     }
                 }
             }
@@ -190,7 +179,12 @@ public class AppSnapshotImpl {
         return list;
     }
 
-    //获取单个安装列表
+
+    /**
+     * 获取安装列表和对应的调试状态
+     *
+     * @return
+     */
     public List<JSONObject> getAppDebugStatus() {
         List<JSONObject> list = new ArrayList<JSONObject>();
         try {
@@ -209,7 +203,7 @@ public class AppSnapshotImpl {
                 }
                 if (list.size() < 5) {
                     Set<String> result = new HashSet<String>();
-                    result = getPkgList(result, SHELL_PM_LIST_PACKAGES);
+                    result = getPkgNamesByShell(result, SHELL_PM_LIST_PACKAGES);
 
                     for (String packageName : result) {
                         JSONObject appInfo = new JSONObject();
@@ -221,7 +215,7 @@ public class AppSnapshotImpl {
             } else {
                 // 如果上面的方法不能获取，改用shell命令
                 Set<String> result = new HashSet<String>();
-                result = getPkgList(result, SHELL_PM_LIST_PACKAGES);
+                result = getPkgNamesByShell(result, SHELL_PM_LIST_PACKAGES);
 
                 for (String packageName : result) {
                     JSONObject appInfo = new JSONObject();
@@ -240,24 +234,25 @@ public class AppSnapshotImpl {
         return list;
     }
 
-    private List<JSONObject> getAppsFromShell(Context mContext, String tag, List<JSONObject> appList) {
-//        JSONArray appList = new JSONArray();
+    /**
+     * shell方式获取文件名字，然后解析出app详情
+     *
+     * @param mContext
+     * @param tag
+     * @param appList
+     * @return
+     */
+    private List<JSONObject> getAppInfosFromShell(Context mContext, String tag, List<JSONObject> appList) {
         try {
             JSONObject appInfo;
             Set<String> result = new HashSet<>();
             PackageManager pm = mContext.getPackageManager();
-            result = getPkgList(result, SHELL_PM_LIST_PACKAGES);
+            result = getPkgNamesByShell(result, SHELL_PM_LIST_PACKAGES);
             PackageInfo pi = null;
             for (String pkgName : result) {
                 if (!TextUtils.isEmpty(pkgName) && pm.getLaunchIntentForPackage(pkgName) != null) {
                     pi = mContext.getPackageManager().getPackageInfo(pkgName, 0);
-                    appInfo = new JSONObject();
-                    appInfo = AppSnapshotImpl.getInstance(mContext).getAppInfo(appInfo, pi, pm, tag);
-//                    appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,
-//                            pkgName);
-//                    appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ActionType, tag);
-//                    appInfo.put(DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
-//                            String.valueOf(System.currentTimeMillis()));
+                    appInfo = AppSnapshotImpl.getInstance(mContext).getAppInfo(pi, pm, tag);
                     if (!appList.contains(appInfo)) {
                         appList.add(appInfo);
                     }
@@ -273,13 +268,13 @@ public class AppSnapshotImpl {
     }
 
     /**
-     * 获取安装列表
+     * 通过shell获取安装列表
      *
      * @param appSet
      * @param shell
      * @return
      */
-    private Set<String> getPkgList(Set<String> appSet, String shell) {
+    private Set<String> getPkgNamesByShell(Set<String> appSet, String shell) {
         // Set<String> set = new HashSet<String>();
         String result = ShellUtils.shell(shell);
         if (!TextUtils.isEmpty(result) && result.contains("\n")) {
@@ -303,18 +298,6 @@ public class AppSnapshotImpl {
         return appSet;
     }
 
-    /**
-     * 获取APP类型
-     *
-     * @param pkg
-     * @return
-     */
-    public String getAppType(String pkg) {
-        if (TextUtils.isEmpty(pkg)) {
-            return "OA";
-        }
-        return isSystemApps(pkg) ? "SA" : "OA";
-    }
 
     /**
      * 是否为系统应用:
@@ -326,11 +309,11 @@ public class AppSnapshotImpl {
      * @param pkg
      * @return
      */
-    private boolean isSystemApps(String pkg) {
+    public boolean isSystemApps(String pkg) {
 
         // 1. 没有获取应用列表则获取
         if (mSystemAppSet.size() < 1) {
-            getPkgList(mSystemAppSet, APP_LIST_SYSTEM);
+            getPkgNamesByShell(mSystemAppSet, APP_LIST_SYSTEM);
         }
         // 2. 根据列表内容判断
         if (mSystemAppSet.size() > 0) {
@@ -361,27 +344,18 @@ public class AppSnapshotImpl {
         return false;
     }
 
+
     /**
-     * 单个应用json信息
+     * 获取APP详情
      *
      * @param pkgInfo
+     * @param packageManager
      * @param tag
      * @return
      */
-    private JSONObject getAppInfo(PackageInfo pkgInfo, String tag) {
-        JSONObject appInfo = null;
-        try {
-            PackageManager packageManager = mContext.getPackageManager();
-            appInfo = getAppInfo(appInfo, pkgInfo, packageManager, tag);
-        } catch (Throwable e) {
-        }
-        return appInfo;
-    }
-
     @SuppressWarnings("deprecation")
-    public JSONObject getAppInfo(JSONObject appInfo, PackageInfo pkgInfo, PackageManager packageManager, String tag)
-            throws JSONException {
-        appInfo = new JSONObject();
+    public JSONObject getAppInfo(PackageInfo pkgInfo, PackageManager packageManager, String tag) {
+        JSONObject appInfo = new JSONObject();
         JsonUtils.pushToJSON(mContext, appInfo, DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,
                 pkgInfo.packageName, DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
         JsonUtils.pushToJSON(mContext, appInfo, DeviceKeyContacts.AppSnapshotInfo.ApplicationName,
@@ -396,10 +370,15 @@ public class AppSnapshotImpl {
         return appInfo;
     }
 
+
     /**
-     * 处理应用安装卸载更新广播改变状态
+     * 处理消息中的应用安装、卸载、更新广播
+     *
+     * @param pkgName
+     * @param type
+     * @param time
      */
-    public void changeActionType(final String pkgName, final int type, final long time) {
+    public void processAppModifyMsg(final String pkgName, final int type, final long time) {
         try {
             if (TextUtils.isEmpty(pkgName)) {
                 return;
@@ -413,7 +392,7 @@ public class AppSnapshotImpl {
                             if (type == 0) {
                                 PackageInfo pi = mContext.getPackageManager().getPackageInfo(pkgName, 0);
                                 if (pi != null) {
-                                    JSONObject jsonObject = getAppInfo(pi, EGContext.SNAP_SHOT_INSTALL);
+                                    JSONObject jsonObject = getAppInfo(pi, mContext.getPackageManager(), EGContext.SNAP_SHOT_INSTALL);
                                     if (jsonObject != null) {
                                         // 判断数据表中是否有该应用的存在，如果有标识此次安装是应用更新所导致
                                         boolean isHas = TableAppSnapshot.getInstance(mContext).isHasPkgName(pkgName);
@@ -423,11 +402,9 @@ public class AppSnapshotImpl {
                                     }
                                 }
                             } else if (type == 1) {
-                                TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UNINSTALL,
-                                        time);
+                                TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UNINSTALL, time);
                             } else if (type == 2) {
-                                TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UPDATE,
-                                        time);
+                                TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UPDATE, time);
                             }
                         } catch (Throwable e) {
                         }
@@ -436,9 +413,10 @@ public class AppSnapshotImpl {
             } else {
                 try {
                     if (type == 0) {
-                        PackageInfo pi = mContext.getPackageManager().getPackageInfo(pkgName, 0);
+                        PackageManager pm = mContext.getPackageManager();
+                        PackageInfo pi = pm.getPackageInfo(pkgName, 0);
                         if (pi != null) {
-                            JSONObject jsonObject = getAppInfo(pi, EGContext.SNAP_SHOT_INSTALL);
+                            JSONObject jsonObject = getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL);
                             if (jsonObject != null) {
                                 // 判断数据表中是否有该应用的存在，如果有标识此次安装是应用更新所导致
                                 boolean isHas = TableAppSnapshot.getInstance(mContext).isHasPkgName(pkgName);
@@ -460,12 +438,35 @@ public class AppSnapshotImpl {
             }
 
         } catch (Throwable t) {
-
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(t);
+            }
         }
 
+    }
+
+    private AppSnapshotImpl() {
     }
 
     private static class Holder {
         private static final AppSnapshotImpl INSTANCE = new AppSnapshotImpl();
     }
+
+
+    public static AppSnapshotImpl getInstance(Context context) {
+        if (Holder.INSTANCE.mContext == null) {
+            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
+        }
+        return Holder.INSTANCE;
+    }
+
+    private final String SHELL_PM_LIST_PACKAGES = "pm list packages";// all
+    private final String APP_LIST_SYSTEM = "pm list packages -s";// system
+    // private final String APP_LIST_USER = "pm list packages -3";// third party
+    // 获取系统应用列表
+    private final Set<String> mSystemAppSet = new HashSet<String>();
+    private boolean isSnapShotBlockRunning = false;
+    private Context mContext;
+
+
 }

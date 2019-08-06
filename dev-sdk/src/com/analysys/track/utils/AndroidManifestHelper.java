@@ -49,6 +49,21 @@ public class AndroidManifestHelper {
         return false;
     }
 
+    public static boolean isJobServiceDefineInManifest(Context context, Class<?> clazz) {
+        try {
+            context = EContextHelper.getContext(context);
+            if (context != null) {
+                ServiceInfo info = getServiceInfo(context, clazz);
+                if (info != null && "android.permission.BIND_JOB_SERVICE".equals(info.permission)) {
+                    return true;
+                }
+            }
+        } catch (Throwable e) {
+        }
+
+        return false;
+    }
+
     /**
      * 判断AndroidManifest是否包含权限
      *

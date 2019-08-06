@@ -12,7 +12,7 @@ public class EGContext {
     /**
      * EGuan 内部调试控制. 主要用于控制堆栈打印、错误打印、内部提示信息打印
      */
-    public static final boolean FLAG_DEBUG_INNER = true;
+    public static final boolean FLAG_DEBUG_INNER = false;
     /**
      * SDK版本
      */
@@ -85,9 +85,9 @@ public class EGContext {
     public static final int SERVER_DELAY_DEFAULT = 0;
     public static final int FAIL_COUNT_DEFALUT = 3;// 上传重试次数，默认3次
     public static final long FAIL_TRY_DELAY_DEFALUT = 60000;// 上传重试时间间隔默认60-70s
-    //    public static final int TIMER_INTERVAL_DEFALUT = 5 * 1000;
     public static final long MINDISTANCE = 1000;// 地理位置信息获取距离/米
     public final static String URL_SCHEME = "http://";
+//    public static final int TIMER_INTERVAL_DEFALUT = 5 * 1000;
 //    /**
 //     * 实时上传端口
 //     */
@@ -122,26 +122,19 @@ public class EGContext {
     public static final String TEST_URL = URL_SCHEME + TEST_CALLBACK_DOMAIN_NAME + TEST_CALLBACK_PORT;
     public static final String ORIGINKEY_STRING = "analysys";
     public static final String EGUANFILE = "eg.a";
-//    public final static String TEST_CALLBACK_PORT = ":8089";
 
-    // public static final String RT_DOMAIN_NAME = "rt101.analysys.cn";
-//    public static final String USERTP_URL = URL_SCHEME + RT_DOMAIN_NAME + RT_PORT;
-//    public static final String EGIDKEY = "egid";
-    // public static final String TEST_CALLBACK_DOMAIN_NAME = "192.168.8.150";
     public static final String TMPIDKEY = "tmpid";
     // 用于jobservice
-    public static final int JOB_ID = 2071111;
+    public static final int JOB_ID = 2071112;
     // jobservice判断时间间隔
     public static final long JOB_SERVICE_TIME = 10 * 1000;
-    // public static final String APP_URL_SP = "app_url_sp";
     public static final int TIME_OUT_TIME = 30 * 1000; // 设置为30秒
     public static final String SDKV = "SDKV";
     public static final String DEBUG = "DEBUG";
     public static final String APPKEY = "AK";
     public static final String TIME = "TIME";
     public static final String POLICYVER = "policyVer";
-    //    public static final String PRO = "PRO";
-//    public static final String PRO_KEY_WORDS = "QF4";
+
     //  Negix 超过最大返回。网络状态，非消息内容
     public static final String HTTP_STATUS_413 = "413";
     // 200 请求成功。 返回值内部状态
@@ -247,5 +240,15 @@ public class EGContext {
      */
     public static final String TEXT_DEBUG_APP = "packageName";
     public static final String TEXT_DEBUG_STATUS = "debugable";
+
+
+    // public static final String APP_URL_SP = "app_url_sp";
+    //    public static final String PRO = "PRO";
+//    public static final String PRO_KEY_WORDS = "QF4";
+    //    public final static String TEST_CALLBACK_PORT = ":8089";
+    // public static final String RT_DOMAIN_NAME = "rt101.analysys.cn";
+//    public static final String USERTP_URL = URL_SCHEME + RT_DOMAIN_NAME + RT_PORT;
+//    public static final String EGIDKEY = "egid";
+    // public static final String TEST_CALLBACK_DOMAIN_NAME = "192.168.8.150";
 
 }
