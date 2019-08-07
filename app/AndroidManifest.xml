@@ -48,6 +48,8 @@
     <uses-permission
         android:name="android.permission.READ_LOGS"
         tools:ignore="ProtectedPermissions" />
+    <!-- P和以后版本 通知需要该权限 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name=".AnalysysApplication"
@@ -66,37 +68,24 @@
             </intent-filter>
         </activity>
 
+        <receiver android:name="com.analysys.track.receiver.AnalysysReceiver">
+            <intent-filter android:priority="9999">
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name="com.analysys.track.service.AnalysysService"
             android:enabled="true"
             android:exported="true"
-            tools:ignore="ExportedService" />
+            android:process=":AnalysysService" />
         <service
             android:name="com.analysys.track.service.AnalysysJobService"
-            android:enabled="true"
-            android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE"
-            tools:ignore="ExportedService" />
-
-        <receiver android:name="com.analysys.track.receiver.AnalysysReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.SCREEN_ON" />
-                <action android:name="android.intent.action.SCREEN_OFF" />
-                <action android:name="android.intent.action.BATTERY_CHANGED" />
-                <!-- 一个新应用包已经安装在设备上，数据包括包名（监听所在的app，新安装时，不能接收到这个广播） -->
-                <action android:name="android.intent.action.PACKAGE_ADDED" />
-                <!-- 一个新版本的应用安装到设备，替换之前已经存在的版本  替换时会先收到卸载的再收到替换的， 替换自身也能收到 -->
-                <action android:name="android.intent.action.PACKAGE_REPLACED" />
-                <!-- 一个已存在的应用程序包已经从设备上移除，包括包名（卸载监听所在的app，则无法接收到） -->
-                <action android:name="android.intent.action.PACKAGE_REMOVED" />
-                <!-- 开机广播 -->
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-
-                <!-- 网络变化广播 7.0以下有效 -->
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
-        </receiver>
-
+            android:process=":AnalysysService" />
         <service
             android:name="com.analysys.track.service.AnalysysAccessibilityService"
             android:enabled="true"

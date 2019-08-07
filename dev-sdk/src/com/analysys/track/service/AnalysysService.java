@@ -28,6 +28,7 @@ public class AnalysysService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysService 。onCreate");
         }
@@ -37,7 +38,7 @@ public class AnalysysService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        return START_NOT_STICKY;
+        return super.onStartCommand(intent, Service.START_STICKY, startId);
     }
 
     @Override

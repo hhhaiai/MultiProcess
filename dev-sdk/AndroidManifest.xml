@@ -1,5 +1,4 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.analysys.track"
     android:versionCode="1"
     android:versionName="1.0">
@@ -8,63 +7,11 @@
         android:minSdkVersion="14"
         android:targetSdkVersion="23" />
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission
-        android:name="android.permission.MOUNT_FORMAT_FILESYSTEMS"
-        tools:ignore="ProtectedPermissions" />
-    <uses-permission
-        android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
-        tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.GET_TASKS" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <!-- P和以后版本 通知需要该权限 -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission
-        android:name="android.permission.WRITE_SETTINGS"
-        tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
         android:allowBackup="true"
         android:label="@string/app_name">
 
-        <!--
-    <activity android:name="demo.MainActivity" >
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-    </activity>
-        -->
-        <!-- <receiver android:name="AnalysysReceiver" > -->
-        <!-- <intent-filter android:priority="9999" > -->
-        <!-- <action android:name="android.intent.action.BOOT_COMPLETED" /> -->
-        <!-- <action android:name="android.intent.action.USER_PRESENT" /> -->
-        <!-- <action android:name="android.intent.action.ACTION_POWER_CONNECTED" /> -->
-        <!-- <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" /> -->
-        <!-- </intent-filter> -->
-        <!-- </receiver> -->
-
-
-        <!-- <service -->
-        <!-- android:name="AnalysysService" -->
-        <!-- android:enabled="true" -->
-        <!-- android:exported="true" -->
-        <!-- android:process=":AnalysysService" -->
-        <!-- tools:ignore="ExportedService" /> -->
-        <!-- <service -->
-        <!-- android:name="AnalysysJobService" -->
-        <!-- android:permission="android.permission.BIND_JOB_SERVICE" -->
-        <!-- android:process=":AnalysysService" /> -->
         <service
             android:name="com.analysys.track.service.AnalysysAccessibilityService"
             android:enabled="true"
@@ -76,12 +23,6 @@
             </intent-filter>
         </service>
 
-        <!-- <meta-data -->
-        <!-- android:name="ANALYSYS_APPKEY" -->
-        <!-- android:value="qwertyuiop123" /> -->
-        <!-- <meta-data -->
-        <!-- android:name="ANALYSYS_CHANNEL" -->
-        <!-- android:value="WanDouJia" /> -->
     </application>
 
 </manifest>

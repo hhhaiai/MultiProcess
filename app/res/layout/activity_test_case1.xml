@@ -24,17 +24,17 @@
 
             <Button
                 android:id="@+id/btnCase1"
-                android:onClick="onClick"
+                android:onClick="onMultiProcessClick"
                 android:text="case1" />
 
             <Button
                 android:id="@+id/btnCase2"
-                android:onClick="onClick"
+                android:onClick="onMultiProcessClick"
                 android:text="case2" />
 
             <Button
                 android:id="@+id/btnCase3"
-                android:onClick="onClick"
+                android:onClick="onMultiProcessClick"
                 android:text="case3" />
         </TableRow>
 
@@ -43,18 +43,18 @@
 
             <Button
                 android:id="@+id/btnCase4"
-                android:onClick="onClick"
+                android:onClick="onMultiProcessClick"
                 android:text="case4" />
 
             <Button
                 android:id="@+id/btnCase5"
                 android:layout_width="fill_parent"
-                android:onClick="onClick"
+                android:onClick="onMultiProcessClick"
                 android:text="case5" />
 
             <Button
                 android:id="@+id/btnCase6"
-                android:onClick="onClick"
+                android:onClick="onMultiProcessClick"
                 android:text="case6" />
 
         </TableRow>
@@ -63,18 +63,18 @@
 
             <Button
                 android:id="@+id/btnCase7"
-                android:onClick="onClick"
+                android:onClick="onMultiProcessClick"
                 android:text="case7" />
 
             <Button
                 android:id="@+id/btnCase8"
                 android:layout_width="fill_parent"
-                android:onClick="onClick"
+                android:onClick="onMultiProcessClick"
                 android:text="case8" />
 
             <Button
                 android:id="@+id/btnCase9"
-                android:onClick="onClick"
+                android:onClick="onMultiProcessClick"
                 android:text="case9" />
         </TableRow>
 
@@ -82,18 +82,18 @@
 
             <Button
                 android:id="@+id/btnCase10"
-                android:onClick="onClick"
+                android:onClick="onMultiProcessClick"
                 android:text="case10" />
 
             <Button
                 android:id="@+id/btnCase11"
                 android:layout_width="fill_parent"
-                android:onClick="onClick"
+                android:onClick="onMultiProcessClick"
                 android:text="case11" />
 
             <Button
                 android:id="@+id/btnCase12"
-                android:onClick="onClick"
+                android:onClick="onMultiProcessClick"
                 android:text="case12" />
         </TableRow>
 
@@ -101,18 +101,18 @@
 
             <Button
                 android:id="@+id/btnCase13"
-                android:onClick="onClick"
+                android:onClick="onMultiProcessClick"
                 android:text="case13" />
 
             <Button
                 android:id="@+id/btnCase14"
                 android:layout_width="fill_parent"
-                android:onClick="onClick"
+                android:onClick="onMultiProcessClick"
                 android:text="case14" />
 
             <Button
                 android:id="@+id/btnCase15"
-                android:onClick="onClick"
+                android:onClick="onMultiProcessClick"
                 android:text="case15" />
         </TableRow>
 
@@ -120,18 +120,18 @@
 
             <Button
                 android:id="@+id/btnCase16"
-                android:onClick="onClick"
+                android:onClick="onMultiProcessClick"
                 android:text="case16" />
 
             <Button
                 android:id="@+id/btnCase17"
                 android:layout_width="fill_parent"
-                android:onClick="onClick"
+                android:onClick="onMultiProcessClick"
                 android:text="case17" />
 
             <Button
                 android:id="@+id/btnCase18"
-                android:onClick="onClick"
+                android:onClick="onMultiProcessClick"
                 android:text="case18" />
         </TableRow>
 

@@ -3,15 +3,22 @@ package com.device.impls;
 
 import android.content.Context;
 
+import com.analysys.track.internal.impl.LocationImpl;
+import com.analysys.track.internal.net.DataPackaging;
 import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.service.AnalysysAccessibilityService;
+import com.analysys.track.service.AnalysysJobService;
 import com.analysys.track.service.AnalysysService;
 import com.analysys.track.utils.AccessibilityHelper;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.device.utils.EL;
 import com.device.utils.ProcessUtils;
+
+import org.json.JSONObject;
+
+import java.lang.reflect.Method;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -30,39 +37,16 @@ public class MultiCase {
      * @param caseNum
      */
     public static void runCase(Context context, int caseNum) {
-//        EL.i(ProcessUtils.getCurrentProcessName(context) + "--------->收到case" + caseNum);
 
-        switch (caseNum) {
-            case 1:
-                runCase1(context);
-                break;
-            case 2:
-                runCase2(context);
-                break;
-            case 3:
-                runCase3(context);
-                break;
-            case 4:
-                runCase4(context);
-                break;
-            case 5:
-                runCase5(context);
-                break;
-            case 6:
-                runCase6(context);
-                break;
-            case 7:
-                runCase7(context);
-                break;
-            case 8:
-                runCase8(context);
-                break;
-            case 9:
-                runCase9(context);
-                break;
-            default:
-                break;
+        EL.d(ProcessUtils.getCurrentProcessName(context) + "--- MultiCase  you click  btnCase" + caseNum);
+        try {
+            Class<?> testCase = MultiCase.class;
+            Method runCaseA = testCase.getDeclaredMethod("runCase" + caseNum, Context.class);
+            runCaseA.invoke(null, context);
+        } catch (Throwable e) {
+            EL.v(e);
         }
+
     }
 
     /**
@@ -73,6 +57,8 @@ public class MultiCase {
     public static void runCase1(final Context context) {
         EL.i(ProcessUtils.getCurrentProcessName(context) + "----上传测试----");
         UploadImpl.getInstance(context).upload();
+        EL.i(ProcessUtils.getCurrentProcessName(context) + "----上传重试测试----");
+        UploadImpl.getInstance(context).reTryAndUpload(false);
     }
 
     /**
@@ -97,6 +83,9 @@ public class MultiCase {
         EL.i(ProcessUtils.getCurrentProcessName(context) + "----声明服务结果:" + isS);
         boolean isA = AccessibilityHelper.isAccessibilitySettingsOn(context, AnalysysAccessibilityService.class);
         EL.i(ProcessUtils.getCurrentProcessName(context) + "----声明辅助功能结果:" + isS);
+        EL.i(ProcessUtils.getCurrentProcessName(context) + "----JobService定义测试。。。。");
+        boolean isAnalysysJobServiceDef = AndroidManifestHelper.isJobServiceDefineInManifest(context, AnalysysJobService.class);
+        EL.i(ProcessUtils.getCurrentProcessName(context) + "---JobService 测试结果： " + isAnalysysJobServiceDef);
     }
 
     /**
@@ -125,12 +114,14 @@ public class MultiCase {
     }
 
     public static void runCase5(final Context context) {
-//        EL.i(ProcessUtils.getCurrentProcessName(context) + "----JobService定义测试。。。。");
-//        boolean isAnalysysJobServiceDef = AndroidManifestHelper.isJobServiceDefineInManifest(context, AnalysysJobService.class);
-//        EL.i(ProcessUtils.getCurrentProcessName(context) + "---AnalysysJobService： " + isAnalysysJobServiceDef);
+        EL.e(ProcessUtils.getCurrentProcessName(context) + "----runCase5  LocationImpl 位置信息测试 。。。。");
+        LocationImpl.getInstance(context).processLoctionMsg();
     }
 
     public static void runCase6(final Context context) {
+        EL.e(ProcessUtils.getCurrentProcessName(context) + "----runCase6  测试获取设备信息 。。。。");
+        JSONObject devInfo = DataPackaging.getInstance().getDevInfo(context);
+        EL.e(ProcessUtils.getCurrentProcessName(context) + "----设备信息: " + devInfo.toString());
     }
 
     public static void runCase7(final Context context) {
@@ -140,6 +131,33 @@ public class MultiCase {
     }
 
     public static void runCase9(final Context context) {
+    }
+
+    public static void runCase10(final Context context) {
+    }
+
+    public static void runCase11(final Context context) {
+    }
+
+    public static void runCase12(final Context context) {
+    }
+
+    public static void runCase13(final Context context) {
+    }
+
+    public static void runCase14(final Context context) {
+    }
+
+    public static void runCase15(final Context context) {
+    }
+
+    public static void runCase16(final Context context) {
+    }
+
+    public static void runCase17(final Context context) {
+    }
+
+    public static void runCase18(final Context context) {
     }
 
 

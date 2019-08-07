@@ -260,7 +260,7 @@ public class UploadImpl {
             // 组装DevInfo数据
             JSONObject devJson = null;
             try {
-                devJson = DataPackaging.getDevInfo(mContext);
+                devJson = DataPackaging.getInstance().getDevInfo(mContext);
             } catch (Throwable t) {
             }
             if (devJson != null && devJson.length() > 0) {

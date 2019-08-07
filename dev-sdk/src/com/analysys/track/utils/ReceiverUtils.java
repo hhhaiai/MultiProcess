@@ -9,7 +9,7 @@ import android.os.Build;
 import com.analysys.track.receiver.AnalysysReceiver;
 
 public class ReceiverUtils {
-    private AnalysysReceiver aReceiver = null;
+    private AnalysysReceiver mReceiver = null;
     @SuppressWarnings("unused")
     private boolean sWorkStatus = false;
 
@@ -26,41 +26,56 @@ public class ReceiverUtils {
             // L.i("[%s]----registAllReceiver...begin....",
             // SystemUtils.getCurrentProcessName(mContext));
             setWork(true);
-            if (aReceiver == null) {
-                aReceiver = AnalysysReceiver.getInstance();
+            if (mReceiver == null) {
+                mReceiver = new AnalysysReceiver();
                 // net work
                 IntentFilter intentFilter = new IntentFilter();
                 if (Build.VERSION.SDK_INT < 24) {
                     intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+                    intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+                    context.registerReceiver(mReceiver, intentFilter);
                 }
-                context.registerReceiver(aReceiver, intentFilter);
+                // 启动
+                intentFilter = new IntentFilter();
+                intentFilter.addAction(Intent.ACTION_BOOT_COMPLETED);
+                intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+                context.registerReceiver(mReceiver, intentFilter);
 
-                // 解锁,更新网络
+                // 连接、断开电源
+                intentFilter = new IntentFilter();
+                intentFilter.addAction(Intent.ACTION_POWER_CONNECTED);
+                intentFilter.addAction(Intent.ACTION_POWER_DISCONNECTED);
+                intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+                context.registerReceiver(mReceiver, intentFilter);
+
+
+                //解锁唤醒
                 intentFilter = new IntentFilter();
                 intentFilter.addAction(Intent.ACTION_USER_PRESENT);
-                context.registerReceiver(aReceiver, intentFilter);
+                intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+                context.registerReceiver(mReceiver, intentFilter);
 
                 // battery
                 intentFilter = new IntentFilter();
                 intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
-                context.registerReceiver(aReceiver, intentFilter);
+                intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+                context.registerReceiver(mReceiver, intentFilter);
 
                 // IUUinfo
                 intentFilter = new IntentFilter();
                 intentFilter.addAction(Intent.ACTION_PACKAGE_ADDED);
+                intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
                 intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
                 intentFilter.addAction(Intent.ACTION_PACKAGE_REPLACED);
                 intentFilter.addDataScheme("package");
-                context.registerReceiver(aReceiver, intentFilter);
+                context.registerReceiver(mReceiver, intentFilter);
 
                 // 关屏、锁屏
                 intentFilter = new IntentFilter();
                 intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
                 intentFilter.addAction(Intent.ACTION_SCREEN_ON);
-                intentFilter.setPriority(Integer.MAX_VALUE);
-                context.registerReceiver(aReceiver, intentFilter);
-                // L.i("[%s]----registAllReceiver...over....",
-                // SystemUtils.getCurrentProcessName(mContext));
+                intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+                context.registerReceiver(mReceiver, intentFilter);
             }
         } catch (Throwable e) {
         }

@@ -73,7 +73,7 @@ public class LocationImpl {
         return LocationImpl.Holder.INSTANCE;
     }
 
-    public void location() {
+    public void processLoctionMsg() {
         try {
             long currentTime = System.currentTimeMillis();
             MessageDispatcher.getInstance(mContext).locationInfo(EGContext.LOCATION_CYCLE);

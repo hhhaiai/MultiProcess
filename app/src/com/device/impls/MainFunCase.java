@@ -10,75 +10,42 @@ import com.device.utils.AssetsHelper;
 import com.device.utils.EL;
 import com.device.utils.MyLooper;
 import com.device.utils.ProcessUtils;
-import com.umeng.analytics.MobclickAgent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
- * @Description: 测试case实现类
+ * @Description: 单进程功能测试类
  * @Version: 1.0
  * @Create: 2019-07-27 14:19:53
  * @author: sanbo
  * @mail: xueyongfu@analysys.com.cn
  */
-public class TestCasesImpl {
+public class MainFunCase {
 
     /**
      * 接收到方法
      *
      * @param context
-     * @param caseNum
+     * @param x
      */
-    public static void runCase(Context context, int caseNum) {
-        MobclickAgent.onEvent(context, "[" + ProcessUtils.getCurrentProcessName(context) + "]测试-case" + caseNum);
-
-        EL.d(ProcessUtils.getCurrentProcessName(context) + "--- you click  btnCase" + caseNum);
-
-        //多进程测试
-        if (caseNum < 1000) {
-            MultiProcessWorker.postMultiMessages(context, caseNum);
-        } else {
-            switch (caseNum) {
-                case 1001:
-                    runCaseP1(context);
-                    break;
-                case 1002:
-                    runCaseP2(context);
-                    break;
-                case 1003:
-                    runCaseP3(context);
-                    break;
-                case 1004:
-                    runCaseP4(context);
-                    break;
-                case 1005:
-                    runCaseP5(context);
-                    break;
-                case 1006:
-                    runCaseP6(context);
-                    break;
-                case 1007:
-                    runCaseP7(context);
-                    break;
-                case 1008:
-                    runCaseP8(context);
-                    break;
-                default:
-                    break;
-            }
+    public static void runCase(Context context, String x) {
+        EL.d(ProcessUtils.getCurrentProcessName(context) + "--- you click  btnCase" + x);
+        try {
+            Class<?> testCase = MainFunCase.class;
+            Method runCaseA = testCase.getDeclaredMethod("runCaseP" + x, Context.class);
+            runCaseA.invoke(null, context);
+        } catch (Throwable e) {
+            EL.v(e);
         }
 
     }
 
-
-    /**************************************************************************************/
-    /********************************** 功能测试区************************************/
-    /**************************************************************************************/
 
     // 1. 测试发起请求，接收策略
     private static void runCaseP1(final Context context) {

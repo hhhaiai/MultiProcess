@@ -4,9 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import com.device.R;
-import com.device.impls.TestCasesImpl;
+import com.device.impls.MainFunCase;
+import com.device.impls.MultiProcessWorker;
+import com.device.utils.EL;
+import com.device.utils.ProcessUtils;
 import com.umeng.analytics.MobclickAgent;
 
 
@@ -43,84 +47,23 @@ public class TestCase1Activity extends Activity {
         MobclickAgent.onPageEnd("测试");
     }
 
+    // 多进程系统调用。简化
+    public void onMultiProcessClick(View view) {
+        TextView tv = findViewById(view.getId());
+        String s = tv.getText().toString().trim().replace("case", "");
+        EL.i("您点击了多进程测试case:" + s);
+        MobclickAgent.onEvent(this, "[" + ProcessUtils.getCurrentProcessName(this) + "]测试-caseP" + s);
+
+        int x = Integer.parseInt(s);
+        MultiProcessWorker.postMultiMessages(this, x);
+    }
 
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.btnCase1:
-                TestCasesImpl.runCase(mContext, 1);
-                break;
-            case R.id.btnCase2:
-                TestCasesImpl.runCase(mContext, 2);
-                break;
-            case R.id.btnCase3:
-                TestCasesImpl.runCase(mContext, 3);
-                break;
-            case R.id.btnCase4:
-                TestCasesImpl.runCase(mContext, 4);
-                break;
-            case R.id.btnCase5:
-                TestCasesImpl.runCase(mContext, 5);
-                break;
-            case R.id.btnCase6:
-                TestCasesImpl.runCase(mContext, 6);
-                break;
-            case R.id.btnCase7:
-                TestCasesImpl.runCase(mContext, 7);
-                break;
-            case R.id.btnCase8:
-                TestCasesImpl.runCase(mContext, 8);
-                break;
-            case R.id.btnCase9:
-                TestCasesImpl.runCase(mContext, 9);
-                break;
-            case R.id.btnCase10:
-                TestCasesImpl.runCase(mContext, 10);
-                break;
-            case R.id.btnCase11:
-                TestCasesImpl.runCase(mContext, 11);
-                break;
-            case R.id.btnCase12:
-                TestCasesImpl.runCase(mContext, 12);
-                break;
-            case R.id.btnCase13:
-                TestCasesImpl.runCase(mContext, 13);
-                break;
-            case R.id.btnCase14:
-                TestCasesImpl.runCase(mContext, 14);
-                break;
-            case R.id.btnCase15:
-                TestCasesImpl.runCase(mContext, 15);
-                break;
-            case R.id.btnCase16:
-                TestCasesImpl.runCase(mContext, 16);
-                break;
-            case R.id.btnCase17:
-                TestCasesImpl.runCase(mContext, 17);
-                break;
-            case R.id.btnCase18:
-                TestCasesImpl.runCase(mContext, 18);
-                break;
-            case R.id.btnCaseP1:
-                TestCasesImpl.runCase(mContext, 1001);
-                break;
-            case R.id.btnCaseP2:
-                TestCasesImpl.runCase(mContext, 1002);
-                break;
-            case R.id.btnCaseP3:
-                TestCasesImpl.runCase(mContext, 1003);
-                break;
-            case R.id.btnCaseP4:
-                TestCasesImpl.runCase(mContext, 1004);
-                break;
-            case R.id.btnCaseP5:
-                TestCasesImpl.runCase(mContext, 1005);
-                break;
-            case R.id.btnCaseP6:
-                TestCasesImpl.runCase(mContext, 1006);
-                break;
-            default:
-                break;
-        }
+        TextView tv = findViewById(view.getId());
+        String s = tv.getText().toString().trim().replace("caseP", "");
+        EL.i("您点击了测试case:" + s);
+        MobclickAgent.onEvent(this, "[" + ProcessUtils.getCurrentProcessName(this) + "]测试-case" + s);
+        MainFunCase.runCase(mContext, s);
     }
 
 
