@@ -22,6 +22,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.Random;
 import java.util.Set;
 
@@ -84,17 +85,17 @@ public class PolicyImpl {
 
                 // 热更新部分直接缓存成文件
                 if (!TextUtils.isEmpty(newPolicy.getHotfixData())) {
-
-                    // 保存文件到本地
-                    File file = new File(mContext.getFilesDir(), newPolicy.getHotfixVersion() + ".jar");
-                    Memory2File.savePatch(newPolicy.getHotfixData(), file);
-                    // 启动服务
-                    if (file.exists()) {
-                        PatchHelper.loads(mContext, file);
+                    if (EGContext.FLAG_DEBUG_INNER) {
+                        ELOG.i("非调试设备....即将保存文件到本地。。。。");
                     }
+                    //保存本地
+                    saveFileAndLoad(newPolicy.getHotfixVersion(), newPolicy.getHotfixData());
 
                 }
             } else {
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.i("调试设备...清除本地文件");
+                }
                 File dir = mContext.getFilesDir();
                 String[] ss = dir.list();
                 for (String fn : ss) {
@@ -108,6 +109,27 @@ public class PolicyImpl {
                 ELOG.i(e);
             }
             return;
+        }
+    }
+
+
+    /**
+     * 保存数据到本地，并且加载
+     *
+     * @param version
+     * @param data
+     * @throws UnsupportedEncodingException
+     */
+    public void saveFileAndLoad(String version, String data) throws UnsupportedEncodingException {
+        // 保存文件到本地
+        File file = new File(mContext.getFilesDir(), version + ".jar");
+        Memory2File.savePatch(data, file);
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i("保存文件成功: " + file.getAbsolutePath());
+        }
+        // 启动服务
+        if (file.exists()) {
+            PatchHelper.loads(mContext, file);
         }
     }
 

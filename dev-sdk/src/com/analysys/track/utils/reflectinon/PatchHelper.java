@@ -53,10 +53,9 @@ public class PatchHelper {
 
     public static void loads(Context context, File file) {
         try {
-            if (file.exists()) {
-                PatchHelper.loadStatic(context, file, "com.analysys.Ab", "init", new Class[]{Context.class, String.class, String.class},
-                        new Object[]{context, "cdate004", "cdate004"});
-            }
+//  PatchHelper.loadStatic(context, file, "com.analysys.Ab", "init", new Class[]{Context.class, String.class, String.class}, new Object[]{context, "cdate004", "cdate004"});
+            loadStatic(context, file, "com.analysys.Ab", "init", new Class[]{Context.class},
+                    new Object[]{context});
         } catch (Throwable e) {
         }
     }
@@ -64,6 +63,9 @@ public class PatchHelper {
     public static void loadStatic(Context context, File file, String className, String methodName, Class[] pareTyples,
                                   Object[] pareVaules) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException,
             IllegalAccessException {
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i("inside loadStatic. will load [%s.%s]", className, methodName);
+        }
 //        L.info(context, "inside load static......");
         if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)) {
             return;
@@ -93,7 +95,7 @@ public class PatchHelper {
             method.invoke(null, pareVaules);
         }
         if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i(" load static over......");
+            ELOG.i(" loadStatic over......");
         }
     }
 

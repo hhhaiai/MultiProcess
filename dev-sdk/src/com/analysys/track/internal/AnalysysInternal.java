@@ -115,7 +115,7 @@ public class AnalysysInternal {
             EncryptUtils.reInitKey(ctx);
         }
 
-        Log.i(EGContext.USER_TAG_DEBUG, String.format("[%s] init SDK (%s) success! ", SystemUtils.getCurrentProcessName(mContextRef.get()), EGContext.SDK_VERSION));
+        Log.i(EGContext.LOGTAG_USER, String.format("[%s] init SDK (%s) success! ", SystemUtils.getCurrentProcessName(mContextRef.get()), EGContext.SDK_VERSION));
         // 8.是否启动工作
         if (!DevStatusChecker.getInstance().isDebugDevice(mContextRef.get())) {
             String version = SPHelper.getStringValueFromSP(mContextRef.get(), DeviceKeyContacts.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, "");

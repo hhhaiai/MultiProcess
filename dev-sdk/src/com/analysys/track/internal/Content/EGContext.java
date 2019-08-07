@@ -12,19 +12,19 @@ public class EGContext {
     /**
      * EGuan 内部调试控制. 主要用于控制堆栈打印、错误打印、内部提示信息打印
      */
-    public static final boolean FLAG_DEBUG_INNER = false;
+    public static final boolean FLAG_DEBUG_INNER = true;
     /**
      * SDK版本
      */
     public static final String SDK_VERSION = "4.3.0.3|20190806";
-    public static final String LOGTAG_DEBUG = "sanbo";
-    public static final String USER_TAG_DEBUG = "analysys";
+    public static final String SDK_TYPE = "Android";
+    public static final String LOGTAG_INNER = "sanbo";
+    public static final String LOGTAG_USER = "analysys";
     /**
      * xml 中声明的 appid、channel
      */
     public static final String XML_METADATA_APPKEY = "ANALYSYS_APPKEY";
     public static final String XML_METADATA_CHANNEL = "ANALYSYS_CHANNEL";
-    public static final String SERVICE_NAME = "AnalysysService";
     // 应用列表获取周期时间,3个小时
     public static final int SNAPSHOT_CYCLE = 3 * 60 * 60 * 1000;
     public static final String SP_SNAPSHOT_CYCLE = "SP_SNAPSHOT_CYCLE";
@@ -40,12 +40,13 @@ public class EGContext {
     public static final int UPLOAD_CYCLE = 6 * 60 * 60 * 1000;
     // 心跳检查
     public static final int CHECK_HEARTBEAT_CYCLE = 5 * 1000;
-    public static final String HEARTBEAT_LAST_TIME = "HEART_BETA";
+
+
     // 发送失败后重复发送的心跳检查
     public static final int CHECK_RETRY_CYCLE = 5 * 1000;
     public static final String SP_APP_KEY = "appKey";
     public static final String SP_APP_CHANNEL = "appChannel";
-    // public static final String SP_LOCATION_TIME = "getLocationTime";
+
     public static final String SP_MAC_ADDRESS = "MACAddress";
     public static final String SP_APP_IDFA = "appIDFA";
     // 蓝牙
@@ -73,25 +74,25 @@ public class EGContext {
     public static final String SNAP_SHOT_INSTALL = "0";
     public static final String SNAP_SHOT_UNINSTALL = "1";
     public static final String SNAP_SHOT_UPDATE = "2";
+    public static final String SP_NAME = "eg_policy";
+    public static final String LAST_LOCATION = "last_location";
+    public static final String TMPID = "tmp_id";
+    public static final int SERVER_DELAY_DEFAULT = 0;
+    // 上传重试次数，默认3次
+    public static final int FAIL_COUNT_DEFALUT = 3;
+    // 上传重试时间间隔默认60-70s
+    public static final long FAIL_TRY_DELAY_DEFALUT = 60000;
+    // 地理位置信息获取距离/米
+    public static final long MINDISTANCE = 1000;
+    public final static String URL_SCHEME = "http://";
+
+
     public static final String NETWORK_TYPE_2G = "2G";
     public static final String NETWORK_TYPE_3G = "3G";
     public static final String NETWORK_TYPE_4G = "4G";
     public static final String NETWORK_TYPE_5G = "5G";
     public static final String NETWORK_TYPE_WIFI = "WIFI";
     public static final String NETWORK_TYPE_NO_NET = "无网络";
-    public static final String SP_NAME = "eg_policy";
-    public static final String LAST_LOCATION = "last_location";
-    public static final String TMPID = "tmp_id";
-    public static final int SERVER_DELAY_DEFAULT = 0;
-    public static final int FAIL_COUNT_DEFALUT = 3;// 上传重试次数，默认3次
-    public static final long FAIL_TRY_DELAY_DEFALUT = 60000;// 上传重试时间间隔默认60-70s
-    public static final long MINDISTANCE = 1000;// 地理位置信息获取距离/米
-    public final static String URL_SCHEME = "http://";
-//    public static final int TIMER_INTERVAL_DEFALUT = 5 * 1000;
-//    /**
-//     * 实时上传端口
-//     */
-//    public final static String RT_PORT = ":8099";
     /**
      * 非实时上传端口
      */
@@ -217,10 +218,14 @@ public class EGContext {
     public static final String MODULE_XXX = "M_XXX";
     public static final String SPUTIL = "sptrack";
     /**
+     * 判断是否debug App列表
+     */
+    public static final String TEXT_DEBUG_APP = "packageName";
+    public static final String TEXT_DEBUG_STATUS = "debugable";
+    /**
      * 用户debug控制
      */
     public static boolean FLAG_DEBUG_USER = false;
-
     public static String VALUE_APPKEY = "";
     public static String VALUE_APP_CHANNEL = "";
     public static String EGUAN_CHANNEL_PREFIX = "EGUAN_CHANNEL_";
@@ -235,11 +240,6 @@ public class EGContext {
      * 是否USB调试状态
      */
     public static boolean STATUS_USB_DEBUG = false;
-    /**
-     * 判断是否debug App列表
-     */
-    public static final String TEXT_DEBUG_APP = "packageName";
-    public static final String TEXT_DEBUG_STATUS = "debugable";
 
 
     // public static final String APP_URL_SP = "app_url_sp";
@@ -250,5 +250,12 @@ public class EGContext {
 //    public static final String USERTP_URL = URL_SCHEME + RT_DOMAIN_NAME + RT_PORT;
 //    public static final String EGIDKEY = "egid";
     // public static final String TEST_CALLBACK_DOMAIN_NAME = "192.168.8.150";
-
+    // public static final String SP_LOCATION_TIME = "getLocationTime";
+//    public static final String HEARTBEAT_LAST_TIME = "HEART_BETA";
+//    public static final String SERVICE_NAME = "AnalysysService";
+    //    public static final int TIMER_INTERVAL_DEFALUT = 5 * 1000;
+//    /**
+//     * 实时上传端口
+//     */
+//    public final static String RT_PORT = ":8099";
 }

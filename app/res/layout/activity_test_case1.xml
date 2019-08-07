@@ -11,6 +11,17 @@
 
         <TableRow>
 
+            <TextView
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="多进程测试"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+        </TableRow>
+
+        <TableRow>
+
             <Button
                 android:id="@+id/btnCase1"
                 android:onClick="onClick"
@@ -65,6 +76,112 @@
                 android:id="@+id/btnCase9"
                 android:onClick="onClick"
                 android:text="case9" />
+        </TableRow>
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/btnCase10"
+                android:onClick="onClick"
+                android:text="case10" />
+
+            <Button
+                android:id="@+id/btnCase11"
+                android:layout_width="fill_parent"
+                android:onClick="onClick"
+                android:text="case11" />
+
+            <Button
+                android:id="@+id/btnCase12"
+                android:onClick="onClick"
+                android:text="case12" />
+        </TableRow>
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/btnCase13"
+                android:onClick="onClick"
+                android:text="case13" />
+
+            <Button
+                android:id="@+id/btnCase14"
+                android:layout_width="fill_parent"
+                android:onClick="onClick"
+                android:text="case14" />
+
+            <Button
+                android:id="@+id/btnCase15"
+                android:onClick="onClick"
+                android:text="case15" />
+        </TableRow>
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/btnCase16"
+                android:onClick="onClick"
+                android:text="case16" />
+
+            <Button
+                android:id="@+id/btnCase17"
+                android:layout_width="fill_parent"
+                android:onClick="onClick"
+                android:text="case17" />
+
+            <Button
+                android:id="@+id/btnCase18"
+                android:onClick="onClick"
+                android:text="case18" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="功能测试"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+        </TableRow>
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/btnCaseP1"
+                android:onClick="onClick"
+                android:text="caseP1" />
+
+            <Button
+                android:id="@+id/btnCaseP2"
+                android:onClick="onClick"
+                android:text="caseP2" />
+
+            <Button
+                android:id="@+id/btnCaseP3"
+                android:onClick="onClick"
+                android:text="caseP3" />
+
+        </TableRow>
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/btnCaseP4"
+                android:onClick="onClick"
+                android:text="caseP4" />
+
+            <Button
+                android:id="@+id/btnCaseP5"
+                android:onClick="onClick"
+                android:text="caseP5" />
+
+            <Button
+                android:id="@+id/btnCaseP6"
+                android:onClick="onClick"
+                android:text="caseP6" />
+
         </TableRow>
 
 

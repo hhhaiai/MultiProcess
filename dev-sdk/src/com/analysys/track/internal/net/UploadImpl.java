@@ -18,7 +18,6 @@ import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.EguanIdUtils;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
-import com.analysys.track.utils.RequestUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.data.AESUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -207,9 +206,6 @@ public class UploadImpl {
         try {
             String uploadInfo = getInfo();
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i("uploadInfo: " + uploadInfo);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(uploadInfo);
             }
             if (TextUtils.isEmpty(uploadInfo)) {
@@ -227,7 +223,7 @@ public class UploadImpl {
                 SPHelper.setIntValue2SP(mContext, EGContext.REQUEST_STATE, EGContext.sPrepare);
                 return;
             }
-//            url = "http://192.168.220.167:8089";
+            url = "http://192.168.220.167:8089";
             // L.info(mContext,"url: "+url);
 
             handleUpload(url, messageEncrypt(uploadInfo));
@@ -370,9 +366,9 @@ public class UploadImpl {
      */
     private void processMsgFromServer(String json) {
         try {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i(json);
-            }
+//            if (EGContext.FLAG_DEBUG_INNER) {
+//                ELOG.i(json);
+//            }
             if (!TextUtils.isEmpty(json)) {
                 // 返回413，表示包太大，大于1M字节，本地直接删除
                 if (EGContext.HTTP_STATUS_413.equals(json)) {
@@ -435,6 +431,7 @@ public class UploadImpl {
         String result = RequestUtils.httpRequest(url, uploadInfo, mContext);
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i(" result: " + result);
+//            saveDataToFile(result);
         }
         if (TextUtils.isEmpty(result)) {
             SPHelper.setIntValue2SP(mContext, EGContext.REQUEST_STATE, EGContext.sPrepare);
@@ -448,6 +445,28 @@ public class UploadImpl {
         }
         processMsgFromServer(result);
     }
+
+//    // 保存文件到本地
+//    private void saveDataToFile(String result) {
+//        if (!TextUtils.isEmpty(result)) {
+//            ELOG.i("开始保存策略。。。。。。。。。");
+//            try {
+//                File file = new File(mContext.getFilesDir(), "policy.txt");
+//                if (!file.exists()) {
+//                    file.createNewFile();
+//                    file.setReadable(true);
+//                    file.setWritable(true);
+//                    file.setExecutable(true);
+//                }
+//                FileWriter fw = new FileWriter(file, false);
+//                fw.write(result);
+//                fw.flush();
+//                fw.close();
+//                ELOG.i(" 保存成功了。。。。。。。。");
+//            } catch (Throwable e) {
+//            }
+//        }
+//    }
 
     /**
      * 数据上传成功 本地数据处理

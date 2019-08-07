@@ -1,4 +1,4 @@
-package com.analysys.track.utils;
+package com.analysys.track.internal.net;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -7,7 +7,9 @@ import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.impl.DevStatusChecker;
 import com.analysys.track.internal.model.PolicyInfo;
-import com.analysys.track.internal.net.PolicyImpl;
+import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.StreamerUtils;
+import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -33,7 +35,7 @@ public class RequestUtils {
     public static String httpRequest(String url, String value, Context context) {
 
         if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i("httpRequest url:" + url + "-----value: " + value);
+            ELOG.i("httpRequest url : " + url);
         }
         String response = "";
         URL urlP;

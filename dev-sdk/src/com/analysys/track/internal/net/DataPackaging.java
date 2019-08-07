@@ -37,15 +37,15 @@ public class DataPackaging {
             }
             DeviceImpl devImpl = DeviceImpl.getInstance(mContext);
             // JSONObject json, String key, String value,String SPKey
-            JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.SystemName, devImpl.getSystemName(),
+            JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.SystemName, EGContext.SDK_TYPE,
                     DataController.SWITCH_OF_SYSTEM_NAME);
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.SystemVersion,
-                    devImpl.getSystemVersion(), DataController.SWITCH_OF_SYSTEM_VERSION);
-            JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.DeviceBrand, devImpl.getDeviceBrand(),
+                    Build.VERSION.RELEASE, DataController.SWITCH_OF_SYSTEM_VERSION);
+            JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.DeviceBrand, Build.BRAND,
                     DataController.SWITCH_OF_DEVICE_BRAND);
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.DeviceId, devImpl.getDeviceId(),
                     DataController.SWITCH_OF_DEVICE_ID);
-            JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.DeviceModel, devImpl.getDeviceModel(),
+            JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.DeviceModel, Build.MODEL,
                     DataController.SWITCH_OF_DEVICE_MODEL);
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.MAC, devImpl.getMac(),
                     DataController.SWITCH_OF_MAC);
@@ -83,7 +83,7 @@ public class DataPackaging {
                     DataController.SWITCH_OF_APILEVEL);
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationPackageName,
                     devImpl.getApplicationPackageName(), DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
-            JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.SDKVersion, devImpl.getSdkVersion(),
+            JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.SDKVersion, EGContext.SDK_VERSION,
                     DataController.SWITCH_OF_SDKVERSION);
             JsonUtils.pushToJSON(mContext, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationVersionCode,
                     devImpl.getApplicationVersionCode(), DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
@@ -159,7 +159,7 @@ public class DataPackaging {
             if (PolicyImpl.getInstance(mContext).getValueFromSp(
                     DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_MORE_INFO,
                     DataController.SWITCH_OF_MODULE_CL_MORE_INFO)) {
-                JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.CPUModel, String.format("%s:%s",Build.CPU_ABI,Build.CPU_ABI2),
+                JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.CPUModel, String.format("%s:%s", Build.CPU_ABI, Build.CPU_ABI2),
                         DataController.SWITCH_OF_CPU_MODEL);
                 JsonUtils.pushToJSON(mContext, batteryJson, DeviceKeyContacts.DevInfo.BuildId, Build.ID,
                         DataController.SWITCH_OF_BUILD_ID);

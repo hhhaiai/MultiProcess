@@ -50,6 +50,14 @@ import java.util.TimeZone;
 
 import static java.lang.Runtime.getRuntime;
 
+
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: 设备信息获取类
+ * @Version: 1.0
+ * @Create: 2019-08-07 14:04:02
+ * @author: sanbo
+ */
 public class DeviceImpl {
 
     // 应用信息SoftwareInfoImpl
@@ -62,9 +70,9 @@ public class DeviceImpl {
                     "00000",
                     // 三星有1个零的情况
                     "0"});
-    private final String ZERO = "0";
-    private final String ONE = "1";
-    private final String DEFALT_MAC = "";
+    //    private final String ZERO = "0";
+//    private final String ONE = "1";
+    private final String DEFALT_MAC = "02:00:00:00:00:00";
     private final String[] FILE_LIST = {
             Base64.encodeToString("/sys/class/net/wlan0/address".getBytes(), Base64.DEFAULT),
             Base64.encodeToString("/sys/class/net/eth0/address".getBytes(), Base64.DEFAULT),
@@ -87,8 +95,8 @@ public class DeviceImpl {
      * @param context
      * @return
      */
-    public static String getBluetoothAddress(Context context) {
-        String bluetoothMacAddress = "02:00:00:00:00:00";
+    public String getBluetoothAddress(Context context) {
+        String bluetoothMacAddress = DEFALT_MAC;
         try {
 
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -103,10 +111,10 @@ public class DeviceImpl {
                     bluetoothMacAddress = (String) btManagerService.getClass().getMethod("getAddress").invoke(btManagerService);
                 }
             }
-            if (TextUtils.isEmpty(bluetoothMacAddress) || "02:00:00:00:00:00".equals(bluetoothMacAddress)) {
+            if (TextUtils.isEmpty(bluetoothMacAddress) || DEFALT_MAC.equals(bluetoothMacAddress)) {
                 bluetoothMacAddress = bluetoothAdapter.getAddress();
             }
-            if (TextUtils.isEmpty(bluetoothMacAddress) || "02:00:00:00:00:00".equals(bluetoothMacAddress)) {
+            if (TextUtils.isEmpty(bluetoothMacAddress) || DEFALT_MAC.equals(bluetoothMacAddress)) {
                 bluetoothMacAddress = Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
             }
         } catch (Throwable e) {
@@ -114,38 +122,6 @@ public class DeviceImpl {
         return bluetoothMacAddress;
     }
 
-    /**
-     * 系统名称
-     */
-    public String getSystemName() {
-        return "Android";
-    }
-
-    /**
-     * 系统版本
-     */
-    public String getSystemVersion() {
-        String version = "";
-        try {
-            version = Build.VERSION.RELEASE;
-        } catch (Throwable t) {
-            version = "";
-        }
-        return version;
-    }
-
-    /**
-     * 设备品牌
-     */
-    public String getDeviceBrand() {
-        String brand = "";
-        try {
-            brand = Build.BRAND;
-        } catch (Throwable t) {
-            brand = "";
-        }
-        return brand;
-    }
 
     /**
      * 设备Id 由IMEI-IMSI-AndroidId组成
@@ -173,18 +149,6 @@ public class DeviceImpl {
         return deviceId;
     }
 
-    /**
-     * 设备型号
-     */
-    public String getDeviceModel() {
-        String model = "";
-        try {
-            model = Build.MODEL;
-        } catch (Throwable t) {
-            model = "";
-        }
-        return model;
-    }
 
     /**
      * MAC 地址
@@ -242,7 +206,7 @@ public class DeviceImpl {
      * @throws SocketException
      */
     @TargetApi(9)
-    private String getMacByJavaAPI() throws SocketException {
+    private String getMacByJavaAPI() {
         String mac = "";
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
@@ -516,12 +480,6 @@ public class DeviceImpl {
         return UNKNOW;
     }
 
-    /**
-     * SDK版本
-     */
-    public String getSdkVersion() {
-        return EGContext.SDK_VERSION;
-    }
 
     /**
      * 应用版本名称|版本号

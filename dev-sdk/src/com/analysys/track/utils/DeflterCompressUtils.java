@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.impl.DevStatusChecker;
-import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.utils.data.Md5Utils;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -63,7 +62,7 @@ public class DeflterCompressUtils {
             SPHelper.setStringValue2SP(ctx, EGContext.APPKEY, value);
             value = value.substring(0, 3);
         }
-        String sdkv = DeviceImpl.getInstance(ctx).getSdkVersion();
+        String sdkv = EGContext.SDK_VERSION;
         SPHelper.setStringValue2SP(ctx, EGContext.SDKV, sdkv);
         if (sdkv.contains("|")) {
             sdkv = sdkv.substring(0, sdkv.indexOf("|")).replace(".", "");
@@ -71,9 +70,11 @@ public class DeflterCompressUtils {
             sdkv = sdkv.replace(".", "");
         }
         sb.append(sdkv);// 版本号-主版本号去掉点---规则变动，不需要处理了
-
 //        sb.append(DeviceImpl.getInstance(ctx).getDebug());// 是否debug模式，0/1值
-        sb.append(DevStatusChecker.getInstance().isSelfDebugApp(ctx) ? "1" : "0");// 是否debug模式，0/1值
+        // app自身的debug模式
+//        sb.append(DevStatusChecker.getInstance().isSelfDebugApp(ctx) ? "1" : "0");// 是否debug模式，0/1值
+        // 是否debug模式，0/1值
+        sb.append(DevStatusChecker.getInstance().isSelfDebugApp(ctx) ? "1" : "0");
         sb.append(value);// 前三位
         long time = System.currentTimeMillis();
         SPHelper.setStringValue2SP(ctx, EGContext.TIME, String.valueOf(time));

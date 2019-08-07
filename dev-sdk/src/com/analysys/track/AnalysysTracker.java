@@ -32,6 +32,6 @@ public class AnalysysTracker {
      */
     public static void setDebugMode(boolean isDebug) {
         EGContext.FLAG_DEBUG_USER = isDebug;
-//        Log.i(EGContext.USER_TAG_DEBUG, "setDebugMode ::" + isDebug);
+//        Log.i(EGContext.LOGTAG_USER, "setDebugMode ::" + isDebug);
     }
 }

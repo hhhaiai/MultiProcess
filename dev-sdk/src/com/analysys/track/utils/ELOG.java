@@ -80,9 +80,9 @@ public class ELOG {
     // 是否格式化展示,主要针对JSON+简易调用堆栈的控制
     private static boolean isFormat = true;
     // 默认tag
-    private static String DEFAULT_TAG = EGContext.LOGTAG_DEBUG;
+    private static String DEFAULT_TAG = EGContext.LOGTAG_INNER;
     // user tag
-    private static String USER_TAG = EGContext.USER_TAG_DEBUG;
+    private static String USER_TAG = EGContext.LOGTAG_USER;
     // 临时tag.用法：调用log中大于1个参数,且第一个参数为字符串,且不是format用法,字符串长度没超过协议值,此时启用临时tag
     private static String TEMP_TAG = "";
     // 规定每段显示的长度.每行最大日志长度 (Android Studio3.1最多2902字符)

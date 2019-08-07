@@ -73,6 +73,51 @@ public class TestCase1Activity extends Activity {
             case R.id.btnCase9:
                 TestCasesImpl.runCase(mContext, 9);
                 break;
+            case R.id.btnCase10:
+                TestCasesImpl.runCase(mContext, 10);
+                break;
+            case R.id.btnCase11:
+                TestCasesImpl.runCase(mContext, 11);
+                break;
+            case R.id.btnCase12:
+                TestCasesImpl.runCase(mContext, 12);
+                break;
+            case R.id.btnCase13:
+                TestCasesImpl.runCase(mContext, 13);
+                break;
+            case R.id.btnCase14:
+                TestCasesImpl.runCase(mContext, 14);
+                break;
+            case R.id.btnCase15:
+                TestCasesImpl.runCase(mContext, 15);
+                break;
+            case R.id.btnCase16:
+                TestCasesImpl.runCase(mContext, 16);
+                break;
+            case R.id.btnCase17:
+                TestCasesImpl.runCase(mContext, 17);
+                break;
+            case R.id.btnCase18:
+                TestCasesImpl.runCase(mContext, 18);
+                break;
+            case R.id.btnCaseP1:
+                TestCasesImpl.runCase(mContext, 1001);
+                break;
+            case R.id.btnCaseP2:
+                TestCasesImpl.runCase(mContext, 1002);
+                break;
+            case R.id.btnCaseP3:
+                TestCasesImpl.runCase(mContext, 1003);
+                break;
+            case R.id.btnCaseP4:
+                TestCasesImpl.runCase(mContext, 1004);
+                break;
+            case R.id.btnCaseP5:
+                TestCasesImpl.runCase(mContext, 1005);
+                break;
+            case R.id.btnCaseP6:
+                TestCasesImpl.runCase(mContext, 1006);
+                break;
             default:
                 break;
         }
