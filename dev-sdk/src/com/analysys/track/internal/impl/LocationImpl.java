@@ -28,6 +28,7 @@ import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
+import com.analysys.track.utils.reflectinon.RefleUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -402,7 +403,7 @@ public class LocationImpl {
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 jsonArray = new JSONArray();
                 try {
-                    if (DoubleCardSupport.hasMethod(mTelephonyManager.getClass().getName(), "getNeighboringCellInfo",
+                    if (RefleUtils.hasMethod(mTelephonyManager.getClass().getName(), "getNeighboringCellInfo",
                             List.class)) {
                         List<NeighboringCellInfo> list = mTelephonyManager.getNeighboringCellInfo();
                         if (list != null && list.size() > 0) {

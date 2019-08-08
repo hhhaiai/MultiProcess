@@ -8,6 +8,14 @@ import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.internal.work.ServiceHelper;
 
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: TODO
+ * @Version: 1.0
+ * @Create: 2019-08-08 10:46:43
+ * @author: sanbo
+ * @mail: xueyongfu@analysys.com.cn
+ */
 @TargetApi(21)
 public class AnalysysJobService extends JobService {
 

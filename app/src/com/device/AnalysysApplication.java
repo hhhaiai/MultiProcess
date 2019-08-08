@@ -36,6 +36,7 @@ public class AnalysysApplication extends Application {
         super.onCreate();
         initAnalysys();
         MultiProcessWorker.runServices(this);
+        EL.init(this);
     }
 
     /**

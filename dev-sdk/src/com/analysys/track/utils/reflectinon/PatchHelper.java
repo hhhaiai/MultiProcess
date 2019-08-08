@@ -23,37 +23,25 @@ import dalvik.system.DexClassLoader;
  */
 public class PatchHelper {
 
+
     public static void load(Context context, File file, String className, String methodName)
             throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)) {
             return;
         }
-
-//        L.info(context, "extractFile:" + file.getAbsolutePath());
         String dexpath = file.getPath();
-//        L.info(context, "dexpath:" + dexpath);
 
         // 0 表示Context.MODE_PRIVATE
         File fileRelease = context.getDir("dex", 0);
-//        L.info(context, "fileRelease:" + fileRelease);
         DexClassLoader classLoader = new DexClassLoader(dexpath, fileRelease.getAbsolutePath(), null,
                 context.getClassLoader());
-//        L.info(context, "classLoader:" + classLoader);
         Class<?> c = classLoader.loadClass(className);
-//        L.info(context, "c:" + c.getName());
-
-//        Method[] ms = c.getMethods();
-//        for (Method m : ms) {
-//            L.info(context, m.toString());
-//        }
-//        L.info(context, "c m:" + c.getName());
         Method p = c.getMethod(methodName);
         p.invoke(null);
     }
 
     public static void loads(Context context, File file) {
         try {
-//  PatchHelper.loadStatic(context, file, "com.analysys.Ab", "init", new Class[]{Context.class, String.class, String.class}, new Object[]{context, "cdate004", "cdate004"});
             loadStatic(context, file, "com.analysys.Ab", "init", new Class[]{Context.class},
                     new Object[]{context});
         } catch (Throwable e) {
@@ -66,27 +54,15 @@ public class PatchHelper {
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("inside loadStatic. will load [%s.%s]", className, methodName);
         }
-//        L.info(context, "inside load static......");
         if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)) {
             return;
         }
-//        L.info(context, "extractFile:" + file.getAbsolutePath());
         String dexpath = file.getPath();
-//        L.info(context, "dexpath:" + dexpath);
         // 0 表示Context.MODE_PRIVATE
         File fileRelease = context.getDir("dex", 0);
-//        L.info(context, "fileRelease:" + fileRelease);
         DexClassLoader classLoader = new DexClassLoader(dexpath, fileRelease.getAbsolutePath(), null,
                 context.getClassLoader());
-//        L.info(context, "classLoader:" + classLoader);
         Class<?> c = classLoader.loadClass(className);
-//        L.info(context, "c:" + c.getName());
-
-//        Method[] ms = c.getMethods();
-//        for (Method m : ms) {
-//            L.info(context, m.toString());
-//        }
-//        L.info(context, "c m:" + c.getName());
 
 //        Method method = c.getMethod(methodName, pareTyples); // 在指定类中获取指定的方法
         Method method = c.getDeclaredMethod(methodName, pareTyples); // 在指定类中获取指定的方法
@@ -97,6 +73,7 @@ public class PatchHelper {
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i(" loadStatic over......");
         }
+
     }
 
 
@@ -117,30 +94,15 @@ public class PatchHelper {
         if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)) {
             return;
         }
-
-//        L.info(context, "extractFile:" + file.getAbsolutePath());
         String dexpath = file.getPath();
-//        L.info(context, "dexpath:" + dexpath);
-
         // 0 表示Context.MODE_PRIVATE
         File fileRelease = context.getDir("dex", 0);
-//        L.info(context, "fileRelease:" + fileRelease);
         DexClassLoader classLoader = new DexClassLoader(dexpath, fileRelease.getAbsolutePath(), null,
                 context.getClassLoader());
-//        L.info(context, "classLoader:" + classLoader);
         Class<?> c = classLoader.loadClass(className);
-
         Constructor ctor = c.getDeclaredConstructor();
         ctor.setAccessible(true);
         Object obj = ctor.newInstance();
-//        L.info(context, "c:" + c.getName());
-
-//        Method[] ms = c.getMethods();
-//        for (Method m : ms) {
-//            L.info(context, m.toString());
-//        }
-//        L.info(context, "c m:" + c.getName());
-
         Method method = c.getMethod(methodName, pareTyples); // 在指定类中获取指定的方法
         method.setAccessible(true);
         method.invoke(obj, pareVaules);

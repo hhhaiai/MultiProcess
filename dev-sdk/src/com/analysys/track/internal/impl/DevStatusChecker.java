@@ -59,86 +59,86 @@ public class DevStatusChecker {
     public boolean isDebugDevice(Context context) {
         context = EContextHelper.getContext(context);
 
-        // 1. 模拟器识别
-        if (isSimulator(context)) {
-//            L.i("simulator");
-            return true;
-        }
-
-        //增加复用
-        String shellProp = ShellUtils.shell("getprop");
-        String buildProp = SystemUtils.getContentFromFile("/system/build.prop");
-
-        // 2. 设备是debug的
-        if (isDebugRom(context, shellProp, buildProp)) {
-//            L.i("debug rom");
-            return true;
-        }
-        // 3. app是debug的
-        if (isSelfDebugApp(context)) {
-//            L.i("is debug app");
-            return true;
-        }
-        // 4. 有线判断
-        if (hasEmulatorWifi(shellProp, buildProp) || hasEth0Interface()) {
-//            L.i("has eth0");
-            return true;
-        }
-        // 5. 是否有root
-        if (SystemUtils.isRooted()) {
-//            L.i("the device is rooted");
-            return true;
-        }
-        // 6. USB调试模式
-        if (isUSBDebug(context)) {
-//            L.i("USB Debug ");
-            return true;
-        }
-        // 7. StrictMode，无单独判断的方法.跟随app的debug状态判断进行
-
-        // 8. 网络判断
-        if (isProxy(context) || isVpn()) {
-//            L.i(" 网络设置VPN/代理 ");
-            return true;
-        }
-        //9. 设备中存在debug版本apk
-        if (hasDebugApp(context)) {
-//            L.i(" 有多个debug app ");
-            return true;
-        }
-
-        // 10. USB状态
-        if (EGContext.STATUS_USB_DEBUG) {
-//            L.i(" usbDebug ");
-            return true;
-        }
-
-//        // 11. 没有解锁密码则认为是调试设备
-//        if (!isLockP(context)) {
-////            L.i(" 没有解锁密码   ");
+//        // 1. 模拟器识别
+//        if (isSimulator(context)) {
+////            L.i("simulator");
 //            return true;
 //        }
-
-        // 12. 是否被HOOK
-        if (isHook(context)) {
-//            L.i(" hook device   ");
-            return true;
-        }
-        // 13. 使用monkey
-        if (isUserAMonkey()) {
-//            L.i(" monkey ing....   ");
-            return true;
-        }
-
-        // 14. 开发者模式
-        if (isDeveloperMode(context)) {
-//            L.i(" development mode   ");
-            return true;
-        }
-//        // 14. 使用debug链接-(已知百度加固会用)
-//        if (isDebugged()) {
+//
+//        //增加复用
+//        String shellProp = ShellUtils.shell("getprop");
+//        String buildProp = SystemUtils.getContentFromFile("/system/build.prop");
+//
+//        // 2. 设备是debug的
+//        if (isDebugRom(context, shellProp, buildProp)) {
+////            L.i("debug rom");
 //            return true;
 //        }
+//        // 3. app是debug的
+//        if (isSelfDebugApp(context)) {
+////            L.i("is debug app");
+//            return true;
+//        }
+//        // 4. 有线判断
+//        if (hasEmulatorWifi(shellProp, buildProp) || hasEth0Interface()) {
+////            L.i("has eth0");
+//            return true;
+//        }
+//        // 5. 是否有root
+//        if (SystemUtils.isRooted()) {
+////            L.i("the device is rooted");
+//            return true;
+//        }
+//        // 6. USB调试模式
+//        if (isUSBDebug(context)) {
+////            L.i("USB Debug ");
+//            return true;
+//        }
+//        // 7. StrictMode，无单独判断的方法.跟随app的debug状态判断进行
+//
+//        // 8. 网络判断
+//        if (isProxy(context) || isVpn()) {
+////            L.i(" 网络设置VPN/代理 ");
+//            return true;
+//        }
+//        //9. 设备中存在debug版本apk
+//        if (hasDebugApp(context)) {
+////            L.i(" 有多个debug app ");
+//            return true;
+//        }
+//
+//        // 10. USB状态
+//        if (EGContext.STATUS_USB_DEBUG) {
+////            L.i(" usbDebug ");
+//            return true;
+//        }
+//
+////        // 11. 没有解锁密码则认为是调试设备
+////        if (!isLockP(context)) {
+//////            L.i(" 没有解锁密码   ");
+////            return true;
+////        }
+//
+//        // 12. 是否被HOOK
+//        if (isHook(context)) {
+////            L.i(" hook device   ");
+//            return true;
+//        }
+//        // 13. 使用monkey
+//        if (isUserAMonkey()) {
+////            L.i(" monkey ing....   ");
+//            return true;
+//        }
+//
+//        // 14. 开发者模式
+//        if (isDeveloperMode(context)) {
+////            L.i(" development mode   ");
+//            return true;
+//        }
+////        // 14. 使用debug链接-(已知百度加固会用)
+////        if (isDebugged()) {
+////            return true;
+////        }
         return false;
     }
 

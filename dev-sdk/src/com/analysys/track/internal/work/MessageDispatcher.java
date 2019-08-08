@@ -44,7 +44,7 @@ public class MessageDispatcher {
             msg.what = MessageDispatcher.MSG_INIT_MODULE;
             sendMessageDelay(msg);
         } catch (Throwable t) {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                 ELOG.e(t);
             }
         }
@@ -69,7 +69,7 @@ public class MessageDispatcher {
                 }
             }
         } catch (Throwable t) {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                 ELOG.e(t);
             }
         }
@@ -96,7 +96,7 @@ public class MessageDispatcher {
                 }
             }
         } catch (Throwable t) {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                 ELOG.e(t);
             }
         }
@@ -115,7 +115,7 @@ public class MessageDispatcher {
                 UploadImpl.getInstance(mContext).reTryAndUpload(false);
             }
         } catch (Throwable t) {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                 ELOG.e(t);
             }
         }
@@ -128,7 +128,7 @@ public class MessageDispatcher {
             msg.what = MessageDispatcher.MSG_START_SERVICE_SELF;
             sendMessageDelay(msg);
         } catch (Throwable t) {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                 ELOG.e(t);
             }
         }
@@ -146,7 +146,7 @@ public class MessageDispatcher {
             }
             sendMessageDelay(msg);
         } catch (Throwable t) {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                 ELOG.e(t);
             }
         }
@@ -201,7 +201,7 @@ public class MessageDispatcher {
                 }
             }
         } catch (Throwable t) {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                 ELOG.e(t);
             }
         }
@@ -229,7 +229,7 @@ public class MessageDispatcher {
                 }
             }
         } catch (Throwable t) {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                 ELOG.e(t);
             }
         }
@@ -263,7 +263,7 @@ public class MessageDispatcher {
                 }
             }
         } catch (Throwable t) {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                 ELOG.e(t);
             }
         }
@@ -292,7 +292,7 @@ public class MessageDispatcher {
                 }
             }
         } catch (Throwable t) {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                 ELOG.e(t);
             }
         }
@@ -325,7 +325,7 @@ public class MessageDispatcher {
 //            } else {
 //                return;
 //            }
-//            if (EGContext.FLAG_DEBUG_INNER){
+//            if (EGContext.FLAG_DEBUG_INNER&&isDebug){
 //                ELOG.i(SystemUtils.getCurrentProcessName(mContext));
 //            }
             if (SystemUtils.isMainThread()) {
@@ -340,7 +340,7 @@ public class MessageDispatcher {
                 screenOnOffHandle(on);
             }
         } catch (Throwable e) {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                 ELOG.e(e);
             }
         } finally {
@@ -423,19 +423,19 @@ public class MessageDispatcher {
             try {
                 switch (msg.what) {
                     case MSG_INIT_MODULE:
-                        if (EGContext.FLAG_DEBUG_INNER) {
+                        if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                             ELOG.i("接收到初始化消息");
                         }
                         msgInitModule();
                         break;
                     case MSG_CHECK_HEARTBEAT:
-                        if (EGContext.FLAG_DEBUG_INNER) {
+                        if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                             ELOG.i("接收到心跳检测消息");
                         }
                         checkMsgInHeatbeat();
                         break;
                     case MSG_START_SERVICE_SELF:
-                        if (EGContext.FLAG_DEBUG_INNER) {
+                        if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                             ELOG.i("接收到启动服务消息");
                         }
                         ServiceHelper.getInstance(mContext).startSelfService();
@@ -452,38 +452,38 @@ public class MessageDispatcher {
                     case MSG_SCREEN_RECEIVER:
                         break;
                     case MSG_SNAPSHOT:
-                        if (EGContext.FLAG_DEBUG_INNER) {
+                        if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                             ELOG.i("接收到获取应用列表消息");
                         }
                         AppSnapshotImpl.getInstance(mContext).snapshotsInfo();
                         break;
                     case MSG_LOCATION:
-                        if (EGContext.FLAG_DEBUG_INNER) {
+                        if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                             ELOG.i("接收到获取地理位置消息");
                         }
                         LocationImpl.getInstance(mContext).processLoctionMsg();
                         break;
                     case MSG_OC_INFO:
-                        if (EGContext.FLAG_DEBUG_INNER) {
+                        if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                             ELOG.i("接收到获取OC消息");
                         }
                         OCImpl.getInstance(mContext).processOCMsg();
                         break;
                     case MSG_UPLOAD:
-                        if (EGContext.FLAG_DEBUG_INNER) {
+                        if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                             ELOG.i("接收到上传消息");
                         }
                         UploadImpl.getInstance(mContext).upload();
                         break;
                     case MSG_CHECK_RETRY:
-                        if (EGContext.FLAG_DEBUG_INNER) {
+                        if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                             ELOG.i("接收到重试检测消息");
                         }
                         MessageDispatcher.getInstance(mContext).reTryUpload();
                         break;
 
                     case MSG_CHECK:
-                        if (EGContext.FLAG_DEBUG_INNER) {
+                        if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                             ELOG.i("心跳检查");
                         }
 //                    SPHelper.setLongValue2SP(mContext,EGContext.HEARTBEAT_LAST_TIME,System.currentTimeMillis());
@@ -493,20 +493,20 @@ public class MessageDispatcher {
                         MessageDispatcher.this.sendMessage();
                         break;
                     case MSG_RETRY:
-                        if (EGContext.FLAG_DEBUG_INNER) {
+                        if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                             ELOG.i("数据重发轮询检查");
                         }
                         MessageDispatcher.getInstance(mContext).isNeedRetry(EGContext.CHECK_RETRY_CYCLE);
                         checkRetry();
                         break;
                     case MSG_HANDLE_SCREEN_ON:
-                        if (EGContext.FLAG_DEBUG_INNER) {
+                        if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                             ELOG.i("开屏");
                         }
                         processScreenOnOff(true);
                         break;
                     case MSG_HANDLE_SCREEN_OFF:
-                        if (EGContext.FLAG_DEBUG_INNER) {
+                        if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                             ELOG.i("关屏");
                         }
                         processScreenOnOff(false);
@@ -515,7 +515,7 @@ public class MessageDispatcher {
                         break;
                 }
             } catch (Throwable t) {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                     ELOG.e(t);
                 }
             }
@@ -526,7 +526,7 @@ public class MessageDispatcher {
          */
         public void checkMsgInHeatbeat() {
             try {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                     ELOG.i("-----checkMsgInHeatbeat--检查消息队列-->[  SNAPSHOT: " + mHandler.hasMessages(MSG_SNAPSHOT) + " ;  LOCATION:  " + mHandler.hasMessages(MSG_LOCATION) + " ;  OC:  "
                             + mHandler.hasMessages(MSG_OC_INFO) + " ; UPLOAD:  " + mHandler.hasMessages(MSG_UPLOAD) + "]");
                 }
@@ -566,7 +566,7 @@ public class MessageDispatcher {
                     MessageDispatcher.getInstance(mContext).initModule();
                 }
             } catch (Throwable t) {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                     ELOG.e(t);
                 }
             }
@@ -585,7 +585,7 @@ public class MessageDispatcher {
                 uploadInfo(0);
                 MessageDispatcher.this.sendMessage();
             } catch (Throwable t) {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                     ELOG.e(t);
                 }
             }
@@ -727,5 +727,8 @@ public class MessageDispatcher {
     // 上次结束时间
     public long mLastCloseTime = 0;
 //    public boolean isScreenOnOffBroadCastHandled = false;
+
+
+    private final boolean isDebug = false;
 
 }

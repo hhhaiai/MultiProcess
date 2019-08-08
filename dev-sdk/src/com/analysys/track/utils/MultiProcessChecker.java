@@ -175,9 +175,8 @@ public class MultiProcessChecker {
                         } else {
                             return false;
                         }
+
                     }
-
-
                 } catch (Throwable e) {
                 }
             } else {

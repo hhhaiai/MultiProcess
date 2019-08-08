@@ -35,7 +35,7 @@ public class MainFunCase {
      * @param x
      */
     public static void runCase(Context context, String x) {
-        EL.d(ProcessUtils.getCurrentProcessName(context) + "--- you click  btnCase" + x);
+        EL.d( "--- you click  btnCase" + x);
         try {
             Class<?> testCase = MainFunCase.class;
             Method runCaseA = testCase.getDeclaredMethod("runCaseP" + x, Context.class);
@@ -125,7 +125,6 @@ public class MainFunCase {
         });
     }
 
-    //
     private static void runCaseP6(final Context context) {
         MyLooper.execute(new Runnable() {
             @Override

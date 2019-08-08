@@ -202,15 +202,6 @@ public class ELOG {
         }
     }
 
-//    public static void ii(String info) {
-//        try {
-//            mContext = EContextHelper.getContext(mContext);
-//            StackTraceElement[] eles = Thread.currentThread().getStackTrace();
-//            i("[%s]------[%s.%s---%d]  %s ", SystemUtils.getCurrentProcessName(mContext), eles[3].getClassName(), eles[3].getMethodName(), eles[3].getLineNumber(), info);
-//        } catch (Throwable e) {
-//            e(e);
-//        }
-//    }
 
     /**
      * 解析参数入口.这步骤开始忽略类型.解析所有参数,参数检查逻辑：
@@ -229,16 +220,16 @@ public class ELOG {
             }
             StringBuilder sb = new StringBuilder();
             // 开始
-
-//            if (isFormat) {
-//                sb.append(CONTENT_LOG_INFO).append("\n");
-//            }
             if (isFormat) {
                 sb.append("\n");
             }
             String stackinfo = getCallStaceInfo();
             if (!TextUtils.isEmpty(stackinfo)) {
-                sb.append(stackinfo).append("\n");
+                if (isNeedCallstackInfo) {
+                    sb.append(stackinfo).append("\n");
+                } else {
+                    sb.append(stackinfo);
+                }
             }
 
             if (args[0] instanceof String) {
@@ -475,10 +466,8 @@ public class ELOG {
                                     .append("Native方法:" + (!ste.isNativeMethod() ? "不是" : "是")).append("\n")
                                     .append("调用堆栈详情:").append("\n").append(wrapperString(cc));
                         } else {
-                            if (isFormat) {
-                                sb.append(String.format(content_simple_callstack, SystemUtils.getCurrentProcessName(EContextHelper.getContext(mContext)), ste.getClassName(),
-                                        ste.getMethodName(), ste.getLineNumber()));
-                            }
+                            sb.append(String.format(content_simple_callstack, SystemUtils.getCurrentProcessName(EContextHelper.getContext(mContext)), ste.getClassName(),
+                                    ste.getMethodName(), ste.getLineNumber()));
                         }
                     }
 

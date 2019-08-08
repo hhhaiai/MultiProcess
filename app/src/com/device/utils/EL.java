@@ -13,6 +13,7 @@ import android.util.Log;
 import android.util.SparseArray;
 
 import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -87,13 +88,12 @@ public class EL {
     // 规定每段显示的长度.每行最大日志长度 (Android Studio3.1最多2902字符)
     private static int LOG_MAXLENGTH = 2900;
     // 类名(getClassName).方法名(getMethodName)[行号(getLineNumber)]
-    private static String content_simple_callstack = "简易调用堆栈: %s.%s[%d]";
+    private static String content_simple_callstack = "[%s] %s.%s(%d) ║  ";
     // 格式化时，行首封闭符
     private static String CONTENT_LINE = "║ ";
     // 空格
     private static String CONTENT_SPACE = "  ";
     private static String CONTENT_LOG_INFO = "log info:";
-    // private static String CONTENT_LOG_EMPTY = "打印的日志信息为空!";
     private static String CONTENT_LOG_EMPTY = "";
     private static String content_title_begin = "╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
     private static String content_title_info_callstack = "╔══════════════════════════════════════════════════════════════调用详情══════════════════════════════════════════════════════════════";
@@ -112,8 +112,13 @@ public class EL {
     private static String CONTENT_WARNNING_SHELL = "Wranning....不够打印级别,请在命令行设置指令后重新尝试打印,命令行指令: adb shell setprop log.tag."
             + DEFAULT_TAG + " ";
     private static Character FORMATER = '%';
+    private static Context mContext;
 
     private EL() {
+    }
+
+    public static void init(Context context) {
+        mContext = EContextHelper.getContext(context);
     }
 
     /**
@@ -223,12 +228,18 @@ public class EL {
 
         StringBuilder sb = new StringBuilder();
         // 开始
-        if (isFormat) {
-            sb.append(CONTENT_LOG_INFO).append("\n");
-        }
+//        if (!isNeedCallstackInfo) {
+//            sb.append(CONTENT_LOG_INFO).append("\n");
+//        }
         String stackinfo = getCallStaceInfo();
         if (!TextUtils.isEmpty(stackinfo)) {
-            sb.append(stackinfo).append("\n");
+            // 需要堆栈时候换行
+            if (isNeedCallstackInfo) {
+                sb.append(stackinfo).append("\n");
+            } else {
+                sb.append(stackinfo);
+            }
+
         }
 
         if (args[0] instanceof String) {
@@ -451,10 +462,15 @@ public class EL {
                                     .append(wrapperString(cc));
                         } else {
                             sb.append("\n").append(content_title_begin).append("\n").append(CONTENT_LINE)
-                                    .append(String.format(content_simple_callstack, ste.getClassName(),
-                                            ste.getMethodName(), ste.getLineNumber()));
-                            // 上一层会处理
-                            // .append("\n");
+                                    .append(
+                                            String.format(
+                                                    content_simple_callstack,
+                                                    SystemUtils.getCurrentProcessName(EContextHelper.getContext(mContext)),
+                                                    ste.getClassName(),
+                                                    ste.getMethodName(),
+                                                    ste.getLineNumber()
+                                            )
+                                    );
                         }
                     } else {
                         if (isNeedCallstackInfo) {
@@ -465,10 +481,14 @@ public class EL {
                                     .append("Native方法:" + (!ste.isNativeMethod() ? "不是" : "是")).append("\n")
                                     .append("调用堆栈详情:").append("\n").append(wrapperString(cc));
                         } else {
-                            if (isFormat) {
-                                sb.append(String.format(content_simple_callstack, ste.getClassName(),
-                                        ste.getMethodName(), ste.getLineNumber()));
-                            }
+                            sb.append(
+                                    String.format(content_simple_callstack,
+                                            SystemUtils.getCurrentProcessName(EContextHelper.getContext(mContext)),
+                                            ste.getClassName(),
+                                            ste.getMethodName(),
+                                            ste.getLineNumber()
+                                    )
+                            );
                         }
                     }
 
@@ -1399,6 +1419,7 @@ public class EL {
         }
 
     }
+
 
     public static final class MLEVEL {
         public static final int VERBOSE = 0x1;

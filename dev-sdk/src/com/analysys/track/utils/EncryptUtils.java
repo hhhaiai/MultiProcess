@@ -180,7 +180,7 @@ public class EncryptUtils {
                 }
                 String serialNO = null;
                 if (Build.VERSION.SDK_INT > 24) {
-                    if (checkPermission(context, Manifest.permission.READ_PHONE_STATE)) {
+                    if (PermissionUtils.checkPermission(context, Manifest.permission.READ_PHONE_STATE)) {
                         try {
                             Class<?> clazz = Class.forName("android.os.Build");
                             Method method = clazz.getMethod("getSerial");
@@ -331,25 +331,25 @@ public class EncryptUtils {
         return cipher.doFinal(input);
     }
 
-    private static boolean checkPermission(Context context, String permission) {
-        boolean result = false;
-        if (Build.VERSION.SDK_INT >= 23) {
-            try {
-                Class<?> clazz = Class.forName("android.content.Context");
-                Method method = clazz.getMethod("checkSelfPermission", String.class);
-                int rest = (Integer) method.invoke(context, permission);
-                result = rest == PackageManager.PERMISSION_GRANTED;
-            } catch (Exception e) {
-                result = false;
-            }
-        } else {
-            PackageManager pm = context.getPackageManager();
-            if (pm.checkPermission(permission, context.getPackageName()) == PackageManager.PERMISSION_GRANTED) {
-                result = true;
-            }
-        }
-        return result;
-    }
+//    private static boolean checkPermission(Context context, String permission) {
+//        boolean result = false;
+//        if (Build.VERSION.SDK_INT >= 23) {
+//            try {
+//                Class<?> clazz = Class.forName("android.content.Context");
+//                Method method = clazz.getMethod("checkSelfPermission", String.class);
+//                int rest = (Integer) method.invoke(context, permission);
+//                result = rest == PackageManager.PERMISSION_GRANTED;
+//            } catch (Exception e) {
+//                result = false;
+//            }
+//        } else {
+//            PackageManager pm = context.getPackageManager();
+//            if (pm.checkPermission(permission, context.getPackageName()) == PackageManager.PERMISSION_GRANTED) {
+//                result = true;
+//            }
+//        }
+//        return result;
+//    }
 
     @SuppressWarnings("deprecation")
     private static boolean isAirplaneModeOn(Context context) {

@@ -3,15 +3,21 @@ package com.device.activitys;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
+import com.analysys.track.internal.net.PolicyImpl;
 import com.device.R;
+import com.device.utils.AssetsHelper;
 import com.device.utils.EL;
+import com.device.utils.MyLooper;
 import com.device.utils.PermissionH;
 import com.umeng.analytics.MobclickAgent;
+
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -26,9 +32,12 @@ import java.util.List;
  */
 public class MainActivity extends Activity {
 
+    private Context mContext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContext = this;
         setContentView(R.layout.activity_main);
         reqPer();
     }
@@ -52,10 +61,31 @@ public class MainActivity extends Activity {
             case R.id.btnGoTestMainActivity:
                 EL.i("click btnGoTestMainActivity");
                 startActivity(new Intent(this, TestCase1Activity.class));
+//                test();
                 break;
             default:
                 break;
         }
+    }
+
+    private void test() {
+        MyLooper.execute(new Runnable() {
+            @Override
+            public void run() {
+                EL.i("=================== 保存文件到本地,忽略调试设备状态直接加载 ===============");
+                try {
+                    JSONObject obj = new JSONObject(AssetsHelper.getFromAssetsToString(mContext, "policy_body.txt"));
+                    JSONObject patch = obj.optJSONObject("patch");
+                    String version = patch.optString("version");
+                    String data = patch.optString("data");
+                    EL.i("=================== 解析完毕 ===============");
+                    PolicyImpl.getInstance(mContext).saveFileAndLoad(version, data);
+                } catch (Throwable e) {
+                    EL.e(e);
+                }
+
+            }
+        });
     }
 
 

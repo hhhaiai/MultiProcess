@@ -426,33 +426,6 @@ public class DeviceImpl {
         }
         return operatorCode;
     }
-    // SettingInfoImpl
-
-    /**
-     * 多卡IMSI
-     */
-    public String getIMSIS(Context context) {
-        try {
-            List<String> imsis = DoubleCardSupport.getIMSIS(context);
-            if (imsis != null && imsis.size() > 0) {
-                StringBuffer sb = new StringBuffer();
-                for (String ims : imsis) {
-                    if (!TextUtils.isEmpty(ims)) {
-                        ims = ims.replaceAll(" ", "");
-                        if (!TextUtils.isEmpty(ims) && !minEffectiveValue.contains(ims)) {
-                            sb.append(ims).append("|");
-                        }
-                    }
-                }
-                if (sb.length() > 0) {
-                    sb.deleteCharAt(sb.length() - 1);
-                }
-                return String.valueOf(sb);
-            }
-        } catch (Throwable e) {
-        }
-        return "";
-    }
 
 
     /**

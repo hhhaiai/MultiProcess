@@ -3,6 +3,7 @@ package com.device.impls;
 
 import android.content.Context;
 
+import com.analysys.track.internal.impl.DoubleCardSupport;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.net.DataPackaging;
 import com.analysys.track.internal.net.UploadImpl;
@@ -14,7 +15,6 @@ import com.analysys.track.utils.AccessibilityHelper;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.device.utils.EL;
-import com.device.utils.ProcessUtils;
 
 import org.json.JSONObject;
 
@@ -38,7 +38,7 @@ public class MultiCase {
      */
     public static void runCase(Context context, int caseNum) {
 
-        EL.d(ProcessUtils.getCurrentProcessName(context) + "--- MultiCase  you click  btnCase" + caseNum);
+//        EL.d("--- MultiCase  you click  btnCase" + caseNum);
         try {
             Class<?> testCase = MultiCase.class;
             Method runCaseA = testCase.getDeclaredMethod("runCase" + caseNum, Context.class);
@@ -55,9 +55,9 @@ public class MultiCase {
      * @param context
      */
     public static void runCase1(final Context context) {
-        EL.i(ProcessUtils.getCurrentProcessName(context) + "----上传测试----");
+        EL.i("----上传测试----");
         UploadImpl.getInstance(context).upload();
-        EL.i(ProcessUtils.getCurrentProcessName(context) + "----上传重试测试----");
+        EL.i("----上传重试测试----");
         UploadImpl.getInstance(context).reTryAndUpload(false);
     }
 
@@ -67,9 +67,9 @@ public class MultiCase {
      * @param context
      */
     public static void runCase2(final Context context) {
-        EL.i(ProcessUtils.getCurrentProcessName(context) + "-----多进程开关屏处理测试----处理打开屏幕");
+        EL.i("-----多进程开关屏处理测试----处理打开屏幕");
         MessageDispatcher.getInstance(context).processScreenOnOff(true);
-        EL.i(ProcessUtils.getCurrentProcessName(context) + "-----多进程开关屏处理测试----处理关闭屏幕");
+        EL.i("-----多进程开关屏处理测试----处理关闭屏幕");
         MessageDispatcher.getInstance(context).processScreenOnOff(false);
     }
 
@@ -80,12 +80,12 @@ public class MultiCase {
      */
     public static void runCase3(final Context context) {
         boolean isS = AndroidManifestHelper.isServiceDefineInManifest(context, AnalysysService.class);
-        EL.i(ProcessUtils.getCurrentProcessName(context) + "----声明服务结果:" + isS);
+        EL.i("----声明服务结果:" + isS);
         boolean isA = AccessibilityHelper.isAccessibilitySettingsOn(context, AnalysysAccessibilityService.class);
-        EL.i(ProcessUtils.getCurrentProcessName(context) + "----声明辅助功能结果:" + isS);
-        EL.i(ProcessUtils.getCurrentProcessName(context) + "----JobService定义测试。。。。");
+        EL.i("----声明辅助功能结果:" + isS);
+        EL.i("----JobService定义测试。。。。");
         boolean isAnalysysJobServiceDef = AndroidManifestHelper.isJobServiceDefineInManifest(context, AnalysysJobService.class);
-        EL.i(ProcessUtils.getCurrentProcessName(context) + "---JobService 测试结果： " + isAnalysysJobServiceDef);
+        EL.i("---JobService 测试结果： " + isAnalysysJobServiceDef);
     }
 
     /**
@@ -94,17 +94,17 @@ public class MultiCase {
      * @param context
      */
     public static void runCase4(final Context context) {
-        EL.e(ProcessUtils.getCurrentProcessName(context) + "----多进程测试。。。。");
+        EL.e("----多进程测试。。。。");
         for (int i = 0; i < 100; i++) {
             try {
                 long now = System.currentTimeMillis();
                 boolean is = MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, "test", 1000, now);
                 if (is) {
-                    EL.i("[" + ProcessUtils.getCurrentProcessName(context) + "]----" + (i + 1) + "----多进程测试文件:" + is);
+                    EL.i("----" + (i + 1) + "----多进程测试文件:" + is);
                     Thread.sleep(200);
                     MultiProcessChecker.getInstance().setLockLastModifyTime(context, "test", System.currentTimeMillis());
                 } else {
-                    EL.d("[" + ProcessUtils.getCurrentProcessName(context) + "]-----" + (i + 1) + "----多进程测试文件:" + is);
+                    EL.d("-----" + (i + 1) + "----多进程测试文件:" + is);
                 }
                 Thread.sleep(50);
             } catch (Throwable e) {
@@ -114,17 +114,21 @@ public class MultiCase {
     }
 
     public static void runCase5(final Context context) {
-        EL.e(ProcessUtils.getCurrentProcessName(context) + "----runCase5  LocationImpl 位置信息测试 。。。。");
+        EL.i("----runCase5  LocationImpl 位置信息测试 。。。。");
         LocationImpl.getInstance(context).processLoctionMsg();
     }
 
     public static void runCase6(final Context context) {
-        EL.e(ProcessUtils.getCurrentProcessName(context) + "----runCase6  测试获取设备信息 。。。。");
+        EL.i("----runCase6  测试获取设备信息 。。。。");
         JSONObject devInfo = DataPackaging.getInstance().getDevInfo(context);
-        EL.e(ProcessUtils.getCurrentProcessName(context) + "----设备信息: " + devInfo.toString());
+        EL.d("----设备信息: " + devInfo.toString());
     }
 
+    // 多卡获取信息
     public static void runCase7(final Context context) {
+        EL.i("=================== 测试多卡获取信息===============");
+        EL.i("多卡IMEI： " + DoubleCardSupport.getInstance().getIMEIS(context));
+        EL.i("多卡IMSI： " + DoubleCardSupport.getInstance().getIMSIS(context));
     }
 
     public static void runCase8(final Context context) {

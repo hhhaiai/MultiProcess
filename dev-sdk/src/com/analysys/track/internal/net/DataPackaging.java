@@ -70,16 +70,10 @@ public class DataPackaging {
                     devImpl.getNetworkOperatorCode(), DataController.SWITCH_OF_NETWORK_OPERATOR_CODE);
             JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.NetworkOperatorName,
                     devImpl.getNetworkOperatorName(), DataController.SWITCH_OF_NETWORK_OPERATOR_NAME);
-            try {
-                JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.Imeis,
-                        DoubleCardSupport.getIMEIS(context), DataController.SWITCH_OF_IMEIS);
-            } catch (Throwable t) {
-            }
-            try {
-                JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.Imsis, devImpl.getIMSIS(context),
-                        DataController.SWITCH_OF_IMSIS);
-            } catch (Throwable t) {
-            }
+            JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.Imeis,
+                    DoubleCardSupport.getInstance().getIMEIS(context), DataController.SWITCH_OF_IMEIS);
+            JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.Imsis, DoubleCardSupport.getInstance().getIMSIS(context),
+                    DataController.SWITCH_OF_IMSIS);
             JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationChannel,
                     SystemUtils.getAppChannel(context), DataController.SWITCH_OF_APPLICATION_CHANNEL);
             JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationKey,
