@@ -184,6 +184,63 @@
 
         </TableRow>
 
+        <TableRow>
+
+            <Button
+                android:id="@+id/btnCaseP7"
+                android:onClick="onClick"
+                android:text="caseP7" />
+
+            <Button
+                android:id="@+id/btnCaseP8"
+                android:onClick="onClick"
+                android:text="caseP8" />
+
+            <Button
+                android:id="@+id/btnCaseP9"
+                android:onClick="onClick"
+                android:text="caseP9" />
+
+        </TableRow>
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/btnCaseP10"
+                android:onClick="onClick"
+                android:text="caseP10" />
+
+            <Button
+                android:id="@+id/btnCaseP11"
+                android:onClick="onClick"
+                android:text="caseP11" />
+
+            <Button
+                android:id="@+id/btnCaseP12"
+                android:onClick="onClick"
+                android:text="caseP12" />
+
+        </TableRow>
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/btnCaseP13"
+                android:onClick="onClick"
+                android:text="caseP13" />
+
+            <Button
+                android:id="@+id/btnCaseP14"
+                android:onClick="onClick"
+                android:text="caseP14" />
+
+            <Button
+                android:id="@+id/btnCaseP15"
+                android:onClick="onClick"
+                android:text="caseP15" />
+
+        </TableRow>
+
 
     </TableLayout>
 

@@ -9,7 +9,6 @@ import com.analysys.track.internal.net.UploadImpl;
 import com.device.utils.AssetsHelper;
 import com.device.utils.EL;
 import com.device.utils.MyLooper;
-import com.device.utils.ProcessUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,7 +34,7 @@ public class MainFunCase {
      * @param x
      */
     public static void runCase(Context context, String x) {
-        EL.d( "--- you click  btnCase" + x);
+//        EL.d("--- you click  btnCase" + x);
         try {
             Class<?> testCase = MainFunCase.class;
             Method runCaseA = testCase.getDeclaredMethod("runCaseP" + x, Context.class);
@@ -144,6 +143,69 @@ public class MainFunCase {
     }
 
     private static void runCaseP8(final Context context) {
+        MyLooper.execute(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
+    }
+
+    private static void runCaseP9(final Context context) {
+        MyLooper.execute(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
+    }
+
+    private static void runCaseP10(final Context context) {
+        MyLooper.execute(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
+    }
+
+    private static void runCaseP11(final Context context) {
+        MyLooper.execute(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
+    }
+
+    private static void runCaseP12(final Context context) {
+        MyLooper.execute(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
+    }
+
+    private static void runCaseP13(final Context context) {
+        MyLooper.execute(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
+    }
+
+    private static void runCaseP14(final Context context) {
+        MyLooper.execute(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
+    }
+
+    private static void runCaseP15(final Context context) {
         MyLooper.execute(new Runnable() {
             @Override
             public void run() {
