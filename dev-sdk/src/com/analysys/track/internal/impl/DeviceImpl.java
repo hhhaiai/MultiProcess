@@ -26,6 +26,7 @@ import android.util.DisplayMetrics;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -74,9 +75,9 @@ public class DeviceImpl {
 //    private final String ONE = "1";
     private final String DEFALT_MAC = "02:00:00:00:00:00";
     private final String[] FILE_LIST = {
-            Base64.encodeToString("/sys/class/net/wlan0/address".getBytes(), Base64.DEFAULT),
-            Base64.encodeToString("/sys/class/net/eth0/address".getBytes(), Base64.DEFAULT),
-            Base64.encodeToString("/sys/devices/virtual/net/wlan0/address".getBytes(), Base64.DEFAULT)};
+            Base64.encodeToString("/sys/class/net/wlan0/address" .getBytes(), Base64.DEFAULT),
+            Base64.encodeToString("/sys/class/net/eth0/address" .getBytes(), Base64.DEFAULT),
+            Base64.encodeToString("/sys/devices/virtual/net/wlan0/address" .getBytes(), Base64.DEFAULT)};
     private Context mContext;
 
     private DeviceImpl() {
@@ -212,7 +213,7 @@ public class DeviceImpl {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             while (interfaces.hasMoreElements()) {
                 NetworkInterface netInterface = interfaces.nextElement();
-                if ("wlan0".equals(netInterface.getName()) || "eth0".equals(netInterface.getName())) {
+                if ("wlan0" .equals(netInterface.getName()) || "eth0" .equals(netInterface.getName())) {
                     byte[] addr = netInterface.getHardwareAddress();
                     if (addr == null || addr.length == 0) {
                         return "";
@@ -578,8 +579,8 @@ public class DeviceImpl {
             // 电池温度
             info.setBatteryTemperature(String.valueOf(temperature));
         } catch (Throwable e) {
-
         }
+        MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_BATTERY_BROADCAST, System.currentTimeMillis());
     }
 
     // 电池相关信息BatteryModuleNameImpl

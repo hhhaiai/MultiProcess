@@ -379,70 +379,55 @@ public class AppSnapshotImpl {
      * @param time
      */
     public void processAppModifyMsg(final String pkgName, final int type, final long time) {
-        try {
-            if (TextUtils.isEmpty(pkgName)) {
-                return;
-            }
-            if (SystemUtils.isMainThread()) {
-                // 数据库操作修改包名和类型
-                EThreadPool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            if (type == 0) {
-                                PackageInfo pi = mContext.getPackageManager().getPackageInfo(pkgName, 0);
-                                if (pi != null) {
-                                    JSONObject jsonObject = getAppInfo(pi, mContext.getPackageManager(), EGContext.SNAP_SHOT_INSTALL);
-                                    if (jsonObject != null) {
-                                        // 判断数据表中是否有该应用的存在，如果有标识此次安装是应用更新所导致
-                                        boolean isHas = TableAppSnapshot.getInstance(mContext).isHasPkgName(pkgName);
-                                        if (!isHas) {
-                                            TableAppSnapshot.getInstance(mContext).insert(jsonObject);
-                                        }
-                                    }
-                                }
-                            } else if (type == 1) {
-                                TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UNINSTALL, time);
-                            } else if (type == 2) {
-                                TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UPDATE, time);
-                            }
-                        } catch (Throwable e) {
-                        }
-                    }
-                });
-            } else {
-                try {
-                    if (type == 0) {
-                        PackageManager pm = mContext.getPackageManager();
-                        PackageInfo pi = pm.getPackageInfo(pkgName, 0);
-                        if (pi != null) {
-                            JSONObject jsonObject = getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL);
-                            if (jsonObject != null) {
-                                // 判断数据表中是否有该应用的存在，如果有标识此次安装是应用更新所导致
-                                boolean isHas = TableAppSnapshot.getInstance(mContext).isHasPkgName(pkgName);
-                                if (!isHas) {
-                                    TableAppSnapshot.getInstance(mContext).insert(jsonObject);
-                                }
-                            }
-                        }
-                    } else if (type == 1) {
-                        TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UNINSTALL, time);
-                    } else if (type == 2) {
-                        TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UPDATE, time);
-                    }
-                } catch (Throwable e) {
-                    if (EGContext.FLAG_DEBUG_INNER) {
-                        ELOG.e(e);
-                    }
+        if (TextUtils.isEmpty(pkgName)) {
+            return;
+        }
+        if (SystemUtils.isMainThread()) {
+            // 数据库操作修改包名和类型
+            EThreadPool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    realProcessInThread(type, pkgName, time);
                 }
-            }
-
-        } catch (Throwable t) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
-            }
+            });
+        } else {
+            realProcessInThread(type, pkgName, time);
         }
 
+
+    }
+
+    private void realProcessInThread(int type, String pkgName, long time) {
+        try {
+            if (type == 0) {
+                // SNAP_SHOT_INSTALL 解锁
+                PackageManager pm = mContext.getPackageManager();
+                PackageInfo pi = pm.getPackageInfo(pkgName, 0);
+                if (pi != null) {
+                    JSONObject jsonObject = getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL);
+                    if (jsonObject != null) {
+                        // 判断数据表中是否有该应用的存在，如果有标识此次安装是应用更新所导致
+                        boolean isHas = TableAppSnapshot.getInstance(mContext).isHasPkgName(pkgName);
+                        if (!isHas) {
+                            TableAppSnapshot.getInstance(mContext).insert(jsonObject);
+                        }
+                    }
+                }
+                MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST, System.currentTimeMillis());
+
+            } else if (type == 1) {
+                TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UNINSTALL, time);
+                // SNAP_SHOT_UNINSTALL 解锁
+                MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST,
+                        System.currentTimeMillis());
+            } else if (type == 2) {
+                TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UPDATE, time);
+                // SNAP_SHOT_UPDATE 解锁
+                MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST,
+                        System.currentTimeMillis());
+            }
+        } catch (Throwable e) {
+        }
     }
 
     private AppSnapshotImpl() {

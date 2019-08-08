@@ -305,46 +305,45 @@ public class MessageDispatcher {
             if (on) {
                 if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SCREEN_ON_BROADCAST,
                         EGContext.TIME_SYNC_BROADCAST, currentTime)) {
-                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SCREEN_ON_BROADCAST, currentTime);
+                    if (SystemUtils.isMainThread()) {
+                        EThreadPool.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                screenOnOffHandle(on);
+                            }
+                        });
+
+                    } else {
+                        screenOnOffHandle(on);
+                    }
                 } else {
                     return;
                 }
             } else {
                 if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST,
                         EGContext.TIME_SYNC_BROADCAST, currentTime)) {
-                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST, currentTime);
+                    if (SystemUtils.isMainThread()) {
+                        EThreadPool.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                screenOnOffHandle(on);
+                            }
+                        });
+
+                    } else {
+                        screenOnOffHandle(on);
+                    }
+
                 } else {
                     return;
                 }
             }
 
 
-//            // TODO 干什么的？？？
-//            if (!AnalysysReceiver.isScreenOnOffBroadCastHandled) {
-//                AnalysysReceiver.isScreenOnOffBroadCastHandled = true;
-//            } else {
-//                return;
-//            }
-//            if (EGContext.FLAG_DEBUG_INNER&&isDebug){
-//                ELOG.i(SystemUtils.getCurrentProcessName(mContext));
-//            }
-            if (SystemUtils.isMainThread()) {
-                EThreadPool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        screenOnOffHandle(on);
-                    }
-                });
-
-            } else {
-                screenOnOffHandle(on);
-            }
         } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER && isDebug) {
                 ELOG.e(e);
             }
-        } finally {
-//            AnalysysReceiver.isScreenOnOffBroadCastHandled = false;
         }
     }
 
@@ -402,6 +401,12 @@ public class MessageDispatcher {
             if (on) {
                 MessageDispatcher.getInstance(mContext).sendMessage();
             }
+        }
+        // 解开对应的进程锁
+        if (on) {
+            MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SCREEN_ON_BROADCAST, System.currentTimeMillis());
+        } else {
+            MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST, System.currentTimeMillis());
         }
     }
 
@@ -489,8 +494,8 @@ public class MessageDispatcher {
 //                    SPHelper.setLongValue2SP(mContext,EGContext.HEARTBEAT_LAST_TIME,System.currentTimeMillis());
                         // 本次发送
                         MessageDispatcher.getInstance(mContext).checkHeartbeat(EGContext.CHECK_HEARTBEAT_CYCLE);
-                        // 本次delay,用于轮询
-                        MessageDispatcher.this.sendMessage();
+//                        // 本次delay,用于轮询
+//   MessageDispatcher.this.sendMessage();
                         break;
                     case MSG_RETRY:
                         if (EGContext.FLAG_DEBUG_INNER && isDebug) {
@@ -729,6 +734,6 @@ public class MessageDispatcher {
 //    public boolean isScreenOnOffBroadCastHandled = false;
 
 
-    private final boolean isDebug = false;
+    private final boolean isDebug = true;
 
 }
