@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.internal.impl.DevStatusChecker;
+import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.CrashHandler;
 import com.analysys.track.internal.work.MessageDispatcher;

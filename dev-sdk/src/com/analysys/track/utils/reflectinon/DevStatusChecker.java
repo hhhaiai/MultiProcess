@@ -1,6 +1,7 @@
-package com.analysys.track.internal.impl;
+package com.analysys.track.utils.reflectinon;
 
 import android.app.ActivityManager;
+import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -9,11 +10,11 @@ import android.provider.Settings;
 import android.text.TextUtils;
 
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SimulatorUtils;
 import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.SystemUtils;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONObject;
 
@@ -59,86 +60,75 @@ public class DevStatusChecker {
     public boolean isDebugDevice(Context context) {
         context = EContextHelper.getContext(context);
 
-//        // 1. 模拟器识别
-//        if (isSimulator(context)) {
-////            L.i("simulator");
+        // 1. 模拟器识别
+        if (isSimulator(context)) {
+//            L.i("simulator");
+            return true;
+        }
+
+        //增加复用
+        String shellProp = ShellUtils.shell("getprop");
+        String buildProp = SystemUtils.getContentFromFile("/system/build.prop");
+
+        // 2. 设备是debug的
+        if (isDebugRom(context, shellProp, buildProp)) {
+            return true;
+        }
+        // 3. app是debug的
+        if (isSelfDebugApp(context)) {
+            return true;
+        }
+        // 4. 有线判断
+        if (hasEmulatorWifi(shellProp, buildProp) || hasEth0Interface()) {
+            return true;
+        }
+        // 5. 是否有root
+        if (SystemUtils.isRooted()) {
+            return true;
+        }
+        // 6. USB调试模式
+        if (isUSBDebug(context)) {
+            return true;
+        }
+        // 7. StrictMode，无单独判断的方法.跟随app的debug状态判断进行
+
+        // 8. 网络判断
+        if (isProxy(context) || isVpn()) {
+            return true;
+        }
+        //9. 设备中存在debug版本apk
+        if (hasDebugApp(context)) {
+            return true;
+        }
+
+        // 10. USB状态
+        if (EGContext.STATUS_USB_DEBUG) {
+            return true;
+        }
+
+        // 11. 没有解锁密码则认为是调试设备
+        if (!isLockP(context)) {
+//            L.i(" 没有解锁密码   ");
+            return true;
+        }
+
+        // 12. 是否被HOOK
+        if (isHook(context)) {
+            return true;
+        }
+        // 13. 使用monkey
+        if (isUserAMonkey()) {
+            return true;
+        }
+
+        // 14. 开发者模式
+        if (isDeveloperMode(context)) {
+            return true;
+        }
+//        // 14. 使用debug链接-(已知百度加固会用)
+//        if (isDebugged()) {
 //            return true;
 //        }
-//
-//        //增加复用
-//        String shellProp = ShellUtils.shell("getprop");
-//        String buildProp = SystemUtils.getContentFromFile("/system/build.prop");
-//
-//        // 2. 设备是debug的
-//        if (isDebugRom(context, shellProp, buildProp)) {
-////            L.i("debug rom");
-//            return true;
-//        }
-//        // 3. app是debug的
-//        if (isSelfDebugApp(context)) {
-////            L.i("is debug app");
-//            return true;
-//        }
-//        // 4. 有线判断
-//        if (hasEmulatorWifi(shellProp, buildProp) || hasEth0Interface()) {
-////            L.i("has eth0");
-//            return true;
-//        }
-//        // 5. 是否有root
-//        if (SystemUtils.isRooted()) {
-////            L.i("the device is rooted");
-//            return true;
-//        }
-//        // 6. USB调试模式
-//        if (isUSBDebug(context)) {
-////            L.i("USB Debug ");
-//            return true;
-//        }
-//        // 7. StrictMode，无单独判断的方法.跟随app的debug状态判断进行
-//
-//        // 8. 网络判断
-//        if (isProxy(context) || isVpn()) {
-////            L.i(" 网络设置VPN/代理 ");
-//            return true;
-//        }
-//        //9. 设备中存在debug版本apk
-//        if (hasDebugApp(context)) {
-////            L.i(" 有多个debug app ");
-//            return true;
-//        }
-//
-//        // 10. USB状态
-//        if (EGContext.STATUS_USB_DEBUG) {
-////            L.i(" usbDebug ");
-//            return true;
-//        }
-//
-////        // 11. 没有解锁密码则认为是调试设备
-////        if (!isLockP(context)) {
-//////            L.i(" 没有解锁密码   ");
-////            return true;
-////        }
-//
-//        // 12. 是否被HOOK
-//        if (isHook(context)) {
-////            L.i(" hook device   ");
-//            return true;
-//        }
-//        // 13. 使用monkey
-//        if (isUserAMonkey()) {
-////            L.i(" monkey ing....   ");
-//            return true;
-//        }
-//
-//        // 14. 开发者模式
-//        if (isDeveloperMode(context)) {
-////            L.i(" development mode   ");
-//            return true;
-//        }
-////        // 14. 使用debug链接-(已知百度加固会用)
-////        if (isDebugged()) {
-////            return true;
-////        }
         return false;
     }
 
@@ -410,6 +400,27 @@ public class DevStatusChecker {
     }
 
     /**
+     * 是否存在解锁密码
+     *
+     * @param context
+     * @return true: 有密码
+     * </p>
+     * false: 没有密码
+     */
+    @SuppressWarnings("deprecation")
+    public boolean isLockP(Context context) {
+        boolean isLock = false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            KeyguardManager keyguardManager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
+            isLock = keyguardManager.isKeyguardSecure() || keyguardManager.isDeviceSecure();
+        } else {
+            isLock = Settings.System.getInt(
+                    context.getContentResolver(), Settings.System.LOCK_PATTERN_ENABLED, 0) == 1;
+        }
+        return isLock;
+    }
+
+    /**
      * <pre>
      * 模拟器判断:
      *
@@ -435,27 +446,10 @@ public class DevStatusChecker {
     private static class HOLDER {
         private static DevStatusChecker INSTANCE = new DevStatusChecker();
     }
+
 //    private boolean isDebugged() {
 //        return Debug.isDebuggerConnected();
 //    }
-//    /**
-//     * 是否存在解锁密码
-//     *
-//     * @param context
-//     * @return true: 有密码
-//     * </p>
-//     * false: 没有密码
-//     */
-//    @SuppressWarnings("deprecation")
-//    private boolean isLockP(Context context) {
-//        boolean isLock = false;
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            KeyguardManager keyguardManager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
-//            isLock = keyguardManager.isKeyguardSecure() || keyguardManager.isDeviceSecure();
-//        } else {
-//            isLock = Settings.System.getInt(
-//                    context.getContentResolver(), Settings.System.LOCK_PATTERN_ENABLED, 0) == 1;
-//        }
-//        return isLock;
-//    }
+
+
 }

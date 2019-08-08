@@ -5,7 +5,7 @@ import android.text.TextUtils;
 
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.internal.impl.DevStatusChecker;
+import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.internal.model.PolicyInfo;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.StreamerUtils;

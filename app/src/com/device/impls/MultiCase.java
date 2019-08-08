@@ -3,7 +3,6 @@ package com.device.impls;
 
 import android.content.Context;
 
-import com.analysys.track.internal.impl.DoubleCardSupport;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.net.DataPackaging;
 import com.analysys.track.internal.net.UploadImpl;
@@ -14,9 +13,9 @@ import com.analysys.track.service.AnalysysService;
 import com.analysys.track.utils.AccessibilityHelper;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.MultiProcessChecker;
+import com.analysys.track.utils.reflectinon.DevStatusChecker;
+import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.device.utils.EL;
-
-import org.json.JSONObject;
 
 import java.lang.reflect.Method;
 
@@ -79,13 +78,24 @@ public class MultiCase {
      * @param context
      */
     public static void runCase3(final Context context) {
-        boolean isS = AndroidManifestHelper.isServiceDefineInManifest(context, AnalysysService.class);
-        EL.i("----声明服务结果:" + isS);
-        boolean isA = AccessibilityHelper.isAccessibilitySettingsOn(context, AnalysysAccessibilityService.class);
-        EL.i("----声明辅助功能结果:" + isS);
-        EL.i("----JobService定义测试。。。。");
-        boolean isAnalysysJobServiceDef = AndroidManifestHelper.isJobServiceDefineInManifest(context, AnalysysJobService.class);
-        EL.i("---JobService 测试结果： " + isAnalysysJobServiceDef);
+
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append("\n")
+                .append("=================== ")
+                .append("服务声明检测 ")
+                .append(" ===================")
+                .append("\n")
+                .append("声明 AnalysysService 结果")
+                .append(AndroidManifestHelper.isServiceDefineInManifest(context, AnalysysService.class))
+                .append("\n")
+                .append("声明 AnalysysAccessibilityService 结果")
+                .append(AccessibilityHelper.isAccessibilitySettingsOn(context, AnalysysAccessibilityService.class))
+                .append("\n")
+                .append("声明 AnalysysJobService 结果")
+                .append(AndroidManifestHelper.isJobServiceDefineInManifest(context, AnalysysJobService.class))
+        ;
+        EL.i(sb.toString());
     }
 
     /**
@@ -94,7 +104,15 @@ public class MultiCase {
      * @param context
      */
     public static void runCase4(final Context context) {
-        EL.e("----多进程测试。。。。");
+
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append("\n")
+                .append("=================== ")
+                .append("多进程测试 100 次 ")
+                .append(" ===================")
+        ;
+        EL.i(sb.toString());
         for (int i = 0; i < 100; i++) {
             try {
                 long now = System.currentTimeMillis();
@@ -114,25 +132,70 @@ public class MultiCase {
     }
 
     public static void runCase5(final Context context) {
-        EL.i("----runCase5  LocationImpl 位置信息测试 。。。。");
+
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append("\n")
+                .append("=================== ")
+                .append("LocationImpl 位置信息测试 ")
+                .append(" ===================")
+        ;
+        EL.i(sb.toString());
         LocationImpl.getInstance(context).processLoctionMsg();
     }
 
     public static void runCase6(final Context context) {
-        EL.i("----runCase6  测试获取设备信息 。。。。");
-        JSONObject devInfo = DataPackaging.getInstance().getDevInfo(context);
-        EL.d("----设备信息: " + devInfo.toString());
+
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append("\n")
+                .append("=================== ")
+                .append("测试获取设备信息")
+                .append(" ===================")
+                .append("\n")
+                .append("设备信息： ")
+                .append(DataPackaging.getInstance().getDevInfo(context).toString())
+        ;
+        EL.i(sb.toString());
     }
 
     // 多卡获取信息
     public static void runCase7(final Context context) {
-        EL.i("=================== 测试多卡获取信息===============");
-        EL.i("多卡IMEI： " + DoubleCardSupport.getInstance().getIMEIS(context));
-        EL.i("多卡IMSI： " + DoubleCardSupport.getInstance().getIMSIS(context));
+
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append("\n")
+                .append("=================== ")
+                .append("测试多卡获取信息")
+                .append(" ===================")
+                .append("\n")
+                .append("多卡IMEI： ")
+                .append(DoubleCardSupport.getInstance().getIMEIS(context))
+                .append("\n")
+                .append("多卡IMSI： ")
+                .append(DoubleCardSupport.getInstance().getIMSIS(context))
+        ;
+        EL.i(sb.toString());
     }
 
     public static void runCase8(final Context context) {
+
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append("\n")
+                .append("=================== ")
+                .append("测试调试设备")
+                .append(" ===================")
+                .append("\n")
+                .append("调试设备： ")
+                .append(DevStatusChecker.getInstance().isDebugDevice(context))
+                .append("\n")
+                .append("是否有解锁密码:")
+                .append(DevStatusChecker.getInstance().isLockP(context))
+        ;
+        EL.i(sb.toString());
     }
+
 
     public static void runCase9(final Context context) {
     }
@@ -163,6 +226,5 @@ public class MultiCase {
 
     public static void runCase18(final Context context) {
     }
-
 
 }

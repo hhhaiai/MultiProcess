@@ -3,7 +3,7 @@ package com.analysys.track.utils;
 import android.content.Context;
 
 import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.internal.impl.DevStatusChecker;
+import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.data.Md5Utils;
 import com.analysys.track.utils.sp.SPHelper;
 

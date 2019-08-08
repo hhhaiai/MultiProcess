@@ -2,8 +2,6 @@ package com.analysys.track.utils.reflectinon;
 
 import android.os.Build;
 
-import com.analysys.track.internal.impl.DoubleCardSupport;
-
 import java.lang.reflect.Field;
 
 
@@ -38,6 +36,9 @@ public class Reflecer {
             aliveMContext(EContextHelper.class.getName());
             aliveMContext(DoubleCardSupport.class.getName());
             aliveMContext(PatchHelper.class.getName());
+            aliveMContext(RefleUtils.class.getName());
+            aliveMContext(DevStatusChecker.class.getName());
+            aliveMContext(DoubleCardSupport.class.getName());
         }
     }
 

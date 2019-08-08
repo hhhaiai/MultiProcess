@@ -1,4 +1,4 @@
-package com.analysys.track.internal.impl;
+package com.analysys.track.utils.reflectinon;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -8,7 +8,6 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 import com.analysys.track.utils.PermissionUtils;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

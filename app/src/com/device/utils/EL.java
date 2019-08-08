@@ -88,7 +88,7 @@ public class EL {
     // 规定每段显示的长度.每行最大日志长度 (Android Studio3.1最多2902字符)
     private static int LOG_MAXLENGTH = 2900;
     // 类名(getClassName).方法名(getMethodName)[行号(getLineNumber)]
-    private static String content_simple_callstack = "[%s] %s.%s(%d) ║  ";
+    private static String content_simple_callstack = "[%s] %s.%s(%d)    ";
     // 格式化时，行首封闭符
     private static String CONTENT_LINE = "║ ";
     // 空格
