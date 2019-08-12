@@ -6,15 +6,15 @@ import android.os.Build;
 import com.analysys.track.internal.content.DataController;
 import com.analysys.track.internal.content.DeviceKeyContacts;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.internal.impl.DeviceImpl;
-import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.analysys.track.internal.impl.SenSorModuleNameImpl;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EguanIdUtils;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.reflectinon.DevStatusChecker;
+import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -58,10 +58,8 @@ public class DataPackaging {
                     DataController.SWITCH_OF_MAC);
             JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.SerialNumber,
                     devImpl.getSerialNumber(), DataController.SWITCH_OF_SERIALNUMBER);
-            JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.Resolution, devImpl.getResolution(),
-                    DataController.SWITCH_OF_RESOLUTION);
-            JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.DotPerInch, devImpl.getDotPerInch(),
-                    DataController.SWITCH_OF_DOTPERINCH);
+            JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.Resolution, devImpl.getResolution(), DataController.SWITCH_OF_RESOLUTION);
+            JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.DotPerInch, devImpl.getDotPerInch(), DataController.SWITCH_OF_DOTPERINCH);
             JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.MobileOperator,
                     devImpl.getMobileOperator(), DataController.SWITCH_OF_MOBILE_OPERATOR);
             JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.MobileOperatorName,
@@ -72,16 +70,14 @@ public class DataPackaging {
                     devImpl.getNetworkOperatorName(), DataController.SWITCH_OF_NETWORK_OPERATOR_NAME);
             JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.Imeis,
                     DoubleCardSupport.getInstance().getIMEIS(context), DataController.SWITCH_OF_IMEIS);
-            JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.Imsis, DoubleCardSupport.getInstance().getIMSIS(context),
-                    DataController.SWITCH_OF_IMSIS);
+            JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.Imsis, DoubleCardSupport.getInstance().getIMSIS(context), DataController.SWITCH_OF_IMSIS);
             JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationChannel,
                     SystemUtils.getAppChannel(context), DataController.SWITCH_OF_APPLICATION_CHANNEL);
             JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationKey,
                     SystemUtils.getAppKey(context), DataController.SWITCH_OF_APPLICATION_KEY);
             JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationName,
                     devImpl.getApplicationName(), DataController.SWITCH_OF_APPLICATION_NAME);
-            JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.APILevel, String.valueOf(Build.VERSION.SDK_INT),
-                    DataController.SWITCH_OF_APILEVEL);
+            JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.APILevel, String.valueOf(Build.VERSION.SDK_INT), DataController.SWITCH_OF_APILEVEL);
             JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.ApplicationPackageName,
                     devImpl.getApplicationPackageName(), DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
             JsonUtils.pushToJSON(context, deviceInfo, DeviceKeyContacts.DevInfo.SDKVersion, EGContext.SDK_VERSION,
@@ -190,18 +186,23 @@ public class DataPackaging {
                         Build.FINGERPRINT, DataController.SWITCH_OF_BUILD_FINGER_PRINT);
                 JsonUtils.pushToJSON(context, batteryJson, DeviceKeyContacts.DevInfo.BuildRadioVersion,
                         Build.getRadioVersion(), DataController.SWITCH_OF_BUILD_RADIO_VERSION);
+                //Added in API level 1
                 JsonUtils.pushToJSON(context, batteryJson, DeviceKeyContacts.DevInfo.BuildIncremental,
                         Build.VERSION.INCREMENTAL, DataController.SWITCH_OF_BUILD_INCREMENTAL);
-                JsonUtils.pushToJSON(context, batteryJson, DeviceKeyContacts.DevInfo.BuildBaseOS,
-                        Build.VERSION.BASE_OS, DataController.SWITCH_OF_BUILD_BASE_OS);
-                JsonUtils.pushToJSON(context, batteryJson, DeviceKeyContacts.DevInfo.BuildSecurityPatch,
-                        Build.VERSION.SECURITY_PATCH, DataController.SWITCH_OF_BUILD_SECURITY_PATCH);
-                JsonUtils.pushToJSON(context, batteryJson, DeviceKeyContacts.DevInfo.BuildSdkInt,
-                        String.valueOf(Build.VERSION.SDK_INT), DataController.SWITCH_OF_BUILD_SDK_INT);
+
                 if (Build.VERSION.SDK_INT > 22) {
+                    JsonUtils.pushToJSON(context, batteryJson, DeviceKeyContacts.DevInfo.BuildBaseOS,
+                            Build.VERSION.BASE_OS, DataController.SWITCH_OF_BUILD_BASE_OS);
+                    JsonUtils.pushToJSON(context, batteryJson, DeviceKeyContacts.DevInfo.BuildSecurityPatch,
+                            Build.VERSION.SECURITY_PATCH, DataController.SWITCH_OF_BUILD_SECURITY_PATCH);
                     JsonUtils.pushToJSON(context, batteryJson, DeviceKeyContacts.DevInfo.BuildPreviewSdkInt,
                             String.valueOf(Build.VERSION.PREVIEW_SDK_INT), DataController.SWITCH_OF_BUILD_PREVIEW_SDK_INT);
                 }
+
+                //Added in API level 4
+                JsonUtils.pushToJSON(context, batteryJson, DeviceKeyContacts.DevInfo.BuildSdkInt,
+                        String.valueOf(Build.VERSION.SDK_INT), DataController.SWITCH_OF_BUILD_SDK_INT);
+                //Added in API level 4
                 JsonUtils.pushToJSON(context, batteryJson, DeviceKeyContacts.DevInfo.BuildCodename,
                         Build.VERSION.CODENAME, DataController.SWITCH_OF_BUILD_CODE_NAME);
                 JsonUtils.pushToJSON(context, batteryJson, DeviceKeyContacts.DevInfo.IDFA, devImpl.getIDFA(),
