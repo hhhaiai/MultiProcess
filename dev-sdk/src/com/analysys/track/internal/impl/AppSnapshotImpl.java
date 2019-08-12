@@ -53,12 +53,18 @@ public class AppSnapshotImpl {
             long now = System.currentTimeMillis();
             // 获取下发的间隔时间
             long durByPolicy = PolicyImpl.getInstance(mContext).getSP().getLong(EGContext.SP_SNAPSHOT_CYCLE, EGContext.TIME_HOUR * 3);
+
             // 3小时内只能操作一次
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, durByPolicy, now)) {
                 long time = SPHelper.getLongValueFromSP(mContext, EGContext.SP_APP_SNAP, 0);
                 long dur = now - time;
+
+
                 //大于三个小时才可以工作
                 if (dur > durByPolicy) {
+                    if (EGContext.DEBUG_SNAP) {
+                        ELOG.i("sanbo.snap", " 大于3小时可以开始工作 ");
+                    }
                     SPHelper.setLongValue2SP(mContext, EGContext.SP_APP_SNAP, now);
                     if (SystemUtils.isMainThread()) {
                         EThreadPool.execute(new Runnable() {
@@ -71,6 +77,9 @@ public class AppSnapshotImpl {
                         getSnapShotInfo();
                     }
                 } else {
+                    if (EGContext.DEBUG_SNAP) {
+                        ELOG.i("sanbo.snap", " 大于小于3小时 time：" + time);
+                    }
                     //同步调整时间
                     MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, time);
                     MessageDispatcher.getInstance(mContext).postLocation(dur);
@@ -88,15 +97,18 @@ public class AppSnapshotImpl {
         try {
             // 1. 获取现在的安装列表
             List<JSONObject> currentSnapshotsList = getCurrentSnapshots();
+            if (EGContext.DEBUG_SNAP) {
+                ELOG.i("sanbo.snap", " 获取安装列表: " + currentSnapshotsList.size());
+            }
             if (currentSnapshotsList != null && currentSnapshotsList.size() > 0) {
                 // 2. 获取DB中缓存的列表
                 Map<String, String> dbSnapshotsMap = TableAppSnapshot.getInstance(mContext).snapShotSelect();
                 if (dbSnapshotsMap != null && !dbSnapshotsMap.isEmpty()) {
                     // 3. 对比处理当前快照和db数据
                     currentSnapshotsList = getDifference(currentSnapshotsList, dbSnapshotsMap);
-                    // 4. 最新的数据存储本地
-                    TableAppSnapshot.getInstance(mContext).coverInsert(currentSnapshotsList);
                 }
+                // 4. 最新的数据存储本地
+                TableAppSnapshot.getInstance(mContext).coverInsert(currentSnapshotsList);
             }
 
             // 5. 解锁多进程
@@ -457,6 +469,7 @@ public class AppSnapshotImpl {
 
     private AppSnapshotImpl() {
     }
+
 
     private static class Holder {
         private static final AppSnapshotImpl INSTANCE = new AppSnapshotImpl();

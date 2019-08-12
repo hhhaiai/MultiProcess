@@ -196,11 +196,9 @@ public class UploadImpl {
             }
             if (TextUtils.isEmpty(url)) {
                 isUploading = false;
-//                SPHelper.setIntValue2SP(mContext, EGContext.REQUEST_STATE, EGContext.sPrepare);
                 return;
             }
             url = "http://192.168.220.167:8089";
-            // L.info(mContext,"url: "+url);
 
             handleUpload(url, messageEncrypt(uploadInfo));
             int failNum = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);
@@ -215,7 +213,6 @@ public class UploadImpl {
                 uploadInfo = getInfo();
                 if (TextUtils.isEmpty(url)) {
                     isUploading = false;
-//                    SPHelper.setIntValue2SP(mContext, EGContext.REQUEST_STATE, EGContext.sPrepare);
                     return;
                 }
                 handleUpload(url, messageEncrypt(uploadInfo));
@@ -249,7 +246,7 @@ public class UploadImpl {
                     true)) {
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                 if (useFulLength > 0 && !isChunkUpload) {
-                    JSONArray ocJson = getModuleInfos(mContext, object, "OC", useFulLength);
+                    JSONArray ocJson = getModuleInfos(mContext, object, MODULE_OC, useFulLength);
                     if (ocJson != null && ocJson.length() > 0) {
                         object.put(DeviceKeyContacts.OCInfo.NAME, ocJson);
                     }
@@ -262,7 +259,7 @@ public class UploadImpl {
                     .getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                 if (useFulLength > 0 && !isChunkUpload) {
-                    JSONArray locationInfo = getModuleInfos(mContext, object, "LOCATION", useFulLength);
+                    JSONArray locationInfo = getModuleInfos(mContext, object, MODULE_LOCATION, useFulLength);
                     if (locationInfo != null && locationInfo.length() > 0) {
                         object.put(DeviceKeyContacts.AppSnapshotInfo.NAME, locationInfo);
                     }
@@ -275,7 +272,7 @@ public class UploadImpl {
                     .getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                 if (useFulLength > 0 && !isChunkUpload) {
-                    JSONArray snapshotJar = getModuleInfos(mContext, object, "SNAPSHOT", useFulLength);
+                    JSONArray snapshotJar = getModuleInfos(mContext, object, MODULE_SNAPSHOT, useFulLength);
                     if (snapshotJar != null && snapshotJar.length() > 0) {
                         object.put(DeviceKeyContacts.AppSnapshotInfo.NAME, snapshotJar);
                     }
@@ -289,7 +286,7 @@ public class UploadImpl {
                 // 计算离最大上线的差值
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                 if (useFulLength > 0 && !isChunkUpload) {
-                    JSONArray xxxInfo = getModuleInfos(mContext, object, "XXX", useFulLength);
+                    JSONArray xxxInfo = getModuleInfos(mContext, object, MODULE_XXX, useFulLength);
                     if (xxxInfo != null && xxxInfo.length() > 0) {
                         object.put(DeviceKeyContacts.XXXInfo.NAME, xxxInfo);
                     }
@@ -505,7 +502,8 @@ public class UploadImpl {
 
     }
 
-    private JSONArray getModuleInfos(Context mContext, JSONObject obj, String moduleName, long useFulLength) {
+
+    private JSONArray getModuleInfos(Context mContext, JSONObject obj, int module, long useFulLength) {
         // 结果存放JsonObject结构
         JSONArray arr = new JSONArray();
         try {
@@ -516,24 +514,25 @@ public class UploadImpl {
                 }
                 return arr;
             }
-            if (TextUtils.isEmpty(moduleName)) {
-                return arr;
-            }
-            if ("OC".equals(moduleName)) {
-//                ELOG.e("OC模块数据读取开始：：：");
-                arr = TableOC.getInstance(mContext).select(useFulLength);
-            } else if ("LOCATION".equals(moduleName)) {
-//                ELOG.e("LOCATION模块数据读取开始：：：");
-                arr = TableLocation.getInstance(mContext).select(useFulLength);
-            } else if ("SNAPSHOT".equals(moduleName)) {
-//                ELOG.e("SNAPSHOT模块数据读取开始：：：");
-                arr = TableAppSnapshot.getInstance(mContext).select(useFulLength);
-            } else if ("XXX".equals(moduleName)) {
-//                ELOG.e("XXX模块数据读取开始：：：");
-                arr = TableXXXInfo.getInstance(mContext).select(useFulLength);
+
+            switch (module) {
+                case MODULE_OC:
+                    arr = TableOC.getInstance(mContext).select(useFulLength);
+                    break;
+                case MODULE_LOCATION:
+                    arr = TableLocation.getInstance(mContext).select(useFulLength);
+                    break;
+                case MODULE_SNAPSHOT:
+                    arr = TableAppSnapshot.getInstance(mContext).select(useFulLength);
+                    break;
+                case MODULE_XXX:
+                    arr = TableXXXInfo.getInstance(mContext).select(useFulLength);
+                    break;
+                default:
+                    break;
             }
             if (EGContext.DEBUG_UPLOAD) {
-                ELOG.i("isChunkUpload  :::: " + isChunkUpload);
+                ELOG.i("isChunkUpload:  " + isChunkUpload);
             }
             if (arr == null || arr.length() <= 1) {
                 isChunkUpload = false;
@@ -574,5 +573,13 @@ public class UploadImpl {
     public static List<String> idList = new ArrayList<String>();
     private Context mContext;
     private String fail = "-1";
+
+    /**
+     * 上传数据时取数据类型
+     */
+    private final int MODULE_OC = 0;
+    private final int MODULE_LOCATION = 1;
+    private final int MODULE_SNAPSHOT = 2;
+    private final int MODULE_XXX = 3;
 
 }

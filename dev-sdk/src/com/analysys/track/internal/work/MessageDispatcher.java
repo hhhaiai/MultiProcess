@@ -103,6 +103,9 @@ public class MessageDispatcher {
                         break;
 
                     case MSG_INFO_SNAPS:
+                        if (EGContext.DEBUG_SNAP) {
+                            ELOG.d("sanbo.snap", " 收到 MSG_INFO_SNAPS 信息。。心跳。。");
+                        }
                         AppSnapshotImpl.getInstance(mContext).snapshotsInfo();
                         break;
                     default:
