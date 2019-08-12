@@ -73,8 +73,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
         } catch (SQLiteDatabaseCorruptException e) {
             rebuildDB();
-        } finally {
-            db.close();
+//        } finally {
+//            db.close();
         }
     }
 

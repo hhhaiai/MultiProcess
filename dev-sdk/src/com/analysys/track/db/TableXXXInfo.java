@@ -21,6 +21,14 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: xxxinfo写入DB
+ * @Version: 1.0
+ * @Create: 2019-08-12 19:04:48
+ * @author: sanbo
+ */
 public class TableXXXInfo {
 
     /**
@@ -37,7 +45,10 @@ public class TableXXXInfo {
                 db = DBManager.getInstance(mContext).openDB();
             }
             ContentValues cv = getContentValues(xxxInfo);
-            db.insert(DBConfig.XXXInfo.TABLE_NAME, null, cv);
+            // 防止因为传递控制导致的写入异常
+            if (cv.size() > 1) {
+                db.insert(DBConfig.XXXInfo.TABLE_NAME, null, cv);
+            }
 
         } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {
@@ -53,24 +64,20 @@ public class TableXXXInfo {
      * json数据转成ContentValues
      */
     private ContentValues getContentValues(JSONObject xxxInfo) {
-        ContentValues cv = null;
+        ContentValues cv = new ContentValues();
         String result = null;
-        try {
-            if (xxxInfo != null) {
-                result = String.valueOf(xxxInfo.opt(ProcUtils.RUNNING_RESULT));
-                if (!TextUtils.isEmpty(result) && !"null".equalsIgnoreCase(result)) {
-                    cv = new ContentValues();
-                    cv.put(DBConfig.XXXInfo.Column.TIME,
-                            EncryptUtils.encrypt(mContext, String.valueOf(xxxInfo.opt(ProcUtils.RUNNING_TIME))));
-//                    cv.put(DBConfig.XXXInfo.Column.TOP, EncryptUtils.encrypt(mContext,String.valueOf(object.opt(ProcParser.RUNNING_TOP))));
-//                    cv.put(DBConfig.XXXInfo.Column.PS, EncryptUtils.encrypt(mContext,String.valueOf(object.opt(ProcParser.RUNNING_PS))));
+        if (xxxInfo != null) {
+            if (xxxInfo.has(ProcUtils.RUNNING_RESULT)) {
+                result = xxxInfo.optString(ProcUtils.RUNNING_RESULT);
+                if (!TextUtils.isEmpty(result)) {
                     // PROC
                     cv.put(DBConfig.XXXInfo.Column.PROC, EncryptUtils.encrypt(mContext, result));
+                    if (xxxInfo.has(ProcUtils.RUNNING_TIME)) {
+                        long time = xxxInfo.optLong(ProcUtils.RUNNING_TIME);
+                        cv.put(DBConfig.XXXInfo.Column.TIME,
+                                EncryptUtils.encrypt(mContext, String.valueOf(time)));
+                    }
                 }
-            }
-        } catch (Throwable t) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
             }
         }
         return cv;

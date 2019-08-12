@@ -3,8 +3,6 @@ package com.analysys.track.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -30,31 +28,17 @@ public class DBManager {
     }
 
     public synchronized SQLiteDatabase openDB() {
-        try {
-            if (mOpenWriteCounter.incrementAndGet() == 1) {
-                // Opening new database
-                db = dbHelper.getWritableDatabase();
-            }
-        } catch (Throwable t) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
-            }
+        if (mOpenWriteCounter.incrementAndGet() == 1) {
+            // Opening new database
+            db = dbHelper.getWritableDatabase();
         }
         return db;
     }
 
     public synchronized void closeDB() {
-        try {
-            if (mOpenWriteCounter.decrementAndGet() == 0) {
-                // Closing database
-                db.close();
-            }
-
-        } catch (Throwable t) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
-            }
-
+        if (mOpenWriteCounter.decrementAndGet() == 0) {
+            // Closing database
+            db.close();
         }
     }
 
