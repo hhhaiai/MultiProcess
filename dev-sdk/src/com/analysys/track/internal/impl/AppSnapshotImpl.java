@@ -18,6 +18,7 @@ import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
+import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONObject;
 
@@ -43,49 +44,67 @@ public class AppSnapshotImpl {
      */
     public void snapshotsInfo() {
         try {
-            long currentTime = System.currentTimeMillis();
-//            long snapCollectCycle = PolicyImpl.getInstance(mContext).getSP().getLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL,EGContext.UPLOAD_CYCLE);
-            MessageDispatcher.getInstance(mContext).snapshotInfo(EGContext.SNAPSHOT_CYCLE);
-            if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, EGContext.SNAPSHOT_CYCLE,
-                    currentTime)) {
-                MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, currentTime);
-            } else {
+
+            // 策略不允许安装列表模快工作, 则停止工作。
+            if (!PolicyImpl.getInstance(mContext)
+                    .getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
                 return;
             }
-            if (!isSnapShotBlockRunning) {
-                isSnapShotBlockRunning = true;
-            } else {
-                return;
-            }
-            if (SystemUtils.isMainThread()) {
-                EThreadPool.execute(new Runnable() {
-                    @Override
-                    public void run() {
+            long now = System.currentTimeMillis();
+            // 获取下发的间隔时间
+            long durByPolicy = PolicyImpl.getInstance(mContext).getSP().getLong(EGContext.SP_SNAPSHOT_CYCLE, EGContext.TIME_HOUR * 3);
+            // 3小时内只能操作一次
+            if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, durByPolicy, now)) {
+                long time = SPHelper.getLongValueFromSP(mContext, EGContext.SP_APP_SNAP, 0);
+                long dur = now - time;
+                //大于三个小时才可以工作
+                if (dur > durByPolicy) {
+                    SPHelper.setLongValue2SP(mContext, EGContext.SP_APP_SNAP, now);
+                    if (SystemUtils.isMainThread()) {
+                        EThreadPool.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                getSnapShotInfo();
+                            }
+                        });
+                    } else {
                         getSnapShotInfo();
                     }
-                });
+                } else {
+                    //同步调整时间
+                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, time);
+                    MessageDispatcher.getInstance(mContext).postLocation(dur);
+                }
+
             } else {
-                getSnapShotInfo();
+                return;
             }
+
         } catch (Throwable t) {
-        } finally {
-            isSnapShotBlockRunning = false;
         }
     }
 
     private void getSnapShotInfo() {
         try {
-            if (!PolicyImpl.getInstance(mContext)
-                    .getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
-                return;
-            }
-            Map<String, String> dbSnapshotsMap = TableAppSnapshot.getInstance(mContext).snapShotSelect();
+            // 1. 获取现在的安装列表
             List<JSONObject> currentSnapshotsList = getCurrentSnapshots();
-            if (dbSnapshotsMap != null && !dbSnapshotsMap.isEmpty()) {
-                // 对比处理当前快照和db数据
-                currentSnapshotsList = getDifference(currentSnapshotsList, dbSnapshotsMap);
+            if (currentSnapshotsList != null && currentSnapshotsList.size() > 0) {
+                // 2. 获取DB中缓存的列表
+                Map<String, String> dbSnapshotsMap = TableAppSnapshot.getInstance(mContext).snapShotSelect();
+                if (dbSnapshotsMap != null && !dbSnapshotsMap.isEmpty()) {
+                    // 3. 对比处理当前快照和db数据
+                    currentSnapshotsList = getDifference(currentSnapshotsList, dbSnapshotsMap);
+                    // 4. 最新的数据存储本地
+                    TableAppSnapshot.getInstance(mContext).coverInsert(currentSnapshotsList);
+                }
             }
-            TableAppSnapshot.getInstance(mContext).coverInsert(currentSnapshotsList);
+
+            // 5. 解锁多进程
+            long now = System.currentTimeMillis();
+            MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, now);
+            MessageDispatcher.getInstance(mContext).postSnap(now);
+            // 6. 异步消息
+            MessageDispatcher.getInstance(mContext).postSnap(EGContext.TIME_HOUR * 3);
         } catch (Throwable t) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
@@ -354,7 +373,7 @@ public class AppSnapshotImpl {
      * @return
      */
     @SuppressWarnings("deprecation")
-    public JSONObject getAppInfo(PackageInfo pkgInfo, PackageManager packageManager, String tag) {
+    private JSONObject getAppInfo(PackageInfo pkgInfo, PackageManager packageManager, String tag) {
         JSONObject appInfo = new JSONObject();
         JsonUtils.pushToJSON(mContext, appInfo, DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,
                 pkgInfo.packageName, DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
@@ -370,6 +389,7 @@ public class AppSnapshotImpl {
         return appInfo;
     }
 
+    /**************************************  处理广播消息 ******************************************************/
 
     /**
      * 处理消息中的应用安装、卸载、更新广播
@@ -430,6 +450,8 @@ public class AppSnapshotImpl {
         }
     }
 
+    /**************************************  单例和变量 ******************************************************/
+
     private AppSnapshotImpl() {
     }
 
@@ -450,7 +472,7 @@ public class AppSnapshotImpl {
     // private final String APP_LIST_USER = "pm list packages -3";// third party
     // 获取系统应用列表
     private final Set<String> mSystemAppSet = new HashSet<String>();
-    private boolean isSnapShotBlockRunning = false;
+    //    private boolean isSnapShotBlockRunning = false;
     private Context mContext;
 
 

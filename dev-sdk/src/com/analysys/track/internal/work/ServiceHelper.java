@@ -54,15 +54,11 @@ public class ServiceHelper {
                 startServiceWhenP();
             }
         } catch (Throwable t) {
+            MessageDispatcher.getInstance(mContext).initModule();
         }
 
     }
 
-//if () {
-//                return false;
-//            } else {
-//                return false;
-//            }
 
     /**
      * 4.x启动服务。 逻辑: 服务启动-->没服务消息方式启动
@@ -280,7 +276,7 @@ public class ServiceHelper {
                 JobScheduler jobScheduler = (JobScheduler) mContext.getApplicationContext().getSystemService(Context.JOB_SCHEDULER_SERVICE);
                 JobInfo.Builder builder = new JobInfo.Builder(EGContext.JOB_ID,
                         new ComponentName(mContext, AnalysysJobService.class.getName())); // 指定哪个JobService执行操作
-                builder.setPeriodic(EGContext.JOB_SERVICE_TIME);// 10s
+                builder.setPeriodic(EGContext.TIME_SECOND*10);// 10s
                 builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
                 jobScheduler.schedule(builder.build());
                 return true;

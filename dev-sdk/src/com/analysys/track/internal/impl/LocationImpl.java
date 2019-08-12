@@ -18,6 +18,7 @@ import com.analysys.track.internal.Content.DataController;
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.net.PolicyImpl;
+import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.ELOG;
@@ -51,77 +52,73 @@ import java.util.Set;
  */
 public class LocationImpl {
 
-    private static boolean isLocationBlockRunning = false;
-    private static int permissionAskCount = 0;
-    Context mContext;
-    TelephonyManager mTelephonyManager = null;
-    JSONObject locationJson = null;
-    private LocationManager locationManager;
 
-    private LocationImpl() {
-    }
-
-    public static LocationImpl getInstance(Context context) {
-        if (Holder.INSTANCE.mContext == null) {
-            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
-        }
-        if (LocationImpl.Holder.INSTANCE.locationManager == null) {
-            if (LocationImpl.Holder.INSTANCE.mContext != null) {
-                LocationImpl.Holder.INSTANCE.locationManager = (LocationManager) LocationImpl.Holder.INSTANCE.mContext
-                        .getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-            }
-        }
-        return LocationImpl.Holder.INSTANCE;
-    }
-
-    public void processLoctionMsg() {
+    /**
+     * 处理位置信息
+     *
+     * @param callback
+     */
+    public void tryUploadLocationInfo(final ECallBack callback) {
         try {
-            long currentTime = System.currentTimeMillis();
-            MessageDispatcher.getInstance(mContext).locationInfo(EGContext.LOCATION_CYCLE);
-            if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_LOCATION, EGContext.LOCATION_CYCLE,
-                    currentTime)) {
-                MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, currentTime);
-            } else {
-                return;
-            }
-            if (!isLocationBlockRunning) {
-                isLocationBlockRunning = true;
-            } else {
-                return;
-            }
-            if (SystemUtils.isMainThread()) {
-                EThreadPool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        LocationHandle();
-                    }
-                });
-            } else {
-                LocationHandle();
-            }
-        } catch (Throwable t) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
-            }
-        } finally {
-            isLocationBlockRunning = false;
-        }
-    }
-
-    private void LocationHandle() {
-        try {
+            // 模快不工作，没有必要轮训
             if (!PolicyImpl.getInstance(mContext)
                     .getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
                 return;
             }
-            // 么有获取地理位置权限则不做处理
-            if (!hasLocationPermission()) {
-//                return;
 
+            long now = System.currentTimeMillis();
+            long durByPolicy = PolicyImpl.getInstance(mContext).getSP().getLong(EGContext.SP_LOCATION_CYCLE, EGContext.TIME_MINUTE * 30);
+            if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_LOCATION, durByPolicy, now)) {
+                long time = SPHelper.getLongValueFromSP(mContext, EGContext.SP_APP_LOCATION, 0);
+                long dur = now - time;
+                //大于固定时间才可以工作
+                if (dur > durByPolicy) {
+                    if (SystemUtils.isMainThread()) {
+                        EThreadPool.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                getLocationInfoInThread();
+                                MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, System.currentTimeMillis());
+                                if (callback != null) {
+                                    callback.onProcessed();
+                                }
+                            }
+                        });
+                    } else {
+                        getLocationInfoInThread();
+                        MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, System.currentTimeMillis());
+                        if (callback != null) {
+                            callback.onProcessed();
+                        }
+                    }
+                    SPHelper.setLongValue2SP(mContext, EGContext.SP_APP_LOCATION, now);
+                } else {
+                    // 时间不到
+                    //同步调整时间
+                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, time);
+                    MessageDispatcher.getInstance(mContext).postSnap(dur);
+                }
+
+            } else {
+                return;
+            }
+
+        } catch (Throwable t) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(t);
+            }
+        }
+    }
+
+    private void getLocationInfoInThread() {
+        try {
+
+            // 么有获取地理位置权限则不做处理
+            if (!isWillWork()) {
+                return;
             }
             if (mTelephonyManager == null) {
                 mTelephonyManager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-//                mTelephonyManager = AnalysysPhoneStateListener.getInstance(mContext).getTelephonyManager();
             }
             JSONObject location = getLocation();
             if (location != null && (location.has(DeviceKeyContacts.LocationInfo.GeographyLocation)
@@ -136,24 +133,31 @@ public class LocationImpl {
         }
     }
 
-    private boolean hasLocationPermission() {
+
+    /**
+     * 允许工作： 声明权限、允许申请权限、移动距离长度大于1000米
+     *
+     * @return
+     */
+    private boolean isWillWork() {
         /**
-         * Manifest是否声明权限
+         * 1. Manifest未声明权限，退出
          */
         if (!AndroidManifestHelper.isPermissionDefineInManifest(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
                 && !AndroidManifestHelper.isPermissionDefineInManifest(mContext,
                 Manifest.permission.ACCESS_COARSE_LOCATION)) {
             return false;
         }
-        // 是否可以去获取权限
-        if (canCheckPermission(mContext)) {
-            if (!PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
-                    && !PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+        // 2. 没权限再进行判断。是否申请超过五次
+        if (!PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
+                && !PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            if (!makesureRequestPermissionLessThanFive(mContext)) {
                 return false;
             }
-        } else {
-            return false;
         }
+
+        // 3. 距离不超过1000米
         List<String> pStrings = this.locationManager.getProviders(true);
         String provider;
         if (pStrings.contains(LocationManager.GPS_PROVIDER)) {
@@ -181,7 +185,13 @@ public class LocationImpl {
         return true;
     }
 
-    private boolean canCheckPermission(Context context) {
+    /**
+     * 确保每天权限只申请五次
+     *
+     * @param context
+     * @return
+     */
+    private boolean makesureRequestPermissionLessThanFive(Context context) {
         try {
             if (context == null) {
                 return false;
@@ -191,13 +201,15 @@ public class LocationImpl {
             if (permissionAskCount == 0) {
                 permissionAskCount = SPHelper.getIntValueFromSP(context, EGContext.PERMISSION_COUNT, 0);
             }
-            if (spDay.equals(day) && permissionAskCount > 5) {
-                return false;
-            }
             // 如果是当天，则累加，并将当前count存sp；否则，则置零，重新累加。即，一天只能有5次申请授权
             if (spDay.equals(day)) {
-                permissionAskCount += 1;
-                SPHelper.setIntValue2SP(context, EGContext.PERMISSION_COUNT, permissionAskCount);
+                if (permissionAskCount > 5) {
+                    return false;
+                } else {
+                    permissionAskCount += 1;
+                    SPHelper.setIntValue2SP(context, EGContext.PERMISSION_COUNT, permissionAskCount);
+                }
+
             } else {
                 permissionAskCount += 1;
                 SPHelper.setStringValue2SP(context, EGContext.PERMISSION_TIME, day);
@@ -323,59 +335,6 @@ public class LocationImpl {
                 }
 
             }
-//            //cidList 获取
-//            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_CID_LIST, true)) {
-//                try {
-//                    String cidList = SPHelper.getStringValueFromSP(mContext,EGContext.CID_LIST,null);
-//                    if(cidList != null && cidList.length() > 0){
-//                        JsonUtils.pushToJSON(mContext, locationJson, DeviceKeyContacts.LocationInfo.BaseStationInfo.cidList, cidList, DataController.SWITCH_OF_BS_CID_LIST);
-//                    }
-//                } catch (Throwable t) {
-//                    if(EGContext.FLAG_DEBUG_INNER){
-//                        ELOG.e(t);
-//                    }
-//                }
-//
-//            }
-//            //lacList 获取
-//            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LAC_LIST, true)) {
-//                try {
-//                    String lacList = SPHelper.getStringValueFromSP(mContext,EGContext.LAC_LIST,null);
-//                    if(lacList != null && lacList.length() > 0){
-//                        JsonUtils.pushToJSON(mContext, locationJson, DeviceKeyContacts.LocationInfo.BaseStationInfo.lacList, lacList, DataController.SWITCH_OF_BS_LAC_LIST);
-//                    }
-//                } catch (Throwable t) {
-//                    if(EGContext.FLAG_DEBUG_INNER){
-//                        ELOG.e(t);
-//                    }
-//                }
-//            }
-//            //rsrpList 获取
-//            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_RSRP_LIST, true)) {
-//                try {
-//                    String rsrpList = SPHelper.getStringValueFromSP(mContext,EGContext.RSRP_LIST,null);
-//                    if(rsrpList != null && rsrpList.length() > 0){
-//                        JsonUtils.pushToJSON(mContext, locationJson, DeviceKeyContacts.LocationInfo.BaseStationInfo.rsrpList, rsrpList, DataController.SWITCH_OF_BS_RSRP_LIST);
-//                    }
-//                } catch (Throwable t) {
-//                    if(EGContext.FLAG_DEBUG_INNER){
-//                        ELOG.e(t);
-//                    }
-//                }
-//            }
-//            //ecioList 获取
-//            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_ECIO_LIST, true)) {
-//                try {
-//                    String ecioList = SPHelper.getStringValueFromSP(mContext,EGContext.ECIO_LIST,null);
-//                    if(ecioList != null && ecioList.length() > 0){
-//                        JsonUtils.pushToJSON(mContext, locationJson, DeviceKeyContacts.LocationInfo.BaseStationInfo.ecIoList, ecioList, DataController.SWITCH_OF_BS_ECIO_LIST);
-//                    }
-//                } catch (Throwable t) {
-//                    if(EGContext.FLAG_DEBUG_INNER){
-//                        ELOG.e(t);
-//                    }
-//                }
-//            }
         } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
@@ -661,7 +620,32 @@ public class LocationImpl {
         return jsonObject;
     }
 
+    /*********************************************** 单例和变量 *****************************************************/
     private static class Holder {
         private static final LocationImpl INSTANCE = new LocationImpl();
     }
+
+
+    private LocationImpl() {
+    }
+
+    public static LocationImpl getInstance(Context context) {
+        if (Holder.INSTANCE.mContext == null) {
+            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
+        }
+        if (LocationImpl.Holder.INSTANCE.locationManager == null) {
+            if (LocationImpl.Holder.INSTANCE.mContext != null) {
+                LocationImpl.Holder.INSTANCE.locationManager = (LocationManager) LocationImpl.Holder.INSTANCE.mContext
+                        .getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+            }
+        }
+        return LocationImpl.Holder.INSTANCE;
+    }
+
+    private static int permissionAskCount = 0;
+    Context mContext;
+    TelephonyManager mTelephonyManager = null;
+    JSONObject locationJson = null;
+    private LocationManager locationManager;
+
 }

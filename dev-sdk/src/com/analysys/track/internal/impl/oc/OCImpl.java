@@ -17,6 +17,7 @@ import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.net.PolicyImpl;
+import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.utils.AccessibilityHelper;
 import com.analysys.track.utils.ELOG;
@@ -39,83 +40,78 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @Copyright 2019 sanbo Inc. All rights reserved.
+ * @Description: OC处理逻辑
+ * @Version: 1.0
+ * @Create: 2019-08-10 22:42:03
+ * @author: sanbo
+ */
 public class OCImpl {
-
-    public static long mLastAvailableOpenOrCloseTime = -1;
-    /**
-     * mCache为Android4.x正在运行的app列表的内存变量值
-     */
-    public static JSONObject mCache = null;
-    /**
-     * mRunningApps为Android5/6正在运行的app列表的内存变量值
-     */
-    private static List<JSONObject> mRunningApps = null;
-    private static boolean isOCBlockRunning = false;
-    String pkgName = null;
-    private Context mContext;
-    private String mLastPkgName = "";
-    private long lastAvailableTime = -1;
-
-    private OCImpl() {
-    }
-
-    public static OCImpl getInstance(Context context) {
-        if (Holder.INSTANCE.mContext == null) {
-            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
-        }
-        return Holder.INSTANCE;
-    }
 
 
     /**
      * 处理OC采集信息
      */
-    public void processOCMsg() {
+    public void processOCMsg(final ECallBack callback) {
+        try {
+            if (SystemUtils.isMainThread()) {
+                EThreadPool.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        checkMultiProcessForWork();
+                        if (callback != null) {
+                            callback.onProcessed();
+                        }
+                    }
+                });
+            } else {
+                checkMultiProcessForWork();
+                if (callback != null) {
+                    callback.onProcessed();
+                }
+            }
+        } catch (Throwable t) {
+        }
+
+    }
+
+
+    /**
+     * 进程检查
+     *
+     * @return
+     */
+    public boolean checkMultiProcessForWork() {
         try {
             long currentTime = System.currentTimeMillis();
 
-            // 获取间隔时间
-            long durTime = -1;
-            if (Build.VERSION.SDK_INT < 21) {
-                durTime = EGContext.OC_CYCLE;
-            } else if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {
-                durTime = EGContext.OC_CYCLE_OVER_5;
-            } else {// 6以上不处理
-                return;
-            }
+            // 根据OC间隔时间进行任务调整
+            long durTime = getOCDurTime();
             if (durTime > 0) {
+
+
                 // 多进程锁定文件工作。
-                if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_OC, durTime,
-                        currentTime)) {
-                    if (!isOCBlockRunning) {
-                        isOCBlockRunning = true;
-                    } else {
-                        return;
-                    }
-                    if (SystemUtils.isMainThread()) {
-                        EThreadPool.execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                processOC();
-                            }
-                        });
-                    } else {
-                        processOC();
-                    }
+                if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_OC, EGContext.TIME_SECOND * 2, currentTime)) {
+                    processOC();
                     //oc开始处理重置标记位.
                     MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_OC, System.currentTimeMillis());
                 } else {
-                    return;
+                    if (EGContext.DEBUG_OC) {
+                        ELOG.e("sanbo.oc", "多进程并发。停止处理 。。。");
+                    }
+                    // 多进程
+                    return false;
                 }
+            } else {
+                if (EGContext.DEBUG_OC) {
+                    ELOG.i("sanbo.oc", " 6.0以上版本. 停止处理");
+                }
+                // 6.0以上版本
             }
-
-
-        } catch (Throwable t) {
-
-        } finally {
-            isOCBlockRunning = false;
+        } catch (Throwable e) {
         }
-
+        return true;
     }
 
     /**
@@ -127,18 +123,26 @@ public class OCImpl {
             if (SystemUtils.isScreenOn(mContext)) {
 //                fillData();
                 if (!SystemUtils.isScreenLocked(mContext)) {
+                    if (EGContext.DEBUG_OC) {
+                        ELOG.i("sanbo.oc", " 屏幕不亮 且不锁屏，开始检测");
+                    }
                     // 约束OC是否能工作
                     boolean isOCCollectedByPolicy = PolicyImpl.getInstance(mContext)
                             .getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC, true);
                     boolean isXXXCollectedByPolicy = PolicyImpl.getInstance(mContext)
                             .getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_XXX, true);
                     if (!isOCCollectedByPolicy && !isXXXCollectedByPolicy) {
+                        if (EGContext.DEBUG_OC) {
+                            ELOG.i("sanbo.oc", " 屏幕不亮 且不锁屏，不需要采集OC和XXX，即将停止工作");
+                        }
                         return;
                     }
-                    JSONObject xxxInfo = null;
-                    getInfoByVersion(isOCCollectedByPolicy, isXXXCollectedByPolicy, xxxInfo);
+                    getInfoByVersion(isOCCollectedByPolicy, isXXXCollectedByPolicy);
                 }
             } else {
+                if (EGContext.DEBUG_OC) {
+                    ELOG.i("sanbo.oc", " 屏幕不亮，停止处理。。保存数据");
+                }
                 closeOC(false, System.currentTimeMillis());
             }
         } catch (Throwable t) {
@@ -157,8 +161,9 @@ public class OCImpl {
     public void closeOC(boolean needCalculateTime, long closeTime) {
         try {
             // String lastAvailableTime = "";
-            if (Build.VERSION.SDK_INT < 21) {// 4.x
-                if (needCalculateTime && (System.currentTimeMillis() - closeTime < EGContext.OC_CYCLE)) {// 两次时间间隔如果小于5s,则无效
+            if (Build.VERSION.SDK_INT < 21) {
+                // 4.x及以下版本的数据处理
+                if (needCalculateTime && (System.currentTimeMillis() - closeTime < EGContext.TIME_SECOND * 5)) {// 两次时间间隔如果小于5s,则无效
                     if (mCache != null) {
                         mCache.remove(EGContext.LAST_OPEN_TIME);
                         mCache = null;
@@ -166,14 +171,16 @@ public class OCImpl {
                     return;
                 } else {// 有效入库
                     if (mCache != null) {
-                        mCache.put(EGContext.END_TIME, mLastAvailableOpenOrCloseTime);
+//                        mCache.put(EGContext.END_TIME, mLastAvailableOpenOrCloseTime);
+                        mCache.put(EGContext.END_TIME, System.currentTimeMillis());
                     } else {
                         return;
                     }
                     filterInsertOCInfo(EGContext.CLOSE_SCREEN);
                 }
-            } else if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {// 5/6
-                if (needCalculateTime && (System.currentTimeMillis() - closeTime < EGContext.OC_CYCLE_OVER_5)) {// 无效
+            } else if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {
+                // 5、6版本处理
+                if (needCalculateTime && (System.currentTimeMillis() - closeTime < EGContext.TIME_SECOND * 30)) {// 无效
                     return;
                 } else {
                     /**
@@ -238,18 +245,28 @@ public class OCImpl {
     }
 
     /**
+
+     */
+
+    /**
      * <pre>
      * OC获取，按照版本区别处理:
      *      1. 5.x以下系统API获取
      *      2. 5.x/6.x使用top/ps+proc来完成，数据同步给XXXInfo
      *      3. 7.x+获取活着服务.
      * </pre>
+     *
+     * @param isOCCollectedByPolicy
+     * @param isXXXCollectedByPolicy
      */
     @SuppressWarnings("deprecation")
-    public void getInfoByVersion(boolean isOCCollectedByPolicy, boolean isXXXCollectedByPolicy, JSONObject obj) {
+    public void getInfoByVersion(boolean isOCCollectedByPolicy, boolean isXXXCollectedByPolicy) {
         // 1. 获取info.
-        obj = ProcUtils.getInstance(mContext).getRunningInfo();
-//        L.info(mContext,"getInfoByVersion--RunningInfo---->" + obj);
+        JSONObject obj = ProcUtils.getInstance(mContext).getRunningInfo();
+
+        if (EGContext.DEBUG_OC) {
+            ELOG.i("sanbo.oc", " 获取的XXXInfo：" + obj.toString());
+        }
         if (obj == null || obj.length() <= 0) {
             return;
         }
@@ -377,6 +394,11 @@ public class OCImpl {
         }
     }
 
+    /**
+     * 系统api获取的运行列表
+     *
+     * @param am
+     */
     private void getRunningProcess(ActivityManager am) {
         try {
             List<ActivityManager.RunningAppProcessInfo> processInfos = am.getRunningAppProcesses();
@@ -421,12 +443,12 @@ public class OCImpl {
                             lastAvailableTime = SPHelper.getLongValueFromSP(mContext, EGContext.LAST_AVAILABLE_TIME, 0);
                         }
                         long time = System.currentTimeMillis() - lastAvailableTime;
-                        if (time > EGContext.OC_CYCLE) {
+                        if (time > EGContext.TIME_SECOND * 5) {
                             lastAvailableTime = System.currentTimeMillis();
                             SPHelper.setLongValue2SP(mContext, EGContext.LAST_AVAILABLE_TIME, lastAvailableTime);
                             saveCacheOCInfo(ocJson);
                         } else {
-                            SaveData2Sp(packageName, null);
+                            saveData2Sp(packageName, null);
                         }
                     }
                 }
@@ -437,12 +459,12 @@ public class OCImpl {
                 lastAvailableTime = SPHelper.getLongValueFromSP(mContext, EGContext.LAST_AVAILABLE_TIME, 0);
                 // 第一次打开
                 if (mCache.optLong(EGContext.LAST_AVAILABLE_TIME) == 0 && lastAvailableTime == 0) {
-                    SaveData2Sp(packageName, ocJson);
+                    saveData2Sp(packageName, ocJson);
                 } else {// 之前有缓存数据
-                    if (System.currentTimeMillis() - lastAvailableTime > EGContext.OC_CYCLE) {
-                        SaveData2Sp(packageName, ocJson);
+                    if (System.currentTimeMillis() - lastAvailableTime > EGContext.TIME_SECOND * 5) {
+                        saveData2Sp(packageName, ocJson);
                     } else {
-                        SaveData2Sp(packageName, null);
+                        saveData2Sp(packageName, null);
                     }
                 }
             }
@@ -452,7 +474,7 @@ public class OCImpl {
 
     }
 
-    private void SaveData2Sp(String packageName, JSONObject ocJson) {
+    private void saveData2Sp(String packageName, JSONObject ocJson) {
         mLastPkgName = packageName;
         // 第一次打开存数进内存
         SPHelper.setLongValue2SP(mContext, EGContext.LAST_AVAILABLE_TIME, System.currentTimeMillis());
@@ -495,10 +517,7 @@ public class OCImpl {
 
         }
 
-        String lastOpenTime = SPHelper.getStringValueFromSP(mContext, EGContext.LAST_OPEN_TIME, "");
-        if (TextUtils.isEmpty(lastOpenTime)) {
-            lastOpenTime = "0";
-        }
+//        saveData2Sp
 
     }
 
@@ -745,6 +764,12 @@ public class OCImpl {
         return ocInfo;
     }
 
+
+    /**
+     * 当前缓存的apptime入库操作
+     *
+     * @param switchType
+     */
     public void filterInsertOCInfo(String switchType) {
         String OldPkgName = mCache.optString(EGContext.LAST_PACKAGE_NAME, "");
         String appName = mCache.optString(EGContext.LAST_APP_NAME, "");
@@ -835,8 +860,125 @@ public class OCImpl {
         }
     }
 
+    /**
+     * 获取OC轮训时间
+     *
+     * @return
+     */
+    public long getOCDurTime() {
+        if (Build.VERSION.SDK_INT < 21) {
+            return EGContext.TIME_SECOND * 5;
+        } else if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {
+            return EGContext.TIME_SECOND * 30;
+        } else {// 6以上不处理
+            return -1;
+        }
+    }
+
+    /************************************** 开关屏处理 ********************************************/
+    /**
+     * 处理关闭屏幕、打开屏幕. 多进程+多线程支持。 多进程1秒处理一次
+     *
+     * @param isScreenOn
+     */
+    public void processOCWhenScreenChange(boolean isScreenOn) {
+        if (isScreenOn) {
+            // 亮屏幕处理
+//            if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext,
+//                    EGContext.FILES_SYNC_SCREEN_ON_BROADCAST,
+//                    EGContext.TIME_SECOND, System.currentTimeMillis())) {
+//
+//                if (SystemUtils.isMainThread()) {
+//                    EThreadPool.execute(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            processScreenOn();
+//                            MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SCREEN_ON_BROADCAST, System.currentTimeMillis());
+//                        }
+//                    });
+//                } else {
+//                    processScreenOn();
+//                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SCREEN_ON_BROADCAST, System.currentTimeMillis());
+//                }
+//
+//            } else {
+//                // 多进程抢占
+//                return;
+//            }
+
+        } else {
+            // 灭屏幕处理
+            if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext,
+                    EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST,
+                    EGContext.TIME_SECOND, System.currentTimeMillis())) {
+
+                if (SystemUtils.isMainThread()) {
+                    EThreadPool.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            processScreenOff();
+                            MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST, System.currentTimeMillis());
+                        }
+                    });
+                } else {
+                    processScreenOff();
+                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST, System.currentTimeMillis());
+                }
+            } else {
+                // 多进程抢占
+                return;
+            }
+        }
+    }
+
+//    /**
+//     * 点量屏幕处理
+//     */
+//    private void processScreenOn() {
+//        MessageDispatcher.getInstance(mContext).keepAlive();
+//    }
+
+    /**
+     * 关闭屏幕处理
+     */
+    private void processScreenOff() {
+
+        long now = System.currentTimeMillis();
+//        long lastCloseTime = SPHelper.getLongValueFromSP(mContext, EGContext.LAST_AVAILABLE_TIME, 0);
+
+        SPHelper.setLongValue2SP(mContext, EGContext.LAST_AVAILABLE_TIME, now);
+        OCImpl.getInstance(mContext).closeOC(false, now);
+
+    }
+
+    /************************************** 开关屏处理 ********************************************/
+
     private static class Holder {
         private static final OCImpl INSTANCE = new OCImpl();
     }
+
+    private OCImpl() {
+    }
+
+    public static OCImpl getInstance(Context context) {
+        if (Holder.INSTANCE.mContext == null) {
+            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
+        }
+        return Holder.INSTANCE;
+    }
+
+    /**
+     * mCache为Android4.x正在运行的app列表的内存变量值
+     */
+    public static JSONObject mCache = null;
+    /**
+     * mRunningApps为Android5/6正在运行的app列表的内存变量值
+     */
+    private static List<JSONObject> mRunningApps = null;
+    String pkgName = null;
+    private Context mContext;
+    private String mLastPkgName = "";
+    private long lastAvailableTime = -1;
+
 
 }

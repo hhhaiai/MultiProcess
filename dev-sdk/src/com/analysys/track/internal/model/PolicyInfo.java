@@ -31,11 +31,11 @@ public class PolicyInfo implements Serializable {
     /**
      * 上传失败后延迟时间
      */
-    private long FailTryDelay = EGContext.FAIL_TRY_DELAY_DEFALUT;
+    private long FailTryDelay = EGContext.TIME_MINUTE;
     /**
      * 客户端上传时间间隔
      */
-    private long TimerInterval = EGContext.UPLOAD_CYCLE;
+    private long TimerInterval = EGContext.TIME_HOUR * 6;
     /**
      * 动态采集模块
      */

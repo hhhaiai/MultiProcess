@@ -6,7 +6,6 @@ import android.content.Context;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.net.DataPackaging;
 import com.analysys.track.internal.net.UploadImpl;
-import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.service.AnalysysJobService;
 import com.analysys.track.service.AnalysysService;
@@ -56,8 +55,6 @@ public class MultiCase {
     public static void runCase1(final Context context) {
         EL.i("----上传测试----");
         UploadImpl.getInstance(context).upload();
-        EL.i("----上传重试测试----");
-        UploadImpl.getInstance(context).reTryAndUpload(false);
     }
 
     /**
@@ -66,10 +63,10 @@ public class MultiCase {
      * @param context
      */
     public static void runCase2(final Context context) {
-        EL.i("-----多进程开关屏处理测试----处理打开屏幕");
-        MessageDispatcher.getInstance(context).processScreenOnOff(true);
-        EL.i("-----多进程开关屏处理测试----处理关闭屏幕");
-        MessageDispatcher.getInstance(context).processScreenOnOff(false);
+//        EL.i("-----多进程开关屏处理测试----处理打开屏幕");
+//        MessageDispatcher.getInstance(context).processScreenOnOff(true);
+//        EL.i("-----多进程开关屏处理测试----处理关闭屏幕");
+//        MessageDispatcher.getInstance(context).processScreenOnOff(false);
     }
 
     /**
@@ -141,7 +138,7 @@ public class MultiCase {
                 .append(" ===================")
         ;
         EL.i(sb.toString());
-        LocationImpl.getInstance(context).processLoctionMsg();
+        LocationImpl.getInstance(context).tryUploadLocationInfo(null);
     }
 
     public static void runCase6(final Context context) {

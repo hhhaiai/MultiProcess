@@ -70,6 +70,7 @@ public class EThreadPool {
         if (executorUpload.isShutdown()) {
             executorUpload = Executors.newSingleThreadScheduledExecutor();
         }
+//        queue.add( new WeakReference<ScheduledFuture<?>>(executorUpload.schedule(command, 0, TimeUnit.MILLISECONDS)));
         executorUpload.execute(command);
     }
 

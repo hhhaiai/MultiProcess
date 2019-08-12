@@ -28,7 +28,7 @@ public class ReceiverUtils {
             setWork(true);
             if (mReceiver == null) {
                 mReceiver = new AnalysysReceiver();
-                // net work
+                // net checkMultiProcessForWork
                 IntentFilter intentFilter = new IntentFilter();
                 if (Build.VERSION.SDK_INT < 24) {
                     intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);

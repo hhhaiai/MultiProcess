@@ -278,7 +278,7 @@ public class SystemUtils {
         long reTryTime = PolicyImpl.getInstance(ctx).getSP()
                 .getLong(DeviceKeyContacts.Response.RES_POLICY_FAIL_TRY_DELAY, 0);
         if (reTryTime == 0) {
-            reTryTime = EGContext.FAIL_TRY_DELAY_DEFALUT;
+            reTryTime = EGContext.TIME_MINUTE;
             // 10s间隔
             reTryTime = ((int) (Math.random() * 10) * 1000) + reTryTime;
         }
@@ -468,7 +468,7 @@ public class SystemUtils {
                 closeTime = (long) (Math.random() * (currentTime - openTime) + openTime);
             }
         } else if (Build.VERSION.SDK_INT < 21) {
-            if (currentTime - openTime > EGContext.OC_CYCLE) {
+            if (currentTime - openTime > EGContext.TIME_SECOND * 5) {
                 closeTime = (long) (Math.random() * (currentTime - openTime) + openTime);
             }
         }

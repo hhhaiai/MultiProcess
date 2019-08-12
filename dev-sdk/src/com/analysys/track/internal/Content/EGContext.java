@@ -20,30 +20,31 @@ public class EGContext {
     public static final String SDK_TYPE = "Android";
     public static final String LOGTAG_INNER = "sanbo";
     public static final String LOGTAG_USER = "analysys";
+
+    /**
+     * 调试系列tag
+     */
+    public static final boolean DEBUG_UPLOAD = true;
+    public static final boolean DEBUG_OC = true;
     /**
      * xml 中声明的 appid、channel
      */
     public static final String XML_METADATA_APPKEY = "ANALYSYS_APPKEY";
     public static final String XML_METADATA_CHANNEL = "ANALYSYS_CHANNEL";
-    // 应用列表获取周期时间,3个小时
-    public static final int SNAPSHOT_CYCLE = 3 * 60 * 60 * 1000;
+
+    //获取间隔时间
     public static final String SP_SNAPSHOT_CYCLE = "SP_SNAPSHOT_CYCLE";
-    // 位置获取周期时间,30min
-    public static final int LOCATION_CYCLE = 30 * 60 * 1000;
     public static final String SP_LOCATION_CYCLE = "SP_LOCATION_CYCLE";
-    // 应用打开关闭获取周期时间
-    public static final int OC_CYCLE = 5 * 1000;
     public static final String SP_OC_CYCLE = "SP_OC_CYCLE";
-    // 5.0以上30s
-    public static final int OC_CYCLE_OVER_5 = 30 * 1000;
-    // 应用打开关闭获取周期时间
-    public static final int UPLOAD_CYCLE = 6 * 60 * 60 * 1000;
-    // 心跳检查
-    public static final int CHECK_HEARTBEAT_CYCLE = 5 * 1000;
+
+    public static final String SP_APP_SNAP = "S_SNAP_TIME";
+    public static final String SP_APP_LOCATION = "S_LOC_TIME";
+
+    public static final int TIME_SECOND = 1000;
+    public static final int TIME_MINUTE = 60 * 1000;
+    public static final int TIME_HOUR = 60 * 60 * 1000;
 
 
-    // 发送失败后重复发送的心跳检查
-    public static final int CHECK_RETRY_CYCLE = 5 * 1000;
     public static final String SP_APP_KEY = "appKey";
     public static final String SP_APP_CHANNEL = "appChannel";
 
@@ -80,8 +81,6 @@ public class EGContext {
     public static final int SERVER_DELAY_DEFAULT = 0;
     // 上传重试次数，默认3次
     public static final int FAIL_COUNT_DEFALUT = 3;
-    // 上传重试时间间隔默认60-70s
-    public static final long FAIL_TRY_DELAY_DEFALUT = 60000;
     // 地理位置信息获取距离/米
     public static final long MINDISTANCE = 1000;
     public final static String URL_SCHEME = "http://";
@@ -127,9 +126,6 @@ public class EGContext {
     public static final String TMPIDKEY = "tmpid";
     // 用于jobservice
     public static final int JOB_ID = 2071112;
-    // jobservice判断时间间隔
-    public static final long JOB_SERVICE_TIME = 10 * 1000;
-    public static final int TIME_OUT_TIME = 30 * 1000; // 设置为30秒
     public static final String SDKV = "SDKV";
     public static final String DEBUG = "DEBUG";
     public static final String APPKEY = "AK";
@@ -155,7 +151,7 @@ public class EGContext {
     public static final long DEFAULT_SPACE_TIME = 30 * 1000;// 默认开关屏时间间隔在30s以上，才算一次有效的时间闭合事件
     public static final String CLOSE_SCREEN = "2";
     public static final String APP_SWITCH = "1";
-    public static final String SERVICE_RESTART = "3";
+    //    public static final String SERVICE_RESTART = "3";
     public static final String THREAD_NAME = "com.eguan";
     public static final String UPLOAD_KEY_WORDS = "facility4";
     public static final String EXTRA_DATA = "ETDM";
@@ -171,25 +167,22 @@ public class EGContext {
     public static final String FILES_SYNC_OC = "OCS.TAG";
     // OC 5+同步时间,同时只有一个进程工作
     public static final long TIME_SYNC_OC_OVER_5 = 30 * 1000;
-    // 位置信息,通进程只有一个工作,两次间隔29分钟
-    public static final String FILES_SYNC_LOCATION = "LCT.TAG";
+
 
     /************************************************************************************/
     /***********************************
      * 多进程同步
      *****************************************/
     public static final long TIME_SYNC_LOCATION = 30 * 60 * 1000;
-    // 数据库写入，多进程只有一个写入,两次间隔5秒
-    public static final String FILES_SYNC_SP_WRITER = "SP.TAG";
-    // 最少间隔5s查询一次
-    public static final long TIME_SYNC_SP = 5 * 1000;
-    public static final String FILES_SYNC_SCREEN_OFF_BROADCAST = "OFF.TAG";
-    public static final String FILES_SYNC_SCREEN_ON_BROADCAST = "ON.TAG";
-    public static final String FILES_SYNC_SNAP_ADD_BROADCAST = "SADD.TAG";
-    public static final String FILES_SYNC_SNAP_DELETE_BROADCAST = "SDEL.TAG";
-    public static final String FILES_SYNC_SNAP_UPDATE_BROADCAST = "SUPDATE.TAG";
-    public static final String FILES_SYNC_BOOT_BROADCAST = "BOOT.TAG";
-    public static final String FILES_SYNC_BATTERY_BROADCAST = "BATTERY.TAG";
+
+    public static final String FILES_SYNC_SCREEN_OFF_BROADCAST = "T-OFF";
+    public static final String FILES_SYNC_SCREEN_ON_BROADCAST = "T-ON";
+    public static final String FILES_SYNC_SNAP_ADD_BROADCAST = "T-SADD";
+    public static final String FILES_SYNC_SNAP_DELETE_BROADCAST = "T-SDEL";
+    public static final String FILES_SYNC_SNAP_UPDATE_BROADCAST = "T-SUPDATE";
+    public static final String FILES_SYNC_BATTERY_BROADCAST = "T-BATTERY";
+    // 位置信息,通进程只有一个工作,两次间隔29分钟
+    public static final String FILES_SYNC_LOCATION = "T-LCT";
     // 最少间隔2s查询一次
     public static final long TIME_SYNC_BROADCAST = 2 * 1000;
     // 广播多进程处理，一次只能有一个进程在处理
@@ -203,11 +196,11 @@ public class EGContext {
     public static final String RETRYTIME = "RetryIntervalTime";// 重试间隔时间
     public static final String FAILEDNUMBER = "uploadFailedNumber";// 本地已经重试并失败，次数
     public static final String FAILEDTIME = "uploadFailedTime";
-    public static final String REQUEST_STATE = "request_state";
+
     // 设备内SDK发送 进程同步文件。首次SDK初始化时创建
-    public static final String DEV_UPLOAD_PROC_NAME = "tmp";
-    public static final int sPrepare = 0;
-    public static final int sBeginResuest = 1;
+    public static final String MULTI_FILE_UPLOAD_RETRY = "M_TMP";
+    public static final String MULTI_FILE_UPLOAD = "M_UP";
+
     // 上传模块
     public static final String MODULE_OC = "M_OC";
     public static final String MODULE_SNAPSHOT = "M_SNAP";
@@ -235,27 +228,35 @@ public class EGContext {
      * 控制android8以后是否后台启动服务。提示通知
      */
     public static boolean IS_SHOW_NOTIFITION = false;
-    public static boolean SCREEN_ON = true;
     /**
      * 是否USB调试状态
      */
     public static boolean STATUS_USB_DEBUG = false;
 
 
-    // public static final String APP_URL_SP = "app_url_sp";
-    //    public static final String PRO = "PRO";
+// public static final String APP_URL_SP = "app_url_sp";
+//    public static final String PRO = "PRO";
 //    public static final String PRO_KEY_WORDS = "QF4";
-    //    public final static String TEST_CALLBACK_PORT = ":8089";
-    // public static final String RT_DOMAIN_NAME = "rt101.analysys.cn";
+//    public final static String TEST_CALLBACK_PORT = ":8089";
+// public static final String RT_DOMAIN_NAME = "rt101.analysys.cn";
 //    public static final String USERTP_URL = URL_SCHEME + RT_DOMAIN_NAME + RT_PORT;
 //    public static final String EGIDKEY = "egid";
-    // public static final String TEST_CALLBACK_DOMAIN_NAME = "192.168.8.150";
-    // public static final String SP_LOCATION_TIME = "getLocationTime";
+// public static final String TEST_CALLBACK_DOMAIN_NAME = "192.168.8.150";
+// public static final String SP_LOCATION_TIME = "getLocationTime";
 //    public static final String HEARTBEAT_LAST_TIME = "HEART_BETA";
 //    public static final String SERVICE_NAME = "AnalysysService";
-    //    public static final int TIMER_INTERVAL_DEFALUT = 5 * 1000;
+//    public static final int TIMER_INTERVAL_DEFALUT = 5 * 1000;
 //    /**
 //     * 实时上传端口
 //     */
 //    public final static String RT_PORT = ":8099";
+//    public static boolean SCREEN_ON = true;
+//    public static final String FILES_SYNC_BOOT_BROADCAST = "T-BOOT";
+//    // 数据库写入，多进程只有一个写入,两次间隔5秒
+//    public static final String FILES_SYNC_SP_WRITER = "SP.TAG";
+//    // 最少间隔5s查询一次
+//    public static final long TIME_SYNC_SP = 5 * 1000;
+//    public static final int sPrepare = 0;
+//    public static final int sBeginResuest = 1;
+//    public static final String REQUEST_STATE = "request_state";
 }

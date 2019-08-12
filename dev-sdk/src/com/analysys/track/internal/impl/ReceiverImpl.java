@@ -6,8 +6,8 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.work.MessageDispatcher;
-import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.MultiProcessChecker;
 
 /**
@@ -29,9 +29,9 @@ public class ReceiverImpl {
      */
     public void process(Context context, Intent intent) {
 
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.d(" receiver intent: " + intent.toString());
-        }
+//        if (EGContext.FLAG_DEBUG_INNER) {
+//            ELOG.d(" receiver intent: " + intent.toString());
+//        }
 
         context = context.getApplicationContext();
         long currentTime = System.currentTimeMillis();
@@ -43,8 +43,11 @@ public class ReceiverImpl {
             }
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST,
                     EGContext.TIME_SYNC_DEFAULT, currentTime)) {
-                MessageDispatcher.getInstance(context).appChangeReceiver(packageName,
-                        Integer.parseInt(EGContext.SNAP_SHOT_INSTALL), currentTime);
+
+                AppSnapshotImpl.getInstance(context)
+                        .processAppModifyMsg(packageName,
+                                Integer.parseInt(EGContext.SNAP_SHOT_INSTALL),
+                                currentTime);
 
             } else {
                 return;
@@ -59,9 +62,10 @@ public class ReceiverImpl {
             }
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST,
                     EGContext.TIME_SYNC_DEFAULT, currentTime)) {
-
-                MessageDispatcher.getInstance(context).appChangeReceiver(packageName,
-                        Integer.parseInt(EGContext.SNAP_SHOT_UNINSTALL), currentTime);
+                AppSnapshotImpl.getInstance(context)
+                        .processAppModifyMsg(packageName,
+                                Integer.parseInt(EGContext.SNAP_SHOT_UNINSTALL),
+                                currentTime);
             } else {
                 return;
             }
@@ -74,28 +78,27 @@ public class ReceiverImpl {
             }
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST,
                     EGContext.TIME_SYNC_DEFAULT, currentTime)) {
-                MessageDispatcher.getInstance(context).appChangeReceiver(packageName,
-                        Integer.parseInt(EGContext.SNAP_SHOT_UPDATE), currentTime);
+                AppSnapshotImpl.getInstance(context)
+                        .processAppModifyMsg(packageName,
+                                Integer.parseInt(EGContext.SNAP_SHOT_UPDATE),
+                                currentTime);
             } else {
                 return;
             }
 
         } else if (Intent.ACTION_SCREEN_ON.equals(intent.getAction())) {
-            //  7.x以上版本保持心跳
-            if (Build.VERSION.SDK_INT >= 24) {
-                MessageDispatcher.getInstance(context).sendMessage();
-                return;
-            }
-            // 设置开锁屏的flag 用于补数逻辑
-            EGContext.SCREEN_ON = true;
-            MessageDispatcher.getInstance(context).screenStatusHandle(true);
+//            //  7.x以上版本保持心跳
+//            if (Build.VERSION.SDK_INT >= 24) {
+//                return;
+//            }
+
+            OCImpl.getInstance(context).processOCWhenScreenChange(true);
         } else if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
             //  7.x以上版本 不操作
             if (Build.VERSION.SDK_INT >= 24) {
                 return;
             }
-            EGContext.SCREEN_ON = false;
-            MessageDispatcher.getInstance(context).screenStatusHandle(false);
+            OCImpl.getInstance(context).processOCWhenScreenChange(false);
         } else if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_BATTERY_BROADCAST,
                     EGContext.TIME_SYNC_DEFAULT, currentTime)) {
@@ -104,13 +107,7 @@ public class ReceiverImpl {
                 return;
             }
         } else if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
-//            if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_BOOT_BROADCAST,
-//                    EGContext.TIME_SYNC_DEFAULT, currentTime)) {
-//                MultiProcessChecker.getInstance().setLockLastModifyTime(context, EGContext.FILES_SYNC_BOOT_BROADCAST, currentTime);
-//            } else {
-//                return;
-//            }
-            MessageDispatcher.getInstance(context).startService();
+            MessageDispatcher.getInstance(context).initModule();
         }
     }
 

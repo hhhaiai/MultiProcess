@@ -7,12 +7,12 @@ import android.text.TextUtils;
 
 import com.analysys.track.internal.Content.DeviceKeyContacts;
 import com.analysys.track.internal.Content.EGContext;
-import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.model.PolicyInfo;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.Memory2File;
+import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
@@ -63,9 +63,9 @@ public class PolicyImpl {
      */
     private void saveNewPolicyToLocal(PolicyInfo newPolicy) {
         // 策略保存。
-        long timerInterval = newPolicy.getTimerInterval() > 0 ? newPolicy.getTimerInterval() : EGContext.UPLOAD_CYCLE;
+        long timerInterval = newPolicy.getTimerInterval() > 0 ? newPolicy.getTimerInterval() : EGContext.TIME_HOUR * 6;
         getEditor().putString(DeviceKeyContacts.Response.RES_POLICY_VERSION, newPolicy.getPolicyVer())
-                .putInt(DeviceKeyContacts.Response.RES_POLICY_SERVER_DELAY, newPolicy.getServerDelay())
+//                .putInt(DeviceKeyContacts.Response.RES_POLICY_SERVER_DELAY, newPolicy.getServerDelay())
                 .putInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT, newPolicy.getFailCount())
                 .putLong(DeviceKeyContacts.Response.RES_POLICY_FAIL_TRY_DELAY, newPolicy.getFailTryDelay())
                 .putLong(DeviceKeyContacts.Response.RES_POLICY_TIMER_INTERVAL, timerInterval)
@@ -192,10 +192,10 @@ public class PolicyImpl {
             policyInfo.setPolicyVer(policy_version);// 策略版本
 
 
-            if (serverPolicy.has(DeviceKeyContacts.Response.RES_POLICY_SERVER_DELAY)) {
-                policyInfo
-                        .setServerDelay(serverPolicy.optInt(DeviceKeyContacts.Response.RES_POLICY_SERVER_DELAY) * 1000);
-            }
+//            if (serverPolicy.has(DeviceKeyContacts.Response.RES_POLICY_SERVER_DELAY)) {
+//                policyInfo
+//                        .setServerDelay(serverPolicy.optInt(DeviceKeyContacts.Response.RES_POLICY_SERVER_DELAY) * 1000);
+//            }
 
             /**
              * 失败策略处理
@@ -320,7 +320,7 @@ public class PolicyImpl {
                         continue;
                     } else {// 1收集,默认值即为轮询的值，忽略最小最大
                         if (deuFreq != 0) {
-                            getEditor().putString(EGContext.SP_LOCATION_CYCLE, String.valueOf(deuFreq));
+                            getEditor().putLong(EGContext.SP_LOCATION_CYCLE, deuFreq);
                         }
                     }
                 } else if (EGContext.MODULE_SNAPSHOT.equals(module)) {
@@ -330,7 +330,7 @@ public class PolicyImpl {
                         continue;
                     } else {// 1收集,默认值即为轮询的值，忽略最小最大
                         if (deuFreq != 0) {
-                            getEditor().putString(EGContext.SP_SNAPSHOT_CYCLE, String.valueOf(deuFreq));
+                            getEditor().putLong(EGContext.SP_SNAPSHOT_CYCLE, deuFreq);
                         }
                     }
                 } else if (EGContext.MODULE_WIFI.equals(module)) {

@@ -1,20 +1,50 @@
 package com.analysys.track.db;
 
+
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: 数据库配置类
+ * @Version: 1.0
+ * @Create: 2019-08-12 09:43:52
+ * @author: sanbo
+ * @mail: xueyongfu@analysys.com.cn
+ */
 public class DBConfig {
 
+    /**
+     * @Copyright © 2019 sanbo Inc. All rights reserved.
+     * @Description: OC 数据库对应字段
+     * @Version: 1.0
+     * @Create: 2019-08-12 09:44:06
+     * @author: sanbo
+     * @mail: xueyongfu@analysys.com.cn
+     */
     public static class OC {
         // 表名
         public static final String TABLE_NAME = "e_occ";
         // 建表
         public static final String CREATE_TABLE = String.format(
                 "create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)",
-                TABLE_NAME, Column.ID, DBType.AUTOINCREMENT, Column.APN, DBType.VARCHAR_HUNDRED, Column.AN,
-                DBType.VARCHAR_TWENTY, Column.AOT, DBType.VARCHAR_TWENTY, Column.ACT, DBType.VARCHAR_TWENTY_NULL,
-                Column.CU, DBType.INT_NOT_NULL, Column.DY, DBType.VARCHAR_TWENTY, Column.IT, DBType.VARCHAR_TWENTY,
-                Column.AVC, DBType.VARCHAR_TWENTY, Column.NT, DBType.VARCHAR_TEN, Column.AST, DBType.VARCHAR_TEN_NULL,
-                Column.AT, DBType.VARCHAR_TEN, Column.CT, DBType.VARCHAR_TEN, Column.TI, DBType.VARCHAR_TEN, Column.ST,
-                DBType.VARCHAR_TEN, Column.RS, DBType.VARCHAR_TEN, Column.OCT_RA, DBType.TEXT, Column.OCT_RB,
-                DBType.TEXT, Column.OCT_RC, DBType.TEXT);
+                TABLE_NAME,
+                Column.ID, DBType.AUTOINCREMENT,
+                Column.APN, DBType.VARCHAR_HUNDRED,
+                Column.AN, DBType.VARCHAR_TWENTY,
+                Column.AOT, DBType.VARCHAR_TWENTY,
+                Column.ACT, DBType.VARCHAR_TWENTY_NULL,
+                Column.CU, DBType.INT_NOT_NULL,
+                Column.DY, DBType.VARCHAR_TWENTY,
+                Column.IT, DBType.VARCHAR_TWENTY,
+                Column.AVC, DBType.VARCHAR_TWENTY,
+                Column.NT, DBType.VARCHAR_TEN,
+                Column.AST, DBType.VARCHAR_TEN_NULL,
+                Column.AT, DBType.VARCHAR_TEN,
+                Column.CT, DBType.VARCHAR_TEN,
+                Column.TI, DBType.VARCHAR_TEN,
+                Column.ST, DBType.VARCHAR_TEN,
+                Column.RS, DBType.VARCHAR_TEN,
+                Column.OCT_RA, DBType.TEXT,
+                Column.OCT_RB, DBType.TEXT,
+                Column.OCT_RC, DBType.TEXT);
 
         public static class Column {
             public static final String ID = "id";
