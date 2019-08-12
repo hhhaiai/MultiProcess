@@ -7,7 +7,7 @@ import android.provider.Settings;
 import android.text.TextUtils;
 
 import com.analysys.track.db.TableIDStorage;
-import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 

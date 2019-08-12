@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.provider.Settings;
 import android.text.TextUtils;
 
-import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.content.EGContext;
 
 import java.util.Arrays;
 

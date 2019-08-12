@@ -1,4 +1,4 @@
-package com.analysys.track.internal.Content;
+package com.analysys.track.internal.content;
 
 
 /**
@@ -376,24 +376,24 @@ public class DeviceKeyContacts {
         //
         public static final String RES_POLICY_CTRL_SUB_UNWANTED = "sub_exclude";
 
-        /*
-         * 控制ProcessInfo模块的采集
-         */
-        public static final String RES_POLICY_CL = "pi_cl";
+//        /*
+//         * 控制ProcessInfo模块的采集
+//         */
+//        public static final String RES_POLICY_CL = "pi_cl";
         // public static final String RES_POLICY_CL_MODULE_PROC = "pi_proc";
 //    public static final String RES_POLICY_CL_MODULE_XXX_TIME = "pi_time";
 //    public static final String RES_POLICY_CL_MODULE_OCR = "pi_ocr";
-        // 控制策略. 1,0
-        public static final String RES_POLICY_CL_PROCESSINFO = "use_process_info";
-        // 获取策略频率
-        public static final String RES_POLICY_CL_GET_DUR = "process_info_get_dur";
-        // 上传频率
-        public static final String RES_POLICY_CL_UP_DUR = "process_info_up_dur";
+//        // 控制策略. 1,0
+//        public static final String RES_POLICY_CL_PROCESSINFO = "use_process_info";
+//        // 获取策略频率
+//        public static final String RES_POLICY_CL_GET_DUR = "process_info_get_dur";
+//        // 上传频率
+//        public static final String RES_POLICY_CL_UP_DUR = "process_info_up_dur";
 
         /*
          * 模块的采集控制
-         */
-        public static final String RES_POLICY_MODULE_CL = "module_cl";
+//         */
+//        public static final String RES_POLICY_MODULE_CL = "module_cl";
         // 蓝牙采集.默认不上传，可控制上传
         public static final String RES_POLICY_MODULE_CL_BLUETOOTH = "module_cl_bluetooth";
         // 电量采集.默认不上传，可控制上传

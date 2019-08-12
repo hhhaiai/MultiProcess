@@ -5,9 +5,9 @@ import android.content.Context;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 
-import com.analysys.track.internal.Content.DataController;
-import com.analysys.track.internal.Content.DeviceKeyContacts;
-import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.content.DataController;
+import com.analysys.track.internal.content.DeviceKeyContacts;
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.PermissionUtils;

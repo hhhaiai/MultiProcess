@@ -1,6 +1,6 @@
 package com.analysys.track.utils.data;
 
-import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.ELOG;
 
 import javax.crypto.Cipher;

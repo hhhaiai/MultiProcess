@@ -10,7 +10,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.text.TextUtils;
 
-import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.service.AnalysysJobService;
 import com.analysys.track.service.AnalysysService;
 import com.analysys.track.utils.AndroidManifestHelper;

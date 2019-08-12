@@ -14,9 +14,9 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 import com.analysys.track.db.TableLocation;
-import com.analysys.track.internal.Content.DataController;
-import com.analysys.track.internal.Content.DeviceKeyContacts;
-import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.content.DataController;
+import com.analysys.track.internal.content.DeviceKeyContacts;
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.internal.work.MessageDispatcher;
@@ -113,7 +113,7 @@ public class LocationImpl {
     private void getLocationInfoInThread() {
         try {
 
-            // 么有获取地理位置权限则不做处理
+            // 没有获取地理位置权限则不做处理
             if (!isWillWork()) {
                 return;
             }

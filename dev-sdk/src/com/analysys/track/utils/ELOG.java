@@ -11,7 +11,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;

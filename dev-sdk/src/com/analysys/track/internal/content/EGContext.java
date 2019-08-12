@@ -1,4 +1,4 @@
-package com.analysys.track.internal.Content;
+package com.analysys.track.internal.content;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -26,6 +26,7 @@ public class EGContext {
      */
     public static final boolean DEBUG_UPLOAD = true;
     public static final boolean DEBUG_OC = true;
+    public static final boolean DEBUG_SNAP = true;
     /**
      * xml 中声明的 appid、channel
      */

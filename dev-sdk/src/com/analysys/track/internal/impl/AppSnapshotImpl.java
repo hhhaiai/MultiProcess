@@ -6,9 +6,9 @@ import android.content.pm.PackageManager;
 import android.text.TextUtils;
 
 import com.analysys.track.db.TableAppSnapshot;
-import com.analysys.track.internal.Content.DataController;
-import com.analysys.track.internal.Content.DeviceKeyContacts;
-import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.content.DataController;
+import com.analysys.track.internal.content.DeviceKeyContacts;
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.ELOG;
@@ -401,6 +401,9 @@ public class AppSnapshotImpl {
     public void processAppModifyMsg(final String pkgName, final int type, final long time) {
         if (TextUtils.isEmpty(pkgName)) {
             return;
+        }
+        if (EGContext.DEBUG_SNAP) {
+            ELOG.d("sanbo.snap", " 处理广播接收到的信息 包:" + pkgName + "----type: " + type);
         }
         if (SystemUtils.isMainThread()) {
             // 数据库操作修改包名和类型

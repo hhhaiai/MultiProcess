@@ -9,7 +9,7 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.util.Pair;
 
-import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.ELOG;
 
 import java.io.Closeable;

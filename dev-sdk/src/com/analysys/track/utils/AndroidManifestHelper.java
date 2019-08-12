@@ -9,7 +9,7 @@ import android.content.pm.ServiceInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import java.util.ArrayList;

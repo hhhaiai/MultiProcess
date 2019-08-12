@@ -6,8 +6,8 @@ import android.os.PowerManager;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.analysys.track.internal.Content.DeviceKeyContacts;
-import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.content.DeviceKeyContacts;
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.CrashHandler;
 import com.analysys.track.internal.work.ServiceHelper;

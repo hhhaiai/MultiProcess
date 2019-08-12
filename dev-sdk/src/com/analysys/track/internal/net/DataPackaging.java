@@ -3,9 +3,9 @@ package com.analysys.track.internal.net;
 import android.content.Context;
 import android.os.Build;
 
-import com.analysys.track.internal.Content.DataController;
-import com.analysys.track.internal.Content.DeviceKeyContacts;
-import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.content.DataController;
+import com.analysys.track.internal.content.DeviceKeyContacts;
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;

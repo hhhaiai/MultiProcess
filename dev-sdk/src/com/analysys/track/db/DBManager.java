@@ -3,7 +3,7 @@ package com.analysys.track.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 

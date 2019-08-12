@@ -1,6 +1,6 @@
 package com.analysys.track.internal.model;
 
-import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.content.EGContext;
 
 import org.json.JSONArray;
 

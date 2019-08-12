@@ -6,9 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
-import com.analysys.track.internal.Content.DataController;
-import com.analysys.track.internal.Content.DeviceKeyContacts;
-import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.content.DataController;
+import com.analysys.track.internal.content.DeviceKeyContacts;
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EncryptUtils;
@@ -22,6 +22,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: APP SNAPSHOT 操作
+ * @Version: 1.0
+ * @Create: 2019-08-12 14:25:43
+ * @author: LY
+ */
 public class TableAppSnapshot {
 
 
@@ -31,9 +38,6 @@ public class TableAppSnapshot {
     public void coverInsert(List<JSONObject> snapshots) {
         SQLiteDatabase db = null;
         try {
-//            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_APPSNAPSHOT)){
-//                return;
-//            }
             db = DBManager.getInstance(mContext).openDB();
             db.beginTransaction();
             db.delete(DBConfig.AppSnapshot.TABLE_NAME, null, null);
@@ -59,15 +63,15 @@ public class TableAppSnapshot {
     public void insert(JSONObject snapshots) {
         SQLiteDatabase db = null;
         try {
-//            if(!DBUtils.isValidData(mContext,EGContext.FILES_SYNC_APPSNAPSHOT)){
-//                return;
-//            }
             db = DBManager.getInstance(mContext).openDB();
             if (db == null) {
                 return;
             }
             if (!db.isOpen()) {
                 db = DBManager.getInstance(mContext).openDB();
+            }
+            if (EGContext.DEBUG_SNAP) {
+                ELOG.d("sanbo.snap", " 写入数据库: " + snapshots.toString());
             }
             db.insert(DBConfig.AppSnapshot.TABLE_NAME, null, getContentValues(snapshots));
         } catch (Throwable e) {
@@ -186,6 +190,10 @@ public class TableAppSnapshot {
             cv.put(DBConfig.AppSnapshot.Column.AHT, time);
             db.update(DBConfig.AppSnapshot.TABLE_NAME, cv, DBConfig.AppSnapshot.Column.APN + "= ? ",
                     new String[]{EncryptUtils.encrypt(mContext, pkgName)});
+
+            if (EGContext.DEBUG_SNAP) {
+                ELOG.d("sanbo.snap", " 更新信息: " + cv.toString());
+            }
         } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);

@@ -1,4 +1,4 @@
-package com.analysys.track.internal.Content;
+package com.analysys.track.internal.content;
 
 /**
  * @Copyright 2019 sanbo Inc. All rights reserved.

@@ -3,7 +3,7 @@ package com.analysys.track;
 import android.content.Context;
 
 import com.analysys.track.internal.AnalysysInternal;
-import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.content.EGContext;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.

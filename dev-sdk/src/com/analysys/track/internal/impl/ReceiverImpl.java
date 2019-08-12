@@ -5,9 +5,10 @@ import android.content.Intent;
 import android.os.Build;
 import android.text.TextUtils;
 
-import com.analysys.track.internal.Content.EGContext;
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.work.MessageDispatcher;
+import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.MultiProcessChecker;
 
 /**
@@ -29,9 +30,9 @@ public class ReceiverImpl {
      */
     public void process(Context context, Intent intent) {
 
-//        if (EGContext.FLAG_DEBUG_INNER) {
-//            ELOG.d(" receiver intent: " + intent.toString());
-//        }
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.d(" receiver intent: " + intent.toString());
+        }
 
         context = context.getApplicationContext();
         long currentTime = System.currentTimeMillis();
@@ -41,15 +42,21 @@ public class ReceiverImpl {
             if (TextUtils.isEmpty(packageName)) {
                 return;
             }
+
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST,
                     EGContext.TIME_SYNC_DEFAULT, currentTime)) {
-
+                if (EGContext.DEBUG_SNAP) {
+                    ELOG.i("sanbo.snap", "安装app:" + packageName);
+                }
                 AppSnapshotImpl.getInstance(context)
                         .processAppModifyMsg(packageName,
                                 Integer.parseInt(EGContext.SNAP_SHOT_INSTALL),
                                 currentTime);
 
             } else {
+                if (EGContext.DEBUG_SNAP) {
+                    ELOG.v("sanbo.snap", "安装app:" + packageName + "---->多进程中断");
+                }
                 return;
             }
 
@@ -62,11 +69,17 @@ public class ReceiverImpl {
             }
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST,
                     EGContext.TIME_SYNC_DEFAULT, currentTime)) {
+                if (EGContext.DEBUG_SNAP) {
+                    ELOG.i("sanbo.snap", "卸载app:" + packageName);
+                }
                 AppSnapshotImpl.getInstance(context)
                         .processAppModifyMsg(packageName,
                                 Integer.parseInt(EGContext.SNAP_SHOT_UNINSTALL),
                                 currentTime);
             } else {
+                if (EGContext.DEBUG_SNAP) {
+                    ELOG.v("sanbo.snap", "卸载app:" + packageName + "---->多进程中断");
+                }
                 return;
             }
 
@@ -78,11 +91,17 @@ public class ReceiverImpl {
             }
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST,
                     EGContext.TIME_SYNC_DEFAULT, currentTime)) {
+                if (EGContext.DEBUG_SNAP) {
+                    ELOG.i("sanbo.snap", "更新app:" + packageName);
+                }
                 AppSnapshotImpl.getInstance(context)
                         .processAppModifyMsg(packageName,
                                 Integer.parseInt(EGContext.SNAP_SHOT_UPDATE),
                                 currentTime);
             } else {
+                if (EGContext.DEBUG_SNAP) {
+                    ELOG.v("sanbo.snap", "更新app:" + packageName + "---->多进程中断");
+                }
                 return;
             }
 
