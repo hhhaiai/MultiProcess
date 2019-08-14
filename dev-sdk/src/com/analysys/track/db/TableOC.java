@@ -13,6 +13,7 @@ import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.JsonUtils;
+import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
@@ -165,9 +166,7 @@ public class TableOC {
                 ELOG.e("sanbo.oc", e);
             }
         } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
+            StreamerUtils.safeClose(cursor);
             if (db != null && db.isOpen() && db.inTransaction()) {
                 db.endTransaction();
             }

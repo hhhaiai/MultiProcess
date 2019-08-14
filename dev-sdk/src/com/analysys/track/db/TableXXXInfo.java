@@ -14,6 +14,7 @@ import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.JsonUtils;
+import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
@@ -41,9 +42,6 @@ public class TableXXXInfo {
             if (db == null || xxxInfo == null) {
                 return;
             }
-//            if (!db.isOpen()) {
-//                db = DBManager.getInstance(mContext).openDB();
-//            }
             ContentValues cv = getContentValues(xxxInfo);
             // 防止因为传递控制导致的写入异常
             if (cv.size() > 1) {
@@ -66,16 +64,17 @@ public class TableXXXInfo {
     private ContentValues getContentValues(JSONObject xxxInfo) {
         ContentValues cv = new ContentValues();
         String result = null;
+        //样例数据: {"time":1563676428130,"ocr":["com.alipay.hulu","com.device"],"result":[{"pid":4815,"oomScore":41,"pkg":"com.device","cpuset":"\/foreground","cgroup":"3:cpuset:\/foreground\n2:cpu:\/\n1:cpuacct:\/uid_10219\/pid_4815","oomAdj":"0"},{"pid":3644,"oomScore":95,"pkg":"com.alipay.hulu","cpuset":"\/foreground","cgroup":"3:cpuset:\/foreground\n2:cpu:\/\n1:cpuacct:\/uid_10131\/pid_3644","oomAdj":"1"}]}
         if (xxxInfo != null) {
             if (xxxInfo.has(ProcUtils.RUNNING_RESULT)) {
                 result = xxxInfo.optString(ProcUtils.RUNNING_RESULT);
                 if (!TextUtils.isEmpty(result)) {
                     // PROC
                     cv.put(DBConfig.XXXInfo.Column.PROC, EncryptUtils.encrypt(mContext, result));
+                    // time 不加密
                     if (xxxInfo.has(ProcUtils.RUNNING_TIME)) {
                         long time = xxxInfo.optLong(ProcUtils.RUNNING_TIME);
-                        cv.put(DBConfig.XXXInfo.Column.TIME,
-                                EncryptUtils.encrypt(mContext, String.valueOf(time)));
+                        cv.put(DBConfig.XXXInfo.Column.TIME, String.valueOf(time));
                     }
                 }
             }
@@ -90,9 +89,6 @@ public class TableXXXInfo {
             if (db == null) {
                 return;
             }
-//            if (!db.isOpen()) {
-//                db = DBManager.getInstance(mContext).openDB();
-//            }
             db.delete(DBConfig.XXXInfo.TABLE_NAME, null, null);
         } catch (Throwable e) {
         } finally {
@@ -115,13 +111,8 @@ public class TableXXXInfo {
             if (db == null) {
                 return;
             }
-//            if (!db.isOpen()) {
-//                db = DBManager.getInstance(mContext).openDB();
-//            }
-            String id = "";
-//            ELOG.e("deleteByID ::: "+idList.size());
             for (int i = 0; i < idList.size(); i++) {
-                id = idList.get(i);
+                String id = idList.get(i);
                 if (TextUtils.isEmpty(id)) {
                     return;
                 }
@@ -146,9 +137,6 @@ public class TableXXXInfo {
             if (db == null) {
                 return array;
             }
-//            if (!db.isOpen()) {
-//                db = DBManager.getInstance(mContext).openDB();
-//            }
             array = new JSONArray();
             cursor = db.query(DBConfig.XXXInfo.TABLE_NAME, null, null, null, null, null, null, "2000");
             JSONObject jsonObject = null;
@@ -171,8 +159,8 @@ public class TableXXXInfo {
                     if (jsonObject == null || jsonObject.length() < 1) {
                         return array;
                     } else {
-                        String time = EncryptUtils.decrypt(mContext,
-                                cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TIME)));
+                        // time 不加密
+                        String time = cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TIME));
                         JsonUtils.pushToJSON(mContext, jsonObject, ProcUtils.RUNNING_TIME, time,
                                 DataController.SWITCH_OF_RUNNING_TIME);
                         if (countNum / 300 > 0) {
@@ -204,9 +192,7 @@ public class TableXXXInfo {
             }
             array = null;
         } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
+            StreamerUtils.safeClose(cursor);
             DBManager.getInstance(mContext).closeDB();
         }
         return array;

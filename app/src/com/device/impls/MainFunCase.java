@@ -233,7 +233,6 @@ public class MainFunCase {
         MyLooper.execute(new Runnable() {
             @Override
             public void run() {
-
             }
         });
     }

@@ -224,7 +224,7 @@ public class OCImpl {
         if (aliveList == null || aliveList.length() < 1) {
             return;
         }
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (EGContext.DEBUG_OC) {
             ELOG.i("sanbo,oc", "\n内存里的列表数据[" + mOpenedPkgNameList.size() + "]:" + mOpenedPkgNameList.toString());
             ELOG.i("sanbo,oc", "\n内存里的MAP数据[" + mOpenedPkgNameAndInfoMap.size() + "]:" + mOpenedPkgNameAndInfoMap.toString());
             ELOG.i("sanbo,oc", "\n本次处理的数据[" + aliveList.length() + "]:" + aliveList.toString());
@@ -264,7 +264,7 @@ public class OCImpl {
             }
         }
 
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (EGContext.DEBUG_OC) {
             ELOG.i("sanbo,oc", "-----needOpenList:" + needOpenList.toString());
             ELOG.i("sanbo,oc", "-----needCloseList:" + needCloseList.toString());
         }
@@ -304,7 +304,7 @@ public class OCImpl {
             needCloseList.clear();
             needCloseList = null;
         }
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (EGContext.DEBUG_OC) {
             ELOG.i("sanbo,oc", "\n 闭合数据后，列表[" + mOpenedPkgNameList.size() + "]:" + mOpenedPkgNameList.toString());
             ELOG.i("sanbo,oc", "\n 闭合数据后，MAP[" + mOpenedPkgNameAndInfoMap.size() + "]:" + mOpenedPkgNameAndInfoMap.toString());
         }
@@ -319,7 +319,7 @@ public class OCImpl {
             needOpenList.clear();
             needOpenList = null;
         }
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (EGContext.DEBUG_OC) {
             ELOG.i("sanbo,oc", "\n 新增数据完毕，列表[" + mOpenedPkgNameList.size() + "]:" + mOpenedPkgNameList.toString());
             ELOG.i("sanbo,oc", "\n 新增数据完毕，MAP[" + mOpenedPkgNameAndInfoMap.size() + "]:" + mOpenedPkgNameAndInfoMap.toString());
         }
@@ -475,13 +475,6 @@ public class OCImpl {
             //APN 加密
             info.put(DBConfig.OC.Column.APN, EncryptUtils.encrypt(mContext, packageName));
 
-            if (appInfo != null) {
-                //AN 加密
-                CharSequence cs = appInfo.loadLabel(pm);
-                if (cs != null) {
-                    info.put(DBConfig.OC.Column.AN, EncryptUtils.encrypt(mContext, String.valueOf(cs)));
-                }
-            }
 
             // AOT 不加密
             info.put(DBConfig.OC.Column.AOT, String.valueOf(System.currentTimeMillis()));
@@ -490,7 +483,7 @@ public class OCImpl {
             // 采集来源类型，1-getRunningTask，2-读取proc，3-辅助功能，4-系统统计
             info.put(DBConfig.OC.Column.CT, ct);
             //AVC 加密
-            String avc =EncryptUtils.encrypt(mContext, ii.versionName + "|" + ii.versionCode);
+            String avc = EncryptUtils.encrypt(mContext, ii.versionName + "|" + ii.versionCode);
             info.put(DBConfig.OC.Column.AVC, avc);
             info.put(DBConfig.OC.Column.DY, SystemUtils.getDay());
             // IT不加密
@@ -503,7 +496,14 @@ public class OCImpl {
             info.put(DBConfig.OC.Column.RS, "0");
 //            info.put(DBConfig.OC.Column.ACT,  closeTime);
 
-
+            //存在异常的case
+            if (appInfo != null) {
+                //AN 加密
+                CharSequence cs = appInfo.loadLabel(pm);
+                if (cs != null) {
+                    info.put(DBConfig.OC.Column.AN, EncryptUtils.encrypt(mContext, String.valueOf(cs)));
+                }
+            }
         } catch (Throwable t) {
         }
         return info;

@@ -58,18 +58,14 @@ public class ProcUtils {
 
         JSONObject uploadInfo = null;
         try {
-//            L.i("sanbo.xxx", SystemUtils.getCurrentProcessName(mContext) + "-----getRunningInfo----");
-
             uploadInfo = new JSONObject();
             uploadInfo.put(RUNNING_TIME, System.currentTimeMillis());
 
             // 1. get source data
             List<ProcessInfo> infos = getSouceProcessInfo();
-//            L.i("sanbo.xxx", SystemUtils.getCurrentProcessName(mContext) + "---11111---getRunningInfo---原始的infos[" + infos.size() + "]: " + infos.toString());
             if (infos != null && infos.size() > 0) {
                 // 解析Proc和result
                 JSONObject jsonObject = processInfos(infos);
-//                L.i("sanbo.xxx", SystemUtils.getCurrentProcessName(mContext) + "---2222---getRunningInfo  ---   解析后--" + jsonObject.toString());
 
                 if (jsonObject != null && jsonObject.length() > 0) {
 
@@ -79,7 +75,6 @@ public class ProcUtils {
                         JSONArray resultArray = new JSONArray(ocResult.toString());
                         if (resultArray.length() > 0) {
                             uploadInfo.put(RUNNING_OC_RESULT, resultArray);
-//                            L.i("sanbo.xxx", SystemUtils.getCurrentProcessName(mContext) + "--3333----- getRunningInfo---  oc使用的结果--" + resultArray.toString());
                         }
                     }
 
@@ -89,16 +84,13 @@ public class ProcUtils {
                         JSONArray resultArray = new JSONArray(result.toString());
                         if (resultArray.length() > 0) {
                             uploadInfo.put(RUNNING_RESULT, resultArray);
-//                            L.i("sanbo.xxx", SystemUtils.getCurrentProcessName(mContext) + "--4444----- getRunningInfo---  解析result--" + resultArray.toString());
                         }
                     }
 
                 }
             }
         } catch (Throwable t) {
-//            L.i(t);
         }
-//        L.i("sanbo.xxx", SystemUtils.getCurrentProcessName(mContext) + "--5555----- getRunningInfo---  all--" + uploadInfo.toString());
         return uploadInfo;
     }
 

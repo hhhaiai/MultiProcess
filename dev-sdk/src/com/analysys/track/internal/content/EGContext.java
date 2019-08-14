@@ -10,9 +10,20 @@ package com.analysys.track.internal.content;
 public class EGContext {
 
     /**
-     * EGuan 内部调试控制. 主要用于控制堆栈打印、错误打印、内部提示信息打印
+     * EGuan 内部调试系列tag.主要用于控制堆栈打印、错误打印、内部提示信息打印
      */
     public static final boolean FLAG_DEBUG_INNER = true;
+    // 上传模快日志控制
+    public static final boolean DEBUG_UPLOAD = true;
+    // OC模快日志控制
+    public static final boolean DEBUG_OC = true;
+    // 安装列表部分日志控制
+    public static final boolean DEBUG_SNAP = true;
+    // 广播日志控制
+    public static final boolean DEBUG_RECEIVER = true;
+    // 执行上传URL控制
+    public static final boolean DEBUG_URL = true;
+
     /**
      * SDK版本
      */
@@ -21,13 +32,6 @@ public class EGContext {
     public static final String LOGTAG_INNER = "sanbo";
     public static final String LOGTAG_USER = "analysys";
 
-    /**
-     * 调试系列tag
-     */
-    public static final boolean DEBUG_UPLOAD = false;
-    public static final boolean DEBUG_OC = true;
-    public static final boolean DEBUG_SNAP = false;
-    public static final boolean DEBUG_RECEIVER = false;
     /**
      * xml 中声明的 appid、channel
      */

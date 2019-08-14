@@ -8,13 +8,14 @@ import android.text.TextUtils;
 
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.EncryptUtils;
+import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 public class TableIDStorage {
 
 
     /**
-     * 存储eguanid tempid
+     * 存储tempid
      *
      * @param tmpId
      */
@@ -27,10 +28,8 @@ public class TableIDStorage {
                 return;
             }
             ContentValues cv = new ContentValues();
+            // TEMPID 加密
             cv.put(DBConfig.IDStorage.Column.TEMPID, EncryptUtils.encrypt(mContext, tmpId));
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
             db.insert(DBConfig.IDStorage.TABLE_NAME, null, cv);
         } catch (Throwable e) {
         } finally {
@@ -52,9 +51,6 @@ public class TableIDStorage {
             if (db == null) {
                 return tmpid;
             }
-//            if (!db.isOpen()) {
-//                db = DBManager.getInstance(mContext).openDB();
-//            }
             cursor = db.query(DBConfig.IDStorage.TABLE_NAME, null, null, null, null, null, null);
             if (cursor == null) {
                 return tmpid;
@@ -63,6 +59,7 @@ public class TableIDStorage {
                 if (blankCount >= EGContext.BLANK_COUNT_MAX) {
                     return tmpid;
                 }
+                // TEMPID 加密
                 tmpid = EncryptUtils.decrypt(mContext,
                         cursor.getString(cursor.getColumnIndex(DBConfig.IDStorage.Column.TEMPID)));
                 if (TextUtils.isEmpty(tmpid)) {
@@ -73,9 +70,7 @@ public class TableIDStorage {
             }
         } catch (Throwable e) {
         } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
+            StreamerUtils.safeClose(cursor);
             DBManager.getInstance(mContext).closeDB();
         }
         return tmpid;
@@ -87,9 +82,6 @@ public class TableIDStorage {
             if (db == null) {
                 return;
             }
-//            if (!db.isOpen()) {
-//                db = DBManager.getInstance(mContext).openDB();
-//            }
             db.delete(DBConfig.IDStorage.TABLE_NAME, null, null);
         } catch (Throwable e) {
         } finally {

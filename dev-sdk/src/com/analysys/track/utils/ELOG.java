@@ -62,65 +62,121 @@ import javax.xml.transform.stream.StreamSource;
  */
 public class ELOG {
 
-    private static Context mContext = null;
+    private static Context mContext;
 
     // 解析属性最大层级
-    public static final int MAX_CHILD_LEVEL = 3;
+    public static int MAX_CHILD_LEVEL;
     // 换行符
-    public static final String BR = System.getProperty("line.separator");
-    private static final int JSON_INDENT = 2;
+    public static String BR;
+    private static int JSON_INDENT;
     // 是否打印bug.用于开发者自己排查问题打印
-    public static boolean DEV_DEBUG = EGContext.FLAG_DEBUG_INNER;
+    public static boolean DEV_DEBUG;
     // 是否接受shell控制打印
-    private static boolean isShellControl = true;
+    private static boolean isShellControl;
     // 是否打印详细log,详细打印调用的堆栈
-    private static boolean isNeedCallstackInfo = false;
+    private static boolean isNeedCallstackInfo;
     // 是否按照条形框输出,有包裹域的输出
-    private static boolean isNeedWrapper = false;
+    private static boolean isNeedWrapper;
     // 是否格式化展示,主要针对JSON+简易调用堆栈的控制
-    private static boolean isFormat = true;
+    private static boolean isFormat;
     // 默认tag
-    private static String DEFAULT_TAG = EGContext.LOGTAG_INNER;
-    // user tag
-    private static String USER_TAG = EGContext.LOGTAG_USER;
+    private static String DEFAULT_TAG;
     // 临时tag.用法：调用log中大于1个参数,且第一个参数为字符串,且不是format用法,字符串长度没超过协议值,此时启用临时tag
-    private static String TEMP_TAG = "";
+    private static String TEMP_TAG;
     // 规定每段显示的长度.每行最大日志长度 (Android Studio3.1最多2902字符)
-    private static int LOG_MAXLENGTH = 2900;
+    private static int LOG_MAXLENGTH;
     // 类名(getClassName).方法名(getMethodName)[行号(getLineNumber)]
-    private static String content_simple_callstack = "[%s]  堆栈: %s.%s[%d]  ";
+    private static String content_simple_callstack;
     // 查找%个数
-    private static Pattern mPattern = Pattern.compile("%", Pattern.CASE_INSENSITIVE);
+    private static Pattern mPattern;
     // 格式化时，行首封闭符
-    private static String CONTENT_LINE = "║ ";
+    private static String CONTENT_LINE;
     // 空格
-    private static String CONTENT_SPACE = "  ";
-    private static String CONTENT_LOG_INFO = "log info:";
-    private static String CONTENT_LOG_EMPTY = "打印的日志信息为空!";
-    private static String content_title_begin = "╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
-    private static String content_title_info_callstack = "╔══════════════════════════════════════════════════════════════调用详情══════════════════════════════════════════════════════════════";
-    private static String content_title_info_log = "╔══════════════════════════════════════════════════════════════日志详情══════════════════════════════════════════════════════════════";
-    private static String content_title_info_error = "╔══════════════════════════════════════════════════════════════异常详情══════════════════════════════════════════════════════════════";
-    private static String content_title_info_type = "╔════════════════════════════════════════════════════「%s"
-            + "」════════════════════════════════════════════════════";
-    private static String content_title_end = "╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
+    private static String CONTENT_SPACE;
+    private static String CONTENT_LOG_INFO;
+    private static String CONTENT_LOG_EMPTY;
+    private static String content_title_begin;
+    private static String content_title_info_callstack;
+    private static String content_title_info_log;
+    private static String content_title_info_error;
+    private static String content_title_info_type;
+    private static String content_title_end;
     /**
      * 行首为该符号时，不增加行首封闭符
      */
-    private static String CONTENT_A = CONTENT_LINE;
-    private static String CONTENT_B = "╔";
-    private static String CONTENT_C = "╚";
-    private static String CONTENT_D = " ╔";
-    private static String CONTENT_E = " ╚";
-    private static Character FORMATER = '%';
-    private static String CONTENT_WARNNING_SHELL =
-            "Wranning....不够打印级别,请在命令行设置指令后重新尝试打印,命令行指令: adb shell setprop log.tag." + DEFAULT_TAG + " ";
+    private static String CONTENT_A;
+    private static String CONTENT_B;
+    private static String CONTENT_C;
+    private static String CONTENT_D;
+    private static String CONTENT_E;
+    private static Character FORMATER;
+    private static String CONTENT_WARNNING_SHELL;
 
     private ELOG() {
     }
 
+    // 防止混淆编译还能看到所有字符串的情况
+    static {
+        if (EGContext.FLAG_DEBUG_INNER) {
+            mContext = null;
+
+            // 解析属性最大层级
+            MAX_CHILD_LEVEL = 3;
+            // 换行符
+            BR = System.getProperty("line.separator");
+            JSON_INDENT = 2;
+            // 是否打印bug.用于开发者自己排查问题打印
+            DEV_DEBUG = EGContext.FLAG_DEBUG_INNER;
+            // 是否接受shell控制打印
+            isShellControl = true;
+            // 是否打印详细log,详细打印调用的堆栈
+            isNeedCallstackInfo = false;
+            // 是否按照条形框输出,有包裹域的输出
+            isNeedWrapper = false;
+            // 是否格式化展示,主要针对JSON+简易调用堆栈的控制
+            isFormat = true;
+            // 默认tag
+            DEFAULT_TAG = EGContext.LOGTAG_INNER;
+            // 临时tag.用法：调用log中大于1个参数,且第一个参数为字符串,且不是format用法,字符串长度没超过协议值,此时启用临时tag
+            TEMP_TAG = "";
+            // 规定每段显示的长度.每行最大日志长度 (Android Studio3.1最多2902字符)
+            LOG_MAXLENGTH = 2900;
+            // 类名(getClassName).方法名(getMethodName)[行号(getLineNumber)]
+            content_simple_callstack = "[%s]  堆栈: %s.%s[%d]  ";
+            // 查找%个数
+            mPattern = Pattern.compile("%", Pattern.CASE_INSENSITIVE);
+            // 格式化时，行首封闭符
+            CONTENT_LINE = "║ ";
+            // 空格
+            CONTENT_SPACE = "  ";
+            CONTENT_LOG_INFO = "log info:";
+            CONTENT_LOG_EMPTY = "打印的日志信息为空!";
+            content_title_begin = "╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
+            content_title_info_callstack = "╔══════════════════════════════════════════════════════════════调用详情══════════════════════════════════════════════════════════════";
+            content_title_info_log = "╔══════════════════════════════════════════════════════════════日志详情══════════════════════════════════════════════════════════════";
+            content_title_info_error = "╔══════════════════════════════════════════════════════════════异常详情══════════════════════════════════════════════════════════════";
+            content_title_info_type = "╔════════════════════════════════════════════════════「%s"
+                    + "」════════════════════════════════════════════════════";
+            content_title_end = "╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
+            /**
+             * 行首为该符号时，不增加行首封闭符
+             */
+            CONTENT_A = CONTENT_LINE;
+            CONTENT_B = "╔";
+            CONTENT_C = "╚";
+            CONTENT_D = " ╔";
+            CONTENT_E = " ╚";
+            FORMATER = '%';
+            CONTENT_WARNNING_SHELL =
+                    "Wranning....不够打印级别,请在命令行设置指令后重新尝试打印,命令行指令: adb shell setprop log.tag." + DEFAULT_TAG + " ";
+
+        }
+    }
+
     public static void init(Context context) {
-        mContext = EContextHelper.getContext(context);
+        if (EGContext.FLAG_DEBUG_INNER) {
+            mContext = EContextHelper.getContext(context);
+        }
     }
 
 
@@ -130,74 +186,78 @@ public class ELOG {
      */
     /*********************************************************************************************************/
     public static void v(Object... args) {
-        if (isShellControl) {
-            if (!Log.isLoggable(DEFAULT_TAG, Log.VERBOSE)) {
-                Log.v(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "VERBOSE");
-                return;
-            }
-        }
         if (EGContext.FLAG_DEBUG_INNER) {
+            if (isShellControl) {
+                if (!Log.isLoggable(DEFAULT_TAG, Log.VERBOSE)) {
+                    Log.v(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "VERBOSE");
+                    return;
+                }
+            }
+
             parserArgsMain(MLEVEL.VERBOSE, args);
         }
+
+
     }
 
     public static void d(Object... args) {
-        if (isShellControl) {
-            if (!Log.isLoggable(DEFAULT_TAG, Log.DEBUG)) {
-                Log.d(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "DEBUG");
-                return;
-            }
-        }
         if (EGContext.FLAG_DEBUG_INNER) {
+            if (isShellControl) {
+                if (!Log.isLoggable(DEFAULT_TAG, Log.DEBUG)) {
+                    Log.d(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "DEBUG");
+                    return;
+                }
+            }
             parserArgsMain(MLEVEL.DEBUG, args);
         }
     }
 
     public static void i(Object... args) {
-        if (isShellControl) {
-            if (!Log.isLoggable(DEFAULT_TAG, Log.INFO)) {
-                Log.i(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "INFO");
-                return;
-            }
-        }
         if (EGContext.FLAG_DEBUG_INNER) {
+            if (isShellControl) {
+                if (!Log.isLoggable(DEFAULT_TAG, Log.INFO)) {
+                    Log.i(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "INFO");
+                    return;
+                }
+            }
             parserArgsMain(MLEVEL.INFO, args);
         }
     }
 
 
     public static void w(Object... args) {
-        if (isShellControl) {
-            if (!Log.isLoggable(DEFAULT_TAG, Log.WARN)) {
-                Log.w(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "WARN");
-                return;
-            }
-        }
         if (EGContext.FLAG_DEBUG_INNER) {
+            if (isShellControl) {
+                if (!Log.isLoggable(DEFAULT_TAG, Log.WARN)) {
+                    Log.w(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "WARN");
+                    return;
+                }
+            }
+
             parserArgsMain(MLEVEL.WARN, args);
         }
     }
 
     public static void e(Object... args) {
-        if (isShellControl) {
-            if (!Log.isLoggable(DEFAULT_TAG, Log.ERROR)) {
-                Log.e(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "ERROR");
-                return;
-            }
-        }
         if (EGContext.FLAG_DEBUG_INNER) {
+            if (isShellControl) {
+                if (!Log.isLoggable(DEFAULT_TAG, Log.ERROR)) {
+                    Log.e(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "ERROR");
+                    return;
+                }
+            }
             parserArgsMain(MLEVEL.ERROR, args);
         }
     }
 
     public static void wtf(Object... args) {
-        if (isShellControl) {
-            if (!Log.isLoggable(DEFAULT_TAG, Log.ASSERT)) {
-                Log.wtf(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "ASSERT");
-                return;
-            }
-        }
         if (EGContext.FLAG_DEBUG_INNER) {
+            if (isShellControl) {
+                if (!Log.isLoggable(DEFAULT_TAG, Log.ASSERT)) {
+                    Log.wtf(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "ASSERT");
+                    return;
+                }
+            }
             parserArgsMain(MLEVEL.WTF, args);
         }
     }
@@ -212,111 +272,113 @@ public class ELOG {
      * @param args
      */
     private static void parserArgsMain(int level, Object[] args) {
-        try {
-            String tag = DEFAULT_TAG;
-            if (!DEV_DEBUG) {
-                Log.e(DEFAULT_TAG, "请确认Log工具类已经设置打印!");
-                return;
-            }
-            StringBuilder sb = new StringBuilder();
-            // 开始
-            if (isFormat) {
-                sb.append("\n");
-            }
-            String stackinfo = getCallStaceInfo();
-            if (!TextUtils.isEmpty(stackinfo)) {
-                if (isNeedCallstackInfo) {
-                    sb.append(stackinfo).append("\n");
-                } else {
-                    sb.append(stackinfo);
+        if (EGContext.FLAG_DEBUG_INNER) {
+            try {
+                String tag = DEFAULT_TAG;
+                if (!DEV_DEBUG) {
+                    Log.e(DEFAULT_TAG, "请确认Log工具类已经设置打印!");
+                    return;
                 }
-            }
-
-            if (args[0] instanceof String) {
-                // if (isNeedWrapper) {
-                // sb.append(content_title_info_log).append("\n");
-                // }
-                String one = (String) args[0];
-                // 解析fromat
-                if (one.contains(String.valueOf(FORMATER)) && args.length > 1) {
-
-                    /*
-                     * 参数解析
-                     */
-                    Object[] temp = new Object[args.length - 1];
-                    for (int i = 1; i < args.length; i++) {
-                        temp[i - 1] = args[i];
-                    }
-
-                    Matcher m = mPattern.matcher(one);
-                    int count = 0;
-                    while (m.find()) {
-                        count++;
-                    }
-
-                    /**
-                     * %和后面参数一样，则格式化，否则不进行格式化
-                     */
-                    if (count == temp.length) {
-                        // 格式化操作
-                        String log = String.format(Locale.getDefault(), one, temp);
-                        if (isNeedWrapper) {
-                            sb.append(content_title_info_log).append("\n");
-                        }
-                        sb.append(wrapperString(log)).append("\n");
+                StringBuilder sb = new StringBuilder();
+                // 开始
+                if (isFormat) {
+                    sb.append("\n");
+                }
+                String stackinfo = getCallStaceInfo();
+                if (!TextUtils.isEmpty(stackinfo)) {
+                    if (isNeedCallstackInfo) {
+                        sb.append(stackinfo).append("\n");
                     } else {
-                        if (isNeedWrapper) {
-                            sb.append(content_title_info_log).append("\n");
-                        }
-                        StringBuilder tempSB = new StringBuilder();
-                        for (Object obj : args) {
-                            // 解析成字符串,添加
-                            String tempStr = objectToString(obj);
-                            // Log.i(DEFAULT_TAG, "tempStr:" + tempStr);
-                            if (!TextUtils.isEmpty(tempStr)) {
-                                // sb.append(nativeWrapperString(temp)).append("\n");
-                                tempSB.append(tempStr).append("\t");
-                            }
-                        }
-                        sb.append(wrapperString(tempSB.toString())).append("\n");
+                        sb.append(stackinfo);
                     }
-                } else {
-                    // 不符合format规则数据
-                    if (args.length > 1) {
-                        // 大于一次参数，第一个参数是字符串，默认是tag
-                        String log = processTagCase(args);
-                        if (!TextUtils.isEmpty(log)) {
+                }
+
+                if (args[0] instanceof String) {
+                    // if (isNeedWrapper) {
+                    // sb.append(content_title_info_log).append("\n");
+                    // }
+                    String one = (String) args[0];
+                    // 解析fromat
+                    if (one.contains(String.valueOf(FORMATER)) && args.length > 1) {
+
+                        /*
+                         * 参数解析
+                         */
+                        Object[] temp = new Object[args.length - 1];
+                        for (int i = 1; i < args.length; i++) {
+                            temp[i - 1] = args[i];
+                        }
+
+                        Matcher m = mPattern.matcher(one);
+                        int count = 0;
+                        while (m.find()) {
+                            count++;
+                        }
+
+                        /**
+                         * %和后面参数一样，则格式化，否则不进行格式化
+                         */
+                        if (count == temp.length) {
+                            // 格式化操作
+                            String log = String.format(Locale.getDefault(), one, temp);
+                            if (isNeedWrapper) {
+                                sb.append(content_title_info_log).append("\n");
+                            }
                             sb.append(wrapperString(log)).append("\n");
                         } else {
-                            // 需要支持打印""或者null
-                            sb.append(wrapperString("")).append("\n");
+                            if (isNeedWrapper) {
+                                sb.append(content_title_info_log).append("\n");
+                            }
+                            StringBuilder tempSB = new StringBuilder();
+                            for (Object obj : args) {
+                                // 解析成字符串,添加
+                                String tempStr = objectToString(obj);
+                                // Log.i(DEFAULT_TAG, "tempStr:" + tempStr);
+                                if (!TextUtils.isEmpty(tempStr)) {
+                                    // sb.append(nativeWrapperString(temp)).append("\n");
+                                    tempSB.append(tempStr).append("\t");
+                                }
+                            }
+                            sb.append(wrapperString(tempSB.toString())).append("\n");
                         }
                     } else {
-                        if (isNeedWrapper) {
-                            sb.append(content_title_info_log).append("\n");
+                        // 不符合format规则数据
+                        if (args.length > 1) {
+                            // 大于一次参数，第一个参数是字符串，默认是tag
+                            String log = processTagCase(args);
+                            if (!TextUtils.isEmpty(log)) {
+                                sb.append(wrapperString(log)).append("\n");
+                            } else {
+                                // 需要支持打印""或者null
+                                sb.append(wrapperString("")).append("\n");
+                            }
+                        } else {
+                            if (isNeedWrapper) {
+                                sb.append(content_title_info_log).append("\n");
+                            }
+                            sb.append(wrapperString(one)).append("\n");
                         }
-                        sb.append(wrapperString(one)).append("\n");
                     }
-                }
-            } else {
+                } else {
 
-                for (Object obj : args) {
-                    // 解析成字符串,添加
-                    String temp = processObjectCase(obj);
-                    // Log.i(DEFAULT_TAG, "temp:" + temp);
-                    if (!TextUtils.isEmpty(temp)) {
-                        // sb.append(nativeWrapperString(temp)).append("\n");
-                        sb.append(temp).append("\n");
+                    for (Object obj : args) {
+                        // 解析成字符串,添加
+                        String temp = processObjectCase(obj);
+                        // Log.i(DEFAULT_TAG, "temp:" + temp);
+                        if (!TextUtils.isEmpty(temp)) {
+                            // sb.append(nativeWrapperString(temp)).append("\n");
+                            sb.append(temp).append("\n");
+                        }
                     }
                 }
+                // 结束,标记结束符
+                if (isNeedWrapper) {
+                    sb.append(content_title_end);
+                }
+                // 打印字符
+                preparePrint(tag, level, sb.toString());
+            } catch (Throwable e) {
             }
-            // 结束,标记结束符
-            if (isNeedWrapper) {
-                sb.append(content_title_end);
-            }
-            // 打印字符
-            preparePrint(tag, level, sb.toString());
-        } catch (Throwable e) {
         }
     }
 

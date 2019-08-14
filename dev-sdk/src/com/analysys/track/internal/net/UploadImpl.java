@@ -8,8 +8,8 @@ import com.analysys.track.db.TableAppSnapshot;
 import com.analysys.track.db.TableLocation;
 import com.analysys.track.db.TableOC;
 import com.analysys.track.db.TableXXXInfo;
-import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.utils.DeflterCompressUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
@@ -198,8 +198,9 @@ public class UploadImpl {
                 isUploading = false;
                 return;
             }
-            url = "http://192.168.220.167:8089";
-
+            if (EGContext.DEBUG_URL) {
+                url = "http://192.168.220.167:8089";
+            }
             handleUpload(url, messageEncrypt(uploadInfo));
             int failNum = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);
             int maxFailCount = PolicyImpl.getInstance(mContext).getSP()

@@ -70,28 +70,28 @@ public class DBHelper extends SQLiteOpenHelper {
             if (DBUtils.isTableExist(db, DBConfig.XXXInfo.CREATE_TABLE)) {
                 db.execSQL(DBConfig.XXXInfo.CREATE_TABLE);
             }
-//            if (DBUtils.isTableExist(db, DBConfig.PROCInfo.CREATE_TABLE)) {
-//                db.execSQL(DBConfig.PROCInfo.CREATE_TABLE);
-//            }
             if (DBUtils.isTableExist(db, DBConfig.IDStorage.CREATE_TABLE)) {
                 db.execSQL(DBConfig.IDStorage.CREATE_TABLE);
             }
 
         } catch (SQLiteDatabaseCorruptException e) {
-//            rebuildDB();
+            rebuildDB(db);
 //        } finally {
 //            db.close();
         }
     }
 
     public void rebuildDB(SQLiteDatabase db) {
-        if (mContext != null) {
+        try {
+            if (mContext != null) {
 //            MultiProcessChecker.deleteFile("/data/data/" + mContext.getPackageName() + "/databases/" + DB_NAME);
-            File f = mContext.getDatabasePath(DB_NAME);
-            if (f.exists()) {
-                f.delete();
+                File f = mContext.getDatabasePath(DB_NAME);
+                if (f.exists()) {
+                    f.delete();
+                }
+                recreateTables(db);
             }
-            recreateTables(db);
+        } catch (Throwable e) {
         }
     }
 

@@ -75,9 +75,9 @@ public class DeviceImpl {
 //    private final String ONE = "1";
     private final String DEFALT_MAC = "02:00:00:00:00:00";
     private final String[] FILE_LIST = {
-            Base64.encodeToString("/sys/class/net/wlan0/address" .getBytes(), Base64.DEFAULT),
-            Base64.encodeToString("/sys/class/net/eth0/address" .getBytes(), Base64.DEFAULT),
-            Base64.encodeToString("/sys/devices/virtual/net/wlan0/address" .getBytes(), Base64.DEFAULT)};
+            Base64.encodeToString("/sys/class/net/wlan0/address".getBytes(), Base64.DEFAULT),
+            Base64.encodeToString("/sys/class/net/eth0/address".getBytes(), Base64.DEFAULT),
+            Base64.encodeToString("/sys/devices/virtual/net/wlan0/address".getBytes(), Base64.DEFAULT)};
     private Context mContext;
 
     private DeviceImpl() {
@@ -213,7 +213,7 @@ public class DeviceImpl {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             while (interfaces.hasMoreElements()) {
                 NetworkInterface netInterface = interfaces.nextElement();
-                if ("wlan0" .equals(netInterface.getName()) || "eth0" .equals(netInterface.getName())) {
+                if ("wlan0".equals(netInterface.getName()) || "eth0".equals(netInterface.getName())) {
                     byte[] addr = netInterface.getHardwareAddress();
                     if (addr == null || addr.length == 0) {
                         return "";

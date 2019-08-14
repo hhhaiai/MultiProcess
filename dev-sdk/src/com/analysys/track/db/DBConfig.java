@@ -31,7 +31,7 @@ public class DBConfig {
                 Column.AN, DBType.VARCHAR_TWENTY,
                 Column.AOT, DBType.VARCHAR_TWENTY,
                 Column.ACT, DBType.VARCHAR_TWENTY_NULL,
-                Column.CU, DBType.INT_NOT_NULL,
+                Column.CU, DBType.INT_DEFAULT_ONE,
                 Column.DY, DBType.VARCHAR_TWENTY,
                 Column.IT, DBType.VARCHAR_TWENTY,
                 Column.AVC, DBType.VARCHAR_TWENTY,
@@ -153,14 +153,8 @@ public class DBConfig {
             public static final String ID = "id";
             // RESULT
             public static final String TIME = "xxx_a";
-            // TOP
-//      public static final String TOP = "xxx_b";
-//      // PS
-//      public static final String PS = "xxx_c";
             // PROC
             public static final String PROC = "xxx_d";
-            // RESULT
-//      public static final String RESULT = "xxx_e";
 
             // 备用字段 text 类型
             public static final String L_RA = "xxx_ra";
