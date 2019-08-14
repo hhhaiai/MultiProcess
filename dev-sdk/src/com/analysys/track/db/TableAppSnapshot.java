@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
 import com.analysys.track.internal.content.DataController;
-import com.analysys.track.internal.content.DeviceKeyContacts;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.ELOG;
@@ -67,9 +67,9 @@ public class TableAppSnapshot {
             if (db == null) {
                 return;
             }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
             if (EGContext.DEBUG_SNAP) {
                 ELOG.d("sanbo.snap", " 写入数据库: " + snapshots.toString());
             }
@@ -86,16 +86,16 @@ public class TableAppSnapshot {
     private ContentValues getContentValues(JSONObject snapshot) {
         ContentValues cv = new ContentValues();
         String an = EncryptUtils.encrypt(mContext,
-                snapshot.optString(DeviceKeyContacts.AppSnapshotInfo.ApplicationName));
+                snapshot.optString(UploadKey.AppSnapshotInfo.ApplicationName));
 //        ELOG.i(an+ " getContentValues  an");
         cv.put(DBConfig.AppSnapshot.Column.APN, EncryptUtils.encrypt(mContext,
-                snapshot.optString(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName)));
+                snapshot.optString(UploadKey.AppSnapshotInfo.ApplicationPackageName)));
         cv.put(DBConfig.AppSnapshot.Column.AN, an);
         cv.put(DBConfig.AppSnapshot.Column.AVC, EncryptUtils.encrypt(mContext,
-                snapshot.optString(DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode)));
+                snapshot.optString(UploadKey.AppSnapshotInfo.ApplicationVersionCode)));
         cv.put(DBConfig.AppSnapshot.Column.AT,
-                EncryptUtils.encrypt(mContext, snapshot.optString(DeviceKeyContacts.AppSnapshotInfo.ActionType)));
-        cv.put(DBConfig.AppSnapshot.Column.AHT, snapshot.optString(DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime));
+                EncryptUtils.encrypt(mContext, snapshot.optString(UploadKey.AppSnapshotInfo.ActionType)));
+        cv.put(DBConfig.AppSnapshot.Column.AHT, snapshot.optString(UploadKey.AppSnapshotInfo.ActionHappenTime));
         return cv;
     }
 
@@ -111,9 +111,9 @@ public class TableAppSnapshot {
             if (db == null) {
                 return map;
             }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
             cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null, null, null);
             map = new HashMap<String, String>();
             while (cursor.moveToNext()) {
@@ -150,19 +150,19 @@ public class TableAppSnapshot {
                     cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AN)));
             pkgName = EncryptUtils.decrypt(mContext,
                     cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN)));
-            JsonUtils.pushToJSON(mContext, jsonObj, DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName, pkgName,
+            JsonUtils.pushToJSON(mContext, jsonObj, UploadKey.AppSnapshotInfo.ApplicationPackageName, pkgName,
                     DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
-            JsonUtils.pushToJSON(mContext, jsonObj, DeviceKeyContacts.AppSnapshotInfo.ApplicationName, an,
+            JsonUtils.pushToJSON(mContext, jsonObj, UploadKey.AppSnapshotInfo.ApplicationName, an,
                     DataController.SWITCH_OF_APPLICATION_NAME);
-            JsonUtils.pushToJSON(mContext, jsonObj, DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode,
+            JsonUtils.pushToJSON(mContext, jsonObj, UploadKey.AppSnapshotInfo.ApplicationVersionCode,
                     EncryptUtils.decrypt(mContext,
                             cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AVC))),
                     DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
-            JsonUtils.pushToJSON(mContext, jsonObj, DeviceKeyContacts.AppSnapshotInfo.ActionType,
+            JsonUtils.pushToJSON(mContext, jsonObj, UploadKey.AppSnapshotInfo.ActionType,
                     EncryptUtils.decrypt(mContext,
                             cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AT))),
                     DataController.SWITCH_OF_ACTION_TYPE);
-            JsonUtils.pushToJSON(mContext, jsonObj, DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
+            JsonUtils.pushToJSON(mContext, jsonObj, UploadKey.AppSnapshotInfo.ActionHappenTime,
                     cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AHT)),
                     DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
         } catch (Throwable e) {
@@ -182,9 +182,9 @@ public class TableAppSnapshot {
             if (db == null) {
                 return;
             }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
             ContentValues cv = new ContentValues();
             cv.put(DBConfig.AppSnapshot.Column.AT, EncryptUtils.encrypt(mContext, appTag));
             cv.put(DBConfig.AppSnapshot.Column.AHT, time);
@@ -211,9 +211,9 @@ public class TableAppSnapshot {
             if (db == null) {
                 return false;
             }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
             cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, DBConfig.AppSnapshot.Column.APN + "=?",
                     new String[]{EncryptUtils.encrypt(mContext, pkgName)}, null, null, null);
 //            cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME,
@@ -251,9 +251,9 @@ public class TableAppSnapshot {
             if (db == null) {
                 return array;
             }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
             array = new JSONArray();
             cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null, null, null, "4000");
             if (cursor == null) {
@@ -305,9 +305,9 @@ public class TableAppSnapshot {
             if (db == null) {
                 return;
             }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
             db.delete(DBConfig.AppSnapshot.TABLE_NAME, DBConfig.AppSnapshot.Column.AT + "=?",
                     new String[]{EncryptUtils.encrypt(mContext, EGContext.SNAP_SHOT_UNINSTALL)});
 //            ELOG.e("AppSnapshot 删除行数：：："+co);
@@ -329,9 +329,9 @@ public class TableAppSnapshot {
             if (db == null) {
                 return;
             }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
             ContentValues cv = new ContentValues();
             cv.put(DBConfig.AppSnapshot.Column.AT, EncryptUtils.encrypt(mContext, EGContext.SNAP_SHOT_INSTALL));
             db.update(DBConfig.AppSnapshot.TABLE_NAME, cv, null, null);
@@ -350,9 +350,9 @@ public class TableAppSnapshot {
             if (db == null) {
                 return;
             }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
             db.delete(DBConfig.AppSnapshot.TABLE_NAME, null, null);
         } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {

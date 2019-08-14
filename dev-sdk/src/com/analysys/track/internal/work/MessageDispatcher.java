@@ -43,9 +43,9 @@ public class MessageDispatcher {
             try {
                 switch (msg.what) {
                     case MSG_INFO_OC:
-                        if (EGContext.DEBUG_OC) {
-                            ELOG.i("sanbo.oc", "收到OC消息。心跳。。。");
-                        }
+//                        if (EGContext.DEBUG_OC) {
+//                            ELOG.i("sanbo.oc", "收到OC消息。心跳。。。");
+//                        }
                         // 调用OC，等待处理完毕后，回调处理对应事务
                         OCImpl.getInstance(mContext).processOCMsg(new ECallBack() {
                             @Override
@@ -53,9 +53,9 @@ public class MessageDispatcher {
 
                                 // 根据版本获取OC循环时间
                                 long ocDurTime = OCImpl.getInstance(mContext).getOCDurTime();
-                                if (EGContext.DEBUG_OC) {
-                                    ELOG.i("sanbo.oc", "收到OC处理完毕的回调。。。。下次处理时间间隔: " + ocDurTime);
-                                }
+//                                if (EGContext.DEBUG_OC) {
+//                                    ELOG.i("sanbo.oc", "收到OC处理完毕的回调。。。。下次处理时间间隔: " + ocDurTime);
+//                                }
                                 if (ocDurTime > 0) {
                                     postDelay(MSG_INFO_OC, ocDurTime);
                                 } else {
@@ -73,16 +73,6 @@ public class MessageDispatcher {
                         UploadImpl.getInstance(mContext).upload();
                         // 5秒检查一次是否可以发送。
                         postDelay(MSG_INFO_UPLOAD, EGContext.TIME_SECOND * 5);
-//                        int failNum = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);
-//                        if (failNum > 0) {
-//                            //获取重试时间
-//                            long dur = SPHelper.getLongValueFromSP(mContext, EGContext.RETRYTIME, 0);
-//                            // 根据重试时间来设置重试时间
-//                            postDelay(MSG_INFO_UPLOAD, dur > 0 ? dur : EGContext.TIME_SECOND * 5);
-//                        } else {
-//                            // 5秒检查一次是否可以发送。
-//                            postDelay(MSG_INFO_UPLOAD, EGContext.TIME_SECOND * 5);
-//                        }
 
                         break;
 
@@ -146,15 +136,6 @@ public class MessageDispatcher {
         postDelay(MSG_INFO_SNAPS, 0);
     }
 
-//    public void keepAlive() {
-//        if (Build.VERSION.SDK_INT < 24) {
-//            postDelay(MSG_INFO_OC, 0);
-//        }
-//        postDelay(MSG_INFO_UPLOAD, 0);
-//        postDelay(MSG_INFO_WBG, 0);
-//        postDelay(MSG_INFO_SNAPS, 0);
-//    }
-
 
     /************************************* 发送消息************************************************/
 
@@ -211,14 +192,6 @@ public class MessageDispatcher {
 
     }
 
-
-//    private void postMsg(int what, long delay) {
-//        Message msg = new Message();
-//        msg.what = what;
-//        if (mHandler != null && !mHandler.hasMessages(what)) {
-//            mHandler.sendMessageDelayed(msg, delay);
-//        }
-//    }
 
     /************************************* 单例: 初始化************************************************/
 

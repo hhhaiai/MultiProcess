@@ -7,8 +7,8 @@ import android.text.TextUtils;
 
 import com.analysys.track.db.TableAppSnapshot;
 import com.analysys.track.internal.content.DataController;
-import com.analysys.track.internal.content.DeviceKeyContacts;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.ELOG;
@@ -47,7 +47,7 @@ public class AppSnapshotImpl {
 
             // 策略不允许安装列表模快工作, 则停止工作。
             if (!PolicyImpl.getInstance(mContext)
-                    .getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
+                    .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
                 return;
             }
             long now = System.currentTimeMillis();
@@ -138,23 +138,23 @@ public class AppSnapshotImpl {
             }
             for (int i = 0; i < currentSnapshotsList.size(); i++) {
                 JSONObject item = (JSONObject) currentSnapshotsList.get(i);
-                String apn = item.getString(DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName);
+                String apn = item.getString(UploadKey.AppSnapshotInfo.ApplicationPackageName);
                 if (dbSnapshotsMap.containsKey(apn)) {
                     JSONObject dbitem = new JSONObject(dbSnapshotsMap.get(apn));
-                    String avc = item.optString(DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode);
-                    String dbAvc = dbitem.optString(DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode);
+                    String avc = item.optString(UploadKey.AppSnapshotInfo.ApplicationVersionCode);
+                    String dbAvc = dbitem.optString(UploadKey.AppSnapshotInfo.ApplicationVersionCode);
                     if (!TextUtils.isEmpty(avc) && !avc.equals(dbAvc)) {
-                        item.put(DeviceKeyContacts.AppSnapshotInfo.ActionType, EGContext.SNAP_SHOT_UPDATE);
+                        item.put(UploadKey.AppSnapshotInfo.ActionType, EGContext.SNAP_SHOT_UPDATE);
                     }
                     dbSnapshotsMap.remove(apn);
                     continue;
                 }
-                item.put(DeviceKeyContacts.AppSnapshotInfo.ActionType, EGContext.SNAP_SHOT_INSTALL);
+                item.put(UploadKey.AppSnapshotInfo.ActionType, EGContext.SNAP_SHOT_INSTALL);
             }
             Set<String> set = dbSnapshotsMap.keySet();
             for (String json : set) {
                 JSONObject j = new JSONObject(dbSnapshotsMap.get(json));
-                j.put(DeviceKeyContacts.AppSnapshotInfo.ActionType, EGContext.SNAP_SHOT_UNINSTALL);
+                j.put(UploadKey.AppSnapshotInfo.ActionType, EGContext.SNAP_SHOT_UNINSTALL);
                 currentSnapshotsList.add(j);
             }
         } catch (Throwable e) {
@@ -330,6 +330,10 @@ public class AppSnapshotImpl {
     }
 
 
+    public String getAppType(String pkg) {
+        return isSystemApps(pkg) ? UploadKey.OCInfo.APPLICATIONTYPE_SYSTEM_APP : UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP;
+    }
+
     /**
      * 是否为系统应用:
      * <p>
@@ -387,16 +391,16 @@ public class AppSnapshotImpl {
     @SuppressWarnings("deprecation")
     private JSONObject getAppInfo(PackageInfo pkgInfo, PackageManager packageManager, String tag) {
         JSONObject appInfo = new JSONObject();
-        JsonUtils.pushToJSON(mContext, appInfo, DeviceKeyContacts.AppSnapshotInfo.ApplicationPackageName,
+        JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationPackageName,
                 pkgInfo.packageName, DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
-        JsonUtils.pushToJSON(mContext, appInfo, DeviceKeyContacts.AppSnapshotInfo.ApplicationName,
+        JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationName,
                 String.valueOf(pkgInfo.applicationInfo.loadLabel(packageManager)),
                 DataController.SWITCH_OF_APPLICATION_NAME);
-        JsonUtils.pushToJSON(mContext, appInfo, DeviceKeyContacts.AppSnapshotInfo.ApplicationVersionCode,
+        JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationVersionCode,
                 pkgInfo.versionName + "|" + pkgInfo.versionCode, DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
-        JsonUtils.pushToJSON(mContext, appInfo, DeviceKeyContacts.AppSnapshotInfo.ActionType, tag,
+        JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ActionType, tag,
                 DataController.SWITCH_OF_ACTION_TYPE);
-        JsonUtils.pushToJSON(mContext, appInfo, DeviceKeyContacts.AppSnapshotInfo.ActionHappenTime,
+        JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ActionHappenTime,
                 String.valueOf(System.currentTimeMillis()), DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
         return appInfo;
     }

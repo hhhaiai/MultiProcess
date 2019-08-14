@@ -8,7 +8,7 @@ package com.analysys.track.internal.content;
  * @Create: 2019-08-04 17:36:53
  * @author: sanbo
  */
-public class DeviceKeyContacts {
+public class UploadKey {
     /**
      * 设备相关信息
      */
@@ -233,6 +233,18 @@ public class DeviceKeyContacts {
         public static final String TI = "TI";
         // 发生日期
         public static final String DY = "DY";
+
+        public static final String COLLECTIONTYPE_RUNNINGTASK = "1";
+        public static final String COLLECTIONTYPE_PROC = "2";
+        public static final String COLLECTIONTYPE_ACCESSIBILITY = "3";
+        public static final String COLLECTIONTYPE_USAGESTATSMANAGER = "4";
+
+        public static final String SWITCHTYPE_GENERAL = "1";
+        public static final String SWITCHTYPE_CLOSE_SCREEN = "2";
+        public static final String SWITCHTYPE_RESTART_SERVICE = "3";
+
+        public static final String APPLICATIONTYPE_SYSTEM_APP = "SA";
+        public static final String APPLICATIONTYPE_THREE_APP = "OA";
     }
 
 

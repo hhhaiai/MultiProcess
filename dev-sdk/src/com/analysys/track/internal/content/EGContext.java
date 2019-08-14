@@ -69,10 +69,6 @@ public class EGContext {
     public static final String OCR = "7";
     // PROC信息
     public static final String PROC = "8";
-    public static final int OC_COLLECTION_TYPE_RUNNING_TASK = 1;// getRunningTask
-    public static final int OC_COLLECTION_TYPE_PROC = 2;// 读取proc
-    public static final int OC_COLLECTION_TYPE_AUX = 3;// 辅助功能
-    //    public static final int OC_COLLECTION_TYPE_SYSTEM = 4;// 系统统计
     public static final String SNAP_SHOT_INSTALL = "0";
     public static final String SNAP_SHOT_UNINSTALL = "1";
     public static final String SNAP_SHOT_UPDATE = "2";
@@ -140,19 +136,8 @@ public class EGContext {
     // 500 策略。返回值内部状态
     public static final String HTTP_STATUS_500 = "500";
 
-    // OCINFO
-    public static final String LAST_APP_NAME = "lastAppName";
-    public static final String LAST_PACKAGE_NAME = "lastPackageName";
-    public static final String END_TIME = "ProcessEndTime";
-    public static final String LAST_APP_VERSION = "lastAppVersion";
-    public static final String LAST_OPEN_TIME = "lastOpenTime";
-    public static final String LAST_AVAILABLE_TIME = "lastAvailableTime";
-    public static final String APP_TYPE = "applicationType";
     public static final int SHORT_TIME = 5 * 1000;// 计时器时间间隔毫秒数
     public static final long DEFAULT_SPACE_TIME = 30 * 1000;// 默认开关屏时间间隔在30s以上，才算一次有效的时间闭合事件
-    public static final String CLOSE_SCREEN = "2";
-    public static final String APP_SWITCH = "1";
-    //    public static final String SERVICE_RESTART = "3";
     public static final String THREAD_NAME = "com.eguan";
     public static final String UPLOAD_KEY_WORDS = "facility4";
     public static final String EXTRA_DATA = "ETDM";
@@ -177,7 +162,7 @@ public class EGContext {
     public static final long TIME_SYNC_LOCATION = 30 * 60 * 1000;
 
     public static final String FILES_SYNC_SCREEN_OFF_BROADCAST = "T-OFF";
-    public static final String FILES_SYNC_SCREEN_ON_BROADCAST = "T-ON";
+    //    public static final String FILES_SYNC_SCREEN_ON_BROADCAST = "T-ON";
     public static final String FILES_SYNC_SNAP_ADD_BROADCAST = "T-SADD";
     public static final String FILES_SYNC_SNAP_DELETE_BROADCAST = "T-SDEL";
     public static final String FILES_SYNC_SNAP_UPDATE_BROADCAST = "T-SUPDATE";
@@ -235,29 +220,4 @@ public class EGContext {
     public static boolean STATUS_USB_DEBUG = false;
 
 
-// public static final String APP_URL_SP = "app_url_sp";
-//    public static final String PRO = "PRO";
-//    public static final String PRO_KEY_WORDS = "QF4";
-//    public final static String TEST_CALLBACK_PORT = ":8089";
-// public static final String RT_DOMAIN_NAME = "rt101.analysys.cn";
-//    public static final String USERTP_URL = URL_SCHEME + RT_DOMAIN_NAME + RT_PORT;
-//    public static final String EGIDKEY = "egid";
-// public static final String TEST_CALLBACK_DOMAIN_NAME = "192.168.8.150";
-// public static final String SP_LOCATION_TIME = "getLocationTime";
-//    public static final String HEARTBEAT_LAST_TIME = "HEART_BETA";
-//    public static final String SERVICE_NAME = "AnalysysService";
-//    public static final int TIMER_INTERVAL_DEFALUT = 5 * 1000;
-//    /**
-//     * 实时上传端口
-//     */
-//    public final static String RT_PORT = ":8099";
-//    public static boolean SCREEN_ON = true;
-//    public static final String FILES_SYNC_BOOT_BROADCAST = "T-BOOT";
-//    // 数据库写入，多进程只有一个写入,两次间隔5秒
-//    public static final String FILES_SYNC_SP_WRITER = "SP.TAG";
-//    // 最少间隔5s查询一次
-//    public static final long TIME_SYNC_SP = 5 * 1000;
-//    public static final int sPrepare = 0;
-//    public static final int sBeginResuest = 1;
-//    public static final String REQUEST_STATE = "request_state";
 }

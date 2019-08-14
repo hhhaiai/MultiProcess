@@ -1,7 +1,9 @@
 package com.device.impls;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.PolicyImpl;
@@ -10,10 +12,12 @@ import com.device.utils.AssetsHelper;
 import com.device.utils.EL;
 import com.device.utils.MyLooper;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -124,20 +128,59 @@ public class MainFunCase {
         });
     }
 
+    // 6. 根据手机APP情况，随机抽5个进行OC逻辑验证
     private static void runCaseP6(final Context context) {
         MyLooper.execute(new Runnable() {
             @Override
             public void run() {
+                EL.i("=================== 根据手机APP情况，随机抽5个进行OC逻辑验证 ===============");
 
+                // 获取安装列表
+                List<JSONObject> list = AppSnapshotImpl.getInstance(context).getAppDebugStatus();
+
+                //获取有界面的安装列表
+                PackageManager pm = context.getPackageManager();
+                List<String> ll = new ArrayList<String>();
+                for (int i = 0; i < list.size(); i++) {
+
+                    JSONObject o = list.get(i);
+
+                    if (o != null && o.has(EGContext.TEXT_DEBUG_APP)) {
+                        String pkg = o.optString(EGContext.TEXT_DEBUG_APP);
+                        if (pm.getLaunchIntentForPackage(pkg) != null && !ll.contains(pkg)) {
+                            ll.add(pkg);
+                        }
+                    }
+                }
+
+
+                //获取前5个，然后三个作为老列表，2个作为新列表进行测试
+                if (ll.size() > 5) {
+                    //proc方式获取
+                    OCImpl.getInstance(context).cacheDataToMemory(ll.get(0), "2");
+                    OCImpl.getInstance(context).cacheDataToMemory(ll.get(1), "2");
+                    OCImpl.getInstance(context).cacheDataToMemory(ll.get(2), "2");
+
+                    JSONArray arr = new JSONArray();
+                    arr.put(ll.get(2));
+                    arr.put(ll.get(3));
+                    arr.put(ll.get(4));
+                    // 进行新旧对比，内部打印日志和详情
+                    OCImpl.getInstance(context).getAliveAppByProc(arr);
+                } else {
+                    EL.e("应用列表还没有5个。。无法正常测试");
+                }
             }
         });
     }
 
+    // 7. OC逻辑验证
     private static void runCaseP7(final Context context) {
         MyLooper.execute(new Runnable() {
             @Override
             public void run() {
-
+                EL.i("=================== OC逻辑验证 ===============");
+                OCImpl.getInstance(context).processOC();
             }
         });
     }

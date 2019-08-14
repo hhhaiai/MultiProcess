@@ -52,9 +52,9 @@ public class TableIDStorage {
             if (db == null) {
                 return tmpid;
             }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
             cursor = db.query(DBConfig.IDStorage.TABLE_NAME, null, null, null, null, null, null);
             if (cursor == null) {
                 return tmpid;
@@ -87,9 +87,9 @@ public class TableIDStorage {
             if (db == null) {
                 return;
             }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
             db.delete(DBConfig.IDStorage.TABLE_NAME, null, null);
         } catch (Throwable e) {
         } finally {

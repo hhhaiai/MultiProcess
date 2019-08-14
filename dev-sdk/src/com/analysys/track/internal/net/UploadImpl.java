@@ -8,7 +8,7 @@ import com.analysys.track.db.TableAppSnapshot;
 import com.analysys.track.db.TableLocation;
 import com.analysys.track.db.TableOC;
 import com.analysys.track.db.TableXXXInfo;
-import com.analysys.track.internal.content.DeviceKeyContacts;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.DeflterCompressUtils;
 import com.analysys.track.utils.ELOG;
@@ -60,7 +60,7 @@ public class UploadImpl {
 
 //            // 3.延迟策略
 //           int serverDelayTime = PolicyImpl.getInstance(mContext).getSP()
-//                    .getInt(DeviceKeyContacts.Response.RES_POLICY_SERVER_DELAY, EGContext.SERVER_DELAY_DEFAULT);
+//                    .getInt(UploadKey.Response.RES_POLICY_SERVER_DELAY, EGContext.SERVER_DELAY_DEFAULT);
 //            if (serverDelayTime>0){
 //          return
 //            }
@@ -73,7 +73,7 @@ public class UploadImpl {
                     ELOG.i("sanbo.upload", "失败重试。。。。failNum：" + failNum);
                 }
                 int maxFailCount = PolicyImpl.getInstance(mContext).getSP()
-                        .getInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT, EGContext.FAIL_COUNT_DEFALUT);
+                        .getInt(UploadKey.Response.RES_POLICY_FAIL_COUNT, EGContext.FAIL_COUNT_DEFALUT);
 
                 if (failNum == maxFailCount) {
                     // 最后一次重试
@@ -203,7 +203,7 @@ public class UploadImpl {
             handleUpload(url, messageEncrypt(uploadInfo));
             int failNum = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);
             int maxFailCount = PolicyImpl.getInstance(mContext).getSP()
-                    .getInt(DeviceKeyContacts.Response.RES_POLICY_FAIL_COUNT, EGContext.FAIL_COUNT_DEFALUT);
+                    .getInt(UploadKey.Response.RES_POLICY_FAIL_COUNT, EGContext.FAIL_COUNT_DEFALUT);
             // 3. 兼容多次分包的上传
             while (isChunkUpload && failNum < maxFailCount) {
                 if (EGContext.DEBUG_UPLOAD) {
@@ -239,16 +239,16 @@ public class UploadImpl {
             } catch (Throwable t) {
             }
             if (devJson != null && devJson.length() > 0) {
-                object.put(DeviceKeyContacts.DevInfo.NAME, devJson);
+                object.put(UploadKey.DevInfo.NAME, devJson);
             }
             //  组装OC数据
-            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_OC,
+            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_OC,
                     true)) {
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray ocJson = getModuleInfos(mContext, object, MODULE_OC, useFulLength);
                     if (ocJson != null && ocJson.length() > 0) {
-                        object.put(DeviceKeyContacts.OCInfo.NAME, ocJson);
+                        object.put(UploadKey.OCInfo.NAME, ocJson);
                     }
                 }
             } else {
@@ -256,12 +256,12 @@ public class UploadImpl {
             }
             // 组装位置数据
             if (PolicyImpl.getInstance(mContext)
-                    .getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
+                    .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray locationInfo = getModuleInfos(mContext, object, MODULE_LOCATION, useFulLength);
                     if (locationInfo != null && locationInfo.length() > 0) {
-                        object.put(DeviceKeyContacts.AppSnapshotInfo.NAME, locationInfo);
+                        object.put(UploadKey.AppSnapshotInfo.NAME, locationInfo);
                     }
                 }
             } else {
@@ -269,26 +269,26 @@ public class UploadImpl {
             }
             //  组装安装列表数据
             if (PolicyImpl.getInstance(mContext)
-                    .getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
+                    .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray snapshotJar = getModuleInfos(mContext, object, MODULE_SNAPSHOT, useFulLength);
                     if (snapshotJar != null && snapshotJar.length() > 0) {
-                        object.put(DeviceKeyContacts.AppSnapshotInfo.NAME, snapshotJar);
+                        object.put(UploadKey.AppSnapshotInfo.NAME, snapshotJar);
                     }
                 }
             } else {
                 TableAppSnapshot.getInstance(mContext).deleteAll();
             }
             // 组装XXXInfo数据
-            if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.Response.RES_POLICY_MODULE_CL_XXX,
+            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_XXX,
                     true)) {
                 // 计算离最大上线的差值
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray xxxInfo = getModuleInfos(mContext, object, MODULE_XXX, useFulLength);
                     if (xxxInfo != null && xxxInfo.length() > 0) {
-                        object.put(DeviceKeyContacts.XXXInfo.NAME, xxxInfo);
+                        object.put(UploadKey.XXXInfo.NAME, xxxInfo);
                     }
                 }
             } else {
@@ -349,7 +349,7 @@ public class UploadImpl {
                     return;
                 }
                 JSONObject object = new JSONObject(json);
-                String code = String.valueOf(object.opt(DeviceKeyContacts.Response.RES_CODE));
+                String code = String.valueOf(object.opt(UploadKey.Response.RES_CODE));
                 if (code != null) {
                     if (EGContext.HTTP_STATUS_200.equals(code)) {
                         EguanIdUtils.getInstance(mContext).setId(json);
@@ -360,7 +360,7 @@ public class UploadImpl {
                         int numb = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);
                         if (numb == 0) {
                             PolicyImpl.getInstance(mContext)
-                                    .saveRespParams(object.optJSONObject(DeviceKeyContacts.Response.RES_POLICY));
+                                    .saveRespParams(object.optJSONObject(UploadKey.Response.RES_POLICY));
                         }
                         uploadFailure(mContext);
 //                        // 500 后重新尝试发送

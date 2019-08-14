@@ -6,7 +6,7 @@ import android.hardware.SensorManager;
 import android.text.TextUtils;
 
 import com.analysys.track.internal.content.DataController;
-import com.analysys.track.internal.content.DeviceKeyContacts;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.utils.ELOG;
@@ -53,53 +53,53 @@ public class SenSorModuleNameImpl {
             for (int i = 0; i < sensorList.size(); i++) {
                 Sensor s = sensorList.get(i);
                 info = new JSONObject();
-                if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorName,
+                if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.DevInfo.SenSorName,
                         DataController.SWITCH_OF_SENSOR_NAME) && !TextUtils.isEmpty(s.getName())) {
                     // 传感器名称
-                    info.put(DeviceKeyContacts.DevInfo.SenSorName, s.getName());
+                    info.put(UploadKey.DevInfo.SenSorName, s.getName());
                 }
 
                 // 传感器版本
-                if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorVersion,
+                if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.DevInfo.SenSorVersion,
                         DataController.SWITCH_OF_SENSOR_VERSION)
                         && !TextUtils.isEmpty(String.valueOf(s.getVersion()))) {
                     // 传感器名称
-                    info.put(DeviceKeyContacts.DevInfo.SenSorVersion, String.valueOf(s.getVersion()));
+                    info.put(UploadKey.DevInfo.SenSorVersion, String.valueOf(s.getVersion()));
                 }
 
                 // 传感器厂商
-                if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorManufacturer,
+                if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.DevInfo.SenSorManufacturer,
                         DataController.SWITCH_OF_SENSOR_MANUFACTURER) && !TextUtils.isEmpty(s.getVendor())) {
                     // 传感器名称
-                    info.put(DeviceKeyContacts.DevInfo.SenSorManufacturer, s.getVendor());
+                    info.put(UploadKey.DevInfo.SenSorManufacturer, s.getVendor());
                 }
                 try {
                     // 传感器id
-                    if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorId,
+                    if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.DevInfo.SenSorId,
                             DataController.SWITCH_OF_SENSOR_ID)) {
                         // 传感器名称
-                        info.put(DeviceKeyContacts.DevInfo.SenSorId, s.getId());
+                        info.put(UploadKey.DevInfo.SenSorId, s.getId());
                     }
                 } catch (Throwable t1) {
                 }
                 try {
                     // 当传感器是唤醒状态返回true
-                    if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorWakeUpSensor,
+                    if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.DevInfo.SenSorWakeUpSensor,
                             DataController.SWITCH_OF_SENSOR_WAKEUPSENSOR)) {
                         // 传感器名称
-                        info.put(DeviceKeyContacts.DevInfo.SenSorWakeUpSensor, s.isWakeUpSensor());
+                        info.put(UploadKey.DevInfo.SenSorWakeUpSensor, s.isWakeUpSensor());
                     }
                 } catch (Throwable t) {
                     // 当传感器是唤醒状态返回true
-                    if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorWakeUpSensor,
+                    if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.DevInfo.SenSorWakeUpSensor,
                             DataController.SWITCH_OF_SENSOR_WAKEUPSENSOR)) {
-                        info.put(DeviceKeyContacts.DevInfo.SenSorWakeUpSensor, false);
+                        info.put(UploadKey.DevInfo.SenSorWakeUpSensor, false);
                     }
                 }
                 // 传感器耗电量
-                if (PolicyImpl.getInstance(mContext).getValueFromSp(DeviceKeyContacts.DevInfo.SenSorPower,
+                if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.DevInfo.SenSorPower,
                         DataController.SWITCH_OF_SENSOR_POWER)) {
-                    info.put(DeviceKeyContacts.DevInfo.SenSorPower, s.getPower());
+                    info.put(UploadKey.DevInfo.SenSorPower, s.getPower());
                 }
                 senSorArray.put(info);
             }

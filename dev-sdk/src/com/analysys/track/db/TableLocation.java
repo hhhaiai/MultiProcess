@@ -6,7 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
-import com.analysys.track.internal.content.DeviceKeyContacts;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.ELOG;
@@ -28,7 +28,7 @@ public class TableLocation {
             String encryptLocation = null;
             if (locationInfo != null && locationInfo.length() > 0) {
                 locationTime = null;
-                locationTime = locationInfo.optString(DeviceKeyContacts.LocationInfo.CollectionTime);
+                locationTime = locationInfo.optString(UploadKey.LocationInfo.CollectionTime);
                 time = 0;
                 if (!TextUtils.isEmpty(locationTime)) {
                     time = Long.parseLong(locationTime);
@@ -43,9 +43,9 @@ public class TableLocation {
                     if (db == null) {
                         return;
                     }
-                    if (!db.isOpen()) {
-                        db = DBManager.getInstance(mContext).openDB();
-                    }
+//                    if (!db.isOpen()) {
+//                        db = DBManager.getInstance(mContext).openDB();
+//                    }
                     db.insert(DBConfig.Location.TABLE_NAME, null, cv);
                 }
             }
@@ -70,9 +70,9 @@ public class TableLocation {
             if (db == null) {
                 return array;
             }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
             db.beginTransaction();
             cursor = db.query(DBConfig.Location.TABLE_NAME, null, null, null, null, null, null, "2000");
             String encryptLocation = "", time = "";
@@ -141,9 +141,9 @@ public class TableLocation {
             if (db == null) {
                 return;
             }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
             db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?",
                     new String[]{mInsertStatusReadOver});
 //            ELOG.e("LOCATION删除的行数：：："+co);
@@ -162,9 +162,9 @@ public class TableLocation {
             if (db == null) {
                 return;
             }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
             db.delete(DBConfig.Location.TABLE_NAME, null, null);
         } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {

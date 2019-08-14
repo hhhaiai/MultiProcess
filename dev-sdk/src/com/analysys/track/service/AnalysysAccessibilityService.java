@@ -2,9 +2,12 @@ package com.analysys.track.service;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.content.Context;
+import android.text.TextUtils;
 import android.view.accessibility.AccessibilityEvent;
 
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
@@ -23,12 +26,16 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onCreate() {
         super.onCreate();
+        mContext = this.getApplicationContext();
     }
+
+    private Context mContext;
 
     @Override
     protected void onServiceConnected() {
         try {
             super.onServiceConnected();
+            mContext = this.getApplicationContext();
             settingAccessibilityInfo();
         } catch (Throwable t) {
             if (EGContext.FLAG_DEBUG_INNER) {
@@ -51,18 +58,21 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         try {
-            final String pkgName = String.valueOf(event.getPackageName()).replaceAll(" ", "");
+            CharSequence pkgName = event.getPackageName();
+            if (TextUtils.isEmpty(pkgName)) {
+                return;
+            }
+            final String pkg = pkgName.toString().trim();
             if (SystemUtils.isMainThread()) {
                 EThreadPool.execute(new Runnable() {
                     @Override
                     public void run() {
-                        OCImpl.getInstance(AnalysysAccessibilityService.this).RunningApps(pkgName,
-                                EGContext.OC_COLLECTION_TYPE_AUX);
+                        OCImpl.getInstance(mContext).processSignalPkgName(pkg, UploadKey.OCInfo.COLLECTIONTYPE_ACCESSIBILITY);
                     }
                 });
 
             } else {
-                OCImpl.getInstance(this).RunningApps(pkgName, EGContext.OC_COLLECTION_TYPE_AUX);
+                OCImpl.getInstance(mContext).processSignalPkgName(pkg, UploadKey.OCInfo.COLLECTIONTYPE_ACCESSIBILITY);
             }
 
         } catch (Throwable t) {

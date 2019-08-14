@@ -8,9 +8,12 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.utils.sp.SPHelper;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -75,6 +78,27 @@ public class JsonUtils {
             }
         }
         return nameSet;
+    }
+
+    /**
+     * 类型转换。装换结果为不重复的list
+     *
+     * @param arr
+     * @return
+     */
+    public static List<String> converyJSONArrayToList(JSONArray arr) {
+        List<String> result = new ArrayList<String>();
+
+        for (int i = 0; i < arr.length(); i++) {
+            String a = arr.optString(i);
+            // 非空不包含
+            if (!TextUtils.isEmpty(a) && !result.contains(a)) {
+                result.add(a);
+            }
+        }
+
+        return result;
+
     }
 
 //    public static List<JSONObject> jsonArray2JsonObjList(JSONArray array) {

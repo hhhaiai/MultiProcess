@@ -15,7 +15,7 @@ import android.os.Looper;
 import android.os.PowerManager;
 import android.text.TextUtils;
 
-import com.analysys.track.internal.content.DeviceKeyContacts;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -89,7 +89,12 @@ public class SystemUtils {
      */
     public static boolean isApkDebugable(Context context, String packageName) {
         try {
-            PackageInfo pkginfo = getPkgInfo(context, packageName);
+            context = EContextHelper.getContext(context);
+            if (context == null) {
+                return false;
+            }
+            PackageInfo pkginfo = context.getPackageManager().getPackageInfo(
+                    packageName, 1);
             if (pkginfo != null) {
                 return (pkginfo.applicationInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
             }
@@ -99,25 +104,6 @@ public class SystemUtils {
         return false;
     }
 
-    /**
-     * 获取PackageInfo
-     *
-     * @param context
-     * @param packageName
-     * @return
-     */
-    private static PackageInfo getPkgInfo(Context context, String packageName) {
-        try {
-            context = EContextHelper.getContext(context);
-            if (context == null) {
-                return null;
-            }
-            return context.getPackageManager().getPackageInfo(
-                    packageName, 1);
-        } catch (Throwable e) {
-        }
-        return null;
-    }
 
     /**
      * Method to reflectively invoke the SystemProperties.get command - which is the equivalent to the adb shell getProp
@@ -276,7 +262,7 @@ public class SystemUtils {
      */
     public static long intervalTime(Context ctx) {
         long reTryTime = PolicyImpl.getInstance(ctx).getSP()
-                .getLong(DeviceKeyContacts.Response.RES_POLICY_FAIL_TRY_DELAY, 0);
+                .getLong(UploadKey.Response.RES_POLICY_FAIL_TRY_DELAY, 0);
         if (reTryTime == 0) {
             reTryTime = EGContext.TIME_MINUTE;
             // 10s间隔

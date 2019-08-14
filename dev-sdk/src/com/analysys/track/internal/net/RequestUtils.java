@@ -3,7 +3,7 @@ package com.analysys.track.internal.net;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.analysys.track.internal.content.DeviceKeyContacts;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.internal.model.PolicyInfo;
@@ -47,7 +47,7 @@ public class RequestUtils {
         try {
             String ver = PolicyInfo.getInstance().getPolicyVer();
             PolicyImpl policy = PolicyImpl.getInstance(context);
-            String version = policy.getSP().getString(DeviceKeyContacts.Response.RES_POLICY_VERSION, "0");
+            String version = policy.getSP().getString(UploadKey.Response.RES_POLICY_VERSION, "0");
             String pl = TextUtils.isEmpty(ver) ? version : ver;
             urlP = new URL(url);
             connection = (HttpURLConnection) urlP.openConnection();

@@ -6,7 +6,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 
 import com.analysys.track.internal.content.DataController;
-import com.analysys.track.internal.content.DeviceKeyContacts;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
@@ -101,15 +101,15 @@ public class WifiImpl {
             if (jsonObject == null) {
                 jsonObject = new JSONObject();
             }
-            JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.WifiInfo.SSID, ssid,
+            JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.SSID, ssid,
                     DataController.SWITCH_OF_SSID);
-            JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.WifiInfo.BSSID, bssid,
+            JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.BSSID, bssid,
                     DataController.SWITCH_OF_BSSID);
-            JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.WifiInfo.Level, level,
+            JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.Level, level,
                     DataController.SWITCH_OF_LEVEL);
-            JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.WifiInfo.Capabilities,
+            JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.Capabilities,
                     capabilities, DataController.SWITCH_OF_CAPABILITIES);
-            JsonUtils.pushToJSON(mContext, jsonObject, DeviceKeyContacts.LocationInfo.WifiInfo.Frequency, frequency,
+            JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.Frequency, frequency,
                     DataController.SWITCH_OF_FREQUENCY);
         } catch (Throwable t) {
         }

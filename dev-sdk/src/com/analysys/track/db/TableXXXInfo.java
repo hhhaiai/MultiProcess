@@ -41,9 +41,9 @@ public class TableXXXInfo {
             if (db == null || xxxInfo == null) {
                 return;
             }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
             ContentValues cv = getContentValues(xxxInfo);
             // 防止因为传递控制导致的写入异常
             if (cv.size() > 1) {
@@ -90,9 +90,9 @@ public class TableXXXInfo {
             if (db == null) {
                 return;
             }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
             db.delete(DBConfig.XXXInfo.TABLE_NAME, null, null);
         } catch (Throwable e) {
         } finally {
@@ -115,9 +115,9 @@ public class TableXXXInfo {
             if (db == null) {
                 return;
             }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
             String id = "";
 //            ELOG.e("deleteByID ::: "+idList.size());
             for (int i = 0; i < idList.size(); i++) {
@@ -146,9 +146,9 @@ public class TableXXXInfo {
             if (db == null) {
                 return array;
             }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
             array = new JSONArray();
             cursor = db.query(DBConfig.XXXInfo.TABLE_NAME, null, null, null, null, null, null, "2000");
             JSONObject jsonObject = null;
