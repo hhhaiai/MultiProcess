@@ -30,7 +30,7 @@ public class ReceiverImpl {
      */
     public void process(Context context, Intent intent) {
 
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (EGContext.DEBUG_RECEIVER) {
             ELOG.d(" receiver intent: " + intent.toString());
         }
 
@@ -45,7 +45,7 @@ public class ReceiverImpl {
 
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST,
                     EGContext.TIME_SYNC_DEFAULT, currentTime)) {
-                if (EGContext.DEBUG_SNAP) {
+                if (EGContext.DEBUG_RECEIVER) {
                     ELOG.i("sanbo.snap", "安装app:" + packageName);
                 }
                 AppSnapshotImpl.getInstance(context)
@@ -54,7 +54,7 @@ public class ReceiverImpl {
                                 currentTime);
 
             } else {
-                if (EGContext.DEBUG_SNAP) {
+                if (EGContext.DEBUG_RECEIVER) {
                     ELOG.v("sanbo.snap", "安装app:" + packageName + "---->多进程中断");
                 }
                 return;
@@ -69,7 +69,7 @@ public class ReceiverImpl {
             }
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST,
                     EGContext.TIME_SYNC_DEFAULT, currentTime)) {
-                if (EGContext.DEBUG_SNAP) {
+                if (EGContext.DEBUG_RECEIVER) {
                     ELOG.i("sanbo.snap", "卸载app:" + packageName);
                 }
                 AppSnapshotImpl.getInstance(context)
@@ -77,7 +77,7 @@ public class ReceiverImpl {
                                 Integer.parseInt(EGContext.SNAP_SHOT_UNINSTALL),
                                 currentTime);
             } else {
-                if (EGContext.DEBUG_SNAP) {
+                if (EGContext.DEBUG_RECEIVER) {
                     ELOG.v("sanbo.snap", "卸载app:" + packageName + "---->多进程中断");
                 }
                 return;
@@ -91,7 +91,7 @@ public class ReceiverImpl {
             }
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST,
                     EGContext.TIME_SYNC_DEFAULT, currentTime)) {
-                if (EGContext.DEBUG_SNAP) {
+                if (EGContext.DEBUG_RECEIVER) {
                     ELOG.i("sanbo.snap", "更新app:" + packageName);
                 }
                 AppSnapshotImpl.getInstance(context)
@@ -99,7 +99,7 @@ public class ReceiverImpl {
                                 Integer.parseInt(EGContext.SNAP_SHOT_UPDATE),
                                 currentTime);
             } else {
-                if (EGContext.DEBUG_SNAP) {
+                if (EGContext.DEBUG_RECEIVER) {
                     ELOG.v("sanbo.snap", "更新app:" + packageName + "---->多进程中断");
                 }
                 return;

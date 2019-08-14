@@ -77,9 +77,9 @@ public class MessageDispatcher {
                         break;
 
                     case MSG_INFO_WBG:
-                        if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i("收到定位信息。。。。");
-                        }
+//                        if (EGContext.FLAG_DEBUG_INNER) {
+//                            ELOG.i("收到定位信息。。。。");
+//                        }
                         LocationImpl.getInstance(mContext).tryUploadLocationInfo(new ECallBack() {
                             @Override
                             public void onProcessed() {

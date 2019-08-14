@@ -13,7 +13,6 @@ import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.JsonUtils;
-import com.analysys.track.utils.data.Base64Utils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
@@ -29,15 +28,19 @@ public class TableOC {
      */
     public void insert(ContentValues cv) {
         try {
+
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if (db == null || cv.size() < 1) {
                 return;
             }
-//            cv.put(DBConfig.OC.Column.CU, 1);// 可有可无，暂时赋值
-            db.insert(DBConfig.OC.TABLE_NAME, null, cv);
-        } catch (Exception e) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
+            cv.put(DBConfig.OC.Column.CU, 1);
+            long result = db.insert(DBConfig.OC.TABLE_NAME, null, cv);
+            if (EGContext.DEBUG_OC) {
+                ELOG.i("sanbo.oc", "写入  结果：[" + result + "]。。。。\n写入详情" + cv.toString());
+            }
+        } catch (Throwable e) {
+            if (EGContext.DEBUG_OC) {
+                ELOG.i("sanbo.oc", e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -71,22 +74,29 @@ public class TableOC {
                 if (blankCount >= EGContext.BLANK_COUNT_MAX) {
                     return ocJar;
                 }
-                act = EncryptUtils.decrypt(mContext, cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.ACT)));
+
+                // ACT不加密
+                act = cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.ACT));
                 if (TextUtils.isEmpty(act) || "".equals(act)) {// closeTime为空，则继续循环，只取closeTime有值的信息
                     continue;
                 }
-                id = cursor.getInt(cursor.getColumnIndexOrThrow(DBConfig.OC.Column.ID));
                 jsonObject = new JSONObject();
-                String insertTime = EncryptUtils.decrypt(mContext,
-                        cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.IT)));
-                String encryptAn = EncryptUtils.decrypt(mContext,
-                        cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AN)));
-                String an = Base64Utils.decrypt(encryptAn, Long.valueOf(insertTime));
-                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.OCInfo.ApplicationOpenTime,
-                        EncryptUtils.decrypt(mContext, cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AOT))),
-                        DataController.SWITCH_OF_APPLICATION_OPEN_TIME);
+
                 JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.OCInfo.ApplicationCloseTime, act,
                         DataController.SWITCH_OF_APPLICATION_CLOSE_TIME);
+
+
+                id = cursor.getInt(cursor.getColumnIndexOrThrow(DBConfig.OC.Column.ID));
+                //IT 不加密
+                String insertTime = cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.IT));
+
+
+                //AOT 不加密
+                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.OCInfo.ApplicationOpenTime,
+                        cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AOT)),
+                        DataController.SWITCH_OF_APPLICATION_OPEN_TIME);
+
+                // APN 加密
                 pkgName = EncryptUtils.decrypt(mContext,
                         cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.APN)));
                 if (TextUtils.isEmpty(pkgName)) {
@@ -94,21 +104,33 @@ public class TableOC {
                 }
                 JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.OCInfo.ApplicationPackageName, pkgName,
                         DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
+
+                // AN 加密
+                String an = EncryptUtils.decrypt(mContext,
+                        cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AN)));
                 JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.OCInfo.ApplicationName, an,
                         DataController.SWITCH_OF_APPLICATION_NAME);
-                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.OCInfo.ApplicationVersionCode,
-                        EncryptUtils.decrypt(mContext, cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AVC))),
+
+                //AVC 加密
+                String avc = EncryptUtils.decrypt(mContext,
+                        cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AVC)));
+                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.OCInfo.ApplicationVersionCode, avc,
                         DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
+                //NT不加密
                 JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.OCInfo.NetworkType,
-                        EncryptUtils.decrypt(mContext, cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.NT))),
+                        cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.NT)),
                         DataController.SWITCH_OF_NETWORK_TYPE);
+
                 etdm = new JSONObject();
+                // AST 不加密
                 JsonUtils.pushToJSON(mContext, etdm, UploadKey.OCInfo.SwitchType,
                         cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AST)),
                         DataController.SWITCH_OF_SWITCH_TYPE);
+                // AT 不加密
                 JsonUtils.pushToJSON(mContext, etdm, UploadKey.OCInfo.ApplicationType,
                         cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AT)),
                         DataController.SWITCH_OF_APPLICATION_TYPE);
+                // CT 不加密
                 JsonUtils.pushToJSON(mContext, etdm, UploadKey.OCInfo.CollectionType,
                         cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.CT)),
                         DataController.SWITCH_OF_COLLECTION_TYPE);
@@ -139,8 +161,8 @@ public class TableOC {
             }
             db.setTransactionSuccessful();
         } catch (Exception e) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
+            if (EGContext.DEBUG_OC) {
+                ELOG.e("sanbo.oc", e);
             }
         } finally {
             if (cursor != null) {
@@ -167,8 +189,8 @@ public class TableOC {
             db.delete(DBConfig.OC.TABLE_NAME, DBConfig.OC.Column.ST + "=?", new String[]{ONE});
 //            ELOG.e("删除的行数：：：  "+count);
         } catch (Throwable e) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
+            if (EGContext.DEBUG_OC) {
+                ELOG.e("sanbo.oc", e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -186,8 +208,8 @@ public class TableOC {
 //            }
             db.delete(DBConfig.OC.TABLE_NAME, null, null);
         } catch (Throwable e) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
+            if (EGContext.DEBUG_OC) {
+                ELOG.e("sanbo.oc", e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();

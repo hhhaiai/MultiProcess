@@ -43,7 +43,15 @@ import java.util.zip.ZipFile;
  * @Author: sanbo
  */
 public class SystemUtils {
-
+    /**
+     * 获取日期
+     */
+    public static String getDay() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        Date date = new Date(System.currentTimeMillis());
+        String time = simpleDateFormat.format(date);
+        return time;
+    }
 
     /**
      * 生成n个不同的随机数，且随机数区间为[0,10)

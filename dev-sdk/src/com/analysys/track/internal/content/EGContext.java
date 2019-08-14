@@ -24,9 +24,10 @@ public class EGContext {
     /**
      * 调试系列tag
      */
-    public static final boolean DEBUG_UPLOAD = true;
+    public static final boolean DEBUG_UPLOAD = false;
     public static final boolean DEBUG_OC = true;
-    public static final boolean DEBUG_SNAP = true;
+    public static final boolean DEBUG_SNAP = false;
+    public static final boolean DEBUG_RECEIVER = false;
     /**
      * xml 中声明的 appid、channel
      */

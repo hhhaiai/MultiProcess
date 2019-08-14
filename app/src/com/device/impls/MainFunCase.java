@@ -3,6 +3,7 @@ package com.device.impls;
 import android.content.Context;
 import android.content.pm.PackageManager;
 
+import com.analysys.track.db.TableOC;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
@@ -185,10 +186,44 @@ public class MainFunCase {
         });
     }
 
+    //8. OC部分数据入库测试
     private static void runCaseP8(final Context context) {
         MyLooper.execute(new Runnable() {
             @Override
             public void run() {
+                EL.i("=================== 插入OC数据到数据库测试 ===============");
+                // 获取安装列表
+                List<JSONObject> list = AppSnapshotImpl.getInstance(context).getAppDebugStatus();
+
+                //获取有界面的安装列表
+                PackageManager pm = context.getPackageManager();
+                List<String> ll = new ArrayList<String>();
+                for (int i = 0; i < list.size(); i++) {
+
+                    JSONObject o = list.get(i);
+
+                    if (o != null && o.has(EGContext.TEXT_DEBUG_APP)) {
+                        String pkg = o.optString(EGContext.TEXT_DEBUG_APP);
+                        if (pm.getLaunchIntentForPackage(pkg) != null && !ll.contains(pkg)) {
+                            ll.add(pkg);
+                        }
+                    }
+                }
+
+                // 2.放内存里
+                OCImpl.getInstance(context).cacheDataToMemory(ll.get(0), "2");
+                OCImpl.getInstance(context).cacheDataToMemory(ll.get(1), "2");
+                OCImpl.getInstance(context).cacheDataToMemory(ll.get(2), "2");
+                //写入库
+                OCImpl.getInstance(context).processScreenOff();
+
+                EL.i("=================== 从数据库取出OC数据 ===============");
+
+                JSONArray oc = TableOC.getInstance(context).select(EGContext.LEN_MAX_UPDATE_SIZE);
+
+                if (oc != null) {
+                    EL.i("获取OC数据:" + oc.toString());
+                }
 
             }
         });

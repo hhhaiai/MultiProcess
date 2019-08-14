@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import java.io.File;
@@ -12,12 +13,12 @@ import java.io.File;
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "e.data";
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
     private static Context mContext = null;
 
     public DBHelper(Context context) {
         super(EContextHelper.getContext(context), DB_NAME, null, DB_VERSION);
-        recreateTables();
+        recreateTables(getWritableDatabase());
     }
 
     public static DBHelper getInstance(Context context) {
@@ -43,14 +44,19 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        ELOG.e("触发升级逻辑");
+        //数据库版本机密算法变动，简单粗暴直接删除老的库，重新构建新库
+        rebuildDB(db);
     }
 
-    public void recreateTables() {
-        SQLiteDatabase db = null;
+    public void recreateTables(SQLiteDatabase db) {
         try {
-            db = getWritableDatabase();
+
             if (db == null) {
-                return;
+                db = getWritableDatabase();
+                if (db == null) {
+                    return;
+                }
             }
             if (DBUtils.isTableExist(db, DBConfig.OC.CREATE_TABLE)) {
                 db.execSQL(DBConfig.OC.CREATE_TABLE);
@@ -72,20 +78,20 @@ public class DBHelper extends SQLiteOpenHelper {
             }
 
         } catch (SQLiteDatabaseCorruptException e) {
-            rebuildDB();
+//            rebuildDB();
 //        } finally {
 //            db.close();
         }
     }
 
-    public void rebuildDB() {
+    public void rebuildDB(SQLiteDatabase db) {
         if (mContext != null) {
 //            MultiProcessChecker.deleteFile("/data/data/" + mContext.getPackageName() + "/databases/" + DB_NAME);
             File f = mContext.getDatabasePath(DB_NAME);
             if (f.exists()) {
                 f.delete();
             }
-            recreateTables();
+            recreateTables(db);
         }
     }
 

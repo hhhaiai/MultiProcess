@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.text.TextUtils;
 
+import com.analysys.track.db.DBConfig;
 import com.analysys.track.db.TableOC;
 import com.analysys.track.db.TableXXXInfo;
 import com.analysys.track.internal.content.EGContext;
@@ -24,11 +25,13 @@ import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.utils.AccessibilityHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
+import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.data.Base64Utils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
@@ -280,8 +283,9 @@ public class OCImpl {
                     // 获取内存里的数据
                     info = mOpenedPkgNameAndInfoMap.get(closePkg);
                     if (info != null && info.size() > 0) {
-                        // 补充上闭合时间
-                        info.put(UploadKey.OCInfo.ApplicationCloseTime, System.currentTimeMillis());
+                        // 补充上闭合时间 ACT不加密
+                        info.put(DBConfig.OC.Column.ACT, String.valueOf(System.currentTimeMillis()));
+                        info.put(DBConfig.OC.Column.RS, "1");
                         // 保存上一个打开关闭记录信息
                         TableOC.getInstance(mContext).insert(info);
                     }
@@ -417,8 +421,9 @@ public class OCImpl {
                             // 获取内存里的数据
                             info = mOpenedPkgNameAndInfoMap.get(pkg);
                             if (info != null && info.size() > 0) {
-                                // 补充上闭合时间
-                                info.put(UploadKey.OCInfo.ApplicationCloseTime, System.currentTimeMillis());
+                                // 补充上闭合时间 ACT不加密
+                                info.put(DBConfig.OC.Column.ACT, String.valueOf(System.currentTimeMillis()));
+                                info.put(DBConfig.OC.Column.RS, "1");
                                 // 保存上一个打开关闭记录信息
                                 TableOC.getInstance(mContext).insert(info);
                             }
@@ -462,21 +467,43 @@ public class OCImpl {
     private ContentValues getInfoWhenFound(String packageName, String ct, String switchType) {
         ContentValues info = new ContentValues();
         try {
+            long insertTime = System.currentTimeMillis();
             PackageManager pm = mContext.getPackageManager();
             ApplicationInfo appInfo = pm.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
             PackageInfo ii = pm.getPackageInfo(packageName, 0);
 
-            info.put(UploadKey.OCInfo.ApplicationPackageName, packageName);
-            info.put(UploadKey.OCInfo.ApplicationOpenTime, System.currentTimeMillis());
-//        info.put(UploadKey.OCInfo.ApplicationCloseTime, closeTime);
-            info.put(UploadKey.OCInfo.NetworkType, NetworkUtils.getNetworkType(mContext));
-//            采集来源类型，1-getRunningTask，2-读取proc，3-辅助功能，4-系统统计
-            info.put(UploadKey.OCInfo.CollectionType, ct);
-//            OC 切换的类型，1-正常使用，2-开关屏幕切换，3-服务重启
-            info.put(UploadKey.OCInfo.SwitchType, switchType);
-            info.put(UploadKey.OCInfo.ApplicationType, AppSnapshotImpl.getInstance(mContext).getAppType(packageName));
-            info.put(UploadKey.OCInfo.ApplicationVersionCode, ii.versionName + "|" + ii.versionCode);
-            info.put(UploadKey.OCInfo.ApplicationName, String.valueOf(appInfo.loadLabel(pm)));
+            //APN 加密
+            info.put(DBConfig.OC.Column.APN, EncryptUtils.encrypt(mContext, packageName));
+
+            if (appInfo != null) {
+                //AN 加密
+                CharSequence cs = appInfo.loadLabel(pm);
+                if (cs != null) {
+                    info.put(DBConfig.OC.Column.AN, EncryptUtils.encrypt(mContext, String.valueOf(cs)));
+                }
+            }
+
+            // AOT 不加密
+            info.put(DBConfig.OC.Column.AOT, String.valueOf(System.currentTimeMillis()));
+            //NT不加密
+            info.put(DBConfig.OC.Column.NT, NetworkUtils.getNetworkType(mContext));
+            // 采集来源类型，1-getRunningTask，2-读取proc，3-辅助功能，4-系统统计
+            info.put(DBConfig.OC.Column.CT, ct);
+            //AVC 加密
+            String avc =EncryptUtils.encrypt(mContext, ii.versionName + "|" + ii.versionCode);
+            info.put(DBConfig.OC.Column.AVC, avc);
+            info.put(DBConfig.OC.Column.DY, SystemUtils.getDay());
+            // IT不加密
+            info.put(DBConfig.OC.Column.IT, String.valueOf(insertTime));
+            //  OC 切换的类型，1-正常使用，2-开关屏幕切换，3-服务重启
+            info.put(DBConfig.OC.Column.AST, switchType);
+            info.put(DBConfig.OC.Column.AT, AppSnapshotImpl.getInstance(mContext).getAppType(packageName));
+            info.put(DBConfig.OC.Column.TI, Base64Utils.getTimeTag(insertTime));
+            info.put(DBConfig.OC.Column.ST, "0");
+            info.put(DBConfig.OC.Column.RS, "0");
+//            info.put(DBConfig.OC.Column.ACT,  closeTime);
+
+
         } catch (Throwable t) {
         }
         return info;
@@ -580,7 +607,7 @@ public class OCImpl {
     /**
      * 关闭屏幕处理，内存里所有数据都保存到DB
      */
-    private void processScreenOff() {
+    public void processScreenOff() {
 
         ContentValues info = null;
         // 闭合上一个, 存储
@@ -590,10 +617,11 @@ public class OCImpl {
                 // 获取内存里的数据
                 info = mOpenedPkgNameAndInfoMap.get(pkg);
                 if (info != null && info.size() > 0) {
-                    // 补充上闭合时间
-                    info.put(UploadKey.OCInfo.ApplicationCloseTime, System.currentTimeMillis());
+                    // 补充上闭合时间 ACT不加密
+                    info.put(DBConfig.OC.Column.ACT, String.valueOf(System.currentTimeMillis()));
                     // 设置数据产生时机
-                    info.put(UploadKey.OCInfo.SwitchType, UploadKey.OCInfo.SWITCHTYPE_CLOSE_SCREEN);
+                    info.put(DBConfig.OC.Column.AST, UploadKey.OCInfo.SWITCHTYPE_CLOSE_SCREEN);
+                    info.put(DBConfig.OC.Column.RS, "1");
                     // 保存上一个打开关闭记录信息
                     TableOC.getInstance(mContext).insert(info);
                 }

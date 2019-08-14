@@ -7,6 +7,6 @@ public class DBType {
     public static final String VARCHAR_TWENTY = " varchar(20)";
     public static final String VARCHAR_TWENTY_NULL = " varchar(20) ";
     public static final String VARCHAR_HUNDRED = " varchar(100) not null ";
-    public static final String INT_NOT_NULL = " int not null ";
+    public static final String INT_NOT_NULL = " int default 1 ";
     public static final String TEXT = " text ";
 }
