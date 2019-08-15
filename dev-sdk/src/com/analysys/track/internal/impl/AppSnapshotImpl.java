@@ -183,7 +183,7 @@ public class AppSnapshotImpl {
                         pi = packageInfo.get(i);
                         if (pi != null) {
                             jsonObject = null;
-                            jsonObject = getAppInfo(pi, mContext.getPackageManager(), EGContext.SNAP_SHOT_INSTALL);
+                            jsonObject = getAppInfo(pi, mContext.getPackageManager(), EGContext.SNAP_SHOT_DEFAULT);
                             if (jsonObject != null) {
                                 list.add(jsonObject);
                             }
@@ -192,14 +192,14 @@ public class AppSnapshotImpl {
                     }
                 }
                 if (list.size() < 5) {
-                    list = getAppInfosFromShell(mContext, EGContext.SNAP_SHOT_INSTALL, list);
+                    list = getAppInfosFromShell(mContext, EGContext.SNAP_SHOT_DEFAULT, list);
                 }
             } else {
                 // 如果上面的方法不能获取，改用shell命令
                 if (list == null) {
                     list = new ArrayList<JSONObject>();
                     if (list.size() < 5) {
-                        list = getAppInfosFromShell(mContext, EGContext.SNAP_SHOT_INSTALL, list);
+                        list = getAppInfosFromShell(mContext, EGContext.SNAP_SHOT_DEFAULT, list);
                     }
                 }
             }

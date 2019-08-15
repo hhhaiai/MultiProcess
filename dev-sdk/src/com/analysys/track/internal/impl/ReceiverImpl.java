@@ -44,7 +44,7 @@ public class ReceiverImpl {
             }
 
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST,
-                    EGContext.TIME_SYNC_DEFAULT, currentTime)) {
+                    EGContext.TIME_SECOND * 2, currentTime)) {
                 if (EGContext.DEBUG_RECEIVER) {
                     ELOG.i(EGContext.TAG_SNAP, "安装app:" + packageName);
                 }
@@ -68,7 +68,7 @@ public class ReceiverImpl {
                 return;
             }
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST,
-                    EGContext.TIME_SYNC_DEFAULT, currentTime)) {
+                    EGContext.TIME_SECOND * 2, currentTime)) {
                 if (EGContext.DEBUG_RECEIVER) {
                     ELOG.i(EGContext.TAG_SNAP, "卸载app:" + packageName);
                 }
@@ -90,7 +90,7 @@ public class ReceiverImpl {
                 return;
             }
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST,
-                    EGContext.TIME_SYNC_DEFAULT, currentTime)) {
+                    EGContext.TIME_SECOND * 2, currentTime)) {
                 if (EGContext.DEBUG_RECEIVER) {
                     ELOG.i(EGContext.TAG_SNAP, "更新app:" + packageName);
                 }
@@ -120,7 +120,7 @@ public class ReceiverImpl {
             OCImpl.getInstance(context).processOCWhenScreenChange(false);
         } else if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_BATTERY_BROADCAST,
-                    EGContext.TIME_SYNC_DEFAULT, currentTime)) {
+                    EGContext.TIME_SECOND * 2, currentTime)) {
                 DeviceImpl.getInstance(context).processBattery(intent);
             } else {
                 return;

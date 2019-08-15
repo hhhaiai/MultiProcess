@@ -72,7 +72,7 @@ public class TableAppSnapshot {
 //                db = DBManager.getInstance(mContext).openDB();
 //            }
             if (EGContext.DEBUG_SNAP) {
-                ELOG.d("sanbo.snap", " 写入数据库: " + snapshots.toString());
+                ELOG.d(EGContext.TAG_SNAP, " 写入数据库: " + snapshots.toString());
             }
             db.insert(DBConfig.AppSnapshot.TABLE_NAME, null, getContentValues(snapshots));
         } catch (Throwable e) {
@@ -98,9 +98,9 @@ public class TableAppSnapshot {
         //AVC 加密
         cv.put(DBConfig.AppSnapshot.Column.AVC, EncryptUtils.encrypt(mContext,
                 snapshot.optString(UploadKey.AppSnapshotInfo.ApplicationVersionCode)));
-        // AT 加密
+        // AT 不加密
         cv.put(DBConfig.AppSnapshot.Column.AT,
-                EncryptUtils.encrypt(mContext, snapshot.optString(UploadKey.AppSnapshotInfo.ActionType)));
+                snapshot.optString(UploadKey.AppSnapshotInfo.ActionType));
         cv.put(DBConfig.AppSnapshot.Column.AHT, snapshot.optString(UploadKey.AppSnapshotInfo.ActionHappenTime));
         return cv;
     }
@@ -165,10 +165,9 @@ public class TableAppSnapshot {
                             cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AVC))),
                     DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
 
-            //AT 加密
+            //AT 不加密
             JsonUtils.pushToJSON(mContext, jsonObj, UploadKey.AppSnapshotInfo.ActionType,
-                    EncryptUtils.decrypt(mContext,
-                            cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AT))),
+                    cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AT)),
                     DataController.SWITCH_OF_ACTION_TYPE);
 
             //AHT 不加密
@@ -193,15 +192,15 @@ public class TableAppSnapshot {
                 return;
             }
             ContentValues cv = new ContentValues();
-            // AT 加密
-            cv.put(DBConfig.AppSnapshot.Column.AT, EncryptUtils.encrypt(mContext, appTag));
+            // AT 不加密
+            cv.put(DBConfig.AppSnapshot.Column.AT, appTag);
             cv.put(DBConfig.AppSnapshot.Column.AHT, time);
             // APN 加密
             db.update(DBConfig.AppSnapshot.TABLE_NAME, cv, DBConfig.AppSnapshot.Column.APN + "= ? ",
                     new String[]{EncryptUtils.encrypt(mContext, pkgName)});
 
             if (EGContext.DEBUG_SNAP) {
-                ELOG.d("sanbo.snap", " 更新信息: " + cv.toString());
+                ELOG.d(EGContext.TAG_SNAP, " 更新信息: " + cv.toString());
             }
         } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {
@@ -302,9 +301,9 @@ public class TableAppSnapshot {
             if (db == null) {
                 return;
             }
-            // AT 加密
+            // AT 不加密
             db.delete(DBConfig.AppSnapshot.TABLE_NAME, DBConfig.AppSnapshot.Column.AT + "=?",
-                    new String[]{EncryptUtils.encrypt(mContext, EGContext.SNAP_SHOT_UNINSTALL)});
+                    new String[]{EGContext.SNAP_SHOT_UNINSTALL});
 //            ELOG.e("AppSnapshot 删除行数：：："+co);
         } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {
@@ -325,8 +324,8 @@ public class TableAppSnapshot {
                 return;
             }
             ContentValues cv = new ContentValues();
-            // AT 加密
-            cv.put(DBConfig.AppSnapshot.Column.AT, EncryptUtils.encrypt(mContext, EGContext.SNAP_SHOT_INSTALL));
+            // AT 不加密
+            cv.put(DBConfig.AppSnapshot.Column.AT, EGContext.SNAP_SHOT_DEFAULT);
             db.update(DBConfig.AppSnapshot.TABLE_NAME, cv, null, null);
         } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {

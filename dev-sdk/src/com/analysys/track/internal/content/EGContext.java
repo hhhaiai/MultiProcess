@@ -64,6 +64,8 @@ public class EGContext {
     public static final String SNAP_SHOT_INSTALL = "0";
     public static final String SNAP_SHOT_UNINSTALL = "1";
     public static final String SNAP_SHOT_UPDATE = "2";
+    public static final String SNAP_SHOT_DEFAULT = "3";
+
     public static final String SP_NAME = "eg_policy";
     public static final String LAST_LOCATION = "last_location";
     public static final String TMPID = "tmp_id";
@@ -168,8 +170,6 @@ public class EGContext {
     // 最少间隔2s查询一次
     public static final long TIME_SYNC_BROADCAST = 2 * 1000;
     // 广播多进程处理，一次只能有一个进程在处理
-    // 默认同步写入时间，5秒内能写入一次。 间隔范围: APP列表(多进程广播方面)、 OC 5.x以下、DB写入
-    public static final long TIME_SYNC_DEFAULT = 5 * 1000;
     public static final String PERMISSION_TIME = "LOCATION_PERMISSION";
     public static final String PERMISSION_COUNT = "LOCATION_COUNT";
     public static final long LEN_MAX_UPDATE_SIZE = 1 * 1024 * 1024;
