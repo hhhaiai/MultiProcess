@@ -43,7 +43,8 @@ public class RequestUtils {
         PrintWriter pw = null;
         byte[] buffer = new byte[1024];
         try {
-            String plocyVersion = PolicyImpl.getInstance(context).optStringValue(UploadKey.Response.RES_POLICY_VERSION, "0");
+            String plocyVersion = SPHelper.getStringValueFromSP(context, UploadKey.Response.RES_POLICY_VERSION, "0");
+
             urlP = new URL(url);
             connection = (HttpURLConnection) urlP.openConnection();
             connection.setDoInput(true);
@@ -66,7 +67,7 @@ public class RequestUtils {
             // connection.setRequestProperty(EGContext.UPLOAD_HEAD_APPV, SystemUtils.getAppV(context));
             // 打印请求头信息内容
             if (EGContext.DEBUG_UPLOAD) {
-                ELOG.i("HTTP头： " + connection.getRequestProperties().toString());
+                ELOG.i("========HTTP头： " + connection.getRequestProperties().toString());
             }
 
             // 发送数据

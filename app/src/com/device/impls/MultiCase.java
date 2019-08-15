@@ -53,20 +53,18 @@ public class MultiCase {
      * @param context
      */
     public static void runCase1(final Context context) {
-        EL.i("----上传测试----");
+        EL.i("----上传测试--包含多进程检测------");
         UploadImpl.getInstance(context).upload();
     }
 
     /**
-     * 多进程开关屏处理测试
+     * 忽略多进程直接发起上传
      *
      * @param context
      */
     public static void runCase2(final Context context) {
-//        EL.i("-----多进程开关屏处理测试----处理打开屏幕");
-//        MessageDispatcher.getInstance(context).processScreenOnOff(true);
-//        EL.i("-----多进程开关屏处理测试----处理关闭屏幕");
-//        MessageDispatcher.getInstance(context).processScreenOnOff(false);
+        EL.i("----直接发起请求-----");
+        UploadImpl.getInstance(context).doUploadImpl();
     }
 
     /**

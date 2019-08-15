@@ -229,10 +229,13 @@ public class MainFunCase {
         });
     }
 
+    // 9. 直接发起网络请求
     private static void runCaseP9(final Context context) {
         MyLooper.execute(new Runnable() {
             @Override
             public void run() {
+                EL.i("----直接发起网络请求-----");
+                UploadImpl.getInstance(context).doUploadImpl();
             }
         });
     }

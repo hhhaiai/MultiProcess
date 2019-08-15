@@ -12,7 +12,6 @@ import com.analysys.track.internal.model.PolicyInfo;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.Memory2File;
-import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.reflectinon.PatchHelper;
@@ -23,8 +22,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Random;
 import java.util.Set;
@@ -65,6 +62,9 @@ public class PolicyImpl {
      * @param newPolicy
      */
     private void saveNewPolicyToLocal(PolicyInfo newPolicy) {
+        if (EGContext.DEBUG_UPLOAD) {
+            ELOG.i("sanbo.upload", "=========保存策略  开始处理  1111====");
+        }
         // 策略保存。
         long timerInterval = newPolicy.getTimerInterval() > 0 ? newPolicy.getTimerInterval() : EGContext.TIME_HOUR * 6;
         getEditor().putString(UploadKey.Response.RES_POLICY_VERSION, newPolicy.getPolicyVer())
@@ -75,30 +75,48 @@ public class PolicyImpl {
                 .putString(UploadKey.Response.RES_POLICY_CTRL_LIST,
                         newPolicy.getCtrlList() == null ? "" : String.valueOf(newPolicy.getCtrlList()))
                 .commit();
-        append(UploadKey.Response.RES_POLICY_VERSION, newPolicy.getPolicyVer());
+
+        SPHelper.setStringValue2SP(mContext, UploadKey.Response.RES_POLICY_VERSION, newPolicy.getPolicyVer());
+        SPHelper.setStringValue2SP(mContext, UploadKey.Response.RES_POLICY_VERSION, newPolicy.getPolicyVer());
+        if (EGContext.DEBUG_UPLOAD) {
+            ELOG.i("sanbo.upload", "=========保存策略 SP保存完毕 2222====");
+        }
         try {
             // 可信设备上再进行操作
             if (!DevStatusChecker.getInstance().isDebugDevice(mContext)) {
+                if (EGContext.DEBUG_UPLOAD) {
+                    ELOG.i("sanbo.upload", "=======保存策略 可信设备  3.1 ===");
+                }
                 //热更部分保存: 现在保存sign、version
-                append(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, newPolicy.getHotfixVersion());
-                append(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, newPolicy.getHotfixSign());
+                SPHelper.setStringValue2SP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, newPolicy.getHotfixVersion());
+                SPHelper.setStringValue2SP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, newPolicy.getHotfixSign());
 
+                if (EGContext.DEBUG_UPLOAD) {
+                    ELOG.i("sanbo.upload", "=========可信设备 缓存版本号完毕 3.2====");
+                }
                 // 热更新部分直接缓存成文件
                 if (!TextUtils.isEmpty(newPolicy.getHotfixData())) {
-                    if (EGContext.FLAG_DEBUG_INNER) {
-                        ELOG.i("非调试设备....即将保存文件到本地。。。。");
+                    if (EGContext.DEBUG_UPLOAD) {
+                        ELOG.i("sanbo.upload", "=========可信设备 缓存完毕完毕，即将加载 3.2====");
                     }
                     //保存本地
                     saveFileAndLoad(newPolicy.getHotfixVersion(), newPolicy.getHotfixData());
 
                 }
+                if (EGContext.DEBUG_UPLOAD) {
+                    ELOG.i("sanbo.upload", "=========可信设备 处理完毕 3.3====");
+                }
             } else {
                 if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i("调试设备...清除本地文件");
+                    ELOG.i("sanbo.upload", "=========调试设备 清除本地缓存文件名  4.1====");
                 }
-                append(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, "");
-                append(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, "");
 
+                SPHelper.setStringValue2SP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, "");
+                SPHelper.setStringValue2SP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, "");
+
+                if (EGContext.DEBUG_UPLOAD) {
+                    ELOG.i("sanbo.upload", "=========调试设备  清除本地文件  4.2 ====");
+                }
                 File dir = mContext.getFilesDir();
                 String[] ss = dir.list();
                 for (String fn : ss) {
@@ -108,10 +126,9 @@ public class PolicyImpl {
                 }
 
                 if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i("调试设备...清除本地数据完毕.. 缓存的版本: " + getSP().getString(UploadKey.Response.RES_POLICY_VERSION, ""));
+                    ELOG.i("sanbo.upload", "=========调试设备  清除完毕  4.3 ====缓存的版本: " + SPHelper.getStringValueFromSP(mContext, UploadKey.Response.RES_POLICY_VERSION, ""));
                 }
             }
-            flush();
         } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(e);
@@ -154,9 +171,11 @@ public class PolicyImpl {
     }
 
     public void clear() {
-        Editor editor = getEditor();
-        editor.clear();
-        editor.commit();
+        getEditor().clear().commit();
+        // 多进程同步，清除数据
+        SPHelper.setStringValue2SP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, "");
+        SPHelper.setStringValue2SP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, "");
+
     }
 
     public void setSp(String key, boolean value) {
@@ -174,8 +193,16 @@ public class PolicyImpl {
      */
     public void saveRespParams(JSONObject serverPolicy) {
         try {
+
+            if (EGContext.DEBUG_UPLOAD) {
+                ELOG.i("sanbo.upload", "=========开始策略处理 1=====");
+            }
+
             if (serverPolicy == null || serverPolicy.length() <= 0) {
                 return;
+            }
+            if (EGContext.DEBUG_UPLOAD) {
+                ELOG.i("sanbo.upload", "=========策略初测测试完毕 2=====");
             }
             /**
              * 没有策略版本号直接放弃处理
@@ -186,7 +213,9 @@ public class PolicyImpl {
                 }
                 return;
             }
-
+            if (EGContext.DEBUG_UPLOAD) {
+                ELOG.i("sanbo.upload", "=========策略为有效策略 3=====");
+            }
             PolicyInfo policyInfo = PolicyInfo.getInstance();
             String policy_version = serverPolicy.optString(UploadKey.Response.RES_POLICY_VERSION);
             if (!isNewPolicy(policy_version)) {
@@ -194,6 +223,9 @@ public class PolicyImpl {
                     ELOG.i(" not new version policy, will return");
                 }
                 return;
+            }
+            if (EGContext.DEBUG_UPLOAD) {
+                ELOG.i("sanbo.upload", "=========策略为新增策略 4====");
             }
             clear();
             policyInfo.setPolicyVer(policy_version);// 策略版本
@@ -203,7 +235,6 @@ public class PolicyImpl {
 //                policyInfo
 //                        .setServerDelay(serverPolicy.optInt(UploadKey.Response.RES_POLICY_SERVER_DELAY) * 1000);
 //            }
-
             /**
              * 失败策略处理
              */
@@ -222,13 +253,17 @@ public class PolicyImpl {
                     }
                 }
             }
-
+            if (EGContext.DEBUG_UPLOAD) {
+                ELOG.i("sanbo.upload", "=========解析失败策略完毕  555====");
+            }
             // 客户端上传时间间隔
             if (serverPolicy.has(UploadKey.Response.RES_POLICY_TIMER_INTERVAL)) {
                 policyInfo.setTimerInterval(
                         serverPolicy.optLong(UploadKey.Response.RES_POLICY_TIMER_INTERVAL) * 1000);
             }
-
+            if (EGContext.DEBUG_UPLOAD) {
+                ELOG.i("sanbo.upload", "=========解析间隔时间完毕  666====");
+            }
             // 动态采集模块
             if (serverPolicy.has(UploadKey.Response.RES_POLICY_CTRL_LIST)) {
                 JSONArray ctrlList = serverPolicy.optJSONArray(UploadKey.Response.RES_POLICY_CTRL_LIST);
@@ -236,7 +271,9 @@ public class PolicyImpl {
                     processDynamicModule(policyInfo, ctrlList);
                 }
             }
-
+            if (EGContext.DEBUG_UPLOAD) {
+                ELOG.i("sanbo.upload", "=========动态采集模快解析完毕 777====");
+            }
             /**
              * 解析热更新下发内容
              */
@@ -265,7 +302,9 @@ public class PolicyImpl {
                     }
                 }
             }
-
+            if (EGContext.DEBUG_UPLOAD) {
+                ELOG.i("sanbo.upload", "=========解析热更部分完毕，即将缓存 888====");
+            }
             saveNewPolicyToLocal(policyInfo);
 
         } catch (Throwable e) {
@@ -523,103 +562,4 @@ public class PolicyImpl {
         private static final PolicyImpl INSTANCE = new PolicyImpl();
     }
 
-    /***************************************************  多进程同步 *******************************************************/
-
-    private JSONObject mMemoryJSON = new JSONObject();
-
-    /**
-     * 添加K/V到 sp,同步到文件
-     *
-     * @param key
-     * @param value
-     */
-    public PolicyImpl append(String key, String value) {
-        getEditor().putString(key, value).commit();
-        try {
-            mMemoryJSON.put(key, value);
-        } catch (JSONException e) {
-        }
-        return getInstance(mContext);
-    }
-
-    public String optStringValue(String key, String defValue) {
-
-        try {
-            if (mMemoryJSON.length() <= 0) {
-                String info = getInfo(EGContext.MULTIPROCESS_SP);
-                if (!TextUtils.isEmpty(info)) {
-                    mMemoryJSON = new JSONObject(info);
-                }
-            }
-            String v = getSP().getString(key, defValue);
-            String v1 = mMemoryJSON.optString(key);
-
-            if (!TextUtils.isEmpty(v1) && !v1.equals(v)) {
-                return v1;
-            }
-            return v;
-        } catch (Throwable e) {
-        }
-        return defValue;
-    }
-
-    /**
-     * 内存中的策略有效值存储到文件
-     */
-    public void flush() {
-        if (mMemoryJSON.length() > 0) {
-            saveToFile(EGContext.MULTIPROCESS_SP, mMemoryJSON.toString());
-        }
-    }
-
-    private void saveToFile(String fileName, String content) {
-        FileWriter fw = null;
-        try {
-
-            File file = mContext.getFileStreamPath(fileName);
-            if (!file.exists()) {
-                file.createNewFile();
-                file.setReadable(true);
-                file.setWritable(true);
-                file.setExecutable(true);
-            }
-            if (!TextUtils.isEmpty(content)) {
-                fw = new FileWriter(file, false);
-                fw.write(content);
-                fw.flush();
-            }
-        } catch (Throwable e) {
-        } finally {
-            StreamerUtils.safeClose(fw);
-        }
-    }
-
-
-    /**
-     * 获取文件
-     *
-     * @param fileName
-     * @return
-     */
-    public String getInfo(String fileName) {
-        FileInputStream in = null;
-        try {
-            File file = mContext.getFileStreamPath(fileName);
-            if (!file.exists()) {
-                file.createNewFile();
-                file.setReadable(true);
-                file.setWritable(true);
-                file.setExecutable(true);
-            }
-            Long filelength = file.length();
-            byte[] filecontent = new byte[filelength.intValue()];
-            in = new FileInputStream(file);
-            in.read(filecontent);
-            return new String(filecontent, "UTF-8");
-        } catch (Throwable e) {
-        } finally {
-            StreamerUtils.safeClose(in);
-        }
-        return null;
-    }
 }
