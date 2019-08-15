@@ -6,8 +6,8 @@ import android.os.PowerManager;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.CrashHandler;
 import com.analysys.track.internal.work.ServiceHelper;
@@ -125,17 +125,18 @@ public class AnalysysInternal {
                 if (file.exists()) {
                     PatchHelper.loads(mContextRef.get(), file);
                 } else {
+                    PolicyImpl.getInstance(mContextRef.get()).clear();
                     clear();
                 }
             }
         } else {
+            PolicyImpl.getInstance(mContextRef.get()).getEditor().remove(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN).remove(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION).commit();
             clear();
         }
 
     }
 
     private void clear() {
-        PolicyImpl.getInstance(mContextRef.get()).clear();
         File dir = mContextRef.get().getFilesDir();
         String[] ss = dir.list();
         for (String fn : ss) {

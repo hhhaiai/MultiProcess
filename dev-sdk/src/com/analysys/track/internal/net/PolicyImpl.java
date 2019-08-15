@@ -141,7 +141,7 @@ public class PolicyImpl {
         return mSP;
     }
 
-    private Editor getEditor() {
+    public Editor getEditor() {
         return getSP().edit();
     }
 
