@@ -88,13 +88,13 @@ public class OCImpl {
 
                 } else {
                     if (EGContext.DEBUG_OC) {
-                        ELOG.v("sanbo.oc", "多进程并发。停止处理 。。。");
+                        ELOG.v(EGContext.TAG_OC, "多进程并发。停止处理 。。。");
                     }
                     return;
                 }
             } else {
                 if (EGContext.DEBUG_OC) {
-                    ELOG.v("sanbo.oc", " 6.0以上版本. 停止处理");
+                    ELOG.v(EGContext.TAG_OC, " 6.0以上版本. 停止处理");
                 }
                 // 6.0以上版本
             }
@@ -115,7 +115,7 @@ public class OCImpl {
 //                fillData();
                 if (!SystemUtils.isScreenLocked(mContext)) {
                     if (EGContext.DEBUG_OC) {
-                        ELOG.d("sanbo.oc", " 屏幕不亮 且不锁屏，开始检测");
+                        ELOG.d(EGContext.TAG_OC, " 屏幕不亮 且不锁屏，开始检测");
                     }
                     // 约束OC是否能工作
 //                    boolean isAllowOC = PolicyImpl.getInstance(mContext)
@@ -126,7 +126,7 @@ public class OCImpl {
                     boolean isAllowXXX = SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true);
                     if (!isAllowOC && !isAllowXXX) {
                         if (EGContext.DEBUG_OC) {
-                            ELOG.d("sanbo.oc", " 屏幕不亮 且不锁屏，不需要采集OC和XXX，即将停止工作");
+                            ELOG.d(EGContext.TAG_OC, " 屏幕不亮 且不锁屏，不需要采集OC和XXX，即将停止工作");
                         }
                         return;
                     }
@@ -137,7 +137,7 @@ public class OCImpl {
                 }
             } else {
                 if (EGContext.DEBUG_OC) {
-                    ELOG.d("sanbo.oc", " 屏幕不亮，停止处理。。保存数据");
+                    ELOG.d(EGContext.TAG_OC, " 屏幕不亮，停止处理。。保存数据");
                 }
                 processScreenOff();
             }
@@ -183,13 +183,13 @@ public class OCImpl {
                 if (Build.VERSION.SDK_INT < 21) {
                     if (PermissionUtils.checkPermission(mContext, Manifest.permission.GET_TASKS)) {
                         if (EGContext.DEBUG_OC) {
-                            ELOG.i("sanbo.oc", " 4.x版本  有GET_TASKS权限。。。");
+                            ELOG.i(EGContext.TAG_OC, " 4.x版本  有GET_TASKS权限。。。");
                         }
                         getRunningTasksByapiWhen4x(aliveList);
                     } else {
                         // 没权限，用xxxinfo方式收集
                         if (EGContext.DEBUG_OC) {
-                            ELOG.e("sanbo.oc", " 4.x版本  没有GET_TASKS权限。。。");
+                            ELOG.e(EGContext.TAG_OC, " 4.x版本  没有GET_TASKS权限。。。");
                         }
                         getAliveAppByProc(aliveList);
                     }
@@ -227,9 +227,9 @@ public class OCImpl {
             return;
         }
         if (EGContext.DEBUG_OC) {
-            ELOG.i("sanbo,oc", "\n内存里的列表数据[" + mOpenedPkgNameList.size() + "]:" + mOpenedPkgNameList.toString());
-            ELOG.i("sanbo,oc", "\n内存里的MAP数据[" + mOpenedPkgNameAndInfoMap.size() + "]:" + mOpenedPkgNameAndInfoMap.toString());
-            ELOG.i("sanbo,oc", "\n本次处理的数据[" + aliveList.length() + "]:" + aliveList.toString());
+            ELOG.i(EGContext.TAG_OC, "\n内存里的列表数据[" + mOpenedPkgNameList.size() + "]:" + mOpenedPkgNameList.toString());
+            ELOG.i(EGContext.TAG_OC, "\n内存里的MAP数据[" + mOpenedPkgNameAndInfoMap.size() + "]:" + mOpenedPkgNameAndInfoMap.toString());
+            ELOG.i(EGContext.TAG_OC, "\n本次处理的数据[" + aliveList.length() + "]:" + aliveList.toString());
         }
 
         /**
@@ -267,8 +267,8 @@ public class OCImpl {
         }
 
         if (EGContext.DEBUG_OC) {
-            ELOG.i("sanbo,oc", "-----needOpenList:" + needOpenList.toString());
-            ELOG.i("sanbo,oc", "-----needCloseList:" + needCloseList.toString());
+            ELOG.i(EGContext.TAG_OC, "-----needOpenList:" + needOpenList.toString());
+            ELOG.i(EGContext.TAG_OC, "-----needCloseList:" + needCloseList.toString());
         }
 
 
@@ -307,8 +307,8 @@ public class OCImpl {
             needCloseList = null;
         }
         if (EGContext.DEBUG_OC) {
-            ELOG.i("sanbo,oc", "\n 闭合数据后，列表[" + mOpenedPkgNameList.size() + "]:" + mOpenedPkgNameList.toString());
-            ELOG.i("sanbo,oc", "\n 闭合数据后，MAP[" + mOpenedPkgNameAndInfoMap.size() + "]:" + mOpenedPkgNameAndInfoMap.toString());
+            ELOG.i(EGContext.TAG_OC, "\n 闭合数据后，列表[" + mOpenedPkgNameList.size() + "]:" + mOpenedPkgNameList.toString());
+            ELOG.i(EGContext.TAG_OC, "\n 闭合数据后，MAP[" + mOpenedPkgNameAndInfoMap.size() + "]:" + mOpenedPkgNameAndInfoMap.toString());
         }
 
         // 增加新增加的数据
@@ -322,8 +322,8 @@ public class OCImpl {
             needOpenList = null;
         }
         if (EGContext.DEBUG_OC) {
-            ELOG.i("sanbo,oc", "\n 新增数据完毕，列表[" + mOpenedPkgNameList.size() + "]:" + mOpenedPkgNameList.toString());
-            ELOG.i("sanbo,oc", "\n 新增数据完毕，MAP[" + mOpenedPkgNameAndInfoMap.size() + "]:" + mOpenedPkgNameAndInfoMap.toString());
+            ELOG.i(EGContext.TAG_OC, "\n 新增数据完毕，列表[" + mOpenedPkgNameList.size() + "]:" + mOpenedPkgNameList.toString());
+            ELOG.i(EGContext.TAG_OC, "\n 新增数据完毕，MAP[" + mOpenedPkgNameAndInfoMap.size() + "]:" + mOpenedPkgNameAndInfoMap.toString());
         }
     }
 
@@ -395,7 +395,7 @@ public class OCImpl {
     public void processSignalPkgName(String packageName, String ct) {
         try {
             if (EGContext.DEBUG_OC) {
-                ELOG.i("sanbo.oc", " 处理包名： " + packageName);
+                ELOG.i(EGContext.TAG_OC, " 处理包名： " + packageName);
             }
             if (TextUtils.isEmpty(packageName)) {
                 return;

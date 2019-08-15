@@ -9,28 +9,15 @@ package com.analysys.track.internal.content;
  */
 public class EGContext {
 
-    /**
-     * EGuan 内部调试系列tag.主要用于控制堆栈打印、错误打印、内部提示信息打印
-     */
-    public static final boolean FLAG_DEBUG_INNER = true;
-    // 上传模快日志控制
-    public static final boolean DEBUG_UPLOAD = true;
-    // OC模快日志控制
-    public static final boolean DEBUG_OC = false;
-    // 安装列表部分日志控制
-    public static final boolean DEBUG_SNAP = false;
-    // 广播日志控制
-    public static final boolean DEBUG_RECEIVER = false;
-    // 执行上传URL控制
-    public static final boolean DEBUG_URL = true;
 
     /**
      * SDK版本
      */
     public static final String SDK_VERSION = "4.3.0.3|20190806";
     public static final String SDK_TYPE = "Android";
-    public static final String LOGTAG_INNER = "sanbo";
     public static final String LOGTAG_USER = "analysys";
+    public static String LOGTAG_INNER;
+
 
     /**
      * xml 中声明的 appid、channel
@@ -229,4 +216,57 @@ public class EGContext {
     public static boolean STATUS_USB_DEBUG = false;
 
 
+    /********************************************日志控制************************************************/
+    /**
+     * EGuan 内部调试系列tag.主要用于控制堆栈打印、错误打印、内部提示信息打印
+     */
+    // 策略的总控。关闭后所有的日志都不能打印
+    public static final boolean FLAG_DEBUG_INNER = true;
+
+    // 上传模快日志控制
+    public static boolean DEBUG_UPLOAD;
+    public static String TAG_UPLOAD;
+    // OC模快日志控制
+    public static boolean DEBUG_OC;
+    public static String TAG_OC;
+    // 安装列表部分日志控制
+    public static boolean DEBUG_SNAP;
+    public static String TAG_SNAP;
+    // 广播日志控制
+    public static boolean DEBUG_RECEIVER;
+    public static String TAG_RECEIVER;
+    // 位置日志打印
+    public static boolean DEBUG_LOCATION;
+    public static String TAG_LOC;
+    // 执行上传URL控制
+    public static boolean DEBUG_URL;
+
+    static {
+
+        //调整。解决编译时到处可见打印字段问题。
+        if (FLAG_DEBUG_INNER) {
+            LOGTAG_INNER = "sanbo";
+            // 上传模快日志控制
+            DEBUG_UPLOAD = true;
+            TAG_UPLOAD = LOGTAG_INNER + ".upload";
+
+            // OC模快日志控制
+            DEBUG_OC = true;
+            TAG_OC = LOGTAG_INNER + ".oc";
+
+            // 安装列表部分日志控制
+            DEBUG_SNAP = true;
+            TAG_SNAP = LOGTAG_INNER + ".snap";
+
+            // 广播日志控制
+            DEBUG_RECEIVER = true;
+            TAG_RECEIVER = LOGTAG_INNER + ".rece";
+
+            // 位置日志打印
+            DEBUG_LOCATION = true;
+            TAG_LOC = LOGTAG_INNER + ".loc";
+            // 执行上传URL控制
+            DEBUG_URL = true;
+        }
+    }
 }

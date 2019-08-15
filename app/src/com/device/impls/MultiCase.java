@@ -136,7 +136,7 @@ public class MultiCase {
                 .append(" ===================")
         ;
         EL.i(sb.toString());
-        LocationImpl.getInstance(context).tryUploadLocationInfo(null);
+        LocationImpl.getInstance(context).tryGetLocationInfo(null);
     }
 
     public static void runCase6(final Context context) {

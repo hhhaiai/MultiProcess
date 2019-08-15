@@ -43,9 +43,9 @@ public class MessageDispatcher {
             try {
                 switch (msg.what) {
                     case MSG_INFO_OC:
-//                        if (EGContext.DEBUG_OC) {
-//                            ELOG.i("sanbo.oc", "收到OC消息。心跳。。。");
-//                        }
+                        if (EGContext.DEBUG_OC) {
+                            ELOG.i(EGContext.TAG_OC, "收到OC消息。心跳。。。");
+                        }
                         // 调用OC，等待处理完毕后，回调处理对应事务
                         OCImpl.getInstance(mContext).processOCMsg(new ECallBack() {
                             @Override
@@ -53,9 +53,9 @@ public class MessageDispatcher {
 
                                 // 根据版本获取OC循环时间
                                 long ocDurTime = OCImpl.getInstance(mContext).getOCDurTime();
-//                                if (EGContext.DEBUG_OC) {
-//                                    ELOG.i("sanbo.oc", "收到OC处理完毕的回调。。。。下次处理时间间隔: " + ocDurTime);
-//                                }
+                                if (EGContext.DEBUG_OC) {
+                                    ELOG.i(EGContext.TAG_OC, "收到OC处理完毕的回调。。。。下次处理时间间隔: " + ocDurTime);
+                                }
                                 if (ocDurTime > 0) {
                                     postDelay(MSG_INFO_OC, ocDurTime);
                                 } else {
@@ -68,7 +68,7 @@ public class MessageDispatcher {
 
                     case MSG_INFO_UPLOAD:
                         if (EGContext.DEBUG_UPLOAD) {
-                            ELOG.i("sanbo.upload", "上行检测，心跳。。。。");
+                            ELOG.i(EGContext.TAG_UPLOAD, "上行检测，心跳。。。。");
                         }
                         UploadImpl.getInstance(mContext).upload();
                         // 5秒检查一次是否可以发送。
@@ -77,10 +77,10 @@ public class MessageDispatcher {
                         break;
 
                     case MSG_INFO_WBG:
-//                        if (EGContext.FLAG_DEBUG_INNER) {
-//                            ELOG.i("收到定位信息。。。。");
-//                        }
-                        LocationImpl.getInstance(mContext).tryUploadLocationInfo(new ECallBack() {
+                        if (EGContext.DEBUG_LOCATION) {
+                            ELOG.i(EGContext.TAG_LOC, "收到定位信息。。。。");
+                        }
+                        LocationImpl.getInstance(mContext).tryGetLocationInfo(new ECallBack() {
                             @Override
                             public void onProcessed() {
                                 if (EGContext.FLAG_DEBUG_INNER) {
@@ -94,7 +94,7 @@ public class MessageDispatcher {
 
                     case MSG_INFO_SNAPS:
                         if (EGContext.DEBUG_SNAP) {
-                            ELOG.d("sanbo.snap", " 收到 MSG_INFO_SNAPS 信息。。心跳。。");
+                            ELOG.d(EGContext.TAG_SNAP, " 收到 MSG_INFO_SNAPS 信息。。心跳。。");
                         }
                         AppSnapshotImpl.getInstance(mContext).snapshotsInfo();
                         break;

@@ -66,7 +66,7 @@ public class AppSnapshotImpl {
                 //大于三个小时才可以工作
                 if (dur > durByPolicy) {
                     if (EGContext.DEBUG_SNAP) {
-                        ELOG.i("sanbo.snap", " 大于3小时可以开始工作 ");
+                        ELOG.i(EGContext.TAG_SNAP, " 大于3小时可以开始工作 ");
                     }
                     SPHelper.setLongValue2SP(mContext, EGContext.SP_APP_SNAP, now);
                     if (SystemUtils.isMainThread()) {
@@ -81,7 +81,7 @@ public class AppSnapshotImpl {
                     }
                 } else {
                     if (EGContext.DEBUG_SNAP) {
-                        ELOG.i("sanbo.snap", " 大于小于3小时 time：" + time);
+                        ELOG.i(EGContext.TAG_SNAP, " 大于小于3小时 time：" + time);
                     }
                     //同步调整时间
                     MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, time);
@@ -101,7 +101,7 @@ public class AppSnapshotImpl {
             // 1. 获取现在的安装列表
             List<JSONObject> currentSnapshotsList = getCurrentSnapshots();
             if (EGContext.DEBUG_SNAP) {
-                ELOG.i("sanbo.snap", " 获取安装列表: " + currentSnapshotsList.size());
+                ELOG.i(EGContext.TAG_SNAP, " 获取安装列表: " + currentSnapshotsList.size());
             }
             if (currentSnapshotsList != null && currentSnapshotsList.size() > 0) {
                 // 2. 获取DB中缓存的列表
@@ -422,7 +422,7 @@ public class AppSnapshotImpl {
             return;
         }
         if (EGContext.DEBUG_SNAP) {
-            ELOG.d("sanbo.snap", " 处理广播接收到的信息 包:" + pkgName + "----type: " + type);
+            ELOG.d(EGContext.TAG_SNAP, " 处理广播接收到的信息 包:" + pkgName + "----type: " + type);
         }
         if (SystemUtils.isMainThread()) {
             // 数据库操作修改包名和类型

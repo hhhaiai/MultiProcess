@@ -58,7 +58,7 @@ public class LocationImpl {
      *
      * @param callback
      */
-    public void tryUploadLocationInfo(final ECallBack callback) {
+    public void tryGetLocationInfo(final ECallBack callback) {
         try {
             // 模快不工作，没有必要轮训
 //            if (!PolicyImpl.getInstance(mContext)

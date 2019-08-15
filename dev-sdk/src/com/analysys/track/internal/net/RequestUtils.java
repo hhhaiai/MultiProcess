@@ -67,7 +67,7 @@ public class RequestUtils {
             // connection.setRequestProperty(EGContext.UPLOAD_HEAD_APPV, SystemUtils.getAppV(context));
             // 打印请求头信息内容
             if (EGContext.DEBUG_UPLOAD) {
-                ELOG.i("========HTTP头： " + connection.getRequestProperties().toString());
+                ELOG.i(EGContext.TAG_UPLOAD, "========HTTP头： " + connection.getRequestProperties().toString());
             }
 
             // 发送数据
@@ -77,7 +77,7 @@ public class RequestUtils {
 
             int status = connection.getResponseCode();
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i("httpRequest status:" + status);
+                ELOG.i(EGContext.TAG_UPLOAD, "httpRequest status:" + status);
             }
             // 获取数据
             if (HttpURLConnection.HTTP_OK == status) {
