@@ -67,9 +67,9 @@ public class MessageDispatcher {
                         break;
 
                     case MSG_INFO_UPLOAD:
-                        if (EGContext.DEBUG_UPLOAD) {
-                            ELOG.i("sanbo.upload", "上行检测，心跳。。。。");
-                        }
+//                        if (EGContext.DEBUG_UPLOAD) {
+//                            ELOG.i("sanbo.upload", "上行检测，心跳。。。。");
+//                        }
                         UploadImpl.getInstance(mContext).upload();
                         // 5秒检查一次是否可以发送。
                         postDelay(MSG_INFO_UPLOAD, EGContext.TIME_SECOND * 5);

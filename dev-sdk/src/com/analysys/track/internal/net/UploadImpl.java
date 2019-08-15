@@ -45,9 +45,9 @@ public class UploadImpl {
     public void upload() {
         try {
 
-            if (EGContext.DEBUG_UPLOAD) {
-                ELOG.i("sanbo.upload", "inside upload...");
-            }
+//            if (EGContext.DEBUG_UPLOAD) {
+//                ELOG.i("sanbo.upload", "inside upload...");
+//            }
             // 1. 没网络停止工作
             if (!NetworkUtils.isNetworkAlive(mContext)) {
                 return;
@@ -67,11 +67,11 @@ public class UploadImpl {
 
 
             // 5. 失败重试
-            int failNum = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);
+            final int failNum = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);
             if (failNum > 0) {
-                if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i("sanbo.upload", "失败重试。。。。failNum：" + failNum);
-                }
+//                if (EGContext.DEBUG_UPLOAD) {
+//                    ELOG.i("sanbo.upload", "失败重试。。。。failNum：" + failNum);
+//                }
                 int maxFailCount = PolicyImpl.getInstance(mContext).getSP()
                         .getInt(UploadKey.Response.RES_POLICY_FAIL_COUNT, EGContext.FAIL_COUNT_DEFALUT);
 
@@ -98,21 +98,21 @@ public class UploadImpl {
                             @Override
                             public void run() {
                                 if (EGContext.DEBUG_UPLOAD) {
-                                    ELOG.i("sanbo.upload", "失败重试 。即将进入发送。。。。");
+                                    ELOG.i("sanbo.upload", "失败重试 [" + failNum + "] 。即将进入发送。。。。");
                                 }
                                 doUploadImpl();
 
                             }
                         });
                     } else {
-                        if (EGContext.DEBUG_UPLOAD) {
-                            ELOG.i("sanbo.upload", "失败重试 时间间隔不对。即将停止。。。");
-                        }
+//                        if (EGContext.DEBUG_UPLOAD) {
+//                            ELOG.i("sanbo.upload", "失败重试 时间间隔不对。即将停止。。。");
+//                        }
                     }
                 } else {
-                    if (EGContext.DEBUG_UPLOAD) {
-                        ELOG.i("sanbo.upload", "失败重试。。。多进程并发。。中断发送。");
-                    }
+//                    if (EGContext.DEBUG_UPLOAD) {
+//                        ELOG.i("sanbo.upload", "失败重试。。。多进程并发。。中断发送。");
+//                    }
                 }
                 return;
             }
@@ -122,16 +122,16 @@ public class UploadImpl {
             // 6. 多调用入口。增加进程锁同步。6小时只能发起一次(跟本地时间对比。可以忽略时间修改导致的不能上传)
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.MULTI_FILE_UPLOAD, EGContext.TIME_SECOND * 3, now)) {
                 long lastReqTime = SPHelper.getLongValueFromSP(mContext, EGContext.LASTQUESTTIME, 0);
-                if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i("sanbo.upload", "lastReqTime:" + lastReqTime + "--->上传间隔：" + (System.currentTimeMillis() - lastReqTime));
-                }
+//                if (EGContext.DEBUG_UPLOAD) {
+//                    ELOG.i("sanbo.upload", "lastReqTime:" + lastReqTime + "--->上传间隔：" + (System.currentTimeMillis() - lastReqTime));
+//                }
 
                 if ((now - lastReqTime) < EGContext.TIME_HOUR * 6) {
                     MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.MULTI_FILE_UPLOAD, System.currentTimeMillis());
 
-                    if (EGContext.DEBUG_UPLOAD) {
-                        ELOG.e("sanbo.upload", "小于6小时停止工作");
-                    }
+//                    if (EGContext.DEBUG_UPLOAD) {
+//                        ELOG.e("sanbo.upload", "小于6小时停止工作");
+//                    }
                     return;
                 } else {
                     if (EGContext.DEBUG_UPLOAD) {
@@ -153,9 +153,9 @@ public class UploadImpl {
 
 
             } else {
-                if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i("sanbo.upload", "正常模式。。。多进程并发。。中断发送。");
-                }
+//                if (EGContext.DEBUG_UPLOAD) {
+//                    ELOG.i("sanbo.upload", "正常模式。。。多进程并发。。中断发送。");
+//                }
                 //多进程并发导致中断了
                 return;
             }

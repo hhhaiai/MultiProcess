@@ -227,4 +227,5 @@ public class MultiProcessChecker {
             StreamerUtils.safeClose(mFileChannel);
         }
     }
+
 }

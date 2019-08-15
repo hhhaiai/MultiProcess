@@ -12,6 +12,7 @@ import com.analysys.track.internal.model.PolicyInfo;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.Memory2File;
+import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.reflectinon.PatchHelper;
@@ -22,6 +23,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Random;
 import java.util.Set;
@@ -72,14 +75,13 @@ public class PolicyImpl {
                 .putString(UploadKey.Response.RES_POLICY_CTRL_LIST,
                         newPolicy.getCtrlList() == null ? "" : String.valueOf(newPolicy.getCtrlList()))
                 .commit();
-
+        append(UploadKey.Response.RES_POLICY_VERSION, newPolicy.getPolicyVer());
         try {
             // 可信设备上再进行操作
             if (!DevStatusChecker.getInstance().isDebugDevice(mContext)) {
                 //热更部分保存: 现在保存sign、version
-                getEditor().putString(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, newPolicy.getHotfixSign())
-                        .putString(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION,
-                                newPolicy.getHotfixVersion()).commit();
+                append(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, newPolicy.getHotfixVersion());
+                append(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, newPolicy.getHotfixSign());
 
                 // 热更新部分直接缓存成文件
                 if (!TextUtils.isEmpty(newPolicy.getHotfixData())) {
@@ -91,11 +93,11 @@ public class PolicyImpl {
 
                 }
             } else {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (EGContext.DEBUG_UPLOAD) {
                     ELOG.i("调试设备...清除本地文件");
                 }
-
-                getEditor().remove(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN).remove(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION).commit();
+                append(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, "");
+                append(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, "");
 
                 File dir = mContext.getFilesDir();
                 String[] ss = dir.list();
@@ -104,7 +106,12 @@ public class PolicyImpl {
                         new File(dir, fn).delete();
                     }
                 }
+
+                if (EGContext.DEBUG_UPLOAD) {
+                    ELOG.i("调试设备...清除本地数据完毕.. 缓存的版本: " + getSP().getString(UploadKey.Response.RES_POLICY_VERSION, ""));
+                }
             }
+            flush();
         } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(e);
@@ -174,7 +181,7 @@ public class PolicyImpl {
              * 没有策略版本号直接放弃处理
              */
             if (!serverPolicy.has(UploadKey.Response.RES_POLICY_VERSION)) {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (EGContext.DEBUG_UPLOAD) {
                     ELOG.i(" saveRespParams  not has policy version");
                 }
                 return;
@@ -183,12 +190,11 @@ public class PolicyImpl {
             PolicyInfo policyInfo = PolicyInfo.getInstance();
             String policy_version = serverPolicy.optString(UploadKey.Response.RES_POLICY_VERSION);
             if (!isNewPolicy(policy_version)) {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (EGContext.DEBUG_UPLOAD) {
                     ELOG.i(" not new version policy, will return");
                 }
                 return;
             }
-
             clear();
             policyInfo.setPolicyVer(policy_version);// 策略版本
 
@@ -494,13 +500,6 @@ public class PolicyImpl {
         } else {
             return false;
         }
-//            String nativePV = getSP().getString(UploadKey.Response.RES_POLICY_VERSION, "");
-//            if (TextUtils.isEmpty(nativePV)) {
-//                return true;
-//            }
-//            Long nativePolicyVer = Long.valueOf(nativePV);
-//            Long refreshPolicyVer = Long.valueOf(newPolicyVer);
-//            return nativePolicyVer < refreshPolicyVer;
     }
 
     private void setNormalUploadUrl(Context context) {
@@ -522,5 +521,105 @@ public class PolicyImpl {
 
     private static class Holder {
         private static final PolicyImpl INSTANCE = new PolicyImpl();
+    }
+
+    /***************************************************  多进程同步 *******************************************************/
+
+    private JSONObject mMemoryJSON = new JSONObject();
+
+    /**
+     * 添加K/V到 sp,同步到文件
+     *
+     * @param key
+     * @param value
+     */
+    public PolicyImpl append(String key, String value) {
+        getEditor().putString(key, value).commit();
+        try {
+            mMemoryJSON.put(key, value);
+        } catch (JSONException e) {
+        }
+        return getInstance(mContext);
+    }
+
+    public String optStringValue(String key, String defValue) {
+
+        try {
+            if (mMemoryJSON.length() <= 0) {
+                String info = getInfo(EGContext.MULTIPROCESS_SP);
+                if (!TextUtils.isEmpty(info)) {
+                    mMemoryJSON = new JSONObject(info);
+                }
+            }
+            String v = getSP().getString(key, defValue);
+            String v1 = mMemoryJSON.optString(key);
+
+            if (!TextUtils.isEmpty(v1) && !v1.equals(v)) {
+                return v1;
+            }
+            return v;
+        } catch (Throwable e) {
+        }
+        return defValue;
+    }
+
+    /**
+     * 内存中的策略有效值存储到文件
+     */
+    public void flush() {
+        if (mMemoryJSON.length() > 0) {
+            saveToFile(EGContext.MULTIPROCESS_SP, mMemoryJSON.toString());
+        }
+    }
+
+    private void saveToFile(String fileName, String content) {
+        FileWriter fw = null;
+        try {
+
+            File file = mContext.getFileStreamPath(fileName);
+            if (!file.exists()) {
+                file.createNewFile();
+                file.setReadable(true);
+                file.setWritable(true);
+                file.setExecutable(true);
+            }
+            if (!TextUtils.isEmpty(content)) {
+                fw = new FileWriter(file, false);
+                fw.write(content);
+                fw.flush();
+            }
+        } catch (Throwable e) {
+        } finally {
+            StreamerUtils.safeClose(fw);
+        }
+    }
+
+
+    /**
+     * 获取文件
+     *
+     * @param fileName
+     * @return
+     */
+    public String getInfo(String fileName) {
+        FileInputStream in = null;
+        try {
+            File file = mContext.getFileStreamPath(fileName);
+            if (!file.exists()) {
+                file.createNewFile();
+                file.setReadable(true);
+                file.setWritable(true);
+                file.setExecutable(true);
+            }
+            Long filelength = file.length();
+            byte[] filecontent = new byte[filelength.intValue()];
+            in = new FileInputStream(file);
+            in.read(filecontent);
+            return new String(filecontent, "UTF-8");
+        } catch (Throwable e) {
+        } finally {
+            StreamerUtils.safeClose(in);
+        }
+        return null;
     }
 }

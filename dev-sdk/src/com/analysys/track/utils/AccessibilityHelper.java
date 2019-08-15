@@ -21,9 +21,9 @@ public class AccessibilityHelper {
      */
     public static boolean isAccessibilitySettingsOn(Context context, Class<?> clazz) {
         if (context == null || clazz == null) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i("AccessibilityHelper.isAccessibilitySettingsOn  the param is null!");
-            }
+//            if (EGContext.FLAG_DEBUG_INNER) {
+//                ELOG.i("AccessibilityHelper.isAccessibilitySettingsOn  the param is null!");
+//            }
             return false;
         }
         int accessibilityEnabled = 0;
@@ -88,9 +88,9 @@ public class AccessibilityHelper {
                 }
             }
         } else {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i("please make sure  accessibility  Enabled!");
-            }
+//            if (EGContext.FLAG_DEBUG_INNER) {
+//                ELOG.i("please make sure  accessibility  Enabled!");
+//            }
         }
         return false;
     }

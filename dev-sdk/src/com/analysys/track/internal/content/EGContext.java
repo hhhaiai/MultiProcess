@@ -16,11 +16,11 @@ public class EGContext {
     // 上传模快日志控制
     public static final boolean DEBUG_UPLOAD = true;
     // OC模快日志控制
-    public static final boolean DEBUG_OC = true;
+    public static final boolean DEBUG_OC = false;
     // 安装列表部分日志控制
-    public static final boolean DEBUG_SNAP = true;
+    public static final boolean DEBUG_SNAP = false;
     // 广播日志控制
-    public static final boolean DEBUG_RECEIVER = true;
+    public static final boolean DEBUG_RECEIVER = false;
     // 执行上传URL控制
     public static final boolean DEBUG_URL = true;
 
@@ -172,6 +172,10 @@ public class EGContext {
     public static final String FILES_SYNC_SNAP_DELETE_BROADCAST = "T-SDEL";
     public static final String FILES_SYNC_SNAP_UPDATE_BROADCAST = "T-SUPDATE";
     public static final String FILES_SYNC_BATTERY_BROADCAST = "T-BATTERY";
+
+    // 多进程同步. 同步版本号
+    public static final String MULTIPROCESS_SP = "T-SP";
+
     // 位置信息,通进程只有一个工作,两次间隔29分钟
     public static final String FILES_SYNC_LOCATION = "T-LCT";
     // 最少间隔2s查询一次

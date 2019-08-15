@@ -28,6 +28,26 @@ public class TableOC {
      * @param cv
      */
     public void insert(ContentValues cv) {
+
+        try {
+            if (cv == null && cv.size() < 1) {
+                return;
+            }
+            if (cv.containsKey(DBConfig.OC.Column.ACT) && cv.containsKey(DBConfig.OC.Column.AOT)) {
+                // 关闭时间
+                String act = cv.getAsString(DBConfig.OC.Column.ACT);
+                // 打开时间
+                String aot = cv.getAsString(DBConfig.OC.Column.AOT);
+                // 关闭时间-开启时间 大于3秒有意义
+                if (Long.valueOf(act) - Long.valueOf(aot) < EGContext.MINDISTANCE * 3) {
+                    return;
+                }
+            } else {
+                // 没有开始关闭时间，丢弃
+                return;
+            }
+        } catch (Throwable e) {
+        }
         try {
 
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
@@ -39,7 +59,8 @@ public class TableOC {
             if (EGContext.DEBUG_OC) {
                 ELOG.i("sanbo.oc", "写入  结果：[" + result + "]。。。。\n写入详情" + cv.toString());
             }
-        } catch (Throwable e) {
+        } catch (
+                Throwable e) {
             if (EGContext.DEBUG_OC) {
                 ELOG.i("sanbo.oc", e);
             }
