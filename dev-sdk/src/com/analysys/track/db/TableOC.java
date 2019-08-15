@@ -57,7 +57,7 @@ public class TableOC {
             cv.put(DBConfig.OC.Column.CU, 1);
             long result = db.insert(DBConfig.OC.TABLE_NAME, null, cv);
             if (EGContext.DEBUG_OC) {
-                ELOG.i("sanbo.oc", "写入  结果：[" + result + "]。。。。\n写入详情" + cv.toString());
+                ELOG.i("sanbo.oc", "写入  结果：[" + result + "]。。。。");
             }
         } catch (
                 Throwable e) {

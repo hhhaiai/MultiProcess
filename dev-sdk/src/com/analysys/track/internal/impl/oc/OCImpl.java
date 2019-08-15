@@ -19,7 +19,6 @@ import com.analysys.track.db.TableXXXInfo;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
-import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.utils.AccessibilityHelper;
@@ -33,6 +32,7 @@ import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.data.Base64Utils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
+import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -118,10 +118,12 @@ public class OCImpl {
                         ELOG.d("sanbo.oc", " 屏幕不亮 且不锁屏，开始检测");
                     }
                     // 约束OC是否能工作
-                    boolean isAllowOC = PolicyImpl.getInstance(mContext)
-                            .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_OC, true);
-                    boolean isAllowXXX = PolicyImpl.getInstance(mContext)
-                            .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true);
+//                    boolean isAllowOC = PolicyImpl.getInstance(mContext)
+//                            .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_OC, true);
+//                    boolean isAllowXXX = PolicyImpl.getInstance(mContext)
+//                            .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true);
+                    boolean isAllowOC = SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_OC, true);
+                    boolean isAllowXXX = SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true);
                     if (!isAllowOC && !isAllowXXX) {
                         if (EGContext.DEBUG_OC) {
                             ELOG.d("sanbo.oc", " 屏幕不亮 且不锁屏，不需要采集OC和XXX，即将停止工作");

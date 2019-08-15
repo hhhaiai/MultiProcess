@@ -9,7 +9,6 @@ import com.analysys.track.db.TableAppSnapshot;
 import com.analysys.track.internal.content.DataController;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
-import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
@@ -46,13 +45,17 @@ public class AppSnapshotImpl {
         try {
 
             // 策略不允许安装列表模快工作, 则停止工作。
-            if (!PolicyImpl.getInstance(mContext)
-                    .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
+//            if (!PolicyImpl.getInstance(mContext)
+//                    .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
+//                return;
+//            }
+            if (!SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
                 return;
             }
             long now = System.currentTimeMillis();
             // 获取下发的间隔时间
-            long durByPolicy = PolicyImpl.getInstance(mContext).getSP().getLong(EGContext.SP_SNAPSHOT_CYCLE, EGContext.TIME_HOUR * 3);
+//            long durByPolicy = PolicyImpl.getInstance(mContext).getSP().getLong(EGContext.SP_SNAPSHOT_CYCLE, EGContext.TIME_HOUR * 3);
+            long durByPolicy = SPHelper.getIntValueFromSP(mContext, EGContext.SP_SNAPSHOT_CYCLE, EGContext.TIME_HOUR * 3);
 
             // 3小时内只能操作一次
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, durByPolicy, now)) {

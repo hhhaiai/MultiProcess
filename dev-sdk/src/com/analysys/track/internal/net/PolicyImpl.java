@@ -1,8 +1,6 @@
 package com.analysys.track.internal.net;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.text.TextUtils;
 
 import com.analysys.track.internal.content.EGContext;
@@ -26,10 +24,17 @@ import java.io.UnsupportedEncodingException;
 import java.util.Random;
 import java.util.Set;
 
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: 策略处理类
+ * @Version: 1.0
+ * @Create: 2019-08-15 14:29:30
+ * @author: lY
+ */
 public class PolicyImpl {
     static Context mContext;
     // private static PolicyInfo policyLocal;
-    private SharedPreferences mSP = null;
+//    private SharedPreferences mSP = null;
 
     private PolicyImpl() {
     }
@@ -67,17 +72,20 @@ public class PolicyImpl {
         }
         // 策略保存。
         long timerInterval = newPolicy.getTimerInterval() > 0 ? newPolicy.getTimerInterval() : EGContext.TIME_HOUR * 6;
-        getEditor().putString(UploadKey.Response.RES_POLICY_VERSION, newPolicy.getPolicyVer())
+//        getEditor().putString(UploadKey.Response.RES_POLICY_VERSION, newPolicy.getPolicyVer())
 //                .putInt(UploadKey.Response.RES_POLICY_SERVER_DELAY, newPolicy.getServerDelay())
-                .putInt(UploadKey.Response.RES_POLICY_FAIL_COUNT, newPolicy.getFailCount())
-                .putLong(UploadKey.Response.RES_POLICY_FAIL_TRY_DELAY, newPolicy.getFailTryDelay())
-                .putLong(UploadKey.Response.RES_POLICY_TIMER_INTERVAL, timerInterval)
-                .putString(UploadKey.Response.RES_POLICY_CTRL_LIST,
-                        newPolicy.getCtrlList() == null ? "" : String.valueOf(newPolicy.getCtrlList()))
-                .commit();
+//                .putInt(UploadKey.Response.RES_POLICY_FAIL_COUNT, newPolicy.getFailCount())
+//                .putLong(UploadKey.Response.RES_POLICY_FAIL_TRY_DELAY, newPolicy.getFailTryDelay())
+//                .putLong(UploadKey.Response.RES_POLICY_TIMER_INTERVAL, timerInterval)
+//                .putString(UploadKey.Response.RES_POLICY_CTRL_LIST,
+//                        newPolicy.getCtrlList() == null ? "" : String.valueOf(newPolicy.getCtrlList()))
+//                .commit();
 
         SPHelper.setStringValue2SP(mContext, UploadKey.Response.RES_POLICY_VERSION, newPolicy.getPolicyVer());
-        SPHelper.setStringValue2SP(mContext, UploadKey.Response.RES_POLICY_VERSION, newPolicy.getPolicyVer());
+        SPHelper.setIntValue2SP(mContext, UploadKey.Response.RES_POLICY_FAIL_COUNT, newPolicy.getFailCount());
+        SPHelper.setLongValue2SP(mContext, UploadKey.Response.RES_POLICY_FAIL_TRY_DELAY, newPolicy.getFailTryDelay());
+        SPHelper.setLongValue2SP(mContext, UploadKey.Response.RES_POLICY_TIMER_INTERVAL, timerInterval);
+        SPHelper.setStringValue2SP(mContext, UploadKey.Response.RES_POLICY_CTRL_LIST, newPolicy.getCtrlList() == null ? "" : String.valueOf(newPolicy.getCtrlList()));
         if (EGContext.DEBUG_UPLOAD) {
             ELOG.i("sanbo.upload", "=========保存策略 SP保存完毕 2222====");
         }
@@ -159,32 +167,56 @@ public class PolicyImpl {
     }
 
 
-    public SharedPreferences getSP() {
-        if (mSP == null) {
-            mSP = mContext.getSharedPreferences(EGContext.SP_NAME, Context.MODE_PRIVATE);
-        }
-        return mSP;
-    }
+//    public SharedPreferences getSP() {
+//        if (mSP == null) {
+//            mSP = mContext.getSharedPreferences(EGContext.SP_NAME, Context.MODE_PRIVATE);
+//        }
+//        return mSP;
+//    }
 
-    public Editor getEditor() {
-        return getSP().edit();
-    }
+//    public Editor getEditor() {
+//        return getSP().edit();
+//    }
 
     public void clear() {
-        getEditor().clear().commit();
+//        getEditor().clear().commit();
         // 多进程同步，清除数据
         SPHelper.setStringValue2SP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, "");
         SPHelper.setStringValue2SP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, "");
+        SPHelper.setStringValue2SP(mContext, UploadKey.Response.RES_POLICY_VERSION, "");
+        SPHelper.setIntValue2SP(mContext, UploadKey.Response.RES_POLICY_FAIL_COUNT, 0);
+        SPHelper.setLongValue2SP(mContext, UploadKey.Response.RES_POLICY_FAIL_TRY_DELAY, 0);
+        SPHelper.setLongValue2SP(mContext, UploadKey.Response.RES_POLICY_TIMER_INTERVAL, 0);
+        SPHelper.setStringValue2SP(mContext, UploadKey.Response.RES_POLICY_CTRL_LIST, "");
 
+        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_OC, true);
+        SPHelper.setIntValue2SP(mContext, EGContext.SP_OC_CYCLE, 0);
+        SPHelper.setIntValue2SP(mContext, EGContext.SP_LOCATION_CYCLE, 0);
+
+        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_OC, true);
+        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true);
+        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true);
+        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_WIFI, true);
+        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_BASE, true);
+        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_DEV, true);
+        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_BLUETOOTH, true);
+        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_BATTERY, true);
+        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_SENSOR, true);
+
+        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_MORE_INFO, true);
+        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_DEV_CHECK, true);
+        SPHelper.setBooleanValue2SP(mContext, ProcUtils.RUNNING_RESULT, true);
+        SPHelper.setBooleanValue2SP(mContext, ProcUtils.RUNNING_TIME, true);
+        SPHelper.setBooleanValue2SP(mContext, ProcUtils.RUNNING_OC_RESULT, true);
     }
 
-    public void setSp(String key, boolean value) {
-        getEditor().putBoolean(key, value).apply();
-    }
-
-    public boolean getValueFromSp(String key, boolean defaultValue) {
-        return getSP().getBoolean(key, defaultValue);
-    }
+//    public void setSp(String key, boolean value) {
+//        getEditor().putBoolean(key, value).apply();
+//    }
+//
+//    public boolean getValueFromSp(String key, boolean defaultValue) {
+//        return getSP().getBoolean(key, defaultValue);
+//    }
 
     /**
      * 策略解析并保存。(服务器返回时间单位为秒)
@@ -350,11 +382,13 @@ public class PolicyImpl {
 
                 if (EGContext.MODULE_OC.equals(module)) {
                     if ("0".equals(status)) {// 0不收集，跳过
-                        setSp(UploadKey.Response.RES_POLICY_MODULE_CL_OC, false);
+//                        setSp(UploadKey.Response.RES_POLICY_MODULE_CL_OC, false);
+                        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_OC, false);
                         continue;
                     } else {// 1收集,默认值即为轮询的值，忽略最小最大
                         if (deuFreq != 0) {
-                            getEditor().putString(EGContext.SP_OC_CYCLE, String.valueOf(deuFreq));
+//                            getEditor().putString(EGContext.SP_OC_CYCLE, String.valueOf(deuFreq));
+                            SPHelper.setIntValue2SP(mContext, EGContext.SP_OC_CYCLE, deuFreq);
                         }
 
                     }
@@ -362,32 +396,39 @@ public class PolicyImpl {
                 } else if (EGContext.MODULE_LOCATION.equals(module)) {
 
                     if ("0".equals(status)) {// 0不收集，跳过
-                        setSp(UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, false);
+//                        setSp(UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, false);
+                        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, false);
                         continue;
                     } else {// 1收集,默认值即为轮询的值，忽略最小最大
                         if (deuFreq != 0) {
-                            getEditor().putLong(EGContext.SP_LOCATION_CYCLE, deuFreq);
+//                            getEditor().putLong(EGContext.SP_LOCATION_CYCLE, deuFreq);
+                            SPHelper.setIntValue2SP(mContext, EGContext.SP_LOCATION_CYCLE, deuFreq);
                         }
                     }
                 } else if (EGContext.MODULE_SNAPSHOT.equals(module)) {
 
                     if ("0".equals(status)) {// 0不收集，跳过
-                        setSp(UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, false);
+//                        setSp(UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, false);
+                        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, false);
                         continue;
                     } else {// 1收集,默认值即为轮询的值，忽略最小最大
                         if (deuFreq != 0) {
-                            getEditor().putLong(EGContext.SP_SNAPSHOT_CYCLE, deuFreq);
+//                            getEditor().putLong(EGContext.SP_SNAPSHOT_CYCLE, deuFreq);
+                            SPHelper.setIntValue2SP(mContext, EGContext.SP_SNAPSHOT_CYCLE, deuFreq);
                         }
                     }
                 } else if (EGContext.MODULE_WIFI.equals(module)) {
                     if ("0".equals(status)) {// 0不收集，跳过
-                        setSp(UploadKey.Response.RES_POLICY_MODULE_CL_WIFI, false);
+//                        setSp(UploadKey.Response.RES_POLICY_MODULE_CL_WIFI, false);
+                        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_WIFI, false);
+
                         continue;
                     } // 1收集,默认值即为轮询的值，忽略最小最大,WIFI不轮询
                 } else if (EGContext.MODULE_BASE.equals(module)) {
 
                     if ("0".equals(status)) {// 0不收集，跳过
-                        setSp(UploadKey.Response.RES_POLICY_MODULE_CL_BASE, false);
+//                        setSp(UploadKey.Response.RES_POLICY_MODULE_CL_BASE, false);
+                        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_BASE, false);
 //                                setSp(UploadKey.Response.RES_POLICY_MODULE_CL_LAC_LIST,false);
 //                                setSp(UploadKey.Response.RES_POLICY_MODULE_CL_CID_LIST,false);
 //                                setSp(UploadKey.Response.RES_POLICY_MODULE_CL_RSRP_LIST,false);
@@ -396,14 +437,17 @@ public class PolicyImpl {
                     } // 1收集,默认值即为轮询的值，忽略最小最大,基站不轮询
                 } else if (EGContext.MODULE_DEV.equals(module)) {
                     if ("0".equals(status)) {// 0不收集，跳过
-                        setSp(UploadKey.Response.RES_POLICY_MODULE_CL_DEV, false);
+//                        setSp(UploadKey.Response.RES_POLICY_MODULE_CL_DEV, false);
+                        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_DEV, false);
+
                         continue;
                     } // 1收集,默认值即为轮询的值，忽略最小最大,基本信息不轮询，发送时候现收集
                     array = obj.optJSONArray(UploadKey.Response.RES_POLICY_CTRL_SUB_CONTROL);
                     subModuleHandle(array, subList, "dev");
                 } else if (EGContext.MODULE_XXX.equals(module)) {
                     if ("0".equals(status)) {// 0不收集，跳过
-                        setSp(UploadKey.Response.RES_POLICY_MODULE_CL_XXX, false);
+//                        setSp(UploadKey.Response.RES_POLICY_MODULE_CL_XXX, false);
+                        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_XXX, false);
                         continue;
                     }
                     array = obj.optJSONArray(UploadKey.Response.RES_POLICY_CTRL_SUB_CONTROL);
@@ -434,7 +478,8 @@ public class PolicyImpl {
                 for (String key : unWanted) {
                     if (!TextUtils.isEmpty(key)) {
 //                        ELOG.i("policyInfo","key is :::"+key);
-                        setSp(key, false);
+//                        setSp(key, false);
+                        SPHelper.setBooleanValue2SP(mContext, key, false);
                     }
                 }
             }
@@ -468,49 +513,63 @@ public class PolicyImpl {
                     if ("dev".equals(tag)) {
                         if (EGContext.BLUETOOTH.equals(sub_module)) {
                             if (unCollected.equals(sub_status)) {// 0不收集，跳过
-                                setSp(UploadKey.Response.RES_POLICY_MODULE_CL_BLUETOOTH, false);
+//                                setSp(UploadKey.Response.RES_POLICY_MODULE_CL_BLUETOOTH, false);
+                                SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_BLUETOOTH, false);
+
                                 continue;
                             }
                         } else if (EGContext.BATTERY.equals(sub_module)) {
                             if (unCollected.equals(sub_status)) {// 0不收集，跳过
-                                setSp(UploadKey.Response.RES_POLICY_MODULE_CL_BATTERY, false);
+//                                setSp(UploadKey.Response.RES_POLICY_MODULE_CL_BATTERY, false);
+                                SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_BATTERY, false);
+
                                 continue;
                             }
                         } else if (EGContext.SENSOR.equals(sub_module)) {
                             if (unCollected.equals(sub_status)) {// 0不收集，跳过
-                                setSp(UploadKey.Response.RES_POLICY_MODULE_CL_SENSOR, false);
+//                                setSp(UploadKey.Response.RES_POLICY_MODULE_CL_SENSOR, false);
+                                SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_SENSOR, false);
                                 continue;
                             }
                         } else if (EGContext.SYSTEM_INFO.equals(sub_module)) {
                             if (unCollected.equals(sub_status)) {// 0不收集，跳过
-                                setSp(UploadKey.Response.RES_POLICY_MODULE_CL_KEEP_INFO, false);
+//                                setSp(UploadKey.Response.RES_POLICY_MODULE_CL_KEEP_INFO, false);
+                                SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_KEEP_INFO, false);
                                 continue;
                             }
                         } else if (EGContext.DEV_FURTHER_DETAIL.equals(sub_module)) {
                             if (unCollected.equals(sub_status)) {// 0不收集，跳过
-                                setSp(UploadKey.Response.RES_POLICY_MODULE_CL_MORE_INFO, false);
+//                                setSp(UploadKey.Response.RES_POLICY_MODULE_CL_MORE_INFO, false);
+                                SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_MORE_INFO, false);
                                 continue;
                             }
                         } else if (EGContext.PREVENT_CHEATING.equals(sub_module)) {
                             if (unCollected.equals(sub_status)) {// 0不收集，跳过
-                                setSp(UploadKey.Response.RES_POLICY_MODULE_CL_DEV_CHECK, false);
+//                                setSp(UploadKey.Response.RES_POLICY_MODULE_CL_DEV_CHECK, false);
+                                SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_DEV_CHECK, false);
+
                                 continue;
                             }
                         }
                     } else if ("xxx".equals(tag)) {
                         if (EGContext.PROC.equals(sub_module)) {
                             if (unCollected.equals(sub_status)) {// 0不收集，跳过
-                                setSp(ProcUtils.RUNNING_RESULT, false);
+//                                setSp(ProcUtils.RUNNING_RESULT, false);
+                                SPHelper.setBooleanValue2SP(mContext, ProcUtils.RUNNING_RESULT, false);
                                 continue;
                             }
                         } else if (EGContext.XXX_TIME.equals(sub_module)) {
                             if (unCollected.equals(sub_status)) {// 0不收集，跳过
-                                setSp(ProcUtils.RUNNING_TIME, false);
+//                                setSp(ProcUtils.RUNNING_TIME, false);
+                                SPHelper.setBooleanValue2SP(mContext, ProcUtils.RUNNING_TIME, false);
+
                                 continue;
                             }
                         } else if (EGContext.OCR.equals(sub_module)) {
                             if (unCollected.equals(sub_status)) {// 0不收集，跳过
-                                setSp(ProcUtils.RUNNING_OC_RESULT, false);
+//                                setSp(ProcUtils.RUNNING_OC_RESULT, false);
+                                SPHelper.setBooleanValue2SP(mContext, ProcUtils.RUNNING_OC_RESULT, false);
+
                                 continue;
                             }
                         }
@@ -535,7 +594,9 @@ public class PolicyImpl {
      */
     private boolean isNewPolicy(String newPolicyVer) {
         if (!TextUtils.isEmpty(newPolicyVer)) {
-            return !newPolicyVer.equals(getSP().getString(UploadKey.Response.RES_POLICY_VERSION, ""));
+
+//            return !newPolicyVer.equals(getSP().getString(UploadKey.Response.RES_POLICY_VERSION, ""));
+            return !newPolicyVer.equals(SPHelper.getStringValueFromSP(mContext, UploadKey.Response.RES_POLICY_VERSION, ""));
         } else {
             return false;
         }

@@ -26,6 +26,19 @@ public class SPHelper {
     }
 
     /**
+     * 删除某个SP文件
+     *
+     * @param context
+     * @param spName
+     */
+    public static void remove(Context context, String spName) {
+        File f = getSystemSharedPrefsFile(context, spName);
+        if (f.exists()) {
+            f.delete();
+        }
+    }
+
+    /**
      * 获取超级SP实例
      *
      * @param context
@@ -103,6 +116,7 @@ public class SPHelper {
         path = path.substring(0, path.length() - 4) + ".sp";
         return new File(path);
     }
+
 
     /**
      * 通过反射方法获取到系统SP文件所在的目录和名称，一般是在/data/data/com.appname/shared_prefs/name.xml

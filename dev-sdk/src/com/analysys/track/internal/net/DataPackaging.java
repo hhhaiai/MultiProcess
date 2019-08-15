@@ -4,8 +4,8 @@ import android.content.Context;
 import android.os.Build;
 
 import com.analysys.track.internal.content.DataController;
-import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.impl.SenSorModuleNameImpl;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
@@ -15,6 +15,7 @@ import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
+import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,8 +39,10 @@ public class DataPackaging {
     public JSONObject getDevInfo(Context context) {
         JSONObject deviceInfo = new JSONObject();
         try {
-            if (!PolicyImpl.getInstance(context).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_DEV,
-                    true)) {
+//            if (!PolicyImpl.getInstance(context).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_DEV,
+//                    true)) {
+            if (!SPHelper.getBooleanValueFromSP(context, UploadKey.Response.RES_POLICY_MODULE_CL_DEV, true)) {
+
                 return null;
             }
             DeviceImpl devImpl = DeviceImpl.getInstance(context);
@@ -91,9 +94,10 @@ public class DataPackaging {
             JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.TempID,
                     EguanIdUtils.getInstance(context).getId(), DataController.SWITCH_OF_TEMP_ID);
 
-            if (PolicyImpl.getInstance(context).getValueFromSp(
-                    UploadKey.Response.RES_POLICY_MODULE_CL_DEV_CHECK,
-                    DataController.SWITCH_OF_MODULE_CL_DEV_CHECK)) {
+//            if (PolicyImpl.getInstance(context).getValueFromSp(
+//                    UploadKey.Response.RES_POLICY_MODULE_CL_DEV_CHECK,
+//                    DataController.SWITCH_OF_MODULE_CL_DEV_CHECK)) {
+            if (SPHelper.getBooleanValueFromSP(context, UploadKey.Response.RES_POLICY_MODULE_CL_DEV_CHECK, DataController.SWITCH_OF_MODULE_CL_DEV_CHECK)) {
                 JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.Simulator,
                         DevStatusChecker.getInstance().isSimulator(context) ? "1" : "0", DataController.SWITCH_OF_SIMULATOR);
                 JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.Debug, DevStatusChecker.getInstance().isSelfDebugApp(context) ? "1" : "0",
@@ -104,17 +108,21 @@ public class DataPackaging {
                         DataController.SWITCH_OF_IS_ROOT);
             }
 
-            if (PolicyImpl.getInstance(context).getValueFromSp(
-                    UploadKey.Response.RES_POLICY_MODULE_CL_BLUETOOTH,
-                    DataController.SWITCH_OF_MODULE_CL_BLUETOOTH)) {
+//            if (PolicyImpl.getInstance(context).getValueFromSp(
+//                    UploadKey.Response.RES_POLICY_MODULE_CL_BLUETOOTH,
+//                    DataController.SWITCH_OF_MODULE_CL_BLUETOOTH)) {
+
+            if (SPHelper.getBooleanValueFromSP(context, UploadKey.Response.RES_POLICY_MODULE_CL_BLUETOOTH, DataController.SWITCH_OF_MODULE_CL_BLUETOOTH)) {
                 JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.BluetoothMac,
                         devImpl.getBluetoothAddress(context), DataController.SWITCH_OF_BLUETOOTH_MAC);
                 JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.BluetoothName,
                         devImpl.getBluetoothName(), DataController.SWITCH_OF_BLUETOOTH_NAME);
             }
-            if (PolicyImpl.getInstance(context).getValueFromSp(
-                    UploadKey.Response.RES_POLICY_MODULE_CL_KEEP_INFO,
-                    DataController.SWITCH_OF_MODULE_CL_KEEP_INFO)) {
+//            if (PolicyImpl.getInstance(context).getValueFromSp(
+//                    UploadKey.Response.RES_POLICY_MODULE_CL_KEEP_INFO,
+//                    DataController.SWITCH_OF_MODULE_CL_KEEP_INFO)) {
+
+            if (SPHelper.getBooleanValueFromSP(context, UploadKey.Response.RES_POLICY_MODULE_CL_KEEP_INFO, DataController.SWITCH_OF_MODULE_CL_KEEP_INFO)) {
                 JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.SystemFontSize,
                         devImpl.getSystemFontSize(), DataController.SWITCH_OF_SYSTEM_FONT_SIZE);
                 JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.SystemHour,
@@ -126,8 +134,10 @@ public class DataPackaging {
                 JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.TimeZone, devImpl.getTimeZone(),
                         DataController.SWITCH_OF_TIMEZONE);
             }
-            if (PolicyImpl.getInstance(context).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_SENSOR,
-                    DataController.SWITCH_OF_MODULE_CL_SENSOR)) {
+//            if (PolicyImpl.getInstance(context).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_SENSOR,
+//                    DataController.SWITCH_OF_MODULE_CL_SENSOR)) {
+
+            if (SPHelper.getBooleanValueFromSP(context, UploadKey.Response.RES_POLICY_MODULE_CL_SENSOR, DataController.SWITCH_OF_MODULE_CL_SENSOR)) {
                 JSONArray senSorArray = SenSorModuleNameImpl.getInstance(context).getSensorInfo();
                 if (senSorArray != null && senSorArray.length() > 0) {
                     deviceInfo.put(UploadKey.DevInfo.SenSorModuleName, senSorArray);
@@ -135,8 +145,10 @@ public class DataPackaging {
             }
             JSONObject batteryJson = new JSONObject();
 
-            if (PolicyImpl.getInstance(context).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_BATTERY,
-                    DataController.SWITCH_OF_MODULE_CL_BATTERY)) {
+//            if (PolicyImpl.getInstance(context).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_BATTERY,
+//                    DataController.SWITCH_OF_MODULE_CL_BATTERY)) {
+
+            if (SPHelper.getBooleanValueFromSP(context, UploadKey.Response.RES_POLICY_MODULE_CL_BATTERY, DataController.SWITCH_OF_MODULE_CL_BATTERY)) {
                 BatteryModuleNameInfo battery = BatteryModuleNameInfo.getInstance();
                 JsonUtils.pushToJSON(context, batteryJson, UploadKey.DevInfo.BatteryStatus,
                         battery.getBatteryStatus(), DataController.SWITCH_OF_BATTERY_STATUS);
@@ -153,9 +165,11 @@ public class DataPackaging {
                 JsonUtils.pushToJSON(context, batteryJson, UploadKey.DevInfo.BatteryTemperature,
                         battery.getBatteryTemperature(), DataController.SWITCH_OF_BATTERY_TEMPERATURE);
             }
-            if (PolicyImpl.getInstance(context).getValueFromSp(
-                    UploadKey.Response.RES_POLICY_MODULE_CL_MORE_INFO,
-                    DataController.SWITCH_OF_MODULE_CL_MORE_INFO)) {
+//            if (PolicyImpl.getInstance(context).getValueFromSp(
+//                    UploadKey.Response.RES_POLICY_MODULE_CL_MORE_INFO,
+//                    DataController.SWITCH_OF_MODULE_CL_MORE_INFO)) {
+
+            if (SPHelper.getBooleanValueFromSP(context, UploadKey.Response.RES_POLICY_MODULE_CL_MORE_INFO, DataController.SWITCH_OF_MODULE_CL_MORE_INFO)) {
                 JsonUtils.pushToJSON(context, batteryJson, UploadKey.DevInfo.CPUModel, String.format("%s:%s", Build.CPU_ABI, Build.CPU_ABI2),
                         DataController.SWITCH_OF_CPU_MODEL);
                 JsonUtils.pushToJSON(context, batteryJson, UploadKey.DevInfo.BuildId, Build.ID,

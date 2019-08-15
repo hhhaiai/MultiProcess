@@ -15,9 +15,8 @@ import android.os.Looper;
 import android.os.PowerManager;
 import android.text.TextUtils;
 
-import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.internal.net.PolicyImpl;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -269,8 +268,8 @@ public class SystemUtils {
      * @return
      */
     public static long intervalTime(Context ctx) {
-        long reTryTime = PolicyImpl.getInstance(ctx).getSP()
-                .getLong(UploadKey.Response.RES_POLICY_FAIL_TRY_DELAY, 0);
+//        long reTryTime = PolicyImpl.getInstance(ctx).getSP() .getLong(UploadKey.Response.RES_POLICY_FAIL_TRY_DELAY, 0);
+        long reTryTime = SPHelper.getLongValueFromSP(ctx, UploadKey.Response.RES_POLICY_FAIL_TRY_DELAY, 0);
         if (reTryTime == 0) {
             reTryTime = EGContext.TIME_MINUTE;
             // 10s间隔

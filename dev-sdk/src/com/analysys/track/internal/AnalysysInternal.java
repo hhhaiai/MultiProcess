@@ -142,6 +142,9 @@ public class AnalysysInternal {
             clear();
         }
 
+        // 9. 清除以前的SP
+        SPHelper.remove(mContextRef.get(), EGContext.SP_NAME);
+
     }
 
     private void clear() {

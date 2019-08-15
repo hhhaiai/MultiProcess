@@ -15,8 +15,8 @@ import android.text.TextUtils;
 
 import com.analysys.track.db.TableLocation;
 import com.analysys.track.internal.content.DataController;
-import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.internal.work.MessageDispatcher;
@@ -61,13 +61,17 @@ public class LocationImpl {
     public void tryUploadLocationInfo(final ECallBack callback) {
         try {
             // 模快不工作，没有必要轮训
-            if (!PolicyImpl.getInstance(mContext)
-                    .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
+//            if (!PolicyImpl.getInstance(mContext)
+//                    .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
+//                return;
+//            }
+            if (!SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
                 return;
             }
 
             long now = System.currentTimeMillis();
-            long durByPolicy = PolicyImpl.getInstance(mContext).getSP().getLong(EGContext.SP_LOCATION_CYCLE, EGContext.TIME_MINUTE * 30);
+//            long durByPolicy = PolicyImpl.getInstance(mContext).getSP().getLong(EGContext.SP_LOCATION_CYCLE, EGContext.TIME_MINUTE * 30);
+            long durByPolicy = SPHelper.getIntValueFromSP(mContext, EGContext.SP_LOCATION_CYCLE, EGContext.TIME_MINUTE * 30);
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_LOCATION, durByPolicy, now)) {
                 long time = SPHelper.getLongValueFromSP(mContext, EGContext.SP_APP_LOCATION, 0);
                 long dur = now - time;
@@ -310,7 +314,8 @@ public class LocationImpl {
             } catch (Throwable t) {
             }
 
-            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_WIFI,
+//            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_WIFI, true)) {
+            if (SPHelper.getBooleanValueFromSP(mContext,UploadKey.Response.RES_POLICY_MODULE_CL_WIFI,
                     true)) {
                 try {
                     JSONArray wifiInfo = WifiImpl.getInstance(mContext).getWifiInfo();
@@ -322,7 +327,9 @@ public class LocationImpl {
                 }
             }
 
-            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_BASE,
+//            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_BASE,
+//                    true)) {
+            if (SPHelper.getBooleanValueFromSP(mContext,UploadKey.Response.RES_POLICY_MODULE_CL_BASE,
                     true)) {
                 try {
                     JSONArray baseStation = getBaseStationInfo();

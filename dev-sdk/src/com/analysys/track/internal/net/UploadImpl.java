@@ -72,8 +72,9 @@ public class UploadImpl {
                 if (EGContext.DEBUG_UPLOAD) {
                     ELOG.i("sanbo.upload", "失败重试。。。。failNum：" + failNum);
                 }
-                int maxFailCount = PolicyImpl.getInstance(mContext).getSP()
-                        .getInt(UploadKey.Response.RES_POLICY_FAIL_COUNT, EGContext.FAIL_COUNT_DEFALUT);
+//                int maxFailCount = PolicyImpl.getInstance(mContext).getSP()
+//                        .getInt(UploadKey.Response.RES_POLICY_FAIL_COUNT, EGContext.FAIL_COUNT_DEFALUT);
+                int maxFailCount = SPHelper.getIntValueFromSP(mContext, UploadKey.Response.RES_POLICY_FAIL_COUNT, EGContext.FAIL_COUNT_DEFALUT);
 
                 if (failNum == maxFailCount) {
                     // 最后一次重试
@@ -203,8 +204,8 @@ public class UploadImpl {
             }
             handleUpload(url, messageEncrypt(uploadInfo));
             int failNum = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);
-            int maxFailCount = PolicyImpl.getInstance(mContext).getSP()
-                    .getInt(UploadKey.Response.RES_POLICY_FAIL_COUNT, EGContext.FAIL_COUNT_DEFALUT);
+            int maxFailCount = SPHelper.getIntValueFromSP(mContext, UploadKey.Response.RES_POLICY_FAIL_COUNT, EGContext.FAIL_COUNT_DEFALUT);
+//            int maxFailCount = PolicyImpl.getInstance(mContext).getSP()  .getInt(UploadKey.Response.RES_POLICY_FAIL_COUNT, EGContext.FAIL_COUNT_DEFALUT);
             // 3. 兼容多次分包的上传
             while (isChunkUpload && failNum < maxFailCount) {
                 if (EGContext.DEBUG_UPLOAD) {
@@ -243,8 +244,8 @@ public class UploadImpl {
                 object.put(UploadKey.DevInfo.NAME, devJson);
             }
             //  组装OC数据
-            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_OC,
-                    true)) {
+//            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_OC, true)) {
+            if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_OC, true)) {
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray ocJson = getModuleInfos(mContext, object, MODULE_OC, useFulLength);
@@ -256,8 +257,9 @@ public class UploadImpl {
                 TableOC.getInstance(mContext).deleteAll();
             }
             // 组装位置数据
-            if (PolicyImpl.getInstance(mContext)
-                    .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
+//            if (PolicyImpl.getInstance(mContext) .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
+            if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
+
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray locationInfo = getModuleInfos(mContext, object, MODULE_LOCATION, useFulLength);
@@ -269,8 +271,9 @@ public class UploadImpl {
                 TableLocation.getInstance(mContext).deleteAll();
             }
             //  组装安装列表数据
-            if (PolicyImpl.getInstance(mContext)
-                    .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
+//            if (PolicyImpl.getInstance(mContext) .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
+            if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
+
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray snapshotJar = getModuleInfos(mContext, object, MODULE_SNAPSHOT, useFulLength);
@@ -282,8 +285,9 @@ public class UploadImpl {
                 TableAppSnapshot.getInstance(mContext).deleteAll();
             }
             // 组装XXXInfo数据
-            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_XXX,
-                    true)) {
+//            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true)) {
+            if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true)) {
+
                 // 计算离最大上线的差值
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                 if (useFulLength > 0 && !isChunkUpload) {
