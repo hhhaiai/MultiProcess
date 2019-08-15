@@ -83,8 +83,8 @@ public class MessageDispatcher {
                         LocationImpl.getInstance(mContext).tryGetLocationInfo(new ECallBack() {
                             @Override
                             public void onProcessed() {
-                                if (EGContext.FLAG_DEBUG_INNER) {
-                                    ELOG.i("收到定位信息回调。。30秒后继续发起请求。。。");
+                                if (EGContext.DEBUG_LOCATION) {
+                                    ELOG.i(EGContext.TAG_LOC, "收到定位信息回调。。30秒后继续发起请求。。。");
                                 }
                                 // 30秒检查一次是否可以发送。
                                 postDelay(MSG_INFO_WBG, EGContext.TIME_SECOND * 30);

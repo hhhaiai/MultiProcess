@@ -17,9 +17,7 @@ import com.analysys.track.db.TableLocation;
 import com.analysys.track.internal.content.DataController;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
-import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.ECallBack;
-import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
@@ -66,17 +64,24 @@ public class LocationImpl {
 //                return;
 //            }
             if (!SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
+                if (EGContext.DEBUG_LOCATION) {
+                    ELOG.i(EGContext.TAG_LOC, "不允许采集位置停止处理");
+                }
                 return;
             }
 
             long now = System.currentTimeMillis();
 //            long durByPolicy = PolicyImpl.getInstance(mContext).getSP().getLong(EGContext.SP_LOCATION_CYCLE, EGContext.TIME_MINUTE * 30);
             long durByPolicy = SPHelper.getIntValueFromSP(mContext, EGContext.SP_LOCATION_CYCLE, EGContext.TIME_MINUTE * 30);
-            if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_LOCATION, durByPolicy, now)) {
+            // 3秒内只能处理一次
+            if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_LOCATION, EGContext.TIME_SECOND * 3, now)) {
                 long time = SPHelper.getLongValueFromSP(mContext, EGContext.SP_APP_LOCATION, 0);
                 long dur = now - time;
                 //大于固定时间才可以工作
                 if (dur > durByPolicy) {
+                    if (EGContext.DEBUG_LOCATION) {
+                        ELOG.i(EGContext.TAG_LOC, "时间满足，即将开始处理。。。");
+                    }
                     if (SystemUtils.isMainThread()) {
                         EThreadPool.execute(new Runnable() {
                             @Override
@@ -97,13 +102,26 @@ public class LocationImpl {
                     }
                     SPHelper.setLongValue2SP(mContext, EGContext.SP_APP_LOCATION, now);
                 } else {
-                    // 时间不到
+                    if (EGContext.DEBUG_LOCATION) {
+                        ELOG.d(EGContext.TAG_LOC, "时间不到...等待处理时间，继续循环");
+                    }
                     //同步调整时间
                     MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, time);
-                    MessageDispatcher.getInstance(mContext).postSnap(dur);
+//                    MessageDispatcher.getInstance(mContext).postSnap(dur);
+                    if (callback != null) {
+                        callback.onProcessed();
+                    }
                 }
 
             } else {
+
+                if (callback != null) {
+                    callback.onProcessed();
+                }
+
+                if (EGContext.DEBUG_LOCATION) {
+                    ELOG.d(EGContext.TAG_LOC, "多进程并发，停止处理");
+                }
                 return;
             }
 
@@ -116,18 +134,34 @@ public class LocationImpl {
 
     private void getLocationInfoInThread() {
         try {
-
+            if (EGContext.DEBUG_LOCATION) {
+                ELOG.i(EGContext.TAG_LOC, "开始处理。。。。");
+            }
             // 没有获取地理位置权限则不做处理
             if (!isWillWork()) {
+                if (EGContext.DEBUG_LOCATION) {
+                    ELOG.e(EGContext.TAG_LOC, "没有权限等，停止工作。。。。");
+                }
                 return;
             }
             if (mTelephonyManager == null) {
                 mTelephonyManager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
             }
             JSONObject location = getLocation();
-            if (location != null && (location.has(UploadKey.LocationInfo.GeographyLocation)
+            if (EGContext.DEBUG_LOCATION) {
+                ELOG.i(EGContext.TAG_LOC, "获取 Loction结束，结果 location:" + location.toString());
+            }
+            if (location == null || location.length() < 1) {
+                return;
+            }
+            if (EGContext.DEBUG_LOCATION) {
+                ELOG.i(EGContext.TAG_LOC, "Loction检测 GL:" + location.has(UploadKey.LocationInfo.GeographyLocation) );
+                ELOG.i(EGContext.TAG_LOC, "Loction检测 WifiInfo:" + location.has(UploadKey.LocationInfo.WifiInfo.NAME) );
+                ELOG.i(EGContext.TAG_LOC, "Loction检测 BaseStationInfo:" + location.has(UploadKey.LocationInfo.BaseStationInfo.NAME) );
+            }
+            if (location.has(UploadKey.LocationInfo.GeographyLocation)
                     || location.has(UploadKey.LocationInfo.WifiInfo.NAME)
-                    || location.has(UploadKey.LocationInfo.BaseStationInfo.NAME))) {
+                    || location.has(UploadKey.LocationInfo.BaseStationInfo.NAME)) {
                 TableLocation.getInstance(mContext).insert(location);
             }
         } catch (Throwable t) {
@@ -315,7 +349,7 @@ public class LocationImpl {
             }
 
 //            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_WIFI, true)) {
-            if (SPHelper.getBooleanValueFromSP(mContext,UploadKey.Response.RES_POLICY_MODULE_CL_WIFI,
+            if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_WIFI,
                     true)) {
                 try {
                     JSONArray wifiInfo = WifiImpl.getInstance(mContext).getWifiInfo();
@@ -329,7 +363,7 @@ public class LocationImpl {
 
 //            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_BASE,
 //                    true)) {
-            if (SPHelper.getBooleanValueFromSP(mContext,UploadKey.Response.RES_POLICY_MODULE_CL_BASE,
+            if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_BASE,
                     true)) {
                 try {
                     JSONArray baseStation = getBaseStationInfo();

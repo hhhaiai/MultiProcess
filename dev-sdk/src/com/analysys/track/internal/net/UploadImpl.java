@@ -231,9 +231,8 @@ public class UploadImpl {
      * 获取各个模块数据组成json
      */
     private String getInfo() {
-        JSONObject object = null;
+        JSONObject object = new JSONObject();
         try {
-            object = new JSONObject();
             // 组装DevInfo数据
             JSONObject devJson = null;
             try {
@@ -261,13 +260,22 @@ public class UploadImpl {
             if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
 
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
+                if (EGContext.DEBUG_LOCATION) {
+                    ELOG.i(EGContext.TAG_LOC, "  上传允许采集位置信息，即将获取数据  useFulLength：" + useFulLength + "----isChunkUpload：" + isChunkUpload);
+                }
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray locationInfo = getModuleInfos(mContext, object, MODULE_LOCATION, useFulLength);
+                    if (EGContext.DEBUG_LOCATION) {
+                        ELOG.i(EGContext.TAG_LOC, "  上传位置信息：" + locationInfo.toString());
+                    }
                     if (locationInfo != null && locationInfo.length() > 0) {
-                        object.put(UploadKey.AppSnapshotInfo.NAME, locationInfo);
+                        object.put(UploadKey.LocationInfo.NAME, locationInfo);
                     }
                 }
             } else {
+                if (EGContext.DEBUG_LOCATION) {
+                    ELOG.i(EGContext.TAG_LOC, "  上传不允许采集位置信息，即将清除本地数据 ");
+                }
                 TableLocation.getInstance(mContext).deleteAll();
             }
             //  组装安装列表数据
@@ -304,7 +312,12 @@ public class UploadImpl {
                 ELOG.e(e);
             }
         }
-        return String.valueOf(object);
+
+        if (EGContext.DEBUG_LOCATION) {
+            ELOG.i(EGContext.TAG_LOC, " ======================" + object.length() + " ======================");
+            ELOG.i(EGContext.TAG_LOC, "  上行：" + object.toString());
+        }
+        return object.toString();
     }
 
     /**

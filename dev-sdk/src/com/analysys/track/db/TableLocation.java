@@ -17,11 +17,22 @@ import com.analysys.track.utils.reflectinon.EContextHelper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+
+/**
+ * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Description: 定位信息操作
+ * @Version: 1.0
+ * @Create: 2019-08-15 17:46:46
+ * @author: sanbo
+ */
 public class TableLocation {
 
 
     public void insert(JSONObject locationInfo) {
         try {
+            if (EGContext.DEBUG_LOCATION) {
+                ELOG.i(EGContext.TAG_LOC, " 位置信息即将插入DB .....");
+            }
             ContentValues cv = null;
             String locationTime = null;
             long time = -1;
@@ -44,7 +55,10 @@ public class TableLocation {
                     if (db == null) {
                         return;
                     }
-                    db.insert(DBConfig.Location.TABLE_NAME, null, cv);
+                    long result = db.insert(DBConfig.Location.TABLE_NAME, null, cv);
+                    if (EGContext.DEBUG_LOCATION) {
+                        ELOG.i(EGContext.TAG_LOC, " 位置信息插入DB 完毕，结果: " + result);
+                    }
                 }
             }
         } catch (Throwable e) {

@@ -245,28 +245,21 @@ public class EGContext {
 
         //调整。解决编译时到处可见打印字段问题。
         if (FLAG_DEBUG_INNER) {
+
+            DEBUG_UPLOAD = true;// 上传模快日志控制
+            DEBUG_RECEIVER = true;// 广播日志控制
+            DEBUG_LOCATION = true;// 位置日志打印
+            DEBUG_URL = true; // 执行上传URL控制
+            DEBUG_OC = true;// OC模快日志控制
+            DEBUG_SNAP = true;// 安装列表部分日志控制
+
+
             LOGTAG_INNER = "sanbo";
-            // 上传模快日志控制
-            DEBUG_UPLOAD = true;
-            TAG_UPLOAD = LOGTAG_INNER + ".upload";
-
-            // OC模快日志控制
-            DEBUG_OC = true;
-            TAG_OC = LOGTAG_INNER + ".oc";
-
-            // 安装列表部分日志控制
-            DEBUG_SNAP = true;
-            TAG_SNAP = LOGTAG_INNER + ".snap";
-
-            // 广播日志控制
-            DEBUG_RECEIVER = true;
             TAG_RECEIVER = LOGTAG_INNER + ".rece";
-
-            // 位置日志打印
-            DEBUG_LOCATION = true;
+            TAG_SNAP = LOGTAG_INNER + ".snap";
+            TAG_OC = LOGTAG_INNER + ".oc";
             TAG_LOC = LOGTAG_INNER + ".loc";
-            // 执行上传URL控制
-            DEBUG_URL = true;
+            TAG_UPLOAD = LOGTAG_INNER + ".upload";
         }
     }
 }
