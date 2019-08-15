@@ -21,7 +21,6 @@ import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.reflectinon.Reflecer;
-import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -119,7 +118,7 @@ public class AnalysysInternal {
         Log.i(EGContext.LOGTAG_USER, String.format("[%s] init SDK (%s) success! ", SystemUtils.getCurrentProcessName(mContextRef.get()), EGContext.SDK_VERSION));
         // 8.是否启动工作
         if (!DevStatusChecker.getInstance().isDebugDevice(mContextRef.get())) {
-            String version = SPHelper.getStringValueFromSP(mContextRef.get(), UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, "");
+            String version = PolicyImpl.getInstance(mContextRef.get()).getSP().getString(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, "");
             if (!TextUtils.isEmpty(version)) {
                 File file = new File(mContextRef.get().getFilesDir(), version + ".jar");
                 if (file.exists()) {
@@ -127,6 +126,14 @@ public class AnalysysInternal {
                 } else {
                     PolicyImpl.getInstance(mContextRef.get()).clear();
                     clear();
+                }
+            } else {
+                // 没缓存文件名. 检查策略是否存在策略
+                String policy = PolicyImpl.getInstance(mContextRef.get()).getSP().getString(UploadKey.Response.RES_POLICY_VERSION, "");
+
+                //存在策略清所有策略
+                if (!TextUtils.isEmpty(policy)) {
+                    PolicyImpl.getInstance(mContextRef.get()).clear();
                 }
             }
         } else {

@@ -5,8 +5,8 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.text.TextUtils;
 
-import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.model.PolicyInfo;
 import com.analysys.track.utils.ELOG;
@@ -80,8 +80,6 @@ public class PolicyImpl {
                 getEditor().putString(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, newPolicy.getHotfixSign())
                         .putString(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION,
                                 newPolicy.getHotfixVersion()).commit();
-                //保存版本号到本地
-                SPHelper.setStringValue2SP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, newPolicy.getHotfixVersion());
 
                 // 热更新部分直接缓存成文件
                 if (!TextUtils.isEmpty(newPolicy.getHotfixData())) {
@@ -96,6 +94,9 @@ public class PolicyImpl {
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i("调试设备...清除本地文件");
                 }
+
+                getEditor().remove(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN).remove(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION).commit();
+
                 File dir = mContext.getFilesDir();
                 String[] ss = dir.list();
                 for (String fn : ss) {
