@@ -17,7 +17,7 @@ public class EGContext {
     public static final String SDK_TYPE = "Android";
     public static final String LOGTAG_USER = "analysys";
     public static String LOGTAG_INNER;
-
+    public static boolean FLAG_DEBUG_USER = false;
 
     /**
      * xml 中声明的 appid、channel
@@ -197,10 +197,7 @@ public class EGContext {
      */
     public static final String TEXT_DEBUG_APP = "packageName";
     public static final String TEXT_DEBUG_STATUS = "debugable";
-    /**
-     * 用户debug控制
-     */
-    public static boolean FLAG_DEBUG_USER = false;
+
     public static String VALUE_APPKEY = "";
     public static String VALUE_APP_CHANNEL = "";
     public static String EGUAN_CHANNEL_PREFIX = "EGUAN_CHANNEL_";
@@ -209,7 +206,7 @@ public class EGContext {
     /**
      * 控制android8以后是否后台启动服务。提示通知
      */
-    public static boolean IS_SHOW_NOTIFITION = false;
+    public static final boolean IS_SHOW_NOTIFITION = false;
     /**
      * 是否USB调试状态
      */
@@ -221,39 +218,29 @@ public class EGContext {
      * EGuan 内部调试系列tag.主要用于控制堆栈打印、错误打印、内部提示信息打印
      */
     // 策略的总控。关闭后所有的日志都不能打印
-    public static final boolean FLAG_DEBUG_INNER = true;
+    public static final boolean FLAG_DEBUG_INNER = false;
 
     // 上传模快日志控制
-    public static boolean DEBUG_UPLOAD;
+    public static final boolean DEBUG_UPLOAD = false;
     public static String TAG_UPLOAD;
     // OC模快日志控制
-    public static boolean DEBUG_OC;
+    public static final boolean DEBUG_OC = false;
     public static String TAG_OC;
     // 安装列表部分日志控制
-    public static boolean DEBUG_SNAP;
+    public static final boolean DEBUG_SNAP = false;
     public static String TAG_SNAP;
     // 广播日志控制
-    public static boolean DEBUG_RECEIVER;
+    public static final boolean DEBUG_RECEIVER = false;
     public static String TAG_RECEIVER;
     // 位置日志打印
-    public static boolean DEBUG_LOCATION;
+    public static final boolean DEBUG_LOCATION = false;
     public static String TAG_LOC;
     // 执行上传URL控制
-    public static boolean DEBUG_URL;
+    public static final boolean DEBUG_URL = false;
 
     static {
-
         //调整。解决编译时到处可见打印字段问题。
         if (FLAG_DEBUG_INNER) {
-
-            DEBUG_UPLOAD = true;// 上传模快日志控制
-            DEBUG_RECEIVER = true;// 广播日志控制
-            DEBUG_LOCATION = true;// 位置日志打印
-            DEBUG_URL = true; // 执行上传URL控制
-            DEBUG_OC = true;// OC模快日志控制
-            DEBUG_SNAP = true;// 安装列表部分日志控制
-
-
             LOGTAG_INNER = "sanbo";
             TAG_RECEIVER = LOGTAG_INNER + ".rece";
             TAG_SNAP = LOGTAG_INNER + ".snap";

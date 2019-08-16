@@ -12,6 +12,7 @@ buildscript {
 //        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         // for umeng
         maven { url 'https://dl.bintray.com/umsdk/release' }
+        google()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
@@ -25,7 +26,6 @@ allprojects {
         }
     }
     repositories {
-        google()
 //        jcenter()
 //        mavenLocal()
 //        mavenCentral()
@@ -34,6 +34,7 @@ allprojects {
 //        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         // for umeng
         maven { url 'https://dl.bintray.com/umsdk/release' }
+        google()
     }
 }
 
