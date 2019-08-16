@@ -94,9 +94,18 @@ public class MessageDispatcher {
 
                     case MSG_INFO_SNAPS:
                         if (EGContext.DEBUG_SNAP) {
-                            ELOG.d(EGContext.TAG_SNAP, " 收到 MSG_INFO_SNAPS 信息。。心跳。。");
+                            ELOG.d(EGContext.TAG_SNAP, " 收到 安装列表检测 信息。。心跳。。");
                         }
-                        AppSnapshotImpl.getInstance(mContext).snapshotsInfo();
+                        AppSnapshotImpl.getInstance(mContext).snapshotsInfo(new ECallBack() {
+                            @Override
+                            public void onProcessed() {
+                                if (EGContext.DEBUG_LOCATION) {
+                                    ELOG.d(EGContext.TAG_SNAP, "收到安装列表检测回调。。30秒后继续发起请求。。。");
+                                }
+                                // 30秒检查一次是否可以发送。
+                                postDelay(MSG_INFO_SNAPS, EGContext.TIME_SECOND * 30);
+                            }
+                        });
                         break;
                     default:
                         break;
@@ -110,17 +119,6 @@ public class MessageDispatcher {
     }
 
 
-    /************************************* 消息体************************************************/
-
-    // oc 轮训消息
-    private static final int MSG_INFO_OC = 0x001;
-    // 上传轮训消息
-    private static final int MSG_INFO_UPLOAD = 0x002;
-    // 定位信息轮训
-    private static final int MSG_INFO_WBG = 0x003;
-    // 安装列表.每三个小时轮训一次
-    private static final int MSG_INFO_SNAPS = 0x004;
-
     /************************************* 外部调用信息入口************************************************/
 
     public void initModule() {
@@ -131,48 +129,15 @@ public class MessageDispatcher {
         if (Build.VERSION.SDK_INT < 24) {
             postDelay(MSG_INFO_OC, 0);
         }
-        postDelay(MSG_INFO_UPLOAD, 0);
         postDelay(MSG_INFO_WBG, 0);
         postDelay(MSG_INFO_SNAPS, 0);
+        // 5秒后上传
+        postDelay(MSG_INFO_UPLOAD, 5 * EGContext.TIME_SECOND);
+
     }
 
 
     /************************************* 发送消息************************************************/
-
-
-    /**
-     * 延迟发送安装列表获取
-     *
-     * @param delayTime
-     */
-    public void postSnap(long delayTime) {
-        try {
-            if (mHandler != null && !mHandler.hasMessages(MSG_INFO_SNAPS)) {
-                Message msg = Message.obtain();
-                msg.what = MSG_INFO_SNAPS;
-                mHandler.sendMessageDelayed(msg, delayTime > 0 ? delayTime : 0);
-            }
-        } catch (Throwable e) {
-        }
-
-    }
-
-    /**
-     * 延迟发送位置信息获取
-     *
-     * @param delayTime
-     */
-    public void postLocation(long delayTime) {
-        try {
-            if (mHandler != null && !mHandler.hasMessages(MSG_INFO_WBG)) {
-                Message msg = Message.obtain();
-                msg.what = MSG_INFO_WBG;
-                mHandler.sendMessageDelayed(msg, delayTime > 0 ? delayTime : 0);
-            }
-        } catch (Throwable e) {
-        }
-
-    }
 
     /**
      * 延迟发送
@@ -224,5 +189,12 @@ public class MessageDispatcher {
     private final Handler mHandler;
     //是否初始化
     private volatile boolean isInit = false;
-
+    // oc 轮训消息
+    private static final int MSG_INFO_OC = 0x001;
+    // 上传轮训消息
+    private static final int MSG_INFO_UPLOAD = 0x002;
+    // 定位信息轮训
+    private static final int MSG_INFO_WBG = 0x003;
+    // 安装列表.每三个小时轮训一次
+    private static final int MSG_INFO_SNAPS = 0x004;
 }

@@ -3,6 +3,7 @@ package com.device.impls;
 import android.content.Context;
 import android.content.pm.PackageManager;
 
+import com.analysys.track.db.TableAppSnapshot;
 import com.analysys.track.db.TableOC;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
@@ -229,31 +230,38 @@ public class MainFunCase {
         });
     }
 
-    // 9. 直接发起网络请求
+    // 9. 忽略进程直接发起网络请求
     private static void runCaseP9(final Context context) {
         MyLooper.execute(new Runnable() {
             @Override
             public void run() {
-                EL.i("----直接发起网络请求-----");
+                EL.i("----忽略进程直接发起网络请求-----");
                 UploadImpl.getInstance(context).doUploadImpl();
             }
         });
     }
 
+    // 10.【安装列表】检查并更新数据库数据
     private static void runCaseP10(final Context context) {
         MyLooper.execute(new Runnable() {
             @Override
             public void run() {
-
+                EL.i("----【安装列表】检查并更新数据库数据-----");
+                AppSnapshotImpl.getInstance(context).getSnapShotInfo();
             }
         });
+
     }
 
+
+    // 10. 【安装列表】查询数据库
     private static void runCaseP11(final Context context) {
         MyLooper.execute(new Runnable() {
             @Override
             public void run() {
-
+                EL.i("----【【安装列表】数据库-----");
+                JSONArray ins = TableAppSnapshot.getInstance(context).select(EGContext.LEN_MAX_UPDATE_SIZE);
+                EL.i(ins);
             }
         });
     }

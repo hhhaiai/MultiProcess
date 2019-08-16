@@ -611,25 +611,26 @@ public class OCImpl {
      */
     public void processScreenOff() {
 
-        ContentValues info = null;
-        // 闭合上一个, 存储
-        for (String pkg : mOpenedPkgNameList) {
-            info = null;
-            if (mOpenedPkgNameAndInfoMap.containsKey(pkg)) {
-                // 获取内存里的数据
-                info = mOpenedPkgNameAndInfoMap.get(pkg);
-                if (info != null && info.size() > 0) {
-                    // 补充上闭合时间 ACT不加密
-                    info.put(DBConfig.OC.Column.ACT, String.valueOf(System.currentTimeMillis()));
-                    // 设置数据产生时机
-                    info.put(DBConfig.OC.Column.AST, UploadKey.OCInfo.SWITCHTYPE_CLOSE_SCREEN);
-                    info.put(DBConfig.OC.Column.RS, "1");
-                    // 保存上一个打开关闭记录信息
-                    TableOC.getInstance(mContext).insert(info);
+        if (mOpenedPkgNameList.size() > 0) {
+            // 闭合上一个, 存储
+            for (int i = 0; i < mOpenedPkgNameList.size(); i++) {
+                String pkg = mOpenedPkgNameList.get(i);
+                if (!TextUtils.isEmpty(pkg) && mOpenedPkgNameAndInfoMap.containsKey(pkg)) {
+                    // 获取内存里的数据
+                    ContentValues info = mOpenedPkgNameAndInfoMap.get(pkg);
+                    if (info != null && info.size() > 0) {
+                        // 补充上闭合时间 ACT不加密
+                        info.put(DBConfig.OC.Column.ACT, String.valueOf(System.currentTimeMillis()));
+                        // 设置数据产生时机
+                        info.put(DBConfig.OC.Column.AST, UploadKey.OCInfo.SWITCHTYPE_CLOSE_SCREEN);
+                        info.put(DBConfig.OC.Column.RS, "1");
+                        // 保存上一个打开关闭记录信息
+                        TableOC.getInstance(mContext).insert(info);
+                    }
+                    info = null;
                 }
             }
         }
-        info = null;
         mOpenedPkgNameList.clear();
         mOpenedPkgNameAndInfoMap.clear();
     }

@@ -86,6 +86,9 @@ public class MultiProcessWorker {
      * @param intent
      */
     public static void processCommand(final Context context, final Intent intent) {
+        if (intent == null) {
+            return;
+        }
         if (ProcessUtils.isMainThread()) {
             MyLooper.execute(new Runnable() {
                 @Override
@@ -106,12 +109,10 @@ public class MultiProcessWorker {
      */
     private static void parser(final Context context, final Intent intent) {
         try {
-            if (intent != null) {
-                final Bundle bundle = intent.getExtras();
-                if (bundle != null && bundle.size() > 0) {
-                    if (bundle.containsKey(TYPE_MSG)) {
-                        MultiCase.runCase(context, bundle.getInt(TYPE_MSG, -1));
-                    }
+            final Bundle bundle = intent.getExtras();
+            if (bundle != null && bundle.size() > 0) {
+                if (bundle.containsKey(TYPE_MSG)) {
+                    MultiCase.runCase(context, bundle.getInt(TYPE_MSG, -1));
                 }
             }
         } catch (Throwable e) {

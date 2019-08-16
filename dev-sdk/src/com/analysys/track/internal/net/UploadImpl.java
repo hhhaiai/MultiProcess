@@ -266,7 +266,7 @@ public class UploadImpl {
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray locationInfo = getModuleInfos(mContext, object, MODULE_LOCATION, useFulLength);
                     if (EGContext.DEBUG_LOCATION) {
-                        ELOG.i(EGContext.TAG_LOC, "  上传位置信息：" + locationInfo.toString());
+                        ELOG.i(EGContext.TAG_LOC, "  上传位置信息：" + locationInfo);
                     }
                     if (locationInfo != null && locationInfo.length() > 0) {
                         object.put(UploadKey.LocationInfo.NAME, locationInfo);
@@ -281,15 +281,24 @@ public class UploadImpl {
             //  组装安装列表数据
 //            if (PolicyImpl.getInstance(mContext) .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
             if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
-
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
+                if (EGContext.DEBUG_SNAP) {
+                    ELOG.i(EGContext.TAG_SNAP, " 上传允许组装 安装列表。。。useFulLength：" + useFulLength + " -----isChunkUpload-->" + isChunkUpload);
+                }
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray snapshotJar = getModuleInfos(mContext, object, MODULE_SNAPSHOT, useFulLength);
+
+                    if (EGContext.DEBUG_SNAP) {
+                        ELOG.i(EGContext.TAG_SNAP, " 上传获取 安装列表。。：" + snapshotJar);
+                    }
                     if (snapshotJar != null && snapshotJar.length() > 0) {
                         object.put(UploadKey.AppSnapshotInfo.NAME, snapshotJar);
                     }
                 }
             } else {
+                if (EGContext.DEBUG_SNAP) {
+                    ELOG.i(EGContext.TAG_SNAP, " 上传不允许组装 ，即将清除数据 ");
+                }
                 TableAppSnapshot.getInstance(mContext).deleteAll();
             }
             // 组装XXXInfo数据
@@ -313,9 +322,9 @@ public class UploadImpl {
             }
         }
 
-        if (EGContext.DEBUG_LOCATION) {
-            ELOG.i(EGContext.TAG_LOC, " ======================" + object.length() + " ======================");
-            ELOG.i(EGContext.TAG_LOC, "  上行：" + object.toString());
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i(EGContext.TAG_SNAP, " =========上行key=============" + object.length() + " ======================");
+//            ELOG.i(EGContext.TAG_SNAP, "  上行：" + object.toString());
         }
         return object.toString();
     }
@@ -482,8 +491,9 @@ public class UploadImpl {
             SPHelper.setLongValue2SP(mContext, EGContext.RETRYTIME, 0);
             TableOC.getInstance(mContext).delete();
             // 上传完成回来清理数据的时候，snapshot删除卸载的，其余的统一恢复成正常值
-            TableAppSnapshot.getInstance(mContext).delete();
-            TableAppSnapshot.getInstance(mContext).update();
+//            TableAppSnapshot.getInstance(mContext).delete();
+//            TableAppSnapshot.getInstance(mContext).update();
+            TableAppSnapshot.getInstance(mContext).reset();
 
             // location全部删除已读的数据，最后一条无需保留，sp里有
             TableLocation.getInstance(mContext).delete();

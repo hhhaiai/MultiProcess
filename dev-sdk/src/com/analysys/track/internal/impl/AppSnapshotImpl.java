@@ -9,7 +9,7 @@ import com.analysys.track.db.TableAppSnapshot;
 import com.analysys.track.internal.content.DataController;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
-import com.analysys.track.internal.work.MessageDispatcher;
+import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.JsonUtils;
@@ -19,9 +19,11 @@ import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,11 +39,12 @@ import java.util.Set;
  */
 public class AppSnapshotImpl {
 
-
     /**
      * 应用列表
+     *
+     * @param callBack
      */
-    public void snapshotsInfo() {
+    public void snapshotsInfo(final ECallBack callBack) {
         try {
 
             // 策略不允许安装列表模快工作, 则停止工作。
@@ -50,6 +53,9 @@ public class AppSnapshotImpl {
 //                return;
 //            }
             if (!SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
+                if (EGContext.DEBUG_SNAP) {
+                    ELOG.i(EGContext.TAG_SNAP, "动态调整关闭采集安装列表。。。");
+                }
                 return;
             }
             long now = System.currentTimeMillis();
@@ -57,14 +63,17 @@ public class AppSnapshotImpl {
 //            long durByPolicy = PolicyImpl.getInstance(mContext).getSP().getLong(EGContext.SP_SNAPSHOT_CYCLE, EGContext.TIME_HOUR * 3);
             long durByPolicy = SPHelper.getIntValueFromSP(mContext, EGContext.SP_SNAPSHOT_CYCLE, EGContext.TIME_HOUR * 3);
 
-            // 3小时内只能操作一次
-            if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, durByPolicy, now)) {
+            // 3秒内只能操作一次
+            if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, EGContext.TIME_SECOND * 3, now)) {
+
                 long time = SPHelper.getLongValueFromSP(mContext, EGContext.SP_APP_SNAP, 0);
                 long dur = now - time;
-
+                if (EGContext.DEBUG_SNAP) {
+                    ELOG.i(EGContext.TAG_SNAP, "通过多进程验证。  time： " + time + " ----间隔：" + dur);
+                }
 
                 //大于三个小时才可以工作
-                if (dur > durByPolicy) {
+                if (time == 0 || (dur > durByPolicy)) {
                     if (EGContext.DEBUG_SNAP) {
                         ELOG.i(EGContext.TAG_SNAP, " 大于3小时可以开始工作 ");
                     }
@@ -74,21 +83,39 @@ public class AppSnapshotImpl {
                             @Override
                             public void run() {
                                 getSnapShotInfo();
+                                MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, System.currentTimeMillis());
+                                if (callBack != null) {
+                                    callBack.onProcessed();
+                                }
+
                             }
                         });
                     } else {
                         getSnapShotInfo();
+                        // 5. 解锁多进程
+                        MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, System.currentTimeMillis());
+                        if (callBack != null) {
+                            callBack.onProcessed();
+                        }
                     }
                 } else {
                     if (EGContext.DEBUG_SNAP) {
-                        ELOG.i(EGContext.TAG_SNAP, " 大于小于3小时 time：" + time);
+                        ELOG.i(EGContext.TAG_SNAP, " 小于3小时 time：" + time);
                     }
                     //同步调整时间
                     MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, time);
-                    MessageDispatcher.getInstance(mContext).postLocation(dur);
+                    if (callBack != null) {
+                        callBack.onProcessed();
+                    }
                 }
 
             } else {
+                if (EGContext.DEBUG_SNAP) {
+                    ELOG.d(EGContext.TAG_SNAP, "多进程并发，停止操作。。。。");
+                }
+                if (callBack != null) {
+                    callBack.onProcessed();
+                }
                 return;
             }
 
@@ -96,30 +123,34 @@ public class AppSnapshotImpl {
         }
     }
 
-    private void getSnapShotInfo() {
+    public void getSnapShotInfo() {
         try {
-            // 1. 获取现在的安装列表
-            List<JSONObject> currentSnapshotsList = getCurrentSnapshots();
+            // 1. 获取现在的安装列表。所有标志位都是default(3)
+            List<JSONObject> memoryData = getCurrentSnapshots();
             if (EGContext.DEBUG_SNAP) {
-                ELOG.i(EGContext.TAG_SNAP, " 获取安装列表: " + currentSnapshotsList.size());
-            }
-            if (currentSnapshotsList != null && currentSnapshotsList.size() > 0) {
-                // 2. 获取DB中缓存的列表
-                Map<String, String> dbSnapshotsMap = TableAppSnapshot.getInstance(mContext).snapShotSelect();
-                if (dbSnapshotsMap != null && !dbSnapshotsMap.isEmpty()) {
-                    // 3. 对比处理当前快照和db数据
-                    currentSnapshotsList = getDifference(currentSnapshotsList, dbSnapshotsMap);
-                }
-                // 4. 最新的数据存储本地
-                TableAppSnapshot.getInstance(mContext).coverInsert(currentSnapshotsList);
+                ELOG.i(EGContext.TAG_SNAP, " 获取安装列表: " + memoryData.size());
             }
 
-            // 5. 解锁多进程
-            long now = System.currentTimeMillis();
-            MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, now);
-            MessageDispatcher.getInstance(mContext).postSnap(now);
-            // 6. 异步消息
-            MessageDispatcher.getInstance(mContext).postSnap(EGContext.TIME_HOUR * 3);
+            if (memoryData.size() < 1) {
+                if (EGContext.DEBUG_SNAP) {
+                    ELOG.i(EGContext.TAG_SNAP, " 获取安装列表失败。。 ");
+                }
+                return;
+            }
+
+            // 2. 获取DB数据
+            JSONArray dbData = TableAppSnapshot.getInstance(mContext).select(EGContext.LEN_MAX_UPDATE_SIZE);
+            if (dbData.length() < 1) {
+                //DB没存数据,存入. 兼容场景首次、不允许采集->允许采集
+                TableAppSnapshot.getInstance(mContext).insert(memoryData);
+            } else {
+                // 双列表对比，处理
+                checkDiff(dbData, memoryData);
+            }
+            memoryData.clear();
+            dbData = null;
+            memoryData = null;
+
         } catch (Throwable t) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
@@ -129,53 +160,132 @@ public class AppSnapshotImpl {
     }
 
     /**
-     * 数据库与新获取的当前列表list做对比合并成新的list 存储
+     * 内存列表和数据库安装列表对比
      *
-     * @param currentSnapshotsList
-     * @param dbSnapshotsMap
+     * @param dbData
+     * @param memoryData
      */
-    private List<JSONObject> getDifference(List<JSONObject> currentSnapshotsList, Map<String, String> dbSnapshotsMap) {
-        try {
-            if (currentSnapshotsList == null) {
-                currentSnapshotsList = new ArrayList<JSONObject>();
+    private void checkDiff(JSONArray dbData, List<JSONObject> memoryData) {
+        /**
+         *  阶段一、双列表对比，生成需要处理的列表
+         *
+         *  // APN
+         *  UploadKey.AppSnapshotInfo.ApplicationPackageName
+         *  //AN
+         *  UploadKey.AppSnapshotInfo.ApplicationName
+         *  //AVC
+         *  UploadKey.AppSnapshotInfo.ApplicationVersionCode
+         *  // AT
+         *  UploadKey.AppSnapshotInfo.ActionType
+         *  //ATh
+         *  UploadKey.AppSnapshotInfo.ActionHappenTime
+         *
+         */
+
+        // 1. dbData生成MAP
+        Map<String, JSONObject> dbMap = new HashMap<String, JSONObject>();
+        //先单节点遍历生成，内存map
+        for (int i = 0; i < dbData.length(); i++) {
+            JSONObject dbJson = dbData.optJSONObject(i);
+            if (dbJson == null || dbJson.length() < 1) {
+                continue;
             }
-            for (int i = 0; i < currentSnapshotsList.size(); i++) {
-                JSONObject item = (JSONObject) currentSnapshotsList.get(i);
-                String apn = item.getString(UploadKey.AppSnapshotInfo.ApplicationPackageName);
-                if (dbSnapshotsMap.containsKey(apn)) {
-                    JSONObject dbitem = new JSONObject(dbSnapshotsMap.get(apn));
-                    String avc = item.optString(UploadKey.AppSnapshotInfo.ApplicationVersionCode);
-                    String dbAvc = dbitem.optString(UploadKey.AppSnapshotInfo.ApplicationVersionCode);
-                    if (!TextUtils.isEmpty(avc) && !avc.equals(dbAvc)) {
-                        item.put(UploadKey.AppSnapshotInfo.ActionType, EGContext.SNAP_SHOT_UPDATE);
-                    }
-                    dbSnapshotsMap.remove(apn);
+            String apn = dbJson.optString(UploadKey.AppSnapshotInfo.ApplicationPackageName);
+            dbMap.put(apn, dbJson);
+        }
+        if (EGContext.DEBUG_SNAP) {
+            ELOG.i(EGContext.TAG_SNAP, " DB存储数据:" + dbMap.size());
+        }
+        // 2. memoryData数据生成map
+        Map<String, JSONObject> memMap = new HashMap<String, JSONObject>();
+        for (int j = 0; j < memoryData.size(); j++) {
+            JSONObject memJson = memoryData.get(j);
+            //最小粒径控制，单次无效。则跳过节点循环
+            if (memJson == null || memJson.length() < 1) {
+                continue;
+            }
+            String apn = memJson.optString(UploadKey.AppSnapshotInfo.ApplicationPackageName);
+            dbMap.put(apn, memJson);
+        }
+        if (EGContext.DEBUG_SNAP) {
+            ELOG.i(EGContext.TAG_SNAP, " 内存存储数据:" + dbMap.size());
+        }
+
+
+        /**
+         * 阶段二、根据对比，处理对应数据。
+         * 新增[内存有，DB没有]
+         * 删除[DB有.内存没有]
+         * 更改[版本号不一致,使用新的-适应内存数据遍历]
+         */
+        PackageManager pm = mContext.getPackageManager();
+        for (int i = 0; i < dbData.length(); i++) {
+            try {
+                JSONObject dbJson = dbData.optJSONObject(i);
+                if (dbJson == null || dbJson.length() < 1) {
                     continue;
                 }
-                item.put(UploadKey.AppSnapshotInfo.ActionType, EGContext.SNAP_SHOT_INSTALL);
+                String apn = dbJson.optString(UploadKey.AppSnapshotInfo.ApplicationPackageName);
+                // 内存没有。DB有 -->删除列表
+                if (!memMap.containsKey(apn)) {
+                    PackageInfo pi = pm.getPackageInfo(apn, 0);
+                    String avc = pi.versionName + "|" + pi.versionCode;
+                    TableAppSnapshot.getInstance(mContext).update(apn, EGContext.SNAP_SHOT_UNINSTALL, avc);
+                }
+            } catch (Throwable e) {
+                if (EGContext.DEBUG_SNAP) {
+                    ELOG.e(EGContext.TAG_SNAP, e);
+                }
             }
-            Set<String> set = dbSnapshotsMap.keySet();
-            for (String json : set) {
-                JSONObject j = new JSONObject(dbSnapshotsMap.get(json));
-                j.put(UploadKey.AppSnapshotInfo.ActionType, EGContext.SNAP_SHOT_UNINSTALL);
-                currentSnapshotsList.add(j);
-            }
-        } catch (Throwable e) {
-            return currentSnapshotsList;
         }
-        return currentSnapshotsList;
+        for (int j = 0; j < memoryData.size(); j++) {
+            try {
+                JSONObject memJson = memoryData.get(j);
+                //最小粒径控制，单次无效。则跳过节点循环
+                if (memJson == null || memJson.length() < 1) {
+                    continue;
+                }
+                String memApn = memJson.optString(UploadKey.AppSnapshotInfo.ApplicationPackageName);
+                // 内存有，DB没有--> 插入
+                if (!dbMap.containsKey(memApn)) {
+                    PackageInfo pi = pm.getPackageInfo(memApn, 0);
+                    TableAppSnapshot.getInstance(mContext).insert(getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL));
+                } else {
+                    String memAvc = memJson.optString(UploadKey.AppSnapshotInfo.ApplicationVersionCode);
+                    JSONObject dbJson = dbMap.get(memApn);
+                    String dbAvc = dbJson.optString(UploadKey.AppSnapshotInfo.ApplicationVersionCode);
+                    //版本不一致
+                    if (!memAvc.equals(dbAvc)) {
+                        TableAppSnapshot.getInstance(mContext).update(memApn, EGContext.SNAP_SHOT_UPDATE, memAvc);
+                    }
+                }
+            } catch (Throwable e) {
+                if (EGContext.DEBUG_SNAP) {
+                    ELOG.e(EGContext.TAG_SNAP, e);
+                }
+            }
+        }
+
+        /**
+         * 阶段三、清除数据
+         */
+        memMap.clear();
+        dbMap.clear();
+        memMap = null;
+        dbMap = null;
+
     }
+
 
     /**
      * 获取应用列表快照
      */
     private List<JSONObject> getCurrentSnapshots() {
-        List<JSONObject> list = null;
+        List<JSONObject> list = new ArrayList<JSONObject>();
         try {
             PackageManager packageManager = mContext.getPackageManager();
             List<PackageInfo> packageInfo = packageManager.getInstalledPackages(0);
             if (packageInfo != null && packageInfo.size() > 0) {
-                list = new ArrayList<JSONObject>();
                 JSONObject jsonObject = null;
                 PackageInfo pi = null;
                 for (int i = 0; i < packageInfo.size(); i++) {
@@ -441,29 +551,30 @@ public class AppSnapshotImpl {
 
     private void realProcessInThread(int type, String pkgName, long time) {
         try {
+            PackageManager pm = mContext.getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(pkgName, 0);
+            String avc = pi.versionName + "|" + pi.versionCode;
             if (type == 0) {
                 // SNAP_SHOT_INSTALL 解锁
-                PackageManager pm = mContext.getPackageManager();
-                PackageInfo pi = pm.getPackageInfo(pkgName, 0);
                 if (pi != null) {
-                    JSONObject jsonObject = getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL);
-                    if (jsonObject != null) {
-                        // 判断数据表中是否有该应用的存在，如果有标识此次安装是应用更新所导致
-                        boolean isHas = TableAppSnapshot.getInstance(mContext).isHasPkgName(pkgName);
-                        if (!isHas) {
-                            TableAppSnapshot.getInstance(mContext).insert(jsonObject);
-                        }
-                    }
+                    TableAppSnapshot.getInstance(mContext).insert(getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL));
+//                    if (jsonObject != null) {
+//                        // 判断数据表中是否有该应用的存在，如果有标识此次安装是应用更新所导致
+//                        boolean isHas = TableAppSnapshot.getInstance(mContext).isHasPkgName(pkgName);
+//                        if (!isHas) {
+//                            TableAppSnapshot.getInstance(mContext).update(jsonObject);
+//                        }
+//                    }
                 }
                 MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST, System.currentTimeMillis());
 
             } else if (type == 1) {
-                TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UNINSTALL, time);
+                TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UNINSTALL, avc);
                 // SNAP_SHOT_UNINSTALL 解锁
                 MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST,
                         System.currentTimeMillis());
             } else if (type == 2) {
-                TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UPDATE, time);
+                TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UPDATE, avc);
                 // SNAP_SHOT_UPDATE 解锁
                 MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST,
                         System.currentTimeMillis());

@@ -91,10 +91,20 @@ public class DBConfig {
         public static final String TABLE_NAME = "e_asi";
         // 建表
         public static final String CREATE_TABLE = String.format(
-                "create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)", TABLE_NAME, Column.ID,
-                DBType.AUTOINCREMENT, Column.APN, DBType.VARCHAR_HUNDRED, Column.AN, DBType.VARCHAR_HUNDRED, Column.AVC,
-                DBType.VARCHAR_TWENTY, Column.AT, DBType.VARCHAR_TWENTY, Column.AHT, DBType.VARCHAR_TWENTY,
-                Column.ASI_RA, DBType.TEXT, Column.ASI_RB, DBType.TEXT, Column.ASI_RC, DBType.TEXT);
+                "create table if not exists %s (%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,unique(%s))",
+                TABLE_NAME,
+                Column.ID, DBType.AUTOINCREMENT,
+                Column.APN, DBType.VARCHAR_HUNDRED,
+                Column.AN, DBType.VARCHAR_HUNDRED,
+                Column.AVC, DBType.VARCHAR_TWENTY,
+                Column.AT, DBType.VARCHAR_TWENTY,
+                Column.AHT, DBType.VARCHAR_TWENTY,
+                Column.ASI_RA, DBType.TEXT,
+                Column.ASI_RB, DBType.TEXT,
+                Column.ASI_RC, DBType.TEXT,
+                Column.APN
+
+        );
 
         public static class Column {
             public static final String ID = "id";
