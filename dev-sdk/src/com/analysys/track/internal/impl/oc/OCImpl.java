@@ -307,8 +307,8 @@ public class OCImpl {
             needCloseList = null;
         }
         if (EGContext.DEBUG_OC) {
-            ELOG.i(EGContext.TAG_OC, "\n 闭合数据后，列表[" + mOpenedPkgNameList.size() + "]:" + mOpenedPkgNameList.toString());
-            ELOG.i(EGContext.TAG_OC, "\n 闭合数据后，MAP[" + mOpenedPkgNameAndInfoMap.size() + "]:" + mOpenedPkgNameAndInfoMap.toString());
+            ELOG.i(EGContext.TAG_OC, "\n 闭合数据后，列表[" + mOpenedPkgNameList.size() + "]" );
+            ELOG.i(EGContext.TAG_OC, "\n 闭合数据后，MAP[" + mOpenedPkgNameAndInfoMap.size() + "]" );
         }
 
         // 增加新增加的数据
@@ -322,8 +322,8 @@ public class OCImpl {
             needOpenList = null;
         }
         if (EGContext.DEBUG_OC) {
-            ELOG.i(EGContext.TAG_OC, "\n 新增数据完毕，列表[" + mOpenedPkgNameList.size() + "]:" + mOpenedPkgNameList.toString());
-            ELOG.i(EGContext.TAG_OC, "\n 新增数据完毕，MAP[" + mOpenedPkgNameAndInfoMap.size() + "]:" + mOpenedPkgNameAndInfoMap.toString());
+            ELOG.i(EGContext.TAG_OC, "\n 新增数据完毕，列表[" + mOpenedPkgNameList.size() + "]");
+            ELOG.i(EGContext.TAG_OC, "\n 新增数据完毕，MAP[" + mOpenedPkgNameAndInfoMap.size() + "]");
         }
     }
 

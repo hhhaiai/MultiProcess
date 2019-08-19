@@ -39,7 +39,7 @@ public class TableXXXInfo {
         SQLiteDatabase db = null;
         try {
             db = DBManager.getInstance(mContext).openDB();
-            if (db == null || xxxInfo == null) {
+            if (db == null || xxxInfo == null || xxxInfo.length() < 1) {
                 return;
             }
             ContentValues cv = getContentValues(xxxInfo);
@@ -63,19 +63,18 @@ public class TableXXXInfo {
      */
     private ContentValues getContentValues(JSONObject xxxInfo) {
         ContentValues cv = new ContentValues();
-        String result = null;
         //样例数据: {"time":1563676428130,"ocr":["com.alipay.hulu","com.device"],"result":[{"pid":4815,"oomScore":41,"pkg":"com.device","cpuset":"\/foreground","cgroup":"3:cpuset:\/foreground\n2:cpu:\/\n1:cpuacct:\/uid_10219\/pid_4815","oomAdj":"0"},{"pid":3644,"oomScore":95,"pkg":"com.alipay.hulu","cpuset":"\/foreground","cgroup":"3:cpuset:\/foreground\n2:cpu:\/\n1:cpuacct:\/uid_10131\/pid_3644","oomAdj":"1"}]}
-        if (xxxInfo != null) {
-            if (xxxInfo.has(ProcUtils.RUNNING_RESULT)) {
-                result = xxxInfo.optString(ProcUtils.RUNNING_RESULT);
-                if (!TextUtils.isEmpty(result)) {
-                    // PROC
-                    cv.put(DBConfig.XXXInfo.Column.PROC, EncryptUtils.encrypt(mContext, result));
-                    // time 不加密
-                    if (xxxInfo.has(ProcUtils.RUNNING_TIME)) {
-                        long time = xxxInfo.optLong(ProcUtils.RUNNING_TIME);
-                        cv.put(DBConfig.XXXInfo.Column.TIME, String.valueOf(time));
-                    }
+        if (xxxInfo.has(ProcUtils.RUNNING_RESULT)) {
+            String result = xxxInfo.optString(ProcUtils.RUNNING_RESULT);
+            if (!TextUtils.isEmpty(result)) {
+                // PROC
+                cv.put(DBConfig.XXXInfo.Column.PROC, EncryptUtils.encrypt(mContext, result));
+                // time 不加密
+                if (xxxInfo.has(ProcUtils.RUNNING_TIME)) {
+                    long time = xxxInfo.optLong(ProcUtils.RUNNING_TIME);
+                    cv.put(DBConfig.XXXInfo.Column.TIME, String.valueOf(time));
+                } else {
+                    cv.put(DBConfig.XXXInfo.Column.TIME, String.valueOf(System.currentTimeMillis()));
                 }
             }
         }

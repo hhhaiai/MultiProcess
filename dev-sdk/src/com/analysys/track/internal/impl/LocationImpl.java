@@ -79,6 +79,7 @@ public class LocationImpl {
                 long dur = now - time;
                 //大于固定时间才可以工作
                 if (dur > durByPolicy) {
+                    SPHelper.setLongValue2SP(mContext, EGContext.SP_APP_LOCATION, now);
                     if (EGContext.DEBUG_LOCATION) {
                         ELOG.i(EGContext.TAG_LOC, "时间满足，即将开始处理。。。");
                     }
@@ -100,7 +101,6 @@ public class LocationImpl {
                             callback.onProcessed();
                         }
                     }
-                    SPHelper.setLongValue2SP(mContext, EGContext.SP_APP_LOCATION, now);
                 } else {
                     if (EGContext.DEBUG_LOCATION) {
                         ELOG.d(EGContext.TAG_LOC, "时间不到...等待处理时间，继续循环");
@@ -155,9 +155,9 @@ public class LocationImpl {
                 return;
             }
             if (EGContext.DEBUG_LOCATION) {
-                ELOG.i(EGContext.TAG_LOC, "Loction检测 GL:" + location.has(UploadKey.LocationInfo.GeographyLocation) );
-                ELOG.i(EGContext.TAG_LOC, "Loction检测 WifiInfo:" + location.has(UploadKey.LocationInfo.WifiInfo.NAME) );
-                ELOG.i(EGContext.TAG_LOC, "Loction检测 BaseStationInfo:" + location.has(UploadKey.LocationInfo.BaseStationInfo.NAME) );
+                ELOG.i(EGContext.TAG_LOC, "Loction检测 GL:" + location.has(UploadKey.LocationInfo.GeographyLocation));
+                ELOG.i(EGContext.TAG_LOC, "Loction检测 WifiInfo:" + location.has(UploadKey.LocationInfo.WifiInfo.NAME));
+                ELOG.i(EGContext.TAG_LOC, "Loction检测 BaseStationInfo:" + location.has(UploadKey.LocationInfo.BaseStationInfo.NAME));
             }
             if (location.has(UploadKey.LocationInfo.GeographyLocation)
                     || location.has(UploadKey.LocationInfo.WifiInfo.NAME)
