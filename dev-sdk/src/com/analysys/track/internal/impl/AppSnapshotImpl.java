@@ -69,11 +69,11 @@ public class AppSnapshotImpl {
                 long time = SPHelper.getLongValueFromSP(mContext, EGContext.SP_APP_SNAP, 0);
                 long dur = now - time;
                 if (EGContext.DEBUG_SNAP) {
-                    ELOG.i(EGContext.TAG_SNAP, "通过多进程验证。  time： " + time + " ----间隔：" + dur );
+                    ELOG.i(EGContext.TAG_SNAP, "通过多进程验证。  time： " + time + " ----间隔：" + dur);
                 }
 
                 //大于三个小时才可以工作
-                if (durByPolicy > dur || time == 0) {
+                if (dur > durByPolicy || time == 0) {
                     if (EGContext.DEBUG_SNAP) {
                         ELOG.i(EGContext.TAG_SNAP, " 大于3小时可以开始工作 ");
                     }
@@ -102,6 +102,8 @@ public class AppSnapshotImpl {
                     if (EGContext.DEBUG_SNAP) {
                         ELOG.i(EGContext.TAG_SNAP, " 小于3小时");
                     }
+                    //多进程解锁
+                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, time);
                     if (callBack != null) {
                         callBack.onProcessed();
                     }

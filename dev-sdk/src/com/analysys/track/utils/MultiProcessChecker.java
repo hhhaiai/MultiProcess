@@ -87,7 +87,7 @@ public class MultiProcessChecker {
      * @param time
      * @return
      */
-    public boolean setLockLastModifyTime(Context cxt, String fileName, long time) {
+    public synchronized boolean setLockLastModifyTime(Context cxt, String fileName, long time) {
         try {
             cxt = EContextHelper.getContext(cxt);
             if (cxt != null) {
@@ -138,7 +138,7 @@ public class MultiProcessChecker {
      * @param now  本次时间
      * @return
      */
-    public boolean isNeedWorkByLockFile(Context cxt, String lock, long time, long now) {
+    public synchronized boolean isNeedWorkByLockFile(Context cxt, String lock, long time, long now) {
         try {
             cxt = EContextHelper.getContext(cxt);
             if (cxt == null) {

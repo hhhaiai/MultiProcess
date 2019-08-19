@@ -82,7 +82,7 @@ public class LocationImpl {
                     ELOG.i(EGContext.TAG_LOC, "间隔时间: " + dur + "----------durByPolicy---->" + durByPolicy);
                 }
                 //大于固定时间才可以工作
-                if (durByPolicy > dur || time == 0) {
+                if (dur > durByPolicy || time == 0) {
                     SPHelper.setLongValue2SP(mContext, EGContext.SP_APP_LOCATION, now);
                     if (EGContext.DEBUG_LOCATION) {
                         ELOG.i(EGContext.TAG_LOC, "时间满足，即将开始处理。。。");
@@ -109,6 +109,8 @@ public class LocationImpl {
                     if (EGContext.DEBUG_LOCATION) {
                         ELOG.d(EGContext.TAG_LOC, "时间不到...等待处理时间，继续循环");
                     }
+                    //多进程解锁
+                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, time);
 //                    MessageDispatcher.getInstance(mContext).postSnap(dur);
                     if (callback != null) {
                         callback.onProcessed();
