@@ -77,6 +77,10 @@ public class LocationImpl {
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_LOCATION, EGContext.TIME_SECOND * 3, now)) {
                 long time = SPHelper.getLongValueFromSP(mContext, EGContext.SP_APP_LOCATION, 0);
                 long dur = now - time;
+
+                if (EGContext.DEBUG_LOCATION) {
+                    ELOG.i(EGContext.TAG_LOC, "间隔时间: " + dur + "----------durByPolicy---->" + durByPolicy);
+                }
                 //大于固定时间才可以工作
                 if (dur > durByPolicy) {
                     SPHelper.setLongValue2SP(mContext, EGContext.SP_APP_LOCATION, now);
@@ -132,15 +136,15 @@ public class LocationImpl {
         }
     }
 
-    private void getLocationInfoInThread() {
+    public void getLocationInfoInThread() {
         try {
             if (EGContext.DEBUG_LOCATION) {
-                ELOG.i(EGContext.TAG_LOC, "开始处理。。。。");
+                ELOG.i(EGContext.TAG_LOC, "位置信息获取 开始处理。。。。");
             }
             // 没有获取地理位置权限则不做处理
             if (!isWillWork()) {
                 if (EGContext.DEBUG_LOCATION) {
-                    ELOG.e(EGContext.TAG_LOC, "没有权限等，停止工作。。。。");
+                    ELOG.d(EGContext.TAG_LOC, "位置信息获取  停止工作。。。。");
                 }
                 return;
             }
@@ -184,6 +188,9 @@ public class LocationImpl {
         if (!AndroidManifestHelper.isPermissionDefineInManifest(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
                 && !AndroidManifestHelper.isPermissionDefineInManifest(mContext,
                 Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            if (EGContext.DEBUG_LOCATION) {
+                ELOG.d(EGContext.TAG_LOC, "XML没有声明权限。。。。");
+            }
             return false;
         }
 
@@ -191,28 +198,44 @@ public class LocationImpl {
         if (!PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
                 && !PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
             if (!makesureRequestPermissionLessThanFive(mContext)) {
+                if (EGContext.DEBUG_LOCATION) {
+                    ELOG.d(EGContext.TAG_LOC, "没有授权、授权申请次数多余5次。。。。");
+                }
                 return false;
             }
         }
 
         // 3. 距离不超过1000米
-        List<String> pStrings = this.locationManager.getProviders(true);
-        String provider;
-        if (pStrings.contains(LocationManager.GPS_PROVIDER)) {
-            provider = LocationManager.GPS_PROVIDER;
-        } else if (pStrings.contains(LocationManager.NETWORK_PROVIDER)) {
-            provider = LocationManager.NETWORK_PROVIDER;
-        } else {
+        List<String> pStrings = mLocationManager.getProviders(true);
+        if (EGContext.DEBUG_LOCATION) {
+            ELOG.i(EGContext.TAG_LOC, "获取provider: " + pStrings.toString());
+        }
+        // 获取渠道失败。
+        if (pStrings == null || pStrings.size() < 1) {
             return false;
         }
         try {
-            Location location = this.locationManager.getLastKnownLocation(provider);
-            if (location == null) {
-                location = this.locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            Location location = null;
+            for (String provider : pStrings) {
+                location = mLocationManager.getLastKnownLocation(provider);
+                if (EGContext.DEBUG_LOCATION) {
+                    ELOG.i(EGContext.TAG_LOC, "获取渠道: " + provider + "========>" + location);
+                }
+                if (location != null) {
+                    break;
+                }
             }
-            if (needSaveLocation(location)) {// 距离超过1000米则存储，其他wifi等信息亦有效，存储
+            if (location == null) {
+                return false;
+            }
+            if (needSaveLocation(location)) {
+                // 距离超过1000米则存储，其他wifi等信息亦有效，存储
                 resetLocaiton(location);
-            } else {// 距离不超过1000米则无需存储，其他数据也无需获取存储
+            } else {
+                // 距离不超过1000米则无需存储，其他数据也无需获取存储
+                if (EGContext.DEBUG_LOCATION) {
+                    ELOG.d(EGContext.TAG_LOC, "距离不超过1000米。。。。");
+                }
                 return false;
             }
         } catch (Throwable t) {
@@ -309,16 +332,19 @@ public class LocationImpl {
     private boolean needSaveLocation(Location location) {
 
         try {
-            if (location == null) {
-                return false;
-            }
             String lastLocation = SPHelper.getStringValueFromSP(mContext, EGContext.LAST_LOCATION, "");
             if (TextUtils.isEmpty(lastLocation)) {
+                if (EGContext.DEBUG_LOCATION) {
+                    ELOG.d(EGContext.TAG_LOC, "距离检测。SP未缓存。");
+                }
                 return true;
             }
 
             String[] ary = lastLocation.split("-");
             if (ary.length != 2) {
+                if (EGContext.DEBUG_LOCATION) {
+                    ELOG.d(EGContext.TAG_LOC, "缓存有值。");
+                }
                 return true;
             }
             double longitude1 = Double.parseDouble(ary[1]);
@@ -326,6 +352,9 @@ public class LocationImpl {
             double distance = getDistance(longitude1, latitude1, location.getLongitude(), location.getLatitude());
             // 距离没有变化则不保存
             if (EGContext.MINDISTANCE <= distance) {
+                if (EGContext.DEBUG_LOCATION) {
+                    ELOG.d(EGContext.TAG_LOC, "有变化。");
+                }
                 return true;
             }
         } catch (Throwable e) {
@@ -671,22 +700,24 @@ public class LocationImpl {
     }
 
     public static LocationImpl getInstance(Context context) {
-        if (Holder.INSTANCE.mContext == null) {
-            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
-        }
-        if (LocationImpl.Holder.INSTANCE.locationManager == null) {
-            if (LocationImpl.Holder.INSTANCE.mContext != null) {
-                LocationImpl.Holder.INSTANCE.locationManager = (LocationManager) LocationImpl.Holder.INSTANCE.mContext
-                        .getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-            }
-        }
+
+        Holder.INSTANCE.init(context);
         return LocationImpl.Holder.INSTANCE;
+    }
+
+    private void init(Context context) {
+        if (mContext == null) {
+            mContext = EContextHelper.getContext(context);
+        }
+        if (mLocationManager == null && mContext != null) {
+            mLocationManager = (LocationManager) mContext.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        }
     }
 
     private static int permissionAskCount = 0;
     Context mContext;
     TelephonyManager mTelephonyManager = null;
     JSONObject locationJson = null;
-    private LocationManager locationManager;
+    private LocationManager mLocationManager;
 
 }

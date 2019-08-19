@@ -38,12 +38,11 @@ public class TableLocation {
             long time = -1;
             String encryptLocation = null;
             if (locationInfo != null && locationInfo.length() > 0) {
-                locationTime = null;
                 locationTime = locationInfo.optString(UploadKey.LocationInfo.CollectionTime);
-                time = 0;
-                if (!TextUtils.isEmpty(locationTime)) {
-                    time = Long.parseLong(locationTime);
+                if (TextUtils.isEmpty(locationTime)) {
+                    locationTime = "0";
                 }
+                time = Long.parseLong(locationTime);
                 encryptLocation = Base64Utils.encrypt(String.valueOf(locationInfo), time);
                 if (!TextUtils.isEmpty(encryptLocation)) {
                     cv = new ContentValues();
@@ -57,7 +56,7 @@ public class TableLocation {
                     }
                     long result = db.insert(DBConfig.Location.TABLE_NAME, null, cv);
                     if (EGContext.DEBUG_LOCATION) {
-                        ELOG.i(EGContext.TAG_LOC, " 位置信息插入DB 完毕，结果: " + result);
+                        ELOG.i(EGContext.TAG_LOC, " 位置信息插入DB 完毕 time[" + locationTime + "]，结果: " + result);
                     }
                 }
             }

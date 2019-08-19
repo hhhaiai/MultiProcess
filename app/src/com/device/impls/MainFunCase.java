@@ -7,6 +7,7 @@ import com.analysys.track.db.TableAppSnapshot;
 import com.analysys.track.db.TableOC;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
+import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.net.UploadImpl;
@@ -254,23 +255,25 @@ public class MainFunCase {
     }
 
 
-    // 10. 【安装列表】查询数据库
+    // 11. 【安装列表】查询数据库
     private static void runCaseP11(final Context context) {
         MyLooper.execute(new Runnable() {
             @Override
             public void run() {
-                EL.i("----【【安装列表】数据库-----");
+                EL.i("----【安装列表】数据库-----");
                 JSONArray ins = TableAppSnapshot.getInstance(context).select(EGContext.LEN_MAX_UPDATE_SIZE);
                 EL.i(ins);
             }
         });
     }
 
+    // 12.【定位信息】直接获取。。。忽略多进程
     private static void runCaseP12(final Context context) {
         MyLooper.execute(new Runnable() {
             @Override
             public void run() {
-
+                EL.i("----【定位信息】直接获取。。。忽略多进程-----");
+                LocationImpl.getInstance(context).getLocationInfoInThread();
             }
         });
     }

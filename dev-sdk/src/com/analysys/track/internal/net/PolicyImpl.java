@@ -186,14 +186,14 @@ public class PolicyImpl {
         SPHelper.setStringValue2SP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, "");
         SPHelper.setStringValue2SP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, "");
         SPHelper.setStringValue2SP(mContext, UploadKey.Response.RES_POLICY_VERSION, "");
-        SPHelper.setIntValue2SP(mContext, UploadKey.Response.RES_POLICY_FAIL_COUNT, 0);
-        SPHelper.setLongValue2SP(mContext, UploadKey.Response.RES_POLICY_FAIL_TRY_DELAY, 0);
-        SPHelper.setLongValue2SP(mContext, UploadKey.Response.RES_POLICY_TIMER_INTERVAL, 0);
+//        SPHelper.setIntValue2SP(mContext, UploadKey.Response.RES_POLICY_FAIL_COUNT, 0);
+//        SPHelper.setLongValue2SP(mContext, UploadKey.Response.RES_POLICY_FAIL_TRY_DELAY, 0);
+//        SPHelper.setLongValue2SP(mContext, UploadKey.Response.RES_POLICY_TIMER_INTERVAL, 0);
         SPHelper.setStringValue2SP(mContext, UploadKey.Response.RES_POLICY_CTRL_LIST, "");
 
         SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_OC, true);
-        SPHelper.setIntValue2SP(mContext, EGContext.SP_OC_CYCLE, 0);
-        SPHelper.setIntValue2SP(mContext, EGContext.SP_LOCATION_CYCLE, 0);
+//        SPHelper.setIntValue2SP(mContext, EGContext.SP_OC_CYCLE, 0);
+//        SPHelper.setIntValue2SP(mContext, EGContext.SP_LOCATION_CYCLE, 0);
 
         SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_OC, true);
         SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true);
