@@ -91,7 +91,7 @@ public class MessageDispatcher {
 //                                }
 //                                // 按照差距时间发送延迟工作消息
 //                                postDelay(MSG_INFO_WBG, time);
-                                
+
 
                                 if (EGContext.DEBUG_LOCATION) {
                                     ELOG.i(EGContext.TAG_LOC, "收到定位信息回调。。30秒后继续发起请求。。。");

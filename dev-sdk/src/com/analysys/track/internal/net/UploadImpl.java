@@ -4,10 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Base64;
 
-import com.analysys.track.db.TableAppSnapshot;
-import com.analysys.track.db.TableLocation;
-import com.analysys.track.db.TableOC;
-import com.analysys.track.db.TableXXXInfo;
+import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.utils.DeflterCompressUtils;
@@ -253,7 +250,7 @@ public class UploadImpl {
                     }
                 }
             } else {
-                TableOC.getInstance(mContext).deleteAll();
+                TableProcess.getInstance(mContext).deleteAll();
             }
             // 组装位置数据
 //            if (PolicyImpl.getInstance(mContext) .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
@@ -276,7 +273,7 @@ public class UploadImpl {
                 if (EGContext.DEBUG_LOCATION) {
                     ELOG.i(EGContext.TAG_LOC, "  上传不允许采集位置信息，即将清除本地数据 ");
                 }
-                TableLocation.getInstance(mContext).deleteAll();
+                TableProcess.getInstance(mContext).deleteAllLocation();
             }
             //  组装安装列表数据
 //            if (PolicyImpl.getInstance(mContext) .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
@@ -299,7 +296,7 @@ public class UploadImpl {
                 if (EGContext.DEBUG_SNAP) {
                     ELOG.i(EGContext.TAG_SNAP, " 上传不允许组装 ，即将清除数据 ");
                 }
-                TableAppSnapshot.getInstance(mContext).deleteAll();
+                TableProcess.getInstance(mContext).deleteAllSnapshot();
             }
             // 组装XXXInfo数据
 //            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true)) {
@@ -314,17 +311,16 @@ public class UploadImpl {
                     }
                 }
             } else {
-                TableXXXInfo.getInstance(mContext).delete();
+                TableProcess.getInstance(mContext).deleteXXX();
             }
         } catch (Throwable e) {
             if (EGContext.DEBUG_UPLOAD) {
-                ELOG.e(e);
+                ELOG.e(EGContext.TAG_UPLOAD, e);
             }
         }
 
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i(EGContext.TAG_SNAP, " =========上行key=============" + object.length() + " ======================");
-//            ELOG.i(EGContext.TAG_SNAP, "  上行：" + object.toString());
+        if (EGContext.DEBUG_UPLOAD) {
+            ELOG.i(EGContext.TAG_UPLOAD, " =========上行key=============" + object.length() + " ======================");
         }
         return object.toString();
     }
@@ -489,17 +485,15 @@ public class UploadImpl {
             SPHelper.setIntValue2SP(mContext, EGContext.FAILEDNUMBER, 0);
             SPHelper.setLongValue2SP(mContext, EGContext.FAILEDTIME, 0);
             SPHelper.setLongValue2SP(mContext, EGContext.RETRYTIME, 0);
-            TableOC.getInstance(mContext).delete();
+            TableProcess.getInstance(mContext).deleteOC();
             // 上传完成回来清理数据的时候，snapshot删除卸载的，其余的统一恢复成正常值
-//            TableAppSnapshot.getInstance(mContext).delete();
-//            TableAppSnapshot.getInstance(mContext).update();
-            TableAppSnapshot.getInstance(mContext).reset();
+            TableProcess.getInstance(mContext).resetSnapshot();
 
             // location全部删除已读的数据，最后一条无需保留，sp里有
-            TableLocation.getInstance(mContext).delete();
+            TableProcess.getInstance(mContext).deleteLocation();
 
             // 按time值delete xxxinfo表和proc表
-            TableXXXInfo.getInstance(mContext).deleteByID(idList);
+            TableProcess.getInstance(mContext).deleteByIDXXX(idList);
             if (idList != null && idList.size() > 0) {
                 idList.clear();
             }
@@ -507,8 +501,6 @@ public class UploadImpl {
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.e(t);
             }
-//        } finally {
-//            MessageDispatcher.getInstance(mContext).killRetryWorker();
         }
     }
 
@@ -549,16 +541,16 @@ public class UploadImpl {
 
             switch (module) {
                 case MODULE_OC:
-                    arr = TableOC.getInstance(mContext).select(useFulLength);
+                    arr = TableProcess.getInstance(mContext).selectOC(useFulLength);
                     break;
                 case MODULE_LOCATION:
-                    arr = TableLocation.getInstance(mContext).select(useFulLength);
+                    arr = TableProcess.getInstance(mContext).selectLocation(useFulLength);
                     break;
                 case MODULE_SNAPSHOT:
-                    arr = TableAppSnapshot.getInstance(mContext).select(useFulLength);
+                    arr = TableProcess.getInstance(mContext).selectSnapshot(useFulLength);
                     break;
                 case MODULE_XXX:
-                    arr = TableXXXInfo.getInstance(mContext).select(useFulLength);
+                    arr = TableProcess.getInstance(mContext).selectXXX(useFulLength);
                     break;
                 default:
                     break;

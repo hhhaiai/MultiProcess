@@ -114,6 +114,11 @@ public class EGContext {
     public static final String ORIGINKEY_STRING = "analysys";
     public static final String EGUANFILE = "eg.a";
 
+
+
+    public static final String DEFAULT_ZERO = "0";
+    public static final String DEFAULT_ONE = "1";
+
     public static final String TMPIDKEY = "tmpid";
     // 用于jobservice
     public static final int JOB_ID = 2071112;

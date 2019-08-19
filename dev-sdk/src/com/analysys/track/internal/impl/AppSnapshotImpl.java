@@ -5,7 +5,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
 
-import com.analysys.track.db.TableAppSnapshot;
+import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.DataController;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
@@ -148,10 +148,10 @@ public class AppSnapshotImpl {
             }
 
             // 2. 获取DB数据
-            JSONArray dbData = TableAppSnapshot.getInstance(mContext).select(EGContext.LEN_MAX_UPDATE_SIZE);
+            JSONArray dbData = TableProcess.getInstance(mContext).selectSnapshot(EGContext.LEN_MAX_UPDATE_SIZE);
             if (dbData.length() < 1) {
                 //DB没存数据,存入. 兼容场景首次、不允许采集->允许采集
-                TableAppSnapshot.getInstance(mContext).insert(memoryData);
+                TableProcess.getInstance(mContext).insertSnapshot(memoryData);
             } else {
                 // 双列表对比，处理
                 checkDiff(dbData, memoryData);
@@ -239,7 +239,7 @@ public class AppSnapshotImpl {
                 if (!memMap.containsKey(apn)) {
                     PackageInfo pi = pm.getPackageInfo(apn, 0);
                     String avc = pi.versionName + "|" + pi.versionCode;
-                    TableAppSnapshot.getInstance(mContext).update(apn, EGContext.SNAP_SHOT_UNINSTALL, avc);
+                    TableProcess.getInstance(mContext).updateSnapshot(apn, EGContext.SNAP_SHOT_UNINSTALL, avc);
                 }
             } catch (Throwable e) {
                 if (EGContext.DEBUG_SNAP) {
@@ -258,14 +258,14 @@ public class AppSnapshotImpl {
                 // 内存有，DB没有--> 插入
                 if (!dbMap.containsKey(memApn)) {
                     PackageInfo pi = pm.getPackageInfo(memApn, 0);
-                    TableAppSnapshot.getInstance(mContext).insert(getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL));
+                    TableProcess.getInstance(mContext).insertSnapshot(getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL));
                 } else {
                     String memAvc = memJson.optString(UploadKey.AppSnapshotInfo.ApplicationVersionCode);
                     JSONObject dbJson = dbMap.get(memApn);
                     String dbAvc = dbJson.optString(UploadKey.AppSnapshotInfo.ApplicationVersionCode);
                     //版本不一致
                     if (!memAvc.equals(dbAvc)) {
-                        TableAppSnapshot.getInstance(mContext).update(memApn, EGContext.SNAP_SHOT_UPDATE, memAvc);
+                        TableProcess.getInstance(mContext).updateSnapshot(memApn, EGContext.SNAP_SHOT_UPDATE, memAvc);
                     }
                 }
             } catch (Throwable e) {
@@ -566,24 +566,24 @@ public class AppSnapshotImpl {
             if (type == 0) {
                 // SNAP_SHOT_INSTALL 解锁
                 if (pi != null) {
-                    TableAppSnapshot.getInstance(mContext).insert(getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL));
+                    TableProcess.getInstance(mContext).insertSnapshot(getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL));
 //                    if (jsonObject != null) {
 //                        // 判断数据表中是否有该应用的存在，如果有标识此次安装是应用更新所导致
-//                        boolean isHas = TableAppSnapshot.getInstance(mContext).isHasPkgName(pkgName);
+//                        boolean isHas = TableProcess.getInstance(mContext).isHasPkgName(pkgName);
 //                        if (!isHas) {
-//                            TableAppSnapshot.getInstance(mContext).update(jsonObject);
+//                            TableProcess.getInstance(mContext).updateSnapshot(jsonObject);
 //                        }
 //                    }
                 }
                 MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST, System.currentTimeMillis());
 
             } else if (type == 1) {
-                TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UNINSTALL, avc);
+                TableProcess.getInstance(mContext).updateSnapshot(pkgName, EGContext.SNAP_SHOT_UNINSTALL, avc);
                 // SNAP_SHOT_UNINSTALL 解锁
                 MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST,
                         System.currentTimeMillis());
             } else if (type == 2) {
-                TableAppSnapshot.getInstance(mContext).update(pkgName, EGContext.SNAP_SHOT_UPDATE, avc);
+                TableProcess.getInstance(mContext).updateSnapshot(pkgName, EGContext.SNAP_SHOT_UPDATE, avc);
                 // SNAP_SHOT_UPDATE 解锁
                 MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST,
                         System.currentTimeMillis());

@@ -94,7 +94,7 @@ public class DeflterCompressUtils {
 //        byte[] output = new byte[0];
 //
 //        Inflater decompresser = new Inflater();
-//        decompresser.reset();
+//        decompresser.resetSnapshot();
 //        decompresser.setInput(data);
 //
 //        ByteArrayOutputStream o = new ByteArrayOutputStream(data.length);

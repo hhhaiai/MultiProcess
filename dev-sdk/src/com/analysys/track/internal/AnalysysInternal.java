@@ -89,7 +89,7 @@ public class AnalysysInternal {
         if (ctx == null) {
             return;
         }
-        SystemUtils.updateAppkeyAndChannel(ctx, key, channel);// update sp
+        SystemUtils.updateAppkeyAndChannel(ctx, key, channel);// updateSnapshot sp
 
         // 1. 设置错误回调
         CrashHandler.getInstance().setCallback(null);// 不依赖ctx

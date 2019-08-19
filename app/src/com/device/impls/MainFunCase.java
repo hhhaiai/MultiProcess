@@ -3,8 +3,7 @@ package com.device.impls;
 import android.content.Context;
 import android.content.pm.PackageManager;
 
-import com.analysys.track.db.TableAppSnapshot;
-import com.analysys.track.db.TableOC;
+import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.LocationImpl;
@@ -221,7 +220,7 @@ public class MainFunCase {
 
                 EL.i("=================== 从数据库取出OC数据 ===============");
 
-                JSONArray oc = TableOC.getInstance(context).select(EGContext.LEN_MAX_UPDATE_SIZE);
+                JSONArray oc = TableProcess.getInstance(context).selectOC(EGContext.LEN_MAX_UPDATE_SIZE);
 
                 if (oc != null) {
                     EL.i("获取OC数据:" + oc.toString());
@@ -261,7 +260,7 @@ public class MainFunCase {
             @Override
             public void run() {
                 EL.i("----【安装列表】数据库-----");
-                JSONArray ins = TableAppSnapshot.getInstance(context).select(EGContext.LEN_MAX_UPDATE_SIZE);
+                JSONArray ins = TableProcess.getInstance(context).selectSnapshot(EGContext.LEN_MAX_UPDATE_SIZE);
                 EL.i(ins);
             }
         });

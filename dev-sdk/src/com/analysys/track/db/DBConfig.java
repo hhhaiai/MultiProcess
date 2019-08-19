@@ -60,7 +60,7 @@ public class DBConfig {
             public static final String CU = "occ_e";
             // 日期
             public static final String DY = "occ_f";
-            // insert 的时间
+            // insertSnapshot 的时间
             public static final String IT = "occ_g";
             // 应用版本信息
             public static final String AVC = "occ_h";

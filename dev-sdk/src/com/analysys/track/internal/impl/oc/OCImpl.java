@@ -14,8 +14,7 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import com.analysys.track.db.DBConfig;
-import com.analysys.track.db.TableOC;
-import com.analysys.track.db.TableXXXInfo;
+import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
@@ -289,7 +288,7 @@ public class OCImpl {
                         info.put(DBConfig.OC.Column.ACT, String.valueOf(System.currentTimeMillis()));
                         info.put(DBConfig.OC.Column.RS, "1");
                         // 保存上一个打开关闭记录信息
-                        TableOC.getInstance(mContext).insert(info);
+                        TableProcess.getInstance(mContext).insertOC(info);
                     }
                 }
 
@@ -341,7 +340,7 @@ public class OCImpl {
             }
             if (xxx != null && xxx.has(ProcUtils.RUNNING_OC_RESULT)) {
                 xxx.remove(ProcUtils.RUNNING_OC_RESULT);
-                TableXXXInfo.getInstance(mContext).insert(xxx);
+                TableProcess.getInstance(mContext).insertXXX(xxx);
             }
         }
     }
@@ -427,7 +426,7 @@ public class OCImpl {
                                 info.put(DBConfig.OC.Column.ACT, String.valueOf(System.currentTimeMillis()));
                                 info.put(DBConfig.OC.Column.RS, "1");
                                 // 保存上一个打开关闭记录信息
-                                TableOC.getInstance(mContext).insert(info);
+                                TableProcess.getInstance(mContext).insertOC(info);
                             }
                         }
                     }
@@ -625,7 +624,7 @@ public class OCImpl {
                         info.put(DBConfig.OC.Column.AST, UploadKey.OCInfo.SWITCHTYPE_CLOSE_SCREEN);
                         info.put(DBConfig.OC.Column.RS, "1");
                         // 保存上一个打开关闭记录信息
-                        TableOC.getInstance(mContext).insert(info);
+                        TableProcess.getInstance(mContext).insertOC(info);
                     }
                     info = null;
                 }

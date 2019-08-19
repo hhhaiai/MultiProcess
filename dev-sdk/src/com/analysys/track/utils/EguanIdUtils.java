@@ -6,7 +6,7 @@ import android.os.Environment;
 import android.provider.Settings;
 import android.text.TextUtils;
 
-import com.analysys.track.db.TableIDStorage;
+import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
@@ -130,15 +130,15 @@ public class EguanIdUtils {
             if (TextUtils.isEmpty(tmpId)) {
                 return;
             }
-            String id = TableIDStorage.getInstance(mContext).select();
+            String id = TableProcess.getInstance(mContext).selectTempId();
             if (tmpId.equals(id)) {
                 return;
             } else {
                 if (TextUtils.isEmpty(id)) {
-                    TableIDStorage.getInstance(mContext).insert(tmpId);
+                    TableProcess.getInstance(mContext).insertTempId(tmpId);
                 } else {
-                    TableIDStorage.getInstance(mContext).delete();
-                    TableIDStorage.getInstance(mContext).insert(tmpId);
+                    TableProcess.getInstance(mContext).deleteTempId();
+                    TableProcess.getInstance(mContext).insertTempId(tmpId);
                 }
             }
         } catch (Throwable t) {
@@ -151,7 +151,7 @@ public class EguanIdUtils {
      * @return
      */
     private String readDatabase() {
-        return TableIDStorage.getInstance(mContext).select();
+        return TableProcess.getInstance(mContext).selectTempId();
     }
 
     /**

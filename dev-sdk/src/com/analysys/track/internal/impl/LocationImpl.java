@@ -13,7 +13,7 @@ import android.telephony.NeighboringCellInfo;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
-import com.analysys.track.db.TableLocation;
+import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.DataController;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
@@ -177,7 +177,7 @@ public class LocationImpl {
             if (location.has(UploadKey.LocationInfo.GeographyLocation)
                     || location.has(UploadKey.LocationInfo.WifiInfo.NAME)
                     || location.has(UploadKey.LocationInfo.BaseStationInfo.NAME)) {
-                TableLocation.getInstance(mContext).insert(location);
+                TableProcess.getInstance(mContext).insertLocation(location);
             }
         } catch (Throwable t) {
             if (EGContext.FLAG_DEBUG_INNER) {
