@@ -31,7 +31,7 @@ public class SPHelper {
      * @param context
      * @param spName
      */
-    public static void remove(Context context, String spName) {
+    public static void removeSPFiles(Context context, String spName) {
         File f = getSystemSharedPrefsFile(context, spName);
         if (f.exists()) {
             f.delete();
@@ -274,6 +274,10 @@ public class SPHelper {
         getEditor(ctx).putLong(key, value).apply();
     }
 
+    public static void removeKey(Context ctx, String key) {
+        getEditor(ctx).remove(key).apply();
+    }
+
     /**
      * @param ctx
      * @param key
@@ -283,4 +287,6 @@ public class SPHelper {
     public static long getLongValueFromSP(Context ctx, String key, long defaultValue) {
         return getDefault(ctx).getLong(key, defaultValue);
     }
+
+
 }

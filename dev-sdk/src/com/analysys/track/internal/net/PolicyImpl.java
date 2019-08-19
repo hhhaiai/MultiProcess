@@ -183,33 +183,33 @@ public class PolicyImpl {
     public void clear() {
 //        getEditor().clear().commit();
         // 多进程同步，清除数据
-        SPHelper.setStringValue2SP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, "");
-        SPHelper.setStringValue2SP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, "");
-        SPHelper.setStringValue2SP(mContext, UploadKey.Response.RES_POLICY_VERSION, "");
-//        SPHelper.setIntValue2SP(mContext, UploadKey.Response.RES_POLICY_FAIL_COUNT, 0);
-//        SPHelper.setLongValue2SP(mContext, UploadKey.Response.RES_POLICY_FAIL_TRY_DELAY, 0);
-//        SPHelper.setLongValue2SP(mContext, UploadKey.Response.RES_POLICY_TIMER_INTERVAL, 0);
-        SPHelper.setStringValue2SP(mContext, UploadKey.Response.RES_POLICY_CTRL_LIST, "");
+        SPHelper.removeKey(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN);
+        SPHelper.removeKey(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION);
 
-        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_OC, true);
-//        SPHelper.setIntValue2SP(mContext, EGContext.SP_OC_CYCLE, 0);
-//        SPHelper.setIntValue2SP(mContext, EGContext.SP_LOCATION_CYCLE, 0);
+        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_FAIL_COUNT);
+        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_FAIL_TRY_DELAY);
+        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_TIMER_INTERVAL);
+        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_CTRL_LIST);
+        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_OC);
+        SPHelper.removeKey(mContext, EGContext.SP_OC_CYCLE);
+        SPHelper.removeKey(mContext, EGContext.SP_LOCATION_CYCLE);
 
-        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_OC, true);
-        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true);
-        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true);
-        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_WIFI, true);
-        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_BASE, true);
-        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_DEV, true);
-        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_BLUETOOTH, true);
-        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_BATTERY, true);
-        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_SENSOR, true);
 
-        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_MORE_INFO, true);
-        SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_DEV_CHECK, true);
-        SPHelper.setBooleanValue2SP(mContext, ProcUtils.RUNNING_RESULT, true);
-        SPHelper.setBooleanValue2SP(mContext, ProcUtils.RUNNING_TIME, true);
-        SPHelper.setBooleanValue2SP(mContext, ProcUtils.RUNNING_OC_RESULT, true);
+        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_OC);
+        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION);
+        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT);
+        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_WIFI);
+        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_BASE);
+        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_DEV);
+        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_BLUETOOTH);
+        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_BATTERY);
+        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_SENSOR);
+        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_MORE_INFO);
+        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_DEV_CHECK);
+        SPHelper.removeKey(mContext, ProcUtils.RUNNING_RESULT);
+        SPHelper.removeKey(mContext, ProcUtils.RUNNING_TIME);
+        SPHelper.removeKey(mContext, ProcUtils.RUNNING_OC_RESULT);
+
     }
 
 //    public void setSp(String key, boolean value) {

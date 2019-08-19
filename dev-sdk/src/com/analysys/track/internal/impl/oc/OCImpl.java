@@ -227,9 +227,9 @@ public class OCImpl {
             return;
         }
         if (EGContext.DEBUG_OC) {
-            ELOG.i(EGContext.TAG_OC, "\n内存里的列表数据[" + mOpenedPkgNameList.size() + "]:" + mOpenedPkgNameList.toString());
-            ELOG.i(EGContext.TAG_OC, "\n内存里的MAP数据[" + mOpenedPkgNameAndInfoMap.size() + "]:" + mOpenedPkgNameAndInfoMap.toString());
-            ELOG.i(EGContext.TAG_OC, "\n本次处理的数据[" + aliveList.length() + "]:" + aliveList.toString());
+            ELOG.i(EGContext.TAG_OC, "\n内存里的列表数据[" + mOpenedPkgNameList.size() + "]");
+            ELOG.i(EGContext.TAG_OC, "\n内存里的MAP数据[" + mOpenedPkgNameAndInfoMap.size() + "]");
+            ELOG.i(EGContext.TAG_OC, "\n本次处理的数据[" + aliveList.length() + "]");
         }
 
         /**
@@ -307,8 +307,8 @@ public class OCImpl {
             needCloseList = null;
         }
         if (EGContext.DEBUG_OC) {
-            ELOG.i(EGContext.TAG_OC, "\n 闭合数据后，列表[" + mOpenedPkgNameList.size() + "]" );
-            ELOG.i(EGContext.TAG_OC, "\n 闭合数据后，MAP[" + mOpenedPkgNameAndInfoMap.size() + "]" );
+            ELOG.i(EGContext.TAG_OC, "\n 闭合数据后，列表[" + mOpenedPkgNameList.size() + "]");
+            ELOG.i(EGContext.TAG_OC, "\n 闭合数据后，MAP[" + mOpenedPkgNameAndInfoMap.size() + "]");
         }
 
         // 增加新增加的数据

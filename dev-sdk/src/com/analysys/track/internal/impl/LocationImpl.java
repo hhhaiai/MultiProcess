@@ -72,17 +72,18 @@ public class LocationImpl {
 
             long now = System.currentTimeMillis();
 //            long durByPolicy = PolicyImpl.getInstance(mContext).getSP().getLong(EGContext.SP_LOCATION_CYCLE, EGContext.TIME_MINUTE * 30);
-            long durByPolicy = SPHelper.getIntValueFromSP(mContext, EGContext.SP_LOCATION_CYCLE, EGContext.TIME_MINUTE * 30);
+//            long durByPolicy = SPHelper.getIntValueFromSP(mContext, EGContext.SP_LOCATION_CYCLE, EGContext.TIME_MINUTE * 30);
             // 3秒内只能处理一次
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_LOCATION, EGContext.TIME_SECOND * 3, now)) {
-                long time = SPHelper.getLongValueFromSP(mContext, EGContext.SP_APP_LOCATION, 0);
-                long dur = now - time;
-
-                if (EGContext.DEBUG_LOCATION) {
-                    ELOG.i(EGContext.TAG_LOC, "间隔时间: " + dur + "----------durByPolicy---->" + durByPolicy);
-                }
+//                long time = SPHelper.getLongValueFromSP(mContext, EGContext.SP_APP_LOCATION, 0);
+//                long dur = now - time;
+//
+//                if (EGContext.DEBUG_LOCATION) {
+//                    ELOG.i(EGContext.TAG_LOC, "间隔时间: " + dur + "----------durByPolicy---->" + durByPolicy);
+//                }
                 //大于固定时间才可以工作
-                if (dur > durByPolicy) {
+//                if (dur > durByPolicy) {
+                if (getDurTime() > 0) {
                     SPHelper.setLongValue2SP(mContext, EGContext.SP_APP_LOCATION, now);
                     if (EGContext.DEBUG_LOCATION) {
                         ELOG.i(EGContext.TAG_LOC, "时间满足，即将开始处理。。。");
@@ -109,8 +110,6 @@ public class LocationImpl {
                     if (EGContext.DEBUG_LOCATION) {
                         ELOG.d(EGContext.TAG_LOC, "时间不到...等待处理时间，继续循环");
                     }
-                    //同步调整时间
-                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, time);
 //                    MessageDispatcher.getInstance(mContext).postSnap(dur);
                     if (callback != null) {
                         callback.onProcessed();
@@ -134,6 +133,18 @@ public class LocationImpl {
                 ELOG.e(t);
             }
         }
+    }
+
+
+    // 获取应该工作的间隔时间
+    public long getDurTime() {
+        // 获取时间间隔
+        long durByPolicy = SPHelper.getIntValueFromSP(mContext, EGContext.SP_LOCATION_CYCLE, EGContext.TIME_MINUTE * 30);
+        // 获取上次运行时间
+        long time = SPHelper.getLongValueFromSP(mContext, EGContext.SP_APP_LOCATION, 0);
+        // 获取上次运行到现在的时间间隔
+        long dur = System.currentTimeMillis() - time;
+        return durByPolicy - dur;
     }
 
     public void getLocationInfoInThread() {

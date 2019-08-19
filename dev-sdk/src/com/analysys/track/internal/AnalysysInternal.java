@@ -143,7 +143,7 @@ public class AnalysysInternal {
         }
 
         // 9. 清除以前的SP
-        SPHelper.remove(mContextRef.get(), EGContext.SP_NAME);
+        SPHelper.removeSPFiles(mContextRef.get(), EGContext.SP_NAME);
 
     }
 

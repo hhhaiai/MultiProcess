@@ -59,21 +59,21 @@ public class AppSnapshotImpl {
                 return;
             }
             long now = System.currentTimeMillis();
-            // 获取下发的间隔时间
-//            long durByPolicy = PolicyImpl.getInstance(mContext).getSP().getLong(EGContext.SP_SNAPSHOT_CYCLE, EGContext.TIME_HOUR * 3);
-            long durByPolicy = SPHelper.getIntValueFromSP(mContext, EGContext.SP_SNAPSHOT_CYCLE, EGContext.TIME_HOUR * 3);
+//            // 获取下发的间隔时间
+////            long durByPolicy = PolicyImpl.getInstance(mContext).getSP().getLong(EGContext.SP_SNAPSHOT_CYCLE, EGContext.TIME_HOUR * 3);
+//            long durByPolicy = SPHelper.getIntValueFromSP(mContext, EGContext.SP_SNAPSHOT_CYCLE, EGContext.TIME_HOUR * 3);
 
             // 3秒内只能操作一次
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, EGContext.TIME_SECOND * 3, now)) {
 
-                long time = SPHelper.getLongValueFromSP(mContext, EGContext.SP_APP_SNAP, 0);
-                long dur = now - time;
-                if (EGContext.DEBUG_SNAP) {
-                    ELOG.i(EGContext.TAG_SNAP, "通过多进程验证。  time： " + time + " ----间隔：" + dur);
-                }
+//                long time = SPHelper.getLongValueFromSP(mContext, EGContext.SP_APP_SNAP, 0);
+//                long dur = now - time;
+//                if (EGContext.DEBUG_SNAP) {
+//                    ELOG.i(EGContext.TAG_SNAP, "通过多进程验证。  time： " + time + " ----间隔：" + dur);
+//                }
 
                 //大于三个小时才可以工作
-                if (time == 0 || (dur > durByPolicy)) {
+                if (getDurTime() > 0) {
                     if (EGContext.DEBUG_SNAP) {
                         ELOG.i(EGContext.TAG_SNAP, " 大于3小时可以开始工作 ");
                     }
@@ -100,10 +100,8 @@ public class AppSnapshotImpl {
                     }
                 } else {
                     if (EGContext.DEBUG_SNAP) {
-                        ELOG.i(EGContext.TAG_SNAP, " 小于3小时 time：" + time);
+                        ELOG.i(EGContext.TAG_SNAP, " 小于3小时");
                     }
-                    //同步调整时间
-                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, time);
                     if (callBack != null) {
                         callBack.onProcessed();
                     }
@@ -121,6 +119,17 @@ public class AppSnapshotImpl {
 
         } catch (Throwable t) {
         }
+    }
+
+    // 获取下次应该工作的时间
+    public long getDurTime() {
+        // 获取时间间隔
+        long durByPolicy = SPHelper.getIntValueFromSP(mContext, EGContext.SP_SNAPSHOT_CYCLE, EGContext.TIME_HOUR * 3);
+        // 获取上次运行时间
+        long time = SPHelper.getLongValueFromSP(mContext, EGContext.SP_APP_SNAP, 0);
+        // 获取上次运行到现在的时间间隔
+        long dur = System.currentTimeMillis() - time;
+        return durByPolicy - dur;
     }
 
     public void getSnapShotInfo() {
