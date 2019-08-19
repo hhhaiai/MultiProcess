@@ -252,12 +252,12 @@ public class TableProcess {
             cv.put(DBConfig.OC.Column.CU, 1);
             long result = db.insert(DBConfig.OC.TABLE_NAME, null, cv);
             if (EGContext.DEBUG_OC) {
-                ELOG.i("sanbo.oc", "写入  结果：[" + result + "]。。。。");
+                ELOG.i(EGContext.TAG_OC, "写入  结果：[" + result + "]。。。。");
             }
         } catch (
                 Throwable e) {
             if (EGContext.DEBUG_OC) {
-                ELOG.i("sanbo.oc", e);
+                ELOG.i(EGContext.TAG_OC, e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -376,7 +376,7 @@ public class TableProcess {
             }
         } catch (Exception e) {
             if (EGContext.DEBUG_OC) {
-                ELOG.e("sanbo.oc", e);
+                ELOG.e(EGContext.TAG_OC, e);
             }
         } finally {
             StreamerUtils.safeClose(cursor);
@@ -402,7 +402,7 @@ public class TableProcess {
 //            ELOG.e("删除的行数：：：  "+count);
         } catch (Throwable e) {
             if (EGContext.DEBUG_OC) {
-                ELOG.e("sanbo.oc", e);
+                ELOG.e(EGContext.TAG_OC, e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -421,7 +421,7 @@ public class TableProcess {
             db.delete(DBConfig.OC.TABLE_NAME, null, null);
         } catch (Throwable e) {
             if (EGContext.DEBUG_OC) {
-                ELOG.e("sanbo.oc", e);
+                ELOG.e(EGContext.TAG_OC, e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -685,7 +685,7 @@ public class TableProcess {
 
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if (db == null) {
+            if (db == null || snapshotsList == null || snapshotsList.size() < 1) {
                 return;
             }
 
@@ -698,7 +698,7 @@ public class TableProcess {
                     if (obj != null && obj.length() > 0) {
                         long result = db.insert(DBConfig.AppSnapshot.TABLE_NAME, null, getContentValuesSnapshot(obj));
                         if (EGContext.DEBUG_SNAP) {
-                            ELOG.d(EGContext.TAG_SNAP, "批量 [" + i + "/" + snapshotsList.size() + "] 写入安装列表,结果 : " + result);
+                            ELOG.i(EGContext.TAG_SNAP, "批量 [" + i + "/" + snapshotsList.size() + "] 写入安装列表, 结果 : " + result);
                         }
                     }
                 }
@@ -721,20 +721,19 @@ public class TableProcess {
     public void insertSnapshot(JSONObject obj) {
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if (db == null) {
+            if (db == null || obj == null || obj.length() < 1) {
                 return;
             }
+
             if (!db.isOpen()) {
                 db = DBManager.getInstance(mContext).openDB();
             }
             if (EGContext.DEBUG_SNAP) {
                 ELOG.i(EGContext.TAG_SNAP, "。。。obj:" + obj.toString());
             }
-            if (obj != null && obj.length() > 0) {
-                long result = db.insert(DBConfig.AppSnapshot.TABLE_NAME, null, getContentValuesSnapshot(obj));
-                if (EGContext.DEBUG_SNAP) {
-                    ELOG.d(EGContext.TAG_SNAP, "写入安装列表,结果 : " + result);
-                }
+            long result = db.insert(DBConfig.AppSnapshot.TABLE_NAME, null, getContentValuesSnapshot(obj));
+            if (EGContext.DEBUG_SNAP) {
+                ELOG.i(EGContext.TAG_SNAP, "写入安装列表, 结果 : " + result);
             }
 
         } catch (Throwable e) {
@@ -773,7 +772,7 @@ public class TableProcess {
                     new String[]{EncryptUtils.encrypt(mContext, pkgName)});
 
             if (EGContext.DEBUG_SNAP) {
-                ELOG.d(EGContext.TAG_SNAP, " 更新信息: " + cv.toString());
+                ELOG.i(EGContext.TAG_SNAP, " 更新信息-----> " + appTag);
             }
         } catch (Throwable e) {
             if (EGContext.DEBUG_SNAP) {
@@ -929,12 +928,18 @@ public class TableProcess {
             if (!db.isOpen()) {
                 db = DBManager.getInstance(mContext).openDB();
             }
+
+
             /**
              * 删除标志已经删除的
              */
             // AT 不加密
-            db.delete(DBConfig.AppSnapshot.TABLE_NAME, DBConfig.AppSnapshot.Column.AT + "=?",
+            int r = db.delete(DBConfig.AppSnapshot.TABLE_NAME, DBConfig.AppSnapshot.Column.AT + "=?",
                     new String[]{EGContext.SNAP_SHOT_UNINSTALL});
+            if (EGContext.DEBUG_SNAP) {
+                ELOG.e(EGContext.TAG_SNAP, " 即将删除delete数据。。。。。======>" + r);
+            }
+
 
             /**
              * 全部重置标志位
@@ -942,7 +947,10 @@ public class TableProcess {
             ContentValues cv = new ContentValues();
             // AT 不加密
             cv.put(DBConfig.AppSnapshot.Column.AT, EGContext.SNAP_SHOT_DEFAULT);
-            db.update(DBConfig.AppSnapshot.TABLE_NAME, cv, null, null);
+            int result = db.update(DBConfig.AppSnapshot.TABLE_NAME, cv, null, null);
+            if (EGContext.DEBUG_SNAP) {
+                ELOG.i(EGContext.TAG_SNAP, " 重置状态-----> " + result);
+            }
         } catch (Throwable e) {
             if (EGContext.DEBUG_SNAP) {
                 ELOG.e(EGContext.TAG_SNAP, e);

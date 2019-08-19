@@ -610,6 +610,10 @@ public class OCImpl {
      */
     public void processScreenOff() {
 
+        if (EGContext.DEBUG_OC) {
+            ELOG.i(EGContext.TAG_OC, "\n 收到关闭屏幕广播，列表[" + mOpenedPkgNameList.size() + "]");
+        }
+
         if (mOpenedPkgNameList.size() > 0) {
             // 闭合上一个, 存储
             for (int i = 0; i < mOpenedPkgNameList.size(); i++) {

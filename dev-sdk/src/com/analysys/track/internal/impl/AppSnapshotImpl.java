@@ -150,7 +150,7 @@ public class AppSnapshotImpl {
 
             // 2. 获取DB数据
             JSONArray dbData = TableProcess.getInstance(mContext).selectSnapshot(EGContext.LEN_MAX_UPDATE_SIZE);
-            if (dbData.length() < 1) {
+            if (dbData.length() < 5) {
                 //DB没存数据,存入. 兼容场景首次、不允许采集->允许采集
                 TableProcess.getInstance(mContext).insertSnapshot(memoryData);
             } else {
@@ -215,10 +215,10 @@ public class AppSnapshotImpl {
                 continue;
             }
             String apn = memJson.optString(UploadKey.AppSnapshotInfo.ApplicationPackageName);
-            dbMap.put(apn, memJson);
+            memMap.put(apn, memJson);
         }
         if (EGContext.DEBUG_SNAP) {
-            ELOG.i(EGContext.TAG_SNAP, " 内存存储数据:" + dbMap.size());
+            ELOG.i(EGContext.TAG_SNAP, " 内存存储数据:" + memMap.size());
         }
 
 
@@ -236,10 +236,12 @@ public class AppSnapshotImpl {
                     continue;
                 }
                 String apn = dbJson.optString(UploadKey.AppSnapshotInfo.ApplicationPackageName);
+
                 // 内存没有。DB有 -->删除列表
                 if (!memMap.containsKey(apn)) {
                     PackageInfo pi = pm.getPackageInfo(apn, 0);
                     String avc = pi.versionName + "|" + pi.versionCode;
+
                     TableProcess.getInstance(mContext).updateSnapshot(apn, EGContext.SNAP_SHOT_UNINSTALL, avc);
                 }
             } catch (Throwable e) {
@@ -259,7 +261,9 @@ public class AppSnapshotImpl {
                 // 内存有，DB没有--> 插入
                 if (!dbMap.containsKey(memApn)) {
                     PackageInfo pi = pm.getPackageInfo(memApn, 0);
-                    TableProcess.getInstance(mContext).insertSnapshot(getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL));
+                    if (pm.getLaunchIntentForPackage(memApn) != null) {
+                        TableProcess.getInstance(mContext).insertSnapshot(getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL));
+                    }
                 } else {
                     String memAvc = memJson.optString(UploadKey.AppSnapshotInfo.ApplicationVersionCode);
                     JSONObject dbJson = dbMap.get(memApn);
@@ -513,18 +517,24 @@ public class AppSnapshotImpl {
      */
     @SuppressWarnings("deprecation")
     private JSONObject getAppInfo(PackageInfo pkgInfo, PackageManager packageManager, String tag) {
-        JSONObject appInfo = new JSONObject();
-        JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationPackageName,
-                pkgInfo.packageName, DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
-        JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationName,
-                String.valueOf(pkgInfo.applicationInfo.loadLabel(packageManager)),
-                DataController.SWITCH_OF_APPLICATION_NAME);
-        JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationVersionCode,
-                pkgInfo.versionName + "|" + pkgInfo.versionCode, DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
-        JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ActionType, tag,
-                DataController.SWITCH_OF_ACTION_TYPE);
-        JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ActionHappenTime,
-                String.valueOf(System.currentTimeMillis()), DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
+        JSONObject appInfo = null;
+
+        String pkg = pkgInfo.packageName;
+        if (!TextUtils.isEmpty(pkg) && pkg.contains(".") && packageManager.getLaunchIntentForPackage(pkg) != null) {
+            appInfo = new JSONObject();
+            JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationPackageName,
+                    pkgInfo.packageName, DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
+            JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationName,
+                    String.valueOf(pkgInfo.applicationInfo.loadLabel(packageManager)),
+                    DataController.SWITCH_OF_APPLICATION_NAME);
+            JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationVersionCode,
+                    pkgInfo.versionName + "|" + pkgInfo.versionCode, DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
+            JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ActionType, tag,
+                    DataController.SWITCH_OF_ACTION_TYPE);
+            JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ActionHappenTime,
+                    String.valueOf(System.currentTimeMillis()), DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
+        }
+
         return appInfo;
     }
 
@@ -566,7 +576,7 @@ public class AppSnapshotImpl {
             String avc = pi.versionName + "|" + pi.versionCode;
             if (type == 0) {
                 // SNAP_SHOT_INSTALL 解锁
-                if (pi != null) {
+                if (pi != null && pm.getLaunchIntentForPackage(pkgName) != null) {
                     TableProcess.getInstance(mContext).insertSnapshot(getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL));
 //                    if (jsonObject != null) {
 //                        // 判断数据表中是否有该应用的存在，如果有标识此次安装是应用更新所导致

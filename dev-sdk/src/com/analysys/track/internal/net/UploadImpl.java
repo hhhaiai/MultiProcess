@@ -263,7 +263,7 @@ public class UploadImpl {
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray locationInfo = getModuleInfos(mContext, object, MODULE_LOCATION, useFulLength);
                     if (EGContext.DEBUG_LOCATION) {
-                        ELOG.i(EGContext.TAG_LOC, "  上传位置信息：" + locationInfo);
+                        ELOG.i(EGContext.TAG_LOC, "  上传位置信息：" + locationInfo.length());
                     }
                     if (locationInfo != null && locationInfo.length() > 0) {
                         object.put(UploadKey.LocationInfo.NAME, locationInfo);
@@ -286,7 +286,7 @@ public class UploadImpl {
                     JSONArray snapshotJar = getModuleInfos(mContext, object, MODULE_SNAPSHOT, useFulLength);
 
                     if (EGContext.DEBUG_SNAP) {
-                        ELOG.i(EGContext.TAG_SNAP, " 上传获取 安装列表。。：" + snapshotJar);
+                        ELOG.i(EGContext.TAG_SNAP, " 上传获取 安装列表。。：" + snapshotJar.length());
                     }
                     if (snapshotJar != null && snapshotJar.length() > 0) {
                         object.put(UploadKey.AppSnapshotInfo.NAME, snapshotJar);

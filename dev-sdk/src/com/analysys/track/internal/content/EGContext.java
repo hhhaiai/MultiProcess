@@ -115,7 +115,6 @@ public class EGContext {
     public static final String EGUANFILE = "eg.a";
 
 
-
     public static final String DEFAULT_ZERO = "0";
     public static final String DEFAULT_ONE = "1";
 
