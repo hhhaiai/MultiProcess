@@ -241,7 +241,6 @@ public class AppSnapshotImpl {
                 if (!memMap.containsKey(apn)) {
                     PackageInfo pi = pm.getPackageInfo(apn, 0);
                     String avc = pi.versionName + "|" + pi.versionCode;
-
                     TableProcess.getInstance(mContext).updateSnapshot(apn, EGContext.SNAP_SHOT_UNINSTALL, avc);
                 }
             } catch (Throwable e) {
@@ -572,34 +571,39 @@ public class AppSnapshotImpl {
     private void realProcessInThread(int type, String pkgName, long time) {
         try {
             PackageManager pm = mContext.getPackageManager();
-            PackageInfo pi = pm.getPackageInfo(pkgName, 0);
-            String avc = pi.versionName + "|" + pi.versionCode;
             if (type == 0) {
+                PackageInfo pi = pm.getPackageInfo(pkgName, 0);
                 // SNAP_SHOT_INSTALL 解锁
                 if (pi != null && pm.getLaunchIntentForPackage(pkgName) != null) {
                     TableProcess.getInstance(mContext).insertSnapshot(getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL));
-//                    if (jsonObject != null) {
-//                        // 判断数据表中是否有该应用的存在，如果有标识此次安装是应用更新所导致
-//                        boolean isHas = TableProcess.getInstance(mContext).isHasPkgName(pkgName);
-//                        if (!isHas) {
-//                            TableProcess.getInstance(mContext).updateSnapshot(jsonObject);
-//                        }
-//                    }
                 }
                 MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST, System.currentTimeMillis());
 
             } else if (type == 1) {
-                TableProcess.getInstance(mContext).updateSnapshot(pkgName, EGContext.SNAP_SHOT_UNINSTALL, avc);
+
+                if (EGContext.DEBUG_SNAP) {
+                    ELOG.d(EGContext.TAG_SNAP, " 真正处理卸载...." + pkgName);
+                }
+                // 卸载时候，不能获取版本，会出现解析版本异常
+                TableProcess.getInstance(mContext).updateSnapshot(pkgName, EGContext.SNAP_SHOT_UNINSTALL, "");
                 // SNAP_SHOT_UNINSTALL 解锁
                 MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST,
                         System.currentTimeMillis());
             } else if (type == 2) {
+                PackageInfo pi = pm.getPackageInfo(pkgName, 0);
+                String avc = pi.versionName + "|" + pi.versionCode;
+                if (EGContext.DEBUG_SNAP) {
+                    ELOG.d(EGContext.TAG_SNAP, " 真正处理更新...." + pkgName + "----- " + avc);
+                }
                 TableProcess.getInstance(mContext).updateSnapshot(pkgName, EGContext.SNAP_SHOT_UPDATE, avc);
                 // SNAP_SHOT_UPDATE 解锁
                 MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST,
                         System.currentTimeMillis());
             }
         } catch (Throwable e) {
+            if (EGContext.DEBUG_SNAP) {
+                ELOG.e(EGContext.TAG_SNAP, e);
+            }
         }
     }
 

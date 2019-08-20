@@ -735,6 +735,15 @@ public class TableProcess {
             if (EGContext.DEBUG_SNAP) {
                 ELOG.i(EGContext.TAG_SNAP, "写入安装列表, 结果 : " + result);
             }
+            //下次重启SDK，会更改状态
+//            // 写入失败.尝试更改状态
+//            if (result == -1) {
+//                updateSnapshot(
+//                        obj.optString(UploadKey.AppSnapshotInfo.ApplicationPackageName),
+//                        obj.optString(UploadKey.AppSnapshotInfo.ActionType),
+//                        obj.optString(UploadKey.AppSnapshotInfo.ApplicationVersionCode)
+//                );
+//            }
 
         } catch (Throwable e) {
             if (EGContext.DEBUG_SNAP) {
@@ -766,7 +775,9 @@ public class TableProcess {
             cv.put(DBConfig.AppSnapshot.Column.AT, appTag);
             cv.put(DBConfig.AppSnapshot.Column.AHT, System.currentTimeMillis());
             // AVC 加密
-            cv.put(DBConfig.AppSnapshot.Column.AVC, EncryptUtils.encrypt(mContext, avc));
+            if (!TextUtils.isEmpty(avc)) {
+                cv.put(DBConfig.AppSnapshot.Column.AVC, EncryptUtils.encrypt(mContext, avc));
+            }
             // APN 加密
             db.update(DBConfig.AppSnapshot.TABLE_NAME, cv, DBConfig.AppSnapshot.Column.APN + "= ? ",
                     new String[]{EncryptUtils.encrypt(mContext, pkgName)});

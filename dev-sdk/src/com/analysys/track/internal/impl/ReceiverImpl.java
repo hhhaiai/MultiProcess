@@ -54,9 +54,9 @@ public class ReceiverImpl {
                                 currentTime);
 
             } else {
-                if (EGContext.DEBUG_RECEIVER) {
-                    ELOG.v(EGContext.TAG_SNAP, "安装app:" + packageName + "---->多进程中断");
-                }
+//                if (EGContext.DEBUG_RECEIVER) {
+//                    ELOG.v(EGContext.TAG_SNAP, "安装app:" + packageName + "---->多进程中断");
+//                }
                 return;
             }
 
@@ -77,9 +77,9 @@ public class ReceiverImpl {
                                 Integer.parseInt(EGContext.SNAP_SHOT_UNINSTALL),
                                 currentTime);
             } else {
-                if (EGContext.DEBUG_RECEIVER) {
-                    ELOG.v(EGContext.TAG_SNAP, "卸载app:" + packageName + "---->多进程中断");
-                }
+//                if (EGContext.DEBUG_RECEIVER) {
+//                    ELOG.v(EGContext.TAG_SNAP, "卸载app:" + packageName + "---->多进程中断");
+//                }
                 return;
             }
 
@@ -99,9 +99,9 @@ public class ReceiverImpl {
                                 Integer.parseInt(EGContext.SNAP_SHOT_UPDATE),
                                 currentTime);
             } else {
-                if (EGContext.DEBUG_RECEIVER) {
-                    ELOG.v(EGContext.TAG_SNAP, "更新app:" + packageName + "---->多进程中断");
-                }
+//                if (EGContext.DEBUG_RECEIVER) {
+//                    ELOG.v(EGContext.TAG_SNAP, "更新app:" + packageName + "---->多进程中断");
+//                }
                 return;
             }
 
