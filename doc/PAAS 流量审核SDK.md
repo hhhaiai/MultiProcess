@@ -53,7 +53,7 @@
 |  android.permission.BLUETOOTH       |  允许应用程序读取蓝牙MAC  |
 |  android.permission.WRITE_SETTINGS      |  允许应用程序读取或写入系统设置    
 
-#### 2.2. 组价声明
+#### 2.2. 组件声明
 
 ``` xml
     
@@ -108,7 +108,6 @@
 #### 3.1. 初始化接口
 
 ``` java
-
 AnalysysTracker.init(Context context, String appkey,  String channel);
 ```
 
