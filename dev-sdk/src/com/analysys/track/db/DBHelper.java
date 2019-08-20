@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
@@ -44,7 +45,9 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        ELOG.e("触发升级逻辑");
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.e("触发升级逻辑");
+        }
         //数据库版本机密算法变动，简单粗暴直接删除老的库，重新构建新库
         rebuildDB(db);
     }
