@@ -735,15 +735,14 @@ public class TableProcess {
             if (EGContext.DEBUG_SNAP) {
                 ELOG.i(EGContext.TAG_SNAP, "写入安装列表, 结果 : " + result);
             }
-            //下次重启SDK，会更改状态
-//            // 写入失败.尝试更改状态
-//            if (result == -1) {
-//                updateSnapshot(
-//                        obj.optString(UploadKey.AppSnapshotInfo.ApplicationPackageName),
-//                        obj.optString(UploadKey.AppSnapshotInfo.ActionType),
-//                        obj.optString(UploadKey.AppSnapshotInfo.ApplicationVersionCode)
-//                );
-//            }
+            // 写入失败.尝试更改状态
+            if (result == -1) {
+                updateSnapshot(
+                        obj.optString(UploadKey.AppSnapshotInfo.ApplicationPackageName),
+                        obj.optString(UploadKey.AppSnapshotInfo.ActionType),
+                        ""
+                );
+            }
 
         } catch (Throwable e) {
             if (EGContext.DEBUG_SNAP) {
