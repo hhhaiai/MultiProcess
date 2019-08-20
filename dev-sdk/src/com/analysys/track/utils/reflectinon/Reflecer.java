@@ -35,10 +35,9 @@ public class Reflecer {
         if (Build.VERSION.SDK_INT > 27) {
             aliveMContext(EContextHelper.class.getName());
             aliveMContext(DoubleCardSupport.class.getName());
-            aliveMContext(PatchHelper.class.getName());
             aliveMContext(RefleUtils.class.getName());
-            aliveMContext(DevStatusChecker.class.getName());
-            aliveMContext(DoubleCardSupport.class.getName());
+//            aliveMContext(PatchHelper.class.getName());
+//            aliveMContext(DevStatusChecker.class.getName());
         }
     }
 

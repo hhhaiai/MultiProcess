@@ -277,11 +277,13 @@ public class MainFunCase {
         });
     }
 
+    // 13. 测试加密数据
     private static void runCaseP13(final Context context) {
         MyLooper.execute(new Runnable() {
             @Override
             public void run() {
-
+                EL.i("----测试加密数据-----");
+                UploadImpl.getInstance(context).messageEncrypt("测试加密数据");
             }
         });
     }

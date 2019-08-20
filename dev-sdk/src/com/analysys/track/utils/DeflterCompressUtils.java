@@ -3,8 +3,8 @@ package com.analysys.track.utils;
 import android.content.Context;
 
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.data.Md5Utils;
+import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -56,11 +56,14 @@ public class DeflterCompressUtils {
         return output;
     }
 
-    public static String makeSercretKey(String value, Context ctx) {
+    public static String makeSercretKey(String key, Context ctx) {
+        if (EGContext.DEBUG_UPLOAD) {
+            ELOG.i(EGContext.TAG_UPLOAD, " 入参 参考key：" + key);
+        }
         StringBuilder sb = new StringBuilder();
-        if (value.length() > 3) {
-            SPHelper.setStringValue2SP(ctx, EGContext.APPKEY, value);
-            value = value.substring(0, 3);
+        if (key.length() > 3) {
+            SPHelper.setStringValue2SP(ctx, EGContext.APPKEY, key);
+            key = key.substring(0, 3);
         }
         String sdkv = EGContext.SDK_VERSION;
         SPHelper.setStringValue2SP(ctx, EGContext.SDKV, sdkv);
@@ -75,7 +78,7 @@ public class DeflterCompressUtils {
 //        sb.append(DevStatusChecker.getInstance().isSelfDebugApp(ctx) ? "1" : "0");// 是否debug模式，0/1值
         // 是否debug模式，0/1值
         sb.append(DevStatusChecker.getInstance().isSelfDebugApp(ctx) ? "1" : "0");
-        sb.append(value);// 前三位
+        sb.append(key);// 前三位
         long time = System.currentTimeMillis();
         SPHelper.setStringValue2SP(ctx, EGContext.TIME, String.valueOf(time));
         sb.append(time);

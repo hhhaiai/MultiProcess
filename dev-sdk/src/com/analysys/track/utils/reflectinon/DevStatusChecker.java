@@ -11,6 +11,7 @@ import android.text.TextUtils;
 
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
+import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SimulatorUtils;
 import com.analysys.track.utils.StreamerUtils;
@@ -328,16 +329,21 @@ public class DevStatusChecker {
             if (debugField.getBoolean(null)) {
                 return true;
             }
+
+            // 2. 系统判断是否debug
+            if ("1".equals(SystemUtils.getProp(context, "ro.debuggable"))) {
+                return true;
+            }
+            // 3.通过ApplicationInfo的flag判断
+            if ((context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
+                return true;
+            }
         } catch (Throwable t) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(t);
+            }
         }
-        // 2. 系统判断是否debug
-        if ("1".equals(SystemUtils.getProp(context, "ro.debuggable"))) {
-            return true;
-        }
-        // 3.通过ApplicationInfo的flag判断
-        if ((context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
-            return true;
-        }
+
 
         return false;
     }
@@ -439,8 +445,7 @@ public class DevStatusChecker {
                 || SimulatorUtils.hasTracerPid()
                 || SimulatorUtils.hasEmulatorAdb()
                 || SimulatorUtils.hasQemuBuildProps(context)
-                || SimulatorUtils.isVbox(context)
-                ;
+                || SimulatorUtils.isVbox(context);
     }
 
     private static class HOLDER {
