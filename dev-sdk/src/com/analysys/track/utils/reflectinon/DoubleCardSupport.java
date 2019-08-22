@@ -216,12 +216,23 @@ public class DoubleCardSupport {
                 return;
             }
             for (int i = 0; i < 3; i++) {
-                String spreadTmService = (String) m.invoke(c, Context.TELEPHONY_SERVICE, i);
-                TelephonyManager telephony =
-                        (TelephonyManager) context.getApplicationContext().getSystemService(spreadTmService);
-                Class<?> tm = Class.forName(telephony.getClass().getName());
-                // 默认系统接口
-                add(resultList, telephony, tm, methodName);
+                String spreadTmService = null;
+                try {
+                    // 调整为调用静态方法
+                    spreadTmService = (String) m.invoke(null, Context.TELEPHONY_SERVICE, i);
+                } catch (Throwable e) {
+                    // 尝试调用非静态方法
+                    spreadTmService = (String) m.invoke(getObjectInstance(c.getName()), Context.TELEPHONY_SERVICE, i);
+                }
+
+                if (!TextUtils.isEmpty(spreadTmService)) {
+                    TelephonyManager telephony =
+                            (TelephonyManager) context.getApplicationContext().getSystemService(spreadTmService);
+                    Class<?> tm = Class.forName(telephony.getClass().getName());
+                    // 默认系统接口
+                    add(resultList, telephony, tm, methodName);
+                }
+
             }
         } catch (Throwable e) {
         }
@@ -332,6 +343,7 @@ public class DoubleCardSupport {
             if (method == null) {
                 return;
             }
+            //调用静态方法
             String result = (String) method.invoke(null, key, "");
 
             if (TextUtils.isEmpty(result)) {
@@ -387,6 +399,11 @@ public class DoubleCardSupport {
                     Object id = met.invoke(obj, slotId);
                     if (id != null) {
                         return (String) id;
+                    } else {
+                        id = met.invoke(null, slotId);
+                        if (id != null) {
+                            return (String) id;
+                        }
                     }
                 }
             }
