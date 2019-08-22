@@ -10,6 +10,7 @@ import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.net.UploadImpl;
+import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.device.utils.AssetsHelper;
 import com.device.utils.EL;
 import com.device.utils.MyLooper;
@@ -288,11 +289,16 @@ public class MainFunCase {
         });
     }
 
+    // 14.测试双卡
     private static void runCaseP14(final Context context) {
         MyLooper.execute(new Runnable() {
             @Override
             public void run() {
-
+                EL.i("----测试双卡-----");
+                String imeis = DoubleCardSupport.getInstance().getIMEIS(context);
+                EL.i("----测试双卡IMEI: " + imeis);
+                String imsis = DoubleCardSupport.getInstance().getIMSIS(context);
+                EL.i("----测试双卡IMSI: " + imsis);
             }
         });
     }

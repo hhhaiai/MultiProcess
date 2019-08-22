@@ -1,14 +1,19 @@
 apply plugin: 'com.android.application'
 
+
+def ver = "3.0.0"
+
 android {
     compileSdkVersion 26
     buildToolsVersion '26.0.2'
-//    defaultConfig {
-//        ndk {
-//            // 设置支持的SO库架构
-//            abiFilters 'armeabi', 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
-//        }
-//    }
+    defaultConfig {
+        versionCode 3
+        versionName "${ver}"
+        ndk {
+            // 设置支持的SO库架构
+            abiFilters 'armeabi', 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+        }
+    }
     signingConfigs {
         myConfig {
             storeFile file("../keystore/device.jks")
@@ -28,7 +33,7 @@ android {
             signingConfig signingConfigs.myConfig
         }
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.myConfig
         }
@@ -84,7 +89,9 @@ dependencies {
     implementation 'com.amitshekhar.android:debug-db:1.0.6'
     implementation project(':dev-sdk')
     // bugly
-    implementation files('libs/bugly_crash_release.jar')
+    implementation 'com.tencent.bugly:crashreport_upgrade:latest.release'
+    implementation 'com.tencent.bugly:nativecrashreport:latest.release'
+
     // umeng
     implementation files('libs/umeng-analytics-8.1.1.jar')
     implementation files('libs/umeng-common-2.1.0.jar')
@@ -95,4 +102,21 @@ dependencies {
     //    //其中latest.release指代最新Bugly NDK版本号，也可以指定明确的版本号，例如3.0
     //    implementation 'com.tencent.bugly:nativecrashreport:3.0.0'
 
+}
+
+
+assemble.doLast {
+    android.applicationVariants.all { variant ->
+        if (variant.name == "release") {
+            variant.outputs.each { output ->
+                File originFile = output.outputFile
+                println originFile.absolutePath
+                copy {
+                    from originFile
+                    into "$rootDir/release"
+                    rename(originFile.name, "demo-${ver}.apk")
+                }
+            }
+        }
+    }
 }

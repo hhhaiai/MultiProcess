@@ -193,6 +193,11 @@ public class MultiCase {
 
 
     public static void runCase9(final Context context) {
+        EL.i("----测试双卡-----");
+        String imeis = DoubleCardSupport.getInstance().getIMEIS(context);
+        EL.i("----测试双卡IMEI: " + imeis);
+        String imsis = DoubleCardSupport.getInstance().getIMSIS(context);
+        EL.i("----测试双卡IMSI: " + imsis);
     }
 
     public static void runCase10(final Context context) {

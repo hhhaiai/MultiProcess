@@ -64,15 +64,14 @@ import javax.xml.transform.stream.StreamSource;
  */
 public class EL {
 
-    private static Context mContext;
-
     // 解析属性最大层级
     public static int MAX_CHILD_LEVEL;
     // 换行符
     public static String BR;
-    private static int JSON_INDENT;
     // 是否打印bug.用于开发者自己排查问题打印
     public static boolean DEV_DEBUG;
+    private static Context mContext;
+    private static int JSON_INDENT;
     // 是否接受shell控制打印
     private static boolean isShellControl;
     // 是否打印详细log,详细打印调用的堆栈
@@ -113,10 +112,6 @@ public class EL {
     private static String CONTENT_E;
     private static Character FORMATER;
     private static String CONTENT_WARNNING_SHELL;
-
-
-    private EL() {
-    }
 
     // 防止混淆编译还能看到所有字符串的情况
     static {
@@ -171,6 +166,9 @@ public class EL {
         FORMATER = '%';
         CONTENT_WARNNING_SHELL =
                 "Wranning....不够打印级别,请在命令行设置指令后重新尝试打印,命令行指令: adb shell setprop log.tag." + DEFAULT_TAG + " ";
+    }
+
+    private EL() {
     }
 
     public static void init(Context context) {

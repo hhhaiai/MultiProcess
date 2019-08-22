@@ -8,6 +8,8 @@ import android.os.StrictMode;
 import com.analysys.track.AnalysysTracker;
 import com.device.impls.MultiProcessWorker;
 import com.device.utils.EL;
+import com.tencent.bugly.Bugly;
+import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.commonsdk.UMConfigure;
@@ -63,12 +65,15 @@ public class AnalysysApplication extends Application {
         // init  bugly
         try {
             CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(getApplicationContext());
-            strategy.setAppReportDelay(1);   //改为1ms
-            CrashReport.setAppPackage(getApplicationContext(), getPackageName());
-            CrashReport.setAppChannel(getApplicationContext(), "track-demo-dev");
-            //玩安卓demo
-            CrashReport.initCrashReport(getApplicationContext(), "869b2916c8", true, strategy);
+            strategy.setAppReportDelay(0);   //改为1ms
 
+            Beta.autoInit = true;
+            Beta.autoCheckUpgrade = true;
+            Beta.upgradeCheckPeriod = 0L;
+            Beta.initDelay = 0L;
+            Bugly.setAppChannel(getApplicationContext(), "track-demo-dev");
+            // track-sdk-demo
+            Bugly.init(getApplicationContext(), "8b5379e3bc", false, strategy);
         } catch (Throwable e) {
             EL.e(e);
         }

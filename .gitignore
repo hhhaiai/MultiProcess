@@ -16,7 +16,7 @@ import-summary.txt
 *.DS_Store
 #test android studio module
 *androidTest/
-*out/
+*/out/
 *.gradle/
 *release/
 *build/

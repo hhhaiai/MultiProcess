@@ -20,12 +20,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class MyLooper {
 
-    static {
-        new ThreadPoolExecutor(1, 1,
-                0L, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<Runnable>());
-    }
-
     // 任务队列,为了最后的清理数据
     private static List<WeakReference<ScheduledFuture<?>>> queue = new ArrayList<WeakReference<ScheduledFuture<?>>>();
     /**
@@ -37,6 +31,12 @@ public class MyLooper {
      * 上行数据相关的放该线程池
      */
     private static ScheduledExecutorService executorUpload = Executors.newSingleThreadScheduledExecutor();
+
+    static {
+        new ThreadPoolExecutor(1, 1,
+                0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<Runnable>());
+    }
 //    private static ScheduledExecutorService ocPools = Executors.newSingleThreadScheduledExecutor();
 //    private static List<Future<?>> ocTasks = new ArrayList<Future<?>>();
 

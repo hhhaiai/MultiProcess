@@ -7,6 +7,8 @@ import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
+import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PermissionUtils;
 
 import java.lang.reflect.Method;
@@ -59,6 +61,10 @@ public class DoubleCardSupport {
             addBySystemProperties(imeis, "ro.ril.miui.meid1", "");
             addBySystemProperties(imeis, "ro.ril.miui.meid2", "");
 
+
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i("imeis:" + imeis.toString());
+            }
             //保存值到对应字段，以3
             if (imeis.size() > 0) {
                 StringBuffer sb = new StringBuffer();
@@ -73,6 +79,9 @@ public class DoubleCardSupport {
                 return sb.toString();
             }
         } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.v(e);
+            }
         }
         return "";
     }
@@ -86,6 +95,9 @@ public class DoubleCardSupport {
             }
             getContent(context, imsis, "getSubscriberId");
 
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i("imsis:" + imsis.toString());
+            }
             //保存值到对应字段，以3
             if (imsis.size() > 0) {
                 StringBuffer sb = new StringBuffer();
@@ -100,6 +112,9 @@ public class DoubleCardSupport {
                 return sb.toString();
             }
         } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.v(e);
+            }
         }
         return "";
     }
@@ -156,6 +171,9 @@ public class DoubleCardSupport {
                 addForZhanXun(context, resultList, methodName);
             }
         } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.v(e);
+            }
         }
     }
 
@@ -190,6 +208,9 @@ public class DoubleCardSupport {
                 }
             }
         } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.v(e);
+            }
         }
     }
 
@@ -235,6 +256,9 @@ public class DoubleCardSupport {
 
             }
         } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.v(e);
+            }
         }
     }
 
@@ -249,6 +273,9 @@ public class DoubleCardSupport {
                 imeis.add(result);
             }
         } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.v(e);
+            }
         }
     }
 
@@ -271,6 +298,9 @@ public class DoubleCardSupport {
                 imeis.add(result);
             }
         } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.v(e);
+            }
         }
     }
 
@@ -300,6 +330,9 @@ public class DoubleCardSupport {
                 imeis.add(result);
             }
         } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.v(e);
+            }
         }
     }
 
@@ -321,6 +354,9 @@ public class DoubleCardSupport {
             }
 
         } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.v(e);
+            }
         }
     }
 
@@ -372,6 +408,9 @@ public class DoubleCardSupport {
                 }
             }
         } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.v(e);
+            }
         }
     }
 
@@ -399,15 +438,19 @@ public class DoubleCardSupport {
                     Object id = met.invoke(obj, slotId);
                     if (id != null) {
                         return (String) id;
-                    } else {
-                        id = met.invoke(null, slotId);
-                        if (id != null) {
-                            return (String) id;
-                        }
                     }
+//                    else {
+//                        id = met.invoke(null, slotId);
+//                        if (id != null) {
+//                            return (String) id;
+//                        }
+//                    }
                 }
             }
         } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.v(e);
+            }
             return getStringCaseB(obj, method, slotId);
         }
         return null;
@@ -427,7 +470,10 @@ public class DoubleCardSupport {
             if (id != null) {
                 return (String) id;
             }
-        } catch (Throwable th) {
+        } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.v(e);
+            }
         }
         return null;
     }
@@ -455,6 +501,9 @@ public class DoubleCardSupport {
             }
             return getdefault.invoke(null);
         } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.v(e);
+            }
         }
         return null;
     }
