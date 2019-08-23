@@ -12,7 +12,6 @@ import android.util.Log;
 import android.util.SparseArray;
 
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
@@ -472,7 +471,7 @@ public class EL {
             if (currentFile && !isKeeping) {
                 break;
             }
-            if (ste.getClassName().equals(ELOG.class.getName())) {
+            if (ste.getClassName().equals(EL.class.getName())) {
                 if (!currentFile) {
                     currentFile = true;
                 }
