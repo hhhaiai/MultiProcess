@@ -11,17 +11,17 @@ import-summary.txt
 *.iml
 
 #mac temp file
-*.idea/
-*__MACOSX
-*.DS_Store
+*/.idea/
+*/__MACOSX
+*/.DS_Store
 #test android studio module
-*androidTest/
-*/out/
+*.idea/
 *.gradle/
 *release/
 *build/
 *bin/
 *releasebak/
+*.iml
 
 #for eclipse
 .settings/

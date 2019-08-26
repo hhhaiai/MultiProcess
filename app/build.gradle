@@ -13,6 +13,7 @@ android {
             // 设置支持的SO库架构
             abiFilters 'armeabi', 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
         }
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
         myConfig {
@@ -38,21 +39,20 @@ android {
             signingConfig signingConfigs.myConfig
         }
     }
-    sourceSets {
-        main {
-            manifest.srcFile 'AndroidManifest.xml'
-            java.srcDirs = ['src']
-            resources.srcDirs = ['src']
-            aidl.srcDirs = ['src']
-            renderscript.srcDirs = ['src']
-            res.srcDirs = ['res']
-            assets.srcDirs = ['assets']
-            jniLibs.srcDirs = ['libs']
-        }
-
-        debug.setRoot('build-types/debug')
-        release.setRoot('build-types/release')
-    }
+    // sourceSets {
+    //     main {
+    //         manifest.srcFile 'AndroidManifest.xml'
+    //         java.srcDirs = ['src']
+    //         resources.srcDirs = ['src']
+    //         aidl.srcDirs = ['src']
+    //         renderscript.srcDirs = ['src']
+    //         res.srcDirs = ['res']
+    //         assets.srcDirs = ['assets']
+    //         jniLibs.srcDirs = ['libs']
+    //     }
+    //     debug.setRoot('build-types/debug')
+    //     release.setRoot('build-types/release')
+    // }
 
     dexOptions {
         preDexLibraries false
@@ -86,6 +86,11 @@ tasks.withType(Javadoc) {
 
 
 dependencies {
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
     implementation 'com.amitshekhar.android:debug-db:1.0.6'
     implementation project(':dev-sdk')
     // bugly
