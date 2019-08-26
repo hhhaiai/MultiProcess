@@ -1,5 +1,11 @@
 apply plugin: 'com.android.library'
 
+//apply plugin: 'jacoco'
+//jacoco {
+//    toolVersion = "0.7.1.201405082137"
+//}
+
+
 def version = "4.3.0.3"
 def date = "20190806"
 
@@ -12,6 +18,8 @@ android {
     }
     buildTypes {
         debug {
+//            /**打开覆盖率统计开关*/
+//            testCoverageEnabled = true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -72,6 +80,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
 }
+
 
 task generateJar(type: Copy) {
     from("build/intermediates/bundles/release")
