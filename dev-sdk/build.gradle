@@ -29,20 +29,6 @@ android {
         }
     }
 
-    // sourceSets {
-    //     main {
-    //         manifest.srcFile 'AndroidManifest.xml'
-    //         java.srcDirs = ['src']
-    //         resources.srcDirs = ['src']
-    //         aidl.srcDirs = ['src']
-    //         renderscript.srcDirs = ['src']
-    //         res.srcDirs = ['res']
-    //         assets.srcDirs = ['assets']
-    //         jniLibs.srcDirs = ['libs']
-    //     }
-    //     debug.setRoot('build-types/debug')
-    //     release.setRoot('build-types/release')
-    // }
     dexOptions {
         preDexLibraries false
         maxProcessCount 8
@@ -55,6 +41,9 @@ android {
     aaptOptions {
         cruncherEnabled = false
         useNewCruncher = false
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
     }
     lintOptions {
         checkReleaseBuilds false
@@ -74,10 +63,11 @@ tasks.withType(Javadoc) {
 }
 
 dependencies {
-
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    testImplementation 'org.robolectric:robolectric:3.0'
+
 
 }
 

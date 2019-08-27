@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.SystemUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,8 +18,8 @@ public class AnalysysTrackerTest {
         String channel = "custonchannel";
         AnalysysTracker.init(mContext, appkey, channel);
 
-//        Assert.assertEquals(SystemUtils.getAppKey(mContext), appkey);
-//        Assert.assertEquals(SystemUtils.getAppChannel(mContext), channel);
+        Assert.assertEquals(SystemUtils.getAppKey(mContext), appkey);
+        Assert.assertEquals(SystemUtils.getAppChannel(mContext), channel);
     }
 
     @Test
