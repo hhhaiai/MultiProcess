@@ -14,12 +14,12 @@ android {
     buildToolsVersion '26.0.2'
 
     defaultConfig {
-        testInstrumentationRunner "android.test.InstrumentationTestRunner"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         debug {
-//            /**打开覆盖率统计开关*/
-//            testCoverageEnabled = true
+            /**打开覆盖率统计开关*/
+            testCoverageEnabled = true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

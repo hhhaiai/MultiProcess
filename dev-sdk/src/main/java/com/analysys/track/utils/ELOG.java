@@ -134,7 +134,7 @@ public class ELOG {
             // 是否按照条形框输出,有包裹域的输出
             isNeedWrapper = false;
             // 是否格式化展示,主要针对JSON+简易调用堆栈的控制
-            isFormat = true;
+            isFormat = false;
             // 默认tag
             DEFAULT_TAG = EGContext.LOGTAG_INNER;
             // 临时tag.用法：调用log中大于1个参数,且第一个参数为字符串,且不是format用法,字符串长度没超过协议值,此时启用临时tag
