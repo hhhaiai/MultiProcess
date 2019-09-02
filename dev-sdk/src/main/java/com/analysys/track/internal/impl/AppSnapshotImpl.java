@@ -621,7 +621,11 @@ public class AppSnapshotImpl {
 
     public static AppSnapshotImpl getInstance(Context context) {
         if (Holder.INSTANCE.mContext == null) {
-            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
+            synchronized (Holder.INSTANCE) {
+                if (Holder.INSTANCE.mContext == null) {
+                    Holder.INSTANCE.mContext = EContextHelper.getContext(context);
+                }
+            }
         }
         return Holder.INSTANCE;
     }

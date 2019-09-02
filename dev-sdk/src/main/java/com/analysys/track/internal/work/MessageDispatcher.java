@@ -118,7 +118,7 @@ public class MessageDispatcher {
 //                                postDelay(MSG_INFO_SNAPS, time);
 
 
-                                if (EGContext.DEBUG_LOCATION) {
+                                if (EGContext.DEBUG_SNAP) {
                                     ELOG.d(EGContext.TAG_SNAP, "收到安装列表检测回调。。30秒后继续发起请求。。。");
                                 }
                                 // 30秒检查一次是否可以发送。
