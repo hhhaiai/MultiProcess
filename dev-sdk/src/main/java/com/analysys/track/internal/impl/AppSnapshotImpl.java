@@ -306,6 +306,7 @@ public class AppSnapshotImpl {
                         pi = packageInfo.get(i);
                         if (pi != null) {
                             jsonObject = null;
+                            //获取更详细的一些信息，封装成jsonobject
                             jsonObject = getAppInfo(pi, mContext.getPackageManager(), EGContext.SNAP_SHOT_DEFAULT);
                             if (jsonObject != null) {
                                 list.add(jsonObject);
@@ -376,8 +377,8 @@ public class AppSnapshotImpl {
 
                 for (String packageName : result) {
                     JSONObject appInfo = new JSONObject();
-                    appInfo.put("packageName", packageName);
-                    appInfo.put("debug", SystemUtils.isApkDebugable(mContext, packageName));
+                    appInfo.put(EGContext.TEXT_DEBUG_APP, packageName);
+                    appInfo.put(EGContext.TEXT_DEBUG_STATUS, SystemUtils.isApkDebugable(mContext, packageName));
                     list.add(appInfo);
                 }
             }

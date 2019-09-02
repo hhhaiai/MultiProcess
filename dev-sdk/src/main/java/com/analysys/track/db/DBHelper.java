@@ -17,17 +17,27 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final int DB_VERSION = 3;
     private static Context mContext = null;
 
-    public DBHelper(Context context) {
+    private DBHelper(Context context) {
         super(EContextHelper.getContext(context), DB_NAME, null, DB_VERSION);
         recreateTables(getWritableDatabase());
     }
 
+    private static volatile DBHelper instance;
+
     public static DBHelper getInstance(Context context) {
-        if (mContext == null) {
-            mContext = EContextHelper.getContext(context);
+        if (instance == null) {
+            synchronized (DBHelper.class) {
+                if (instance == null) {
+                    if (mContext == null) {
+                        mContext = EContextHelper.getContext(context);
+                    }
+                    instance = new DBHelper(context);
+                }
+            }
         }
-        return new DBHelper(mContext);
+        return instance;
     }
+
 
     @Override
     public void onCreate(SQLiteDatabase db) {

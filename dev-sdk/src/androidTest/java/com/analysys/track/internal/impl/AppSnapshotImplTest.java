@@ -1,64 +1,111 @@
 package com.analysys.track.internal.impl;
 
+import android.content.Context;
+import android.support.test.InstrumentationRegistry;
+
+import com.analysys.track.AnalsysTest;
+import com.analysys.track.db.DBHelper;
+import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.content.UploadKey;
+
+import org.json.JSONObject;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class AppSnapshotImplTest {
+public class AppSnapshotImplTest extends AnalsysTest {
+    AppSnapshotImpl appSnapshot;
 
-    @Test
-    public void snapshotsInfo() {
+    @Before
+    public void setUp() throws Exception {
+
+        appSnapshot = AppSnapshotImpl.getInstance(mContext);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        appSnapshot = null;
     }
 
     @Test
-    public void getSnapShotInfo() {
-    }
+    public void getAppDebugStatus() throws Exception {
+        List<JSONObject> list = appSnapshot.getAppDebugStatus();
+        assertNotNull(list);
+        assertTrue(list.size() > 0);
 
-    @Test
-    public void getAppDebugStatus() {
+        for (int i = 0; i < list.size(); i++) {
+            String app = list.get(i).getString(EGContext.TEXT_DEBUG_APP);
+            Boolean debug = list.get(i).getBoolean(EGContext.TEXT_DEBUG_STATUS);
+
+            assertNotNull(app);
+            assertNotEquals("", app);
+
+            assertNotNull(debug);
+        }
     }
 
     @Test
     public void getAppType() {
+        assertEquals(appSnapshot.getAppType("com.android.contacts"), UploadKey.OCInfo.APPLICATIONTYPE_SYSTEM_APP);
+        assertEquals(appSnapshot.getAppType("com.android.calendar"), UploadKey.OCInfo.APPLICATIONTYPE_SYSTEM_APP);
+        assertEquals(appSnapshot.getAppType("com.android.settings"), UploadKey.OCInfo.APPLICATIONTYPE_SYSTEM_APP);
+        assertEquals(appSnapshot.getAppType("com.aaa.bbb"), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
+        assertEquals(appSnapshot.getAppType(mContext.getPackageName()), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
+        assertEquals(appSnapshot.getAppType(mContext.getClass().getName()), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
+        assertEquals(appSnapshot.getAppType("\n"), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
+        assertEquals(appSnapshot.getAppType("1234"), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
+        assertEquals(appSnapshot.getAppType("fdsfsdf"), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
+        assertEquals(appSnapshot.getAppType("中文"), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
+        assertEquals(appSnapshot.getAppType(""), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
+        assertEquals(appSnapshot.getAppType("null"), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
+        assertEquals(appSnapshot.getAppType(null), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
     }
 
     @Test
     public void isSystemApps() {
+        assertTrue(appSnapshot.isSystemApps("com.android.contacts"));
+        assertTrue(appSnapshot.isSystemApps("com.android.calendar"));
+        assertTrue(appSnapshot.isSystemApps("com.android.settings"));
+        assertFalse(appSnapshot.isSystemApps("com.aaa.bbb"));
+        assertFalse(appSnapshot.isSystemApps(mContext.getPackageName()));
+        assertFalse(appSnapshot.isSystemApps(mContext.getClass().getName()));
+        assertFalse(appSnapshot.isSystemApps("\n"));
+        assertFalse(appSnapshot.isSystemApps("1234"));
+        assertFalse(appSnapshot.isSystemApps("fdsfsdf"));
+        assertFalse(appSnapshot.isSystemApps("中文"));
+        assertFalse(appSnapshot.isSystemApps(""));
+        assertFalse(appSnapshot.isSystemApps("null"));
+        assertFalse(appSnapshot.isSystemApps(null));
     }
 
     @Test
-    public void processAppModifyMsg() {
-    }
+    public void getInstance() throws InterruptedException {
+        final HashSet<AppSnapshotImpl> helpers = new HashSet();
+        Runnable run = new Runnable() {
+            @Override
+            public void run() {
+                AppSnapshotImpl ins = AppSnapshotImpl.getInstance(mContext);
+                helpers.add(ins);
+            }
+        };
+        List<Thread> threads = new ArrayList<>(50);
+        for (int i = 0; i < 50; i++) {
+            Thread thread = new Thread(run);
+            threads.add(thread);
+            thread.start();
+        }
 
-    @Test
-    public void getInstance() {
-    }
+        for (Thread thread :
+                threads) {
+            thread.join();
+        }
 
-    @Test
-    public void snapshotsInfo1() {
-    }
-
-    @Test
-    public void getSnapShotInfo1() {
-    }
-
-    @Test
-    public void getAppDebugStatus1() {
-    }
-
-    @Test
-    public void getAppType1() {
-    }
-
-    @Test
-    public void isSystemApps1() {
-    }
-
-    @Test
-    public void processAppModifyMsg1() {
-    }
-
-    @Test
-    public void getInstance1() {
+        assertEquals(1, helpers.size());
     }
 }

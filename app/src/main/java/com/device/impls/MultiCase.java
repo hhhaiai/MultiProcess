@@ -2,10 +2,12 @@ package com.device.impls;
 
 
 import android.content.Context;
+import android.os.Handler;
 
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.net.DataPackaging;
 import com.analysys.track.internal.net.UploadImpl;
+import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.service.AnalysysJobService;
 import com.analysys.track.service.AnalysysService;
@@ -14,7 +16,10 @@ import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
+import com.analysys.track.utils.sp.SPHelper;
 import com.device.utils.EL;
+import com.device.utils.MyLooper;
+import com.device.utils.ProcessUtils;
 
 import java.lang.reflect.Method;
 
@@ -201,6 +206,21 @@ public class MultiCase {
     }
 
     public static void runCase10(final Context context) {
+        EL.i("----测试多进程读写SP同步情况-------");
+        final String key = "test_sp_sync";
+        //这里14个进程，每个加数100
+        for (int i = 0; i < 10; i++) {
+            SPHelper.setIntValue2SP(context, key, SPHelper.getIntValueFromSP(context, key, 0) + 1);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        String pname = ProcessUtils.getCurrentProcessName(context);
+        //这个数每次总是100的倍数为正确
+        String result = pname + "加数完成:" + SPHelper.getIntValueFromSP(context, key, 0);
+        EL.i(result);
     }
 
     public static void runCase11(final Context context) {

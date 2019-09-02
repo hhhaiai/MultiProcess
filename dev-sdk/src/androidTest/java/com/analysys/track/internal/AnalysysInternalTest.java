@@ -16,7 +16,7 @@ public class AnalysysInternalTest extends TestCase {
     @Test
     public void getInstance() {
         AnalysysInternal internal = AnalysysInternal.getInstance(mContext);
-        AnalysysInternal internalA = AnalysysInternal.getInstance(mContext);
+        AnalysysInternal internalA = AnalysysInternal.getInstance(null);
 
         Assert.assertEquals(internal, internalA);
     }

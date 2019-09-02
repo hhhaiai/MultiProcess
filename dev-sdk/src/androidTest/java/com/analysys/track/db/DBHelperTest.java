@@ -1,35 +1,58 @@
 package com.analysys.track.db;
 
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
+import com.analysys.track.AnalsysTest;
 
-import junit.framework.Assert;
+import org.junit.Test;
+import org.junit.internal.runners.statements.RunAfters;
 
-public class DBHelperTest {
-    Context mContext = InstrumentationRegistry.getContext();
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 
-    @org.junit.Test
-    public void getInstance() {
-        DBHelper a = DBHelper.getInstance(mContext);
-        DBHelper b = DBHelper.getInstance(mContext);
-        Assert.assertEquals(a, b);
-//        dbHelper = DBHelper(RuntimeEnvironment.application)
+import static org.junit.Assert.*;
+
+public class DBHelperTest extends AnalsysTest {
+    @Test
+    public void getInstance() throws InterruptedException {
+        final HashSet<DBHelper> helpers = new HashSet();
+        Runnable run = new Runnable() {
+            @Override
+            public void run() {
+                DBHelper ins = DBHelper.getInstance(mContext);
+                helpers.add(ins);
+            }
+        };
+        List<Thread> threads = new ArrayList<>(50);
+        for (int i = 0; i < 50; i++) {
+            Thread thread = new Thread(run);
+            threads.add(thread);
+            thread.start();
+        }
+
+        for (Thread thread :
+                threads) {
+            thread.join();
+        }
+
+        assertEquals(1, helpers.size());
+
     }
 
-    @org.junit.Test
+    @Test
     public void onCreate() {
-//        DBHelper.getInstance(mContext).onCreate();
     }
 
-    @org.junit.Test
+    @Test
     public void onUpgrade() {
     }
 
-    @org.junit.Test
+    @Test
     public void recreateTables() {
     }
 
-    @org.junit.Test
+    @Test
     public void rebuildDB() {
     }
 }
