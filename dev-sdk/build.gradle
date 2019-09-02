@@ -19,7 +19,7 @@ android {
     buildTypes {
         debug {
             /**打开覆盖率统计开关*/
-            testCoverageEnabled = true
+            //testCoverageEnabled = true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

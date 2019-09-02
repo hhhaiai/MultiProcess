@@ -18,6 +18,12 @@ public class AnalysysTrackerTest {
         String channel = "custonchannel";
         AnalysysTracker.init(mContext, appkey, channel);
 
+        try {
+            //key在子线程存储进去的，这里等一下
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Assert.assertEquals(SystemUtils.getAppKey(mContext), appkey);
         Assert.assertEquals(SystemUtils.getAppChannel(mContext), channel);
     }

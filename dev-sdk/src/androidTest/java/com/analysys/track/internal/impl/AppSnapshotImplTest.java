@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 
 import com.analysys.track.AnalsysTest;
+import com.analysys.track.db.DBHelper;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 
@@ -12,6 +13,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -82,9 +85,27 @@ public class AppSnapshotImplTest extends AnalsysTest {
     }
 
     @Test
-    public void getInstance() {
-        AppSnapshotImpl snapshot = AppSnapshotImpl.getInstance(mContext);
-        assertNotNull(snapshot);
-        assertEquals(snapshot, appSnapshot);
+    public void getInstance() throws InterruptedException {
+        final HashSet<AppSnapshotImpl> helpers = new HashSet();
+        Runnable run = new Runnable() {
+            @Override
+            public void run() {
+                AppSnapshotImpl ins = AppSnapshotImpl.getInstance(mContext);
+                helpers.add(ins);
+            }
+        };
+        List<Thread> threads = new ArrayList<>(50);
+        for (int i = 0; i < 50; i++) {
+            Thread thread = new Thread(run);
+            threads.add(thread);
+            thread.start();
+        }
+
+        for (Thread thread :
+                threads) {
+            thread.join();
+        }
+
+        assertEquals(1, helpers.size());
     }
 }
