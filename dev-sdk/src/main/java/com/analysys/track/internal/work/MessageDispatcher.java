@@ -1,6 +1,7 @@
 package com.analysys.track.internal.work;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -70,7 +71,9 @@ public class MessageDispatcher {
                         if (EGContext.DEBUG_UPLOAD) {
                             ELOG.i(EGContext.TAG_UPLOAD, "上行检测，心跳。。。。");
                         }
-                        UploadImpl.getInstance(mContext).upload();
+                        if (EGContext.snap_complete) {
+                            UploadImpl.getInstance(mContext).upload();
+                        }
                         // 5秒检查一次是否可以发送。
                         postDelay(MSG_INFO_UPLOAD, EGContext.TIME_SECOND * 5);
 
@@ -117,6 +120,9 @@ public class MessageDispatcher {
 //                                // 按照差距时间发送延迟工作消息
 //                                postDelay(MSG_INFO_SNAPS, time);
 
+                                //EGContext.snap_complete = true;
+                                Intent intent = new Intent(EGContext.ACTION_MTC_LOCK);
+                                EContextHelper.getContext(null).sendBroadcast(intent);
 
                                 if (EGContext.DEBUG_SNAP) {
                                     ELOG.d(EGContext.TAG_SNAP, "收到安装列表检测回调。。30秒后继续发起请求。。。");
