@@ -1,10 +1,9 @@
 package com.analysys.track.internal.impl;
 
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
+import android.os.Debug;
 
 import com.analysys.track.AnalsysTest;
-import com.analysys.track.db.DBHelper;
+import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 
@@ -20,6 +19,30 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 public class AppSnapshotImplTest extends AnalsysTest {
+
+    @Test
+    public void snapshotsInfo() {
+    }
+
+    @Test(timeout = 5000)
+    public void getSnapShotInfo() {
+
+        //这个方法是连获取带存储，不管怎么样，不可以超过5秒的执行时间
+        appSnapshot.getSnapShotInfo();
+
+
+    }
+
+    @Test(timeout = 5000)
+    public void processAppModifyMsg() {
+        for (int i = 0; i < 200; i++) {
+            appSnapshot.processAppModifyMsg("com.aaa.bbb" + i, Integer.parseInt(EGContext.SNAP_SHOT_INSTALL),
+                    System.currentTimeMillis());
+        }
+        //这里只测试耗时，不测试数据库操作，这一块的测试放到TableProcessTest进行
+        //TableProcess.getInstance(mContext).selectSnapshot()
+    }
+
     AppSnapshotImpl appSnapshot;
 
     @Before
@@ -107,5 +130,18 @@ public class AppSnapshotImplTest extends AnalsysTest {
         }
 
         assertEquals(1, helpers.size());
+    }
+
+    //
+
+    @Test
+    public void getCurrentSnapshots() {
+        //私有方法
+      //  Debug.startMethodTracing("getCurrentSnapshots/");
+        List<JSONObject> objs = invokeMethod(appSnapshot, AppSnapshotImpl.class.getName(),
+                "getCurrentSnapshots");
+        //Debug.stopMethodTracing();
+        assertNotNull(objs);
+        assertTrue(objs.size() > 0);
     }
 }

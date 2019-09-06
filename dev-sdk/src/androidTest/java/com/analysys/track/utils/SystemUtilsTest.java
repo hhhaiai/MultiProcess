@@ -1,6 +1,10 @@
 package com.analysys.track.utils;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import org.junit.Test;
+
 
 import static org.junit.Assert.*;
 
@@ -78,8 +82,18 @@ public class SystemUtilsTest {
     public void getCloseTime() {
     }
 
-    @Test
-    public void isMainThread() {
+    @Test(timeout = 120)
+    public void isMainThread() throws InterruptedException {
+        assertFalse(SystemUtils.isMainThread());
+
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                assertTrue(SystemUtils.isMainThread());
+            }
+        });
+
+        Thread.sleep(100);
     }
 
     @Test

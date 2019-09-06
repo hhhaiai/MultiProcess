@@ -19,6 +19,8 @@ public class EGContext {
     public static String LOGTAG_INNER;
     public static boolean FLAG_DEBUG_USER = false;
 
+    public static final String ACTION_MTC_LOCK = "com.analysys.sdk.action_snap";
+    public static volatile boolean snap_complete = false;
     /**
      * xml 中声明的 appid、channel
      */

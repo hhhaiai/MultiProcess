@@ -6,6 +6,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Build;
 
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.receiver.AnalysysReceiver;
 
 public class ReceiverUtils {
@@ -74,6 +75,12 @@ public class ReceiverUtils {
                 intentFilter = new IntentFilter();
                 intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
                 intentFilter.addAction(Intent.ACTION_SCREEN_ON);
+                intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+                context.registerReceiver(mReceiver, intentFilter);
+
+                // thread
+                intentFilter = new IntentFilter();
+                intentFilter.addAction(EGContext.ACTION_MTC_LOCK);
                 intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
                 context.registerReceiver(mReceiver, intentFilter);
             }

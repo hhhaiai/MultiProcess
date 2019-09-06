@@ -127,6 +127,8 @@ public class ReceiverImpl {
             }
         } else if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
             MessageDispatcher.getInstance(context).initModule();
+        } else if (EGContext.ACTION_MTC_LOCK.equals(intent.getAction())) {
+            EGContext.snap_complete = true;
         }
     }
 

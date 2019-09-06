@@ -16,8 +16,8 @@ public class DataController {
     public static boolean SWITCH_OF_MODULE_CL_BLUETOOTH = true;
     // 电量采集.默认不上传，可控制上传
     public static boolean SWITCH_OF_MODULE_CL_BATTERY = true;
-    // 传感器控制
-    public static boolean SWITCH_OF_MODULE_CL_SENSOR = true;
+    // 传感器采集控制
+    public static boolean SWITCH_OF_MODULE_CL_SENSOR = false;
     // 防作弊相关信息控制.默认上传,可控制不上传. 0不上传
     public static boolean SWITCH_OF_MODULE_CL_DEV_CHECK = true;
     // 系统阶段保持信息控制,比如语言、时区、小时制等. 默认不上传，可控制不上传
