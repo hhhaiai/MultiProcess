@@ -1,6 +1,7 @@
 package com.analysys.track.internal.net;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Base64;
 
@@ -13,6 +14,7 @@ import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.EguanIdUtils;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
+import com.analysys.track.utils.ProcessUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.data.AESUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -374,6 +376,9 @@ public class UploadImpl {
                 JSONObject object = new JSONObject(json);
                 String code = String.valueOf(object.opt(UploadKey.Response.RES_CODE));
                 if (code != null) {
+                    if (EGContext.DEBUG_UPLOAD) {
+                        ELOG.i(EGContext.TAG_UPLOAD, "========收到code-----"+code);
+                    }
                     if (EGContext.HTTP_STATUS_200.equals(code)) {
                         EguanIdUtils.getInstance(mContext).setId(json);
                         // 清除本地数据
@@ -388,6 +393,20 @@ public class UploadImpl {
                         if (numb == 0) {
                             PolicyImpl.getInstance(mContext)
                                     .saveRespParams(object.optJSONObject(UploadKey.Response.RES_POLICY));
+
+                            //准备发送广播同步策略更新
+                            String intentJson = object.optString(UploadKey.Response.RES_POLICY);
+                            // 0.4M
+                            int bundleMaxSize = (int) (1024 * 1024 * 0.4f);
+                            int jsonSize = (40 + (2 * intentJson.length()));
+                            //判断策略大小,太大了就不传了,避免intent存不下
+                            if (jsonSize < bundleMaxSize) {
+                                //广播出去通知其他进程更新状态
+                                Intent intent = new Intent(EGContext.ACTION_UPDATE_POLICY);
+                                intent.putExtra(EGContext.POLICY, intentJson);
+                                intent.putExtra(EGContext.PNAME, ProcessUtils.getCurrentProcessName(mContext));
+                                EContextHelper.getContext(mContext).sendBroadcast(intent);
+                            }
                         }
                         uploadFailure(mContext);
 //                        // 500 后重新尝试发送,上传循环机制 可以取代这部分处理

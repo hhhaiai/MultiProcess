@@ -19,7 +19,14 @@ public class EGContext {
     public static String LOGTAG_INNER;
     public static boolean FLAG_DEBUG_USER = false;
 
+    /**
+     * 广播相关
+     */
     public static final String ACTION_MTC_LOCK = "com.analysys.sdk.action_snap";
+    public static final String ACTION_UPDATE_POLICY = "com.analysys.sdk.action_policy";
+    public static final String POLICY = "POLICY";
+    public static final String PNAME = "PNAME";
+
     public static volatile boolean snap_complete = false;
     /**
      * xml 中声明的 appid、channel

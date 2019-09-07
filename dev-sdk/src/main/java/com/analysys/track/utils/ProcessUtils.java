@@ -1,4 +1,4 @@
-package com.device.utils;
+package com.analysys.track.utils;
 
 import android.app.ActivityManager;
 import android.content.Context;
