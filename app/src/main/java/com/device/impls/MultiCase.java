@@ -14,12 +14,12 @@ import com.analysys.track.service.AnalysysService;
 import com.analysys.track.utils.AccessibilityHelper;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.MultiProcessChecker;
+import com.analysys.track.utils.ProcessUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.analysys.track.utils.sp.SPHelper;
 import com.device.utils.EL;
 import com.device.utils.MyLooper;
-import com.device.utils.ProcessUtils;
 
 import java.lang.reflect.Method;
 
