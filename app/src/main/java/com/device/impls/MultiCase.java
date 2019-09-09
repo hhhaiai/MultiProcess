@@ -4,8 +4,12 @@ package com.device.impls;
 import android.content.Context;
 import android.os.Handler;
 
+import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.LocationImpl;
+import com.analysys.track.internal.model.PolicyInfo;
 import com.analysys.track.internal.net.DataPackaging;
+import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.service.AnalysysAccessibilityService;
@@ -236,6 +240,11 @@ public class MultiCase {
     }
 
     public static void runCase15(final Context context) {
+        EL.i("----测试策略同步的情况-------");
+        SPHelper.setStringValue2SP(context, UploadKey.Response.RES_POLICY_VERSION, "0");
+        SPHelper.setLongValue2SP(context, EGContext.LASTQUESTTIME, 0);
+        PolicyImpl.getInstance(context).clear();
+        UploadImpl.getInstance(context).upload();
     }
 
     public static void runCase16(final Context context) {

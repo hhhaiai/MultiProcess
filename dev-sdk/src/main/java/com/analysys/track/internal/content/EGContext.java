@@ -13,7 +13,7 @@ public class EGContext {
     /**
      * SDK版本
      */
-    public static final String SDK_VERSION = "4.3.0.3|20190806";
+    public static final String SDK_VERSION = "4.3.0.3|20190807";
     public static final String SDK_TYPE = "Android";
     public static final String LOGTAG_USER = "analysys";
     public static String LOGTAG_INNER;
@@ -231,10 +231,10 @@ public class EGContext {
      * EGuan 内部调试系列tag.主要用于控制堆栈打印、错误打印、内部提示信息打印
      */
     // 策略的总控。关闭后所有的日志都不能打印
-    public static final boolean FLAG_DEBUG_INNER = false;
+    public static final boolean FLAG_DEBUG_INNER = true;
 
     // 上传模快日志控制
-    public static final boolean DEBUG_UPLOAD = false;
+    public static final boolean DEBUG_UPLOAD = true;
     public static String TAG_UPLOAD;
     // OC模快日志控制
     public static final boolean DEBUG_OC = false;
@@ -249,7 +249,7 @@ public class EGContext {
     public static final boolean DEBUG_LOCATION = false;
     public static String TAG_LOC;
     // 执行上传URL控制
-    public static final boolean DEBUG_URL = false;
+    public static final boolean DEBUG_URL = true;
 
     static {
         //调整。解决编译时到处可见打印字段问题。
