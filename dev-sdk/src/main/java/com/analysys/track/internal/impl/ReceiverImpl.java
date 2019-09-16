@@ -7,6 +7,7 @@ import android.text.TextUtils;
 
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.oc.OCImpl;
+import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.MultiProcessChecker;
@@ -129,6 +130,8 @@ public class ReceiverImpl {
             MessageDispatcher.getInstance(context).initModule();
         } else if (EGContext.ACTION_MTC_LOCK.equals(intent.getAction())) {
             EGContext.snap_complete = true;
+        } else if (EGContext.ACTION_UPDATE_POLICY.equals(intent.getAction())) {
+            PolicyImpl.getInstance(context).updatePolicyForReceiver(intent);
         }
     }
 

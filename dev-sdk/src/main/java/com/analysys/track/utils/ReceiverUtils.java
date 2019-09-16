@@ -83,6 +83,11 @@ public class ReceiverUtils {
                 intentFilter.addAction(EGContext.ACTION_MTC_LOCK);
                 intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
                 context.registerReceiver(mReceiver, intentFilter);
+                // 策略
+                intentFilter = new IntentFilter();
+                intentFilter.addAction(EGContext.ACTION_UPDATE_POLICY);
+                intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+                context.registerReceiver(mReceiver, intentFilter);
             }
         } catch (Throwable e) {
         }

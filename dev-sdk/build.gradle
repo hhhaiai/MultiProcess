@@ -7,7 +7,7 @@ apply plugin: 'com.android.library'
 
 
 def version = "4.3.0.3"
-def date = "20190806"
+def date = "20190807"
 
 android {
     compileSdkVersion 26

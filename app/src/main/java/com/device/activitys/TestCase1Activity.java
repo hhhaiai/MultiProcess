@@ -10,7 +10,7 @@ import com.device.R;
 import com.device.impls.MainFunCase;
 import com.device.impls.MultiProcessWorker;
 import com.device.utils.EL;
-import com.device.utils.ProcessUtils;
+import com.analysys.track.utils.ProcessUtils;
 import com.umeng.analytics.MobclickAgent;
 
 
