@@ -6,8 +6,8 @@ apply plugin: 'com.android.library'
 //}
 
 
-def version = "4.3.0.3"
-def date = "20190807"
+def version = "4.3.0.4"
+def date = "20190918"
 
 android {
     compileSdkVersion 26
@@ -24,7 +24,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
