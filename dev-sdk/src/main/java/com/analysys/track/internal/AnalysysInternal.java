@@ -142,8 +142,23 @@ public class AnalysysInternal {
             clear();
         }
 
-        // 9. 清除以前的SP
-        SPHelper.removeSPFiles(mContextRef.get(), EGContext.SP_NAME);
+
+        try {
+            // 9. 清除以前的SP和DB
+            SPHelper.removeSPFiles(mContextRef.get(), EGContext.SP_NAME);
+
+            File file = SPHelper.getNewSharedPrefsFile(mContextRef.get(), "ana_sp_xml");
+            if (file.exists() && file.isFile()) {
+                file.delete();
+            }
+
+            file = mContextRef.get().getDatabasePath("e.data");
+            if (file.exists() && file.isFile()) {
+                file.delete();
+            }
+        } catch (Throwable e) {
+
+        }
 
     }
 

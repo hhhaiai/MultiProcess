@@ -18,7 +18,7 @@ import java.util.Set;
 
 public class SPHelper {
     private final static HashMap<String, Object> SP_CACHE = new HashMap<String, Object>();
-    private static final String DEFAULT_PREFERENCE = "ana_sp_xml";
+    private static final String DEFAULT_PREFERENCE = "ana_sp_xml_v2";
     private static Editor editor = null;
     private static SharedPreferences res = null;
 

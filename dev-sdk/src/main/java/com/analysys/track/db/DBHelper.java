@@ -13,7 +13,7 @@ import java.io.File;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    private static final String DB_NAME = "e.data";
+    private static final String DB_NAME = "ev2.data";
     private static final int DB_VERSION = 3;
     private static Context mContext = null;
 
