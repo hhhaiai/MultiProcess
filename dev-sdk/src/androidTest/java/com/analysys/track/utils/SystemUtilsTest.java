@@ -1,14 +1,18 @@
 package com.analysys.track.utils;
 
+import android.content.pm.PackageManager;
+import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
+
+import com.analysys.track.AnalsysTest;
 
 import org.junit.Test;
 
 
 import static org.junit.Assert.*;
 
-public class SystemUtilsTest {
+public class SystemUtilsTest extends AnalsysTest {
 
     @Test
     public void getDay() {
@@ -20,6 +24,17 @@ public class SystemUtilsTest {
 
     @Test
     public void hasPackageNameInstalled() {
+
+        PackageManager packageManager = mContext.getPackageManager();
+       // Debug.startMethodTracing("hasPackageNameInstalled");
+        String value = null;
+        try {
+            value = packageManager.getInstallerPackageName("org.appanalysis");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+       // Debug.stopMethodTracing();
+        System.out.println(value);
     }
 
     @Test
