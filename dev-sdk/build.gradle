@@ -14,6 +14,7 @@ android {
     buildToolsVersion '26.0.2'
 
     defaultConfig {
+        buildConfigField "String", "SDK_VERSION", "\"${version}|${date}\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
