@@ -74,6 +74,8 @@ public class MessageDispatcher {
                         if (EGContext.snap_complete) {
                             UploadImpl.getInstance(mContext).upload();
                         }
+                        //最多等10秒
+                        EGContext.snap_complete=true;
                         // 5秒检查一次是否可以发送。
                         postDelay(MSG_INFO_UPLOAD, EGContext.TIME_SECOND * 5);
 

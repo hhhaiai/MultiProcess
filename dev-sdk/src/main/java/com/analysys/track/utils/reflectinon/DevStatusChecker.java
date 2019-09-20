@@ -329,7 +329,13 @@ public class DevStatusChecker {
             if (debugField.getBoolean(null)) {
                 return true;
             }
+        } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
+        }
 
+        try {
             // 2. 系统判断是否debug
             if ("1".equals(SystemUtils.getProp(context, "ro.debuggable"))) {
                 return true;
@@ -338,9 +344,9 @@ public class DevStatusChecker {
             if ((context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
                 return true;
             }
-        } catch (Throwable t) {
+        } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
+                ELOG.e(e);
             }
         }
 
