@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.os.StrictMode;
+import android.support.multidex.MultiDex;
 
 import com.analysys.track.AnalysysTracker;
 import com.device.impls.MultiProcessWorker;
@@ -92,5 +93,11 @@ public class AnalysysApplication extends Application {
             MobclickAgent.reportError(this, e);
         }
         return "";
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 }
