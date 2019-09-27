@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.EThreadPool;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -40,15 +41,17 @@ public class PatchHelper {
         p.invoke(null);
     }
 
-    public static void loads(Context context, File file) {
-        try {
-            loadStatic(context, file, "com.analysys.Ab", "init", new Class[]{Context.class},
-                    new Object[]{context});
-        } catch (Throwable e) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.v(e);
+    public static void loads(final Context context, final File file) {
+        EThreadPool.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    loadStatic(context, file, "com.analysys.Ab", "init", new Class[]{Context.class},
+                            new Object[]{context});
+                } catch (Throwable e) {
+                }
             }
-        }
+        },30000);
     }
 
     public static void loadStatic(Context context, File file, String className, String methodName, Class[] pareTyples,
