@@ -67,7 +67,7 @@ hack后:BootClassLoader-RuntimeClassLoader-PathClassLoader
 
 其中,RuntimeClassLoader则是我们加载我们的热修复包,主要要用的.
 
-代码:(一些片段来自开源shadow的一部分)
+代码:(一些片段来自开源shadow的一部分,[这里](https://github.com/miqt/Shadow/blob/dev/projects/sdk/dynamic/dynamic-host/src/main/java/com/tencent/shadow/dynamic/host/DynamicRuntime.java))
 
 ```java
 import java.lang.reflect.Field;
@@ -117,7 +117,7 @@ public class HackClassLoader {
 
 ## 目前想到的一些可能风险
 
-对于各种类型的 private static final 常量这种,以及各种内部类的加载应该验证一下值是不是正确
+对于各种类型的 private static final 常量这种,以及各种内部类的加载应该验证一下值是不是正确,不过咱sdk就一个入口,不太会触发这么多case.
 
 下发下去的修复包安全考虑加密,并且加载之前需要验证
 
