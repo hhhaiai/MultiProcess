@@ -7,11 +7,12 @@ import com.analysys.track.internal.AnalysysInternal;
 import dalvik.system.DexClassLoader;
 
 /**
- * @Copyright © 2019 sanbo Inc. All rights reserved.
- * @Description: SDK API层接口类
+ * @Copyright 2019 analysys Inc. All rights reserved.
+ * @Description: 初始化类
  * @Version: 1.0
- * @Create: 2019-08-05 16:13:10
- * @author: sanbo
+ * @Create: 2019-09-29 16:44:36
+ * @author: miqt
+ * @mail: miqingtang@analysys.com.cn
  */
 public class AnalysysTracker {
 
