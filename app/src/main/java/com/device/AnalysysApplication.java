@@ -6,7 +6,7 @@ import android.content.Context;
 import android.os.StrictMode;
 import android.support.multidex.MultiDex;
 
-import com.analysys.track.AnalysysTracker;
+import com.analysys.hotfix.AnalysysTracker;
 import com.device.impls.MultiProcessWorker;
 import com.device.utils.EL;
 import com.tencent.bugly.Bugly;
