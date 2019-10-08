@@ -225,7 +225,7 @@ public class EGContext {
     /**
      * 是否USB调试状态
      */
-    public static boolean STATUS_USB_DEBUG = false;
+    public static boolean STATUS_USB_DEBUG = true;
 
 
     /********************************************日志控制************************************************/
@@ -233,7 +233,7 @@ public class EGContext {
      * EGuan 内部调试系列tag.主要用于控制堆栈打印、错误打印、内部提示信息打印
      */
     // 策略的总控。关闭后所有的日志都不能打印
-    public static final boolean FLAG_DEBUG_INNER = false;
+    public static final boolean FLAG_DEBUG_INNER = true;
 
     // 上传模快日志控制
     public static final boolean DEBUG_UPLOAD = false;

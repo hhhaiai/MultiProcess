@@ -6,7 +6,7 @@ import android.content.Context;
 import android.os.StrictMode;
 import android.support.multidex.MultiDex;
 
-import com.analysys.hotfix.AnalysysTracker;
+import com.analysys.hotfix.open.AnalysysTracker;
 import com.device.impls.MultiProcessWorker;
 import com.device.utils.EL;
 import com.tencent.bugly.Bugly;
@@ -47,7 +47,7 @@ public class AnalysysApplication extends Application {
      */
     private void initAnalysys() {
         // 设置打开debug模式，上线请置为false
-        AnalysysTracker.setDebugMode(false);
+        AnalysysTracker.setDebugMode(this, false);
         // 初始化接口:第二个参数填写您在平台申请的appKey,第三个参数填写
         AnalysysTracker.init(this, "7752552892442721d", "WanDouJia");
 

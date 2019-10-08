@@ -1,4 +1,4 @@
-package com.analysys.hotfix;
+package com.analysys.hotfix.utils;
 
 import android.content.Context;
 

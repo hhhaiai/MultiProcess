@@ -25,6 +25,9 @@ import com.analysys.track.utils.SystemUtils;
 public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onCreate() {
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i("AnalysysAccessibilityService onCreate");
+        }
         super.onCreate();
         mContext = this.getApplicationContext();
     }
@@ -33,6 +36,9 @@ public class AnalysysAccessibilityService extends AccessibilityService {
 
     @Override
     protected void onServiceConnected() {
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i("AnalysysAccessibilityService onServiceConnected");
+        }
         try {
             super.onServiceConnected();
             mContext = this.getApplicationContext();

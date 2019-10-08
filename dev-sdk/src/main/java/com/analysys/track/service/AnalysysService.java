@@ -30,7 +30,7 @@ public class AnalysysService extends Service {
         super.onCreate();
 
         if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i("AnalysysService 。onCreate");
+            ELOG.i("AnalysysService onCreate");
         }
         AnalysysInternal.getInstance(this);
         MessageDispatcher.getInstance(this).initModule();
@@ -38,11 +38,17 @@ public class AnalysysService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i("AnalysysService onStartCommand");
+        }
         return super.onStartCommand(intent, Service.START_STICKY, startId);
     }
 
     @Override
     public void onDestroy() {
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i("AnalysysService onDestroy");
+        }
         ServiceHelper.getInstance(this).startSelfService();
         super.onDestroy();
     }
