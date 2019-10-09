@@ -29,6 +29,7 @@ import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PermissionUtils;
+import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -377,6 +378,16 @@ public class DeviceImpl {
         try {
             TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
             operatorName = tm.getSimOperator();
+            if (operatorName.isEmpty()) {
+                int mcc = mContext.getResources().getConfiguration().mcc;
+                if (mcc == 0) {
+                    return operatorName;
+                }
+                int mnc = mContext.getResources().getConfiguration().mnc;
+                if (mnc != Configuration.MNC_ZERO) {
+                    operatorName = operatorName + mnc;
+                }
+            }
         } catch (Throwable e) {
         }
         return operatorName;

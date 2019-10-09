@@ -1,10 +1,12 @@
 package com.analysys.track.internal.impl;
 
+import com.analysys.track.AnalsysTest;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class DeviceImplTest {
+public class DeviceImplTest extends AnalsysTest {
 
     @Test
     public void getInstance() {
@@ -36,6 +38,8 @@ public class DeviceImplTest {
 
     @Test
     public void getMobileOperator() {
+
+        DeviceImpl.getInstance(mContext).getMobileOperator();
     }
 
     @Test

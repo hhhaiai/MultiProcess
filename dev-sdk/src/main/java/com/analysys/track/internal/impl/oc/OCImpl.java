@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -200,8 +201,19 @@ public class OCImpl {
                     } else {
                         getAliveAppByProc(aliveList);
                     }
-                } else {
-                    // TODO 7.0以上 service实现
+                } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                    // 如果开了USM则使用USM
+//                    if (SystemUtils.canUseUsageStatsManager(mContext)) {
+//                        processOCByUsageStatsManager(aliveList);
+//                    } else {
+//
+//                    }
+                    getRuningService();
+                } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.O) {
+                    // 如果开了USM则使用USM
+                    if (SystemUtils.canUseUsageStatsManager(mContext)) {
+                        processOCByUsageStatsManager(aliveList);
+                    }
                 }
 
             }
@@ -211,6 +223,31 @@ public class OCImpl {
         if (isAllowXXX) {
             parserXXXAndSave(xxx);
         }
+    }
+
+    private void getRuningService() {
+        ActivityManager myManager = (ActivityManager) mContext
+                .getSystemService(Context.ACTIVITY_SERVICE);
+        ArrayList<ActivityManager.RunningServiceInfo> runningService = (ArrayList<ActivityManager.RunningServiceInfo>) myManager
+                .getRunningServices(30);
+        PackageManager pm = mContext.getPackageManager();
+        HashSet<String> pkgs = new HashSet<>();
+        for (int i = 0; i < runningService.size(); i++) {
+            //分割报名和进程名,样例:com.device:h
+            String name = runningService.get(i).process;
+            String[] split = name.split(":");
+            if (split != null || split.length > 0) {
+                String pkgName = split[0];
+                if (!TextUtils.isEmpty(pkgName)
+                        && pkgName.contains(".")
+                        && !pkgName.contains(":")
+                        && !pkgName.contains("/")
+                        && pm.getLaunchIntentForPackage(pkgName) != null) {
+                    pkgs.add(pkgName);
+                }
+            }
+        }
+        getAliveAppByProc(new JSONArray(pkgs));
     }
 
     /**
