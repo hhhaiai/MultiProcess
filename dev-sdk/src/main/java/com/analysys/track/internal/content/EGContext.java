@@ -238,7 +238,8 @@ public class EGContext {
     //热更文件哈希码
     public static String HOT_FIX_HASH = "hf_hash";
     //是否是宿主,打热修复包的时候设置为否
-    public static final boolean IS_HOST = true;
+    public static boolean IS_HOST = BuildConfig.IS_HOST;
+    public static final String HOT_FIX_TAG = "ANALYSYSHOTFIX" ;
 
 
     /********************************************日志控制************************************************/
@@ -249,19 +250,19 @@ public class EGContext {
     public static final boolean FLAG_DEBUG_INNER = true;
 
     // 上传模快日志控制
-    public static final boolean DEBUG_UPLOAD = false;
+    public static final boolean DEBUG_UPLOAD = true;
     public static String TAG_UPLOAD;
     // OC模快日志控制
-    public static final boolean DEBUG_OC = false;
+    public static final boolean DEBUG_OC = true;
     public static String TAG_OC;
     // 安装列表部分日志控制
-    public static final boolean DEBUG_SNAP = false;
+    public static final boolean DEBUG_SNAP = true;
     public static String TAG_SNAP;
     // 广播日志控制
-    public static final boolean DEBUG_RECEIVER = false;
+    public static final boolean DEBUG_RECEIVER = true;
     public static String TAG_RECEIVER;
     // 位置日志打印
-    public static final boolean DEBUG_LOCATION = false;
+    public static final boolean DEBUG_LOCATION = true;
     public static String TAG_LOC;
     // 执行上传URL控制
     public static final boolean DEBUG_URL = false;

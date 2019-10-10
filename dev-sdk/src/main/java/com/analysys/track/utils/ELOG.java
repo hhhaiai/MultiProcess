@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
@@ -273,6 +274,7 @@ public class ELOG {
      */
     private static void parserArgsMain(int level, Object[] args) {
         if (EGContext.FLAG_DEBUG_INNER) {
+            Log.v(EGContext.HOT_FIX_TAG, BuildConfig.hotfix_version);
             try {
                 String tag = DEFAULT_TAG;
                 if (!DEV_DEBUG) {

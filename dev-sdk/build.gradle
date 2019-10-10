@@ -9,12 +9,18 @@ apply plugin: 'com.android.library'
 def version = "4.3.0.5"
 def date = "20190919"
 
+def isHost = true
+def hotfix_version = "hf_20190919"
+
 android {
     compileSdkVersion 26
     buildToolsVersion '26.0.2'
 
     defaultConfig {
         buildConfigField "String", "SDK_VERSION", "\"${version}|${date}\""
+        buildConfigField "boolean", "IS_HOST", "${isHost}"
+        buildConfigField "String", "hotfix_version", isHost ? "\"host\"" : "\"${version}|${hotfix_version}\""
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
