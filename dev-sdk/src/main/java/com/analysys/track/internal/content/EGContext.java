@@ -227,6 +227,19 @@ public class EGContext {
      */
     public static boolean STATUS_USB_DEBUG = true;
 
+    /**
+     * 热更是否开启
+     */
+    public static String HOT_FIX_ENABLE_STATE = "hf_enable";
+    //热更版本
+    public static String HOT_FIX_VERSION = "hf_version";
+    //热更文件路径
+    public static String HOT_FIX_PATH = "hf_path";
+    //热更文件哈希码
+    public static String HOT_FIX_HASH = "hf_hash";
+    //是否是宿主,打热修复包的时候设置为否
+    public static final boolean IS_HOST = true;
+
 
     /********************************************日志控制************************************************/
     /**

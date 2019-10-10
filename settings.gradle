@@ -1,1 +1,1 @@
-include ':app', ':dev-sdk', ':hot_sdk', ':testhotfix'
+include ':app', ':dev-sdk'

@@ -4,11 +4,13 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
+import com.analysys.track.hotfix.ObjectFactory;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.internal.work.ServiceHelper;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.sp.SPHelper;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -22,11 +24,27 @@ public class AnalysysService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        boolean hfEnable = SPHelper.getBooleanValueFromSP(this.getApplicationContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
+        if (EGContext.IS_HOST &&hfEnable) {
+            return ObjectFactory.invokeMethod(
+                    ObjectFactory.make(AnalysysService.class.getName())
+                    , AnalysysService.class.getName()
+                    , "onBind", intent);
+
+        }
         return null;
     }
 
     @Override
     public void onCreate() {
+        boolean hfEnable = SPHelper.getBooleanValueFromSP(this.getApplicationContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
+        if (EGContext.IS_HOST &&hfEnable) {
+            ObjectFactory.invokeMethod(
+                    ObjectFactory.make(AnalysysService.class.getName())
+                    , AnalysysService.class.getName()
+                    , "onCreate");
+            return;
+        }
         super.onCreate();
 
         if (EGContext.FLAG_DEBUG_INNER) {
@@ -38,6 +56,14 @@ public class AnalysysService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        boolean hfEnable = SPHelper.getBooleanValueFromSP(this.getApplicationContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
+        if (EGContext.IS_HOST &&hfEnable) {
+            return ObjectFactory.invokeMethod(
+                    ObjectFactory.make(AnalysysService.class.getName())
+                    , AnalysysService.class.getName()
+                    , "onStartCommand", intent, flags, startId);
+
+        }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysService onStartCommand");
         }
@@ -46,6 +72,14 @@ public class AnalysysService extends Service {
 
     @Override
     public void onDestroy() {
+        boolean hfEnable = SPHelper.getBooleanValueFromSP(this.getApplicationContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
+        if (EGContext.IS_HOST &&hfEnable) {
+            ObjectFactory.invokeMethod(
+                    ObjectFactory.make(AnalysysService.class.getName())
+                    , AnalysysService.class.getName()
+                    , "onDestroy");
+            return;
+        }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysService onDestroy");
         }

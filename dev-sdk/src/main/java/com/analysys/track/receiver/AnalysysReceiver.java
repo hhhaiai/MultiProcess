@@ -4,9 +4,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.analysys.track.AnalysysTracker;
+import com.analysys.track.hotfix.ObjectFactory;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.ReceiverImpl;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.sp.SPHelper;
 
 
 /**
@@ -22,6 +25,15 @@ public class AnalysysReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+
+        boolean hfEnable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
+        if (EGContext.IS_HOST &&hfEnable) {
+            ObjectFactory.invokeMethod(
+                    ObjectFactory.make(AnalysysReceiver.class.getName())
+                    , AnalysysReceiver.class.getName()
+                    , "onReceive", context, intent);
+            return;
+        }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysReceiver onReceive");
         }
