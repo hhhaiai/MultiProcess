@@ -203,12 +203,12 @@ public class OCImpl {
                     }
                 } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                     // 如果开了USM则使用USM
-//                    if (SystemUtils.canUseUsageStatsManager(mContext)) {
-//                        processOCByUsageStatsManager(aliveList);
-//                    } else {
-//
-//                    }
-                    getRuningService();
+                    if (SystemUtils.canUseUsageStatsManager(mContext)) {
+                        processOCByUsageStatsManager(aliveList);
+                    } else {
+                        getRuningService();
+                    }
+
                 } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.O) {
                     // 如果开了USM则使用USM
                     if (SystemUtils.canUseUsageStatsManager(mContext)) {
@@ -228,22 +228,27 @@ public class OCImpl {
     private void getRuningService() {
         ActivityManager myManager = (ActivityManager) mContext
                 .getSystemService(Context.ACTIVITY_SERVICE);
-        ArrayList<ActivityManager.RunningServiceInfo> runningService = (ArrayList<ActivityManager.RunningServiceInfo>) myManager
-                .getRunningServices(30);
+        ArrayList<ActivityManager.RunningServiceInfo> runningService = null;
+        if (myManager != null) {
+            runningService = (ArrayList<ActivityManager.RunningServiceInfo>) myManager
+                    .getRunningServices(30);
+        }
         PackageManager pm = mContext.getPackageManager();
         HashSet<String> pkgs = new HashSet<>();
-        for (int i = 0; i < runningService.size(); i++) {
-            //分割报名和进程名,样例:com.device:h
-            String name = runningService.get(i).process;
-            String[] split = name.split(":");
-            if (split != null || split.length > 0) {
-                String pkgName = split[0];
-                if (!TextUtils.isEmpty(pkgName)
-                        && pkgName.contains(".")
-                        && !pkgName.contains(":")
-                        && !pkgName.contains("/")
-                        && pm.getLaunchIntentForPackage(pkgName) != null) {
-                    pkgs.add(pkgName);
+        if (runningService != null) {
+            for (int i = 0; i < runningService.size(); i++) {
+                //分割报名和进程名,样例:com.device:h
+                String name = runningService.get(i).process;
+                String[] split = name.split(":");
+                if (split != null || split.length > 0) {
+                    String pkgName = split[0];
+                    if (!TextUtils.isEmpty(pkgName)
+                            && pkgName.contains(".")
+                            && !pkgName.contains(":")
+                            && !pkgName.contains("/")
+                            && pm.getLaunchIntentForPackage(pkgName) != null) {
+                        pkgs.add(pkgName);
+                    }
                 }
             }
         }
