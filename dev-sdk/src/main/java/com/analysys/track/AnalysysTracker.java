@@ -58,8 +58,8 @@ public class AnalysysTracker {
 //        //</editor-fold>
 
 
-        boolean hf_enable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST && hf_enable) {
+        boolean hfEnable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
+        if (EGContext.IS_HOST && hfEnable) {
             ObjectFactory.init(context);
             ObjectFactory.invokeMethod(null, AnalysysTracker.class.getName(), "init", context, appKey, channel);
             return;
@@ -73,8 +73,8 @@ public class AnalysysTracker {
      * @param isDebug
      */
     public static void setDebugMode(Context context, boolean isDebug) {
-        boolean hf_enable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (hf_enable) {
+        boolean hfEnable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
+        if (EGContext.IS_HOST &&hfEnable) {
             ObjectFactory.invokeMethod(null, AnalysysTracker.class.getName(), "setDebugMode",context, isDebug);
             return;
         }

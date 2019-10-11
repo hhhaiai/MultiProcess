@@ -230,7 +230,7 @@ public class EGContext {
     /**
      * 热更是否开启
      */
-    public static String HOT_FIX_ENABLE_STATE = "hf_enable";
+    public static String HOT_FIX_ENABLE_STATE = "hfEnable";
     //热更版本
     public static String HOT_FIX_VERSION = "hf_version";
     //热更文件路径

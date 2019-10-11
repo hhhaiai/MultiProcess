@@ -41,8 +41,8 @@ class AnalysysClassLoader extends DexClassLoader {
         return super.loadClass(name);
     }
 
-    @Override
-    protected Package getPackage(String name) {
-        return null;
-    }
+//    @Override
+//    protected Package getPackage(String name) {
+//        return null;
+//    }
 }
