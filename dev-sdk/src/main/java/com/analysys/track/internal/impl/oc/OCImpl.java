@@ -602,9 +602,10 @@ public class OCImpl {
     public long getOCDurTime() {
         if (Build.VERSION.SDK_INT < 21) {
             return EGContext.TIME_SECOND * 5;
-        } else if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {
+            //5 6 7
+        } else if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 26) {
             return EGContext.TIME_SECOND * 30;
-        } else {// 6以上不处理
+        } else {// 7以上不处理
             return -1;
         }
     }
