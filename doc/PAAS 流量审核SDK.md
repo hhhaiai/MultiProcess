@@ -2,7 +2,7 @@
 
 ## 版本变动
 
-* **版本号**: `4.3.0.6|20191008`
+* **版本号**: `4.3.0.4|20191010`
 * **版本变动**:
         1. 优化部分功能
 
@@ -163,7 +163,21 @@ android P之后版本默认不支持HTTP通讯,为保证正常使用，建议在
     </application>
 </manifest>
 ```
+ 更高得编译版本中 使用如上配置也不起作用，需要添加配置文（network_security_config.xml）件如下：
 
+```
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true"/>
+</network-security-config>
+```
+之后在application中添加配置如下，即可：
+```
+<application
+       .....
+        android:networkSecurityConfig="@xml/network_security_config"
+        .......>
+```
 
 ### 6. 分包支持
 
