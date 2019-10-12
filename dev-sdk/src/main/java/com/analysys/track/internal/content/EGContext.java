@@ -1,7 +1,5 @@
 package com.analysys.track.internal.content;
 
-import com.analysys.track.BuildConfig;
-
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
  * @Description: 内部变量存储
