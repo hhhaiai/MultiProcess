@@ -1,10 +1,15 @@
 package com.analysys.track.utils.reflectinon;
 
+import com.analysys.track.AnalsysTest;
+
 import org.junit.Test;
+
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 
 import static org.junit.Assert.*;
 
-public class PatchHelperTest {
+public class PatchHelperTest extends AnalsysTest {
 
     @Test
     public void load() {
@@ -16,6 +21,7 @@ public class PatchHelperTest {
 
     @Test
     public void loadStatic() {
+
     }
 
     @Test

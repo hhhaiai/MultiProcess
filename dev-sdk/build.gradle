@@ -7,13 +7,14 @@ apply plugin: 'com.android.library'
 
 
 def version = "4.3.0.4"
-def date = "20190918"
+def date = "20191010"
 
 android {
     compileSdkVersion 26
     buildToolsVersion '26.0.2'
 
     defaultConfig {
+        buildConfigField "String", "SDK_VERSION", "\"${version}|${date}\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

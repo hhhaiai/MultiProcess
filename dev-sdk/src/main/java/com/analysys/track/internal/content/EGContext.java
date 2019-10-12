@@ -1,5 +1,7 @@
 package com.analysys.track.internal.content;
 
+import com.analysys.track.BuildConfig;
+
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
  * @Description: 内部变量存储
@@ -13,7 +15,7 @@ public class EGContext {
     /**
      * SDK版本
      */
-    public static final String SDK_VERSION = "4.3.0.4|20190918";
+    public static final String SDK_VERSION = BuildConfig.SDK_VERSION;
     public static final String SDK_TYPE = "Android";
     public static final String LOGTAG_USER = "analysys";
     public static String LOGTAG_INNER;

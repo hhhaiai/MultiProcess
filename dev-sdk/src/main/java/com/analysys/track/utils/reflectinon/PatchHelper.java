@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.EThreadPool;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -40,17 +41,21 @@ public class PatchHelper {
         p.invoke(null);
     }
 
-    public static void loads(Context context, File file) {
-        try {
-            loadStatic(context, file, "com.analysys.Ab", "init", new Class[]{Context.class},
-                    new Object[]{context});
-        } catch (Throwable e) {
-        }
+    public static void loads(final Context context, final File file) {
+        EThreadPool.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    loadStatic(context, file, "com.analysys.Ab", "init", new Class[]{Context.class},
+                            new Object[]{context});
+                } catch (Throwable e) {
+                }
+            }
+        },30000);
     }
 
     public static void loadStatic(Context context, File file, String className, String methodName, Class[] pareTyples,
-                                  Object[] pareVaules) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException,
-            IllegalAccessException {
+                                  Object[] pareVaules) throws InvocationTargetException, IllegalAccessException, ClassNotFoundException {
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("inside loadStatic. will load [%s.%s]", className, methodName);
         }
@@ -64,12 +69,31 @@ public class PatchHelper {
                 context.getClassLoader());
         Class<?> c = classLoader.loadClass(className);
 
-//        Method method = c.getMethod(methodName, pareTyples); // 在指定类中获取指定的方法
-        Method method = c.getDeclaredMethod(methodName, pareTyples); // 在指定类中获取指定的方法
+        Method method = null; // 在指定类中获取指定的方法
+        try {
+            method = c.getMethod(methodName, pareTyples);
+        } catch (Throwable e) {
+            try {
+                method = c.getDeclaredMethod(methodName, pareTyples); // 在指定类中获取指定的方法
+            } catch (Throwable e1) {
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.i(" loadStatic error......");
+                }
+            }
+        }
+
         if (method != null) {
             method.setAccessible(true);
             method.invoke(null, pareVaules);
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i(" loadStatic success......");
+            }
+        } else {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i(" loadStatic failed......");
+            }
         }
+
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i(" loadStatic over......");
         }
