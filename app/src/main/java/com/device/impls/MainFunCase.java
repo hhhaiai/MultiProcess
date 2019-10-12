@@ -3,6 +3,9 @@ package com.device.impls;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Environment;
+import android.os.FileObserver;
+import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
@@ -312,59 +315,13 @@ public class MainFunCase {
     }
 
     private static void runCaseP15(final Context mContext) {
-        try {
-            File innerF = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath() + "/test.jar");
-            File re = new File(mContext.getFilesDir().getAbsolutePath() + "/test.jar");
-            try {
-                re.getParentFile().mkdirs();
-                FileInputStream fileInputStream = new FileInputStream(innerF);
-                FileOutputStream outputStream = new FileOutputStream(re);
-
-                byte[] b = new byte[1024];
-                int len = -1;
-                while ((len = fileInputStream.read(b)) != -1) {
-                    outputStream.write(b);
-                }
-                fileInputStream.close();
-                outputStream.close();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+        FileObserver fileObserver = new FileObserver("/proc/net/tcp", FileObserver.ALL_EVENTS) {
+            @Override
+            public void onEvent(int event, @Nullable String path) {
+                Log.v(path, event + "");
             }
-
-            innerF = re;
-            String classname = "AD";
-            String methodName = "getString";
-            Class[] pt = new Class[]{String.class};
-            Object[] pv = new Object[]{"123123"};
-            //测试加载内部路径jar
-            classname = "AD";
-            methodName = "getString";
-            pt = new Class[]{String.class};
-            pv = new Object[]{"123123"};
-            PatchHelper.loadStatic(mContext, innerF, classname, methodName, pt, pv);
-            //测试加载静态内部类的static方法
-            classname = "AD$Inner";
-            methodName = "getString";
-            pt = new Class[]{String.class};
-            pv = new Object[]{"123123"};
-            PatchHelper.loadStatic(mContext, innerF, classname, methodName, pt, pv);
-            //测试反射ActivityThread
-            classname = "AD$Inner";
-            methodName = "closeAndroidPDialog";
-            pt = new Class[]{};
-            pv = new Object[]{};
-            PatchHelper.loadStatic(mContext, innerF, classname, methodName, pt, pv);
-
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } finally {
-        }
+        };
+        fileObserver.startWatching();
     }
 
     /********************************** 功能实现区 ************************************/
