@@ -28,6 +28,7 @@ import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PermissionUtils;
+import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.data.Base64Utils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -37,12 +38,15 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @Copyright 2019 sanbo Inc. All rights reserved.
@@ -193,7 +197,7 @@ public class OCImpl {
                         }
                         getAliveAppByProc(aliveList);
                     }
-                } else if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {
+                } else if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {// 5 6
 
                     // 如果开了USM则使用USM
                     if (SystemUtils.canUseUsageStatsManager(mContext)) {
@@ -201,14 +205,22 @@ public class OCImpl {
                     } else {
                         getAliveAppByProc(aliveList);
                     }
-                } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                } else if (Build.VERSION.SDK_INT < 26) { // 7
                     // 如果开了USM则使用USM
                     if (SystemUtils.canUseUsageStatsManager(mContext)) {
                         processOCByUsageStatsManager(aliveList);
                     } else {
                         getRuningService();
                     }
-
+                } else if (Build.VERSION.SDK_INT < 29) { //8 9
+                    // 如果开了USM则使用USM
+                    if (SystemUtils.canUseUsageStatsManager(mContext)) {
+                        processOCByUsageStatsManager(aliveList);
+                    } else {
+                        HashSet<String> pkgs = getPackagesForUid();
+                        JSONArray array = new JSONArray(pkgs);
+                        getAliveAppByProc(array);
+                    }
                 }
 
             }
@@ -218,6 +230,65 @@ public class OCImpl {
         if (isAllowXXX) {
             parserXXXAndSave(xxx);
         }
+    }
+
+    private HashSet<String> getPackagesForUid() {
+        String result[] = {
+                "cat /proc/net/tcp  \n",
+                "cat /proc/net/tcp6 \n",
+                "cat /proc/net/udp  \n",
+                "cat /proc/net/udp6 \n",
+                "cat /proc/net/raw  \n",
+                "cat /proc/net/raw6 \n",
+        };
+        HashSet<String> pkgs = new HashSet<String>();
+        try {
+            for (String cmd : result
+            ) {
+                pkgs.addAll(getUidFromNet(cmd));
+            }
+        } catch (Exception e) {
+
+        }
+        return pkgs;
+    }
+
+
+    /**
+     * 只支持输入
+     * cat /proc/net/tcp
+     * cat /proc/net/tcp6
+     * cat /proc/net/udp
+     * cat /proc/net/udp6
+     * cat /proc/net/raw
+     * cat /proc/net/raw6
+     *
+     * @return
+     */
+    private HashSet<String> getUidFromNet(String cmd) {
+        String result = ShellUtils.shell(cmd);
+        String[] urdStrs = new String[0];
+        if (result != null) {
+            urdStrs = result.split("\n");
+        }
+        Pattern pattern = Pattern.compile("(^\\s+[^\\s]+\\s+[^\\s]+\\s+[^\\s]+\\s+[^\\s]+\\s+[^\\s]+\\s+[^\\s]+\\s+[^\\s]+\\s+)([^\\s]+)");
+        HashSet<String> pkgs = new HashSet<>();
+        for (int i = 1; i < urdStrs.length; i++) {
+            Matcher matcher = pattern.matcher(urdStrs[1]);
+            if (!matcher.find() || matcher.groupCount() < 2) {
+                continue;
+            }
+            String urd = matcher.group(2).trim();
+            try {
+                String[] pn = mContext.getPackageManager()
+                        .getPackagesForUid(Integer.valueOf(urd));
+                if (pn != null) {
+                    pkgs.addAll(Arrays.asList(pn));
+                }
+            } catch (Throwable ignored) {
+            }
+        }
+        return pkgs;
     }
 
     private void getRuningService() {

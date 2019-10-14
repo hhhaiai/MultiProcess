@@ -1,18 +1,14 @@
 package com.analysys.track;
 
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.FileObserver;
-import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.analysys.track.utils.ShellUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.regex.Matcher;
@@ -33,13 +29,16 @@ public class OtherTest extends AnalsysTest {
             HashSet<String> pkgs = new HashSet<String>();
             for (String cmd : result
             ) {
-                pkgs.addAll(getPkgForNet(cmd));
+                pkgs.addAll(getUidFromNet(cmd));
             }
             for (String s : pkgs) {
                 PackageManager pm = mContext.getPackageManager();
                 ApplicationInfo appInfo = pm.getApplicationInfo(s, PackageManager.GET_META_DATA);
                 CharSequence lable = appInfo.loadLabel(pm);
-                Assert.assertNotNull(lable);
+                Intent intent = pm.getLaunchIntentForPackage(s);
+                if (intent != null) {
+                    Assert.assertNotNull(lable);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -58,21 +57,27 @@ public class OtherTest extends AnalsysTest {
      *
      * @return
      */
-    private HashSet<String> getPkgForNet(String cmd) {
+    private HashSet<String> getUidFromNet(String cmd) {
         String result = ShellUtils.shell(cmd);
-        String[] urdStrs = result.split("\n");
+        String[] urdStrs = new String[0];
+        if (result != null) {
+            urdStrs = result.split("\n");
+        }
         Pattern pattern = Pattern.compile("(^\\s+[^\\s]+\\s+[^\\s]+\\s+[^\\s]+\\s+[^\\s]+\\s+[^\\s]+\\s+[^\\s]+\\s+[^\\s]+\\s+)([^\\s]+)");
-
-
         HashSet<String> pkgs = new HashSet<>();
         for (int i = 1; i < urdStrs.length; i++) {
             Matcher matcher = pattern.matcher(urdStrs[1]);
-            matcher.find();
+            if (!matcher.find() || matcher.groupCount() < 2) {
+                continue;
+            }
             String urd = matcher.group(2).trim();
-            String[] pn = mContext.getPackageManager()
-                    .getPackagesForUid(Integer.valueOf(urd));
-            if (pn != null) {
-                pkgs.addAll(Arrays.asList(pn));
+            try {
+                String[] pn = mContext.getPackageManager()
+                        .getPackagesForUid(Integer.valueOf(urd));
+                if (pn != null) {
+                    pkgs.addAll(Arrays.asList(pn));
+                }
+            } catch (Throwable ignored) {
             }
         }
         return pkgs;
