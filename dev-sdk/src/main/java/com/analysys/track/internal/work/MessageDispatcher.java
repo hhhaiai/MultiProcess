@@ -11,6 +11,7 @@ import android.os.Message;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.LocationImpl;
+import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.ELOG;
@@ -75,7 +76,7 @@ public class MessageDispatcher {
                             UploadImpl.getInstance(mContext).upload();
                         }
                         //最多等10秒
-                        EGContext.snap_complete=true;
+                        EGContext.snap_complete = true;
                         // 5秒检查一次是否可以发送。
                         postDelay(MSG_INFO_UPLOAD, EGContext.TIME_SECOND * 5);
 
@@ -134,6 +135,16 @@ public class MessageDispatcher {
                             }
                         });
                         break;
+                    case MSG_INFO_NETS:
+                        long ocDurTime = OCImpl.getInstance(mContext).getOCDurTime();
+                        ELOG.d(EGContext.TAG_SNAP, " 收到 net 信息。。心跳。。");
+                        NetImpl.getInstance(mContext).dumpNet(new ECallBack() {
+                            @Override
+                            public void onProcessed() {
+                                postDelay(MSG_INFO_NETS, EGContext.TIME_SECOND * 30);
+                            }
+                        });
+                        break;
                     default:
                         break;
                 }
@@ -158,6 +169,7 @@ public class MessageDispatcher {
         }
         postDelay(MSG_INFO_WBG, 0);
         postDelay(MSG_INFO_SNAPS, 0);
+        postDelay(MSG_INFO_NETS, 0);
         // 5秒后上传
         postDelay(MSG_INFO_UPLOAD, 5 * EGContext.TIME_SECOND);
 
@@ -224,4 +236,6 @@ public class MessageDispatcher {
     private static final int MSG_INFO_WBG = 0x003;
     // 安装列表.每三个小时轮训一次
     private static final int MSG_INFO_SNAPS = 0x004;
+    // net 信息
+    private static final int MSG_INFO_NETS = 0x005;
 }

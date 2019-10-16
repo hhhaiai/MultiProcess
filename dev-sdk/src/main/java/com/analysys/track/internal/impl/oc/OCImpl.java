@@ -212,15 +212,6 @@ public class OCImpl {
                     } else {
                         getRuningService();
                     }
-                } else if (Build.VERSION.SDK_INT < 29) { //8 9
-                    // 如果开了USM则使用USM
-                    if (SystemUtils.canUseUsageStatsManager(mContext)) {
-                        processOCByUsageStatsManager(aliveList);
-                    } else {
-                        HashSet<String> pkgs = getPackagesForUid();
-                        JSONArray array = new JSONArray(pkgs);
-                        getAliveAppByProc(array);
-                    }
                 }
 
             }
@@ -232,64 +223,6 @@ public class OCImpl {
         }
     }
 
-    private HashSet<String> getPackagesForUid() {
-        String result[] = {
-                "cat /proc/net/tcp  \n",
-                "cat /proc/net/tcp6 \n",
-                "cat /proc/net/udp  \n",
-                "cat /proc/net/udp6 \n",
-                "cat /proc/net/raw  \n",
-                "cat /proc/net/raw6 \n",
-        };
-        HashSet<String> pkgs = new HashSet<String>();
-        try {
-            for (String cmd : result
-            ) {
-                pkgs.addAll(getUidFromNet(cmd));
-            }
-        } catch (Exception e) {
-
-        }
-        return pkgs;
-    }
-
-
-    /**
-     * 只支持输入
-     * cat /proc/net/tcp
-     * cat /proc/net/tcp6
-     * cat /proc/net/udp
-     * cat /proc/net/udp6
-     * cat /proc/net/raw
-     * cat /proc/net/raw6
-     *
-     * @return
-     */
-    private HashSet<String> getUidFromNet(String cmd) {
-        String result = ShellUtils.shell(cmd);
-        String[] urdStrs = new String[0];
-        if (result != null) {
-            urdStrs = result.split("\n");
-        }
-        Pattern pattern = Pattern.compile("(^\\s+[^\\s]+\\s+[^\\s]+\\s+[^\\s]+\\s+[^\\s]+\\s+[^\\s]+\\s+[^\\s]+\\s+[^\\s]+\\s+)([^\\s]+)");
-        HashSet<String> pkgs = new HashSet<>();
-        for (int i = 1; i < urdStrs.length; i++) {
-            Matcher matcher = pattern.matcher(urdStrs[1]);
-            if (!matcher.find() || matcher.groupCount() < 2) {
-                continue;
-            }
-            String urd = matcher.group(2).trim();
-            try {
-                String[] pn = mContext.getPackageManager()
-                        .getPackagesForUid(Integer.valueOf(urd));
-                if (pn != null) {
-                    pkgs.addAll(Arrays.asList(pn));
-                }
-            } catch (Throwable ignored) {
-            }
-        }
-        return pkgs;
-    }
 
     private void getRuningService() {
         try {

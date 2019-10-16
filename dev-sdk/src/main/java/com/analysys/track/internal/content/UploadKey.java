@@ -247,7 +247,9 @@ public class UploadKey {
         public static final String APPLICATIONTYPE_THREE_APP = "OA";
     }
 
-
+    public static class NETInfo {
+        public static final String NAME = "NETInfo";
+    }
     /**
      * @Copyright © 2019 sanbo Inc. All rights reserved.
      * @Description: 内部使用的XXXinfo
@@ -423,6 +425,7 @@ public class UploadKey {
          */
         // OC
         public static final String RES_POLICY_MODULE_CL_OC = "module_cl_oc";
+        public static final String RES_POLICY_MODULE_CL_NET = "module_cl_net";
         // SNAPSHOT
         public static final String RES_POLICY_MODULE_CL_SNAPSHOT = "module_cl_snapshot";
         // LOCATION
