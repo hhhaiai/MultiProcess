@@ -199,10 +199,10 @@ public class NetImpl {
                 .append(ipv6_16, 12, 16).append(":")
                 .append(ipv6_16, 16, 20).append(":")
                 .append(ipv6_16, 20, 24).append(":")
-                .append(Integer.parseInt(ipv6_16.substring(24, 26), 16)).append(".")
-                .append(Integer.parseInt(ipv6_16.substring(26, 28), 16)).append(".")
+                .append(Integer.parseInt(ipv6_16.substring(30, 32), 16)).append(".")
                 .append(Integer.parseInt(ipv6_16.substring(28, 30), 16)).append(".")
-                .append(Integer.parseInt(ipv6_16.substring(30, 32), 16)).append(":")
+                .append(Integer.parseInt(ipv6_16.substring(26, 28), 16)).append(".")
+                .append(Integer.parseInt(ipv6_16.substring(24, 26), 16)).append(":")
                 .append(Integer.parseInt(ipv6_16.substring(33), 16));
         return buffer.toString();
     }
@@ -253,10 +253,10 @@ public class NetImpl {
         }
         StringBuffer buffer = new StringBuffer();
         buffer
-                .append(Integer.parseInt(ipv4_16.substring(0, 2), 16)).append(".")
-                .append(Integer.parseInt(ipv4_16.substring(2, 4), 16)).append(".")
+                .append(Integer.parseInt(ipv4_16.substring(6, 8), 16)).append(".")
                 .append(Integer.parseInt(ipv4_16.substring(4, 6), 16)).append(".")
-                .append(Integer.parseInt(ipv4_16.substring(6, 8), 16)).append(":")
+                .append(Integer.parseInt(ipv4_16.substring(2, 4), 16)).append(".")
+                .append(Integer.parseInt(ipv4_16.substring(0, 2), 16)).append(":")
                 .append(Integer.parseInt(ipv4_16.substring(9), 16));
         return buffer.toString();
     }
