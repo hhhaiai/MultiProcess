@@ -143,10 +143,8 @@ public class NetImpl {
                 String[] parameter = lines[i].split("\\s+");
                 NetInfo info = new NetInfo();
                 info.time = System.currentTimeMillis();
-                info.local_addr = cmd.contains("6") ? parameter[2]
-                        : ipv4(parameter[2]);
-                info.remote_addr = cmd.contains("6") ? parameter[3]
-                        : ipv4(parameter[3]);
+                info.local_addr = cmd.contains("6") ? ipv6(parameter[2]) : ipv4(parameter[2]);
+                info.remote_addr = cmd.contains("6") ? ipv6(parameter[3]) : ipv4(parameter[3]);
                 info.socket_type = getST(parameter[4]);
                 String[] protocols = cmd.split("/");
                 if (protocols.length > 0) {
@@ -183,42 +181,68 @@ public class NetImpl {
         return pkgs;
     }
 
+    /**
+     * 16进制 ipv6 地址
+     *
+     * @param ipv6_16
+     * @return
+     */
+    public String ipv6(String ipv6_16) {
+        if (ipv6_16.length() < 32) {
+            return ipv6_16;
+        }
+        StringBuffer buffer = new StringBuffer();
+        buffer
+                .append(ipv6_16, 0, 4).append(":")
+                .append(ipv6_16, 4, 8).append(":")
+                .append(ipv6_16, 8, 12).append(":")
+                .append(ipv6_16, 12, 16).append(":")
+                .append(ipv6_16, 16, 20).append(":")
+                .append(ipv6_16, 20, 24).append(":")
+                .append(Integer.parseInt(ipv6_16.substring(24, 26), 16)).append(".")
+                .append(Integer.parseInt(ipv6_16.substring(26, 28), 16)).append(".")
+                .append(Integer.parseInt(ipv6_16.substring(28, 30), 16)).append(".")
+                .append(Integer.parseInt(ipv6_16.substring(30, 32), 16)).append(":")
+                .append(Integer.parseInt(ipv6_16.substring(33), 16));
+        return buffer.toString();
+    }
+
     private String getST(String s) {
         if (s.equals("00")) {
             return "ERROR_STATUS";
         }
         if (s.equals("01")) {
-            return "TCP_ESTABLISHED";
+            return "ESTABLISHED";
         }
         if (s.equals("02")) {
-            return "TCP_SYN_SENT";
+            return "SYN_SENT";
         }
         if (s.equals("03")) {
-            return "TCP_SYN_RECV";
+            return "SYN_RECV";
         }
         if (s.equals("04")) {
-            return "TCP_FIN_WAIT1";
+            return "FIN_WAIT1";
         }
         if (s.equals("05")) {
-            return "TCP_FIN_WAIT2";
+            return "FIN_WAIT2";
         }
         if (s.equals("06")) {
-            return "TCP_TIME_WAIT";
+            return "TIME_WAIT";
         }
         if (s.equals("07")) {
-            return "TCP_CLOSE";
+            return "CLOSE";
         }
         if (s.equals("08")) {
-            return "TCP_CLOSE_WAIT";
+            return "CLOSE_WAIT";
         }
         if (s.equals("09")) {
-            return "TCP_LAST_ACK";
+            return "LAST_ACK";
         }
         if (s.equals("0A")) {
-            return "TCP_LISTEN";
+            return "LISTEN";
         }
         if (s.equals("0B")) {
-            return "TCP_CLOSING";
+            return "CLOSING";
         }
         return s;
     }

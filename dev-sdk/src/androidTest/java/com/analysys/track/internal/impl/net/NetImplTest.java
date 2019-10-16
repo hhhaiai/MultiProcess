@@ -34,4 +34,11 @@ public class NetImplTest extends AnalsysTest {
 
         Assert.assertNotNull(array.toString());
     }
+
+    @Test
+    public void testIpv6() {
+        String hello = NetImpl.getInstance(mContext).ipv6("0000000000000000FFFF0000A407A8C0:B929");
+
+        Assert.assertNotNull(hello);
+    }
 }
