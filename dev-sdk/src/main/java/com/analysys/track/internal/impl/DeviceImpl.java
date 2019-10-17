@@ -591,7 +591,7 @@ public class DeviceImpl {
             info.setBatteryTemperature(String.valueOf(temperature));
         } catch (Throwable e) {
         }
-        MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_BATTERY_BROADCAST, System.currentTimeMillis());
+        //MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_BATTERY_BROADCAST, System.currentTimeMillis());
     }
 
     // 电池相关信息BatteryModuleNameImpl
