@@ -5,6 +5,7 @@ import android.content.Context;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.sp.SPHelper;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -26,13 +27,18 @@ public class ObjectFactory {
         mapMemberClass.put(Byte.class, "byte");
     }
 
-    private static volatile AnalysysClassLoader loader;
+    private static volatile ClassLoader loader;
 
     public static final void init(Context context) {
         if (loader == null) {
             synchronized (ObjectFactory.class) {
                 if (loader == null) {
                     String path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH, "");
+                    if (path == null || path.equals("") || !new File(path).isFile()) {
+                        SPHelper.setBooleanValue2SP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
+                        loader = Object.class.getClassLoader();
+                        return;
+                    }
                     loader = new AnalysysClassLoader(path, context.getCacheDir().getAbsolutePath(), null, context.getClassLoader());
                 }
             }
