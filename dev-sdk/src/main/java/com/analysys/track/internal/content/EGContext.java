@@ -243,7 +243,7 @@ public class EGContext {
     public static final boolean DEBUG_OC = false;
     public static String TAG_OC;
     // 安装列表部分日志控制
-    public static final boolean DEBUG_SNAP = false;
+    public static final boolean DEBUG_SNAP = true;
     public static String TAG_SNAP;
     // 广播日志控制
     public static final boolean DEBUG_RECEIVER = false;

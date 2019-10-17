@@ -56,6 +56,11 @@ public class AppSnapshotImpl {
                 if (EGContext.DEBUG_SNAP) {
                     ELOG.i(EGContext.TAG_SNAP, "动态调整关闭采集安装列表。。。");
                 }
+
+                if (callBack != null) {
+                    callBack.onProcessed();
+                }
+
                 return;
             }
             long now = System.currentTimeMillis();

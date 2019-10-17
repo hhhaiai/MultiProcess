@@ -454,7 +454,7 @@ public class PolicyImpl {
 //                                setSp(UploadKey.Response.RES_POLICY_MODULE_CL_ECIO_LIST,false);
                         continue;
                     } // 1收集,默认值即为轮询的值，忽略最小最大,基站不轮询
-                    else{
+                    else {
                         SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_BASE, true);
                     }
                 } else if (EGContext.MODULE_DEV.equals(module)) {
@@ -464,7 +464,7 @@ public class PolicyImpl {
 
                         continue;
                     } // 1收集,默认值即为轮询的值，忽略最小最大,基本信息不轮询，发送时候现收集
-                    else{
+                    else {
                         SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_DEV, true);
                     }
                     array = obj.optJSONArray(UploadKey.Response.RES_POLICY_CTRL_SUB_CONTROL);
@@ -474,8 +474,7 @@ public class PolicyImpl {
 //                        setSp(UploadKey.Response.RES_POLICY_MODULE_CL_XXX, false);
                         SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_XXX, false);
                         continue;
-                    }
-                    else{
+                    } else {
                         SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true);
                     }
                     array = obj.optJSONArray(UploadKey.Response.RES_POLICY_CTRL_SUB_CONTROL);
