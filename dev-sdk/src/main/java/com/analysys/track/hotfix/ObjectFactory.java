@@ -3,6 +3,7 @@ package com.analysys.track.hotfix;
 import android.content.Context;
 
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.File;
@@ -63,7 +64,7 @@ public class ObjectFactory {
             }
 
             if (method == null) {
-                throw new IllegalArgumentException("[" + classname + "." + methodName + "]" + "No function found corresponding to the parameter type");
+                ELOG.e(EGContext.HOT_FIX_TAG, "[" + classname + "." + methodName + "]" + "No function found corresponding to the parameter type");
             }
             method.setAccessible(true);
             return (T) method.invoke(object, pram);
@@ -101,7 +102,7 @@ public class ObjectFactory {
             }
 
             if (constructor == null) {
-                throw new IllegalArgumentException("[" + classname + "]" + "not has parameter type constructor,if this is a innerClass,please see :https://github.com/miqt/WandFix/wiki/");
+                ELOG.e(EGContext.HOT_FIX_TAG, "[" + classname + "]" + "not has parameter type constructor,if this is a innerClass");
             }
             constructor.setAccessible(true);
             T o = constructor.newInstance(pram);
