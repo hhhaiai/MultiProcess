@@ -60,7 +60,12 @@ public class AnalysysTracker {
 
         boolean hfEnable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
         if (EGContext.IS_HOST && hfEnable) {
-            ObjectFactory.init(context);
+            String path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH, "");
+            if (path == null || path.equals("") || !new File(path).isFile()) {
+                SPHelper.setBooleanValue2SP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
+                return;
+            }
+            ObjectFactory.init(context, path);
             ObjectFactory.invokeMethod(null, AnalysysTracker.class.getName(), "init", context, appKey, channel);
             return;
         }
@@ -74,8 +79,8 @@ public class AnalysysTracker {
      */
     public static void setDebugMode(Context context, boolean isDebug) {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST &&hfEnable) {
-            ObjectFactory.invokeMethod(null, AnalysysTracker.class.getName(), "setDebugMode",context, isDebug);
+        if (EGContext.IS_HOST && hfEnable) {
+            ObjectFactory.invokeMethod(null, AnalysysTracker.class.getName(), "setDebugMode", context, isDebug);
             return;
         }
         EGContext.FLAG_DEBUG_USER = isDebug;

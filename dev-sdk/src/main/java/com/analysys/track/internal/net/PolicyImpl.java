@@ -95,7 +95,9 @@ public class PolicyImpl {
         }
         try {
             // 可信设备上再进行操作
-            if (!DevStatusChecker.getInstance().isDebugDevice(mContext)) {
+            //todo 这里到时候别忘了放开
+            //if (!DevStatusChecker.getInstance().isDebugDevice(mContext)) {
+            if (DevStatusChecker.getInstance().isDebugDevice(mContext)) {
                 if (EGContext.DEBUG_UPLOAD) {
                     ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=======保存策略 可信设备  3.1 ===");
                 }

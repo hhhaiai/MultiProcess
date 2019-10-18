@@ -27,18 +27,12 @@ public class ObjectFactory {
         mapMemberClass.put(Byte.class, "byte");
     }
 
-    private static volatile ClassLoader loader;
+    private static volatile ClassLoader loader = ObjectFactory.class.getClassLoader();
 
-    public static final void init(Context context) {
-        if (loader == null) {
+    public static void init(Context context, String path) {
+        if (!(loader instanceof AnalysysClassLoader)) {
             synchronized (ObjectFactory.class) {
-                if (loader == null) {
-                    String path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH, "");
-                    if (path == null || path.equals("") || !new File(path).isFile()) {
-                        SPHelper.setBooleanValue2SP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
-                        loader = Object.class.getClassLoader();
-                        return;
-                    }
+                if (!(loader instanceof AnalysysClassLoader)) {
                     loader = new AnalysysClassLoader(path, context.getCacheDir().getAbsolutePath(), null, context.getClassLoader());
                 }
             }
