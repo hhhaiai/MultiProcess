@@ -10,6 +10,7 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.CrashHandler;
+import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.internal.work.ServiceHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
@@ -100,7 +101,7 @@ public class AnalysysInternal {
         // 4. 只能注册一次，不能注册多次
         ReceiverUtils.getInstance().registAllReceiver(ctx);
         // 5. 启动工作机制
-//        MessageDispatcher.getInstance(ctx).startService();
+        MessageDispatcher.getInstance(ctx).initModule();
         ServiceHelper.getInstance(mContextRef.get()).startSelfService();
         // 6. 根据屏幕调整工作状态
         PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);

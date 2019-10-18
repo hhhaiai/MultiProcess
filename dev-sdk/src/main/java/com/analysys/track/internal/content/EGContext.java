@@ -18,6 +18,7 @@ public class EGContext {
     public static final String SDK_VERSION = BuildConfig.SDK_VERSION;
     public static final String SDK_TYPE = "Android";
     public static final String LOGTAG_USER = "analysys";
+    public static final String UPLOAD_HEAD_APPV = "appVer";
     public static String LOGTAG_INNER;
     public static boolean FLAG_DEBUG_USER = false;
 
@@ -265,7 +266,7 @@ public class EGContext {
     public static final boolean DEBUG_LOCATION = true;
     public static String TAG_LOC;
     // 执行上传URL控制
-    public static final boolean DEBUG_URL = false;
+    public static final boolean DEBUG_URL = true;
 
     static {
         //调整。解决编译时到处可见打印字段问题。

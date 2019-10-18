@@ -502,17 +502,17 @@ public class SystemUtils {
         return "";
     }
 
-//    /**
-//     * 获取APP版本，HTTP请求头中使用。墨迹版本时使用
-//     *
-//     * @param context
-//     * @return
-//     */
-//    public static String getAppV(Context context) {
-//        try {
-//            return getPkgInfo(context, context.getPackageName()).versionName;
-//        } catch (Throwable e) {
-//            return "0";
-//        }
-//    }
+    /**
+     * 获取APP版本，HTTP请求头中使用。墨迹版本时使用
+     *
+     * @param context
+     * @return
+     */
+    public static String getAppV(Context context) {
+        try {
+            return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+        } catch (Throwable e) {
+            return "0";
+        }
+    }
 }

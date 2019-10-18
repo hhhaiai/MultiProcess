@@ -51,7 +51,7 @@ public class PatchHelper {
                 } catch (Throwable e) {
                 }
             }
-        },30000);
+        },20000);
     }
 
     public static void loadStatic(Context context, File file, String className, String methodName, Class[] pareTyples,
