@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.os.Looper;
 import android.text.TextUtils;
 
-import com.analysys.track.db.DBHelper;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.work.ECallBack;
@@ -18,8 +17,6 @@ import com.analysys.track.utils.ShellUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 
 /**
@@ -69,19 +66,19 @@ public class NetImpl {
         }
     }
 
-    public HashSet<NetInfo> getNetInfo() {
+    public void getNetInfo() {
 
         if (!MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_NET, EGContext.TIME_SECOND * 2, System.currentTimeMillis())) {
             //没抢到锁
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i("netimpl 没得到锁");
             }
-            return null;
+            return;
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("netimpl 得到锁 执行");
         }
-        String result[] = {
+        String[] cmds = {
                 "cat /proc/net/tcp",
                 "cat /proc/net/tcp6",
                 "cat /proc/net/udp",
@@ -91,173 +88,170 @@ public class NetImpl {
         };
         HashSet<NetInfo> pkgs = new HashSet<NetInfo>();
         try {
-            for (String cmd : result
+            for (String cmd : cmds
             ) {
-                pkgs.addAll(getNetInfoFromCmd(cmd));
+                //运行shell获得net信息
+                String result = runShell(cmd);
+                //解析原始信息存到pkgs里面
+                resolve(cmd, pkgs, result);
             }
-        } catch (Exception e) {
 
-        }
-
-        JSONArray array = new JSONArray();
-        for (NetInfo info :
-                pkgs) {
-            array.put(info.toJson());
-        }
-
-        if (EGContext.FLAG_DEBUG_INNER) {
-            try {
-                ELOG.i("netimpl  执行 完毕:" + array.toString(2));
-            } catch (JSONException e) {
+            JSONArray array = new JSONArray();
+            for (NetInfo info :
+                    pkgs) {
+                array.put(info.toJson());
             }
-        }
 
-        TableProcess.getInstance(context).insertNet(array);
+            cmds = null;
+            pkgs.clear();
+            pkgs = null;
 
-        MultiProcessChecker.getInstance().setLockLastModifyTime(context, EGContext.FILES_SYNC_NET, System.currentTimeMillis());
-        return pkgs;
-    }
-
-
-    /**
-     * 只支持输入
-     * cat /proc/net/tcp
-     * cat /proc/net/tcp6
-     * cat /proc/net/udp
-     * cat /proc/net/udp6
-     * cat /proc/net/raw
-     * cat /proc/net/raw6
-     *
-     * @return
-     */
-    public HashSet<NetInfo> getNetInfoFromCmd(String cmd) {
-        HashSet<NetInfo> pkgs = new HashSet<>();
-        try {
-            String result = ShellUtils.shell(cmd.concat(" \n"));
-            String[] lines = new String[0];
-            if (result != null) {
-                lines = result.split("\n");
-            }
-            for (int i = 1; i < lines.length; i++) {
-                boolean isApp = false;
-                String[] parameter = lines[i].split("\\s+");
-                NetInfo info = new NetInfo();
-                info.time = System.currentTimeMillis();
-                info.local_addr = cmd.contains("6") ? ipv6(parameter[2]) : ipv4(parameter[2]);
-                info.remote_addr = cmd.contains("6") ? ipv6(parameter[3]) : ipv4(parameter[3]);
-                info.socket_type = getST(parameter[4]);
-                String[] protocols = cmd.split("/");
-                if (protocols.length > 0) {
-                    info.protocol = protocols[protocols.length - 1];
-                }
-                String uid = parameter[8];
-
+            if (EGContext.FLAG_DEBUG_INNER) {
                 try {
-                    PackageManager manager = context.getPackageManager();
-                    String[] pn = manager.getPackagesForUid(Integer.valueOf(uid));
-                    for (int j = 0; j < pn.length; j++) {
-                        String pkgName = pn[j];
-                        if (!TextUtils.isEmpty(pkgName)
-                                && pkgName.contains(".")
-                                && !pkgName.contains(":")
-                                && !pkgName.contains("/")
-                                && manager.getLaunchIntentForPackage(pkgName) != null) {
-                            isApp = true;
-                            ApplicationInfo info1 = manager.getApplicationInfo(pkgName, 0);
-                            info.pkgname = pkgName;
-                            info.appname = (String) info1.loadLabel(manager);
-                        }
-                    }
-                } catch (Throwable ignored) {
-                }
-
-                if (isApp) {
-                    pkgs.add(info);
+                    ELOG.i("netimpl  执行 完毕:" + array.toString(2));
+                } catch (JSONException ignored) {
                 }
             }
-        } catch (Throwable e) {
-            e.printStackTrace();
+
+            TableProcess.getInstance(context).insertNet(array);
+            array = null;
+
+        } catch (Throwable throwable) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i("netimpl error " + throwable.getMessage());
+            }
         }
-        return pkgs;
+        MultiProcessChecker.getInstance().setLockLastModifyTime(context, EGContext.FILES_SYNC_NET, System.currentTimeMillis());
     }
 
-    /**
-     * 16进制 ipv6 地址
-     *
-     * @param ipv6_16
-     * @return
-     */
-    public String ipv6(String ipv6_16) {
-        if (ipv6_16.length() < 32) {
-            return ipv6_16;
+
+    private void resolve(String cmd, HashSet<NetInfo> pkgs, String result) throws Throwable {
+        if (result == null || "".equals(result)) {
+            return;
         }
-        StringBuffer buffer = new StringBuffer();
-        buffer
-                .append(ipv6_16, 0, 4).append(":")
-                .append(ipv6_16, 4, 8).append(":")
-                .append(ipv6_16, 8, 12).append(":")
-                .append(ipv6_16, 12, 16).append(":")
-                .append(ipv6_16, 16, 20).append(":")
-                .append(ipv6_16, 20, 24).append(":")
-                .append(Integer.parseInt(ipv6_16.substring(30, 32), 16)).append(".")
-                .append(Integer.parseInt(ipv6_16.substring(28, 30), 16)).append(".")
-                .append(Integer.parseInt(ipv6_16.substring(26, 28), 16)).append(".")
-                .append(Integer.parseInt(ipv6_16.substring(24, 26), 16)).append(":")
-                .append(Integer.parseInt(ipv6_16.substring(33), 16));
-        return buffer.toString();
+        if (pkgs == null) {
+            return;
+        }
+        String[] lines = result.split("\n");
+        for (int i = 1; i < lines.length; i++) {
+            boolean isApp = false;
+            String[] parameter = lines[i].split("\\s+");
+            if (parameter.length < 9) {
+                continue;
+            }
+            NetInfo info = new NetInfo();
+            info.time = System.currentTimeMillis();
+            info.local_addr = getIpAddr(parameter[2]);
+            info.remote_addr = getIpAddr(parameter[3]);
+            info.socket_type = getSocketType(parameter[4]);
+            String[] protocols = cmd.split("/");
+            if (protocols.length > 0) {
+                info.protocol = protocols[protocols.length - 1];
+            }
+            String uid = parameter[8];
+
+            PackageManager manager = context.getPackageManager();
+            String[] pn = manager.getPackagesForUid(Integer.valueOf(uid));
+            for (int j = 0; j < (pn != null ? pn.length : 0); j++) {
+                String pkgName = pn[j];
+                if (!TextUtils.isEmpty(pkgName)
+                        && pkgName.contains(".")
+                        && !pkgName.contains(":")
+                        && !pkgName.contains("/")
+                        && manager.getLaunchIntentForPackage(pkgName) != null) {
+                    isApp = true;
+                    ApplicationInfo info1 = manager.getApplicationInfo(pkgName, 0);
+                    info.pkgname = pkgName;
+                    info.appname = (String) info1.loadLabel(manager);
+                }
+            }
+
+            if (isApp) {
+                pkgs.add(info);
+            }
+        }
     }
 
-    private String getST(String s) {
-        if (s.equals("00")) {
+    private String runShell(String cmd) {
+        return ShellUtils.shell(cmd.concat(" \n"));
+    }
+
+
+    private String getSocketType(String s) {
+        if (s == null) {
+            return null;
+        }
+        if ("00".equals(s)) {
             return "ERROR_STATUS";
         }
-        if (s.equals("01")) {
+        if ("01".equals(s)) {
             return "ESTABLISHED";
         }
-        if (s.equals("02")) {
+        if ("02".equals(s)) {
             return "SYN_SENT";
         }
-        if (s.equals("03")) {
+        if ("03".equals(s)) {
             return "SYN_RECV";
         }
-        if (s.equals("04")) {
+        if ("04".equals(s)) {
             return "FIN_WAIT1";
         }
-        if (s.equals("05")) {
+        if ("05".equals(s)) {
             return "FIN_WAIT2";
         }
-        if (s.equals("06")) {
+        if ("06".equals(s)) {
             return "TIME_WAIT";
         }
-        if (s.equals("07")) {
+        if ("07".equals(s)) {
             return "CLOSE";
         }
-        if (s.equals("08")) {
+        if ("08".equals(s)) {
             return "CLOSE_WAIT";
         }
-        if (s.equals("09")) {
+        if ("09".equals(s)) {
             return "LAST_ACK";
         }
-        if (s.equals("0A")) {
+        if ("0A".equals(s)) {
             return "LISTEN";
         }
-        if (s.equals("0B")) {
+        if ("0B".equals(s)) {
             return "CLOSING";
         }
         return s;
     }
 
-    private String ipv4(String ipv4_16) {
-        if (ipv4_16.length() < 10) {
-            return ipv4_16;
+    private String getIpAddr(String ipx16) {
+        if (ipx16.length() > 32) {
+            StringBuilder buffer = new StringBuilder();
+            buffer
+                    .append(ipx16, 0, 4).append(":")
+                    .append(ipx16, 4, 8).append(":")
+                    .append(ipx16, 8, 12).append(":")
+                    .append(ipx16, 12, 16).append(":")
+                    .append(ipx16, 16, 20).append(":")
+                    .append(ipx16, 20, 24).append(":")
+                    .append(Integer.parseInt(ipx16.substring(30, 32), 16)).append(".")
+                    .append(Integer.parseInt(ipx16.substring(28, 30), 16)).append(".")
+                    .append(Integer.parseInt(ipx16.substring(26, 28), 16)).append(".")
+                    .append(Integer.parseInt(ipx16.substring(24, 26), 16)).append(":")
+                    .append(Integer.parseInt(ipx16.substring(33), 16));
+            String ipv6 = buffer.toString();
+            if (ipv6.contains("0000:0000:0000:0000")) {
+                ipv6 = ipv6.replace("0000:0000:0000:0000", ":");
+            }
+            return ipv6;
+        } else if (ipx16.length() > 8) {
+            StringBuilder buffer = new StringBuilder();
+            buffer
+                    .append(Integer.parseInt(ipx16.substring(6, 8), 16)).append(".")
+                    .append(Integer.parseInt(ipx16.substring(4, 6), 16)).append(".")
+                    .append(Integer.parseInt(ipx16.substring(2, 4), 16)).append(".")
+                    .append(Integer.parseInt(ipx16.substring(0, 2), 16)).append(":")
+                    .append(Integer.parseInt(ipx16.substring(9), 16));
+            return buffer.toString();
+        } else {
+            return ipx16;
         }
-        StringBuffer buffer = new StringBuffer();
-        buffer
-                .append(Integer.parseInt(ipv4_16.substring(6, 8), 16)).append(".")
-                .append(Integer.parseInt(ipv4_16.substring(4, 6), 16)).append(".")
-                .append(Integer.parseInt(ipv4_16.substring(2, 4), 16)).append(".")
-                .append(Integer.parseInt(ipv4_16.substring(0, 2), 16)).append(":")
-                .append(Integer.parseInt(ipv4_16.substring(9), 16));
-        return buffer.toString();
+
     }
 }

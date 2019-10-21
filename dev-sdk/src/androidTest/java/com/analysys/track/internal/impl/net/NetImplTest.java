@@ -18,27 +18,15 @@ public class NetImplTest extends AnalsysTest {
 
     @Test
     public void getUidFromNet() {
-        HashSet<NetInfo> infos = NetImpl.getInstance(mContext).getNetInfo();
-        JSONArray array = new JSONArray();
-        for (NetInfo info :
-                infos) {
-            array.put(info.toJson());
-        }
-        Assert.assertNotNull(array.toString());
+        NetImpl.getInstance(mContext).getNetInfo();
+        JSONArray array = null;
 
-        TableProcess.getInstance(mContext).insertNet(array);
         array = TableProcess.getInstance(mContext).selectNet(1 * 1024 * 1024);
-        Assert.assertNotNull(array.toString());
+        Assert.assertTrue(array.length() > 0);
         TableProcess.getInstance(mContext).deleteNet();
         array = TableProcess.getInstance(mContext).selectNet(1 * 1024 * 1024);
 
-        Assert.assertNotNull(array.toString());
+        Assert.assertEquals(array.length(), 0);
     }
 
-    @Test
-    public void testIpv6() {
-        String hello = NetImpl.getInstance(mContext).ipv6("0000000000000000FFFF0000A407A8C0:B929");
-
-        Assert.assertNotNull(hello);
-    }
 }
