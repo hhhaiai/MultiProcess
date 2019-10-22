@@ -277,7 +277,6 @@ public class ELOG {
             if (EGContext.DEBUG_HF) {
                 Log.v(EGContext.HOT_FIX_TAG,
                         "\n\n[HOST]:" + EGContext.IS_HOST +
-                                "\n[DEX_ERROR]:" + EGContext.DEX_ERROR +
                                 "\n[VERSION]:" + EGContext.HOT_FIX_VERSION
                 );
             }

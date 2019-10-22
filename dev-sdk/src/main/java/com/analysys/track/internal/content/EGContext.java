@@ -161,7 +161,7 @@ public class EGContext {
     // SDK应用列表更新间隔,同时只有一个进程工作,首次SDK初始化时创建,涉及广播，5秒监听就行
     public static final String FILES_SYNC_APPSNAPSHOT = "SAP.TAG";
     public static final String FILES_SYNC_OC = "OCS.TAG";
-    public static final String FILES_SYNC_HOTFIX = "FSH.TAG";
+    public static final String FILES_SYNC_HOTFIX = "FSHTF.TAG";
     // OC 5+同步时间,同时只有一个进程工作
     public static final long TIME_SYNC_OC_OVER_5 = 30 * 1000;
 
@@ -242,7 +242,7 @@ public class EGContext {
     //是否是宿主,打热修复包的时候设置为否
     public static boolean IS_HOST = BuildConfig.IS_HOST;
     //dex文件损坏,默认是没有dex文件的,所以默认为true
-    public static boolean DEX_ERROR = true;
+    public static boolean DEX_ERROR = false;
     public static final String HOT_FIX_TAG = "ANALYSYSHOTFIX";
 
 
@@ -251,27 +251,27 @@ public class EGContext {
      * EGuan 内部调试系列tag.主要用于控制堆栈打印、错误打印、内部提示信息打印
      */
     // 策略的总控。关闭后所有的日志都不能打印
-    public static final boolean FLAG_DEBUG_INNER = false;
+    public static final boolean FLAG_DEBUG_INNER = true;
 
     // 上传模快日志控制
     public static final boolean DEBUG_UPLOAD = false;
     public static String TAG_UPLOAD;
     // OC模快日志控制
-    public static final boolean DEBUG_OC = true;
+    public static final boolean DEBUG_OC = false;
     //热修复打印
     public static final boolean DEBUG_HF = true;
     public static String TAG_OC;
     // 安装列表部分日志控制
-    public static final boolean DEBUG_SNAP = true;
+    public static final boolean DEBUG_SNAP = false;
     public static String TAG_SNAP;
     // 广播日志控制
-    public static final boolean DEBUG_RECEIVER = true;
+    public static final boolean DEBUG_RECEIVER = false;
     public static String TAG_RECEIVER;
     // 位置日志打印
-    public static final boolean DEBUG_LOCATION = true;
+    public static final boolean DEBUG_LOCATION = false;
     public static String TAG_LOC;
     // 执行上传URL控制
-    public static final boolean DEBUG_URL = false;
+    public static final boolean DEBUG_URL = true;
 
     static {
         //调整。解决编译时到处可见打印字段问题。

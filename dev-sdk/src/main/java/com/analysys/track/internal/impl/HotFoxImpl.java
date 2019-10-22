@@ -42,7 +42,8 @@ public class HotFoxImpl {
 
     private static void reqHotFix(Context context) {
         try {
-            if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_HOTFIX, EGContext.TIME_SECOND * 2, System.currentTimeMillis())) {
+            long time = System.currentTimeMillis();
+            if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_UPLOAD, EGContext.TIME_SECOND * 2, time)) {
                 try {
                     if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.i(EGContext.HOT_FIX_TAG, "检查更新[开始]-获得锁");
@@ -54,29 +55,33 @@ public class HotFoxImpl {
                     if (TextUtils.isEmpty(url)) {
                         return;
                     }
-                    url = url + "/hotpatch/";
+                    url = url + "/hotpatch";
                     String result = RequestUtils.httpRequest(url, "", context);
-                    if (EGContext.FLAG_DEBUG_INNER) {
-                        ELOG.i(EGContext.HOT_FIX_TAG, "result = " + result);
-                    }
-                    if (RequestUtils.FAIL.equals(result)) {
-                        return;
-                    }
 
-                    JSONObject object = new JSONObject(result);
-                    String code = String.valueOf(object.opt(UploadKey.Response.RES_CODE));
-                    if (EGContext.HTTP_STATUS_500.equals(code)) {
-                        PolicyImpl.getInstance(context).saveHotFixPatch(object.optJSONObject(UploadKey.Response.RES_POLICY));
-                    }
-                    if (EGContext.FLAG_DEBUG_INNER) {
-                        ELOG.i(EGContext.HOT_FIX_TAG, "检查更新[结束]-释放锁");
+                    if (!RequestUtils.FAIL.equals(result)) {
+                        JSONObject object = new JSONObject(result);
+                        String code = String.valueOf(object.opt(UploadKey.Response.RES_CODE));
+                        if (EGContext.FLAG_DEBUG_INNER) {
+                            ELOG.i(EGContext.HOT_FIX_TAG, "result = " + code);
+                        }
+                        if (EGContext.HTTP_STATUS_500.equals(code)) {
+                            //PolicyImpl.getInstance(context).saveHotFixPatch(object.optJSONObject(UploadKey.Response.RES_POLICY));
+                            PolicyImpl.getInstance(context).saveRespParams(object);
+                        }
+                        if (EGContext.FLAG_DEBUG_INNER) {
+                            ELOG.i(EGContext.HOT_FIX_TAG, "检查更新[结束]-释放锁");
+                        }
+                    } else {
+                        if (EGContext.FLAG_DEBUG_INNER) {
+                            ELOG.i(EGContext.HOT_FIX_TAG, "result = " + result);
+                        }
                     }
                 } catch (Throwable e) {
                     if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.i(EGContext.HOT_FIX_TAG, "检查更新[结束][出错]-释放锁" + e.getMessage());
                     }
                 }
-                MultiProcessChecker.getInstance().setLockLastModifyTime(context, EGContext.FILES_SYNC_HOTFIX, System.currentTimeMillis());
+                MultiProcessChecker.getInstance().setLockLastModifyTime(context, EGContext.FILES_SYNC_UPLOAD, System.currentTimeMillis());
             } else {
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i(EGContext.HOT_FIX_TAG, "检查更新[让行]-没获得锁");
@@ -86,6 +91,8 @@ public class HotFoxImpl {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
+        } finally {
+
         }
     }
 }

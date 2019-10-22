@@ -49,7 +49,9 @@ public class ObjectFactory {
 
                         @Override
                         public void onLoadBySelf(String name) {
-
+                            if(MYCLASS_NAME.contains(name)){
+                                //EGContext.DEX_ERROR=true;
+                            }
                         }
 
                         @Override

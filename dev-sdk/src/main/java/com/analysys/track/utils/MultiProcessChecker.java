@@ -122,6 +122,9 @@ public class MultiProcessChecker {
                 }
             }
         } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
         }
         return false;
     }
@@ -178,6 +181,9 @@ public class MultiProcessChecker {
 
                     }
                 } catch (Throwable e) {
+                    if (EGContext.FLAG_DEBUG_INNER) {
+                        ELOG.e(e);
+                    }
                 }
             } else {
                 return false;

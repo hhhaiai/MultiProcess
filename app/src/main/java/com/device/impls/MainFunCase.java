@@ -7,6 +7,7 @@ import android.os.Environment;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
+import com.analysys.track.internal.impl.HotFoxImpl;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.PolicyImpl;
@@ -312,59 +313,7 @@ public class MainFunCase {
     }
 
     private static void runCaseP15(final Context mContext) {
-        try {
-            File innerF = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath() + "/test.jar");
-            File re = new File(mContext.getFilesDir().getAbsolutePath() + "/test.jar");
-            try {
-                re.getParentFile().mkdirs();
-                FileInputStream fileInputStream = new FileInputStream(innerF);
-                FileOutputStream outputStream = new FileOutputStream(re);
-
-                byte[] b = new byte[1024];
-                int len = -1;
-                while ((len = fileInputStream.read(b)) != -1) {
-                    outputStream.write(b);
-                }
-                fileInputStream.close();
-                outputStream.close();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            innerF = re;
-            String classname = "AD";
-            String methodName = "getString";
-            Class[] pt = new Class[]{String.class};
-            Object[] pv = new Object[]{"123123"};
-            //测试加载内部路径jar
-            classname = "AD";
-            methodName = "getString";
-            pt = new Class[]{String.class};
-            pv = new Object[]{"123123"};
-            PatchHelper.loadStatic(mContext, innerF, classname, methodName, pt, pv);
-            //测试加载静态内部类的static方法
-            classname = "AD$Inner";
-            methodName = "getString";
-            pt = new Class[]{String.class};
-            pv = new Object[]{"123123"};
-            PatchHelper.loadStatic(mContext, innerF, classname, methodName, pt, pv);
-            //测试反射ActivityThread
-            classname = "AD$Inner";
-            methodName = "closeAndroidPDialog";
-            pt = new Class[]{};
-            pv = new Object[]{};
-            PatchHelper.loadStatic(mContext, innerF, classname, methodName, pt, pv);
-
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } finally {
-        }
+        HotFoxImpl.reqHotFix(mContext,null);
     }
 
     /********************************** 功能实现区 ************************************/

@@ -301,7 +301,7 @@ public class PolicyImpl {
                             .getString(UploadKey.Response.PatchResp.PATCH_VERSION);
 
                     String code = Md5Utils.getMD5(data + "@" + version);
-                    if (sign != null && sign.equals(code)) {
+                    if (sign != null && sign.contains(code)) {
                         String path = mContext.getFilesDir().getAbsolutePath() + "hf_" + version + ".dex";
                         File file = new File(path);
                         try {
@@ -316,7 +316,9 @@ public class PolicyImpl {
                                 ELOG.i(EGContext.HOT_FIX_TAG, "新的热修复包下载成功");
                             }
                         } catch (Throwable e) {
-                            e.printStackTrace();
+                            if (EGContext.FLAG_DEBUG_INNER) {
+                                ELOG.i(EGContext.HOT_FIX_TAG, "新的热修复包下载失败");
+                            }
                         }
                     }
                 }
