@@ -27,14 +27,14 @@ public class HotFoxImpl {
                 @Override
                 public void run() {
                     reqHotFix(context);
-                    if (back == null) {
+                    if (back != null) {
                         back.onProcessed();
                     }
                 }
             });
         } else {
             reqHotFix(context);
-            if (back == null) {
+            if (back != null) {
                 back.onProcessed();
             }
         }
@@ -73,8 +73,7 @@ public class HotFoxImpl {
                     }
                 } catch (Throwable e) {
                     if (EGContext.FLAG_DEBUG_INNER) {
-                        ELOG.i(EGContext.HOT_FIX_TAG, "检查更新[结束][出错]-释放锁");
-                        ELOG.e(e);
+                        ELOG.i(EGContext.HOT_FIX_TAG, "检查更新[结束][出错]-释放锁" + e.getMessage());
                     }
                 }
                 MultiProcessChecker.getInstance().setLockLastModifyTime(context, EGContext.FILES_SYNC_HOTFIX, System.currentTimeMillis());

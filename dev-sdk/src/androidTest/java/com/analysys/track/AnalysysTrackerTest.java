@@ -30,9 +30,9 @@ public class AnalysysTrackerTest {
 
     @Test
     public void setDebugMode() {
-        AnalysysTracker.setDebugMode(true);
+        AnalysysTracker.setDebugMode(mContext,true);
         Assert.assertTrue(EGContext.FLAG_DEBUG_USER);
-        AnalysysTracker.setDebugMode(false);
+        AnalysysTracker.setDebugMode(mContext,false);
         Assert.assertFalse(EGContext.FLAG_DEBUG_USER);
     }
 }

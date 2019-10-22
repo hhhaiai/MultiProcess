@@ -10,7 +10,7 @@ def version = "4.3.0.5"
 def date = "20191017_hf"
 
 //是否是热修复的宿主
-def isHost = true
+def isHost = false
 //当前热修复包的版本
 def hf_code = 1
 
