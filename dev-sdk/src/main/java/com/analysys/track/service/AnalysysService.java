@@ -25,7 +25,7 @@ public class AnalysysService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(this.getApplicationContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST &&hfEnable) {
+        if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
             return ObjectFactory.invokeMethod(
                     ObjectFactory.make(AnalysysService.class.getName())
                     , AnalysysService.class.getName()
@@ -38,7 +38,7 @@ public class AnalysysService extends Service {
     @Override
     public void onCreate() {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(this.getApplicationContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST &&hfEnable) {
+        if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
             ObjectFactory.invokeMethod(
                     ObjectFactory.make(AnalysysService.class.getName())
                     , AnalysysService.class.getName()
@@ -57,7 +57,7 @@ public class AnalysysService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(this.getApplicationContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST &&hfEnable) {
+        if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
             return ObjectFactory.invokeMethod(
                     ObjectFactory.make(AnalysysService.class.getName())
                     , AnalysysService.class.getName()
@@ -73,7 +73,7 @@ public class AnalysysService extends Service {
     @Override
     public void onDestroy() {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(this.getApplicationContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST &&hfEnable) {
+        if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
             ObjectFactory.invokeMethod(
                     ObjectFactory.make(AnalysysService.class.getName())
                     , AnalysysService.class.getName()

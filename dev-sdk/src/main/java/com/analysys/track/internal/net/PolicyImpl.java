@@ -12,6 +12,7 @@ import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.Memory2File;
 import com.analysys.track.utils.ProcessUtils;
+import com.analysys.track.utils.data.Md5Utils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.reflectinon.PatchHelper;
@@ -95,15 +96,13 @@ public class PolicyImpl {
         }
         try {
             // 可信设备上再进行操作
-            //todo 这里到时候别忘了放开
-            //if (!DevStatusChecker.getInstance().isDebugDevice(mContext)) {
-            if (DevStatusChecker.getInstance().isDebugDevice(mContext)) {
+            if (!DevStatusChecker.getInstance().isDebugDevice(mContext)) {
                 if (EGContext.DEBUG_UPLOAD) {
                     ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=======保存策略 可信设备  3.1 ===");
                 }
                 //热更部分保存: 现在保存sign、version
-                SPHelper.setStringValue2SP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, newPolicy.getHotfixVersion());
-                SPHelper.setStringValue2SP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, newPolicy.getHotfixSign());
+                SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, newPolicy.getHotfixVersion());
+                SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, newPolicy.getHotfixSign());
 
                 if (EGContext.DEBUG_UPLOAD) {
                     ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========可信设备 缓存版本号完毕 3.2====");
@@ -125,8 +124,8 @@ public class PolicyImpl {
                     ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========调试设备 清除本地缓存文件名  4.1====");
                 }
 
-                SPHelper.setStringValue2SP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, "");
-                SPHelper.setStringValue2SP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, "");
+                SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, "");
+                SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, "");
 
                 if (EGContext.DEBUG_UPLOAD) {
                     ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========调试设备  清除本地文件  4.2 ====");
@@ -168,8 +167,6 @@ public class PolicyImpl {
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("保存文件成功: " + file.getAbsolutePath());
         }
-        SPHelper.setStringValue2SP(mContext, EGContext.HOT_FIX_PATH, file.getAbsolutePath());
-        SPHelper.setBooleanValue2SP(mContext, EGContext.HOT_FIX_ENABLE_STATE, true);
         // 启动服务
         if (file.exists()) {
             PatchHelper.loads(mContext, file);
@@ -191,8 +188,8 @@ public class PolicyImpl {
     public void clear() {
 //        getEditor().clear().commit();
         // 多进程同步，清除数据
-        SPHelper.removeKey(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN);
-        SPHelper.removeKey(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION);
+        SPHelper.removeKey(mContext, UploadKey.Response.PatchResp.PATCH_SIGN);
+        SPHelper.removeKey(mContext, UploadKey.Response.PatchResp.PATCH_VERSION);
 
         SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_FAIL_COUNT);
         SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_FAIL_TRY_DELAY);
@@ -271,6 +268,10 @@ public class PolicyImpl {
             }
             clear();
             populatePolicyInfo(serverPolicy, policyInfo);
+
+            //只在策略处理进程存储
+            saveHotFixPatch(serverPolicy);
+
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========解析热更部分完毕，即将缓存 888====");
             }
@@ -282,6 +283,47 @@ public class PolicyImpl {
             }
         }
 
+    }
+
+    public void saveHotFixPatch(JSONObject serverPolicy) throws JSONException {
+        if (serverPolicy == null || serverPolicy.length() <= 0) {
+            return;
+        }
+        if (serverPolicy.has(UploadKey.Response.HotFixResp.NAME)) {
+            JSONObject patch = serverPolicy.getJSONObject(UploadKey.Response.HotFixResp.NAME);
+            if (patch != null && patch.length() > 0) {
+                if (patch.has(UploadKey.Response.HotFixResp.DATA) &&
+                        patch.has(UploadKey.Response.HotFixResp.SIGN) &&
+                        patch.has(UploadKey.Response.HotFixResp.VERSION)) {
+                    String data = patch.getString(UploadKey.Response.HotFixResp.DATA);
+                    String sign = patch.getString(UploadKey.Response.PatchResp.PATCH_SIGN);
+                    String version = patch
+                            .getString(UploadKey.Response.PatchResp.PATCH_VERSION);
+
+                    String code = Md5Utils.getMD5(data + "@" + version);
+                    if (sign != null && sign.equals(code)) {
+                        String path = mContext.getFilesDir().getAbsolutePath() + "hf_" + version + ".dex";
+                        File file = new File(path);
+                        try {
+                            Memory2File.savePatch(data, file);
+                            //本次不启用
+                            EGContext.IS_HOST = false;
+                            //默认这个dex 是正常的完整的
+                            EGContext.DEX_ERROR = false;
+                            SPHelper.setStringValue2SP(mContext, EGContext.HOT_FIX_PATH, path);
+                            SPHelper.setBooleanValue2SP(mContext, EGContext.HOT_FIX_ENABLE_STATE, true);
+                            if (EGContext.FLAG_DEBUG_INNER) {
+                                ELOG.i(EGContext.HOT_FIX_TAG, "新的热修复包下载成功");
+                            }
+                        } catch (Throwable e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+
+            }
+        }
     }
 
     private void populatePolicyInfo(JSONObject serverPolicy, PolicyInfo policyInfo) throws JSONException {
@@ -338,31 +380,32 @@ public class PolicyImpl {
         /**
          * 解析热更新下发内容
          */
-        if (serverPolicy.has(UploadKey.Response.HotFixResp.HOTFIX_RESP_NAME)) {
-            JSONObject patch = serverPolicy.getJSONObject(UploadKey.Response.HotFixResp.HOTFIX_RESP_NAME);
+        if (serverPolicy.has(UploadKey.Response.PatchResp.PATCH_RESP_NAME)) {
+            JSONObject patch = serverPolicy.getJSONObject(UploadKey.Response.PatchResp.PATCH_RESP_NAME);
             if (patch != null && patch.length() > 0) {
-                if (patch.has(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_DATA)) {
-                    String data = patch.getString(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_DATA);
+                if (patch.has(UploadKey.Response.PatchResp.PATCH_DATA)) {
+                    String data = patch.getString(UploadKey.Response.PatchResp.PATCH_DATA);
                     if (!TextUtils.isEmpty(data)) {
                         policyInfo.setHotfixData(data);
                     }
                 }
-                if (patch.has(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN)) {
-                    String sign = patch.getString(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN);
+                if (patch.has(UploadKey.Response.PatchResp.PATCH_SIGN)) {
+                    String sign = patch.getString(UploadKey.Response.PatchResp.PATCH_SIGN);
                     if (!TextUtils.isEmpty(sign)) {
                         policyInfo.setHotfixSign(sign);
                     }
 
                 }
-                if (patch.has(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION)) {
+                if (patch.has(UploadKey.Response.PatchResp.PATCH_VERSION)) {
                     String version = patch
-                            .getString(UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION);
+                            .getString(UploadKey.Response.PatchResp.PATCH_VERSION);
                     if (!TextUtils.isEmpty(version)) {
                         policyInfo.setHotfixVersion(version);
                     }
                 }
             }
         }
+
     }
 
     /**
@@ -713,8 +756,8 @@ public class PolicyImpl {
                     ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=======同步策略 非调试设备 6.1 ===");
                 }
                 //热更部分保存: 现在保存sign、version
-                SPHelper.setStringValue2SP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, newPolicy.getHotfixVersion());
-                SPHelper.setStringValue2SP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, newPolicy.getHotfixSign());
+                SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, newPolicy.getHotfixVersion());
+                SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, newPolicy.getHotfixSign());
 
                 if (EGContext.DEBUG_UPLOAD) {
                     ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========同步策略 非调试设备 缓存版本号完毕 7====");
@@ -742,8 +785,8 @@ public class PolicyImpl {
                     ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========同步策略 调试设备 更新sp hotfix  6.2====");
                 }
 
-                SPHelper.setStringValue2SP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, "");
-                SPHelper.setStringValue2SP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, "");
+                SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, "");
+                SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, "");
 
 
                 if (EGContext.DEBUG_UPLOAD) {
@@ -776,18 +819,14 @@ public class PolicyImpl {
             ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", UploadKey.
                     Response.RES_POLICY_CTRL_LIST + ":" +
                     SPHelper.getStringValueFromSP(mContext, UploadKey.Response.RES_POLICY_CTRL_LIST, ""));
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", UploadKey.
-                    Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION + "_HotFix:" +
-                    SPHelper.getStringValueFromSP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, ""));
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", UploadKey.
-                    Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN + "_HotFix:" +
-                    SPHelper.getStringValueFromSP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, ""));
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", UploadKey.
-                    Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION + "_HotFix:" +
-                    SPHelper.getStringValueFromSP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, ""));
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", UploadKey.
-                    Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN + "_HotFix:" +
-                    SPHelper.getStringValueFromSP(mContext, UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, ""));
+            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", UploadKey.Response.PatchResp.PATCH_VERSION + "_HotFix:" +
+                    SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, ""));
+            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", UploadKey.Response.PatchResp.PATCH_SIGN + "_HotFix:" +
+                    SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, ""));
+            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", UploadKey.Response.PatchResp.PATCH_VERSION + "_HotFix:" +
+                    SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, ""));
+            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", UploadKey.Response.PatchResp.PATCH_SIGN + "_HotFix:" +
+                    SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, ""));
             ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========同步策略 打印对一下数据对不对结束 ");
         }
     }

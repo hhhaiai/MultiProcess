@@ -26,7 +26,7 @@ public class AnalysysJobService extends JobService {
     @Override
     public boolean onStartJob(final JobParameters params) {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(this.getApplicationContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST &&hfEnable) {
+        if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
             return ObjectFactory.invokeMethod(
                     ObjectFactory.make(AnalysysJobService.class.getName())
                     , AnalysysJobService.class.getName()
@@ -45,7 +45,7 @@ public class AnalysysJobService extends JobService {
     @Override
     public boolean onStopJob(JobParameters params) {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(this.getApplicationContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST &&hfEnable) {
+        if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
             return ObjectFactory.invokeMethod(
                     ObjectFactory.make(AnalysysJobService.class.getName())
                     , AnalysysJobService.class.getName()

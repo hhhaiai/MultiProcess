@@ -446,13 +446,22 @@ public class UploadKey {
 
 
         /**
-         * 热更新部分
+         * 补丁部分
+         */
+        public static class PatchResp {
+            public static final String PATCH_RESP_NAME = "patch";
+            public static final String PATCH_VERSION = "version";
+            public static final String PATCH_SIGN = "sign";
+            public static final String PATCH_DATA = "data";
+        }
+        /**
+         * 热更部分
          */
         public static class HotFixResp {
-            public static final String HOTFIX_RESP_NAME = "patch";
-            public static final String HOTFIX_RESP_PATCH_VERSION = "version";
-            public static final String HOTFIX_RESP_PATCH_SIGN = "sign";
-            public static final String HOTFIX_RESP_PATCH_DATA = "data";
+            public static final String NAME = "hotfix";
+            public static final String VERSION = "version";
+            public static final String SIGN = "sign";
+            public static final String DATA = "data";
         }
     }
 }

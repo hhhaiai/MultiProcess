@@ -11,15 +11,19 @@ def date = "20191017_hf"
 
 //是否是热修复的宿主
 def isHost = true
+//当前热修复包的版本
+def hf_code = 1
+
 
 android {
     compileSdkVersion 26
     buildToolsVersion '26.0.2'
 
     defaultConfig {
-        buildConfigField "String", "SDK_VERSION", "\"${version}|${date}\""
+        def sdkv = "${version}|${date}";
         buildConfigField "boolean", "IS_HOST", "${isHost}"
-
+        buildConfigField "String", "SDK_VERSION", "\"${sdkv}\""
+        buildConfigField "String", "hf_version", isHost ? "\"${sdkv}\"" : "\"${sdkv}.${hf_code}\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

@@ -27,7 +27,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
         boolean hfEnable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST &&hfEnable) {
+        if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
             ObjectFactory.invokeMethod(
                     ObjectFactory.make(AnalysysReceiver.class.getName())
                     , AnalysysReceiver.class.getName()

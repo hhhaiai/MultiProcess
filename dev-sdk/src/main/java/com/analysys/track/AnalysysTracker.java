@@ -59,7 +59,7 @@ public class AnalysysTracker {
 
 
         boolean hfEnable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST && hfEnable) {
+        if (EGContext.IS_HOST&&!EGContext.DEX_ERROR && hfEnable) {
             String path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH, "");
             if (path == null || path.equals("") || !new File(path).isFile()) {
                 SPHelper.setBooleanValue2SP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
@@ -79,7 +79,7 @@ public class AnalysysTracker {
      */
     public static void setDebugMode(Context context, boolean isDebug) {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST && hfEnable) {
+        if (EGContext.IS_HOST&&!EGContext.DEX_ERROR && hfEnable) {
             ObjectFactory.invokeMethod(null, AnalysysTracker.class.getName(), "setDebugMode", context, isDebug);
             return;
         }

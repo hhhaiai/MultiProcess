@@ -26,6 +26,7 @@ import java.net.URLEncoder;
  */
 public class RequestUtils {
 
+    public static final String FAIL = "-1";
 
     /**
      * HTTP
@@ -54,7 +55,7 @@ public class RequestUtils {
             connection.setRequestMethod("POST");
             // 添加头信息
 
-            connection.setRequestProperty(EGContext.SDKV, SPHelper.getStringValueFromSP(context, EGContext.SDKV, ""));
+            connection.setRequestProperty(EGContext.SDKV, EGContext.SDK_VERSION);
 //            connection.setRequestProperty(EGContext.DEBUG, DeviceImpl.getInstance(context).getDebug());
             connection.setRequestProperty(EGContext.DEBUG, DevStatusChecker.getInstance().isSelfDebugApp(context) ? "1" : "0");
             connection.setRequestProperty(EGContext.APPKEY, SystemUtils.getAppKey(context));
@@ -64,7 +65,7 @@ public class RequestUtils {
             //  // 区分3.x. 可以忽略不写
             // connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);// 写死
             // // 兼容墨迹版本区别需求增加。普通版本不增加该值
-             connection.setRequestProperty(EGContext.UPLOAD_HEAD_APPV, SystemUtils.getAppV(context));
+            connection.setRequestProperty(EGContext.UPLOAD_HEAD_APPV, SystemUtils.getAppV(context));
             // 打印请求头信息内容
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.i(EGContext.TAG_UPLOAD, "========HTTP头： " + connection.getRequestProperties().toString());
@@ -96,7 +97,7 @@ public class RequestUtils {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
-            response = "-1";
+            response = FAIL;
         } finally {
 
             StreamerUtils.safeClose(pw);

@@ -274,7 +274,13 @@ public class ELOG {
      */
     private static void parserArgsMain(int level, Object[] args) {
         if (EGContext.FLAG_DEBUG_INNER) {
-            Log.v(EGContext.HOT_FIX_TAG, "IsHost:" + EGContext.IS_HOST + "  v:" + EGContext.SDK_VERSION);
+            if (EGContext.DEBUG_HF) {
+                Log.v(EGContext.HOT_FIX_TAG,
+                        "\n\n[HOST]:" + EGContext.IS_HOST +
+                                "\n[DEX_ERROR]:" + EGContext.DEX_ERROR +
+                                "\n[VERSION]:" + EGContext.HOT_FIX_VERSION
+                );
+            }
             try {
                 String tag = DEFAULT_TAG;
                 if (!DEV_DEBUG) {

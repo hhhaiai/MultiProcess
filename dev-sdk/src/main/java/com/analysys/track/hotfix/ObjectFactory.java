@@ -4,18 +4,19 @@ import android.content.Context;
 
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.sp.SPHelper;
 
-import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
 public class ObjectFactory {
-    private final static HashMap<Class, String> mapMemberClass = new HashMap<Class, String>(8);
+    private final static HashMap<Class, String> mapMemberClass = new HashMap<Class, String>();
+    //放入入口类路径
+    private final static HashSet<String> MYCLASS_NAME = new HashSet<String>();
 
     static {
         mapMemberClass.put(Integer.class, "int");
@@ -26,6 +27,10 @@ public class ObjectFactory {
         mapMemberClass.put(Short.class, "short");
         mapMemberClass.put(Long.class, "long");
         mapMemberClass.put(Byte.class, "byte");
+
+        MYCLASS_NAME.add("com.analysys.track.AnalysysTracker");
+        MYCLASS_NAME.add("com.analysys.track.service.AnalysysService");
+        MYCLASS_NAME.add("com.analysys.track.receiver.AnalysysReceiver");
     }
 
     private static volatile ClassLoader loader = ObjectFactory.class.getClassLoader();
@@ -34,7 +39,34 @@ public class ObjectFactory {
         if (!(loader instanceof AnalysysClassLoader)) {
             synchronized (ObjectFactory.class) {
                 if (!(loader instanceof AnalysysClassLoader)) {
-                    loader = new AnalysysClassLoader(path, context.getCacheDir().getAbsolutePath(), null, context.getClassLoader());
+                    loader = new AnalysysClassLoader(path, context.getCacheDir().getAbsolutePath(), null, context.getClassLoader(), new AnalysysClassLoader.Callback() {
+                        @Override
+                        public void onSelfNotFound(String name) {
+                            if(MYCLASS_NAME.contains(name)){
+                                EGContext.DEX_ERROR=true;
+                            }
+                        }
+
+                        @Override
+                        public void onLoadBySelf(String name) {
+
+                        }
+
+                        @Override
+                        public void onLoadByCache(String name) {
+
+                        }
+
+                        @Override
+                        public void onLoadByParent(String name) {
+
+                        }
+
+                        @Override
+                        public void onNotFound(String name) {
+
+                        }
+                    });
                 }
             }
         }

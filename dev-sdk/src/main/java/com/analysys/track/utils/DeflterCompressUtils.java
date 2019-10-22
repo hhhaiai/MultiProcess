@@ -66,7 +66,6 @@ public class DeflterCompressUtils {
             key = key.substring(0, 3);
         }
         String sdkv = EGContext.SDK_VERSION;
-        SPHelper.setStringValue2SP(ctx, EGContext.SDKV, sdkv);
         if (sdkv.contains("|")) {
             sdkv = sdkv.substring(0, sdkv.indexOf("|")).replace(".", "");
         } else {

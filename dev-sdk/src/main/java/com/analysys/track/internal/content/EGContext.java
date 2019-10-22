@@ -161,6 +161,7 @@ public class EGContext {
     // SDK应用列表更新间隔,同时只有一个进程工作,首次SDK初始化时创建,涉及广播，5秒监听就行
     public static final String FILES_SYNC_APPSNAPSHOT = "SAP.TAG";
     public static final String FILES_SYNC_OC = "OCS.TAG";
+    public static final String FILES_SYNC_HOTFIX = "FSH.TAG";
     // OC 5+同步时间,同时只有一个进程工作
     public static final long TIME_SYNC_OC_OVER_5 = 30 * 1000;
 
@@ -233,14 +234,16 @@ public class EGContext {
      */
     public static String HOT_FIX_ENABLE_STATE = "hfEnable";
     //热更版本
-    public static String HOT_FIX_VERSION = "hf_version";
+    public static String HOT_FIX_VERSION = BuildConfig.hf_version;
     //热更文件路径
     public static String HOT_FIX_PATH = "hf_path";
     //热更文件哈希码
     public static String HOT_FIX_HASH = "hf_hash";
     //是否是宿主,打热修复包的时候设置为否
     public static boolean IS_HOST = BuildConfig.IS_HOST;
-    public static final String HOT_FIX_TAG = "ANALYSYSHOTFIX" ;
+    //dex文件损坏,默认是没有dex文件的,所以默认为true
+    public static boolean DEX_ERROR = true;
+    public static final String HOT_FIX_TAG = "ANALYSYSHOTFIX";
 
 
     /********************************************日志控制************************************************/
@@ -255,6 +258,8 @@ public class EGContext {
     public static String TAG_UPLOAD;
     // OC模快日志控制
     public static final boolean DEBUG_OC = true;
+    //热修复打印
+    public static final boolean DEBUG_HF = true;
     public static String TAG_OC;
     // 安装列表部分日志控制
     public static final boolean DEBUG_SNAP = true;

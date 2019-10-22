@@ -29,7 +29,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onCreate() {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(this.getApplicationContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST &&hfEnable) {
+        if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
             ObjectFactory.invokeMethod(
                     ObjectFactory.make(AnalysysAccessibilityService.class.getName())
                     , AnalysysAccessibilityService.class.getName()
@@ -48,7 +48,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     protected void onServiceConnected() {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(this.getApplicationContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST &&hfEnable) {
+        if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
             ObjectFactory.invokeMethod(
                     ObjectFactory.make(AnalysysAccessibilityService.class.getName())
                     , AnalysysAccessibilityService.class.getName()
@@ -83,7 +83,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(this.getApplicationContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST &&hfEnable) {
+        if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
             ObjectFactory.invokeMethod(
                     ObjectFactory.make(AnalysysAccessibilityService.class.getName())
                     , AnalysysAccessibilityService.class.getName()
@@ -118,7 +118,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onInterrupt() {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(this.getApplicationContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST &&hfEnable) {
+        if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
             ObjectFactory.invokeMethod(
                     ObjectFactory.make(AnalysysAccessibilityService.class.getName())
                     , AnalysysAccessibilityService.class.getName()

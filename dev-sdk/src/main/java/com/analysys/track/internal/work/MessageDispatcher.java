@@ -10,6 +10,7 @@ import android.os.Message;
 
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
+import com.analysys.track.internal.impl.HotFoxImpl;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.UploadImpl;
@@ -75,7 +76,7 @@ public class MessageDispatcher {
                             UploadImpl.getInstance(mContext).upload();
                         }
                         //最多等10秒
-                        EGContext.snap_complete=true;
+                        EGContext.snap_complete = true;
                         // 5秒检查一次是否可以发送。
                         postDelay(MSG_INFO_UPLOAD, EGContext.TIME_SECOND * 5);
 
@@ -107,6 +108,15 @@ public class MessageDispatcher {
                         });
                         break;
 
+                    case MSG_INFO_HOTFIX:
+                        HotFoxImpl.reqHotFix(mContext, new ECallBack() {
+                            @Override
+                            public void onProcessed() {
+                                // 30秒检查一次是否可以发送。
+                                postDelay(MSG_INFO_HOTFIX, EGContext.TIME_HOUR * 1);
+                            }
+                        });
+                        break;
                     case MSG_INFO_SNAPS:
                         if (EGContext.DEBUG_SNAP) {
                             ELOG.d(EGContext.TAG_SNAP, " 收到 安装列表检测 信息。。心跳。。");
@@ -160,6 +170,8 @@ public class MessageDispatcher {
         postDelay(MSG_INFO_SNAPS, 0);
         // 5秒后上传
         postDelay(MSG_INFO_UPLOAD, 5 * EGContext.TIME_SECOND);
+        //10 秒后检查热修复
+        postDelay(MSG_INFO_HOTFIX, 10 * EGContext.TIME_SECOND);
 
     }
 
@@ -224,4 +236,6 @@ public class MessageDispatcher {
     private static final int MSG_INFO_WBG = 0x003;
     // 安装列表.每三个小时轮训一次
     private static final int MSG_INFO_SNAPS = 0x004;
+    //热更新
+    private static final int MSG_INFO_HOTFIX = 0x005;
 }
