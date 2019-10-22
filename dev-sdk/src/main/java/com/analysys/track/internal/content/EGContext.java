@@ -230,9 +230,9 @@ public class EGContext {
     public static boolean STATUS_USB_DEBUG = true;
 
     /**
-     * 热更是否开启
+     * 热更是否开启 true 开启 false 关闭
      */
-    public static String HOT_FIX_ENABLE_STATE = "hfEnable";
+    public static String HOT_FIX_ENABLE_STATE = SDK_VERSION + "_hf";
     //热更版本
     public static String HOT_FIX_VERSION = BuildConfig.hf_version;
     //热更文件路径
