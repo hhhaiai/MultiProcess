@@ -162,6 +162,7 @@ public class EGContext {
     public static final String FILES_SYNC_APPSNAPSHOT = "SAP.TAG";
     public static final String FILES_SYNC_OC = "OCS.TAG";
     public static final String FILES_SYNC_HOTFIX = "FSHTF.TAG";
+    public static final String FILES_SYNC_NET = "NETS.TAG";
     // OC 5+同步时间,同时只有一个进程工作
     public static final long TIME_SYNC_OC_OVER_5 = 30 * 1000;
 

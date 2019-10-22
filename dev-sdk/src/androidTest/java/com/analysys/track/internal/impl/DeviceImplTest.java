@@ -1,10 +1,12 @@
 package com.analysys.track.internal.impl;
 
+import com.analysys.track.AnalsysTest;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class DeviceImplTest {
+public class DeviceImplTest extends AnalsysTest {
 
     @Test
     public void getInstance() {
@@ -12,14 +14,23 @@ public class DeviceImplTest {
 
     @Test
     public void getBluetoothAddress() {
+        //10 取不到
+        String s = DeviceImpl.getInstance(mContext).getBluetoothAddress(mContext);
+        assertNotNull(s);
     }
 
     @Test
     public void getDeviceId() {
+        String s = DeviceImpl.getInstance(mContext).getDeviceId();
+        assertNotNull(s);
     }
 
     @Test
     public void getMac() {
+        //1 3c:28:6d:ff:dd:a8
+        //2 3c:28:6d:ff:dd:a8
+        String s = DeviceImpl.getInstance(mContext).getMac();
+        assertNotNull(s);
     }
 
     @Test
@@ -36,6 +47,8 @@ public class DeviceImplTest {
 
     @Test
     public void getMobileOperator() {
+
+        DeviceImpl.getInstance(mContext).getMobileOperator();
     }
 
     @Test

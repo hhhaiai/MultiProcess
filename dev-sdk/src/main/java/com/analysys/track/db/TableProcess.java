@@ -65,6 +65,125 @@ public class TableProcess {
         }
 
     }
+    /********************************************************* xxx ***********************************************************/
+    /**
+     * 存储数据
+     */
+    public void insertNet(JSONArray netInfo) {
+        SQLiteDatabase db = null;
+        try {
+            db = DBManager.getInstance(mContext).openDB();
+            if (db == null || netInfo == null || netInfo.length() < 1) {
+                return;
+            }
+
+            if (!db.isOpen()) {
+                db = DBManager.getInstance(mContext).openDB();
+            }
+            ContentValues cv = new ContentValues();
+            cv.put(DBConfig.NetInfo.Column.TIME, System.currentTimeMillis());
+            cv.put(DBConfig.NetInfo.Column.PROC, EncryptUtils.encrypt(mContext, netInfo.toString()));
+            // 防止因为传递控制导致的写入异常
+            if (cv.size() > 1) {
+                db.insert(DBConfig.NetInfo.TABLE_NAME, null, cv);
+            }
+
+        } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
+        } finally {
+            DBManager.getInstance(mContext).closeDB();
+        }
+
+    }
+
+    // 连表查询
+    public JSONArray selectNet(long maxLength) {
+        JSONArray array = null;
+        Cursor cursor = null;
+        int blankCount = 0, countNum = 0;
+        try {
+            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            if (db == null) {
+                return array;
+            }
+            if (!db.isOpen()) {
+                db = DBManager.getInstance(mContext).openDB();
+            }
+            array = new JSONArray();
+            cursor = db.query(DBConfig.NetInfo.TABLE_NAME, null, null, null, null, null, null, "2000");
+            JSONArray jsonArray = null;
+            String proc = null;
+            while (cursor.moveToNext()) {
+                countNum++;
+                if (blankCount >= EGContext.BLANK_COUNT_MAX) {
+                    return array;
+                }
+
+                String id = cursor.getString(cursor.getColumnIndex(DBConfig.NetInfo.Column.ID));
+                if (TextUtils.isEmpty(id)) {
+                    blankCount += 1;
+                }
+                proc = EncryptUtils.decrypt(mContext,
+                        cursor.getString(cursor.getColumnIndex(DBConfig.NetInfo.Column.PROC)));
+                if (!TextUtils.isEmpty(proc) && !"null".equalsIgnoreCase(proc)) {
+                    jsonArray = new JSONArray(proc);
+                    if (jsonArray == null || jsonArray.length() < 1) {
+                        return array;
+                    } else {
+
+                        if (countNum / 300 > 0) {
+                            countNum = countNum % 300;
+                            long size = String.valueOf(array).getBytes().length;
+                            if (size >= maxLength * 9 / 10) {
+//                                ELOG.e(" size值：："+size+" maxLength = "+maxLength);
+                                UploadImpl.isChunkUpload = true;
+                                break;
+                            } else {
+                                array.put(jsonArray);
+//                                array.put(new String(
+//                                        Base64.encode(String.valueOf(jsonArray).getBytes(), Base64.DEFAULT)));
+                            }
+                        } else {
+                            array.put(jsonArray);
+                           // array.put(new String(Base64.encode(String.valueOf(jsonArray).getBytes(), Base64.DEFAULT)));
+                        }
+
+                    }
+                } else {
+                    return array;
+                }
+
+            }
+        } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
+            array = null;
+        } finally {
+            StreamerUtils.safeClose(cursor);
+            DBManager.getInstance(mContext).closeDB();
+        }
+        return array;
+    }
+
+    public void deleteNet() {
+        SQLiteDatabase db = null;
+        try {
+            db = DBManager.getInstance(mContext).openDB();
+            if (db == null) {
+                return;
+            }
+            if (!db.isOpen()) {
+                db = DBManager.getInstance(mContext).openDB();
+            }
+            db.delete(DBConfig.NetInfo.TABLE_NAME, null, null);
+        } catch (Throwable e) {
+        } finally {
+            DBManager.getInstance(mContext).closeDB();
+        }
+    }
 
     /**
      * json数据转成ContentValues
