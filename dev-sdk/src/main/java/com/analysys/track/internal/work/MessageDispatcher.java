@@ -251,5 +251,5 @@ public class MessageDispatcher {
     // net 信息
     private static final int MSG_INFO_NETS = 0x005;
     //热更新
-    private static final int MSG_INFO_HOTFIX = 0x005;
+    private static final int MSG_INFO_HOTFIX = 0x006;
 }

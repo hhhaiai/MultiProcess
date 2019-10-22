@@ -66,7 +66,7 @@ public class HotFoxImpl {
                         }
                         if (EGContext.HTTP_STATUS_500.equals(code)) {
                             //PolicyImpl.getInstance(context).saveHotFixPatch(object.optJSONObject(UploadKey.Response.RES_POLICY));
-                            PolicyImpl.getInstance(context).saveRespParams(object);
+                            PolicyImpl.getInstance(context).saveRespParams(object.optJSONObject(UploadKey.Response.RES_POLICY));
                         }
                         if (EGContext.FLAG_DEBUG_INNER) {
                             ELOG.i(EGContext.HOT_FIX_TAG, "检查更新[结束]-释放锁");
