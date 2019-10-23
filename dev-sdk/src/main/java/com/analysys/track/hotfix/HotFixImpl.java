@@ -16,8 +16,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import dalvik.system.PathClassLoader;
-
 public class HotFixImpl {
     private final static HashMap<Class, String> mapMemberClass = new HashMap<Class, String>();
     //放入入口类路径
@@ -42,42 +40,63 @@ public class HotFixImpl {
 
     private static volatile ClassLoader loader = EContextHelper.getContext(null).getClassLoader();
 
-    public static void init(Context context, String path) {
+    public static void init(Context context) {
         if (!isInit()) {
             synchronized (HotFixImpl.class) {
                 if (!isInit()) {
-                    loader = new AnalysysClassLoader(path, context.getCacheDir().getAbsolutePath(), null, context.getClassLoader(), new AnalysysClassLoader.Callback() {
-                        @Override
-                        public void onSelfNotFound(String name) {
-                            //入口类一定能自己找到,如果找不到,则一定是这个dex损坏了
-                            if (MYCLASS_NAME.contains(name)) {
-                                dexError();
-                            }
+                    String path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH, "");
+                    if (hasDexFile(path)) {
+                        setAnalClassloader(context, path);
+                    } else {
+                        if (EGContext.FLAG_DEBUG_INNER) {
+                            ELOG.i(EGContext.HOT_FIX_TAG, "dex 不存在 path = " + path);
                         }
-
-                        @Override
-                        public void onLoadBySelf(String name) {
-                        }
-
-                        @Override
-                        public void onLoadByCache(String name) {
-
-                        }
-
-                        @Override
-                        public void onLoadByParent(String name) {
-
-                        }
-
-                        @Override
-                        public void onNotFound(String name) {
-
-                        }
-                    });
+                        SPHelper.setBooleanValue2SP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
+                        setPathClassLoader();
+                    }
                     isinit = true;
                 }
             }
         }
+    }
+
+    private static void setPathClassLoader() {
+        loader = EContextHelper.getContext(null).getClassLoader();
+    }
+
+    private static void setAnalClassloader(Context context, String path) {
+        loader = new AnalysysClassLoader(path, context.getCacheDir().getAbsolutePath(), null, context.getClassLoader(), new AnalysysClassLoader.Callback() {
+            @Override
+            public void onSelfNotFound(String name) {
+                //入口类一定能自己找到,如果找不到,则一定是这个dex损坏了
+                if (MYCLASS_NAME.contains(name)) {
+                    dexError();
+                }
+            }
+
+            @Override
+            public void onLoadBySelf(String name) {
+            }
+
+            @Override
+            public void onLoadByCache(String name) {
+
+            }
+
+            @Override
+            public void onLoadByParent(String name) {
+
+            }
+
+            @Override
+            public void onNotFound(String name) {
+
+            }
+        });
+    }
+
+    private static boolean hasDexFile(String path) {
+        return path != null && !path.equals("") && new File(path).isFile();
     }
 
     private static volatile boolean isinit = false;
@@ -102,8 +121,11 @@ public class HotFixImpl {
         }
         SPHelper.setStringValue2SP(EContextHelper.getContext(null), EGContext.HOT_FIX_PATH, "");
         //激活状态设置为不激活
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i(EGContext.HOT_FIX_TAG, "dexError path = " + path);
+        }
         SPHelper.setBooleanValue2SP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
-        loader = EContextHelper.getContext(null).getClassLoader();
+        setPathClassLoader();
     }
 
     /**
@@ -116,22 +138,9 @@ public class HotFixImpl {
      * @param <T>
      * @return
      */
-    public static <T> T invokeMethod(Object object, String classname, String methodName,
-                                     Object... pram) throws HotFixException {
-        //热修复包损坏了 宿主自己掉自己  终止调用 走原来的逻辑
-        if (loader instanceof PathClassLoader) {
-            if (isInit()) {
-                throw new HotFixException("热修复包损坏了 宿主自己掉自己  终止调用 走原来的逻辑");
-            } else {
-                Context context = EContextHelper.getContext(null);
-                String path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH, "");
-                if (path == null || path.equals("") || !new File(path).isFile()) {
-                    SPHelper.setBooleanValue2SP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
-                    throw new HotFixException("热修复包损坏了 宿主自己掉自己  终止调用 走原来的逻辑");
-                }
-                init(context, path);
-            }
-        }
+    public static <T> T transform(Object object, String classname, String methodName,
+                                  Object... pram) throws HotFixTransformCancel {
+        canTransForm();
 
         if (classname == null || methodName == null || classname.length() == 0 || methodName.length() == 0) {
             return null;
@@ -168,6 +177,32 @@ public class HotFixImpl {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private static void canTransForm() throws HotFixTransformCancel {
+
+        if (!EGContext.IS_HOST) {
+            throw new HotFixTransformCancel("非宿主 不初始化,不转向");
+        }
+        if (EGContext.DEX_ERROR) {
+            throw new HotFixTransformCancel("dex损坏 不初始化,不转向");
+        }
+        Context context = EContextHelper.getContext(null);
+        if (context == null) {
+            throw new HotFixTransformCancel("context == null 不初始化,不转向");
+        }
+
+        if (!isInit()) {
+            init(context);
+        }
+        boolean b = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
+        if (!b) {
+            throw new HotFixTransformCancel("未激活 不转向");
+        }
+
+        if (!(loader instanceof AnalysysClassLoader)) {
+            throw new HotFixTransformCancel("类加载器不对 不转向");
+        }
     }
 
     public static <T> T make(String classname, Object... pram) {

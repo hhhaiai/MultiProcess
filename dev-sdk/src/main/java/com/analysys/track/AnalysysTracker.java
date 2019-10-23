@@ -2,7 +2,7 @@ package com.analysys.track;
 
 import android.content.Context;
 
-import com.analysys.track.hotfix.HotFixException;
+import com.analysys.track.hotfix.HotFixTransformCancel;
 import com.analysys.track.hotfix.HotFixImpl;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
@@ -58,16 +58,10 @@ public class AnalysysTracker {
 
         boolean hfEnable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
         if (EGContext.IS_HOST && !EGContext.DEX_ERROR && hfEnable) {
-            String path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH, "");
-            if (path == null || path.equals("") || !new File(path).isFile()) {
-                SPHelper.setBooleanValue2SP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
-                return;
-            }
-            HotFixImpl.init(context, path);
             try {
-                HotFixImpl.invokeMethod(null, AnalysysTracker.class.getName(), "init", context, appKey, channel);
+                HotFixImpl.transform(null, AnalysysTracker.class.getName(), "init", context, appKey, channel);
                 return;
-            } catch (HotFixException e) {
+            } catch (HotFixTransformCancel e) {
                 e.printStackTrace();
             }
         }
@@ -83,9 +77,9 @@ public class AnalysysTracker {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
         if (EGContext.IS_HOST && !EGContext.DEX_ERROR && hfEnable) {
             try {
-                HotFixImpl.invokeMethod(null, AnalysysTracker.class.getName(), "setDebugMode", context, isDebug);
+                HotFixImpl.transform(null, AnalysysTracker.class.getName(), "setDebugMode", context, isDebug);
                 return;
-            } catch (HotFixException e) {
+            } catch (HotFixTransformCancel e) {
                 e.printStackTrace();
             }
         }

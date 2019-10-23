@@ -3,7 +3,7 @@ package com.analysys.track.utils.reflectinon;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 
-import com.analysys.track.hotfix.HotFixException;
+import com.analysys.track.hotfix.HotFixTransformCancel;
 import com.analysys.track.hotfix.HotFixImpl;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.sp.SPHelper;
@@ -57,10 +57,10 @@ public class EContextHelperTest {
         }
         try {
             HotFixImpl.init(context, path);
-            Context o = HotFixImpl.invokeMethod(null, EContextHelper.class.getName(),
+            Context o = HotFixImpl.transform(null, EContextHelper.class.getName(),
                     "getContext", new Object[]{null});
             assertEquals(o, this.context);
-        } catch (HotFixException e) {
+        } catch (HotFixTransformCancel e) {
             e.printStackTrace();
         }
     }

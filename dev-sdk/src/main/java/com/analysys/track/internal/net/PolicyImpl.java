@@ -306,8 +306,6 @@ public class PolicyImpl {
                         File file = new File(path);
                         try {
                             Memory2File.savePatch(data, file);
-                            //本次不启用
-                            EGContext.IS_HOST = false;
                             //默认这个dex 是正常的完整的
                             EGContext.DEX_ERROR = false;
                             SPHelper.setStringValue2SP(mContext, EGContext.HOT_FIX_PATH, path);

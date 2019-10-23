@@ -345,7 +345,7 @@ public class DoubleCardSupport {
             if (instance == null) {
                 return;
             }
-            // String result = (String) invokeMethod(instance, method, new Object[]{slotID}, new
+            // String result = (String) transform(instance, method, new Object[]{slotID}, new
             // Class[]{int.class});
             String result = getString(instance, method, slotID);
 

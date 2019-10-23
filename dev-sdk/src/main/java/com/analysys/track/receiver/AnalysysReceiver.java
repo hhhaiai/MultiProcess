@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.analysys.track.hotfix.HotFixException;
+import com.analysys.track.hotfix.HotFixTransformCancel;
 import com.analysys.track.hotfix.HotFixImpl;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.ReceiverImpl;
@@ -29,12 +29,12 @@ public class AnalysysReceiver extends BroadcastReceiver {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
         if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
             try {
-                HotFixImpl.invokeMethod(
+                HotFixImpl.transform(
                         HotFixImpl.make(AnalysysReceiver.class.getName())
                         , AnalysysReceiver.class.getName()
                         , "onReceive", context, intent);
                 return;
-            } catch (HotFixException e) {
+            } catch (HotFixTransformCancel e) {
                 e.printStackTrace();
             }
         }

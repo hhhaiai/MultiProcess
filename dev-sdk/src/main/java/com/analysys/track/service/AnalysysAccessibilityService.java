@@ -6,7 +6,7 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.view.accessibility.AccessibilityEvent;
 
-import com.analysys.track.hotfix.HotFixException;
+import com.analysys.track.hotfix.HotFixTransformCancel;
 import com.analysys.track.hotfix.HotFixImpl;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
@@ -32,7 +32,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
         if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
             try {
-                HotFixImpl.invokeMethod(
+                HotFixImpl.transform(
                         HotFixImpl.make(AnalysysAccessibilityService.class.getName())
                         , AnalysysAccessibilityService.class.getName()
                         , "onCreate");
@@ -56,12 +56,12 @@ public class AnalysysAccessibilityService extends AccessibilityService {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
         if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
             try {
-                HotFixImpl.invokeMethod(
+                HotFixImpl.transform(
                         HotFixImpl.make(AnalysysAccessibilityService.class.getName())
                         , AnalysysAccessibilityService.class.getName()
                         , "onServiceConnected");
                 return;
-            } catch (HotFixException e) {
+            } catch (HotFixTransformCancel e) {
             }
 
         }
@@ -95,12 +95,12 @@ public class AnalysysAccessibilityService extends AccessibilityService {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
         if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
             try {
-                HotFixImpl.invokeMethod(
+                HotFixImpl.transform(
                         HotFixImpl.make(AnalysysAccessibilityService.class.getName())
                         , AnalysysAccessibilityService.class.getName()
                         , "onAccessibilityEvent",event);
                 return;
-            } catch (HotFixException e) {
+            } catch (HotFixTransformCancel e) {
             }
         }
         try {
@@ -133,12 +133,12 @@ public class AnalysysAccessibilityService extends AccessibilityService {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
         if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
             try {
-                HotFixImpl.invokeMethod(
+                HotFixImpl.transform(
                         HotFixImpl.make(AnalysysAccessibilityService.class.getName())
                         , AnalysysAccessibilityService.class.getName()
                         , "onInterrupt");
                 return;
-            } catch (HotFixException e) {
+            } catch (HotFixTransformCancel e) {
                 e.printStackTrace();
             }
         }

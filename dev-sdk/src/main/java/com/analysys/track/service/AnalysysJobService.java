@@ -4,7 +4,7 @@ import android.annotation.TargetApi;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 
-import com.analysys.track.hotfix.HotFixException;
+import com.analysys.track.hotfix.HotFixTransformCancel;
 import com.analysys.track.hotfix.HotFixImpl;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
@@ -30,14 +30,14 @@ public class AnalysysJobService extends JobService {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
         if (EGContext.IS_HOST && !EGContext.DEX_ERROR && hfEnable) {
             try {
-                Boolean aBoolean = HotFixImpl.invokeMethod(
+                Boolean aBoolean = HotFixImpl.transform(
                         HotFixImpl.make(AnalysysJobService.class.getName())
                         , AnalysysJobService.class.getName()
                         , "onStartJob", params);
                 if (aBoolean != null) {
                     return aBoolean;
                 }
-            } catch (HotFixException e) {
+            } catch (HotFixTransformCancel e) {
                 e.printStackTrace();
             }
         }
@@ -55,14 +55,14 @@ public class AnalysysJobService extends JobService {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
         if (EGContext.IS_HOST && !EGContext.DEX_ERROR && hfEnable) {
             try {
-                Boolean aBoolean = HotFixImpl.invokeMethod(
+                Boolean aBoolean = HotFixImpl.transform(
                         HotFixImpl.make(AnalysysJobService.class.getName())
                         , AnalysysJobService.class.getName()
                         , "onStopJob", params);
                 if (aBoolean != null) {
                     return aBoolean;
                 }
-            } catch (HotFixException e) {
+            } catch (HotFixTransformCancel e) {
                 e.printStackTrace();
             }
         }

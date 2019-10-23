@@ -4,7 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
-import com.analysys.track.hotfix.HotFixException;
+import com.analysys.track.hotfix.HotFixTransformCancel;
 import com.analysys.track.hotfix.HotFixImpl;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
@@ -29,14 +29,14 @@ public class AnalysysService extends Service {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
         if (EGContext.IS_HOST && !EGContext.DEX_ERROR && hfEnable) {
             try {
-                IBinder iBinder = HotFixImpl.invokeMethod(
+                IBinder iBinder = HotFixImpl.transform(
                         HotFixImpl.make(AnalysysService.class.getName())
                         , AnalysysService.class.getName()
                         , "onBind", intent);
                 if (iBinder != null) {
                     return iBinder;
                 }
-            } catch (HotFixException e) {
+            } catch (HotFixTransformCancel e) {
                 e.printStackTrace();
             }
         }
@@ -48,12 +48,12 @@ public class AnalysysService extends Service {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
         if (EGContext.IS_HOST && !EGContext.DEX_ERROR && hfEnable) {
             try {
-                HotFixImpl.invokeMethod(
+                HotFixImpl.transform(
                         HotFixImpl.make(AnalysysService.class.getName())
                         , AnalysysService.class.getName()
                         , "onCreate");
                 return;
-            } catch (HotFixException e) {
+            } catch (HotFixTransformCancel e) {
                 e.printStackTrace();
             }
         }
@@ -71,11 +71,11 @@ public class AnalysysService extends Service {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
         if (EGContext.IS_HOST && !EGContext.DEX_ERROR && hfEnable) {
             try {
-                return HotFixImpl.invokeMethod(
+                return HotFixImpl.transform(
                         HotFixImpl.make(AnalysysService.class.getName())
                         , AnalysysService.class.getName()
                         , "onStartCommand", intent, flags, startId);
-            } catch (HotFixException e) {
+            } catch (HotFixTransformCancel e) {
                 e.printStackTrace();
             }
 
@@ -95,12 +95,12 @@ public class AnalysysService extends Service {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
         if (EGContext.IS_HOST && !EGContext.DEX_ERROR && hfEnable) {
             try {
-                HotFixImpl.invokeMethod(
+                HotFixImpl.transform(
                         HotFixImpl.make(AnalysysService.class.getName())
                         , AnalysysService.class.getName()
                         , "onDestroy");
                 return;
-            } catch (HotFixException e) {
+            } catch (HotFixTransformCancel e) {
                 e.printStackTrace();
             }
         }
