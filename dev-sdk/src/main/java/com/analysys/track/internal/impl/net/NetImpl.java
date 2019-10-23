@@ -17,6 +17,12 @@ import com.analysys.track.utils.ShellUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashSet;
 
 /**
@@ -79,21 +85,25 @@ public class NetImpl {
             ELOG.i("netimpl 得到锁 执行");
         }
         String[] cmds = {
-                "cat /proc/net/tcp",
-                "cat /proc/net/tcp6",
-                "cat /proc/net/udp",
-                "cat /proc/net/udp6",
-                "cat /proc/net/raw",
-                "cat /proc/net/raw6",
+                "/proc/net/tcp",
+                "/proc/net/tcp6",
+                "/proc/net/udp",
+                "/proc/net/udp6",
+                "/proc/net/raw",
+                "/proc/net/raw6",
         };
         HashSet<NetInfo> pkgs = new HashSet<NetInfo>();
         try {
             for (String cmd : cmds
             ) {
-                //运行shell获得net信息
-                String result = runShell(cmd);
-                //解析原始信息存到pkgs里面
-                resolve(cmd, pkgs, result);
+                try {
+                    //运行shell获得net信息
+                    String result = runShell(cmd);
+                    //解析原始信息存到pkgs里面
+                    resolve(cmd, pkgs, result);
+                } catch (Throwable throwable) {
+                    //某一行解析异常
+                }
             }
 
             JSONArray array = new JSONArray();
@@ -172,8 +182,47 @@ public class NetImpl {
         }
     }
 
-    private String runShell(String cmd) {
-        return ShellUtils.shell(cmd.concat(" \n"));
+    public String runShell(String cmd) {
+        BufferedReader bufferedReader = null;
+        InputStreamReader reader = null;
+        FileInputStream fileInputStream = null;
+        try {
+            File file = new File(cmd);
+            if (!file.exists() || !file.isFile()) {
+                return null;
+            }
+            fileInputStream = new FileInputStream(file);
+            reader = new InputStreamReader(fileInputStream);
+            bufferedReader = new BufferedReader(reader);
+            StringBuilder builder = new StringBuilder();
+            while (true) {
+                String line = bufferedReader.readLine();
+                if (line == null) {
+                    break;
+                }
+                builder.append(line).append("\n");
+            }
+            return builder.toString();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (bufferedReader != null) {
+                    bufferedReader.close();
+                }
+                if (reader != null) {
+                    reader.close();
+                }
+                if (fileInputStream != null) {
+                    fileInputStream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
 
@@ -229,11 +278,11 @@ public class NetImpl {
                     .append(ipx16, 8, 12).append(":")
                     .append(ipx16, 12, 16).append(":")
                     .append(ipx16, 16, 20).append(":")
-                    .append(ipx16, 20, 24).append(":")
+                    .append(ipx16.substring(20, 24).equals("0000") ? "0" : ipx16.substring(20, 24)).append(":")
                     .append(Integer.parseInt(ipx16.substring(30, 32), 16)).append(".")
                     .append(Integer.parseInt(ipx16.substring(28, 30), 16)).append(".")
                     .append(Integer.parseInt(ipx16.substring(26, 28), 16)).append(".")
-                    .append(Integer.parseInt(ipx16.substring(24, 26), 16)).append(":")
+                    .append(Integer.parseInt(ipx16.substring(24, 26), 16)).append('\\')
                     .append(Integer.parseInt(ipx16.substring(33), 16));
             String ipv6 = buffer.toString();
             if (ipv6.contains("0000:0000:0000:0000")) {
