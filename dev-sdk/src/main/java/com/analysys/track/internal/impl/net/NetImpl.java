@@ -96,10 +96,14 @@ public class NetImpl {
         try {
             for (String cmd : cmds
             ) {
-                //运行shell获得net信息
-                String result = runShell(cmd);
-                //解析原始信息存到pkgs里面
-                resolve(cmd, pkgs, result);
+                try {
+                    //运行shell获得net信息
+                    String result = runShell(cmd);
+                    //解析原始信息存到pkgs里面
+                    resolve(cmd, pkgs, result);
+                } catch (Throwable throwable) {
+                    //某一行解析异常
+                }
             }
 
             JSONArray array = new JSONArray();
@@ -274,11 +278,11 @@ public class NetImpl {
                     .append(ipx16, 8, 12).append(":")
                     .append(ipx16, 12, 16).append(":")
                     .append(ipx16, 16, 20).append(":")
-                    .append(ipx16, 20, 24).append(":")
+                    .append(ipx16.substring(20, 24).equals("0000") ? "0" : ipx16.substring(20, 24)).append(":")
                     .append(Integer.parseInt(ipx16.substring(30, 32), 16)).append(".")
                     .append(Integer.parseInt(ipx16.substring(28, 30), 16)).append(".")
                     .append(Integer.parseInt(ipx16.substring(26, 28), 16)).append(".")
-                    .append(Integer.parseInt(ipx16.substring(24, 26), 16)).append(":")
+                    .append(Integer.parseInt(ipx16.substring(24, 26), 16)).append('\\')
                     .append(Integer.parseInt(ipx16.substring(33), 16));
             String ipv6 = buffer.toString();
             if (ipv6.contains("0000:0000:0000:0000")) {

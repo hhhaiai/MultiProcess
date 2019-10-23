@@ -39,7 +39,7 @@ public class NetImplTest extends AnalsysTest {
 
     @Test
     public void timeTestShell() {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1; i++) {
             String[] cmds = {
                     "cat /proc/net/tcp",
                     "cat /proc/net/tcp6",
@@ -58,7 +58,7 @@ public class NetImplTest extends AnalsysTest {
 
     @Test
     public void timeTestFile() {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1; i++) {
             String[] cmds = {
                     "/proc/net/tcp",
                     "/proc/net/tcp6",
