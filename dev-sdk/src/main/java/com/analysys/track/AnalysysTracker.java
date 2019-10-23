@@ -2,15 +2,13 @@ package com.analysys.track;
 
 import android.content.Context;
 
-import com.analysys.track.hotfix.ObjectFactory;
+import com.analysys.track.hotfix.HotFixException;
+import com.analysys.track.hotfix.HotFixImpl;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -59,15 +57,19 @@ public class AnalysysTracker {
 
 
         boolean hfEnable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST&&!EGContext.DEX_ERROR && hfEnable) {
+        if (EGContext.IS_HOST && !EGContext.DEX_ERROR && hfEnable) {
             String path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH, "");
             if (path == null || path.equals("") || !new File(path).isFile()) {
                 SPHelper.setBooleanValue2SP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
                 return;
             }
-            ObjectFactory.init(context, path);
-            ObjectFactory.invokeMethod(null, AnalysysTracker.class.getName(), "init", context, appKey, channel);
-            return;
+            HotFixImpl.init(context, path);
+            try {
+                HotFixImpl.invokeMethod(null, AnalysysTracker.class.getName(), "init", context, appKey, channel);
+                return;
+            } catch (HotFixException e) {
+                e.printStackTrace();
+            }
         }
         AnalysysInternal.getInstance(context).initEguan(appKey, channel);
     }
@@ -79,9 +81,13 @@ public class AnalysysTracker {
      */
     public static void setDebugMode(Context context, boolean isDebug) {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST&&!EGContext.DEX_ERROR && hfEnable) {
-            ObjectFactory.invokeMethod(null, AnalysysTracker.class.getName(), "setDebugMode", context, isDebug);
-            return;
+        if (EGContext.IS_HOST && !EGContext.DEX_ERROR && hfEnable) {
+            try {
+                HotFixImpl.invokeMethod(null, AnalysysTracker.class.getName(), "setDebugMode", context, isDebug);
+                return;
+            } catch (HotFixException e) {
+                e.printStackTrace();
+            }
         }
         EGContext.FLAG_DEBUG_USER = isDebug;
 //        Log.i(EGContext.LOGTAG_USER, "setDebugMode ::" + isDebug);

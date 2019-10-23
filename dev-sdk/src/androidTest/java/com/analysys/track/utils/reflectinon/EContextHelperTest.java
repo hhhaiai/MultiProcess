@@ -3,7 +3,8 @@ package com.analysys.track.utils.reflectinon;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 
-import com.analysys.track.hotfix.ObjectFactory;
+import com.analysys.track.hotfix.HotFixException;
+import com.analysys.track.hotfix.HotFixImpl;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -54,10 +55,14 @@ public class EContextHelperTest {
             SPHelper.setBooleanValue2SP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
             return;
         }
-        ObjectFactory.init(context, path);
-        Context o = ObjectFactory.invokeMethod(null, EContextHelper.class.getName(),
-                "getContext", new Object[]{null});
-        assertEquals(o, this.context);
+        try {
+            HotFixImpl.init(context, path);
+            Context o = HotFixImpl.invokeMethod(null, EContextHelper.class.getName(),
+                    "getContext", new Object[]{null});
+            assertEquals(o, this.context);
+        } catch (HotFixException e) {
+            e.printStackTrace();
+        }
     }
 
 }

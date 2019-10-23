@@ -6,14 +6,15 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.view.accessibility.AccessibilityEvent;
 
-import com.analysys.track.hotfix.ObjectFactory;
+import com.analysys.track.hotfix.HotFixException;
+import com.analysys.track.hotfix.HotFixImpl;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.OCImpl;
-import com.analysys.track.receiver.AnalysysReceiver;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 
@@ -28,39 +29,48 @@ import com.analysys.track.utils.sp.SPHelper;
 public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onCreate() {
-        boolean hfEnable = SPHelper.getBooleanValueFromSP(this.getApplicationContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
+        boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
         if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
-            ObjectFactory.invokeMethod(
-                    ObjectFactory.make(AnalysysAccessibilityService.class.getName())
-                    , AnalysysAccessibilityService.class.getName()
-                    , "onCreate");
-            return;
+            try {
+                HotFixImpl.invokeMethod(
+                        HotFixImpl.make(AnalysysAccessibilityService.class.getName())
+                        , AnalysysAccessibilityService.class.getName()
+                        , "onCreate");
+                return;
+            } catch (Throwable e) {
+
+            }
+
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysAccessibilityService onCreate");
         }
         super.onCreate();
-        mContext = this.getApplicationContext();
+        mContext = EContextHelper.getContext(null);
     }
 
     private Context mContext;
 
     @Override
     protected void onServiceConnected() {
-        boolean hfEnable = SPHelper.getBooleanValueFromSP(this.getApplicationContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
+        boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
         if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
-            ObjectFactory.invokeMethod(
-                    ObjectFactory.make(AnalysysAccessibilityService.class.getName())
-                    , AnalysysAccessibilityService.class.getName()
-                    , "onServiceConnected");
-            return;
+            try {
+                HotFixImpl.invokeMethod(
+                        HotFixImpl.make(AnalysysAccessibilityService.class.getName())
+                        , AnalysysAccessibilityService.class.getName()
+                        , "onServiceConnected");
+                return;
+            } catch (HotFixException e) {
+            }
+
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysAccessibilityService onServiceConnected");
         }
         try {
             super.onServiceConnected();
-            mContext = this.getApplicationContext();
+            mContext = EContextHelper.getContext(null);
             settingAccessibilityInfo();
         } catch (Throwable t) {
             if (EGContext.FLAG_DEBUG_INNER) {
@@ -82,13 +92,16 @@ public class AnalysysAccessibilityService extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        boolean hfEnable = SPHelper.getBooleanValueFromSP(this.getApplicationContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
+        boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
         if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
-            ObjectFactory.invokeMethod(
-                    ObjectFactory.make(AnalysysAccessibilityService.class.getName())
-                    , AnalysysAccessibilityService.class.getName()
-                    , "onAccessibilityEvent",event);
-            return;
+            try {
+                HotFixImpl.invokeMethod(
+                        HotFixImpl.make(AnalysysAccessibilityService.class.getName())
+                        , AnalysysAccessibilityService.class.getName()
+                        , "onAccessibilityEvent",event);
+                return;
+            } catch (HotFixException e) {
+            }
         }
         try {
             CharSequence pkgName = event.getPackageName();
@@ -117,13 +130,17 @@ public class AnalysysAccessibilityService extends AccessibilityService {
 
     @Override
     public void onInterrupt() {
-        boolean hfEnable = SPHelper.getBooleanValueFromSP(this.getApplicationContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
+        boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
         if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
-            ObjectFactory.invokeMethod(
-                    ObjectFactory.make(AnalysysAccessibilityService.class.getName())
-                    , AnalysysAccessibilityService.class.getName()
-                    , "onInterrupt");
-            return;
+            try {
+                HotFixImpl.invokeMethod(
+                        HotFixImpl.make(AnalysysAccessibilityService.class.getName())
+                        , AnalysysAccessibilityService.class.getName()
+                        , "onInterrupt");
+                return;
+            } catch (HotFixException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

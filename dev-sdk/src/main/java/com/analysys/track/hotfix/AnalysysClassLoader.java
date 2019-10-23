@@ -10,7 +10,7 @@ import dalvik.system.DexClassLoader;
 
 /**
  * @Copyright 2019 analysys Inc. All rights reserved.
- * @Description: 热修复要用的类加载器,反转了双亲委托,先自己找,自己找不到拜托parent找
+ * @Description: 热修复要用的类加载器, 反转了双亲委托, 先自己找, 自己找不到拜托parent找
  * @Version: 1.0
  * @Create: 2019-10-10 14:29:53
  * @author: miqt
@@ -45,9 +45,10 @@ class AnalysysClassLoader extends DexClassLoader {
                 return c;
             }
         } catch (ClassNotFoundException e) {
-            if (callback != null) {
-                callback.onSelfNotFound(name);
-            }
+
+        }
+        if (callback != null) {
+            callback.onSelfNotFound(name);
         }
         //--------parent
         try {
