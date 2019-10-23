@@ -170,6 +170,10 @@ public class ObjectFactory {
             return false;
         }
         for (int j = 0; j < aClass.length; j++) {
+            if (pram[j] == null) {
+                continue;
+            }
+
             List<String> baseClassList = getBaseClass(pram[j].getClass());
             if (!baseClassList.contains(aClass[j].getName())) {
                 return false;

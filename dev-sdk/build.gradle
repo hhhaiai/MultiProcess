@@ -7,7 +7,7 @@ apply plugin: 'com.android.library'
 
 
 def version = "4.3.0.5"
-def date = "20191017_hf"
+def date = "20191023"
 
 //是否是热修复的宿主
 def isHost = true

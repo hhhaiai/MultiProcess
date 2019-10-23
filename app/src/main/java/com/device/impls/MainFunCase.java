@@ -15,7 +15,6 @@ import android.util.Log;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
-import com.analysys.track.internal.impl.HotFoxImpl;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.net.NetInfo;
@@ -332,7 +331,15 @@ public class MainFunCase {
         });
     }
 
-
+    private static void runCaseP15(final Context mContext) {
+        FileObserver fileObserver = new FileObserver("/proc/net/tcp", FileObserver.ALL_EVENTS) {
+            @Override
+            public void onEvent(int event, @Nullable String path) {
+                Log.v(path, event + "");
+            }
+        };
+        fileObserver.startWatching();
+    }
 
     private static void runCaseP16(final Context mContext) {
         new Thread(new Runnable() {
@@ -382,7 +389,7 @@ public class MainFunCase {
                     try {
                         for (String cmd : result
                         ) {
-                           // pkgs.addAll(NetImpl.getInstance(mContext).dumpNet(););
+//                            pkgs.addAll(NetImpl.getInstance(mContext).dumpNet(null););
                         }
                     } catch (Exception e) {
                         throwables.add(e);
@@ -495,7 +502,6 @@ public class MainFunCase {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        HotFoxImpl.reqHotFix(mContext,null);
     }
 
     private static void runCaseP18(final Context mContext) {
