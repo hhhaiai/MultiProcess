@@ -1,6 +1,5 @@
 package com.analysys.track.db;
 
-
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
  * @Description: 数据库配置类

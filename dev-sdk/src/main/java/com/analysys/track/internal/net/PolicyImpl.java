@@ -4,10 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.model.PolicyInfo;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.Memory2File;
@@ -145,6 +147,9 @@ public class PolicyImpl {
                 printInfo();
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(e);
             }
@@ -278,6 +283,9 @@ public class PolicyImpl {
             saveNewPolicyToLocal(policyInfo);
 
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(" not new version policy, will return");
             }
@@ -819,6 +827,9 @@ public class PolicyImpl {
             printInfo();
 
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
     }
 

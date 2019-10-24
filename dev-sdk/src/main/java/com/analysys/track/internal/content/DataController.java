@@ -63,7 +63,7 @@ public class DataController {
 
     public static boolean SWITCH_OF_APP_MD5 = true;
     public static boolean SWITCH_OF_APP_SIGN = true;
-//    public static boolean SWITCH_OF_EGUAN_ID = true;
+    //    public static boolean SWITCH_OF_EGUAN_ID = true;
     public static boolean SWITCH_OF_TEMP_ID = true;
     public static boolean SWITCH_OF_SIMULATOR = true;
     public static boolean SWITCH_OF_DEBUG = true;

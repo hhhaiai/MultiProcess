@@ -3,12 +3,14 @@ package com.analysys.track.internal.net;
 import android.content.Context;
 import android.os.Build;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.DataController;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.impl.SenSorModuleNameImpl;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EguanIdUtils;
 import com.analysys.track.utils.JsonUtils;
@@ -224,6 +226,9 @@ public class DataPackaging {
             }
             deviceInfo.put(EGContext.EXTRA_DATA, batteryJson);
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }

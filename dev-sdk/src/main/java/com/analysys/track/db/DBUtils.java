@@ -3,6 +3,9 @@ package com.analysys.track.db;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.analysys.track.BuildConfig;
+import com.analysys.track.utils.BuglyUtils;
+
 public class DBUtils {
 
     /**
@@ -22,6 +25,9 @@ public class DBUtils {
                 }
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         } finally {
             if (cursor != null) {
                 cursor.close();

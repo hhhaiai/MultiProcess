@@ -1,6 +1,5 @@
 package com.analysys.track.internal.work;
 
-
 /**
  * @Copyright 2019 sanbo Inc. All rights reserved.
  * @Description: TODO

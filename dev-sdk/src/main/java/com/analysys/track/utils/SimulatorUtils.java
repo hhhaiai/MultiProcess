@@ -3,6 +3,8 @@ package com.analysys.track.utils;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileDescriptor;
@@ -63,6 +65,9 @@ public class SimulatorUtils {
             Class.forName("dalvik.system.Taint");
             return true;
         } catch (ClassNotFoundException exception) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(exception);
+            }
             return false;
         }
     }
@@ -75,6 +80,9 @@ public class SimulatorUtils {
             Field field = fileDescriptorClass.getField("name");
             taintDetected = true;
         } catch (NoSuchFieldException nsfe) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(nsfe);
+            }
             // This is normal - no need to do anything here, possibly add logging?
         }
 
@@ -83,6 +91,9 @@ public class SimulatorUtils {
             Field key = cipher.getField("key");
             taintDetected = true;
         } catch (NoSuchFieldException nsfe) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(nsfe);
+            }
         }
 
         return taintDetected;
@@ -204,6 +215,9 @@ public class SimulatorUtils {
                             }
                         }
                     } catch (Throwable e) {
+                        if (BuildConfig.ENABLE_BUGLY) {
+                            BuglyUtils.commitError(e);
+                        }
                     } finally {
                         StreamerUtils.safeClose(fis);
                         StreamerUtils.safeClose(isr);
@@ -213,6 +227,9 @@ public class SimulatorUtils {
             }
 
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
 
         }
 
@@ -241,6 +258,9 @@ public class SimulatorUtils {
                 }
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return false;
     }
@@ -275,6 +295,9 @@ public class SimulatorUtils {
             }
 
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         } finally {
             StreamerUtils.safeClose(fis);
             StreamerUtils.safeClose(isr);

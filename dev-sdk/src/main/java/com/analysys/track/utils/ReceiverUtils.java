@@ -6,6 +6,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Build;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.receiver.AnalysysReceiver;
 
@@ -90,6 +91,9 @@ public class ReceiverUtils {
                 context.registerReceiver(mReceiver, intentFilter);
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
     }
 
@@ -97,6 +101,9 @@ public class ReceiverUtils {
         try {
             setWork(false);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
     }
 

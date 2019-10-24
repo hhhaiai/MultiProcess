@@ -6,6 +6,7 @@ import android.os.Environment;
 import android.provider.Settings;
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -45,6 +46,9 @@ public class EguanIdUtils {
             // 四个文件作对比
             tmpId = getContrastId(file, setting, shard, database);
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
@@ -71,6 +75,9 @@ public class EguanIdUtils {
                 writeDatabase(tmpId);
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
     }
 
@@ -142,6 +149,9 @@ public class EguanIdUtils {
                 }
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
         }
     }
 
@@ -227,6 +237,9 @@ public class EguanIdUtils {
             out = new FileOutputStream(file, false);
             out.write(st.getBytes());
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         } finally {
             StreamerUtils.safeClose(out);
         }
@@ -252,6 +265,9 @@ public class EguanIdUtils {
             }
             return String.valueOf(sb);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         } finally {
             StreamerUtils.safeClose(br);
         }

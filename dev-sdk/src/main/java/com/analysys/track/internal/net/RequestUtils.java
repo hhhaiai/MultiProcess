@@ -2,8 +2,10 @@ package com.analysys.track.internal.net;
 
 import android.content.Context;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.SystemUtils;
@@ -94,6 +96,9 @@ public class RequestUtils {
                 response = EGContext.HTTP_STATUS_413;
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }

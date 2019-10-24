@@ -14,6 +14,7 @@ def isHost = true
 //当前热修复包的版本
 def hf_code = 3
 
+def ENABLE_BUGLY = false
 
 android {
     compileSdkVersion 26
@@ -24,6 +25,7 @@ android {
         buildConfigField "boolean", "IS_HOST", "${isHost}"
         buildConfigField "String", "SDK_VERSION", "\"${sdkv}\""
         buildConfigField "String", "hf_version", isHost ? "\"${sdkv}\"" : "\"${sdkv}.${hf_code}\""
+        buildConfigField "boolean", "ENABLE_BUGLY", "${ENABLE_BUGLY}"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

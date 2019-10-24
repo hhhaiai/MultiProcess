@@ -3,7 +3,9 @@ package com.analysys.track.utils.reflectinon;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 
@@ -49,9 +51,12 @@ public class PatchHelper {
                     loadStatic(context, file, "com.analysys.Ab", "init", new Class[]{Context.class},
                             new Object[]{context});
                 } catch (Throwable e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                 }
             }
-        },20000);
+        }, 20000);
     }
 
     public static void loadStatic(Context context, File file, String className, String methodName, Class[] pareTyples,
@@ -73,9 +78,15 @@ public class PatchHelper {
         try {
             method = c.getMethod(methodName, pareTyples);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             try {
                 method = c.getDeclaredMethod(methodName, pareTyples); // 在指定类中获取指定的方法
             } catch (Throwable e1) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e1);
+                }
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i(" loadStatic error......");
                 }

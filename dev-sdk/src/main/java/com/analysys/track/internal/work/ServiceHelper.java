@@ -10,10 +10,12 @@ import android.content.Intent;
 import android.os.Build;
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.service.AnalysysJobService;
 import com.analysys.track.service.AnalysysService;
 import com.analysys.track.utils.AndroidManifestHelper;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -54,6 +56,9 @@ public class ServiceHelper {
                 startServiceWhenP();
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             MessageDispatcher.getInstance(mContext).initModule();
         }
 
@@ -223,6 +228,9 @@ public class ServiceHelper {
             }
 
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return isWork;
     }
@@ -276,7 +284,7 @@ public class ServiceHelper {
                 JobScheduler jobScheduler = (JobScheduler) mContext.getApplicationContext().getSystemService(Context.JOB_SCHEDULER_SERVICE);
                 JobInfo.Builder builder = new JobInfo.Builder(EGContext.JOB_ID,
                         new ComponentName(mContext, AnalysysJobService.class.getName())); // 指定哪个JobService执行操作
-                builder.setPeriodic(EGContext.TIME_SECOND*10);// 10s
+                builder.setPeriodic(EGContext.TIME_SECOND * 10);// 10s
                 builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
                 jobScheduler.schedule(builder.build());
                 return true;

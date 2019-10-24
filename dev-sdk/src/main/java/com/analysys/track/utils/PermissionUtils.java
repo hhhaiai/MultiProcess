@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
+import com.analysys.track.BuildConfig;
+
 import java.lang.reflect.Method;
 
 
@@ -31,6 +33,9 @@ public class PermissionUtils {
                 int rest = (Integer) method.invoke(context, permission);
                 result = rest == PackageManager.PERMISSION_GRANTED;
             } catch (Exception e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
                 result = false;
             }
         } else {
