@@ -27,19 +27,16 @@ public class AnalysysJobService extends JobService {
 
     @Override
     public boolean onStartJob(final JobParameters params) {
-        boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST && !EGContext.DEX_ERROR && hfEnable) {
-            try {
-                Boolean aBoolean = HotFixImpl.transform(
-                        HotFixImpl.make(AnalysysJobService.class.getName())
-                        , AnalysysJobService.class.getName()
-                        , "onStartJob", params);
-                if (aBoolean != null) {
-                    return aBoolean;
-                }
-            } catch (HotFixTransformCancel e) {
-                e.printStackTrace();
+        try {
+            Boolean aBoolean = HotFixImpl.transform(
+                    HotFixImpl.make(AnalysysJobService.class.getName())
+                    , AnalysysJobService.class.getName()
+                    , "onStartJob", params);
+            if (aBoolean != null) {
+                return aBoolean;
             }
+        } catch (HotFixTransformCancel e) {
+            e.printStackTrace();
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysJobService onStartJob");
@@ -52,19 +49,16 @@ public class AnalysysJobService extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters params) {
-        boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST && !EGContext.DEX_ERROR && hfEnable) {
-            try {
-                Boolean aBoolean = HotFixImpl.transform(
-                        HotFixImpl.make(AnalysysJobService.class.getName())
-                        , AnalysysJobService.class.getName()
-                        , "onStopJob", params);
-                if (aBoolean != null) {
-                    return aBoolean;
-                }
-            } catch (HotFixTransformCancel e) {
-                e.printStackTrace();
+        try {
+            Boolean aBoolean = HotFixImpl.transform(
+                    HotFixImpl.make(AnalysysJobService.class.getName())
+                    , AnalysysJobService.class.getName()
+                    , "onStopJob", params);
+            if (aBoolean != null) {
+                return aBoolean;
             }
+        } catch (HotFixTransformCancel e) {
+            e.printStackTrace();
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysJobService onStopJob");

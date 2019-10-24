@@ -26,17 +26,14 @@ public class AnalysysReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        boolean hfEnable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
-            try {
-                HotFixImpl.transform(
-                        HotFixImpl.make(AnalysysReceiver.class.getName())
-                        , AnalysysReceiver.class.getName()
-                        , "onReceive", context, intent);
-                return;
-            } catch (HotFixTransformCancel e) {
-                e.printStackTrace();
-            }
+        try {
+            HotFixImpl.transform(
+                    HotFixImpl.make(AnalysysReceiver.class.getName())
+                    , AnalysysReceiver.class.getName()
+                    , "onReceive", context, intent);
+            return;
+        } catch (HotFixTransformCancel e) {
+            e.printStackTrace();
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysReceiver onReceive");

@@ -56,14 +56,11 @@ public class AnalysysTracker {
 //        //</editor-fold>
 
 
-        boolean hfEnable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST && !EGContext.DEX_ERROR && hfEnable) {
-            try {
-                HotFixImpl.transform(null, AnalysysTracker.class.getName(), "init", context, appKey, channel);
-                return;
-            } catch (HotFixTransformCancel e) {
-                e.printStackTrace();
-            }
+        try {
+            HotFixImpl.transform(null, AnalysysTracker.class.getName(), "init", context, appKey, channel);
+            return;
+        } catch (HotFixTransformCancel e) {
+            e.printStackTrace();
         }
         AnalysysInternal.getInstance(context).initEguan(appKey, channel);
     }

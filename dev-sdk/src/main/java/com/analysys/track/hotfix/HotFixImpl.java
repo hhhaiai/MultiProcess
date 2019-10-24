@@ -102,9 +102,6 @@ public class HotFixImpl {
     private static volatile boolean isinit = false;
 
     private static boolean isInit() {
-        if (isinit) {
-            isinit = (loader instanceof AnalysysClassLoader);
-        }
         return isinit;
     }
 
@@ -205,7 +202,10 @@ public class HotFixImpl {
         }
     }
 
-    public static <T> T make(String classname, Object... pram) {
+    public static <T> T make(String classname, Object... pram) throws HotFixTransformCancel {
+
+        canTransForm();
+
         if (classname == null || classname.length() == 0) {
             return null;
         }

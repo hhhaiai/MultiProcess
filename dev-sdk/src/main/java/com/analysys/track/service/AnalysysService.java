@@ -26,36 +26,30 @@ public class AnalysysService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST && !EGContext.DEX_ERROR && hfEnable) {
-            try {
-                IBinder iBinder = HotFixImpl.transform(
-                        HotFixImpl.make(AnalysysService.class.getName())
-                        , AnalysysService.class.getName()
-                        , "onBind", intent);
-                if (iBinder != null) {
-                    return iBinder;
-                }
-            } catch (HotFixTransformCancel e) {
-                e.printStackTrace();
+        try {
+            IBinder iBinder = HotFixImpl.transform(
+                    HotFixImpl.make(AnalysysService.class.getName())
+                    , AnalysysService.class.getName()
+                    , "onBind", intent);
+            if (iBinder != null) {
+                return iBinder;
             }
+        } catch (HotFixTransformCancel e) {
+            e.printStackTrace();
         }
         return null;
     }
 
     @Override
     public void onCreate() {
-        boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST && !EGContext.DEX_ERROR && hfEnable) {
-            try {
-                HotFixImpl.transform(
-                        HotFixImpl.make(AnalysysService.class.getName())
-                        , AnalysysService.class.getName()
-                        , "onCreate");
-                return;
-            } catch (HotFixTransformCancel e) {
-                e.printStackTrace();
-            }
+        try {
+            HotFixImpl.transform(
+                    HotFixImpl.make(AnalysysService.class.getName())
+                    , AnalysysService.class.getName()
+                    , "onCreate");
+            return;
+        } catch (HotFixTransformCancel e) {
+            e.printStackTrace();
         }
         super.onCreate();
 
@@ -68,17 +62,13 @@ public class AnalysysService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST && !EGContext.DEX_ERROR && hfEnable) {
-            try {
-                return HotFixImpl.transform(
-                        HotFixImpl.make(AnalysysService.class.getName())
-                        , AnalysysService.class.getName()
-                        , "onStartCommand", intent, flags, startId);
-            } catch (HotFixTransformCancel e) {
-                e.printStackTrace();
-            }
-
+        try {
+            return HotFixImpl.transform(
+                    HotFixImpl.make(AnalysysService.class.getName())
+                    , AnalysysService.class.getName()
+                    , "onStartCommand", intent, flags, startId);
+        } catch (HotFixTransformCancel e) {
+            e.printStackTrace();
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysService onStartCommand");
@@ -92,17 +82,14 @@ public class AnalysysService extends Service {
 
     @Override
     public void onDestroy() {
-        boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST && !EGContext.DEX_ERROR && hfEnable) {
-            try {
-                HotFixImpl.transform(
-                        HotFixImpl.make(AnalysysService.class.getName())
-                        , AnalysysService.class.getName()
-                        , "onDestroy");
-                return;
-            } catch (HotFixTransformCancel e) {
-                e.printStackTrace();
-            }
+        try {
+            HotFixImpl.transform(
+                    HotFixImpl.make(AnalysysService.class.getName())
+                    , AnalysysService.class.getName()
+                    , "onDestroy");
+            return;
+        } catch (HotFixTransformCancel e) {
+            e.printStackTrace();
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysService onDestroy");

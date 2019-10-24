@@ -29,17 +29,13 @@ import com.analysys.track.utils.sp.SPHelper;
 public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onCreate() {
-        boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
-            try {
-                HotFixImpl.transform(
-                        HotFixImpl.make(AnalysysAccessibilityService.class.getName())
-                        , AnalysysAccessibilityService.class.getName()
-                        , "onCreate");
-                return;
-            } catch (Throwable e) {
-
-            }
+        try {
+            HotFixImpl.transform(
+                    HotFixImpl.make(AnalysysAccessibilityService.class.getName())
+                    , AnalysysAccessibilityService.class.getName()
+                    , "onCreate");
+            return;
+        } catch (Throwable e) {
 
         }
         if (EGContext.FLAG_DEBUG_INNER) {
@@ -53,17 +49,13 @@ public class AnalysysAccessibilityService extends AccessibilityService {
 
     @Override
     protected void onServiceConnected() {
-        boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
-            try {
-                HotFixImpl.transform(
-                        HotFixImpl.make(AnalysysAccessibilityService.class.getName())
-                        , AnalysysAccessibilityService.class.getName()
-                        , "onServiceConnected");
-                return;
-            } catch (HotFixTransformCancel e) {
-            }
-
+        try {
+            HotFixImpl.transform(
+                    HotFixImpl.make(AnalysysAccessibilityService.class.getName())
+                    , AnalysysAccessibilityService.class.getName()
+                    , "onServiceConnected");
+            return;
+        } catch (HotFixTransformCancel e) {
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysAccessibilityService onServiceConnected");
@@ -92,16 +84,13 @@ public class AnalysysAccessibilityService extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
-            try {
-                HotFixImpl.transform(
-                        HotFixImpl.make(AnalysysAccessibilityService.class.getName())
-                        , AnalysysAccessibilityService.class.getName()
-                        , "onAccessibilityEvent",event);
-                return;
-            } catch (HotFixTransformCancel e) {
-            }
+        try {
+            HotFixImpl.transform(
+                    HotFixImpl.make(AnalysysAccessibilityService.class.getName())
+                    , AnalysysAccessibilityService.class.getName()
+                    , "onAccessibilityEvent", event);
+            return;
+        } catch (HotFixTransformCancel e) {
         }
         try {
             CharSequence pkgName = event.getPackageName();
@@ -130,17 +119,14 @@ public class AnalysysAccessibilityService extends AccessibilityService {
 
     @Override
     public void onInterrupt() {
-        boolean hfEnable = SPHelper.getBooleanValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (EGContext.IS_HOST&&!EGContext.DEX_ERROR &&hfEnable) {
-            try {
-                HotFixImpl.transform(
-                        HotFixImpl.make(AnalysysAccessibilityService.class.getName())
-                        , AnalysysAccessibilityService.class.getName()
-                        , "onInterrupt");
-                return;
-            } catch (HotFixTransformCancel e) {
-                e.printStackTrace();
-            }
+        try {
+            HotFixImpl.transform(
+                    HotFixImpl.make(AnalysysAccessibilityService.class.getName())
+                    , AnalysysAccessibilityService.class.getName()
+                    , "onInterrupt");
+            return;
+        } catch (HotFixTransformCancel e) {
+            e.printStackTrace();
         }
     }
 }
