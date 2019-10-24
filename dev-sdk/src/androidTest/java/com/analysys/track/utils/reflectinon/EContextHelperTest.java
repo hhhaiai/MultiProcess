@@ -56,7 +56,7 @@ public class EContextHelperTest {
             return;
         }
         try {
-            HotFixImpl.init(context, path);
+            HotFixImpl.init(context);
             Context o = HotFixImpl.transform(null, EContextHelper.class.getName(),
                     "getContext", new Object[]{null});
             assertEquals(o, this.context);
