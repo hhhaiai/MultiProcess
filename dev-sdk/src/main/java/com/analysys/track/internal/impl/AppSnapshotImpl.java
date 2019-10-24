@@ -5,11 +5,13 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.DataController;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.work.ECallBack;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.JsonUtils;
@@ -125,6 +127,9 @@ public class AppSnapshotImpl {
             }
 
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
         }
     }
 //    // 获取下次应该工作的时间
@@ -167,6 +172,9 @@ public class AppSnapshotImpl {
             memoryData = null;
 
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
@@ -249,6 +257,9 @@ public class AppSnapshotImpl {
                     TableProcess.getInstance(mContext).updateSnapshot(apn, EGContext.SNAP_SHOT_UNINSTALL, avc);
                 }
             } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
                 if (EGContext.DEBUG_SNAP) {
                     ELOG.e(EGContext.TAG_SNAP, e);
                 }
@@ -278,6 +289,9 @@ public class AppSnapshotImpl {
                     }
                 }
             } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
                 if (EGContext.DEBUG_SNAP) {
                     ELOG.e(EGContext.TAG_SNAP, e);
                 }
@@ -318,6 +332,9 @@ public class AppSnapshotImpl {
                             }
                         }
                     } catch (Throwable t) {
+                        if (BuildConfig.ENABLE_BUGLY) {
+                            BuglyUtils.commitError(t);
+                        }
                     }
                 }
                 if (list.size() < 5) {
@@ -334,6 +351,9 @@ public class AppSnapshotImpl {
             }
 
         } catch (Exception e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -362,6 +382,9 @@ public class AppSnapshotImpl {
                         appInfo.put(EGContext.TEXT_DEBUG_STATUS, SystemUtils.isApkDebugable(mContext, packageName));
                         list.add(appInfo);
                     } catch (Throwable t) {
+                        if (BuildConfig.ENABLE_BUGLY) {
+                            BuglyUtils.commitError(t);
+                        }
                     }
                 }
                 if (list.size() < 5) {
@@ -389,6 +412,9 @@ public class AppSnapshotImpl {
             }
 
         } catch (Exception e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -423,6 +449,9 @@ public class AppSnapshotImpl {
                 }
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -505,6 +534,9 @@ public class AppSnapshotImpl {
                     return true;
                 }
             } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
 
         }
@@ -607,6 +639,9 @@ public class AppSnapshotImpl {
                         System.currentTimeMillis());
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.DEBUG_SNAP) {
                 ELOG.e(EGContext.TAG_SNAP, e);
             }

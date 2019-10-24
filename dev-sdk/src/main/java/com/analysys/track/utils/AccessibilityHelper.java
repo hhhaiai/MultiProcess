@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.provider.Settings;
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 
 import java.util.Arrays;
@@ -62,6 +63,9 @@ public class AccessibilityHelper {
             accessibilityEnabled = Settings.Secure.getInt(context.getApplicationContext().getContentResolver(),
                     android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
         } catch (Settings.SettingNotFoundException e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             return false;
         }
 

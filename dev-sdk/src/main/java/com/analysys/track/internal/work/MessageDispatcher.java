@@ -8,11 +8,13 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.UploadImpl;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
@@ -75,7 +77,7 @@ public class MessageDispatcher {
                             UploadImpl.getInstance(mContext).upload();
                         }
                         //最多等10秒
-                        EGContext.snap_complete=true;
+                        EGContext.snap_complete = true;
                         // 5秒检查一次是否可以发送。
                         postDelay(MSG_INFO_UPLOAD, EGContext.TIME_SECOND * 5);
 
@@ -138,6 +140,9 @@ public class MessageDispatcher {
                         break;
                 }
             } catch (Throwable t) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(t);
+                }
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.e(t);
                 }
@@ -180,6 +185,9 @@ public class MessageDispatcher {
                 mHandler.sendMessageDelayed(msg, delayTime > 0 ? delayTime : 0);
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
 
     }

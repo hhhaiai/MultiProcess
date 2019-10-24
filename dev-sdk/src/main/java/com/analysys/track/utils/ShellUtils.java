@@ -2,6 +2,8 @@ package com.analysys.track.utils;
 
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -33,6 +35,9 @@ public class ShellUtils {
                 sb.append(line).append("\n");
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         } finally {
             StreamerUtils.safeClose(br);
             StreamerUtils.safeClose(is);
@@ -60,6 +65,9 @@ public class ShellUtils {
                 sb.append(line).append("\n");
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         } finally {
             StreamerUtils.safeClose(is);
             StreamerUtils.safeClose(isr);

@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
@@ -378,6 +379,9 @@ public class ELOG {
                 // 打印字符
                 preparePrint(tag, level, sb.toString());
             } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
     }
@@ -407,6 +411,9 @@ public class ELOG {
                 sb.append(wrapperString(""));// .append("\n");
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return sb.toString();
     }
@@ -676,6 +683,9 @@ public class ELOG {
                 try {
                     subObject = field.get(o);
                 } catch (IllegalAccessException e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                     subObject = e;
                 } finally {
                     if (subObject != null) {
@@ -689,10 +699,16 @@ public class ELOG {
                                     JSONObject temp = new JSONObject(s);
                                     obj.put(fieldName, temp);
                                 } catch (Throwable e) {
+                                    if (BuildConfig.ENABLE_BUGLY) {
+                                        BuglyUtils.commitError(e);
+                                    }
                                     try {
                                         JSONArray arr = new JSONArray(s);
                                         obj.put(fieldName, arr);
                                     } catch (Throwable e2) {
+                                        if (BuildConfig.ENABLE_BUGLY) {
+                                            BuglyUtils.commitError(e2);
+                                        }
                                         obj.put(fieldName, s);
                                     }
                                 }
@@ -708,6 +724,9 @@ public class ELOG {
                 }
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
     }
 
@@ -846,6 +865,9 @@ public class ELOG {
             }
             return format(obj);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             return object.toString();
         }
     }
@@ -867,6 +889,9 @@ public class ELOG {
                 Object fieldValue = f.get(activity);
                 obj.put(fieldName, objectToString(fieldValue));
             } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
 
@@ -886,6 +911,9 @@ public class ELOG {
                 Object fieldValue = field.get(activity);
                 builder.append(field.getName()).append("=>").append(objectToString(fieldValue)).append(BR);
             } catch (IllegalAccessException e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
         builder.append("}");
@@ -905,6 +933,9 @@ public class ELOG {
             obj.put("data", parseString(message.getData()));
             obj.put("obj", objectToString(message.obj));
         } catch (Exception e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return format(obj);
     }
@@ -929,6 +960,9 @@ public class ELOG {
                     obj.put(objectToString(key), "null");
                 }
             } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
         return format(obj);
@@ -954,6 +988,9 @@ public class ELOG {
                 try {
                     bun.put(key, objectToString(bundle.get(key)));
                 } catch (Throwable e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                 }
             }
             return format(bun);
@@ -968,6 +1005,9 @@ public class ELOG {
                 try {
                     bun.put(key, objectToString(bundle.get(key)));
                 } catch (Throwable e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                 }
             }
             return format(bun);
@@ -986,11 +1026,17 @@ public class ELOG {
             JSONObject oo = new JSONObject(src);
             return format(oo);
         } catch (JSONException e1) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e1);
+            }
             // 不是JSONObject
             try {
                 JSONArray arr = new JSONArray(src);
                 return format(arr);
             } catch (JSONException e2) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e2);
+                }
                 // 不是JSONArray
 
                 StringReader reader = null;
@@ -1005,6 +1051,9 @@ public class ELOG {
                     String xml = xmlOutput.getWriter().toString().replaceFirst(">", ">\n");
                     return xml;
                 } catch (Throwable e3) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e3);
+                    }
                     // 不是XML
                     return src;
                 } finally {
@@ -1014,6 +1063,9 @@ public class ELOG {
                 }
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             return src;
         }
     }
@@ -1055,11 +1107,17 @@ public class ELOG {
                 }
             }
         } catch (Throwable error) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(error);
+            }
         } finally {
             if (sw != null) {
                 try {
                     sw.close();
                 } catch (Throwable e1) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e1);
+                    }
                 }
             }
             if (pw != null) {
@@ -1102,6 +1160,9 @@ public class ELOG {
                 obj.put("Flags", intent.getType());
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
 
         return format(obj);
@@ -1127,6 +1188,9 @@ public class ELOG {
                     }
                 }
             } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
 
@@ -1157,6 +1221,9 @@ public class ELOG {
             try {
                 return isFormat ? (arr.toString(JSON_INDENT)) : String.valueOf(arr);
             } catch (Exception e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
         return "";
@@ -1180,6 +1247,9 @@ public class ELOG {
             try {
                 return isFormat ? obj.toString(JSON_INDENT) : String.valueOf(obj);
             } catch (Exception e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
         return "";
@@ -1433,6 +1503,9 @@ public class ELOG {
                     result.add(str);
                     current += maxLen;
                 } catch (StringIndexOutOfBoundsException e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                     str = line.substring(current, line.length());
                     result.add(str);
                     break;

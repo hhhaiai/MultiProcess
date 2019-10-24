@@ -15,6 +15,7 @@ import android.os.Looper;
 import android.os.PowerManager;
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -86,6 +87,9 @@ public class SystemUtils {
             packageManager.getInstallerPackageName(packageName);
             return true;
         } catch (IllegalArgumentException e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             return false;
         }
     }
@@ -110,6 +114,9 @@ public class SystemUtils {
                 return (pkginfo.applicationInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
             }
         } catch (Exception e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
 
         }
         return false;
@@ -133,8 +140,14 @@ public class SystemUtils {
             Object[] params = {property};
             return (String) get.invoke(systemProperties, params);
         } catch (IllegalArgumentException iAE) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(iAE);
+            }
             throw iAE;
         } catch (Exception exception) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(exception);
+            }
             throw null;
         }
     }
@@ -200,6 +213,9 @@ public class SystemUtils {
                 }
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return false;
     }
@@ -262,6 +278,9 @@ public class SystemUtils {
             // return mode == AppOpsManager.MODE_ALLOWED;
             return mode == 0;
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return false;
     }
@@ -302,6 +321,9 @@ public class SystemUtils {
             is = new FileInputStream(f);
             is.read(data);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         } finally {
             StreamerUtils.safeClose(is);
         }
@@ -339,6 +361,9 @@ public class SystemUtils {
                     return;
                 }
             } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
             if (!TextUtils.isEmpty(channel)) {
                 // 赋值接口传入的channel
@@ -381,6 +406,9 @@ public class SystemUtils {
                 return "";
             }
         } catch (IOException e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         } finally {
             StreamerUtils.safeClose(apkZip);
         }
@@ -415,6 +443,9 @@ public class SystemUtils {
                 return appkey;
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return appkey;
     }
@@ -439,6 +470,9 @@ public class SystemUtils {
                 return channel;
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         if (!TextUtils.isEmpty(EGContext.VALUE_APP_CHANNEL)) {
             return EGContext.VALUE_APP_CHANNEL;
@@ -498,6 +532,9 @@ public class SystemUtils {
                 }
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return "";
     }
@@ -512,6 +549,9 @@ public class SystemUtils {
         try {
             return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             return "0";
         }
     }

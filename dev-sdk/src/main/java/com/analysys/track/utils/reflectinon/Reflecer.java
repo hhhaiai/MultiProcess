@@ -2,6 +2,9 @@ package com.analysys.track.utils.reflectinon;
 
 import android.os.Build;
 
+import com.analysys.track.BuildConfig;
+import com.analysys.track.utils.BuglyUtils;
+
 import java.lang.reflect.Field;
 
 
@@ -25,6 +28,9 @@ public class Reflecer {
             classLoaderField.setAccessible(true);
             classLoaderField.set(reflectionHelperClz, null);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
     }
 

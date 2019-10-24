@@ -4,6 +4,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Looper;
 
+import com.analysys.track.BuildConfig;
+
 public class ProcessUtils {
 
 
@@ -21,6 +23,9 @@ public class ProcessUtils {
                 }
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return "";
     }

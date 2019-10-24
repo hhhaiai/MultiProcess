@@ -11,6 +11,9 @@ import android.os.Looper;
 import android.os.Parcel;
 import android.os.RemoteException;
 
+import com.analysys.track.BuildConfig;
+import com.analysys.track.utils.BuglyUtils;
+
 import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -32,6 +35,9 @@ public class AdvertisingIdClient {
             PackageManager pm = context.getPackageManager();
             pm.getPackageInfo("com.android.vending", 0);
         } catch (Exception e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             throw e;
         }
 
@@ -44,6 +50,9 @@ public class AdvertisingIdClient {
                 AdInfo adInfo = new AdInfo(adInterface.getId(), adInterface.isLimitAdTrackingEnabled(true));
                 return adInfo;
             } catch (Exception exception) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(exception);
+                }
                 throw exception;
             } finally {
                 context.unbindService(connection);
@@ -80,6 +89,9 @@ public class AdvertisingIdClient {
             try {
                 this.queue.put(service);
             } catch (InterruptedException localInterruptedException) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(localInterruptedException);
+                }
             }
         }
 

@@ -1,5 +1,7 @@
 package com.analysys.track.utils;
 
+import com.analysys.track.BuildConfig;
+
 import java.io.Closeable;
 import java.net.HttpURLConnection;
 
@@ -10,6 +12,9 @@ public class StreamerUtils {
             try {
                 closeable.close();
             } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
     }
@@ -19,6 +24,9 @@ public class StreamerUtils {
             try {
                 closeable.close();
             } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
     }
@@ -36,6 +44,9 @@ public class StreamerUtils {
             try {
                 proc.exitValue();
             } catch (Throwable t) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(t);
+                }
 //                proc.destroy();
             }
             proc = null;

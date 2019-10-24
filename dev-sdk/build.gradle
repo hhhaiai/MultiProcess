@@ -8,6 +8,7 @@ apply plugin: 'com.android.library'
 
 def version = "4.3.0.4"
 def date = "20191015"
+def ENABLE_BUGLY = false
 
 android {
     compileSdkVersion 26
@@ -15,6 +16,7 @@ android {
 
     defaultConfig {
         buildConfigField "String", "SDK_VERSION", "\"${version}|${date}\""
+        buildConfigField "boolean", "ENABLE_BUGLY", "${ENABLE_BUGLY}"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

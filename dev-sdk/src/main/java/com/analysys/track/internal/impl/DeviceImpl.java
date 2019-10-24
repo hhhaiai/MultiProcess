@@ -23,8 +23,10 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
@@ -119,6 +121,9 @@ public class DeviceImpl {
                 bluetoothMacAddress = Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return bluetoothMacAddress;
     }
@@ -144,6 +149,9 @@ public class DeviceImpl {
                         + "-" + (TextUtils.isEmpty(androidId) ? "null" : androidId);
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             deviceId = "";
         }
 
@@ -173,6 +181,9 @@ public class DeviceImpl {
                 mac = getMacByShell();
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
 
         if (!mac.equals(DEFALT_MAC)) {
@@ -196,6 +207,9 @@ public class DeviceImpl {
                 macAddress = DEFALT_MAC;
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             macAddress = DEFALT_MAC;
         }
         return macAddress;
@@ -229,6 +243,9 @@ public class DeviceImpl {
                 }
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             mac = DEFALT_MAC;
         }
 
@@ -255,6 +272,9 @@ public class DeviceImpl {
                     }
                 }
             } catch (IOException e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.e(e);
                 }
@@ -287,6 +307,9 @@ public class DeviceImpl {
                 }
             }
         } catch (Exception e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -295,6 +318,9 @@ public class DeviceImpl {
                 try {
                     br.close();
                 } catch (IOException e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                 }
             }
             if (in != null) {
@@ -302,6 +328,9 @@ public class DeviceImpl {
                 try {
                     in.close();
                 } catch (IOException e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                 }
             }
         }
@@ -330,6 +359,9 @@ public class DeviceImpl {
                 serialNo = (String) get.invoke(c, "ro.serialnocustom");
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return serialNo;
     }
@@ -339,6 +371,9 @@ public class DeviceImpl {
         try {
             displayMetrics = mContext.getApplicationContext().getResources().getDisplayMetrics();
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             displayMetrics = null;
         }
         return displayMetrics;
@@ -352,6 +387,9 @@ public class DeviceImpl {
         try {
             res = getDisplayMetrics().widthPixels + "-" + getDisplayMetrics().heightPixels;
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             res = "";
         }
         return res;
@@ -364,6 +402,9 @@ public class DeviceImpl {
         try {
             dpi = String.valueOf(getDisplayMetrics().densityDpi);
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             dpi = "";
         }
         return dpi;
@@ -378,6 +419,9 @@ public class DeviceImpl {
             TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
             operatorName = tm.getSimOperator();
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return operatorName;
     }
@@ -391,6 +435,9 @@ public class DeviceImpl {
             TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
             operatorName = tm.getSimOperatorName();
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             operatorName = "";
         }
         return operatorName;
@@ -406,6 +453,9 @@ public class DeviceImpl {
             operatorCode = tm.getNetworkOperator();
 
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             operatorCode = "";
         }
         if (minEffectiveValue.contains(operatorCode)) {
@@ -423,6 +473,9 @@ public class DeviceImpl {
             TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
             operatorCode = tm.getNetworkOperatorName();
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             operatorCode = "";
         }
         return operatorCode;
@@ -438,6 +491,9 @@ public class DeviceImpl {
             ApplicationInfo applicationInfo = packageManager.getApplicationInfo(mContext.getPackageName(), 0);
             return (String) packageManager.getApplicationLabel(applicationInfo);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return UNKNOW;
     }
@@ -450,6 +506,9 @@ public class DeviceImpl {
         try {
             return mContext.getPackageName();
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return UNKNOW;
     }
@@ -466,6 +525,9 @@ public class DeviceImpl {
             String versionName = pInfo.versionName;
             return versionName + "|" + versionCode;
         } catch (NameNotFoundException e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return "";
     }
@@ -479,6 +541,9 @@ public class DeviceImpl {
             String md5Fingerprint = doFingerprint(sig.toByteArray());
             return md5Fingerprint;
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return "";
     }
@@ -493,6 +558,9 @@ public class DeviceImpl {
             byte[] bytes = md.digest();
             return byteArrayToString(bytes);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return UNKNOW;
     }
@@ -509,6 +577,9 @@ public class DeviceImpl {
             byte[] bytes = md.digest(cert);
             return byteArrayToString(bytes);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return UNKNOW;
     }
@@ -521,6 +592,9 @@ public class DeviceImpl {
             Signature sig = packageInfo.signatures[0];
             return sig;
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return null;
     }
@@ -533,6 +607,9 @@ public class DeviceImpl {
             BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
             return adapter.getName();
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             return "";
         }
     }
@@ -579,6 +656,9 @@ public class DeviceImpl {
             // 电池温度
             info.setBatteryTemperature(String.valueOf(temperature));
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_BATTERY_BROADCAST, System.currentTimeMillis());
     }
@@ -599,6 +679,9 @@ public class DeviceImpl {
             mCurConfig = (Configuration) method.invoke(obj);
             return mCurConfig.fontScale + "";
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             return "0";
         }
     }
@@ -647,6 +730,9 @@ public class DeviceImpl {
         try {
             return stringArrayToString(Build.SUPPORTED_ABIS);
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             return "";
         }
 
@@ -656,6 +742,9 @@ public class DeviceImpl {
         try {
             return stringArrayToString(Build.SUPPORTED_32_BIT_ABIS);
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             return "";
         }
     }
@@ -664,6 +753,9 @@ public class DeviceImpl {
         try {
             return stringArrayToString(Build.SUPPORTED_64_BIT_ABIS);
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             return "";
         }
     }
@@ -680,6 +772,9 @@ public class DeviceImpl {
                         String advertisingId = adInfo.getId();
                         SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_IDFA, advertisingId);
                     } catch (Exception e) {
+                        if (BuildConfig.ENABLE_BUGLY) {
+                            BuglyUtils.commitError(e);
+                        }
                     }
                 }
             }).start();
@@ -688,6 +783,9 @@ public class DeviceImpl {
                 return idfa;
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
         }
 
         return idfa;
@@ -723,6 +821,9 @@ public class DeviceImpl {
             result = String.valueOf(sb);
             result = result.substring(0, result.length() - 1);
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             return null;
         }
         return result;

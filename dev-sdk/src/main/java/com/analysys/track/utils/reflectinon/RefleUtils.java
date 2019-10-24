@@ -2,6 +2,9 @@ package com.analysys.track.utils.reflectinon;
 
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
+import com.analysys.track.utils.BuglyUtils;
+
 public class RefleUtils {
     /**
      * 是否包含方法
@@ -18,6 +21,9 @@ public class RefleUtils {
             }
             return hasMethod(Class.forName(className), methodName, parameterTypes);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return false;
     }
@@ -39,6 +45,9 @@ public class RefleUtils {
                 return clazz.getMethod(methodName, parameterTypes) != null;
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return false;
     }

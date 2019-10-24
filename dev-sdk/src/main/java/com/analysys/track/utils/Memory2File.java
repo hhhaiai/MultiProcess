@@ -1,5 +1,6 @@
 package com.analysys.track.utils;
 
+import com.analysys.track.BuildConfig;
 
 import java.io.BufferedOutputStream;
 import java.io.Closeable;
@@ -55,6 +56,9 @@ public class Memory2File {
             }
             return byteBuffer.array();
         } catch (IOException e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         } finally {
 
             close(channel);
@@ -77,6 +81,9 @@ public class Memory2File {
             bos.write(bfile);
             bos.flush();
         } catch (Exception e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         } finally {
             close(bos);
             close(fos);
@@ -170,6 +177,9 @@ public class Memory2File {
             try {
                 close.close();
             } catch (IOException e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
 

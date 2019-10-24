@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -90,6 +92,9 @@ public class ProcUtils {
                 }
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
         }
         return uploadInfo;
     }
@@ -149,6 +154,9 @@ public class ProcUtils {
 
 
                 } catch (Throwable ttt) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(ttt);
+                    }
                 }
 
             }
@@ -156,6 +164,9 @@ public class ProcUtils {
             object.put(RUNNING_RESULT, resultArray);
 
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             // L.e(e);
         }
         return object;
@@ -197,6 +208,9 @@ public class ProcUtils {
                     ocr.add(pkg);
                 }
             } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         } else {
             // sb.append("不符合规则");
@@ -231,6 +245,9 @@ public class ProcUtils {
                     return true;
                 }
             } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
                 // L.e(e);
             }
         }
@@ -316,6 +333,9 @@ public class ProcUtils {
         try {
             return Integer.parseInt(oom_score.trim());
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return DEF_VALUE;
     }
@@ -371,9 +391,15 @@ public class ProcUtils {
                                 }
 
                             } catch (NumberFormatException e) {
+                                if (BuildConfig.ENABLE_BUGLY) {
+                                    BuglyUtils.commitError(e);
+                                }
                             }
                         }
                     } catch (Throwable e) {
+                        if (BuildConfig.ENABLE_BUGLY) {
+                            BuglyUtils.commitError(e);
+                        }
                     }
                 }
             }
@@ -397,6 +423,9 @@ public class ProcUtils {
                 try {
                     pid = Integer.parseInt(file.getName());
                 } catch (NumberFormatException e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                     continue;
                 }
                 String pkgName = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/cmdline"});

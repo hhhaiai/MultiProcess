@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.DeflterCompressUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
@@ -160,6 +162,9 @@ public class UploadImpl {
                 return;
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.e(t);
             }
@@ -220,6 +225,12 @@ public class UploadImpl {
             }
             isUploading = false;
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.e(t);
             }
@@ -237,6 +248,9 @@ public class UploadImpl {
             try {
                 devJson = DataPackaging.getInstance().getDevInfo(mContext);
             } catch (Throwable t) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(t);
+                }
             }
             if (devJson != null && devJson.length() > 0) {
                 object.put(UploadKey.DevInfo.NAME, devJson);
@@ -316,6 +330,9 @@ public class UploadImpl {
                 TableProcess.getInstance(mContext).deleteXXX();
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.e(EGContext.TAG_UPLOAD, e);
             }
@@ -350,6 +367,9 @@ public class UploadImpl {
                 return new String(returnData).replace("\n", "");
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.e(t);
             }
@@ -377,7 +397,7 @@ public class UploadImpl {
                 String code = String.valueOf(object.opt(UploadKey.Response.RES_CODE));
                 if (code != null) {
                     if (EGContext.DEBUG_UPLOAD) {
-                        ELOG.i(EGContext.TAG_UPLOAD, "========收到code-----"+code);
+                        ELOG.i(EGContext.TAG_UPLOAD, "========收到code-----" + code);
                     }
                     if (EGContext.HTTP_STATUS_200.equals(code)) {
                         EguanIdUtils.getInstance(mContext).setId(json);
@@ -433,6 +453,9 @@ public class UploadImpl {
                 return;
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -517,6 +540,9 @@ public class UploadImpl {
                 idList.clear();
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.e(t);
             }
@@ -538,6 +564,9 @@ public class UploadImpl {
             // 多久重试
             SPHelper.setLongValue2SP(mContext, EGContext.RETRYTIME, SystemUtils.intervalTime(mContext));
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.e(t);
             }
@@ -582,6 +611,9 @@ public class UploadImpl {
                 return arr;
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.e(e);
             }

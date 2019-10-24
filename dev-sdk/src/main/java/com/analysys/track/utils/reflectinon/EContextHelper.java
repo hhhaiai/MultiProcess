@@ -3,6 +3,9 @@ package com.analysys.track.utils.reflectinon;
 import android.app.Application;
 import android.content.Context;
 
+import com.analysys.track.BuildConfig;
+import com.analysys.track.utils.BuglyUtils;
+
 public class EContextHelper {
 
     public static Context getContext(Context context) {
@@ -11,6 +14,9 @@ public class EContextHelper {
                 return context.getApplicationContext();
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
         }
         return getApplication();
 
@@ -25,6 +31,9 @@ public class EContextHelper {
                 return (Application) app;
             }
         } catch (Exception e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return null;
     }
