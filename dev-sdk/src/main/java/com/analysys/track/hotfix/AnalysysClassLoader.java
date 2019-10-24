@@ -27,7 +27,7 @@ class AnalysysClassLoader extends DexClassLoader {
 
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        //-------cache
+        //-------hotfix cache
         Class<?> c = findLoadedClass(name);
         if (c != null) {
             if (callback != null) {
@@ -35,7 +35,7 @@ class AnalysysClassLoader extends DexClassLoader {
             }
             return c;
         }
-        //-------self
+        //-------hotfix self
         try {
             c = findClass(name);
             if (c != null) {
@@ -50,7 +50,7 @@ class AnalysysClassLoader extends DexClassLoader {
         if (callback != null) {
             callback.onSelfNotFound(name);
         }
-        //--------parent
+        //--------host or parent
         try {
             if (getParent() != null) {
                 c = getParent().loadClass(name);

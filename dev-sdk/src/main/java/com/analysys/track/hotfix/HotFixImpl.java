@@ -1,6 +1,7 @@
 package com.analysys.track.hotfix;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.ELOG;
@@ -71,6 +72,9 @@ public class HotFixImpl {
                 //入口类一定能自己找到,如果找不到,则一定是这个dex损坏了
                 if (MYCLASS_NAME.contains(name)) {
                     dexError();
+                    if (EGContext.DEBUG_HF) {
+                        ELOG.v(EGContext.HOT_FIX_TAG, "[DEX损坏]:" + name + "[not found]");
+                    }
                 }
             }
 
