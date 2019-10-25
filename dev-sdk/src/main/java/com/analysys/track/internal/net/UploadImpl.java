@@ -389,7 +389,7 @@ public class UploadImpl {
                 String code = String.valueOf(object.opt(UploadKey.Response.RES_CODE));
                 if (code != null) {
                     if (EGContext.DEBUG_UPLOAD) {
-                        ELOG.i(EGContext.TAG_UPLOAD, "========收到code-----"+code);
+                        ELOG.i(EGContext.TAG_UPLOAD, "========收到code-----" + code);
                     }
                     if (EGContext.HTTP_STATUS_200.equals(code)) {
                         EguanIdUtils.getInstance(mContext).setId(json);

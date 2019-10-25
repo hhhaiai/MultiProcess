@@ -389,7 +389,7 @@ public class MainFunCase {
                     try {
                         for (String cmd : result
                         ) {
-                            pkgs.addAll(NetImpl.getInstance(mContext).getNetInfoFromCmd(cmd));
+                           // pkgs.addAll(NetImpl.getInstance(mContext).getNetInfoFromCmd(cmd));
                         }
                     } catch (Exception e) {
                         throwables.add(e);

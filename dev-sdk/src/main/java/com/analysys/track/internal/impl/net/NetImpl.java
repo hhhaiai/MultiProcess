@@ -126,21 +126,15 @@ public class NetImpl {
     private void saveNetInfoToDb(HashSet<NetInfo> pkgs) {
         //todo lastNetInfo 多进程同步
 
+        if (lastNetInfo.isEmpty()) {
+            lastNetInfo.addAll(pkgs);
+            return;
+        }
         for (NetInfo info :
                 lastNetInfo) {
             if (!pkgs.contains(info)) {
                 if (lastNetInfo.remove(info)) {
-                    //闭合本次的info
-                    info.setClose_time(System.currentTimeMillis());
-                    JSONObject object = info.toJson();
-                    TableProcess.getInstance(context).insertNet(object);
-                    if (EGContext.FLAG_DEBUG_INNER) {
-                        try {
-                            ELOG.i("闭合数据:" + object.toString(2));
-                        } catch (JSONException ignored) {
-
-                        }
-                    }
+                    closeAndSave(info);
                 }
             }
         }
@@ -149,6 +143,20 @@ public class NetImpl {
 
         // pkgs.clear();
 
+    }
+
+    private void closeAndSave(NetInfo info) {
+        //闭合本次的info
+        info.setClose_time(System.currentTimeMillis());
+        JSONObject object = info.toJson();
+        TableProcess.getInstance(context).insertNet(object);
+        if (EGContext.FLAG_DEBUG_INNER) {
+            try {
+                ELOG.i("闭合数据:" + object.toString(2));
+            } catch (JSONException ignored) {
+
+            }
+        }
     }
 
 
@@ -319,5 +327,18 @@ public class NetImpl {
             return ipx16;
         }
 
+    }
+
+    public void processWhenScreenChange(boolean open) {
+        //开
+        if (!open) {
+            for (NetInfo info : lastNetInfo
+            ) {
+                closeAndSave(info);
+            }
+            lastNetInfo.clear();
+        } else {
+//            dumpNet(null);
+        }
     }
 }
