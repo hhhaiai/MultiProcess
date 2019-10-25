@@ -6,9 +6,9 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.view.accessibility.AccessibilityEvent;
 
-import com.analysys.track.hotfix.HotFixTransformCancel;
-import com.analysys.track.hotfix.HotFixImpl;
 import com.analysys.track.BuildConfig;
+import com.analysys.track.hotfix.HotFixImpl;
+import com.analysys.track.hotfix.HotFixTransformCancel;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.OCImpl;
@@ -17,7 +17,6 @@ import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
-import com.analysys.track.utils.sp.SPHelper;
 
 
 /**
@@ -38,6 +37,9 @@ public class AnalysysAccessibilityService extends AccessibilityService {
                     , "onCreate");
             return;
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
 
         }
         if (EGContext.FLAG_DEBUG_INNER) {
@@ -58,6 +60,9 @@ public class AnalysysAccessibilityService extends AccessibilityService {
                     , "onServiceConnected");
             return;
         } catch (HotFixTransformCancel e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysAccessibilityService onServiceConnected");
@@ -67,6 +72,9 @@ public class AnalysysAccessibilityService extends AccessibilityService {
             mContext = EContextHelper.getContext(null);
             settingAccessibilityInfo();
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
             }
@@ -96,6 +104,9 @@ public class AnalysysAccessibilityService extends AccessibilityService {
                     , "onAccessibilityEvent", event);
             return;
         } catch (HotFixTransformCancel e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         try {
             CharSequence pkgName = event.getPackageName();
@@ -134,6 +145,9 @@ public class AnalysysAccessibilityService extends AccessibilityService {
                     , "onInterrupt");
             return;
         } catch (HotFixTransformCancel e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             e.printStackTrace();
         }
     }

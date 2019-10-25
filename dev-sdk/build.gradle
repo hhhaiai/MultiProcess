@@ -7,7 +7,7 @@ apply plugin: 'com.android.library'
 
 
 def version = "4.3.0.5"
-def date = "20191023"
+def date = "20191024"
 
 //是否是热修复的宿主
 def isHost = true
@@ -36,7 +36,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            minifyEnabled true
+            //启用BUGLY就不混淆,否则就混淆
+            minifyEnabled !ENABLE_BUGLY
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

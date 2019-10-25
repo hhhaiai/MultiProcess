@@ -4,15 +4,16 @@ import android.annotation.TargetApi;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 
-import com.analysys.track.hotfix.HotFixTransformCancel;
+import com.analysys.track.BuildConfig;
 import com.analysys.track.hotfix.HotFixImpl;
+import com.analysys.track.hotfix.HotFixTransformCancel;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.internal.work.ServiceHelper;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.reflectinon.EContextHelper;
-import com.analysys.track.utils.sp.SPHelper;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -36,6 +37,9 @@ public class AnalysysJobService extends JobService {
                 return aBoolean;
             }
         } catch (HotFixTransformCancel e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             e.printStackTrace();
         }
         if (EGContext.FLAG_DEBUG_INNER) {
@@ -58,6 +62,9 @@ public class AnalysysJobService extends JobService {
                 return aBoolean;
             }
         } catch (HotFixTransformCancel e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             e.printStackTrace();
         }
         if (EGContext.FLAG_DEBUG_INNER) {
