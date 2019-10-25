@@ -5,18 +5,10 @@ import com.analysys.track.db.TableProcess;
 import com.analysys.track.utils.ShellUtils;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.util.HashSet;
+import java.util.Set;
 
 public class NetImplTest extends AnalsysTest {
 
@@ -26,14 +18,15 @@ public class NetImplTest extends AnalsysTest {
 
     @Test
     public void getUidFromNet() {
-        NetImpl.getInstance(mContext).getNetInfo();
+        for (int i = 0; i < 100; i++) {
+            Set<NetInfo> infos = NetImpl.getInstance(mContext).getNetInfo();
+            Assert.assertTrue(infos.size() > 0);
+        }
         JSONArray array = null;
-
         array = TableProcess.getInstance(mContext).selectNet(1 * 1024 * 1024);
-        Assert.assertTrue(array.length() > 0);
+        Assert.assertTrue(array != null);
         TableProcess.getInstance(mContext).deleteNet();
         array = TableProcess.getInstance(mContext).selectNet(1 * 1024 * 1024);
-
         Assert.assertEquals(array.length(), 0);
     }
 

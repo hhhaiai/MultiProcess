@@ -141,7 +141,7 @@ public class MessageDispatcher {
                         NetImpl.getInstance(mContext).dumpNet(new ECallBack() {
                             @Override
                             public void onProcessed() {
-                                postDelay(MSG_INFO_NETS, EGContext.TIME_SECOND * 30);
+                                postDelay(MSG_INFO_NETS, EGContext.TIME_SECOND * 5);
                             }
                         });
                         break;
