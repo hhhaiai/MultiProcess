@@ -2,6 +2,7 @@ package com.miqt.plugin
 
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
+import com.google.common.collect.Sets
 import com.miqt.costtime.CostClassVisitor
 import com.miqt.plugin.CostTimeConfig
 import org.apache.commons.codec.digest.DigestUtils
@@ -15,9 +16,11 @@ import static org.objectweb.asm.ClassReader.EXPAND_FRAMES
 
 public class CostTransform extends Transform {
     Project project
+    boolean islib;
 
-    CostTransform(Project project) {
+    CostTransform(Project project, boolean islib) {
         this.project = project
+        this.islib = islib
     }
 
     @Override
@@ -32,7 +35,13 @@ public class CostTransform extends Transform {
 
     @Override
     Set<QualifiedContent.Scope> getScopes() {
-        return TransformManager.SCOPE_FULL_LIBRARY
+        if (islib) {
+            Sets.immutableEnumSet(
+                    QualifiedContent.Scope.PROJECT,
+            )
+        } else {
+            TransformManager.SCOPE_FULL_PROJECT
+        }
     }
 
     @Override

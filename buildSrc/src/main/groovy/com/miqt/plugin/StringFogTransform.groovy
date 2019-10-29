@@ -2,6 +2,7 @@ package com.miqt.plugin
 
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
+import com.google.common.collect.Sets
 import com.miqt.costtime.StringFogClassVisitor
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
@@ -14,9 +15,11 @@ import static org.objectweb.asm.ClassReader.EXPAND_FRAMES
 
 public class StringFogTransform extends Transform {
     Project project
+    boolean islib;
 
-    StringFogTransform(Project project) {
+    StringFogTransform(Project project, boolean islib) {
         this.project = project
+        this.islib = islib
     }
 
     @Override
@@ -31,7 +34,13 @@ public class StringFogTransform extends Transform {
 
     @Override
     Set<QualifiedContent.Scope> getScopes() {
-        return TransformManager.SCOPE_FULL_LIBRARY
+        if (islib) {
+            Sets.immutableEnumSet(
+                    QualifiedContent.Scope.PROJECT,
+            );
+        } else {
+            TransformManager.SCOPE_FULL_PROJECT
+        }
     }
 
     @Override

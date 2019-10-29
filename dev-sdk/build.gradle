@@ -1,5 +1,13 @@
 apply plugin: 'com.android.library'
+apply plugin: 'costtime'
 
+
+costtime {
+    enable true
+    costAll false
+    timeout 10
+    enableLog true
+}
 //apply plugin: 'jacoco'
 //jacoco {
 //    toolVersion = "0.7.1.201405082137"
@@ -25,7 +33,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -68,7 +76,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     testImplementation 'org.robolectric:robolectric:3.0'
-
+    api project(path: ':costtime')
 
 }
 
