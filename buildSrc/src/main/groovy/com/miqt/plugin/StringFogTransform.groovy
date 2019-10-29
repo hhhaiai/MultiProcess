@@ -61,7 +61,8 @@ public class StringFogTransform extends Transform {
                     directoryInput.file.eachFileRecurse { File file ->
                         def name = file.name
                         if (name.endsWith(".class") && !name.startsWith("R\$") &&
-                                !"R.class".equals(name) && !"BuildConfig.class".equals(name)) {
+                                !"R.class".equals(name) && !"BuildConfig.class".equals(name)
+                                && !name.contains("StringFog")) {
 
                             println name + ' is changing...'
 
