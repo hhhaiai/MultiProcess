@@ -1,10 +1,7 @@
 package com.analysys.track.internal.impl.net;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.List;
 
 /**
  * @Copyright 2019 analysys Inc. All rights reserved.
@@ -28,6 +25,7 @@ public class NetInfo {
      * }
      */
     long time;
+    long close_time;
     String protocol;
     String pkgname;
     String appname;
@@ -59,6 +57,7 @@ public class NetInfo {
             object.put("local_addr", local_addr);
             object.put("remote_addr", remote_addr);
             object.put("socket_type", socket_type);
+            object.put("close_time", close_time);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -77,6 +76,14 @@ public class NetInfo {
         NetInfo info = (NetInfo) o;
 
         return pkgname != null ? pkgname.equals(info.pkgname) : info.pkgname == null;
+    }
+
+    public long getClose_time() {
+        return close_time;
+    }
+
+    public void setClose_time(long close_time) {
+        this.close_time = close_time;
     }
 
     @Override

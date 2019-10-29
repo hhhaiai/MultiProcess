@@ -73,7 +73,7 @@ public class TableProcess {
     /**
      * 存储数据
      */
-    public void insertNet(JSONArray netInfo) {
+    public void insertNet(JSONObject netInfo) {
         SQLiteDatabase db = null;
         try {
             db = DBManager.getInstance(mContext).openDB();
@@ -117,7 +117,7 @@ public class TableProcess {
             }
             array = new JSONArray();
             cursor = db.query(DBConfig.NetInfo.TABLE_NAME, null, null, null, null, null, null, "2000");
-            JSONArray jsonArray = null;
+            JSONObject jsonArray = null;
             String proc = null;
             while (cursor.moveToNext()) {
                 countNum++;
@@ -132,7 +132,7 @@ public class TableProcess {
                 proc = EncryptUtils.decrypt(mContext,
                         cursor.getString(cursor.getColumnIndex(DBConfig.NetInfo.Column.PROC)));
                 if (!TextUtils.isEmpty(proc) && !"null".equalsIgnoreCase(proc)) {
-                    jsonArray = new JSONArray(proc);
+                    jsonArray = new JSONObject(proc);
                     if (jsonArray == null || jsonArray.length() < 1) {
                         return array;
                     } else {

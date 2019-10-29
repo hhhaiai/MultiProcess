@@ -12,10 +12,9 @@ import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MultiProcessChecker;
-import com.analysys.track.utils.ShellUtils;
 
-import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @Copyright 2019 analysys Inc. All rights reserved.
@@ -58,22 +58,21 @@ public class NetImpl {
             EThreadPool.execute(new Runnable() {
                 @Override
                 public void run() {
-                    getNetInfo();
+                    tryLockRun();
                     if (back != null) {
                         back.onProcessed();
                     }
                 }
             });
         } else {
-            getNetInfo();
+            tryLockRun();
             if (back != null) {
                 back.onProcessed();
             }
         }
     }
 
-    public void getNetInfo() {
-
+    public void tryLockRun() {
         if (!MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_NET, EGContext.TIME_SECOND * 2, System.currentTimeMillis())) {
             //没抢到锁
             if (EGContext.FLAG_DEBUG_INNER) {
@@ -84,6 +83,11 @@ public class NetImpl {
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("netimpl 得到锁 执行");
         }
+        getNetInfo();
+        MultiProcessChecker.getInstance().setLockLastModifyTime(context, EGContext.FILES_SYNC_NET, System.currentTimeMillis());
+    }
+
+    public Set<NetInfo> getNetInfo() {
         String[] cmds = {
                 "/proc/net/tcp",
                 "/proc/net/tcp6",
@@ -106,32 +110,53 @@ public class NetImpl {
                 }
             }
 
-            JSONArray array = new JSONArray();
-            for (NetInfo info :
-                    pkgs) {
-                array.put(info.toJson());
-            }
 
-            cmds = null;
-            pkgs.clear();
-            pkgs = null;
-
-            if (EGContext.FLAG_DEBUG_INNER) {
-                try {
-                    ELOG.i("netimpl  执行 完毕:" + array.toString(2));
-                } catch (JSONException ignored) {
-                }
-            }
-
-            TableProcess.getInstance(context).insertNet(array);
-            array = null;
+            saveNetInfoToDb(pkgs);
 
         } catch (Throwable throwable) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i("netimpl error " + throwable.getMessage());
             }
         }
-        MultiProcessChecker.getInstance().setLockLastModifyTime(context, EGContext.FILES_SYNC_NET, System.currentTimeMillis());
+        return pkgs;
+    }
+
+    HashSet<NetInfo> lastNetInfo = new HashSet<>();
+
+    private void saveNetInfoToDb(HashSet<NetInfo> pkgs) {
+        //todo lastNetInfo 多进程同步
+
+        if (lastNetInfo.isEmpty()) {
+            lastNetInfo.addAll(pkgs);
+            return;
+        }
+        for (NetInfo info :
+                lastNetInfo) {
+            if (!pkgs.contains(info)) {
+                if (lastNetInfo.remove(info)) {
+                    closeAndSave(info);
+                }
+            }
+        }
+
+        lastNetInfo.addAll(pkgs);
+
+        // pkgs.clear();
+
+    }
+
+    private void closeAndSave(NetInfo info) {
+        //闭合本次的info
+        info.setClose_time(System.currentTimeMillis());
+        JSONObject object = info.toJson();
+        TableProcess.getInstance(context).insertNet(object);
+        if (EGContext.FLAG_DEBUG_INNER) {
+            try {
+                ELOG.i("闭合数据:" + object.toString(2));
+            } catch (JSONException ignored) {
+
+            }
+        }
     }
 
 
@@ -302,5 +327,18 @@ public class NetImpl {
             return ipx16;
         }
 
+    }
+
+    public void processWhenScreenChange(boolean open) {
+        //开
+        if (!open) {
+            for (NetInfo info : lastNetInfo
+            ) {
+                closeAndSave(info);
+            }
+            lastNetInfo.clear();
+        } else {
+//            dumpNet(null);
+        }
     }
 }
