@@ -1,18 +1,23 @@
 package com.analysys.track.internal.impl.net;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Looper;
 import android.text.TextUtils;
 
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MultiProcessChecker;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,8 +27,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @Copyright 2019 analysys Inc. All rights reserved.
@@ -37,6 +44,15 @@ public class NetImpl {
 
     private Context context;
     private static volatile NetImpl instance;
+
+    private static final String[] CMDS = {
+            "/proc/net/tcp",
+            "/proc/net/tcp6",
+            "/proc/net/udp",
+            "/proc/net/udp6",
+            "/proc/net/raw",
+            "/proc/net/raw6",
+    };
 
     private NetImpl(Context context) {
         this.context = context;
@@ -87,30 +103,75 @@ public class NetImpl {
         MultiProcessChecker.getInstance().setLockLastModifyTime(context, EGContext.FILES_SYNC_NET, System.currentTimeMillis());
     }
 
-    public Set<NetInfo> getNetInfo() {
-        String[] cmds = {
-                "/proc/net/tcp",
-                "/proc/net/tcp6",
-                "/proc/net/udp",
-                "/proc/net/udp6",
-                "/proc/net/raw",
-                "/proc/net/raw6",
-        };
-        HashSet<NetInfo> pkgs = new HashSet<NetInfo>();
+
+    HashMap<String, NetInfo> pkgs = new HashMap<>();
+
+    private HashMap<String, NetInfo> getCacheInfo() {
+        HashMap<String, NetInfo> map = new HashMap<>();
         try {
-            for (String cmd : cmds
+            JSONArray array = TableProcess.getInstance(context).selectNet(1024 * 1024);
+            if(array==null||array.length()==0){
+                return pkgs;
+            }
+            array = (JSONArray) array.get(0);
+            for (int i = 0; array != null && i < array.length(); i++) {
+                JSONObject netInfoObject = (JSONObject) array.get(i);
+                NetInfo info = NetInfo.fromJson(netInfoObject);
+                map.put(info.pkgname, info);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return pkgs;
+        }
+        return map;
+    }
+
+    String api_4;
+    JSONObject proc_56;
+
+    public HashMap<String, NetInfo> getNetInfo() {
+        try {
+            pkgs = getCacheInfo();
+            //本次扫描的时间戳
+            long time = System.currentTimeMillis();
+            //重置打开状态
+            Collection<NetInfo> infoCollection1 = pkgs.values();
+            for (NetInfo info : infoCollection1) {
+                info.isOpen = false;
+            }
+            api_4 = getApi4(context);
+            proc_56 = getProc56(context);
+            //扫描
+            for (String cmd : CMDS
             ) {
                 try {
                     //运行shell获得net信息
                     String result = runShell(cmd);
                     //解析原始信息存到pkgs里面
-                    resolve(cmd, pkgs, result);
+                    resolve(cmd, result, time);
                 } catch (Throwable throwable) {
                     //某一行解析异常
                 }
             }
+            //最后剩下的就是上一次扫描有 但是这一次扫描没有的应用 加关闭符号
+            Collection<NetInfo> infoCollection2 = pkgs.values();
+            for (NetInfo info : infoCollection2) {
+                //本次扫描到的列表里面有  活着
+                if (info.isOpen) {
+                    continue;
+                }
+                // 死了 添加 关闭节点 判断上一个是关闭节点 不新加
+                if (info.scanningInfos.get(info.scanningInfos.size() - 1).tcpInfos == null) {
+                    //有不操作
+                    continue;
+                }
+                //没有添加关闭节点
+                NetInfo.ScanningInfo scanningInfo = new NetInfo.ScanningInfo();
+                scanningInfo.time = time;
+                info.scanningInfos.add(scanningInfo);
+            }
 
-
+            //存数据库
             saveNetInfoToDb(pkgs);
 
         } catch (Throwable throwable) {
@@ -121,38 +182,19 @@ public class NetImpl {
         return pkgs;
     }
 
-    HashSet<NetInfo> lastNetInfo = new HashSet<>();
+    private void saveNetInfoToDb(HashMap<String, NetInfo> pkgs) {
 
-    private void saveNetInfoToDb(HashSet<NetInfo> pkgs) {
-        //todo lastNetInfo 多进程同步
-
-        if (lastNetInfo.isEmpty()) {
-            lastNetInfo.addAll(pkgs);
-            return;
+        JSONArray array = new JSONArray();
+        for (NetInfo netInfo : pkgs.values()) {
+            array.put(netInfo.toJson());
         }
-        for (NetInfo info :
-                lastNetInfo) {
-            if (!pkgs.contains(info)) {
-                if (lastNetInfo.remove(info)) {
-                    closeAndSave(info);
-                }
-            }
+        if (array.length() > 0) {
+            TableProcess.getInstance(context).deleteNet();
         }
-
-        lastNetInfo.addAll(pkgs);
-
-        // pkgs.clear();
-
-    }
-
-    private void closeAndSave(NetInfo info) {
-        //闭合本次的info
-        info.setClose_time(System.currentTimeMillis());
-        JSONObject object = info.toJson();
-        TableProcess.getInstance(context).insertNet(object);
+        TableProcess.getInstance(context).insertNet(array.toString());
         if (EGContext.FLAG_DEBUG_INNER) {
             try {
-                ELOG.i("闭合数据:" + object.toString(2));
+                ELOG.i("更新数据:" + array.toString(2));
             } catch (JSONException ignored) {
 
             }
@@ -160,32 +202,23 @@ public class NetImpl {
     }
 
 
-    private void resolve(String cmd, HashSet<NetInfo> pkgs, String result) throws Throwable {
+    private void resolve(String cmd, String result, Long time) throws Throwable {
         if (result == null || "".equals(result)) {
             return;
         }
+        ;
         if (pkgs == null) {
             return;
         }
         String[] lines = result.split("\n");
+
         for (int i = 1; i < lines.length; i++) {
-            boolean isApp = false;
             String[] parameter = lines[i].split("\\s+");
             if (parameter.length < 9) {
                 continue;
             }
-            NetInfo info = new NetInfo();
-            info.time = System.currentTimeMillis();
-            info.local_addr = getIpAddr(parameter[2]);
-            info.remote_addr = getIpAddr(parameter[3]);
-            info.socket_type = getSocketType(parameter[4]);
-            String[] protocols = cmd.split("/");
-            if (protocols.length > 0) {
-                info.protocol = protocols[protocols.length - 1];
-            }
-            String uid = parameter[8];
-
             PackageManager manager = context.getPackageManager();
+            String uid = parameter[8];
             String[] pn = manager.getPackagesForUid(Integer.valueOf(uid));
             for (int j = 0; j < (pn != null ? pn.length : 0); j++) {
                 String pkgName = pn[j];
@@ -194,18 +227,90 @@ public class NetImpl {
                         && !pkgName.contains(":")
                         && !pkgName.contains("/")
                         && manager.getLaunchIntentForPackage(pkgName) != null) {
-                    isApp = true;
-                    ApplicationInfo info1 = manager.getApplicationInfo(pkgName, 0);
-                    info.pkgname = pkgName;
-                    info.appname = (String) info1.loadLabel(manager);
-                }
-            }
 
-            if (isApp) {
-                pkgs.add(info);
+                    NetInfo info = pkgs.get(pkgName);
+                    if (info == null) {
+                        info = new NetInfo();
+                        info.pkgname = pkgName;
+                        ApplicationInfo info1 = manager.getApplicationInfo(pkgName, 0);
+                        info.appname = (String) info1.loadLabel(manager);
+                        pkgs.put(pkgName, info);
+                    }
+                    info.isOpen = true;
+                    if (info.scanningInfos == null) {
+                        info.scanningInfos = new ArrayList<>();
+                    }
+                    NetInfo.ScanningInfo scanningInfo = null;
+                    for (NetInfo.ScanningInfo scanningInfo1 : info.scanningInfos) {
+                        if (scanningInfo1.time == time) {
+                            scanningInfo = scanningInfo1;
+                            break;
+                        }
+                    }
+                    if (scanningInfo == null) {
+                        scanningInfo = new NetInfo.ScanningInfo();
+                        scanningInfo.time = time;
+                        scanningInfo.api_4 = api_4;
+                        scanningInfo.proc_56 = proc_56;
+                        info.scanningInfos.add(scanningInfo);
+                    }
+
+                    if (scanningInfo.tcpInfos == null) {
+                        scanningInfo.tcpInfos = new ArrayList<>();
+                    }
+                    NetInfo.TcpInfo tcpInfo = new NetInfo.TcpInfo();
+                    scanningInfo.tcpInfos.add(tcpInfo);
+                    tcpInfo.local_addr = getIpAddr(parameter[2]);
+                    tcpInfo.remote_addr = getIpAddr(parameter[3]);
+                    tcpInfo.socket_type = getSocketType(parameter[4]);
+                    String[] protocols = cmd.split("/");
+                    if (protocols.length > 0) {
+                        tcpInfo.protocol = protocols[protocols.length - 1];
+                    }
+                }
             }
         }
     }
+
+    private JSONObject getProc56(Context context) {
+        if ((Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24)) {
+            return ProcUtils.getInstance(context).getRunningInfo();
+        }
+        return null;
+    }
+
+    private String getApi4(Context mContext) {
+        if (Build.VERSION.SDK_INT >= 21) {
+            return null;
+        }
+        String pkgName = null;
+        ActivityManager am = null;
+        try {
+            if (mContext == null) {
+                mContext = EContextHelper.getContext(mContext);
+            }
+            if (mContext != null) {
+                am = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+                List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
+                if (tasks == null || tasks.size() <= 0) {
+                    List<ActivityManager.RunningAppProcessInfo> processInfos = am.getRunningAppProcesses();
+                    for (ActivityManager.RunningAppProcessInfo appProcess : processInfos) {
+                        if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                            pkgName = appProcess.processName;
+                        }
+                    }
+                } else {
+                    // 获取栈顶app的包名
+                    pkgName = tasks.get(0).topActivity.getPackageName();
+                }
+            }
+
+
+        } catch (Throwable e) {
+        }
+        return pkgName;
+    }
+
 
     public String runShell(String cmd) {
         BufferedReader bufferedReader = null;
@@ -327,18 +432,5 @@ public class NetImpl {
             return ipx16;
         }
 
-    }
-
-    public void processWhenScreenChange(boolean open) {
-        //开
-        if (!open) {
-            for (NetInfo info : lastNetInfo
-            ) {
-                closeAndSave(info);
-            }
-            lastNetInfo.clear();
-        } else {
-//            dumpNet(null);
-        }
     }
 }

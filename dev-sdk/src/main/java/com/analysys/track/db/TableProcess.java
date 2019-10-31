@@ -69,7 +69,7 @@ public class TableProcess {
     /**
      * 存储数据
      */
-    public void insertNet(JSONObject netInfo) {
+    public void insertNet(String netInfo) {
         SQLiteDatabase db = null;
         try {
             db = DBManager.getInstance(mContext).openDB();
@@ -82,7 +82,7 @@ public class TableProcess {
             }
             ContentValues cv = new ContentValues();
             cv.put(DBConfig.NetInfo.Column.TIME, System.currentTimeMillis());
-            cv.put(DBConfig.NetInfo.Column.PROC, EncryptUtils.encrypt(mContext, netInfo.toString()));
+            cv.put(DBConfig.NetInfo.Column.PROC, EncryptUtils.encrypt(mContext, netInfo));
             // 防止因为传递控制导致的写入异常
             if (cv.size() > 1) {
                 db.insert(DBConfig.NetInfo.TABLE_NAME, null, cv);
@@ -113,7 +113,7 @@ public class TableProcess {
             }
             array = new JSONArray();
             cursor = db.query(DBConfig.NetInfo.TABLE_NAME, null, null, null, null, null, null, "2000");
-            JSONObject jsonArray = null;
+            JSONArray jsonArray = null;
             String proc = null;
             while (cursor.moveToNext()) {
                 countNum++;
@@ -128,7 +128,7 @@ public class TableProcess {
                 proc = EncryptUtils.decrypt(mContext,
                         cursor.getString(cursor.getColumnIndex(DBConfig.NetInfo.Column.PROC)));
                 if (!TextUtils.isEmpty(proc) && !"null".equalsIgnoreCase(proc)) {
-                    jsonArray = new JSONObject(proc);
+                    jsonArray = new JSONArray(proc);
                     if (jsonArray == null || jsonArray.length() < 1) {
                         return array;
                     } else {
@@ -147,7 +147,7 @@ public class TableProcess {
                             }
                         } else {
                             array.put(jsonArray);
-                           // array.put(new String(Base64.encode(String.valueOf(jsonArray).getBytes(), Base64.DEFAULT)));
+                            // array.put(new String(Base64.encode(String.valueOf(jsonArray).getBytes(), Base64.DEFAULT)));
                         }
 
                     }

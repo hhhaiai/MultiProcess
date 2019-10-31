@@ -1,13 +1,10 @@
 package com.device.impls;
 
-import android.app.ActivityManager;
-import android.app.ApplicationErrorReport;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Environment;
 import android.os.FileObserver;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -22,8 +19,8 @@ import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.net.UploadImpl;
+import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
-import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.device.utils.AssetsHelper;
 import com.device.utils.EL;
 import com.device.utils.MyLooper;
@@ -34,22 +31,16 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-
-import static android.content.Context.ACTIVITY_SERVICE;
 
 
 /**
@@ -389,7 +380,7 @@ public class MainFunCase {
                     try {
                         for (String cmd : result
                         ) {
-                           // pkgs.addAll(NetImpl.getInstance(mContext).getNetInfoFromCmd(cmd));
+                            // pkgs.addAll(NetImpl.getInstance(mContext).getNetInfoFromCmd(cmd));
                         }
                     } catch (Exception e) {
                         throwables.add(e);
@@ -505,6 +496,7 @@ public class MainFunCase {
     }
 
     private static void runCaseP18(final Context mContext) {
+        NetImpl.getInstance(mContext).getNetInfo();
     }
 
     private static void runCaseP19(final Context mContext) {

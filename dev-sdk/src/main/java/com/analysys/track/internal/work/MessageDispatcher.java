@@ -136,14 +136,14 @@ public class MessageDispatcher {
                         });
                         break;
                     case MSG_INFO_NETS:
-                        long ocDurTime = OCImpl.getInstance(mContext).getOCDurTime();
-                        ELOG.d(EGContext.TAG_SNAP, " 收到 net 信息。。心跳。。");
-                        NetImpl.getInstance(mContext).dumpNet(new ECallBack() {
-                            @Override
-                            public void onProcessed() {
-                                postDelay(MSG_INFO_NETS, EGContext.TIME_SECOND * 30);
-                            }
-                        });
+//                        long ocDurTime = OCImpl.getInstance(mContext).getOCDurTime();
+//                        ELOG.d(EGContext.TAG_SNAP, " 收到 net 信息。。心跳。。");
+//                        NetImpl.getInstance(mContext).dumpNet(new ECallBack() {
+//                            @Override
+//                            public void onProcessed() {
+//                                postDelay(MSG_INFO_NETS, EGContext.TIME_SECOND * 30);
+//                            }
+//                        });
                         break;
                     default:
                         break;
