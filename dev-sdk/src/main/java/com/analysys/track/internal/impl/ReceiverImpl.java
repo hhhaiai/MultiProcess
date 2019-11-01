@@ -114,7 +114,6 @@ public class ReceiverImpl {
 //            }
 
             OCImpl.getInstance(context).processOCWhenScreenChange(true);
-            NetImpl.getInstance(context).processWhenScreenChange(true);
 
         } else if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
             //  7.x以上版本 不操作
@@ -122,7 +121,6 @@ public class ReceiverImpl {
                 return;
             }
             OCImpl.getInstance(context).processOCWhenScreenChange(false);
-            NetImpl.getInstance(context).processWhenScreenChange(false);
         } else if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
             DeviceImpl.getInstance(context).processBattery(intent);
         } else if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {

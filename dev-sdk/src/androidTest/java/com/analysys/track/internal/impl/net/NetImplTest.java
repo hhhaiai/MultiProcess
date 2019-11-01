@@ -8,7 +8,7 @@ import org.json.JSONArray;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Set;
+import java.util.HashMap;
 
 public class NetImplTest extends AnalsysTest {
 
@@ -19,7 +19,7 @@ public class NetImplTest extends AnalsysTest {
     @Test
     public void getUidFromNet() {
         for (int i = 0; i < 100; i++) {
-            Set<NetInfo> infos = NetImpl.getInstance(mContext).getNetInfo();
+            HashMap<String, NetInfo> infos = NetImpl.getInstance(mContext).getNetInfo();
             Assert.assertTrue(infos.size() > 0);
         }
         JSONArray array = null;
