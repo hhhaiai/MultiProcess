@@ -1,5 +1,13 @@
 apply plugin: 'com.android.library'
+apply plugin: 'costtime'
 
+
+costtime {
+    enable true
+    costAll false
+    timeout 10
+    enableLog true
+}
 //apply plugin: 'jacoco'
 //jacoco {
 //    toolVersion = "0.7.1.201405082137"
@@ -32,7 +40,7 @@ android {
         debug {
             /**打开覆盖率统计开关*/
             //testCoverageEnabled = true
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {

@@ -1,0 +1,12 @@
+apply plugin: 'com.android.library'
+
+version = "1.0"
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}
