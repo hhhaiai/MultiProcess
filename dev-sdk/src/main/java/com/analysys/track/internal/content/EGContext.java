@@ -255,10 +255,10 @@ public class EGContext {
     public static final boolean FLAG_DEBUG_INNER = true;
 
     // 上传模快日志控制
-    public static final boolean DEBUG_UPLOAD = false;
+    public static final boolean DEBUG_UPLOAD = true;
     public static String TAG_UPLOAD;
     // OC模快日志控制
-    public static final boolean DEBUG_OC = false;
+    public static final boolean DEBUG_OC = true;
     //热修复打印
     public static final boolean DEBUG_HF = true;
     public static String TAG_OC;
@@ -272,7 +272,7 @@ public class EGContext {
     public static final boolean DEBUG_LOCATION = false;
     public static String TAG_LOC;
     // 执行上传URL控制
-    public static final boolean DEBUG_URL = true;
+    public static final boolean DEBUG_URL = false;
 
     static {
         //调整。解决编译时到处可见打印字段问题。

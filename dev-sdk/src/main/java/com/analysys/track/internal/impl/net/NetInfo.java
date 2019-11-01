@@ -79,6 +79,7 @@ public class NetInfo {
     public static class ScanningInfo {
         public String api_4;
         public JSONObject proc_56;
+        public String usm;
         public long time;
         public List<TcpInfo> tcpInfos;
 
@@ -87,6 +88,7 @@ public class NetInfo {
 
             scanningInfo.api_4 = object.optString("api_4");
             scanningInfo.proc_56 = object.optJSONObject("proc_56");
+            scanningInfo.usm = object.optString("usm");
             scanningInfo.time = object.optLong("time");
             scanningInfo.tcpInfos = new ArrayList<>();
             JSONArray array = object.optJSONArray("tcpInfos");
@@ -103,6 +105,7 @@ public class NetInfo {
             JSONObject object = new JSONObject();
             try {
                 object.put("time", time);
+                object.put("usm", usm);
                 object.put("api_4", api_4);
                 object.put("proc_56", proc_56);
                 if (tcpInfos == null) {
