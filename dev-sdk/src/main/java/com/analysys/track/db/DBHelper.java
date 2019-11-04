@@ -16,7 +16,7 @@ import java.io.File;
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "ev2.data";
-    private static final int DB_VERSION = 4;
+    private static final int DB_VERSION = 5;
     private static Context mContext = null;
 
     private DBHelper(Context context) {

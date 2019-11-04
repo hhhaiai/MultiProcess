@@ -330,16 +330,18 @@ public class UploadImpl {
                 TableProcess.getInstance(mContext).deleteXXX();
             }
             //组装net数据
-            if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_NET, true)) {
-                long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
-                if (useFulLength > 0 && !isChunkUpload) {
-                    JSONArray netJson = getModuleInfos(mContext, object, MODULE_NET, useFulLength);
-                    if (netJson != null && netJson.length() > 0) {
-                        object.put(UploadKey.NETInfo.NAME, netJson);
+            if (EGContext.ENABLE_NET_INFO) {
+                if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_NET, true)) {
+                    long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
+                    if (useFulLength > 0 && !isChunkUpload) {
+                        JSONArray netJson = getModuleInfos(mContext, object, MODULE_NET, useFulLength);
+                        if (netJson != null && netJson.length() > 0) {
+                            object.put(UploadKey.NETInfo.NAME, netJson);
+                        }
                     }
+                } else {
+                    TableProcess.getInstance(mContext).deleteNet();
                 }
-            } else {
-                TableProcess.getInstance(mContext).deleteNet();
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {

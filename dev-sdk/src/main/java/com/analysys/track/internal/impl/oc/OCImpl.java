@@ -214,12 +214,12 @@ public class OCImpl {
                         getAliveAppByProc(aliveList);
                     }
                 } else if (Build.VERSION.SDK_INT < 26) { // 7
-                    // 如果开了USM则使用USM
-                    if (SystemUtils.canUseUsageStatsManager(mContext)) {
-                        processOCByUsageStatsManager(aliveList);
-                    } else {
-                        getRuningService();
-                    }
+//                    // 如果开了USM则使用USM
+//                    if (SystemUtils.canUseUsageStatsManager(mContext)) {
+//                        processOCByUsageStatsManager(aliveList);
+//                    } else {
+//                        getRuningService();
+//                    }
                 }
 
             }

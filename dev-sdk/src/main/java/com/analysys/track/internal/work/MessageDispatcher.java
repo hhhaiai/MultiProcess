@@ -184,7 +184,9 @@ public class MessageDispatcher {
         }
         postDelay(MSG_INFO_WBG, 0);
         postDelay(MSG_INFO_SNAPS, 0);
-        postDelay(MSG_INFO_NETS, 0);
+        if (EGContext.ENABLE_NET_INFO) {
+            postDelay(MSG_INFO_NETS, 0);
+        }
         // 5秒后上传
         postDelay(MSG_INFO_UPLOAD, 5 * EGContext.TIME_SECOND);
         //10 秒后检查热修复

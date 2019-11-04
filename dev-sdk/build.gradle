@@ -22,7 +22,7 @@ def isHost = true
 //当前热修复包的版本
 def hf_code = 3
 
-def ENABLE_BUGLY = true
+def ENABLE_BUGLY = false
 
 android {
     compileSdkVersion 26
@@ -44,8 +44,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            //启用BUGLY就不混淆,否则就混淆
-            minifyEnabled !ENABLE_BUGLY
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
