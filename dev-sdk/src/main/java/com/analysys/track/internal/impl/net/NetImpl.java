@@ -208,7 +208,7 @@ public class NetImpl {
                     return null;
                 }
                 long ts = System.currentTimeMillis();
-                List<UsageStats> usageStats = usm.queryUsageStats(UsageStatsManager.INTERVAL_BEST, ts - 10 * 1000, ts);
+                List<UsageStats> usageStats = usm.queryUsageStats(UsageStatsManager.INTERVAL_BEST, 0, ts);
                 if (usageStats == null || usageStats.size() == 0) {
                     return null;
                 }

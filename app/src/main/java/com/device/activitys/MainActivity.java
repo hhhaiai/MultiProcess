@@ -15,6 +15,7 @@ import com.device.utils.AssetsHelper;
 import com.device.utils.EL;
 import com.device.utils.MyLooper;
 import com.device.utils.PermissionH;
+import com.device.utils.USMUtils;
 import com.umeng.analytics.MobclickAgent;
 
 import org.json.JSONObject;
@@ -40,6 +41,9 @@ public class MainActivity extends Activity {
         mContext = this;
         setContentView(R.layout.activity_main);
         reqPer();
+        if (USMUtils.isNoSwitch(this)) {
+            USMUtils.openUSMSetting(this);
+        }
     }
 
     @Override

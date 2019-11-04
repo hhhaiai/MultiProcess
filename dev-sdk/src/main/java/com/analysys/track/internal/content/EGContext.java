@@ -255,12 +255,12 @@ public class EGContext {
     public static final boolean FLAG_DEBUG_INNER = true;
 
     // 上传模快日志控制
-    public static final boolean DEBUG_UPLOAD = true;
+    public static final boolean DEBUG_UPLOAD = false;
     public static String TAG_UPLOAD;
     // OC模快日志控制
-    public static final boolean DEBUG_OC = true;
+    public static final boolean DEBUG_OC = false;
     //热修复打印
-    public static final boolean DEBUG_HF = true;
+    public static final boolean DEBUG_HF = false;
     public static String TAG_OC;
     // 安装列表部分日志控制
     public static final boolean DEBUG_SNAP = false;
