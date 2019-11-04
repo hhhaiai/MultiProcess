@@ -1,6 +1,9 @@
 package com.analysys.track.internal.impl.net;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -8,10 +11,12 @@ import android.os.Build;
 import android.os.Looper;
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.work.ECallBack;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MultiProcessChecker;
@@ -29,6 +34,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -53,6 +60,7 @@ public class NetImpl {
             "/proc/net/raw",
             "/proc/net/raw6",
     };
+    private String usm;
 
     private NetImpl(Context context) {
         this.context = context;
@@ -110,7 +118,7 @@ public class NetImpl {
         HashMap<String, NetInfo> map = new HashMap<>();
         try {
             JSONArray array = TableProcess.getInstance(context).selectNet(1024 * 1024);
-            if(array==null||array.length()==0){
+            if (array == null || array.length() == 0) {
                 return pkgs;
             }
             array = (JSONArray) array.get(0);
@@ -141,6 +149,7 @@ public class NetImpl {
             }
             api_4 = getApi4(context);
             proc_56 = getProc56(context);
+            usm = getUsm(context);
             //扫描
             for (String cmd : CMDS
             ) {
@@ -161,7 +170,8 @@ public class NetImpl {
                     continue;
                 }
                 // 死了 添加 关闭节点 判断上一个是关闭节点 不新加
-                if (info.scanningInfos.get(info.scanningInfos.size() - 1).tcpInfos == null) {
+                List<NetInfo.TcpInfo> tcpInfo = info.scanningInfos.get(info.scanningInfos.size() - 1).tcpInfos;
+                if (tcpInfo == null || tcpInfo.isEmpty()) {
                     //有不操作
                     continue;
                 }
@@ -180,6 +190,41 @@ public class NetImpl {
             }
         }
         return pkgs;
+    }
+
+    private String getUsm(Context mContext) {
+        if (Build.VERSION.SDK_INT >= 21 && Build.VERSION.SDK_INT < 29) {
+            class RecentUseComparator implements Comparator<UsageStats> {
+                @Override
+                public int compare(UsageStats lhs, UsageStats rhs) {
+                    return (lhs.getLastTimeUsed() > rhs.getLastTimeUsed()) ? -1
+                            : (lhs.getLastTimeUsed() == rhs.getLastTimeUsed()) ? 0 : 1;
+                }
+            }
+            try {
+                @SuppressLint("WrongConstant")
+                UsageStatsManager usm = (UsageStatsManager) mContext.getApplicationContext()
+                        .getSystemService(Context.USAGE_STATS_SERVICE);
+                if (usm == null) {
+                    return null;
+                }
+                long ts = System.currentTimeMillis();
+                List<UsageStats> usageStats = usm.queryUsageStats(UsageStatsManager.INTERVAL_BEST, 0, ts);
+                if (usageStats == null || usageStats.size() == 0) {
+                    return null;
+                }
+                Collections.sort(usageStats, new RecentUseComparator());
+                String usmPkg = usageStats.get(0).getPackageName();
+                if (!TextUtils.isEmpty(usmPkg)) {
+                    return usmPkg;
+                }
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
+            }
+        }
+        return null;
     }
 
     private void saveNetInfoToDb(HashMap<String, NetInfo> pkgs) {
@@ -252,6 +297,7 @@ public class NetImpl {
                         scanningInfo.time = time;
                         scanningInfo.api_4 = api_4;
                         scanningInfo.proc_56 = proc_56;
+                        scanningInfo.usm = usm;
                         info.scanningInfos.add(scanningInfo);
                     }
 
