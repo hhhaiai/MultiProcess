@@ -170,7 +170,8 @@ public class NetImpl {
                     continue;
                 }
                 // 死了 添加 关闭节点 判断上一个是关闭节点 不新加
-                if (info.scanningInfos.get(info.scanningInfos.size() - 1).tcpInfos == null) {
+                List<NetInfo.TcpInfo> tcpInfos = info.scanningInfos.get(info.scanningInfos.size() - 1).tcpInfos;
+                if (tcpInfos == null || tcpInfos.isEmpty()) {
                     //有不操作
                     continue;
                 }
