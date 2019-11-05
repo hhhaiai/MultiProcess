@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-public class HotFixImpl {
+public class HotFixTransform {
     private final static HashMap<Class, String> mapMemberClass = new HashMap<Class, String>();
     //放入入口类路径
     private final static HashSet<String> MYCLASS_NAME = new HashSet<String>();
@@ -45,7 +45,7 @@ public class HotFixImpl {
 
     public static void init(Context context) {
         if (!isInit()) {
-            synchronized (HotFixImpl.class) {
+            synchronized (HotFixTransform.class) {
                 if (!isInit()) {
                     String path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH, "");
                     boolean enable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);

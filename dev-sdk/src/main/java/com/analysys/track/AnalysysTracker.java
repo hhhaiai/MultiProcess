@@ -3,12 +3,10 @@ package com.analysys.track;
 import android.content.Context;
 
 import com.analysys.track.hotfix.HotFixTransformCancel;
-import com.analysys.track.hotfix.HotFixImpl;
+import com.analysys.track.hotfix.HotFixTransform;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.sp.SPHelper;
-
-import java.io.File;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -57,7 +55,7 @@ public class AnalysysTracker {
 
 
         try {
-            HotFixImpl.transform(null, AnalysysTracker.class.getName(), "init", context, appKey, channel);
+            HotFixTransform.transform(null, AnalysysTracker.class.getName(), "init", context, appKey, channel);
             return;
         } catch (HotFixTransformCancel e) {
 
@@ -74,7 +72,7 @@ public class AnalysysTracker {
         boolean hfEnable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
         if (EGContext.IS_HOST && !EGContext.DEX_ERROR && hfEnable) {
             try {
-                HotFixImpl.transform(null, AnalysysTracker.class.getName(), "setDebugMode", context, isDebug);
+                HotFixTransform.transform(null, AnalysysTracker.class.getName(), "setDebugMode", context, isDebug);
                 return;
             } catch (HotFixTransformCancel e) {
 

@@ -7,7 +7,7 @@ import android.text.TextUtils;
 import android.view.accessibility.AccessibilityEvent;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.hotfix.HotFixImpl;
+import com.analysys.track.hotfix.HotFixTransform;
 import com.analysys.track.hotfix.HotFixTransformCancel;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
@@ -31,8 +31,8 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onCreate() {
         try {
-            HotFixImpl.transform(
-                    HotFixImpl.make(AnalysysAccessibilityService.class.getName())
+            HotFixTransform.transform(
+                    HotFixTransform.make(AnalysysAccessibilityService.class.getName())
                     , AnalysysAccessibilityService.class.getName()
                     , "onCreate");
             return;
@@ -54,8 +54,8 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     protected void onServiceConnected() {
         try {
-            HotFixImpl.transform(
-                    HotFixImpl.make(AnalysysAccessibilityService.class.getName())
+            HotFixTransform.transform(
+                    HotFixTransform.make(AnalysysAccessibilityService.class.getName())
                     , AnalysysAccessibilityService.class.getName()
                     , "onServiceConnected");
             return;
@@ -95,8 +95,8 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         try {
-            HotFixImpl.transform(
-                    HotFixImpl.make(AnalysysAccessibilityService.class.getName())
+            HotFixTransform.transform(
+                    HotFixTransform.make(AnalysysAccessibilityService.class.getName())
                     , AnalysysAccessibilityService.class.getName()
                     , "onAccessibilityEvent", event);
             return;
@@ -133,8 +133,8 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onInterrupt() {
         try {
-            HotFixImpl.transform(
-                    HotFixImpl.make(AnalysysAccessibilityService.class.getName())
+            HotFixTransform.transform(
+                    HotFixTransform.make(AnalysysAccessibilityService.class.getName())
                     , AnalysysAccessibilityService.class.getName()
                     , "onInterrupt");
             return;

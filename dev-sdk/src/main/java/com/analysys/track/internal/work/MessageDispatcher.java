@@ -11,7 +11,7 @@ import android.os.Message;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
-import com.analysys.track.internal.impl.HotFoxImpl;
+import com.analysys.track.internal.impl.HotFixImpl;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
@@ -112,7 +112,7 @@ public class MessageDispatcher {
                         break;
 
                     case MSG_INFO_HOTFIX:
-                        HotFoxImpl.reqHotFix(mContext, new ECallBack() {
+                        HotFixImpl.reqHotFix(mContext, new ECallBack() {
                             @Override
                             public void onProcessed() {
                                 postDelay(MSG_INFO_HOTFIX, EGContext.TIME_SECOND * 10);

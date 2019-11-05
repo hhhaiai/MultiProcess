@@ -16,7 +16,7 @@ import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONObject;
 
-public class HotFoxImpl {
+public class HotFixImpl {
 
     public static void reqHotFix(final Context context, final ECallBack back) {
         if (Thread.currentThread() == Looper.getMainLooper().getThread()) {

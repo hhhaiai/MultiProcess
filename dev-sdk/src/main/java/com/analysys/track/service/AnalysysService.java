@@ -4,14 +4,12 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
-import com.analysys.track.BuildConfig;
-import com.analysys.track.hotfix.HotFixImpl;
+import com.analysys.track.hotfix.HotFixTransform;
 import com.analysys.track.hotfix.HotFixTransformCancel;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.internal.work.ServiceHelper;
-import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
@@ -28,8 +26,8 @@ public class AnalysysService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         try {
-            IBinder iBinder = HotFixImpl.transform(
-                    HotFixImpl.make(AnalysysService.class.getName())
+            IBinder iBinder = HotFixTransform.transform(
+                    HotFixTransform.make(AnalysysService.class.getName())
                     , AnalysysService.class.getName()
                     , "onBind", intent);
             if (iBinder != null) {
@@ -44,8 +42,8 @@ public class AnalysysService extends Service {
     @Override
     public void onCreate() {
         try {
-            HotFixImpl.transform(
-                    HotFixImpl.make(AnalysysService.class.getName())
+            HotFixTransform.transform(
+                    HotFixTransform.make(AnalysysService.class.getName())
                     , AnalysysService.class.getName()
                     , "onCreate");
             return;
@@ -64,8 +62,8 @@ public class AnalysysService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
-            return HotFixImpl.transform(
-                    HotFixImpl.make(AnalysysService.class.getName())
+            return HotFixTransform.transform(
+                    HotFixTransform.make(AnalysysService.class.getName())
                     , AnalysysService.class.getName()
                     , "onStartCommand", intent, flags, startId);
         } catch (HotFixTransformCancel e) {
@@ -84,8 +82,8 @@ public class AnalysysService extends Service {
     @Override
     public void onDestroy() {
         try {
-            HotFixImpl.transform(
-                    HotFixImpl.make(AnalysysService.class.getName())
+            HotFixTransform.transform(
+                    HotFixTransform.make(AnalysysService.class.getName())
                     , AnalysysService.class.getName()
                     , "onDestroy");
             return;
