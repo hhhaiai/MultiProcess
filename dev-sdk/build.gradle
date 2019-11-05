@@ -9,10 +9,10 @@ costtime {
 }
 
 def version = "4.3.0.5"
-def date = "20191101_hf"
+def date = "20191101"
 
 //是否是热修复的宿主
-def isHost = false
+def isHost = true
 //当前热修复包的版本
 def hf_code = 0
 
