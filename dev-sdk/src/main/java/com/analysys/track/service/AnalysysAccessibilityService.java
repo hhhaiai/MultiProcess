@@ -60,9 +60,6 @@ public class AnalysysAccessibilityService extends AccessibilityService {
                     , "onServiceConnected");
             return;
         } catch (HotFixTransformCancel e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysAccessibilityService onServiceConnected");
@@ -104,9 +101,6 @@ public class AnalysysAccessibilityService extends AccessibilityService {
                     , "onAccessibilityEvent", event);
             return;
         } catch (HotFixTransformCancel e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
         }
         try {
             CharSequence pkgName = event.getPackageName();
@@ -145,10 +139,6 @@ public class AnalysysAccessibilityService extends AccessibilityService {
                     , "onInterrupt");
             return;
         } catch (HotFixTransformCancel e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
-            e.printStackTrace();
         }
     }
 }

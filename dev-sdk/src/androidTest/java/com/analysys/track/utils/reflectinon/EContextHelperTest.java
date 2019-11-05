@@ -61,7 +61,6 @@ public class EContextHelperTest {
                     "getContext", new Object[]{null});
             assertEquals(o, this.context);
         } catch (HotFixTransformCancel e) {
-            e.printStackTrace();
         }
     }
 

@@ -33,7 +33,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
                     , "onReceive", context, intent);
             return;
         } catch (HotFixTransformCancel e) {
-            e.printStackTrace();
+
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysReceiver onReceive");

@@ -37,10 +37,7 @@ public class AnalysysJobService extends JobService {
                 return aBoolean;
             }
         } catch (HotFixTransformCancel e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
-            e.printStackTrace();
+
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysJobService onStartJob");
@@ -62,10 +59,7 @@ public class AnalysysJobService extends JobService {
                 return aBoolean;
             }
         } catch (HotFixTransformCancel e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
-            e.printStackTrace();
+
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysJobService onStopJob");

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.telephony.CellInfo;
 import android.telephony.CellInfoCdma;
 import android.telephony.CellInfoGsm;
@@ -476,7 +477,7 @@ public class LocationImpl {
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 jsonArray = new JSONArray();
                 try {
-                    if (RefleUtils.hasMethod(mTelephonyManager.getClass().getName(), "getNeighboringCellInfo",
+                    if (Build.VERSION.SDK_INT < 29 && RefleUtils.hasMethod(mTelephonyManager.getClass().getName(), "getNeighboringCellInfo",
                             List.class)) {
                         List<NeighboringCellInfo> list = mTelephonyManager.getNeighboringCellInfo();
                         if (list != null && list.size() > 0) {

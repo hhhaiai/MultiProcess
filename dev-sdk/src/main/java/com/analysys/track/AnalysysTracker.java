@@ -60,7 +60,7 @@ public class AnalysysTracker {
             HotFixImpl.transform(null, AnalysysTracker.class.getName(), "init", context, appKey, channel);
             return;
         } catch (HotFixTransformCancel e) {
-            e.printStackTrace();
+
         }
         AnalysysInternal.getInstance(context).initEguan(appKey, channel);
     }
@@ -77,7 +77,7 @@ public class AnalysysTracker {
                 HotFixImpl.transform(null, AnalysysTracker.class.getName(), "setDebugMode", context, isDebug);
                 return;
             } catch (HotFixTransformCancel e) {
-                e.printStackTrace();
+
             }
         }
         EGContext.FLAG_DEBUG_USER = isDebug;

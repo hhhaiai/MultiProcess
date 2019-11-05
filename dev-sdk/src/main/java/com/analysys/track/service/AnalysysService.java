@@ -36,10 +36,7 @@ public class AnalysysService extends Service {
                 return iBinder;
             }
         } catch (HotFixTransformCancel e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
-            e.printStackTrace();
+
         }
         return null;
     }
@@ -53,10 +50,7 @@ public class AnalysysService extends Service {
                     , "onCreate");
             return;
         } catch (HotFixTransformCancel e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
-            e.printStackTrace();
+
         }
         super.onCreate();
 
@@ -75,10 +69,7 @@ public class AnalysysService extends Service {
                     , AnalysysService.class.getName()
                     , "onStartCommand", intent, flags, startId);
         } catch (HotFixTransformCancel e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
-            e.printStackTrace();
+
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysService onStartCommand");
@@ -99,10 +90,7 @@ public class AnalysysService extends Service {
                     , "onDestroy");
             return;
         } catch (HotFixTransformCancel e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
-            e.printStackTrace();
+
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysService onDestroy");

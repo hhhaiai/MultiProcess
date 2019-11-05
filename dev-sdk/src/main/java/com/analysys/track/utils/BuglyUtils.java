@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 public class BuglyUtils {
 
     public static void commitError(Throwable throwable) {
+        ELOG.i(throwable);
         try {
             Class clazz = Class.forName("com.tencent.bugly.crashreport.CrashReport");
             setTag(clazz, 1002);
