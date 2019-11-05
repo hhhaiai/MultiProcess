@@ -310,13 +310,18 @@ public class PolicyImpl {
 
                     String code = Md5Utils.getMD5(data + "@" + version);
                     if (sign != null && sign.contains(code)) {
-                        String path = mContext.getFilesDir().getAbsolutePath() + "hf_" + version + ".dex";
-                        File file = new File(path);
+                        String dirPath = mContext.getFilesDir().getAbsolutePath() + EGContext.HOTFIX_CACHE_DIR;
+                        File dir = new File(dirPath);
+                        if (!dir.exists() || !dir.isDirectory()) {
+                            dir.mkdirs();
+                        }
+                        String path = "hf_" + version + ".dex";
+                        File file = new File(dir, path);
                         try {
                             Memory2File.savePatch(data, file);
                             //默认这个dex 是正常的完整的
                             EGContext.DEX_ERROR = false;
-                            SPHelper.setStringValue2SP(mContext, EGContext.HOT_FIX_PATH, path);
+                            SPHelper.setStringValue2SP(mContext, EGContext.HOT_FIX_PATH, file.getAbsolutePath());
                             SPHelper.setBooleanValue2SP(mContext, EGContext.HOT_FIX_ENABLE_STATE, true);
                             if (EGContext.FLAG_DEBUG_INNER) {
                                 ELOG.i(EGContext.HOT_FIX_TAG, "新的热修复包下载成功");

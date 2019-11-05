@@ -1,14 +1,16 @@
 package com.analysys.track.hotfix;
 
 import android.content.Context;
-import android.util.Log;
+import android.text.TextUtils;
 
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.ProcessUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -46,16 +48,16 @@ public class HotFixImpl {
             synchronized (HotFixImpl.class) {
                 if (!isInit()) {
                     String path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH, "");
-                    if (hasDexFile(path)) {
+                    boolean enable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
+                    if (enable && hasDexFile(path)) {
                         setAnalClassloader(context, path);
                     } else {
-                        if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i(EGContext.HOT_FIX_TAG, "dex 不存在 path = " + path);
-                        }
                         SPHelper.setBooleanValue2SP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
                         setPathClassLoader();
                     }
                     isinit = true;
+                    //主进程进行清理旧的dex文件
+                    deleteOldDex(context, path);
                 }
             }
         }
@@ -99,8 +101,42 @@ public class HotFixImpl {
         });
     }
 
+    private static void deleteOldDex(Context context, String path) {
+        if (ProcessUtils.getCurrentProcessName(context).equals(context.getPackageName())) {
+            String dirPath = context.getFilesDir().getAbsolutePath() + EGContext.HOTFIX_CACHE_DIR;
+            File[] files = new File(dirPath).listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.endsWith(".dex");
+                }
+            });
+            for (File file : files) {
+                if (TextUtils.isEmpty(path)) {
+                    boolean b = file.delete();
+                    ELOG.i(EGContext.HOT_FIX_TAG, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
+                    continue;
+                }
+                if (!path.contains(file.getName())) {
+                    boolean b = file.delete();
+                    ELOG.i(EGContext.HOT_FIX_TAG, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
+                }
+
+            }
+        }
+    }
+
     private static boolean hasDexFile(String path) {
-        return path != null && !path.equals("") && new File(path).isFile();
+        boolean hasdex = path != null && !path.equals("") && new File(path).isFile();
+        if (hasdex) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i(EGContext.HOT_FIX_TAG, "dex 存在 path = " + path);
+            }
+        } else {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i(EGContext.HOT_FIX_TAG, "dex 不存在 path = " + path);
+            }
+        }
+        return hasdex;
     }
 
     private static volatile boolean isinit = false;
@@ -111,7 +147,7 @@ public class HotFixImpl {
 
     private static void dexError() {
         if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.e(EGContext.HOT_FIX_TAG, "dexError");
+            ELOG.e(EGContext.HOT_FIX_TAG, "dexError[损坏]");
         }
         EGContext.DEX_ERROR = true;
         //删掉dex文件

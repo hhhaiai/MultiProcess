@@ -64,6 +64,11 @@ public class RequestUtils {
             connection.setRequestProperty(EGContext.TIME, SPHelper.getStringValueFromSP(context, EGContext.TIME, ""));
             // 策略版本号
             connection.setRequestProperty(EGContext.POLICYVER, plocyVersion);
+            //当前热修版本
+            if (!EGContext.IS_HOST) {
+                connection.setRequestProperty(EGContext.HOTFIX_VERSION, BuildConfig.hf_version);
+            }
+            connection.setRequestProperty(EGContext.POLICYVER, plocyVersion);
             //  // 区分3.x. 可以忽略不写
             // connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);// 写死
             // // 兼容墨迹版本区别需求增加。普通版本不增加该值

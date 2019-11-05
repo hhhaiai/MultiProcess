@@ -20,6 +20,8 @@ public class EGContext {
     public static final String LOGTAG_USER = "analysys";
     public static final String UPLOAD_HEAD_APPV = "appVer";
     public static final boolean ENABLE_NET_INFO = false;
+    public static final String HOTFIX_CACHE_DIR = "/analysys_cache_hf/";
+    public static final String HOTFIX_TIME = "hf_time";
     public static String LOGTAG_INNER;
     public static boolean FLAG_DEBUG_USER = false;
 
@@ -139,6 +141,7 @@ public class EGContext {
     public static final String APPKEY = "AK";
     public static final String TIME = "TIME";
     public static final String POLICYVER = "policyVer";
+    public static final String HOTFIX_VERSION = "HF";
 
     //  Negix 超过最大返回。网络状态，非消息内容
     public static final String HTTP_STATUS_413 = "413";
@@ -238,7 +241,7 @@ public class EGContext {
     //热更版本
     public static String HOT_FIX_VERSION = BuildConfig.hf_version;
     //热更文件路径
-    public static String HOT_FIX_PATH = "hf_path";
+    public static String HOT_FIX_PATH = SDK_VERSION + "hp";
     //热更文件哈希码
     public static String HOT_FIX_HASH = "hf_hash";
     //是否是宿主,打热修复包的时候设置为否
@@ -261,7 +264,7 @@ public class EGContext {
     // OC模快日志控制
     public static final boolean DEBUG_OC = false;
     //热修复打印
-    public static final boolean DEBUG_HF = false;
+    public static final boolean DEBUG_HF = true;
     public static String TAG_OC;
     // 安装列表部分日志控制
     public static final boolean DEBUG_SNAP = false;
@@ -273,7 +276,7 @@ public class EGContext {
     public static final boolean DEBUG_LOCATION = false;
     public static String TAG_LOC;
     // 执行上传URL控制
-    public static final boolean DEBUG_URL = false;
+    public static final boolean DEBUG_URL = true;
 
     static {
         //调整。解决编译时到处可见打印字段问题。

@@ -115,8 +115,7 @@ public class MessageDispatcher {
                         HotFoxImpl.reqHotFix(mContext, new ECallBack() {
                             @Override
                             public void onProcessed() {
-                                // 30秒检查一次是否可以发送。
-                                postDelay(MSG_INFO_HOTFIX, EGContext.TIME_HOUR * 1);
+                                postDelay(MSG_INFO_HOTFIX, EGContext.TIME_SECOND * 10);
                             }
                         });
                         break;
