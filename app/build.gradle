@@ -90,7 +90,7 @@ tasks.withType(Javadoc) {
 
 
 dependencies {
-
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
@@ -99,9 +99,6 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
 
     implementation project(':dev-sdk')
-    // bugly
-    implementation 'com.tencent.bugly:crashreport_upgrade:latest.release'
-    implementation 'com.tencent.bugly:nativecrashreport:latest.release'
 
     // umeng
 //    implementation files('libs/umeng-analytics-8.1.1.jar')

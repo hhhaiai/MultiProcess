@@ -10,8 +10,6 @@ import com.analysys.track.AnalysysTracker;
 import com.device.impls.MultiProcessWorker;
 import com.device.utils.EL;
 import com.tencent.bugly.Bugly;
-import com.tencent.bugly.beta.Beta;
-import com.tencent.bugly.crashreport.CrashReport;
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.commonsdk.UMConfigure;
 
@@ -28,6 +26,9 @@ public class AnalysysApplication extends Application {
 
     @Override
     public void onCreate() {
+
+        // init  bugly
+        Bugly.init(getApplicationContext(), "8fea5d1877", true);
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                 .detectAll()
                 .penaltyLog()
@@ -38,7 +39,7 @@ public class AnalysysApplication extends Application {
                 .build());
         super.onCreate();
         initAnalysys();
-        //MultiProcessWorker.runServices(this);
+        MultiProcessWorker.runServices(this);
         EL.init(this);
     }
 
@@ -64,21 +65,7 @@ public class AnalysysApplication extends Application {
 
         UMConfigure.init(this, "5b4c140cf43e4822b3000077", "track-demo-dev", UMConfigure.DEVICE_TYPE_PHONE, "99108ea07f30c2afcafc1c5248576bc5");
 
-        // init  bugly
-        try {
-            CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(getApplicationContext());
-            strategy.setAppReportDelay(0);   //改为1ms
 
-            Beta.autoInit = true;
-            Beta.autoCheckUpgrade = true;
-            Beta.upgradeCheckPeriod = 0L;
-            Beta.initDelay = 0L;
-            Bugly.setAppChannel(getApplicationContext(), "track-demo-dev");
-            // track-sdk-demo
-            Bugly.init(getApplicationContext(), "8b5379e3bc", false, strategy);
-        } catch (Throwable e) {
-            EL.e(e);
-        }
     }
 
     public String getCurrentProcessName() {
