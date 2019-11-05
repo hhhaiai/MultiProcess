@@ -3,7 +3,9 @@ package com.device.activitys;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -41,9 +43,12 @@ public class MainActivity extends Activity {
         mContext = this;
         setContentView(R.layout.activity_main);
         reqPer();
-        if (USMUtils.isNoSwitch(this)) {
-            USMUtils.openUSMSetting(this);
-        }
+        new AlertDialog.Builder(this).setMessage("设置辅助功能?").setNegativeButton("打开", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                USMUtils.openUSMSetting(MainActivity.this);
+            }
+        });
     }
 
     @Override
