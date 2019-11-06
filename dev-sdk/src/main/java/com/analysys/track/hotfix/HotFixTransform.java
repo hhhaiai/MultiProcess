@@ -21,9 +21,17 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * @Copyright 2019 analysys Inc. All rights reserved.
+ * @Description: 控制热修复转向的类, 主要控制, 初始化, 转向短路, dex包管理的一些逻辑
+ * @Version: 1.0
+ * @Create: 2019-11-06 11:28:37
+ * @author: miqt
+ * @mail: miqingtang@analysys.com.cn
+ */
 public class HotFixTransform {
     private final static HashMap<Class, String> mapMemberClass = new HashMap<Class, String>();
-    //放入入口类路径
+    //放入入口类路径,用于判断dex包是不是损坏
     private final static HashSet<String> MYCLASS_NAME = new HashSet<String>();
 
     static {

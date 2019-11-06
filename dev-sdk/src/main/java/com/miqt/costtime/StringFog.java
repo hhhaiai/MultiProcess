@@ -2,10 +2,21 @@ package com.miqt.costtime;
 
 import java.io.UnsupportedEncodingException;
 
+/**
+ * @Copyright 2019 analysys Inc. All rights reserved.
+ * @Description: 字符串混淆用的, 这个类在打包的时候,会通过ASM插桩到代码中
+ * @Version: 1.0
+ * @Create: 2019-11-06 11:38:19
+ * @author: miqt
+ * @mail: miqingtang@analysys.com.cn
+ */
 public class StringFog {
 
-    public static final StringFogImpl FOG = new StringFogImpl();
+    /**
+     * 加密的key,应该跟插件中的key一致,不然会发生错误
+     */
     public static final String key = "miqt";
+    public static final StringFogImpl FOG = new StringFogImpl();
 
     public static String encrypt(String data) {
         return FOG.encrypt(data, StringFog.key);
@@ -19,6 +30,14 @@ public class StringFog {
         return FOG.overflow(data, StringFog.key);
     }
 
+    /**
+     * @Copyright 2019 analysys Inc. All rights reserved.
+     * @Description: 字符串混淆实现类
+     * @Version: 1.0
+     * @Create: 2019-11-06 11:40:04
+     * @author: miqt
+     * @mail: miqingtang@analysys.com.cn
+     */
     public final static class StringFogImpl implements IStringFog {
 
         private static final String CHARSET_NAME_UTF_8 = "UTF-8";

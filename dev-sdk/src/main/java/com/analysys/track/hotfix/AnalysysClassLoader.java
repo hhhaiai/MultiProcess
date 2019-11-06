@@ -10,7 +10,7 @@ import dalvik.system.DexClassLoader;
 
 /**
  * @Copyright 2019 analysys Inc. All rights reserved.
- * @Description: 热修复要用的类加载器, 反转了双亲委托, 先自己找, 自己找不到拜托parent找
+ * @Description: 热修复要用的类加载器, 反转了双亲委托, 先自己找, 自己找不到拜托parent找,父亲一般是PathClassLoader
  * @Version: 1.0
  * @Create: 2019-10-10 14:29:53
  * @author: miqt
@@ -18,6 +18,9 @@ import dalvik.system.DexClassLoader;
  */
 class AnalysysClassLoader extends DexClassLoader {
 
+    /**
+     * 用来回调一个类具体是由谁加载了
+     */
     private Callback callback;
 
     public AnalysysClassLoader(String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent, Callback callback) {
