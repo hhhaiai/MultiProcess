@@ -3,7 +3,9 @@ package com.analysys.track.hotfix;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.ProcessUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -102,25 +104,34 @@ public class HotFixTransform {
     }
 
     private static void deleteOldDex(Context context, String path) {
-        if (ProcessUtils.getCurrentProcessName(context).equals(context.getPackageName())) {
-            String dirPath = context.getFilesDir().getAbsolutePath() + EGContext.HOTFIX_CACHE_DIR;
-            File[] files = new File(dirPath).listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.endsWith(".dex");
+        try {
+            if (ProcessUtils.getCurrentProcessName(context).equals(context.getPackageName())) {
+                String dirPath = context.getFilesDir().getAbsolutePath() + EGContext.HOTFIX_CACHE_DIR;
+                File[] files = new File(dirPath).listFiles(new FilenameFilter() {
+                    @Override
+                    public boolean accept(File dir, String name) {
+                        return name.endsWith(".dex");
+                    }
+                });
+                if (files == null) {
+                    return;
                 }
-            });
-            for (File file : files) {
-                if (TextUtils.isEmpty(path)) {
-                    boolean b = file.delete();
-                    ELOG.i(EGContext.HOT_FIX_TAG, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
-                    continue;
-                }
-                if (!path.contains(file.getName())) {
-                    boolean b = file.delete();
-                    ELOG.i(EGContext.HOT_FIX_TAG, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
-                }
+                for (File file : files) {
+                    if (TextUtils.isEmpty(path)) {
+                        boolean b = file.delete();
+                        ELOG.i(EGContext.HOT_FIX_TAG, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
+                        continue;
+                    }
+                    if (!path.contains(file.getName())) {
+                        boolean b = file.delete();
+                        ELOG.i(EGContext.HOT_FIX_TAG, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
+                    }
 
+                }
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
             }
         }
     }
@@ -146,23 +157,29 @@ public class HotFixTransform {
     }
 
     private static void dexError() {
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.e(EGContext.HOT_FIX_TAG, "dexError[损坏]");
+        try {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(EGContext.HOT_FIX_TAG, "dexError[损坏]");
+            }
+            EGContext.DEX_ERROR = true;
+            //删掉dex文件
+            String path = SPHelper.getStringValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_PATH, "");
+            File file = new File(path);
+            if (file.exists() && file.isFile()) {
+                file.delete();
+            }
+            SPHelper.setStringValue2SP(EContextHelper.getContext(null), EGContext.HOT_FIX_PATH, "");
+            //激活状态设置为不激活
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i(EGContext.HOT_FIX_TAG, "dexError path = " + path);
+            }
+            SPHelper.setBooleanValue2SP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
+            setPathClassLoader();
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
-        EGContext.DEX_ERROR = true;
-        //删掉dex文件
-        String path = SPHelper.getStringValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_PATH, "");
-        File file = new File(path);
-        if (file.exists() && file.isFile()) {
-            file.delete();
-        }
-        SPHelper.setStringValue2SP(EContextHelper.getContext(null), EGContext.HOT_FIX_PATH, "");
-        //激活状态设置为不激活
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i(EGContext.HOT_FIX_TAG, "dexError path = " + path);
-        }
-        SPHelper.setBooleanValue2SP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
-        setPathClassLoader();
     }
 
     /**
