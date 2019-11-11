@@ -77,13 +77,13 @@ public class HotFixTransform {
         loader = EContextHelper.getContext(null).getClassLoader();
     }
 
-    private static void setAnalClassloader(Context context, String path) {
+    private static void setAnalClassloader(final Context context, String path) {
         loader = new AnalysysClassLoader(path, context.getCacheDir().getAbsolutePath(), null, context.getClassLoader(), new AnalysysClassLoader.Callback() {
             @Override
             public void onSelfNotFound(String name) {
                 //入口类一定能自己找到,如果找不到,则一定是这个dex损坏了
                 if (MYCLASS_NAME.contains(name)) {
-                    dexError();
+                    dexError(context);
                     if (EGContext.DEBUG_HF) {
                         ELOG.v(EGContext.HOT_FIX_TAG, "[DEX损坏]:" + name + "[not found]");
                     }
@@ -164,24 +164,29 @@ public class HotFixTransform {
         return isinit;
     }
 
-    private static void dexError() {
+    private static void dexError(Context context) {
         try {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(EGContext.HOT_FIX_TAG, "dexError[损坏]");
             }
             EGContext.DEX_ERROR = true;
-            //删掉dex文件
-            String path = SPHelper.getStringValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_PATH, "");
-            File file = new File(path);
-            if (file.exists() && file.isFile()) {
-                file.delete();
+            //<editor-fold desc="删掉dex文件 其他进程 只改状态 保证删除的时候只有主进程的时候操作，避免主进程和主进程不同步删除出现异常">
+            String path = null;
+            if (ProcessUtils.getCurrentProcessName(context).equals(context.getPackageName())) {
+                path = SPHelper.getStringValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_PATH, "");
+                File file = new File(path);
+                if (file.exists() && file.isFile()) {
+                    file.delete();
+                }
             }
+            //</editor-fold>
             SPHelper.setStringValue2SP(EContextHelper.getContext(null), EGContext.HOT_FIX_PATH, "");
             //激活状态设置为不激活
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(EGContext.HOT_FIX_TAG, "dexError path = " + path);
             }
             SPHelper.setBooleanValue2SP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
+            //重新设置classloader
             setPathClassLoader();
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {

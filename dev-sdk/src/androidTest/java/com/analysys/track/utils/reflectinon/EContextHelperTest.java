@@ -60,7 +60,7 @@ public class EContextHelperTest {
             Context o = HotFixTransform.transform(null, EContextHelper.class.getName(),
                     "getContext", new Object[]{null});
             assertEquals(o, this.context);
-        } catch (HotFixTransformCancel e) {
+        } catch (Throwable e) {
         }
     }
 

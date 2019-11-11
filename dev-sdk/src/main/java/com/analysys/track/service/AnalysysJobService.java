@@ -34,7 +34,7 @@ public class AnalysysJobService extends JobService {
             if (aBoolean != null) {
                 return aBoolean;
             }
-        } catch (HotFixTransformCancel e) {
+        } catch (Throwable e) {
 
         }
         if (EGContext.FLAG_DEBUG_INNER) {
@@ -56,7 +56,7 @@ public class AnalysysJobService extends JobService {
             if (aBoolean != null) {
                 return aBoolean;
             }
-        } catch (HotFixTransformCancel e) {
+        } catch (Throwable e) {
 
         }
         if (EGContext.FLAG_DEBUG_INNER) {

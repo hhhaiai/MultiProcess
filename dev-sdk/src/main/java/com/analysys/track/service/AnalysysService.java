@@ -33,7 +33,7 @@ public class AnalysysService extends Service {
             if (iBinder != null) {
                 return iBinder;
             }
-        } catch (HotFixTransformCancel e) {
+        } catch (Throwable e) {
 
         }
         return null;
@@ -47,7 +47,7 @@ public class AnalysysService extends Service {
                     , AnalysysService.class.getName()
                     , "onCreate");
             return;
-        } catch (HotFixTransformCancel e) {
+        } catch (Throwable e) {
 
         }
         super.onCreate();
@@ -66,7 +66,7 @@ public class AnalysysService extends Service {
                     HotFixTransform.make(AnalysysService.class.getName())
                     , AnalysysService.class.getName()
                     , "onStartCommand", intent, flags, startId);
-        } catch (HotFixTransformCancel e) {
+        } catch (Throwable e) {
 
         }
         if (EGContext.FLAG_DEBUG_INNER) {
@@ -87,7 +87,7 @@ public class AnalysysService extends Service {
                     , AnalysysService.class.getName()
                     , "onDestroy");
             return;
-        } catch (HotFixTransformCancel e) {
+        } catch (Throwable e) {
 
         }
         if (EGContext.FLAG_DEBUG_INNER) {

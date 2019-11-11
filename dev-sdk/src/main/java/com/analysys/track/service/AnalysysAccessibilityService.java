@@ -59,7 +59,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
                     , AnalysysAccessibilityService.class.getName()
                     , "onServiceConnected");
             return;
-        } catch (HotFixTransformCancel e) {
+        } catch (Throwable e) {
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysAccessibilityService onServiceConnected");
@@ -100,7 +100,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
                     , AnalysysAccessibilityService.class.getName()
                     , "onAccessibilityEvent", event);
             return;
-        } catch (HotFixTransformCancel e) {
+        } catch (Throwable e) {
         }
         try {
             CharSequence pkgName = event.getPackageName();
@@ -138,7 +138,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
                     , AnalysysAccessibilityService.class.getName()
                     , "onInterrupt");
             return;
-        } catch (HotFixTransformCancel e) {
+        } catch (Throwable e) {
         }
     }
 }

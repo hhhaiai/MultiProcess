@@ -14,6 +14,14 @@ import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @Copyright 2019 analysys Inc. All rights reserved.
+ * @Description: 一些验证性的测试
+ * @Version: 1.0
+ * @Create: 2019-11-11 15:24:20
+ * @author: miqt
+ * @mail: miqingtang@analysys.com.cn
+ */
 public class OtherTest extends AnalsysTest {
     @Test
     public void getPackagesForUid() {

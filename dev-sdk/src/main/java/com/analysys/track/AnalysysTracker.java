@@ -57,7 +57,7 @@ public class AnalysysTracker {
         try {
             HotFixTransform.transform(null, AnalysysTracker.class.getName(), "init", context, appKey, channel);
             return;
-        } catch (HotFixTransformCancel e) {
+        } catch (Throwable e) {
 
         }
         AnalysysInternal.getInstance(context).initEguan(appKey, channel);
@@ -74,7 +74,7 @@ public class AnalysysTracker {
             try {
                 HotFixTransform.transform(null, AnalysysTracker.class.getName(), "setDebugMode", context, isDebug);
                 return;
-            } catch (HotFixTransformCancel e) {
+            } catch (Throwable e) {
 
             }
         }
