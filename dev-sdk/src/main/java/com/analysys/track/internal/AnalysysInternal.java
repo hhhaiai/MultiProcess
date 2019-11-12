@@ -53,6 +53,10 @@ public class AnalysysInternal {
         return Holder.instance;
     }
 
+    public static boolean isInit() {
+        return hasInit;
+    }
+
     /**
      * 初始化函数,可能为耗时操作的，判断是否主线程，需要开子线程做
      *

@@ -30,6 +30,8 @@ public class EGContext {
     public static final String ACTION_UPDATE_POLICY = "com.analysys.sdk.action_policy";
     public static final String POLICY = "POLICY";
     public static final String PNAME = "PNAME";
+    public static final String KEY_ACTION_SCREEN_ON_SIZE = "SCREEN_ON_SIZE";
+
 
     public static volatile boolean snap_complete = false;
     /**
@@ -258,7 +260,7 @@ public class EGContext {
      * EGuan 内部调试系列tag.主要用于控制堆栈打印、错误打印、内部提示信息打印
      */
     // 策略的总控。关闭后所有的日志都不能打印
-    public static final boolean FLAG_DEBUG_INNER = false;
+    public static final boolean FLAG_DEBUG_INNER = true;
 
     // 上传模快日志控制
     public static final boolean DEBUG_UPLOAD = false;
