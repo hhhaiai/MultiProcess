@@ -3,7 +3,9 @@ package com.device.activitys;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +17,7 @@ import com.device.utils.AssetsHelper;
 import com.device.utils.EL;
 import com.device.utils.MyLooper;
 import com.device.utils.PermissionH;
+import com.device.utils.USMUtils;
 import com.umeng.analytics.MobclickAgent;
 
 import org.json.JSONObject;
@@ -40,6 +43,12 @@ public class MainActivity extends Activity {
         mContext = this;
         setContentView(R.layout.activity_main);
         reqPer();
+        new AlertDialog.Builder(this).setMessage("设置辅助功能?").setNegativeButton("打开", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                USMUtils.openUSMSetting(MainActivity.this);
+            }
+        });
     }
 
     @Override

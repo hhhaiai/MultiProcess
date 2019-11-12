@@ -9,6 +9,7 @@ import android.content.pm.ServiceInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
@@ -44,6 +45,9 @@ public class AndroidManifestHelper {
                 }
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
 
         return false;
@@ -59,6 +63,9 @@ public class AndroidManifestHelper {
                 }
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
 
         return false;
@@ -89,6 +96,9 @@ public class AndroidManifestHelper {
             }
 
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -119,6 +129,9 @@ public class AndroidManifestHelper {
                 return label;
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return label;
     }
@@ -141,6 +154,9 @@ public class AndroidManifestHelper {
                 }
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -183,6 +199,9 @@ public class AndroidManifestHelper {
                 return context.getPackageManager().getServiceInfo(cn, PackageManager.GET_META_DATA);
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return null;
     }

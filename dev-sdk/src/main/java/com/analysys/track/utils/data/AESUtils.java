@@ -1,6 +1,8 @@
 package com.analysys.track.utils.data;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 
 import javax.crypto.Cipher;
@@ -23,6 +25,9 @@ public class AESUtils {
             byte[] result = cipher.doFinal(content);
             return result;
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -52,6 +57,9 @@ public class AESUtils {
             byte[] result = cipher.doFinal(content);
             return result;
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }

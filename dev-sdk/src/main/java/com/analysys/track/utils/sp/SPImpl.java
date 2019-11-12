@@ -9,7 +9,9 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.util.Pair;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 
 import java.io.Closeable;
@@ -144,6 +146,9 @@ class SPImpl implements SharedPreferences {
                         bakFile.createNewFile();
                     }
                 } catch (Exception e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                     if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.e(e);
                     }
@@ -172,6 +177,9 @@ class SPImpl implements SharedPreferences {
                 String v = (String) mMap.get(key);
                 return v != null ? v : defValue;
             } catch (ClassCastException e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
                 if (mErrorListener != null) {
                     mErrorListener.onError((mFile != null ? mFile.getAbsolutePath() : null) + "#" + key + e,
                             TYPE_CAST_EXCEPTION, mFile != null ? mFile.length() : 0);
@@ -194,6 +202,9 @@ class SPImpl implements SharedPreferences {
                 Integer v = (Integer) mMap.get(key);
                 return v != null ? v : defValue;
             } catch (ClassCastException e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
                 if (mErrorListener != null) {
                     mErrorListener.onError((mFile != null ? mFile.getAbsolutePath() : null) + "#" + key + e,
                             TYPE_CAST_EXCEPTION, mFile != null ? mFile.length() : 0);
@@ -211,6 +222,9 @@ class SPImpl implements SharedPreferences {
                 Long v = (Long) mMap.get(key);
                 return v != null ? v : defValue;
             } catch (ClassCastException e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
                 if (mErrorListener != null) {
                     mErrorListener.onError((mFile != null ? mFile.getAbsolutePath() : null) + "#" + key + e,
                             TYPE_CAST_EXCEPTION, mFile != null ? mFile.length() : 0);
@@ -228,6 +242,9 @@ class SPImpl implements SharedPreferences {
                 Float v = (Float) mMap.get(key);
                 return v != null ? v : defValue;
             } catch (ClassCastException e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
                 if (mErrorListener != null) {
                     mErrorListener.onError((mFile != null ? mFile.getAbsolutePath() : null) + "#" + key + e,
                             TYPE_CAST_EXCEPTION, mFile != null ? mFile.length() : 0);
@@ -245,6 +262,9 @@ class SPImpl implements SharedPreferences {
                 Boolean v = (Boolean) mMap.get(key);
                 return v != null ? v : defValue;
             } catch (ClassCastException e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
                 if (mErrorListener != null) {
                     mErrorListener.onError((mFile != null ? mFile.getAbsolutePath() : null) + "#" + key + e,
                             TYPE_CAST_EXCEPTION, mFile != null ? mFile.length() : 0);
@@ -387,6 +407,9 @@ class SPImpl implements SharedPreferences {
 
                     backup();
                 } catch (Throwable e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                     if (mErrorListener != null) {
                         mErrorListener.onError(e.getMessage(), OTHER_EXCEPTION, -1);
                     }
@@ -394,6 +417,9 @@ class SPImpl implements SharedPreferences {
                     try {
                         fileLock.release();
                     } catch (IOException e) {
+                        if (BuildConfig.ENABLE_BUGLY) {
+                            BuglyUtils.commitError(e);
+                        }
                         if (EGContext.FLAG_DEBUG_INNER) {
                             ELOG.e(e);
                         }
@@ -548,6 +574,9 @@ class SPImpl implements SharedPreferences {
                     allocBuffer(contentLength + MIN_INCREASE_LENGTH);
                 }
             } catch (Exception e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.e(e);
                 }
@@ -585,6 +614,9 @@ class SPImpl implements SharedPreferences {
                 try {
                     parseOK = parseBytesIntoMap(allBytes, true);
                 } catch (Exception e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                     if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.e(e);
                     }
@@ -599,6 +631,9 @@ class SPImpl implements SharedPreferences {
                         lock.release();
                     }
                 } catch (Exception e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                     if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.e(e);
                     }
@@ -671,6 +706,9 @@ class SPImpl implements SharedPreferences {
                 try {
                     SPImpl.this.wait();
                 } catch (Throwable t) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(t);
+                    }
                     if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.e(t);
                     }
@@ -704,6 +742,9 @@ class SPImpl implements SharedPreferences {
         try {
             mMappedByteBuffer = mFileChannel.map(FileChannel.MapMode.READ_WRITE, 0, length);
         } catch (Exception e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -750,6 +791,9 @@ class SPImpl implements SharedPreferences {
                     initFileHeader();
                 }
             } catch (Exception e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
                 isFileExist = false;
 
                 if (mErrorListener != null) {
@@ -773,12 +817,18 @@ class SPImpl implements SharedPreferences {
                 try {
                     lock = mFileChannel.tryLock();
                 } catch (Exception e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                 }
 
                 if (lock == null) {
                     try {
                         Thread.sleep(100);
                     } catch (Exception e) {
+                        if (BuildConfig.ENABLE_BUGLY) {
+                            BuglyUtils.commitError(e);
+                        }
                     }
                 }
 
@@ -790,6 +840,9 @@ class SPImpl implements SharedPreferences {
             try {
                 lock = mFileChannel.tryLock();
             } catch (Exception e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
 
@@ -878,6 +931,9 @@ class SPImpl implements SharedPreferences {
                         }
                     }
                 } catch (Exception e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                     if (mErrorListener != null) {
                         mErrorListener.onError((mFile != null ? mFile.getAbsolutePath() : null) + "#" + e.getCause(),
                                 VALUE_LOST, totalBytes.length);
@@ -1036,6 +1092,9 @@ class SPImpl implements SharedPreferences {
                     return ByteLongUtils.bytesToLong(value);
                 }
             } catch (Throwable t) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(t);
+                }
             }
         }
 
@@ -1058,6 +1117,9 @@ class SPImpl implements SharedPreferences {
                     return ByteLongUtils.longToBytes((Long) obj);
                 }
             } catch (Throwable t) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(t);
+                }
             }
         }
 
@@ -1076,6 +1138,9 @@ class SPImpl implements SharedPreferences {
             osChannel = os.getChannel();
             mFileChannel.transferTo(0, mMappedByteBuffer.capacity(), osChannel);
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
         } finally {
             safeClose(os);
             safeClose(osChannel);
@@ -1087,6 +1152,9 @@ class SPImpl implements SharedPreferences {
             try {
                 obj.close();
             } catch (IOException e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
     }
@@ -1115,6 +1183,9 @@ class SPImpl implements SharedPreferences {
             is.seek((ID_LENGTH + FINISH_MARK_LENGTH) * NUM_TWO);
             is.read(allBytes);
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             throwable = t;
         } finally {
             safeClose(is);
@@ -1122,6 +1193,9 @@ class SPImpl implements SharedPreferences {
             try {
                 parseOK = parseBytesIntoMap(allBytes, false);
             } catch (Exception e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
 
             if (allBytes != null || throwable != null) {

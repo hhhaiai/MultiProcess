@@ -25,7 +25,7 @@ public class UploadImplTest extends AnalsysTest {
 
     @Test
     public void messageEncrypt() {
-
+        UploadImpl.getInstance(mContext).messageEncrypt("._-$,;~()/ ");
     }
 
     @Test
@@ -56,9 +56,10 @@ public class UploadImplTest extends AnalsysTest {
 
         assertEquals(1, helpers.size());
     }
+
     @Test
-    public void processMsgFromServer(){
-        String json="{\n" +
+    public void processMsgFromServer() {
+        String json = "{\n" +
                 "  \"code\": 500,\n" +
                 "  \"policy\": {\n" +
                 "    \"policyVer\": \"20190907142023\",\n" +
@@ -85,6 +86,6 @@ public class UploadImplTest extends AnalsysTest {
                 "    }\n" +
                 "  }\n" +
                 "}";
-        invokeMethod(UploadImpl.getInstance(mContext),UploadImpl.class.getName(),"processMsgFromServer",json);
+        invokeMethod(UploadImpl.getInstance(mContext), UploadImpl.class.getName(), "processMsgFromServer", json);
     }
 }

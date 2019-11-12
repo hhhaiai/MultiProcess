@@ -5,7 +5,9 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 
 import java.io.File;
@@ -76,6 +78,9 @@ public class SPHelper {
                     try {
                         f.createNewFile();
                     } catch (IOException e) {
+                        if (BuildConfig.ENABLE_BUGLY) {
+                            BuglyUtils.commitError(e);
+                        }
                         if (EGContext.FLAG_DEBUG_INNER) {
                             ELOG.e(e);
                         }
@@ -193,6 +198,9 @@ public class SPHelper {
             method.setAccessible(true);
             returnValue = method.invoke(o, args);
         } catch (Exception e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }

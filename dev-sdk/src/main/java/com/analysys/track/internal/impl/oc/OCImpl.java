@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.db.DBConfig;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
@@ -21,6 +22,7 @@ import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.utils.AccessibilityHelper;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.EncryptUtils;
@@ -28,6 +30,7 @@ import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PermissionUtils;
+import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.data.Base64Utils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -37,11 +40,15 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @Copyright 2019 sanbo Inc. All rights reserved.
@@ -98,6 +105,9 @@ public class OCImpl {
                 // 6.0以上版本
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
         }
 
 
@@ -141,6 +151,9 @@ public class OCImpl {
                 processScreenOff();
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
@@ -192,7 +205,7 @@ public class OCImpl {
                         }
                         getAliveAppByProc(aliveList);
                     }
-                } else if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {
+                } else if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {// 5 6
 
                     // 如果开了USM则使用USM
                     if (SystemUtils.canUseUsageStatsManager(mContext)) {
@@ -200,8 +213,13 @@ public class OCImpl {
                     } else {
                         getAliveAppByProc(aliveList);
                     }
-                } else {
-                    // TODO 7.0以上 service实现
+                } else if (Build.VERSION.SDK_INT < 26) { // 7
+//                    // 如果开了USM则使用USM
+//                    if (SystemUtils.canUseUsageStatsManager(mContext)) {
+//                        processOCByUsageStatsManager(aliveList);
+//                    } else {
+//                        getRuningService();
+//                    }
                 }
 
             }
@@ -210,6 +228,41 @@ public class OCImpl {
         // xxx允许采集进行处理
         if (isAllowXXX) {
             parserXXXAndSave(xxx);
+        }
+    }
+
+
+    private void getRuningService() {
+        try {
+            ActivityManager myManager = (ActivityManager) mContext
+                    .getSystemService(Context.ACTIVITY_SERVICE);
+            ArrayList<ActivityManager.RunningServiceInfo> runningService = null;
+            if (myManager != null) {
+                runningService = (ArrayList<ActivityManager.RunningServiceInfo>) myManager
+                        .getRunningServices(30);
+            }
+            PackageManager pm = mContext.getPackageManager();
+            HashSet<String> pkgs = new HashSet<>();
+            if (runningService != null) {
+                for (int i = 0; i < runningService.size(); i++) {
+                    //分割报名和进程名,样例:com.device:h
+                    String name = runningService.get(i).process;
+                    String[] split = name.split(":");
+                    if (split != null || split.length > 0) {
+                        String pkgName = split[0];
+                        if (!TextUtils.isEmpty(pkgName)
+                                && pkgName.contains(".")
+                                && !pkgName.contains(":")
+                                && !pkgName.contains("/")
+                                && pm.getLaunchIntentForPackage(pkgName) != null) {
+                            pkgs.add(pkgName);
+                        }
+                    }
+                }
+            }
+            getAliveAppByProc(new JSONArray(pkgs));
+        } catch (Throwable e) {
+
         }
     }
 
@@ -381,6 +434,9 @@ public class OCImpl {
                 getAliveAppByProc(aliveList);
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             getAliveAppByProc(aliveList);
         }
     }
@@ -438,6 +494,9 @@ public class OCImpl {
                 }
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
 
         }
 
@@ -506,6 +565,9 @@ public class OCImpl {
                 }
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
         }
         return info;
     }
@@ -546,6 +608,9 @@ public class OCImpl {
                 getAliveAppByProc(aliveList);
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             getAliveAppByProc(aliveList);
         }
     }
@@ -561,9 +626,10 @@ public class OCImpl {
     public long getOCDurTime() {
         if (Build.VERSION.SDK_INT < 21) {
             return EGContext.TIME_SECOND * 5;
-        } else if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {
+            //5 6 7
+        } else if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 26) {
             return EGContext.TIME_SECOND * 30;
-        } else {// 6以上不处理
+        } else {// 7以上不处理
             return -1;
         }
     }

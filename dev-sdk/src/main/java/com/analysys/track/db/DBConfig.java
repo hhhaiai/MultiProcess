@@ -1,6 +1,5 @@
 package com.analysys.track.db;
 
-
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
  * @Description: 数据库配置类
@@ -170,6 +169,28 @@ public class DBConfig {
             public static final String L_RA = "xxx_ra";
             public static final String L_RB = "xxx_rb";
             public static final String L_RC = "xxx_rc";
+        }
+    }
+    public static class NetInfo {
+        // 表名
+        public static final String TABLE_NAME = "e_n";
+        // 建表
+        public static final String CREATE_TABLE = String.format(
+                "create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)", TABLE_NAME, Column.ID,
+                DBType.AUTOINCREMENT, Column.TIME, DBType.VARCHAR_TWENTY, Column.PROC, DBType.TEXT, Column.L_RA,
+                DBType.TEXT, Column.L_RB, DBType.TEXT, Column.L_RC, DBType.TEXT);
+
+        public static class Column {
+            public static final String ID = "id";
+            // RESULT
+            public static final String TIME = "n_a";
+            // PROC
+            public static final String PROC = "n_d";
+
+            // 备用字段 text 类型
+            public static final String L_RA = "n_ra";
+            public static final String L_RB = "n_rb";
+            public static final String L_RC = "n_rc";
         }
     }
 

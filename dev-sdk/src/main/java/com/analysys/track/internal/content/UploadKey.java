@@ -1,6 +1,5 @@
 package com.analysys.track.internal.content;
 
-
 /**
  * @Copyright 2019 sanbo Inc. All rights reserved.
  * @Description: 上传字段
@@ -247,7 +246,9 @@ public class UploadKey {
         public static final String APPLICATIONTYPE_THREE_APP = "OA";
     }
 
-
+    public static class NETInfo {
+        public static final String NAME = "NETInfo";
+    }
     /**
      * @Copyright © 2019 sanbo Inc. All rights reserved.
      * @Description: 内部使用的XXXinfo
@@ -423,6 +424,7 @@ public class UploadKey {
          */
         // OC
         public static final String RES_POLICY_MODULE_CL_OC = "module_cl_oc";
+        public static final String RES_POLICY_MODULE_CL_NET = "module_cl_net";
         // SNAPSHOT
         public static final String RES_POLICY_MODULE_CL_SNAPSHOT = "module_cl_snapshot";
         // LOCATION
@@ -446,13 +448,22 @@ public class UploadKey {
 
 
         /**
-         * 热更新部分
+         * 补丁部分
+         */
+        public static class PatchResp {
+            public static final String PATCH_RESP_NAME = "patch";
+            public static final String PATCH_VERSION = "version";
+            public static final String PATCH_SIGN = "sign";
+            public static final String PATCH_DATA = "data";
+        }
+        /**
+         * 热更部分
          */
         public static class HotFixResp {
-            public static final String HOTFIX_RESP_NAME = "patch";
-            public static final String HOTFIX_RESP_PATCH_VERSION = "version";
-            public static final String HOTFIX_RESP_PATCH_SIGN = "sign";
-            public static final String HOTFIX_RESP_PATCH_DATA = "data";
+            public static final String NAME = "hotfix";
+            public static final String VERSION = "version";
+            public static final String SIGN = "sign";
+            public static final String DATA = "data";
         }
     }
 }

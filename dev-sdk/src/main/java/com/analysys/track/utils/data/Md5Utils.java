@@ -1,6 +1,8 @@
 package com.analysys.track.utils.data;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 
 import java.security.MessageDigest;
@@ -21,6 +23,9 @@ public class Md5Utils {
             byte[] m = md5.digest();// 加密
             return getString(m);
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }

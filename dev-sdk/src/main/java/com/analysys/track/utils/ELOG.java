@@ -273,6 +273,11 @@ public class ELOG {
      */
     private static void parserArgsMain(int level, Object[] args) {
         if (EGContext.FLAG_DEBUG_INNER) {
+            if (EGContext.DEBUG_HF) {
+                Log.v(EGContext.HOT_FIX_TAG,
+                        "[HOST]:" + EGContext.IS_HOST + "[VERSION]:" + EGContext.HOT_FIX_VERSION
+                );
+            }
             try {
                 String tag = DEFAULT_TAG;
                 if (!DEV_DEBUG) {
@@ -1157,6 +1162,7 @@ public class ELOG {
             try {
                 return isFormat ? (arr.toString(JSON_INDENT)) : String.valueOf(arr);
             } catch (Exception e) {
+
             }
         }
         return "";
@@ -1180,6 +1186,7 @@ public class ELOG {
             try {
                 return isFormat ? obj.toString(JSON_INDENT) : String.valueOf(obj);
             } catch (Exception e) {
+
             }
         }
         return "";

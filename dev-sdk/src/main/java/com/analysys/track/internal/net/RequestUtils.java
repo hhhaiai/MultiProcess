@@ -2,8 +2,10 @@ package com.analysys.track.internal.net;
 
 import android.content.Context;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.SystemUtils;
@@ -26,6 +28,7 @@ import java.net.URLEncoder;
  */
 public class RequestUtils {
 
+    public static final String FAIL = "-1";
 
     /**
      * HTTP
@@ -54,17 +57,22 @@ public class RequestUtils {
             connection.setRequestMethod("POST");
             // 添加头信息
 
-            connection.setRequestProperty(EGContext.SDKV, SPHelper.getStringValueFromSP(context, EGContext.SDKV, ""));
+            connection.setRequestProperty(EGContext.SDKV, EGContext.SDK_VERSION);
 //            connection.setRequestProperty(EGContext.DEBUG, DeviceImpl.getInstance(context).getDebug());
             connection.setRequestProperty(EGContext.DEBUG, DevStatusChecker.getInstance().isSelfDebugApp(context) ? "1" : "0");
             connection.setRequestProperty(EGContext.APPKEY, SystemUtils.getAppKey(context));
             connection.setRequestProperty(EGContext.TIME, SPHelper.getStringValueFromSP(context, EGContext.TIME, ""));
             // 策略版本号
             connection.setRequestProperty(EGContext.POLICYVER, plocyVersion);
+            //当前热修版本
+            if (!EGContext.IS_HOST) {
+                connection.setRequestProperty(EGContext.HOTFIX_VERSION, BuildConfig.hf_version);
+            }
+            connection.setRequestProperty(EGContext.POLICYVER, plocyVersion);
             //  // 区分3.x. 可以忽略不写
             // connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);// 写死
             // // 兼容墨迹版本区别需求增加。普通版本不增加该值
-             connection.setRequestProperty(EGContext.UPLOAD_HEAD_APPV, SystemUtils.getAppV(context));
+            connection.setRequestProperty(EGContext.UPLOAD_HEAD_APPV, SystemUtils.getAppV(context));
             // 打印请求头信息内容
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.i(EGContext.TAG_UPLOAD, "========HTTP头： " + connection.getRequestProperties().toString());
@@ -93,10 +101,13 @@ public class RequestUtils {
                 response = EGContext.HTTP_STATUS_413;
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
-            response = "-1";
+            response = FAIL;
         } finally {
 
             StreamerUtils.safeClose(pw);

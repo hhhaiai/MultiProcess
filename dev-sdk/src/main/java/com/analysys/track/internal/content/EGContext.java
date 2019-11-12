@@ -19,6 +19,7 @@ public class EGContext {
     public static final String SDK_TYPE = "Android";
     public static final String LOGTAG_USER = "analysys";
     public static final String UPLOAD_HEAD_APPV = "appVer";
+    public static final boolean ENABLE_NET_INFO = false;
     public static String LOGTAG_INNER;
     public static boolean FLAG_DEBUG_USER = false;
 
@@ -139,6 +140,7 @@ public class EGContext {
     public static final String TIME = "TIME";
     public static final String POLICYVER = "policyVer";
 
+
     //  Negix 超过最大返回。网络状态，非消息内容
     public static final String HTTP_STATUS_413 = "413";
     // 200 请求成功。 返回值内部状态
@@ -161,6 +163,8 @@ public class EGContext {
     // SDK应用列表更新间隔,同时只有一个进程工作,首次SDK初始化时创建,涉及广播，5秒监听就行
     public static final String FILES_SYNC_APPSNAPSHOT = "SAP.TAG";
     public static final String FILES_SYNC_OC = "OCS.TAG";
+    public static final String FILES_SYNC_HOTFIX = "FSHTF.TAG";
+    public static final String FILES_SYNC_NET = "NETS.TAG";
     // OC 5+同步时间,同时只有一个进程工作
     public static final long TIME_SYNC_OC_OVER_5 = 30 * 1000;
 
@@ -226,7 +230,27 @@ public class EGContext {
     /**
      * 是否USB调试状态
      */
-    public static boolean STATUS_USB_DEBUG = false;
+    public static boolean STATUS_USB_DEBUG = true;
+
+    /**
+     * 热更是否开启 true 开启 false 关闭
+     */
+    public static String HOT_FIX_ENABLE_STATE = SDK_VERSION + "_hf";
+    //热更版本
+    public static String HOT_FIX_VERSION = BuildConfig.hf_version;
+    //热更文件路径
+    public static String HOT_FIX_PATH_TEMP = SDK_VERSION + "hf_temp";
+    public static String HOT_FIX_PATH = SDK_VERSION + "hp";
+    //热更文件哈希码
+    public static String HOT_FIX_HASH = "hf_hash";
+    //是否是宿主,打热修复包的时候设置为否
+    public static boolean IS_HOST = BuildConfig.IS_HOST;
+    //dex文件损坏,默认是没有dex文件的,所以默认为true
+    public static boolean DEX_ERROR = false;
+    public static final String HOT_FIX_TAG = "ANALYSYSHOTFIX";
+    public static final String HOTFIX_VERSION = "HF";
+    public static final String HOTFIX_CACHE_DIR = "/analysys_cache_hf/";
+    public static final String HOTFIX_TIME = "hf_time";
 
 
     /********************************************日志控制************************************************/
@@ -241,6 +265,8 @@ public class EGContext {
     public static String TAG_UPLOAD;
     // OC模快日志控制
     public static final boolean DEBUG_OC = false;
+    //热修复打印
+    public static final boolean DEBUG_HF = false;
     public static String TAG_OC;
     // 安装列表部分日志控制
     public static final boolean DEBUG_SNAP = false;

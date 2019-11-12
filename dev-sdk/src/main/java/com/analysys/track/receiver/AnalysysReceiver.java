@@ -4,7 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.analysys.track.hotfix.HotFixTransformCancel;
+import com.analysys.track.hotfix.HotFixTransform;
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.ReceiverImpl;
+import com.analysys.track.utils.ELOG;
 
 
 /**
@@ -20,6 +24,19 @@ public class AnalysysReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+
+        try {
+            HotFixTransform.transform(
+                    HotFixTransform.make(AnalysysReceiver.class.getName())
+                    , AnalysysReceiver.class.getName()
+                    , "onReceive", context, intent);
+            return;
+        } catch (Throwable e) {
+
+        }
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i("AnalysysReceiver onReceive");
+        }
         if (intent == null) {
             return;
         }

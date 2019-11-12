@@ -2,6 +2,7 @@ package com.analysys.track.utils;
 
 import android.content.Context;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.data.Md5Utils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
@@ -42,6 +43,9 @@ public class DeflterCompressUtils {
             }
             output = bos.toByteArray();
         } catch (Exception e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             output = data;
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
@@ -50,6 +54,9 @@ public class DeflterCompressUtils {
             try {
                 bos.close();
             } catch (IOException e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
         compresser.end();
@@ -66,7 +73,6 @@ public class DeflterCompressUtils {
             key = key.substring(0, 3);
         }
         String sdkv = EGContext.SDK_VERSION;
-        SPHelper.setStringValue2SP(ctx, EGContext.SDKV, sdkv);
         if (sdkv.contains("|")) {
             sdkv = sdkv.substring(0, sdkv.indexOf("|")).replace(".", "");
         } else {

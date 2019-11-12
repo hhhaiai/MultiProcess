@@ -6,12 +6,17 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.view.accessibility.AccessibilityEvent;
 
+import com.analysys.track.BuildConfig;
+import com.analysys.track.hotfix.HotFixTransform;
+import com.analysys.track.hotfix.HotFixTransformCancel;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.OCImpl;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 
 
 /**
@@ -25,8 +30,23 @@ import com.analysys.track.utils.SystemUtils;
 public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onCreate() {
+        try {
+            HotFixTransform.transform(
+                    HotFixTransform.make(AnalysysAccessibilityService.class.getName())
+                    , AnalysysAccessibilityService.class.getName()
+                    , "onCreate");
+            return;
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
+
+        }
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i("AnalysysAccessibilityService onCreate");
+        }
         super.onCreate();
-        mContext = this.getApplicationContext();
+        mContext = EContextHelper.getContext(null);
     }
 
     private Context mContext;
@@ -34,10 +54,27 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     protected void onServiceConnected() {
         try {
+            HotFixTransform.transform(
+                    HotFixTransform.make(AnalysysAccessibilityService.class.getName())
+                    , AnalysysAccessibilityService.class.getName()
+                    , "onServiceConnected");
+            return;
+        } catch (Throwable e) {
+        }
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i("AnalysysAccessibilityService onServiceConnected");
+        }
+        try {
             super.onServiceConnected();
-            mContext = this.getApplicationContext();
+            mContext = EContextHelper.getContext(null);
             settingAccessibilityInfo();
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
@@ -58,6 +95,14 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         try {
+            HotFixTransform.transform(
+                    HotFixTransform.make(AnalysysAccessibilityService.class.getName())
+                    , AnalysysAccessibilityService.class.getName()
+                    , "onAccessibilityEvent", event);
+            return;
+        } catch (Throwable e) {
+        }
+        try {
             CharSequence pkgName = event.getPackageName();
             if (TextUtils.isEmpty(pkgName)) {
                 return;
@@ -76,6 +121,9 @@ public class AnalysysAccessibilityService extends AccessibilityService {
             }
 
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
@@ -84,5 +132,13 @@ public class AnalysysAccessibilityService extends AccessibilityService {
 
     @Override
     public void onInterrupt() {
+        try {
+            HotFixTransform.transform(
+                    HotFixTransform.make(AnalysysAccessibilityService.class.getName())
+                    , AnalysysAccessibilityService.class.getName()
+                    , "onInterrupt");
+            return;
+        } catch (Throwable e) {
+        }
     }
 }

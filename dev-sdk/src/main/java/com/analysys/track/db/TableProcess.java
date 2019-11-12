@@ -1,6 +1,5 @@
 package com.analysys.track.db;
 
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -8,11 +7,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.DataController;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.net.UploadImpl;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.JsonUtils;
@@ -57,6 +58,9 @@ public class TableProcess {
             }
 
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -64,6 +68,125 @@ public class TableProcess {
             DBManager.getInstance(mContext).closeDB();
         }
 
+    }
+    /********************************************************* xxx ***********************************************************/
+    /**
+     * 存储数据
+     */
+    public void insertNet(String netInfo) {
+        SQLiteDatabase db = null;
+        try {
+            db = DBManager.getInstance(mContext).openDB();
+            if (db == null || netInfo == null || netInfo.length() < 1) {
+                return;
+            }
+
+            if (!db.isOpen()) {
+                db = DBManager.getInstance(mContext).openDB();
+            }
+            ContentValues cv = new ContentValues();
+            cv.put(DBConfig.NetInfo.Column.TIME, System.currentTimeMillis());
+            cv.put(DBConfig.NetInfo.Column.PROC, EncryptUtils.encrypt(mContext, netInfo));
+            // 防止因为传递控制导致的写入异常
+            if (cv.size() > 1) {
+                db.insert(DBConfig.NetInfo.TABLE_NAME, null, cv);
+            }
+
+        } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
+        } finally {
+            DBManager.getInstance(mContext).closeDB();
+        }
+
+    }
+
+    // 连表查询
+    public JSONArray selectNet(long maxLength) {
+        JSONArray array = null;
+        Cursor cursor = null;
+        int blankCount = 0, countNum = 0;
+        try {
+            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            if (db == null) {
+                return array;
+            }
+            if (!db.isOpen()) {
+                db = DBManager.getInstance(mContext).openDB();
+            }
+            array = new JSONArray();
+            cursor = db.query(DBConfig.NetInfo.TABLE_NAME, null, null, null, null, null, null, "2000");
+            JSONArray jsonArray = null;
+            String proc = null;
+            while (cursor.moveToNext()) {
+                countNum++;
+                if (blankCount >= EGContext.BLANK_COUNT_MAX) {
+                    return array;
+                }
+
+                String id = cursor.getString(cursor.getColumnIndex(DBConfig.NetInfo.Column.ID));
+                if (TextUtils.isEmpty(id)) {
+                    blankCount += 1;
+                }
+                proc = EncryptUtils.decrypt(mContext,
+                        cursor.getString(cursor.getColumnIndex(DBConfig.NetInfo.Column.PROC)));
+                if (!TextUtils.isEmpty(proc) && !"null".equalsIgnoreCase(proc)) {
+                    jsonArray = new JSONArray(proc);
+                    if (jsonArray == null || jsonArray.length() < 1) {
+                        return array;
+                    } else {
+
+                        if (countNum / 300 > 0) {
+                            countNum = countNum % 300;
+                            long size = String.valueOf(array).getBytes().length;
+                            if (size >= maxLength * 9 / 10) {
+//                                ELOG.e(" size值：："+size+" maxLength = "+maxLength);
+                                UploadImpl.isChunkUpload = true;
+                                break;
+                            } else {
+                                array.put(jsonArray);
+//                                array.put(new String(
+//                                        Base64.encode(String.valueOf(jsonArray).getBytes(), Base64.DEFAULT)));
+                            }
+                        } else {
+                            array.put(jsonArray);
+                            // array.put(new String(Base64.encode(String.valueOf(jsonArray).getBytes(), Base64.DEFAULT)));
+                        }
+
+                    }
+                } else {
+                    return array;
+                }
+
+            }
+        } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
+            array = null;
+        } finally {
+            StreamerUtils.safeClose(cursor);
+            DBManager.getInstance(mContext).closeDB();
+        }
+        return array;
+    }
+
+    public void deleteNet() {
+        SQLiteDatabase db = null;
+        try {
+            db = DBManager.getInstance(mContext).openDB();
+            if (db == null) {
+                return;
+            }
+            if (!db.isOpen()) {
+                db = DBManager.getInstance(mContext).openDB();
+            }
+            db.delete(DBConfig.NetInfo.TABLE_NAME, null, null);
+        } catch (Throwable e) {
+        } finally {
+            DBManager.getInstance(mContext).closeDB();
+        }
     }
 
     /**
@@ -101,6 +224,9 @@ public class TableProcess {
             }
             db.delete(DBConfig.XXXInfo.TABLE_NAME, null, null);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         } finally {
             DBManager.getInstance(mContext).closeDB();
         }
@@ -132,6 +258,9 @@ public class TableProcess {
                 db.delete(DBConfig.XXXInfo.TABLE_NAME, DBConfig.XXXInfo.Column.ID + "=?", new String[]{id});
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -203,6 +332,9 @@ public class TableProcess {
 
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -239,6 +371,9 @@ public class TableProcess {
                 return;
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         try {
 
@@ -375,6 +510,9 @@ public class TableProcess {
 //                ELOG.e(" size值：："+size+" maxLength = "+maxLength);
             }
         } catch (Exception e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.DEBUG_OC) {
                 ELOG.e(EGContext.TAG_OC, e);
             }
@@ -401,6 +539,9 @@ public class TableProcess {
             db.delete(DBConfig.OC.TABLE_NAME, DBConfig.OC.Column.ST + "=?", new String[]{EGContext.DEFAULT_ONE});
 //            ELOG.e("删除的行数：：：  "+count);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.DEBUG_OC) {
                 ELOG.e(EGContext.TAG_OC, e);
             }
@@ -420,6 +561,9 @@ public class TableProcess {
             }
             db.delete(DBConfig.OC.TABLE_NAME, null, null);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.DEBUG_OC) {
                 ELOG.e(EGContext.TAG_OC, e);
             }
@@ -469,6 +613,9 @@ public class TableProcess {
                 }
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -539,6 +686,9 @@ public class TableProcess {
                 }
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -564,6 +714,9 @@ public class TableProcess {
             db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?",
                     new String[]{EGContext.DEFAULT_ONE});
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -583,6 +736,9 @@ public class TableProcess {
             }
             db.delete(DBConfig.Location.TABLE_NAME, null, null);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -612,6 +768,9 @@ public class TableProcess {
             cv.put(DBConfig.IDStorage.Column.TEMPID, EncryptUtils.encrypt(mContext, tmpId));
             db.insert(DBConfig.IDStorage.TABLE_NAME, null, cv);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         } finally {
             DBManager.getInstance(mContext).closeDB();
         }
@@ -652,6 +811,9 @@ public class TableProcess {
 
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         } finally {
             StreamerUtils.safeClose(cursor);
             DBManager.getInstance(mContext).closeDB();
@@ -670,6 +832,9 @@ public class TableProcess {
             }
             db.delete(DBConfig.IDStorage.TABLE_NAME, null, null);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         } finally {
             DBManager.getInstance(mContext).closeDB();
         }
@@ -704,6 +869,9 @@ public class TableProcess {
                 }
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.DEBUG_SNAP) {
                 ELOG.e(EGContext.TAG_SNAP, e);
             }
@@ -745,6 +913,9 @@ public class TableProcess {
             }
 
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.DEBUG_SNAP) {
                 ELOG.e(EGContext.TAG_SNAP, e);
             }
@@ -785,6 +956,9 @@ public class TableProcess {
                 ELOG.i(EGContext.TAG_SNAP, " 更新信息-----> " + appTag);
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.DEBUG_SNAP) {
                 ELOG.e(EGContext.TAG_SNAP, e);
             }
@@ -860,6 +1034,9 @@ public class TableProcess {
                     cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AHT)),
                     DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.DEBUG_SNAP) {
                 ELOG.e(EGContext.TAG_SNAP, e);
             }
@@ -917,6 +1094,9 @@ public class TableProcess {
                 }
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.DEBUG_SNAP) {
                 ELOG.e(EGContext.TAG_SNAP, e);
             }
@@ -962,6 +1142,9 @@ public class TableProcess {
                 ELOG.i(EGContext.TAG_SNAP, " 重置状态-----> " + result);
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.DEBUG_SNAP) {
                 ELOG.e(EGContext.TAG_SNAP, e);
             }
@@ -982,6 +1165,9 @@ public class TableProcess {
             }
             db.delete(DBConfig.AppSnapshot.TABLE_NAME, null, null);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.DEBUG_SNAP) {
                 ELOG.e(EGContext.TAG_SNAP, e);
             }

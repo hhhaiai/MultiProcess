@@ -4,6 +4,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Looper;
 
+import com.analysys.track.BuildConfig;
+
 public class ProcessUtils {
 
 
@@ -21,8 +23,22 @@ public class ProcessUtils {
                 }
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return "";
+    }
+
+    public static boolean isMainProcess(Context context) {
+        try {
+            return ProcessUtils.getCurrentProcessName(context).equals(context.getPackageName());
+        } catch (Exception e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
+        }
+        return false;
     }
 
 }

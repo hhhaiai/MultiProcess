@@ -6,12 +6,14 @@ import android.os.PowerManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.CrashHandler;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.internal.work.ServiceHelper;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.EncryptUtils;
@@ -44,6 +46,9 @@ public class AnalysysInternal {
             // 初始化日志
             ELOG.init(EContextHelper.getContext(context));
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return Holder.instance;
     }
@@ -67,6 +72,9 @@ public class AnalysysInternal {
                 try {
                     init(key, channel);
                 } catch (Throwable e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                     if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.e(e);
                     }
@@ -120,7 +128,7 @@ public class AnalysysInternal {
         Log.i(EGContext.LOGTAG_USER, String.format("[%s] init SDK (%s) success! ", SystemUtils.getCurrentProcessName(mContextRef.get()), EGContext.SDK_VERSION));
         // 8.是否启动工作
         if (!DevStatusChecker.getInstance().isDebugDevice(mContextRef.get())) {
-            String version = SPHelper.getStringValueFromSP(mContextRef.get(), UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, "");
+            String version = SPHelper.getStringValueFromSP(mContextRef.get(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
             if (!TextUtils.isEmpty(version)) {
                 File file = new File(mContextRef.get().getFilesDir(), version + ".jar");
                 if (file.exists()) {
@@ -138,8 +146,8 @@ public class AnalysysInternal {
                 }
             }
         } else {
-            SPHelper.setStringValue2SP(mContextRef.get(), UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_SIGN, "");
-            SPHelper.setStringValue2SP(mContextRef.get(), UploadKey.Response.HotFixResp.HOTFIX_RESP_PATCH_VERSION, "");
+            SPHelper.setStringValue2SP(mContextRef.get(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
+            SPHelper.setStringValue2SP(mContextRef.get(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
             clear();
         }
 
@@ -158,6 +166,9 @@ public class AnalysysInternal {
                 file.delete();
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
 
         }
 
@@ -185,21 +196,26 @@ public class AnalysysInternal {
             }
             MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_UPLOAD, EGContext.TIME_SYNC_UPLOAD);
             MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_APPSNAPSHOT, EGContext.TIME_HOUR * 3);
-            if (Build.VERSION.SDK_INT < 21) {
-                MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_OC, EGContext.TIME_SECOND *5);
+            if (Build.VERSION.SDK_INT < 26) {
+                MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_OC, EGContext.TIME_SECOND * 5);
             } else {
                 MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_OC, EGContext.TIME_SYNC_OC_OVER_5);
             }
             MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_LOCATION, EGContext.TIME_SYNC_LOCATION);
+            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_HOTFIX, EGContext.TIME_SECOND * 5);
 //            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_SP_WRITER, EGContext.TIME_SYNC_SP);
             MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST, EGContext.TIME_SYNC_BROADCAST);
 //            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_SCREEN_ON_BROADCAST, EGContext.TIME_SYNC_BROADCAST);
-            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST, EGContext.TIME_SECOND *5);
-            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST, EGContext.TIME_SECOND *5);
-            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST, EGContext.TIME_SECOND *5);
+            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST, EGContext.TIME_SECOND * 5);
+            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST, EGContext.TIME_SECOND * 5);
+            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST, EGContext.TIME_SECOND * 5);
 //            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_BOOT_BROADCAST, EGContext.TIME_SYNC_DEFAULT);
-            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_BATTERY_BROADCAST, EGContext.TIME_SECOND *5);
+            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_BATTERY_BROADCAST, EGContext.TIME_SECOND * 5);
+            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_NET, EGContext.TIME_SECOND * 5);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }

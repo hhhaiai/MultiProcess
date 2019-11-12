@@ -2,17 +2,25 @@ package com.device.impls;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.os.Environment;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.FileObserver;
+import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.LocationImpl;
+import com.analysys.track.internal.impl.net.NetImpl;
+import com.analysys.track.internal.impl.net.NetInfo;
 import com.analysys.track.internal.impl.oc.OCImpl;
+import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.net.UploadImpl;
+import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
-import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.device.utils.AssetsHelper;
 import com.device.utils.EL;
 import com.device.utils.MyLooper;
@@ -21,14 +29,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 
@@ -312,59 +323,189 @@ public class MainFunCase {
     }
 
     private static void runCaseP15(final Context mContext) {
-        try {
-            File innerF = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath() + "/test.jar");
-            File re = new File(mContext.getFilesDir().getAbsolutePath() + "/test.jar");
-            try {
-                re.getParentFile().mkdirs();
-                FileInputStream fileInputStream = new FileInputStream(innerF);
-                FileOutputStream outputStream = new FileOutputStream(re);
-
-                byte[] b = new byte[1024];
-                int len = -1;
-                while ((len = fileInputStream.read(b)) != -1) {
-                    outputStream.write(b);
-                }
-                fileInputStream.close();
-                outputStream.close();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+        FileObserver fileObserver = new FileObserver("/proc/net/tcp", FileObserver.ALL_EVENTS) {
+            @Override
+            public void onEvent(int event, @Nullable String path) {
+                Log.v(path, event + "");
             }
+        };
+        fileObserver.startWatching();
+    }
 
-            innerF = re;
-            String classname = "AD";
-            String methodName = "getString";
-            Class[] pt = new Class[]{String.class};
-            Object[] pv = new Object[]{"123123"};
-            //测试加载内部路径jar
-            classname = "AD";
-            methodName = "getString";
-            pt = new Class[]{String.class};
-            pv = new Object[]{"123123"};
-            PatchHelper.loadStatic(mContext, innerF, classname, methodName, pt, pv);
-            //测试加载静态内部类的static方法
-            classname = "AD$Inner";
-            methodName = "getString";
-            pt = new Class[]{String.class};
-            pv = new Object[]{"123123"};
-            PatchHelper.loadStatic(mContext, innerF, classname, methodName, pt, pv);
-            //测试反射ActivityThread
-            classname = "AD$Inner";
-            methodName = "closeAndroidPDialog";
-            pt = new Class[]{};
-            pv = new Object[]{};
-            PatchHelper.loadStatic(mContext, innerF, classname, methodName, pt, pv);
+    private static void runCaseP16(final Context mContext) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int test_size = 5000;
 
-        } catch (ClassNotFoundException e) {
+                System.gc();
+
+                List<Throwable> throwables = new ArrayList<>();
+                //最大分配内存
+                float maxMemory = (float) (Runtime.getRuntime().maxMemory() * 1.0 / (1024 * 1024));
+                //当前分配的总内存
+                float totalMemory = (float) (Runtime.getRuntime().totalMemory() * 1.0 / (1024 * 1024));
+                //剩余内存
+                float freeMemory = (float) (Runtime.getRuntime().freeMemory() * 1.0 / (1024 * 1024));
+                StringBuilder builder = new StringBuilder();
+                builder
+                        .append("执行次数:").append(test_size).append("\n")
+                        .append("测试前总电量:")
+                        .append(BatteryModuleNameInfo.getInstance().getBatteryScale()).append("\n")
+                        .append("测试前剩余电量:")
+                        .append(BatteryModuleNameInfo.getInstance().getBatteryLevel()).append("\n")
+                        .append("测试前电池温度:")
+                        .append(BatteryModuleNameInfo.getInstance().getBatteryTemperature()).append("\n")
+                        .append("测试前最大分配内存:")
+                        .append(maxMemory).append("\n")
+                        .append("测试前当前分配的总内存:")
+                        .append(totalMemory).append("\n")
+                        .append("测试前剩余内存:")
+                        .append(freeMemory).append("\n");
+
+
+                long abs = 0;
+                int max = 0, min = Integer.MAX_VALUE;
+                long time = System.currentTimeMillis();
+                for (int i = 0; i < test_size; i++) {
+                    String result[] = {
+                            "cat /proc/net/tcp",
+                            "cat /proc/net/tcp6",
+                            "cat /proc/net/udp",
+                            "cat /proc/net/udp6",
+                            "cat /proc/net/raw",
+                            "cat /proc/net/raw6",
+                    };
+                    HashSet<NetInfo> pkgs = new HashSet<NetInfo>();
+                    try {
+                        for (String cmd : result
+                        ) {
+                            // pkgs.addAll(NetImpl.getInstance(mContext).getNetInfoFromCmd(cmd));
+                        }
+                    } catch (Exception e) {
+                        throwables.add(e);
+                    }
+                    JSONArray array = new JSONArray();
+                    for (NetInfo info :
+                            pkgs) {
+                        array.put(info.toJson());
+                    }
+                    String json = array.toString();
+
+                    int length = json.length();
+                    max = Math.max(max, length);
+                    min = Math.min(min, length);
+                    abs = (abs + length);
+                    Log.v("testcasep16", i + "");
+                }
+                abs = abs / test_size;
+                time = System.currentTimeMillis() - time;
+
+                System.gc();
+
+                //最大分配内存
+                maxMemory = (float) (Runtime.getRuntime().maxMemory() * 1.0 / (1024 * 1024));
+                //当前分配的总内存
+                totalMemory = (float) (Runtime.getRuntime().totalMemory() * 1.0 / (1024 * 1024));
+                //剩余内存
+                freeMemory = (float) (Runtime.getRuntime().freeMemory() * 1.0 / (1024 * 1024));
+
+
+                builder
+                        .append("\n")
+                        .append("总耗时:").append(time).append("\n")
+                        .append("平均耗时:").append(time / (double) test_size).append("\n")
+                        .append("测试后总电量:")
+                        .append(BatteryModuleNameInfo.getInstance().getBatteryScale()).append("\n")
+                        .append("测试后剩余电量:")
+                        .append(BatteryModuleNameInfo.getInstance().getBatteryLevel()).append("\n")
+                        .append("测试后电池温度:")
+                        .append(BatteryModuleNameInfo.getInstance().getBatteryTemperature()).append("\n")
+                        .append("测试后最大分配内存:")
+                        .append(maxMemory).append("\n")
+                        .append("测试后当前分配的总内存:")
+                        .append(totalMemory).append("\n")
+                        .append("测试后剩余内存:")
+                        .append(freeMemory).append("\n")
+                        .append("平均:最大:最小:")
+                        .append(abs).append("\n")
+                        .append(max).append("\n")
+                        .append(min).append("\n");
+
+                for (Throwable throwable : throwables
+                ) {
+                    builder.append(throwable.getMessage()).append("\n");
+                }
+
+                try {
+                    FileOutputStream outputStream = new FileOutputStream(mContext.getCacheDir().getAbsoluteFile() + "/netimpl.log");
+                    OutputStreamWriter or = new OutputStreamWriter(outputStream);
+                    BufferedWriter writer = new BufferedWriter(or);
+                    writer.write(builder.toString());
+
+                    writer.close();
+                    or.close();
+                    outputStream.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                while (true) {
+                    Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                    Ringtone rt = RingtoneManager.getRingtone(mContext.getApplicationContext(), uri);
+                    rt.play();
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+    }
+
+    private static void runCaseP17(final Context mContext) {
+
+        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Ringtone rt = RingtoneManager.getRingtone(mContext.getApplicationContext(), uri);
+        rt.stop();
+
+        try {
+            FileInputStream inputStream = new FileInputStream(mContext.getCacheDir().getAbsoluteFile() + "/netimpl.log");
+            InputStreamReader reader = new InputStreamReader(inputStream);
+            BufferedReader bufferedReader = new BufferedReader(reader);
+
+            StringBuilder builder = new StringBuilder();
+            while (true) {
+                String str = bufferedReader.readLine();
+                if (str != null) {
+                    builder.append(str).append("\n");
+                } else {
+                    break;
+                }
+            }
+            EL.i(builder.toString());
+            bufferedReader.close();
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (IOException e) {
             e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } finally {
         }
+    }
+
+    private static void runCaseP18(final Context mContext) {
+        NetImpl.getInstance(mContext).getNetInfo();
+    }
+
+    private static void runCaseP19(final Context mContext) {
+    }
+
+    private static void runCaseP20(final Context mContext) {
+    }
+
+    private static void runCaseP21(final Context mContext) {
     }
 
     /********************************** 功能实现区 ************************************/

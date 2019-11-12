@@ -6,6 +6,7 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.MessageDispatcher;
@@ -113,6 +114,7 @@ public class ReceiverImpl {
 //            }
 
             OCImpl.getInstance(context).processOCWhenScreenChange(true);
+
         } else if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
             //  7.x以上版本 不操作
             if (Build.VERSION.SDK_INT >= 24) {
@@ -120,12 +122,7 @@ public class ReceiverImpl {
             }
             OCImpl.getInstance(context).processOCWhenScreenChange(false);
         } else if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
-            if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_BATTERY_BROADCAST,
-                    EGContext.TIME_SECOND * 2, currentTime)) {
-                DeviceImpl.getInstance(context).processBattery(intent);
-            } else {
-                return;
-            }
+            DeviceImpl.getInstance(context).processBattery(intent);
         } else if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
             MessageDispatcher.getInstance(context).initModule();
         } else if (EGContext.ACTION_MTC_LOCK.equals(intent.getAction())) {

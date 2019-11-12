@@ -5,10 +5,11 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.DataController;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
-import com.analysys.track.internal.net.PolicyImpl;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
@@ -94,6 +95,9 @@ public class SenSorModuleNameImpl {
                         info.put(UploadKey.DevInfo.SenSorId, s.getId());
                     }
                 } catch (Throwable t1) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(t1);
+                    }
                 }
                 try {
                     // 当传感器是唤醒状态返回true
@@ -105,24 +109,30 @@ public class SenSorModuleNameImpl {
                         info.put(UploadKey.DevInfo.SenSorWakeUpSensor, s.isWakeUpSensor());
                     }
                 } catch (Throwable t) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(t);
+                    }
                     // 当传感器是唤醒状态返回true
 //                    if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.DevInfo.SenSorWakeUpSensor,
 //                            DataController.SWITCH_OF_SENSOR_WAKEUPSENSOR)) {
-                        if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.DevInfo.SenSorWakeUpSensor,
-                                DataController.SWITCH_OF_SENSOR_WAKEUPSENSOR)) {
+                    if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.DevInfo.SenSorWakeUpSensor,
+                            DataController.SWITCH_OF_SENSOR_WAKEUPSENSOR)) {
                         info.put(UploadKey.DevInfo.SenSorWakeUpSensor, false);
                     }
                 }
                 // 传感器耗电量
 //                if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.DevInfo.SenSorPower,
 //                        DataController.SWITCH_OF_SENSOR_POWER)) {
-                    if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.DevInfo.SenSorPower,
-                            DataController.SWITCH_OF_SENSOR_POWER)) {
+                if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.DevInfo.SenSorPower,
+                        DataController.SWITCH_OF_SENSOR_POWER)) {
                     info.put(UploadKey.DevInfo.SenSorPower, s.getPower());
                 }
                 senSorArray.put(info);
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }

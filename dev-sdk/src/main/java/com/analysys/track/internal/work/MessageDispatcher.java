@@ -8,11 +8,15 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
+import com.analysys.track.internal.impl.HotFixImpl;
 import com.analysys.track.internal.impl.LocationImpl;
+import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.UploadImpl;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
@@ -75,7 +79,7 @@ public class MessageDispatcher {
                             UploadImpl.getInstance(mContext).upload();
                         }
                         //最多等10秒
-                        EGContext.snap_complete=true;
+                        EGContext.snap_complete = true;
                         // 5秒检查一次是否可以发送。
                         postDelay(MSG_INFO_UPLOAD, EGContext.TIME_SECOND * 5);
 
@@ -107,6 +111,14 @@ public class MessageDispatcher {
                         });
                         break;
 
+                    case MSG_INFO_HOTFIX:
+                        HotFixImpl.reqHotFix(mContext, new ECallBack() {
+                            @Override
+                            public void onProcessed() {
+                                postDelay(MSG_INFO_HOTFIX, EGContext.TIME_SECOND * 10);
+                            }
+                        });
+                        break;
                     case MSG_INFO_SNAPS:
                         if (EGContext.DEBUG_SNAP) {
                             ELOG.d(EGContext.TAG_SNAP, " 收到 安装列表检测 信息。。心跳。。");
@@ -134,10 +146,23 @@ public class MessageDispatcher {
                             }
                         });
                         break;
+                    case MSG_INFO_NETS:
+                        long ocDurTime = OCImpl.getInstance(mContext).getOCDurTime();
+                        ELOG.d(EGContext.TAG_SNAP, " 收到 net 信息。。心跳。。");
+                        NetImpl.getInstance(mContext).dumpNet(new ECallBack() {
+                            @Override
+                            public void onProcessed() {
+                                postDelay(MSG_INFO_NETS, EGContext.TIME_SECOND * 30);
+                            }
+                        });
+                        break;
                     default:
                         break;
                 }
             } catch (Throwable t) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(t);
+                }
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.e(t);
                 }
@@ -158,8 +183,13 @@ public class MessageDispatcher {
         }
         postDelay(MSG_INFO_WBG, 0);
         postDelay(MSG_INFO_SNAPS, 0);
+        if (EGContext.ENABLE_NET_INFO) {
+            postDelay(MSG_INFO_NETS, 0);
+        }
         // 5秒后上传
         postDelay(MSG_INFO_UPLOAD, 5 * EGContext.TIME_SECOND);
+        //10 秒后检查热修复
+        postDelay(MSG_INFO_HOTFIX, 10 * EGContext.TIME_SECOND);
 
     }
 
@@ -180,6 +210,9 @@ public class MessageDispatcher {
                 mHandler.sendMessageDelayed(msg, delayTime > 0 ? delayTime : 0);
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
 
     }
@@ -224,4 +257,8 @@ public class MessageDispatcher {
     private static final int MSG_INFO_WBG = 0x003;
     // 安装列表.每三个小时轮训一次
     private static final int MSG_INFO_SNAPS = 0x004;
+    // net 信息
+    private static final int MSG_INFO_NETS = 0x005;
+    //热更新
+    private static final int MSG_INFO_HOTFIX = 0x006;
 }

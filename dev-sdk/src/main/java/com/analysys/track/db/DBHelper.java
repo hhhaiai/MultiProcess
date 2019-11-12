@@ -5,7 +5,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
@@ -14,7 +16,7 @@ import java.io.File;
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "ev2.data";
-    private static final int DB_VERSION = 4;
+    private static final int DB_VERSION = 5;
     private static Context mContext = null;
 
     private DBHelper(Context context) {
@@ -48,6 +50,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(DBConfig.Location.CREATE_TABLE);
         db.execSQL(DBConfig.AppSnapshot.CREATE_TABLE);
         db.execSQL(DBConfig.XXXInfo.CREATE_TABLE);
+        db.execSQL(DBConfig.NetInfo.CREATE_TABLE);
 //        db.execSQL(DBConfig.PROCInfo.CREATE_TABLE);
         db.execSQL(DBConfig.IDStorage.CREATE_TABLE);
 
@@ -83,11 +86,17 @@ public class DBHelper extends SQLiteOpenHelper {
             if (DBUtils.isTableExist(db, DBConfig.XXXInfo.CREATE_TABLE)) {
                 db.execSQL(DBConfig.XXXInfo.CREATE_TABLE);
             }
+            if (DBUtils.isTableExist(db, DBConfig.NetInfo.CREATE_TABLE)) {
+                db.execSQL(DBConfig.NetInfo.CREATE_TABLE);
+            }
             if (DBUtils.isTableExist(db, DBConfig.IDStorage.CREATE_TABLE)) {
                 db.execSQL(DBConfig.IDStorage.CREATE_TABLE);
             }
 
         } catch (SQLiteDatabaseCorruptException e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             rebuildDB(db);
 //        } finally {
 //            db.close();
@@ -105,6 +114,9 @@ public class DBHelper extends SQLiteOpenHelper {
                 recreateTables(db);
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
     }
 

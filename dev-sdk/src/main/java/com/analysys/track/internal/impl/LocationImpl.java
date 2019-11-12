@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.telephony.CellInfo;
 import android.telephony.CellInfoCdma;
 import android.telephony.CellInfoGsm;
@@ -13,12 +14,14 @@ import android.telephony.NeighboringCellInfo;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.DataController;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.AndroidManifestHelper;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.JsonUtils;
@@ -130,6 +133,9 @@ public class LocationImpl {
             }
 
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
@@ -181,6 +187,9 @@ public class LocationImpl {
                 TableProcess.getInstance(mContext).insertLocation(location);
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
@@ -251,6 +260,9 @@ public class LocationImpl {
                 return false;
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
@@ -290,6 +302,9 @@ public class LocationImpl {
             }
             return true;
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
         }
         return false;
     }
@@ -370,6 +385,9 @@ public class LocationImpl {
                 return true;
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return false;
     }
@@ -381,12 +399,18 @@ public class LocationImpl {
                 JsonUtils.pushToJSON(mContext, locationJson, UploadKey.LocationInfo.CollectionTime,
                         String.valueOf(System.currentTimeMillis()), DataController.SWITCH_OF_COLLECTION_TIME);
             } catch (Throwable t) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(t);
+                }
             }
             try {
                 String locationInfo = SPHelper.getStringValueFromSP(mContext, EGContext.LAST_LOCATION, "");
                 JsonUtils.pushToJSON(mContext, locationJson, UploadKey.LocationInfo.GeographyLocation,
                         locationInfo, DataController.SWITCH_OF_GEOGRAPHY_LOCATION);
             } catch (Throwable t) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(t);
+                }
             }
 
 //            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_WIFI, true)) {
@@ -399,6 +423,9 @@ public class LocationImpl {
                                 wifiInfo, DataController.SWITCH_OF_WIFI_NAME);
                     }
                 } catch (Throwable t) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(t);
+                    }
                 }
             }
 
@@ -414,10 +441,16 @@ public class LocationImpl {
                                 DataController.SWITCH_OF_BS_NAME);
                     }
                 } catch (Throwable t) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(t);
+                    }
                 }
 
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -444,7 +477,7 @@ public class LocationImpl {
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 jsonArray = new JSONArray();
                 try {
-                    if (RefleUtils.hasMethod(mTelephonyManager.getClass().getName(), "getNeighboringCellInfo",
+                    if (Build.VERSION.SDK_INT < 29 && RefleUtils.hasMethod(mTelephonyManager.getClass().getName(), "getNeighboringCellInfo",
                             List.class)) {
                         List<NeighboringCellInfo> list = mTelephonyManager.getNeighboringCellInfo();
                         if (list != null && list.size() > 0) {
@@ -476,6 +509,9 @@ public class LocationImpl {
                         }
                     }
                 } catch (Throwable t) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(t);
+                    }
                     if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.e(t);
                     }
@@ -588,6 +624,9 @@ public class LocationImpl {
                         }
                     }
                 } catch (Throwable t) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(t);
+                    }
                     if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.e(t);
                     }
@@ -601,6 +640,9 @@ public class LocationImpl {
                 return jsonArray;
             }
         } catch (Exception e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -629,6 +671,9 @@ public class LocationImpl {
                 }
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
@@ -698,6 +743,9 @@ public class LocationImpl {
                         DataController.SWITCH_OF_BS_RSRQ);
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
         }
         return jsonObject;
     }

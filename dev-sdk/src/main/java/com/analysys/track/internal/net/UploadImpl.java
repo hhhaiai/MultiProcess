@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.DeflterCompressUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
@@ -160,6 +162,9 @@ public class UploadImpl {
                 return;
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.e(t);
             }
@@ -220,6 +225,12 @@ public class UploadImpl {
             }
             isUploading = false;
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.e(t);
             }
@@ -237,6 +248,9 @@ public class UploadImpl {
             try {
                 devJson = DataPackaging.getInstance().getDevInfo(mContext);
             } catch (Throwable t) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(t);
+                }
             }
             if (devJson != null && devJson.length() > 0) {
                 object.put(UploadKey.DevInfo.NAME, devJson);
@@ -315,7 +329,24 @@ public class UploadImpl {
             } else {
                 TableProcess.getInstance(mContext).deleteXXX();
             }
+            //组装net数据
+            if (EGContext.ENABLE_NET_INFO) {
+                if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_NET, true)) {
+                    long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
+                    if (useFulLength > 0 && !isChunkUpload) {
+                        JSONArray netJson = getModuleInfos(mContext, object, MODULE_NET, useFulLength);
+                        if (netJson != null && netJson.length() > 0) {
+                            object.put(UploadKey.NETInfo.NAME, netJson);
+                        }
+                    }
+                } else {
+                    TableProcess.getInstance(mContext).deleteNet();
+                }
+            }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.e(EGContext.TAG_UPLOAD, e);
             }
@@ -350,6 +381,9 @@ public class UploadImpl {
                 return new String(returnData).replace("\n", "");
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.e(t);
             }
@@ -377,7 +411,7 @@ public class UploadImpl {
                 String code = String.valueOf(object.opt(UploadKey.Response.RES_CODE));
                 if (code != null) {
                     if (EGContext.DEBUG_UPLOAD) {
-                        ELOG.i(EGContext.TAG_UPLOAD, "========收到code-----"+code);
+                        ELOG.i(EGContext.TAG_UPLOAD, "========收到code-----" + code);
                     }
                     if (EGContext.HTTP_STATUS_200.equals(code)) {
                         EguanIdUtils.getInstance(mContext).setId(json);
@@ -433,6 +467,9 @@ public class UploadImpl {
                 return;
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -513,10 +550,15 @@ public class UploadImpl {
 
             // 按time值delete xxxinfo表和proc表
             TableProcess.getInstance(mContext).deleteByIDXXX(idList);
+
+            TableProcess.getInstance(mContext).deleteNet();
             if (idList != null && idList.size() > 0) {
                 idList.clear();
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.e(t);
             }
@@ -538,6 +580,9 @@ public class UploadImpl {
             // 多久重试
             SPHelper.setLongValue2SP(mContext, EGContext.RETRYTIME, SystemUtils.intervalTime(mContext));
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.e(t);
             }
@@ -571,6 +616,9 @@ public class UploadImpl {
                 case MODULE_XXX:
                     arr = TableProcess.getInstance(mContext).selectXXX(useFulLength);
                     break;
+                case MODULE_NET:
+                    arr = TableProcess.getInstance(mContext).selectNet(useFulLength);
+                    break;
                 default:
                     break;
             }
@@ -582,6 +630,9 @@ public class UploadImpl {
                 return arr;
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.e(e);
             }
@@ -624,5 +675,6 @@ public class UploadImpl {
     private final int MODULE_LOCATION = 1;
     private final int MODULE_SNAPSHOT = 2;
     private final int MODULE_XXX = 3;
+    private final int MODULE_NET = 4;
 
 }

@@ -10,6 +10,7 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 
 import java.lang.reflect.Method;
@@ -57,6 +58,9 @@ public class EncryptUtils {
 
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -85,6 +89,9 @@ public class EncryptUtils {
             }
             mEncryptKey = null;
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
@@ -110,6 +117,9 @@ public class EncryptUtils {
             return Base64.encodeToString(b, Base64.DEFAULT);
 
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -136,6 +146,9 @@ public class EncryptUtils {
             byte[] b = Base64.decode(str.getBytes(), Base64.DEFAULT);
             return new String(decrypt(b, mEncryptKey.getBytes()));
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -152,6 +165,9 @@ public class EncryptUtils {
                         .isEmpty(Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID));
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -185,6 +201,9 @@ public class EncryptUtils {
                             Method method = clazz.getMethod("getSerial");
                             serialNO = (String) method.invoke(null);
                         } catch (Exception e) {
+                            if (BuildConfig.ENABLE_BUGLY) {
+                                BuglyUtils.commitError(e);
+                            }
                         }
                     }
                 } else {
@@ -221,11 +240,20 @@ public class EncryptUtils {
                 try {
                     firstKey = ensure(preID.charAt(2));
                 } catch (NumberFormatException e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                     try {
                         firstKey = ensure(preID.charAt(2));
                     } catch (NumberFormatException ee) {
+                        if (BuildConfig.ENABLE_BUGLY) {
+                            BuglyUtils.commitError(ee);
+                        }
                         firstKey = 3;
                     } catch (Throwable eeee) {
+                        if (BuildConfig.ENABLE_BUGLY) {
+                            BuglyUtils.commitError(eeee);
+                        }
                     }
                 }
 
@@ -233,9 +261,15 @@ public class EncryptUtils {
                 try {
                     endKey = ensure(fID.charAt(2));
                 } catch (NumberFormatException e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                     try {
                         endKey = ensure(fID.charAt(3));
                     } catch (NumberFormatException ee) {
+                        if (BuildConfig.ENABLE_BUGLY) {
+                            BuglyUtils.commitError(ee);
+                        }
                         endKey = 6;
                     }
                 }
@@ -256,6 +290,9 @@ public class EncryptUtils {
                 mEncryptKey = md5(SP_CONTENT + id.substring(start, (start + dur)));
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -306,6 +343,9 @@ public class EncryptUtils {
             }
             return result;
         } catch (Exception e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
@@ -361,6 +401,9 @@ public class EncryptUtils {
                 return Settings.System.getInt(contentResolver, AIRPLANE_MODE_ON, 0) != 0;
             }
         } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(t);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }

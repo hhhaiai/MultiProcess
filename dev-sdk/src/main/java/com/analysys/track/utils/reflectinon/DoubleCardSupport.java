@@ -7,7 +7,9 @@ import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PermissionUtils;
 
@@ -79,6 +81,9 @@ public class DoubleCardSupport {
                 return sb.toString();
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.v(e);
             }
@@ -112,6 +117,9 @@ public class DoubleCardSupport {
                 return sb.toString();
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.v(e);
             }
@@ -171,6 +179,9 @@ public class DoubleCardSupport {
                 addForZhanXun(context, resultList, methodName);
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.v(e);
             }
@@ -208,6 +219,9 @@ public class DoubleCardSupport {
                 }
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.v(e);
             }
@@ -242,6 +256,9 @@ public class DoubleCardSupport {
                     // 调整为调用静态方法
                     spreadTmService = (String) m.invoke(null, Context.TELEPHONY_SERVICE, i);
                 } catch (Throwable e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                     // 尝试调用非静态方法
                     spreadTmService = (String) m.invoke(getObjectInstance(c.getName()), Context.TELEPHONY_SERVICE, i);
                 }
@@ -256,6 +273,9 @@ public class DoubleCardSupport {
 
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.v(e);
             }
@@ -273,6 +293,9 @@ public class DoubleCardSupport {
                 imeis.add(result);
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.v(e);
             }
@@ -298,6 +321,9 @@ public class DoubleCardSupport {
                 imeis.add(result);
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.v(e);
             }
@@ -330,6 +356,9 @@ public class DoubleCardSupport {
                 imeis.add(result);
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.v(e);
             }
@@ -345,7 +374,7 @@ public class DoubleCardSupport {
             if (instance == null) {
                 return;
             }
-            // String result = (String) invokeMethod(instance, method, new Object[]{slotID}, new
+            // String result = (String) transform(instance, method, new Object[]{slotID}, new
             // Class[]{int.class});
             String result = getString(instance, method, slotID);
 
@@ -354,6 +383,9 @@ public class DoubleCardSupport {
             }
 
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.v(e);
             }
@@ -408,6 +440,9 @@ public class DoubleCardSupport {
                 }
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.v(e);
             }
@@ -448,6 +483,9 @@ public class DoubleCardSupport {
                 }
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.v(e);
             }
@@ -471,6 +509,9 @@ public class DoubleCardSupport {
                 return (String) id;
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.v(e);
             }
@@ -501,6 +542,9 @@ public class DoubleCardSupport {
             }
             return getdefault.invoke(null);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.v(e);
             }
