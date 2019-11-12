@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.IBinder;
 
 import com.analysys.track.hotfix.HotFixTransform;
-import com.analysys.track.hotfix.HotFixTransformCancel;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.work.MessageDispatcher;
@@ -62,21 +61,21 @@ public class AnalysysService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
-            return HotFixTransform.transform(
+            Integer o = HotFixTransform.transform(
                     HotFixTransform.make(AnalysysService.class.getName())
                     , AnalysysService.class.getName()
                     , "onStartCommand", intent, flags, startId);
+            if (o != null) {
+                return o;
+            }
+            return Service.START_STICKY;
         } catch (Throwable e) {
 
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysService onStartCommand");
         }
-        if (EGContext.IS_HOST) {
-            return super.onStartCommand(intent, Service.START_STICKY, startId);
-        } else {
-            return Service.START_STICKY;
-        }
+        return Service.START_STICKY;
     }
 
     @Override

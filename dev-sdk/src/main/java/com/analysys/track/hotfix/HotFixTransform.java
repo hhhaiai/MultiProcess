@@ -57,7 +57,15 @@ public class HotFixTransform {
         if (!isInit()) {
             synchronized (HotFixTransform.class) {
                 if (!isInit()) {
-                    String path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH, "");
+                    String path = null;
+                    if (ProcessUtils.isMainProcess(context)) {
+                        path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH_TEMP, "");
+                        if (hasDexFile(path)) {
+                            SPHelper.setStringValue2SP(context, EGContext.HOT_FIX_PATH, path);
+                        }
+                    }
+                    path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH, "");
+
                     boolean enable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
                     if (enable && hasDexFile(path)) {
                         setAnalClassloader(context, path);
@@ -113,7 +121,7 @@ public class HotFixTransform {
 
     private static void deleteOldDex(Context context, String path) {
         try {
-            if (ProcessUtils.getCurrentProcessName(context).equals(context.getPackageName())) {
+            if (ProcessUtils.isMainProcess(context)) {
                 String dirPath = context.getFilesDir().getAbsolutePath() + EGContext.HOTFIX_CACHE_DIR;
                 File[] files = new File(dirPath).listFiles(new FilenameFilter() {
                     @Override
@@ -172,7 +180,7 @@ public class HotFixTransform {
             EGContext.DEX_ERROR = true;
             //<editor-fold desc="删掉dex文件 其他进程 只改状态 保证删除的时候只有主进程的时候操作，避免主进程和主进程不同步删除出现异常">
             String path = null;
-            if (ProcessUtils.getCurrentProcessName(context).equals(context.getPackageName())) {
+            if (ProcessUtils.isMainProcess(context)) {
                 path = SPHelper.getStringValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_PATH, "");
                 File file = new File(path);
                 if (file.exists() && file.isFile()) {
@@ -196,7 +204,7 @@ public class HotFixTransform {
     }
 
     /**
-     * 只能宿主调用该方法
+     * 逻辑转发方法,由宿主转到热修复dex
      *
      * @param object
      * @param classname
@@ -210,6 +218,10 @@ public class HotFixTransform {
         canTransForm();
 
         if (classname == null || methodName == null || classname.length() == 0 || methodName.length() == 0) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(new Exception(
+                        "[HotFixTransform.transform error]" + classname + "," + methodName));
+            }
             return null;
         }
 

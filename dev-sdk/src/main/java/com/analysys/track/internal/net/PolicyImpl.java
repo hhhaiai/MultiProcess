@@ -322,7 +322,8 @@ public class PolicyImpl {
                                 Memory2File.savePatch(data, file);
                                 //默认这个dex 是正常的完整的
                                 EGContext.DEX_ERROR = false;
-                                SPHelper.setStringValue2SP(mContext, EGContext.HOT_FIX_PATH, file.getAbsolutePath());
+                                SPHelper.setStringValue2SP(mContext, EGContext.HOT_FIX_PATH_TEMP, file.getAbsolutePath());
+                                //SPHelper.setStringValue2SP(mContext, EGContext.HOT_FIX_PATH, "");
                                 SPHelper.setBooleanValue2SP(mContext, EGContext.HOT_FIX_ENABLE_STATE, true);
                                 if (EGContext.FLAG_DEBUG_INNER) {
                                     ELOG.i(EGContext.HOT_FIX_TAG, "新的热修复包下载成功");

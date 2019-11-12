@@ -30,4 +30,15 @@ public class ProcessUtils {
         return "";
     }
 
+    public static boolean isMainProcess(Context context) {
+        try {
+            return ProcessUtils.getCurrentProcessName(context).equals(context.getPackageName());
+        } catch (Exception e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
+        }
+        return false;
+    }
+
 }

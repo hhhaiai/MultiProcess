@@ -239,6 +239,7 @@ public class EGContext {
     //热更版本
     public static String HOT_FIX_VERSION = BuildConfig.hf_version;
     //热更文件路径
+    public static String HOT_FIX_PATH_TEMP = SDK_VERSION + "hf_temp";
     public static String HOT_FIX_PATH = SDK_VERSION + "hp";
     //热更文件哈希码
     public static String HOT_FIX_HASH = "hf_hash";
