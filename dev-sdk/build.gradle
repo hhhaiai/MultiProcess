@@ -9,9 +9,10 @@ costtime {
 }
 
 def version = "4.3.0.5"
-def date = "20191101"
+def date = "20191112_hf"
 
 //是否是热修复的宿主
+def enableHotFix = false
 def isHost = true
 //当前热修复包的版本
 def hf_code = 0
@@ -25,6 +26,7 @@ android {
     defaultConfig {
         def sdkv = "${version}|${date}";
         buildConfigField "boolean", "IS_HOST", "${isHost}"
+        buildConfigField "boolean", "enableHotFix", "${enableHotFix}"
         buildConfigField "String", "SDK_VERSION", "\"${sdkv}\""
         buildConfigField "String", "hf_version", isHost ? "\"${sdkv}\"" : "\"${sdkv}.${hf_code}\""
         buildConfigField "boolean", "ENABLE_BUGLY", "${ENABLE_BUGLY}"
@@ -38,7 +40,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
