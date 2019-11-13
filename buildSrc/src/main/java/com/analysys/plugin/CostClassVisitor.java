@@ -1,4 +1,4 @@
-package com.miqt.costtime;
+package com.analysys.plugin;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
@@ -7,7 +7,14 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.AdviceAdapter;
 
-
+/**
+ * @Copyright 2019 analysys Inc. All rights reserved.
+ * @Description: 方法耗时统计插桩器
+ * @Version: 1.0
+ * @Create: 2019-11-13 11:19:08
+ * @author: miqt
+ * @mail: miqingtang@analysys.com.cn
+ */
 public class CostClassVisitor extends ClassVisitor {
 
     boolean enable, costAll;
@@ -38,7 +45,7 @@ public class CostClassVisitor extends ClassVisitor {
             protected void onMethodEnter() {
                 if (isInject()) {
                     mv.visitLdcInsn(getName(name));
-                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, "com/miqt/costtime/TimePrint", "start", "(Ljava/lang/String;)V", false);
+                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, "com/analysys/plugin/TimePrint", "start", "(Ljava/lang/String;)V", false);
                 }
             }
 
@@ -63,7 +70,7 @@ public class CostClassVisitor extends ClassVisitor {
             protected void onMethodExit(int opcode) {
                 if (isInject()) {
                     mv.visitLdcInsn(getName(name));
-                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, "com/miqt/costtime/TimePrint", "end", "(Ljava/lang/String;)V", false);
+                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, "com/analysys/plugin/TimePrint", "end", "(Ljava/lang/String;)V", false);
                 }
             }
         };

@@ -12,7 +12,7 @@
  * the License.
  */
 
-package com.miqt.costtime;
+package com.analysys.plugin;
 
 /**
  * Interface of how to encrypt and decrypt a string.

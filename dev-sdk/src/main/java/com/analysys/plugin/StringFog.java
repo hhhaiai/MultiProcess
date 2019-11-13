@@ -1,4 +1,4 @@
-package com.miqt.costtime;
+package com.analysys.plugin;
 
 import java.io.UnsupportedEncodingException;
 
@@ -15,7 +15,7 @@ public class StringFog {
     /**
      * 加密的key,应该跟插件中的key一致,不然会发生错误
      */
-    public static final String key = "miqt";
+    public static final String key = "VBgIAFV";
     public static final StringFogImpl FOG = new StringFogImpl();
 
     public static String encrypt(String data) {

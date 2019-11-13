@@ -12,13 +12,15 @@
  * the License.
  */
 
-package com.miqt.costtime;
+package com.analysys.plugin;
 
 /**
- * Interface of how to encrypt and decrypt a string.
- *
- * @author Megatron King
- * @since 2018/9/20 16:15
+ * @Copyright 2019 analysys Inc. All rights reserved.
+ * @Description: 字符串加解密
+ * @Version: 1.0
+ * @Create: 2019-11-13 11:19:54
+ * @author: miqt
+ * @mail: miqingtang@analysys.com.cn
  */
 public interface IStringFog {
 

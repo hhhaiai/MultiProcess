@@ -9,7 +9,7 @@ costtime {
 }
 
 def version = "4.3.0.4"
-def date = "20191015"
+def date = "20191113"
 
 android {
     compileSdkVersion 26

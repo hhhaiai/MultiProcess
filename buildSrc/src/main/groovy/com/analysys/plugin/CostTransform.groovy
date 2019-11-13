@@ -1,10 +1,8 @@
-package com.miqt.plugin
+package com.analysys.plugin
 
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.google.common.collect.Sets
-import com.miqt.costtime.CostClassVisitor
-import com.miqt.plugin.CostTimeConfig
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project

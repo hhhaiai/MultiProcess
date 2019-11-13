@@ -1,9 +1,8 @@
-package com.miqt.plugin
+package com.analysys.plugin
 
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.google.common.collect.Sets
-import com.miqt.costtime.StringFogClassVisitor
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
@@ -68,7 +67,7 @@ public class StringFogTransform extends Transform {
 
                             ClassReader cr = new ClassReader(file.bytes)
                             ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS)
-                            ClassVisitor cv = new StringFogClassVisitor("miqt", cw)
+                            ClassVisitor cv = new StringFogClassVisitor("VBgIAFV", cw)
 
                             cr.accept(cv, EXPAND_FRAMES)
 

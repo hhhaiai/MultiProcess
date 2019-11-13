@@ -1,4 +1,4 @@
-package com.miqt.plugin;
+package com.analysys.plugin;
 
 public class CostTimeConfig {
     boolean enable = true;

@@ -1,4 +1,4 @@
-package com.miqt.costtime;
+package com.analysys.plugin;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;

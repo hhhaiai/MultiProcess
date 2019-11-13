@@ -12,7 +12,7 @@
  * the License.
  */
 
-package com.miqt.costtime;
+package com.analysys.plugin;
 
 
 import org.objectweb.asm.AnnotationVisitor;
@@ -26,12 +26,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Visit the class to execute string fog.
- *
- * @author Megatron King
- * @since 2017/3/6 20:37
+ * @Copyright 2019 analysys Inc. All rights reserved.
+ * @Description: 字符串混淆
+ * @Version: 1.0
+ * @Create: 2019-11-13 11:20:52
+ * @author: miqt
+ * @mail: miqingtang@analysys.com.cn
  */
-
 /* package */public class StringFogClassVisitor extends ClassVisitor {
 
     private static final String IGNORE_ANNOTATION = "Lcom/github/megatronking/stringfog" +

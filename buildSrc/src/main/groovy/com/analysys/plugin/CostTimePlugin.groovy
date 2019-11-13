@@ -1,8 +1,7 @@
-package com.miqt.plugin
+package com.analysys.plugin
 
 
 import com.android.build.gradle.AppExtension
-import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 

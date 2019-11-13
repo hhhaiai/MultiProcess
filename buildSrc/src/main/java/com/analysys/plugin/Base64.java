@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.miqt.costtime;
+package com.analysys.plugin;
 
 /**
  * Utilities for encoding and decoding the Base64 representation of

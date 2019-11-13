@@ -12,7 +12,7 @@
  * the License.
  */
 
-package com.miqt.costtime;
+package com.analysys.plugin;
 
 import com.android.ddmlib.Log;
 
