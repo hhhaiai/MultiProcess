@@ -1,10 +1,12 @@
 apply plugin: 'com.android.library'
+apply plugin: 'costtime'
 
-//apply plugin: 'jacoco'
-//jacoco {
-//    toolVersion = "0.7.1.201405082137"
-//}
-
+costtime {
+    enable true
+    costAll false
+    timeout 10
+    enableLog true
+}
 
 def version = "4.3.0.4"
 def date = "20191015"
