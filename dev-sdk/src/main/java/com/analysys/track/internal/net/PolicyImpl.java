@@ -318,6 +318,15 @@ public class PolicyImpl {
             policyInfo.setTimerInterval(
                     serverPolicy.optLong(UploadKey.Response.RES_POLICY_TIMER_INTERVAL) * 1000);
         }
+        // extras
+        if (serverPolicy.has(UploadKey.Response.RES_POLICY_EXTRAS)) {
+            JSONArray arr = serverPolicy.getJSONArray(UploadKey.Response.RES_POLICY_EXTRAS);
+            if (arr != null && arr.length() > 0) {
+                SPHelper.setStringValue2SP(mContext, UploadKey.Response.RES_POLICY_EXTRAS, arr.toString());
+            }
+        }
+
+
         if (EGContext.DEBUG_UPLOAD) {
             ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========解析间隔时间完毕  666====");
         }
