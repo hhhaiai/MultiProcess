@@ -30,6 +30,8 @@ public class EGContext {
     public static final String ACTION_UPDATE_POLICY = "com.analysys.sdk.action_policy";
     public static final String POLICY = "POLICY";
     public static final String PNAME = "PNAME";
+    public static final String KEY_ACTION_SCREEN_ON_SIZE = "SCREEN_ON_SIZE";
+
 
     public static volatile boolean snap_complete = false;
     /**
