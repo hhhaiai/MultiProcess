@@ -123,8 +123,14 @@ public class NetImpl {
             }
             array = (JSONArray) array.get(0);
             for (int i = 0; array != null && i < array.length(); i++) {
-                JSONObject netInfoObject = (JSONObject) array.get(i);
-                NetInfo info = NetInfo.fromJson(netInfoObject);
+                String pkg_name = (String) array.get(i);
+                String values[] = pkg_name.split("_");
+                if (values == null || values.length < 2) {
+                    continue;
+                }
+                NetInfo info = new NetInfo();
+                info.pkgname = values[0];
+                info.appname = values[1];
                 map.put(info.pkgname, info);
             }
         } catch (JSONException e) {
@@ -140,13 +146,14 @@ public class NetImpl {
     public HashMap<String, NetInfo> getNetInfo() {
         try {
             pkgs = getCacheInfo();
-            //本次扫描的时间戳
-            long time = System.currentTimeMillis();
+
             //重置打开状态
             Collection<NetInfo> infoCollection1 = pkgs.values();
             for (NetInfo info : infoCollection1) {
                 info.isOpen = false;
             }
+            //本次扫描的时间戳
+            long time = System.currentTimeMillis();
             api_4 = getApi4(context);
             proc_56 = getProc56(context);
             usm = getUsm(context);
@@ -169,20 +176,30 @@ public class NetImpl {
                 if (info.isOpen) {
                     continue;
                 }
+
+                List<NetInfo.ScanningInfo> scanningInfos = TableProcess.getInstance(context).selectScanningInfoByPkg(info.pkgname, true);
                 // 死了 添加 关闭节点 判断上一个是关闭节点 不新加
-                List<NetInfo.TcpInfo> tcpInfos = info.scanningInfos.get(info.scanningInfos.size() - 1).tcpInfos;
-                if (tcpInfos == null || tcpInfos.isEmpty()) {
-                    //有不操作
-                    continue;
+                if (scanningInfos != null && scanningInfos.size() > 0) {
+                    List<NetInfo.TcpInfo> tcpInfos = scanningInfos.get(0).tcpInfos;
+                    if (tcpInfos == null || tcpInfos.isEmpty()) {
+                        //有不操作
+                        continue;
+                    }
                 }
                 //没有添加关闭节点
                 NetInfo.ScanningInfo scanningInfo = new NetInfo.ScanningInfo();
                 scanningInfo.time = time;
+                scanningInfo.pkgname = info.pkgname;
+                scanningInfo.appname = info.appname;
+                if (info.scanningInfos == null) {
+                    info.scanningInfos = new ArrayList<>();
+                }
                 info.scanningInfos.add(scanningInfo);
             }
 
             //存数据库
-            saveNetInfoToDb(pkgs);
+            savePkgToDb(pkgs);
+            saveScanningInfos(pkgs);
 
         } catch (Throwable throwable) {
             if (EGContext.FLAG_DEBUG_INNER) {
@@ -190,6 +207,15 @@ public class NetImpl {
             }
         }
         return pkgs;
+    }
+
+    private void saveScanningInfos(HashMap<String, NetInfo> pkgs) {
+        for (String string : pkgs.keySet()) {
+            List<NetInfo.ScanningInfo> scanningInfos = pkgs.get(string).scanningInfos;
+            for (int i = 0; i < scanningInfos.size(); i++) {
+                TableProcess.getInstance(context).insertScanningInfo(scanningInfos.get(i));
+            }
+        }
     }
 
     private String getUsm(Context mContext) {
@@ -227,11 +253,11 @@ public class NetImpl {
         return null;
     }
 
-    private void saveNetInfoToDb(HashMap<String, NetInfo> pkgs) {
+    private void savePkgToDb(HashMap<String, NetInfo> pkgs) {
 
         JSONArray array = new JSONArray();
         for (NetInfo netInfo : pkgs.values()) {
-            array.put(netInfo.toJson());
+            array.put(netInfo.pkgname + "_" + netInfo.appname);
         }
         if (array.length() > 0) {
             TableProcess.getInstance(context).deleteNet();
@@ -277,9 +303,13 @@ public class NetImpl {
                     if (info == null) {
                         info = new NetInfo();
                         info.pkgname = pkgName;
-                        ApplicationInfo info1 = manager.getApplicationInfo(pkgName, 0);
-                        info.appname = (String) info1.loadLabel(manager);
                         pkgs.put(pkgName, info);
+                    }
+                    if (info.appname == null) {
+                        ApplicationInfo info1 = manager.getApplicationInfo(pkgName, 0);
+                        if (info1 != null) {
+                            info.appname = (String) info1.loadLabel(manager);
+                        }
                     }
                     info.isOpen = true;
                     if (info.scanningInfos == null) {
@@ -297,6 +327,9 @@ public class NetImpl {
                         scanningInfo.time = time;
                         scanningInfo.api_4 = api_4;
                         scanningInfo.proc_56 = proc_56;
+                        scanningInfo.usm = usm;
+                        scanningInfo.pkgname = info.pkgname;
+                        scanningInfo.appname = info.appname;
                         scanningInfo.usm = usm;
                         info.scanningInfos.add(scanningInfo);
                     }

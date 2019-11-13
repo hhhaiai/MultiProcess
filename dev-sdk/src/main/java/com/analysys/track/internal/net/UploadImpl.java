@@ -9,6 +9,7 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
+import com.analysys.track.internal.impl.net.NetInfo;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.DeflterCompressUtils;
 import com.analysys.track.utils.ELOG;
@@ -27,6 +28,7 @@ import org.json.JSONObject;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -617,7 +619,22 @@ public class UploadImpl {
                     arr = TableProcess.getInstance(mContext).selectXXX(useFulLength);
                     break;
                 case MODULE_NET:
-                    arr = TableProcess.getInstance(mContext).selectNet(useFulLength);
+                    HashMap<String, NetInfo> map = new HashMap<>();
+                    JSONArray array = TableProcess.getInstance(mContext).selectNet(1024 * 1024);
+                    if (array == null || array.length() == 0) {
+                        break;
+                    }
+                    array = (JSONArray) array.get(0);
+                    for (int i = 0; array != null && i < array.length(); i++) {
+                        String pkgname = (String) array.get(i);
+                        NetInfo info = new NetInfo();
+                        info.pkgname = pkgname;
+                        List<NetInfo.ScanningInfo> scanningInfos =
+                                TableProcess.getInstance(mContext).selectScanningInfoByPkg(info.pkgname, false);
+                        info.scanningInfos = scanningInfos;
+                        map.put(info.pkgname, info);
+                        arr.put(info.toJson());
+                    }
                     break;
                 default:
                     break;

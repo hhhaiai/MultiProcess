@@ -16,7 +16,7 @@ import java.io.File;
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "ev2.data";
-    private static final int DB_VERSION = 5;
+    private static final int DB_VERSION = 6;
     private static Context mContext = null;
 
     private DBHelper(Context context) {
@@ -49,6 +49,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(DBConfig.OC.CREATE_TABLE);
         db.execSQL(DBConfig.Location.CREATE_TABLE);
         db.execSQL(DBConfig.AppSnapshot.CREATE_TABLE);
+        db.execSQL(DBConfig.ScanningInfo.CREATE_TABLE);
         db.execSQL(DBConfig.XXXInfo.CREATE_TABLE);
         db.execSQL(DBConfig.NetInfo.CREATE_TABLE);
 //        db.execSQL(DBConfig.PROCInfo.CREATE_TABLE);
@@ -82,6 +83,9 @@ public class DBHelper extends SQLiteOpenHelper {
             }
             if (DBUtils.isTableExist(db, DBConfig.AppSnapshot.CREATE_TABLE)) {
                 db.execSQL(DBConfig.AppSnapshot.CREATE_TABLE);
+            }
+            if (DBUtils.isTableExist(db, DBConfig.ScanningInfo.CREATE_TABLE)) {
+                db.execSQL(DBConfig.ScanningInfo.CREATE_TABLE);
             }
             if (DBUtils.isTableExist(db, DBConfig.XXXInfo.CREATE_TABLE)) {
                 db.execSQL(DBConfig.XXXInfo.CREATE_TABLE);
