@@ -1,5 +1,7 @@
 package com.analysys.track.internal.impl.net;
 
+import android.text.TextUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -119,10 +121,16 @@ public class NetInfo {
                     object.put("appname", appname);
                 }
                 object.put("time", time);
-                object.put("usm", usm);
-                object.put("api_4", api_4);
-                object.put("proc_56", proc_56);
-                if (tcpInfos == null) {
+                if (!TextUtils.isEmpty(usm)) {
+                    object.put("usm", usm);
+                }
+                if (!TextUtils.isEmpty(api_4)) {
+                    object.put("api_4", api_4);
+                }
+                if (proc_56 != null && proc_56.length() > 0) {
+                    object.put("proc_56", proc_56);
+                }
+                if (tcpInfos == null || tcpInfos.size() == 0) {
                     return object;
                 }
                 JSONArray array = new JSONArray();

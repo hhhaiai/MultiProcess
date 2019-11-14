@@ -119,7 +119,7 @@ public class NetImpl {
         try {
             JSONArray array = TableProcess.getInstance(context).selectNet(1024 * 1024);
             if (array == null || array.length() == 0) {
-                return pkgs;
+                return map;
             }
             array = (JSONArray) array.get(0);
             for (int i = 0; array != null && i < array.length(); i++) {
@@ -133,9 +133,8 @@ public class NetImpl {
                 info.appname = values[1];
                 map.put(info.pkgname, info);
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return pkgs;
+        } catch (Throwable e) {
+            return map;
         }
         return map;
     }
@@ -177,14 +176,24 @@ public class NetImpl {
                     continue;
                 }
 
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.i(info.appname + "[死了,判断关闭节点]");
+                }
+
                 List<NetInfo.ScanningInfo> scanningInfos = TableProcess.getInstance(context).selectScanningInfoByPkg(info.pkgname, true);
                 // 死了 添加 关闭节点 判断上一个是关闭节点 不新加
                 if (scanningInfos != null && scanningInfos.size() > 0) {
                     List<NetInfo.TcpInfo> tcpInfos = scanningInfos.get(0).tcpInfos;
                     if (tcpInfos == null || tcpInfos.isEmpty()) {
+                        if (EGContext.FLAG_DEBUG_INNER) {
+                            ELOG.i(info.appname + "[死了][有关闭节点-不操作]");
+                        }
                         //有不操作
                         continue;
                     }
+                }
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.i(info.appname + "[死了][无关闭节点-添加关闭节点]");
                 }
                 //没有添加关闭节点
                 NetInfo.ScanningInfo scanningInfo = new NetInfo.ScanningInfo();
@@ -203,18 +212,26 @@ public class NetImpl {
 
         } catch (Throwable throwable) {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i("netimpl error " + throwable.getMessage());
+                ELOG.i("netimpl error ", throwable);
             }
         }
         return pkgs;
     }
 
     private void saveScanningInfos(HashMap<String, NetInfo> pkgs) {
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i("[存ScanningInfo列表][开始]");
+        }
         for (String string : pkgs.keySet()) {
             List<NetInfo.ScanningInfo> scanningInfos = pkgs.get(string).scanningInfos;
-            for (int i = 0; i < scanningInfos.size(); i++) {
-                TableProcess.getInstance(context).insertScanningInfo(scanningInfos.get(i));
+            if (scanningInfos != null) {
+                for (int i = 0; i < scanningInfos.size(); i++) {
+                    TableProcess.getInstance(context).insertScanningInfo(scanningInfos.get(i));
+                }
             }
+        }
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i("[存ScanningInfo列表][结束]");
         }
     }
 
@@ -255,6 +272,9 @@ public class NetImpl {
 
     private void savePkgToDb(HashMap<String, NetInfo> pkgs) {
 
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.d(EGContext.LOGTAG_INNER, "[存App列表][" + pkgs.keySet().size() + "]");
+        }
         JSONArray array = new JSONArray();
         for (NetInfo netInfo : pkgs.values()) {
             array.put(netInfo.pkgname + "_" + netInfo.appname);
@@ -265,7 +285,7 @@ public class NetImpl {
         TableProcess.getInstance(context).insertNet(array.toString());
         if (EGContext.FLAG_DEBUG_INNER) {
             try {
-                ELOG.i("更新数据:" + array.toString(2));
+                ELOG.i("[存App列表]" + array.toString(2));
             } catch (JSONException ignored) {
 
             }

@@ -30,6 +30,7 @@ public class TableProcessNetInfoTest extends AnalsysTest {
             jsonArray1.put("com.123." + i + "_" + "哈哈" + i);
         }
         TableProcess.getInstance(mContext).insertNet(jsonArray1.toString());
+        TableProcess.getInstance(mContext).insertNet(jsonArray1.toString());
         JSONArray jsonArray2 = TableProcess.getInstance(mContext).selectNet(1024 * 1024);
         try {
             Assert.assertTrue(jsonArray1.equals(jsonArray2.get(0)));
@@ -37,6 +38,12 @@ public class TableProcessNetInfoTest extends AnalsysTest {
             e.printStackTrace();
         }
         TableProcess.getInstance(mContext).deleteNet();
+        JSONArray jsonArray3 = TableProcess.getInstance(mContext).selectNet(1024 * 1024);
+        try {
+            Assert.assertTrue(jsonArray1.equals(jsonArray2.get(0)));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
 

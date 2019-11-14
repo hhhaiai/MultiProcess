@@ -643,7 +643,7 @@ public class UploadImpl {
                     }
                     arr = new JSONArray();
                     for (String pkg : map.keySet()) {
-                        arr.put(map.get(pkg).toJson(false));
+                        arr.put(map.get(pkg).toJson());
                     }
                     break;
                 default:
