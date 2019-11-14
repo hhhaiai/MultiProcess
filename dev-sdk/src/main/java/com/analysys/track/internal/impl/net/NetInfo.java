@@ -31,18 +31,18 @@ public class NetInfo {
     public JSONObject toJson() {
         JSONObject object = new JSONObject();
         try {
-            object.put("pkgname", pkgname);
-            object.put("appname", appname);
+            object.put("APN", pkgname);
+            object.put("AN", appname);
             JSONArray array = new JSONArray();
             if (scanningInfos != null && scanningInfos.size() > 0) {
                 for (ScanningInfo scanningInfo : scanningInfos
                 ) {
                     array.put(scanningInfo.toJson(false));
                 }
-                object.put("scanningInfos", array);
+                object.put("SINF", array);
             }
         } catch (Throwable e) {
-            if(BuildConfig.ENABLE_BUGLY){
+            if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
         }
@@ -51,9 +51,9 @@ public class NetInfo {
 
     public static NetInfo fromJson(JSONObject jsonObject) throws JSONException {
         NetInfo info = new NetInfo();
-        info.pkgname = jsonObject.optString("pkgname");
-        info.appname = jsonObject.optString("appname");
-        JSONArray array = jsonObject.optJSONArray("scanningInfos");
+        info.pkgname = jsonObject.optString("APN");
+        info.appname = jsonObject.optString("AN");
+        JSONArray array = jsonObject.optJSONArray("SINF");
         if (array != null) {
             info.scanningInfos = new ArrayList<>();
             for (int i = 0; i < array.length(); i++) {
@@ -95,14 +95,14 @@ public class NetInfo {
         public static ScanningInfo fromJson(JSONObject object) throws JSONException {
             ScanningInfo scanningInfo = new ScanningInfo();
 
-            scanningInfo.pkgname = object.optString("pkgname");
-            scanningInfo.appname = object.optString("appname");
-            scanningInfo.api_4 = object.optString("api_4");
-            scanningInfo.proc_56 = object.optJSONObject("proc_56");
-            scanningInfo.usm = object.optString("usm");
-            scanningInfo.time = object.optLong("time");
+            scanningInfo.pkgname = object.optString("APN");
+            scanningInfo.appname = object.optString("AN");
+            scanningInfo.api_4 = object.optString("API4");
+            scanningInfo.proc_56 = object.optJSONObject("PROC56");
+            scanningInfo.usm = object.optString("USM");
+            scanningInfo.time = object.optLong("ST");
             scanningInfo.tcpInfos = new ArrayList<>();
-            JSONArray array = object.optJSONArray("tcpInfos");
+            JSONArray array = object.optJSONArray("CONNS");
             if (array != null) {
                 for (int i = 0; i < array.length(); i++) {
                     scanningInfo.tcpInfos.add(TcpInfo.fromJson((JSONObject) array.get(i)));
@@ -122,18 +122,18 @@ public class NetInfo {
             JSONObject object = new JSONObject();
             try {
                 if (hasPA) {
-                    object.put("pkgname", pkgname);
-                    object.put("appname", appname);
+                    object.put("APN", pkgname);
+                    object.put("AN", appname);
                 }
-                object.put("time", time);
+                object.put("ST", time);
                 if (!TextUtils.isEmpty(usm)) {
-                    object.put("usm", usm);
+                    object.put("USM", usm);
                 }
                 if (!TextUtils.isEmpty(api_4)) {
-                    object.put("api_4", api_4);
+                    object.put("API4", api_4);
                 }
                 if (proc_56 != null && proc_56.length() > 0) {
-                    object.put("proc_56", proc_56);
+                    object.put("PROC56", proc_56);
                 }
                 if (tcpInfos == null || tcpInfos.size() == 0) {
                     return object;
@@ -143,7 +143,7 @@ public class NetInfo {
                 ) {
                     array.put(tcpInfo.toJson());
                 }
-                object.put("tcpInfos", array);
+                object.put("CONNS", array);
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
                     BuglyUtils.commitError(e);
@@ -176,10 +176,10 @@ public class NetInfo {
         public static TcpInfo fromJson(JSONObject object) {
             TcpInfo tcpInfo = new TcpInfo();
 
-            tcpInfo.protocol = object.optString("protocol");
-            tcpInfo.local_addr = object.optString("local_addr");
-            tcpInfo.remote_addr = object.optString("remote_addr");
-            tcpInfo.socket_type = object.optString("socket_type");
+            tcpInfo.protocol = object.optString("PTL");
+            tcpInfo.local_addr = object.optString("CAD");
+            tcpInfo.remote_addr = object.optString("RAD");
+            tcpInfo.socket_type = object.optString("TP");
             return tcpInfo;
         }
 
@@ -187,10 +187,10 @@ public class NetInfo {
             JSONObject object = new JSONObject();
             try {
 
-                object.put("protocol", protocol);
-                object.put("local_addr", local_addr);
-                object.put("remote_addr", remote_addr);
-                object.put("socket_type", socket_type);
+                object.put("PTL", protocol);
+                object.put("CAD", local_addr);
+                object.put("RAD", remote_addr);
+                object.put("TP", socket_type);
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
                     BuglyUtils.commitError(e);
