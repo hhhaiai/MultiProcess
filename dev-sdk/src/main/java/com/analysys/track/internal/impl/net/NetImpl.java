@@ -252,8 +252,8 @@ public class NetImpl {
                 if (usm == null) {
                     return null;
                 }
-                long ts = System.currentTimeMillis();
-                List<UsageStats> usageStats = usm.queryUsageStats(UsageStatsManager.INTERVAL_BEST, 0, ts);
+                long ts = System.currentTimeMillis() - EGContext.TIME_HOUR * 1;
+                List<UsageStats> usageStats = usm.queryUsageStats(UsageStatsManager.INTERVAL_BEST, ts, System.currentTimeMillis());
                 if (usageStats == null || usageStats.size() == 0) {
                     return null;
                 }

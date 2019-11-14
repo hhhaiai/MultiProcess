@@ -17,7 +17,7 @@ def enableHotFix = false
 //当前热修复包的版本
 def hf_code = 0
 
-def ENABLE_BUGLY = true
+def ENABLE_BUGLY = false
 
 android {
     compileSdkVersion 26

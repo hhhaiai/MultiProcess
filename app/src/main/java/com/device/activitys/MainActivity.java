@@ -43,12 +43,6 @@ public class MainActivity extends Activity {
         mContext = this;
         setContentView(R.layout.activity_main);
         reqPer();
-        new AlertDialog.Builder(this).setMessage("设置辅助功能?").setNegativeButton("打开", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                USMUtils.openUSMSetting(MainActivity.this);
-            }
-        });
     }
 
     @Override
@@ -71,6 +65,9 @@ public class MainActivity extends Activity {
                 EL.i("click btnGoTestMainActivity");
                 startActivity(new Intent(this, TestCase1Activity.class));
 //                test();
+                break;
+            case R.id.btnSetAccessibility:
+                USMUtils.openUSMSetting(MainActivity.this);
                 break;
             default:
                 break;
