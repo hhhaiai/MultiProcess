@@ -16,7 +16,7 @@ def isHost = true
 def enableHotFix = false
 //当前热修复包的版本
 def hf_code = 0
-
+//bugly上报
 def ENABLE_BUGLY = false
 
 android {
