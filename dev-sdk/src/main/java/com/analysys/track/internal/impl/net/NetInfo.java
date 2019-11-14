@@ -2,6 +2,9 @@ package com.analysys.track.internal.impl.net;
 
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
+import com.analysys.track.utils.BuglyUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,8 +41,10 @@ public class NetInfo {
                 }
                 object.put("scanningInfos", array);
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
+            if(BuildConfig.ENABLE_BUGLY){
+                BuglyUtils.commitError(e);
+            }
         }
         return object;
     }
@@ -139,8 +144,10 @@ public class NetInfo {
                     array.put(tcpInfo.toJson());
                 }
                 object.put("tcpInfos", array);
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
             return object;
         }
@@ -184,8 +191,10 @@ public class NetInfo {
                 object.put("local_addr", local_addr);
                 object.put("remote_addr", remote_addr);
                 object.put("socket_type", socket_type);
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
             return object;
         }

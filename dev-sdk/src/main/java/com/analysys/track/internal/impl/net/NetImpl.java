@@ -23,14 +23,11 @@ import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -134,7 +131,9 @@ public class NetImpl {
                 map.put(info.pkgname, info);
             }
         } catch (Throwable e) {
-            return map;
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return map;
     }
@@ -164,8 +163,10 @@ public class NetImpl {
                     String result = runShell(cmd);
                     //解析原始信息存到pkgs里面
                     resolve(cmd, result, time);
-                } catch (Throwable throwable) {
-                    //某一行解析异常
+                } catch (Throwable e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                 }
             }
             //最后剩下的就是上一次扫描有 但是这一次扫描没有的应用 加关闭符号
@@ -210,9 +211,9 @@ public class NetImpl {
             savePkgToDb(pkgs);
             saveScanningInfos(pkgs);
 
-        } catch (Throwable throwable) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i("netimpl error ", throwable);
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
             }
         }
         return pkgs;
@@ -286,8 +287,10 @@ public class NetImpl {
         if (EGContext.FLAG_DEBUG_INNER) {
             try {
                 ELOG.i("[存App列表]" + array.toString(2));
-            } catch (JSONException ignored) {
-
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
     }
@@ -406,6 +409,9 @@ public class NetImpl {
 
 
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return pkgName;
     }
@@ -432,10 +438,10 @@ public class NetImpl {
                 builder.append(line).append("\n");
             }
             return builder.toString();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         } finally {
             try {
                 if (bufferedReader != null) {
@@ -447,8 +453,10 @@ public class NetImpl {
                 if (fileInputStream != null) {
                     fileInputStream.close();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
         return null;
