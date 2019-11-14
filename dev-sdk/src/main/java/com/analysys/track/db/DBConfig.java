@@ -140,7 +140,7 @@ public class DBConfig {
                 TABLE_NAME,
                 Column.ID, DBType.AUTOINCREMENT,
                 Column.PKG, DBType.VARCHAR_HUNDRED,
-                Column.TIME, DBType.VARCHAR_TWENTY,
+                Column.TIME, DBType.VARCHAR_HUNDRED,
                 Column.DATA, DBType.TEXT,
                 Column.L_RA, DBType.TEXT,
                 Column.L_RB, DBType.TEXT,

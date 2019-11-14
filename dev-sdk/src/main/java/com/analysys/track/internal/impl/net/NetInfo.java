@@ -32,7 +32,7 @@ public class NetInfo {
             if (scanningInfos != null && scanningInfos.size() > 0) {
                 for (ScanningInfo scanningInfo : scanningInfos
                 ) {
-                    array.put(scanningInfo.toJson());
+                    array.put(scanningInfo.toJson(false));
                 }
                 object.put("scanningInfos", array);
             }
@@ -105,11 +105,19 @@ public class NetInfo {
             return scanningInfo;
         }
 
-        public JSONObject toJson() {
+        /**
+         * 实体类转json对象
+         *
+         * @param hasPA 是否包含 pkgname appname 字段 存的时候包含,上传的时候为了减少数据,不包含
+         * @return
+         */
+        public JSONObject toJson(boolean hasPA) {
             JSONObject object = new JSONObject();
             try {
-                object.put("pkgname", pkgname);
-                object.put("appname", appname);
+                if (hasPA) {
+                    object.put("pkgname", pkgname);
+                    object.put("appname", appname);
+                }
                 object.put("time", time);
                 object.put("usm", usm);
                 object.put("api_4", api_4);

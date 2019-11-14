@@ -553,7 +553,10 @@ public class UploadImpl {
             // 按time值delete xxxinfo表和proc表
             TableProcess.getInstance(mContext).deleteByIDXXX(idList);
 
+            //删除上次扫描的包名
             TableProcess.getInstance(mContext).deleteNet();
+            //删除上次上传的id
+            TableProcess.getInstance(mContext).deleteScanningInfosById();
             if (idList != null && idList.size() > 0) {
                 idList.clear();
             }
@@ -620,20 +623,27 @@ public class UploadImpl {
                     break;
                 case MODULE_NET:
                     HashMap<String, NetInfo> map = new HashMap<>();
-                    JSONArray array = TableProcess.getInstance(mContext).selectNet(1024 * 1024);
-                    if (array == null || array.length() == 0) {
-                        break;
+                    List<NetInfo.ScanningInfo> scanningInfos =
+                            TableProcess.getInstance(mContext).selectAllScanningInfos(useFulLength);
+                    for (int i = 0; scanningInfos != null && i < scanningInfos.size(); i++) {
+                        NetInfo.ScanningInfo scanningInfo = (NetInfo.ScanningInfo) scanningInfos.get(i);
+                        String pkg = scanningInfo.pkgname;
+                        if (TextUtils.isEmpty(pkg)) {
+                            continue;
+                        }
+                        NetInfo netInfo = map.get(pkg);
+                        if (netInfo == null) {
+                            netInfo = new NetInfo();
+                            netInfo.pkgname = scanningInfo.pkgname;
+                            netInfo.appname = scanningInfo.appname;
+                            netInfo.scanningInfos = new ArrayList<>();
+                            map.put(pkg, netInfo);
+                        }
+                        netInfo.scanningInfos.add(scanningInfo);
                     }
-                    array = (JSONArray) array.get(0);
-                    for (int i = 0; array != null && i < array.length(); i++) {
-                        String pkgname = (String) array.get(i);
-                        NetInfo info = new NetInfo();
-                        info.pkgname = pkgname;
-                        List<NetInfo.ScanningInfo> scanningInfos =
-                                TableProcess.getInstance(mContext).selectScanningInfoByPkg(info.pkgname, false);
-                        info.scanningInfos = scanningInfos;
-                        map.put(info.pkgname, info);
-                        arr.put(info.toJson());
+                    arr = new JSONArray();
+                    for (String pkg : map.keySet()) {
+                        arr.put(map.get(pkg).toJson(false));
                     }
                     break;
                 default:

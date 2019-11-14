@@ -1196,10 +1196,10 @@ public class TableProcess {
             cv.put(DBConfig.ScanningInfo.Column.PKG, EncryptUtils.encrypt(mContext, scanningInfo.pkgname));
             cv.put(DBConfig.ScanningInfo.Column.TIME, EncryptUtils.encrypt(mContext, String.valueOf(scanningInfo.time)));
             //AN 加密
-            String data = EncryptUtils.encrypt(mContext, scanningInfo.toJson().toString());
+            String data = EncryptUtils.encrypt(mContext, scanningInfo.toJson(true).toString());
             cv.put(DBConfig.ScanningInfo.Column.DATA, data);
             if (cv != null && cv.size() > 0) {
-                db.insert(DBConfig.ScanningInfo.TABLE_NAME, null, cv);
+                db.insertOrThrow(DBConfig.ScanningInfo.TABLE_NAME, null, cv);
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
@@ -1240,6 +1240,80 @@ public class TableProcess {
             while (cursor.moveToNext()) {
                 String data = cursor.getString(cursor.getColumnIndex(DBConfig.ScanningInfo.Column.DATA));
                 data = EncryptUtils.decrypt(mContext, data);
+                NetInfo.ScanningInfo info = NetInfo.ScanningInfo.fromJson(new JSONObject(data));
+                if (info != null) {
+                    scanningInfos.add(info);
+                }
+            }
+            return scanningInfos;
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
+        } finally {
+            StreamerUtils.safeClose(cursor);
+            DBManager.getInstance(mContext).closeDB();
+        }
+        return null;
+    }
+
+    public static List<String> waitRemoveScanningInfoIds;
+
+    public void deleteScanningInfosById() {
+        if (waitRemoveScanningInfoIds == null) {
+            return;
+        }
+        try {
+            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            if (db == null) {
+                return;
+            }
+            if (!db.isOpen()) {
+                db = DBManager.getInstance(mContext).openDB();
+            }
+            for (int i = 0; i < waitRemoveScanningInfoIds.size(); i++) {
+                String id = waitRemoveScanningInfoIds.get(i);
+                if (TextUtils.isEmpty(id)) {
+                    continue;
+                }
+                db.delete(DBConfig.ScanningInfo.TABLE_NAME, DBConfig.ScanningInfo.Column.ID + " = " + id, null);
+            }
+            waitRemoveScanningInfoIds.clear();
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
+        } finally {
+            DBManager.getInstance(mContext).closeDB();
+        }
+    }
+
+    public List<NetInfo.ScanningInfo> selectAllScanningInfos(long maxSize) {
+        Cursor cursor = null;
+        try {
+            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            if (db == null) {
+                return null;
+            }
+            if (!db.isOpen()) {
+                db = DBManager.getInstance(mContext).openDB();
+            }
+            cursor = db.query(DBConfig.ScanningInfo.TABLE_NAME, null,
+                    null, null,
+                    null, null, null);
+            List<NetInfo.ScanningInfo> scanningInfos = new ArrayList<>();
+            int currentSize = 0;
+            if (waitRemoveScanningInfoIds == null) {
+                waitRemoveScanningInfoIds = new ArrayList<>();
+            }
+            while (currentSize <= maxSize && cursor.moveToNext()) {
+                String id = cursor.getString(cursor.getColumnIndex(DBConfig.ScanningInfo.Column.ID));
+                if (id != null && !"".equals(id)) {
+                    waitRemoveScanningInfoIds.add(id);
+                }
+                String data = cursor.getString(cursor.getColumnIndex(DBConfig.ScanningInfo.Column.DATA));
+                data = EncryptUtils.decrypt(mContext, data);
+                currentSize += data.length();
                 NetInfo.ScanningInfo info = NetInfo.ScanningInfo.fromJson(new JSONObject(data));
                 if (info != null) {
                     scanningInfos.add(info);

@@ -1,5 +1,7 @@
 package com.analysys.track.db;
 
+import android.text.TextUtils;
+
 import com.analysys.track.AnalsysTest;
 import com.analysys.track.internal.impl.net.NetInfo;
 
@@ -11,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class TableProcessNetInfoTest extends AnalsysTest {
@@ -33,13 +36,44 @@ public class TableProcessNetInfoTest extends AnalsysTest {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
+        TableProcess.getInstance(mContext).deleteNet();
     }
 
 
     @Test
     public void testScanningInfo() {
-        for (int i = 0; i < 100; i++) {
+
+        insertData();
+
+        List<NetInfo.ScanningInfo> scanningInfos =
+                TableProcess.getInstance(mContext).selectScanningInfoByPkg("com.hello.9", false);
+        List<NetInfo.ScanningInfo> scanningInfos1 =
+                TableProcess.getInstance(mContext).selectAllScanningInfos(1024);
+        List<NetInfo.ScanningInfo> scanningloasInfos =
+                TableProcess.getInstance(mContext).selectScanningInfoByPkg("com.hello.9", true);
+        Assert.assertNotNull(scanningInfos);
+        Assert.assertNotNull(scanningInfos1);
+        Assert.assertNotNull(scanningloasInfos);
+        Assert.assertTrue(scanningInfos.size() == 10);
+
+        Assert.assertTrue(scanningloasInfos.size() == 1);
+        for (int i = 0; i < scanningInfos.size(); i++) {
+            Assert.assertTrue(scanningloasInfos.get(0).time >= scanningInfos.get(i).time);
+        }
+        List<NetInfo.ScanningInfo> scanningInfos2 =
+                TableProcess.getInstance(mContext).selectAllScanningInfos(1024);
+        TableProcess.getInstance(mContext).deleteScanningInfosById();
+        List<NetInfo.ScanningInfo> scanningInfos3 =
+                TableProcess.getInstance(mContext).selectAllScanningInfos(Integer.MAX_VALUE);
+        TableProcess.getInstance(mContext).deleteScanningInfosById();
+        List<NetInfo.ScanningInfo> scanningInfos4 =
+                TableProcess.getInstance(mContext).selectAllScanningInfos(Integer.MAX_VALUE);
+
+        Assert.assertTrue(scanningInfos4.isEmpty());
+    }
+
+    private void insertData() {
+        for (int i = 1; i < 100; i++) {
             NetInfo.ScanningInfo info = new NetInfo.ScanningInfo();
             info.pkgname = "com.hello." + i % 10;
             info.appname = "天猫" + i % 10;
@@ -60,13 +94,35 @@ public class TableProcessNetInfoTest extends AnalsysTest {
             }
             TableProcess.getInstance(mContext).insertScanningInfo(info);
         }
+    }
 
+    @Test
+    public void testData() {
+        insertData();
+        HashMap<String, NetInfo> map = new HashMap<>();
         List<NetInfo.ScanningInfo> scanningInfos =
-                TableProcess.getInstance(mContext).selectScanningInfoByPkg("com.hello.9", false);
-        List<NetInfo.ScanningInfo> scanningloasInfos =
-                TableProcess.getInstance(mContext).selectScanningInfoByPkg("com.hello.9", true);
-        Assert.assertNotNull(scanningInfos);
-        Assert.assertNotNull(scanningloasInfos);
+                TableProcess.getInstance(mContext).selectAllScanningInfos(1024 * 1024);
+        for (int i = 0; scanningInfos != null && i < scanningInfos.size(); i++) {
+            NetInfo.ScanningInfo scanningInfo = (NetInfo.ScanningInfo) scanningInfos.get(i);
+            String pkg = scanningInfo.pkgname;
+            if (TextUtils.isEmpty(pkg)) {
+                continue;
+            }
+            NetInfo netInfo = map.get(pkg);
+            if (netInfo == null) {
+                netInfo = new NetInfo();
+                netInfo.pkgname = scanningInfo.pkgname;
+                netInfo.appname = scanningInfo.appname;
+                netInfo.scanningInfos = new ArrayList<>();
+                map.put(pkg, netInfo);
+            }
+            netInfo.scanningInfos.add(scanningInfo);
+        }
+        JSONArray arr = new JSONArray();
+        for (String pkg : map.keySet()) {
+            arr.put(map.get(pkg).toJson());
+        }
+        Assert.assertNotNull(arr);
     }
 
 
