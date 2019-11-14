@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-
+apply plugin: 'costtime'
 costtime {
     enable true
     costAll false
@@ -8,11 +8,12 @@ costtime {
 }
 
 def version = "4.3.0.5"
-def date = "20191112_hf"
+def date = "20191114"
 
 //是否是热修复的宿主
-def enableHotFix = false
 def isHost = true
+//打包版本,热修版本,非热修版本
+def enableHotFix = false
 //当前热修复包的版本
 def hf_code = 0
 
