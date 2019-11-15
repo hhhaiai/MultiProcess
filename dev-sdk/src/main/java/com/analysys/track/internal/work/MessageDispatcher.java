@@ -75,7 +75,7 @@ public class MessageDispatcher {
                             UploadImpl.getInstance(mContext).upload();
                         }
                         //最多等10秒
-                        EGContext.snap_complete=true;
+                        EGContext.snap_complete = true;
                         // 5秒检查一次是否可以发送。
                         postDelay(MSG_INFO_UPLOAD, EGContext.TIME_SECOND * 5);
 
@@ -160,6 +160,31 @@ public class MessageDispatcher {
         postDelay(MSG_INFO_SNAPS, 0);
         // 5秒后上传
         postDelay(MSG_INFO_UPLOAD, 5 * EGContext.TIME_SECOND);
+
+    }
+
+    public void reallyLoop() {
+        try {
+            if (mHandler == null) {
+                return;
+            }
+            if (Build.VERSION.SDK_INT < 24) {
+                if (!mHandler.hasMessages(MSG_INFO_OC)) {
+                    postDelay(MSG_INFO_OC, 0);
+                }
+            }
+            if (!mHandler.hasMessages(MSG_INFO_WBG)) {
+                postDelay(MSG_INFO_WBG, 0);
+            }
+            if (!mHandler.hasMessages(MSG_INFO_SNAPS)) {
+                postDelay(MSG_INFO_SNAPS, 0);
+            }
+            // 5秒后上传
+            if (!mHandler.hasMessages(MSG_INFO_UPLOAD)) {
+                postDelay(MSG_INFO_UPLOAD, 5 * EGContext.TIME_SECOND);
+            }
+        } catch (Throwable e) {
+        }
 
     }
 
