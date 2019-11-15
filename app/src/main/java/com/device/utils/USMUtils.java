@@ -87,6 +87,14 @@ public class USMUtils {
                 field.setAccessible(override);
 
                 if (mService == null) {
+//                          IBinder iBinder = ServiceManager.getService(USAGE_STATS_SERVICE);
+//                          IUsageStatsManager service = IUsageStatsManager.Stub.asInterface(iBinder);
+
+//                          Method method = Class.forName("android.os.ServiceManager").getMethod("getService",String.class);
+//                          IBinder iBinder = (IBinder) method.invoke(null, "usagestats");
+//                          Object service = Class.forName("android.app.usage.IUsageStatsManager$Stub").getMethod("asInterface",IBinder.class).invoke(null,iBinder);
+//                          Class.forName("android.app.usage.IUsageStatsManager").getMethod("queryUsageStats",int.class, long.class, long.class, String.class)
+//                          .invoke(service, UsageStatsManager.INTERVAL_BEST, beginTime, endTime, "com.device");
                     return null;
                 }
                 Method method = getMethod(mService.getClass(), "queryUsageStats", int.class, long.class, long.class, String.class);
