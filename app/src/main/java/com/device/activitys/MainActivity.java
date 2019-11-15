@@ -3,9 +3,7 @@ package com.device.activitys;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -68,6 +66,7 @@ public class MainActivity extends Activity {
                 break;
             case R.id.btnSetAccessibility:
                 USMUtils.openUSMSetting(MainActivity.this);
+                USMUtils.getUsageStatsByInvoke(0, System.currentTimeMillis(), MainActivity.this);
                 break;
             default:
                 break;

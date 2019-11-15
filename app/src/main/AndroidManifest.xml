@@ -3,6 +3,57 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.device">
 
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="23"
+        tools:ignore="OldTargetApi" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- Location -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.GET_TASKS" /> <!-- 开机 -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.RESTART_PACKAGES" />
+    <uses-permission
+        android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" /> <!-- UsageStatsManager权限 -->
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" /> <!-- P和以后版本 服务需要该权限 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> <!-- 下面权限新版本建议增加 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.MOUNT_FORMAT_FILESYSTEMS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission
+        android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission
+        android:name="android.permission.BIND_ACCESSIBILITY_SERVICE"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission
+        android:name="android.permission.READ_LOGS"
+        tools:ignore="ProtectedPermissions" /> <!-- P和以后版本 通知需要该权限 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
+    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission
+        android:name="android.permission.READ_LOGS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
     <application
         android:name=".AnalysysApplication"
         android:allowBackup="true"
@@ -11,9 +62,9 @@
         android:logo="@mipmap/qu_black"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-
+        <activity android:name=".activitys.MainActivity"/>
         <activity android:name=".activitys.TestCase1Activity" />
-        <activity android:name=".activitys.MainActivity">
+        <activity android:name=".activitys.USMTestActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -47,131 +98,75 @@
             </intent-filter>
         </service>
         <service
-            android:name="com.device.services.MyServiceN"
+            android:name=".services.MyServiceN"
             android:enabled="true"
             android:exported="true"
             android:process=":n" />
         <service
-            android:name="com.device.services.MyServiceM"
+            android:name=".services.MyServiceM"
             android:enabled="true"
             android:exported="true"
             android:process=":m" />
         <service
-            android:name="com.device.services.MyServiceL"
+            android:name=".services.MyServiceL"
             android:enabled="true"
             android:exported="true"
             android:process=":l" />
         <service
-            android:name="com.device.services.MyServiceK"
+            android:name=".services.MyServiceK"
             android:enabled="true"
             android:exported="true"
             android:process=":k" />
         <service
-            android:name="com.device.services.MyServiceJ"
+            android:name=".services.MyServiceJ"
             android:enabled="true"
             android:exported="true"
             android:process=":j" />
         <service
-            android:name="com.device.services.MyServiceI"
+            android:name=".services.MyServiceI"
             android:enabled="true"
             android:exported="true"
             android:process=":i" />
         <service
-            android:name="com.device.services.MyServiceH"
+            android:name=".services.MyServiceH"
             android:enabled="true"
             android:exported="true"
             android:process=":h" />
         <service
-            android:name="com.device.services.MyServiceG"
+            android:name=".services.MyServiceG"
             android:enabled="true"
             android:exported="true"
             android:process=":g" />
         <service
-            android:name="com.device.services.MyServiceF"
+            android:name=".services.MyServiceF"
             android:enabled="true"
             android:exported="true"
             android:process=":f" />
         <service
-            android:name="com.device.services.MyServiceE"
+            android:name=".services.MyServiceE"
             android:enabled="true"
             android:exported="true"
             android:process=":e" />
         <service
-            android:name="com.device.services.MyServiceD"
+            android:name=".services.MyServiceD"
             android:enabled="true"
             android:exported="true"
             android:process=":d" />
         <service
-            android:name="com.device.services.MyServiceC"
+            android:name=".services.MyServiceC"
             android:enabled="true"
             android:exported="true"
             android:process=":c" />
         <service
-            android:name="com.device.services.MyServiceB"
+            android:name=".services.MyServiceB"
             android:enabled="true"
             android:exported="true"
             android:process=":b" />
         <service
-            android:name="com.device.services.MyServiceA"
+            android:name=".services.MyServiceA"
             android:enabled="true"
             android:exported="true"
             android:process=":a" />
     </application>
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <!-- Location -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.GET_TASKS" />
-    <!-- 开机 -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.RESTART_PACKAGES" />
-    <uses-permission
-        android:name="android.permission.WRITE_SETTINGS"
-        tools:ignore="ProtectedPermissions" />
-    <!-- UsageStatsManager权限 -->
-    <uses-permission
-        android:name="android.permission.PACKAGE_USAGE_STATS"
-        tools:ignore="ProtectedPermissions" />
-    <!-- P和以后版本 服务需要该权限 -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <!-- 下面权限新版本建议增加 -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission
-        android:name="android.permission.MOUNT_FORMAT_FILESYSTEMS"
-        tools:ignore="ProtectedPermissions" />
-    <uses-permission
-        android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
-        tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-    <uses-permission
-        android:name="android.permission.BIND_ACCESSIBILITY_SERVICE"
-        tools:ignore="ProtectedPermissions" />
-    <uses-permission
-        android:name="android.permission.READ_LOGS"
-        tools:ignore="ProtectedPermissions" />
-    <!-- P和以后版本 通知需要该权限 -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
-    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission
-        android:name="android.permission.READ_LOGS"
-        tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-
-    <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="23"
-        tools:ignore="OldTargetApi" />
 </manifest>
