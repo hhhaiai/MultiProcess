@@ -5,7 +5,7 @@
 '
 echo "clean android studio cache! "
 echo ">>>>you must close android studio<<<<"
-dir=("app" "dev-sdk" )
+dir=("app" "dev-sdk" "buildSrc")
 
 for element in ${dir[@]}
 do
@@ -15,7 +15,8 @@ do
     rm -rf $element/gen/
     rm -rf $element/.settings/
     rm -rf $element/.externalNativeBuild
-    rm -rf *.iml
+    rm -rf $element/$element.iml
+    rm -rf $element/.gradle
 done
 
 rm -rf build/

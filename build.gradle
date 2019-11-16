@@ -3,12 +3,8 @@
 buildscript {
 
     repositories {
-//        jcenter()
-//        mavenLocal()
-//        mavenCentral()
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
         jcenter { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-//        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         // for umeng
         maven { url 'https://dl.bintray.com/umsdk/release' }
         google()
@@ -19,18 +15,9 @@ buildscript {
 }
 
 allprojects {
-    gradle.projectsEvaluated {
-        tasks.withType(JavaCompile) {
-            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
-        }
-    }
     repositories {
-//        jcenter()
-//        mavenLocal()
-//        mavenCentral()
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
         jcenter { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-//        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         // for umeng
         maven { url 'https://dl.bintray.com/umsdk/release' }
         google()
