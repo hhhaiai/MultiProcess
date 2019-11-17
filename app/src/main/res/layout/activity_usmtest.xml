@@ -32,4 +32,15 @@
             android:layout_height="wrap_content"
             android:text="123" />
     </ScrollView>
+
+    <Button
+        android:id="@+id/btnClick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/button2"
+        android:layout_alignRight="@+id/button2"
+        android:layout_marginEnd="-107dp"
+        android:layout_marginRight="-107dp"
+        android:onClick="onClick"
+        android:text="手动测试" />
 </RelativeLayout>

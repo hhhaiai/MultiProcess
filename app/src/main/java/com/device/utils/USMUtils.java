@@ -8,6 +8,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Build;
+import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 
@@ -61,8 +62,7 @@ public class USMUtils {
         List<UsageStats> queryUsageStats = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             long ts = System.currentTimeMillis();
-            UsageStatsManager usageStatsManager = null;
-            usageStatsManager = (UsageStatsManager) context.getApplicationContext()
+            UsageStatsManager usageStatsManager = (UsageStatsManager) context.getApplicationContext()
                     .getSystemService(Context.USAGE_STATS_SERVICE);
 
             if (usageStatsManager != null) {
@@ -83,6 +83,7 @@ public class USMUtils {
                 }
                 boolean override = field.isAccessible();
                 field.setAccessible(true);
+                //android.app.usage.IUsageStatsManager$Stub$Proxy
                 Object mService = field.get(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE));
                 field.setAccessible(override);
 
@@ -90,21 +91,28 @@ public class USMUtils {
 //                          IBinder iBinder = ServiceManager.getService(USAGE_STATS_SERVICE);
 //                          IUsageStatsManager service = IUsageStatsManager.Stub.asInterface(iBinder);
 
-//                          Method method = Class.forName("android.os.ServiceManager").getMethod("getService",String.class);
-//                          IBinder iBinder = (IBinder) method.invoke(null, "usagestats");
+                    Method method = Class.forName("android.os.ServiceManager").getMethod("getService", String.class);
+                    IBinder iBinder = (IBinder) method.invoke(null, "usagestats");
+                    mService = Class.forName("android.app.usage.IUsageStatsManager$Stub").getMethod("asInterface", IBinder.class).invoke(null, iBinder);
 //                          Object service = Class.forName("android.app.usage.IUsageStatsManager$Stub").getMethod("asInterface",IBinder.class).invoke(null,iBinder);
 //                          Class.forName("android.app.usage.IUsageStatsManager").getMethod("queryUsageStats",int.class, long.class, long.class, String.class)
 //                          .invoke(service, UsageStatsManager.INTERVAL_BEST, beginTime, endTime, "com.device");
+//                    return null;
+                }
+                if (mService == null) {
+                    EL.e("mService is null");
                     return null;
                 }
                 Method method = getMethod(mService.getClass(), "queryUsageStats", int.class, long.class, long.class, String.class);
                 if (method == null) {
+                    EL.e("method is null");
                     return null;
                 }
                 override = method.isAccessible();
                 method.setAccessible(true);
                 List<String> pkgs = getAppPackageList(context);
                 if (pkgs == null) {
+                    EL.e("pkgs is null");
                     return null;
                 }
                 for (int i = 0; i < pkgs.size(); i++) {
@@ -137,6 +145,7 @@ public class USMUtils {
             }
         } catch (Throwable igone) {
             igone.printStackTrace();
+            EL.i(igone);
         }
         return null;
     }
@@ -148,6 +157,7 @@ public class USMUtils {
             List<String> strings = new ArrayList<>();
             for (int i = 0; i < packageInfo.size(); i++) {
                 strings.add(packageInfo.get(i).packageName);
+//                EL.i(packageInfo.get(i).packageName + "<------>" + packageInfo.get(i).applicationInfo.loadLabel(packageManager));
             }
             return strings;
         }

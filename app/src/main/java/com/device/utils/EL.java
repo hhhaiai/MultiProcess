@@ -2,6 +2,7 @@ package com.device.utils;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.BaseBundle;
@@ -10,10 +11,6 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
-
-import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.utils.SystemUtils;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -171,9 +168,7 @@ public class EL {
     }
 
     public static void init(Context context) {
-        if (EGContext.FLAG_DEBUG_INNER) {
-            mContext = EContextHelper.getContext(context);
-        }
+        mContext = EContextHelper.getContext(context);
     }
 
 
@@ -183,80 +178,67 @@ public class EL {
      */
     /*********************************************************************************************************/
     public static void v(Object... args) {
-        if (EGContext.FLAG_DEBUG_INNER) {
-            if (isShellControl) {
-                if (!Log.isLoggable(DEFAULT_TAG, Log.VERBOSE)) {
-                    Log.v(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "VERBOSE");
-                    return;
-                }
+        if (isShellControl) {
+            if (!Log.isLoggable(DEFAULT_TAG, Log.VERBOSE)) {
+                Log.v(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "VERBOSE");
+                return;
             }
-
-            parserArgsMain(MLEVEL.VERBOSE, args);
         }
 
+        parserArgsMain(MLEVEL.VERBOSE, args);
 
     }
 
     public static void d(Object... args) {
-        if (EGContext.FLAG_DEBUG_INNER) {
-            if (isShellControl) {
-                if (!Log.isLoggable(DEFAULT_TAG, Log.DEBUG)) {
-                    Log.d(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "DEBUG");
-                    return;
-                }
+        if (isShellControl) {
+            if (!Log.isLoggable(DEFAULT_TAG, Log.DEBUG)) {
+                Log.d(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "DEBUG");
+                return;
             }
-            parserArgsMain(MLEVEL.DEBUG, args);
         }
+        parserArgsMain(MLEVEL.DEBUG, args);
     }
 
     public static void i(Object... args) {
-        if (EGContext.FLAG_DEBUG_INNER) {
-            if (isShellControl) {
-                if (!Log.isLoggable(DEFAULT_TAG, Log.INFO)) {
-                    Log.i(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "INFO");
-                    return;
-                }
+        if (isShellControl) {
+            if (!Log.isLoggable(DEFAULT_TAG, Log.INFO)) {
+                Log.i(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "INFO");
+                return;
             }
-            parserArgsMain(MLEVEL.INFO, args);
         }
+        parserArgsMain(MLEVEL.INFO, args);
     }
 
 
     public static void w(Object... args) {
-        if (EGContext.FLAG_DEBUG_INNER) {
-            if (isShellControl) {
-                if (!Log.isLoggable(DEFAULT_TAG, Log.WARN)) {
-                    Log.w(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "WARN");
-                    return;
-                }
+        if (isShellControl) {
+            if (!Log.isLoggable(DEFAULT_TAG, Log.WARN)) {
+                Log.w(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "WARN");
+                return;
             }
-
-            parserArgsMain(MLEVEL.WARN, args);
         }
+
+        parserArgsMain(MLEVEL.WARN, args);
     }
 
     public static void e(Object... args) {
-        if (EGContext.FLAG_DEBUG_INNER) {
-            if (isShellControl) {
-                if (!Log.isLoggable(DEFAULT_TAG, Log.ERROR)) {
-                    Log.e(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "ERROR");
-                    return;
-                }
+        if (isShellControl) {
+            if (!Log.isLoggable(DEFAULT_TAG, Log.ERROR)) {
+                Log.e(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "ERROR");
+                return;
             }
-            parserArgsMain(MLEVEL.ERROR, args);
         }
+        parserArgsMain(MLEVEL.ERROR, args);
     }
 
     public static void wtf(Object... args) {
-        if (EGContext.FLAG_DEBUG_INNER) {
-            if (isShellControl) {
-                if (!Log.isLoggable(DEFAULT_TAG, Log.ASSERT)) {
-                    Log.wtf(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "ASSERT");
-                    return;
-                }
+        if (isShellControl) {
+            if (!Log.isLoggable(DEFAULT_TAG, Log.ASSERT)) {
+                Log.wtf(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "ASSERT");
+                return;
             }
-            parserArgsMain(MLEVEL.WTF, args);
         }
+        parserArgsMain(MLEVEL.WTF, args);
     }
 
 
@@ -269,113 +251,111 @@ public class EL {
      * @param args
      */
     private static void parserArgsMain(int level, Object[] args) {
-        if (EGContext.FLAG_DEBUG_INNER) {
-            try {
-                String tag = DEFAULT_TAG;
-                if (!DEV_DEBUG) {
-                    Log.e(DEFAULT_TAG, "请确认Log工具类已经设置打印!");
-                    return;
+        try {
+            String tag = DEFAULT_TAG;
+            if (!DEV_DEBUG) {
+                Log.e(DEFAULT_TAG, "请确认Log工具类已经设置打印!");
+                return;
+            }
+            StringBuilder sb = new StringBuilder();
+            // 开始
+            if (isFormat) {
+                sb.append("\n");
+            }
+            String stackinfo = getCallStaceInfo();
+            if (!TextUtils.isEmpty(stackinfo)) {
+                if (isNeedCallstackInfo) {
+                    sb.append(stackinfo).append("\n");
+                } else {
+                    sb.append(stackinfo);
                 }
-                StringBuilder sb = new StringBuilder();
-                // 开始
-                if (isFormat) {
-                    sb.append("\n");
-                }
-                String stackinfo = getCallStaceInfo();
-                if (!TextUtils.isEmpty(stackinfo)) {
-                    if (isNeedCallstackInfo) {
-                        sb.append(stackinfo).append("\n");
-                    } else {
-                        sb.append(stackinfo);
+            }
+
+            if (args[0] instanceof String) {
+                // if (isNeedWrapper) {
+                // sb.append(content_title_info_log).append("\n");
+                // }
+                String one = (String) args[0];
+                // 解析fromat
+                if (one.contains(String.valueOf(FORMATER)) && args.length > 1) {
+
+                    /*
+                     * 参数解析
+                     */
+                    Object[] temp = new Object[args.length - 1];
+                    for (int i = 1; i < args.length; i++) {
+                        temp[i - 1] = args[i];
                     }
-                }
 
-                if (args[0] instanceof String) {
-                    // if (isNeedWrapper) {
-                    // sb.append(content_title_info_log).append("\n");
-                    // }
-                    String one = (String) args[0];
-                    // 解析fromat
-                    if (one.contains(String.valueOf(FORMATER)) && args.length > 1) {
+                    Matcher m = mPattern.matcher(one);
+                    int count = 0;
+                    while (m.find()) {
+                        count++;
+                    }
 
-                        /*
-                         * 参数解析
-                         */
-                        Object[] temp = new Object[args.length - 1];
-                        for (int i = 1; i < args.length; i++) {
-                            temp[i - 1] = args[i];
+                    /**
+                     * %和后面参数一样，则格式化，否则不进行格式化
+                     */
+                    if (count == temp.length) {
+                        // 格式化操作
+                        String log = String.format(Locale.getDefault(), one, temp);
+                        if (isNeedWrapper) {
+                            sb.append(content_title_info_log).append("\n");
                         }
-
-                        Matcher m = mPattern.matcher(one);
-                        int count = 0;
-                        while (m.find()) {
-                            count++;
-                        }
-
-                        /**
-                         * %和后面参数一样，则格式化，否则不进行格式化
-                         */
-                        if (count == temp.length) {
-                            // 格式化操作
-                            String log = String.format(Locale.getDefault(), one, temp);
-                            if (isNeedWrapper) {
-                                sb.append(content_title_info_log).append("\n");
-                            }
-                            sb.append(wrapperString(log)).append("\n");
-                        } else {
-                            if (isNeedWrapper) {
-                                sb.append(content_title_info_log).append("\n");
-                            }
-                            StringBuilder tempSB = new StringBuilder();
-                            for (Object obj : args) {
-                                // 解析成字符串,添加
-                                String tempStr = objectToString(obj);
-                                // Log.i(DEFAULT_TAG, "tempStr:" + tempStr);
-                                if (!TextUtils.isEmpty(tempStr)) {
-                                    // sb.append(nativeWrapperString(temp)).append("\n");
-                                    tempSB.append(tempStr).append("\t");
-                                }
-                            }
-                            sb.append(wrapperString(tempSB.toString())).append("\n");
-                        }
+                        sb.append(wrapperString(log)).append("\n");
                     } else {
-                        // 不符合format规则数据
-                        if (args.length > 1) {
-                            // 大于一次参数，第一个参数是字符串，默认是tag
-                            String log = processTagCase(args);
-                            if (!TextUtils.isEmpty(log)) {
-                                sb.append(wrapperString(log)).append("\n");
-                            } else {
-                                // 需要支持打印""或者null
-                                sb.append(wrapperString("")).append("\n");
-                            }
-                        } else {
-                            if (isNeedWrapper) {
-                                sb.append(content_title_info_log).append("\n");
-                            }
-                            sb.append(wrapperString(one)).append("\n");
+                        if (isNeedWrapper) {
+                            sb.append(content_title_info_log).append("\n");
                         }
+                        StringBuilder tempSB = new StringBuilder();
+                        for (Object obj : args) {
+                            // 解析成字符串,添加
+                            String tempStr = objectToString(obj);
+                            // Log.i(DEFAULT_TAG, "tempStr:" + tempStr);
+                            if (!TextUtils.isEmpty(tempStr)) {
+                                // sb.append(nativeWrapperString(temp)).append("\n");
+                                tempSB.append(tempStr).append("\t");
+                            }
+                        }
+                        sb.append(wrapperString(tempSB.toString())).append("\n");
                     }
                 } else {
-
-                    for (Object obj : args) {
-                        // 解析成字符串,添加
-                        String temp = processObjectCase(obj);
-                        // Log.i(DEFAULT_TAG, "temp:" + temp);
-                        if (!TextUtils.isEmpty(temp)) {
-                            // sb.append(nativeWrapperString(temp)).append("\n");
-                            sb.append(temp).append("\n");
+                    // 不符合format规则数据
+                    if (args.length > 1) {
+                        // 大于一次参数，第一个参数是字符串，默认是tag
+                        String log = processTagCase(args);
+                        if (!TextUtils.isEmpty(log)) {
+                            sb.append(wrapperString(log)).append("\n");
+                        } else {
+                            // 需要支持打印""或者null
+                            sb.append(wrapperString("")).append("\n");
                         }
+                    } else {
+                        if (isNeedWrapper) {
+                            sb.append(content_title_info_log).append("\n");
+                        }
+                        sb.append(wrapperString(one)).append("\n");
                     }
                 }
-                // 结束,标记结束符
-                if (isNeedWrapper) {
-                    sb.append(content_title_end);
+            } else {
+
+                for (Object obj : args) {
+                    // 解析成字符串,添加
+                    String temp = processObjectCase(obj);
+                    // Log.i(DEFAULT_TAG, "temp:" + temp);
+                    if (!TextUtils.isEmpty(temp)) {
+                        // sb.append(nativeWrapperString(temp)).append("\n");
+                        sb.append(temp).append("\n");
+                    }
                 }
-                // 打印字符
-                preparePrint(tag, level, sb.toString());
-            } catch (Throwable e) {
             }
+            // 结束,标记结束符
+            if (isNeedWrapper) {
+                sb.append(content_title_end);
+            }
+            // 打印字符
+            preparePrint(tag, level, sb.toString());
+        } catch (Throwable e) {
         }
     }
 
@@ -511,7 +491,7 @@ public class EL {
                                     .append(wrapperString(cc));
                         } else {
                             sb.append("\n").append(content_title_begin).append("\n").append(CONTENT_LINE)
-                                    .append(String.format(content_simple_callstack, SystemUtils.getCurrentProcessName(EContextHelper.getContext(mContext)), ste.getClassName(),
+                                    .append(String.format(content_simple_callstack, getCurrentProcessName(EContextHelper.getContext(mContext)), ste.getClassName(),
                                             ste.getMethodName(), ste.getLineNumber()));
                             // 上一层会处理
                             // .append("\n");
@@ -525,7 +505,7 @@ public class EL {
                                     .append("Native方法:" + (!ste.isNativeMethod() ? "不是" : "是")).append("\n")
                                     .append("调用堆栈详情:").append("\n").append(wrapperString(cc));
                         } else {
-                            sb.append(String.format(content_simple_callstack, SystemUtils.getCurrentProcessName(EContextHelper.getContext(mContext)), ste.getClassName(),
+                            sb.append(String.format(content_simple_callstack, getCurrentProcessName(EContextHelper.getContext(mContext)), ste.getClassName(),
                                     ste.getMethodName(), ste.getLineNumber()));
                         }
                     }
@@ -1449,4 +1429,23 @@ public class EL {
         public static final int WTF = 0x6;
     }
 
+    /**
+     * 获取当前进程的名称
+     *
+     * @param context
+     * @return
+     */
+    public static String getCurrentProcessName(Context context) {
+        try {
+            int pid = android.os.Process.myPid();
+            ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            for (ActivityManager.RunningAppProcessInfo info : am.getRunningAppProcesses()) {
+                if (info.pid == pid) {
+                    return info.processName;
+                }
+            }
+        } catch (Throwable e) {
+        }
+        return "";
+    }
 }
