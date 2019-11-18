@@ -364,6 +364,8 @@ public class UploadKey {
         public static final String RES_POLICY_FAIL_TRY_DELAY = "failTryDelay";
         // 客户端上传时间间隔
         public static final String RES_POLICY_TIMER_INTERVAL = "timerInterval";
+        // extras
+        public static final String RES_POLICY_EXTRAS = "extras";
 //    // 是否使用实时策略， 1不使用 0使用
 //    public static final String RES_POLICY_USE_RTP = "useRTP";
 //    // 是否实时上传[非实时分析策略下，是否实时上传] 0不实时上传，1实时上传
