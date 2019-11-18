@@ -23,7 +23,6 @@ public class EGContext {
     public static String LOGTAG_INNER;
     public static boolean FLAG_DEBUG_USER = false;
 
-    public static final String KEY_ACTION_SCREEN_ON_SIZE = "SCREEN_ON_SIZE";
 
     /**
      * 广播相关
