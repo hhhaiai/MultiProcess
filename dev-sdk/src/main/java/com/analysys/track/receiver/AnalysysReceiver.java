@@ -8,12 +8,14 @@ import android.text.TextUtils;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.hotfix.HotFixTransformCancel;
 import com.analysys.track.hotfix.HotFixTransform;
+import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.ReceiverImpl;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.sp.SPHelper;
 import com.analysys.track.utils.MClipManager;
 import com.analysys.track.utils.sp.SPHelper;
 
