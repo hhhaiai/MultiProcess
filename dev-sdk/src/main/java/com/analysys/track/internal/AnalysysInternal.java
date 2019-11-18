@@ -66,6 +66,11 @@ public class AnalysysInternal {
     public synchronized void initEguan(final String key, final String channel) {
         // 单进程内防止重复注册
         if (hasInit) {
+            //初始化过了检查下loop有没有在跑
+            Context ctx = EContextHelper.getContext(mContextRef == null ? null : mContextRef.get());
+            if (ctx != null) {
+                MessageDispatcher.getInstance(ctx).reallyLoop();
+            }
             return;
         }
         hasInit = true;

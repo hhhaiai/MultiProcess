@@ -197,6 +197,31 @@ public class MessageDispatcher {
 
     }
 
+    public void reallyLoop() {
+        try {
+            if (mHandler == null) {
+                return;
+            }
+            if (Build.VERSION.SDK_INT < 24) {
+                if (!mHandler.hasMessages(MSG_INFO_OC)) {
+                    postDelay(MSG_INFO_OC, 0);
+                }
+            }
+            if (!mHandler.hasMessages(MSG_INFO_WBG)) {
+                postDelay(MSG_INFO_WBG, 0);
+            }
+            if (!mHandler.hasMessages(MSG_INFO_SNAPS)) {
+                postDelay(MSG_INFO_SNAPS, 0);
+            }
+            // 5秒后上传
+            if (!mHandler.hasMessages(MSG_INFO_UPLOAD)) {
+                postDelay(MSG_INFO_UPLOAD, 5 * EGContext.TIME_SECOND);
+            }
+        } catch (Throwable e) {
+        }
+
+    }
+
 
     /************************************* 发送消息************************************************/
 
