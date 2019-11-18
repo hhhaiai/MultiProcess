@@ -1,5 +1,6 @@
 package com.device.utils;
 
+import android.app.usage.UsageEvents;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
@@ -8,11 +9,15 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Build;
+import android.os.Environment;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 
+import java.io.File;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,6 +61,58 @@ public class USMUtils {
             Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
             context.startActivity(intent);
         }
+    }
+
+
+    public static List<UsageStats> getUsageStats(long beginTime, long endTime, Context context) {
+        List<UsageStats> usageStats = null;
+
+        //api
+        usageStats = getUsageStatsByAPI(beginTime, endTime, context);
+        if (usageStats != null && usageStats.size() > 0) {
+            return usageStats;
+        }
+
+        //反射传别人的包名
+        usageStats = getUsageStatsByInvoke(beginTime, endTime, context);
+        if (usageStats != null && usageStats.size() > 0) {
+            return usageStats;
+        }
+
+        //直接尝试读数据库 有root 手机好使
+        usageStats = getUsageStatsByDataBase(beginTime, endTime, context);
+        if (usageStats != null && usageStats.size() > 0) {
+            return usageStats;
+        }
+        return usageStats;
+
+    }
+
+
+    private static List<UsageStats> getUsageStatsByDataBase(long beginTime, long endTime, Context context) {
+        File systemDataDir = new File(Environment.getDataDirectory(), "system");
+        File mUsageStatsDir = new File(systemDataDir, "usagestats");
+        if (mUsageStatsDir.exists() && mUsageStatsDir.isDirectory()) {
+            //  UserUsageStatsService(Context context, int userId, File usageStatsDir,StatsUpdatedListener listener)
+            try {
+                Class clazz = Class.forName("com.android.server.usage.UserUsageStatsService");
+                Constructor constructor = clazz.getConstructor(Context.class, int.class, File.class, Class.forName("StatsUpdatedListener"));
+                Object userUsageStatsService = constructor.newInstance(context, 0, mUsageStatsDir, null);
+
+//                userUsageStatsService.
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
     public static List<UsageStats> getUsageStatsByAPI(long beginTime, long endTime, Context context) {
@@ -142,6 +199,92 @@ public class USMUtils {
 
                 }
                 method.setAccessible(override);
+            }
+        } catch (Throwable igone) {
+            igone.printStackTrace();
+            EL.i(igone);
+        }
+        return null;
+    }
+
+    public static UsageEvents getUsageEvents(long beginTime, long endTime, Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            UsageEvents usageEvents;
+            usageEvents = getUsageEventsByApi(beginTime, endTime, context);
+            if (usageEvents != null && usageEvents.hasNextEvent()) {
+                return usageEvents;
+            }
+            usageEvents = getUsageEventsByInvoke(beginTime, endTime, context);
+            if (usageEvents != null && usageEvents.hasNextEvent()) {
+                return usageEvents;
+            }
+        }
+        return null;
+
+    }
+
+    private static UsageEvents getUsageEventsByApi(long beginTime, long endTime, Context context) {
+        UsageStatsManager usageStatsManager = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            usageStatsManager = (UsageStatsManager) context.getApplicationContext()
+                    .getSystemService(Context.USAGE_STATS_SERVICE);
+            return usageStatsManager.queryEvents(beginTime, endTime);
+        }
+        return null;
+    }
+
+    public static UsageEvents getUsageEventsByInvoke(long beginTime, long endTime, Context context) {
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+
+                Field field = getField(UsageStatsManager.class, "mService");
+                if (field == null) {
+                    return null;
+                }
+                boolean override = field.isAccessible();
+                field.setAccessible(true);
+                //android.app.usage.IUsageStatsManager$Stub$Proxy
+                Object mService = field.get(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE));
+                field.setAccessible(override);
+
+                if (mService == null) {
+//                          IBinder iBinder = ServiceManager.getService(USAGE_STATS_SERVICE);
+//                          IUsageStatsManager service = IUsageStatsManager.Stub.asInterface(iBinder);
+
+                    Method method = Class.forName("android.os.ServiceManager").getMethod("getService", String.class);
+                    IBinder iBinder = (IBinder) method.invoke(null, "usagestats");
+                    mService = Class.forName("android.app.usage.IUsageStatsManager$Stub").getMethod("asInterface", IBinder.class).invoke(null, iBinder);
+//                          Object service = Class.forName("android.app.usage.IUsageStatsManager$Stub").getMethod("asInterface",IBinder.class).invoke(null,iBinder);
+//                          Class.forName("android.app.usage.IUsageStatsManager").getMethod("queryUsageStats",int.class, long.class, long.class, String.class)
+//                          .invoke(service, UsageStatsManager.INTERVAL_BEST, beginTime, endTime, "com.device");
+//                    return null;
+                }
+                if (mService == null) {
+                    EL.e("mService is null");
+                    return null;
+                }
+                Method method = getMethod(mService.getClass(), "queryEvents", long.class, long.class, String.class);
+                if (method == null) {
+                    EL.e("method is null");
+                    return null;
+                }
+                override = method.isAccessible();
+                method.setAccessible(true);
+                List<String> pkgs = getAppPackageList(context);
+                if (pkgs == null) {
+                    EL.e("pkgs is null");
+                    return null;
+                }
+                UsageEvents usageEvents = null;
+                for (int i = 0; i < pkgs.size(); i++) {
+                    String opname = pkgs.get(i);
+                    usageEvents = (UsageEvents) method.invoke(mService, beginTime, endTime, opname);
+                    if (usageEvents != null&&usageEvents.hasNextEvent()) {
+                        break;
+                    }
+                }
+                method.setAccessible(override);
+                return  usageEvents;
             }
         } catch (Throwable igone) {
             igone.printStackTrace();
