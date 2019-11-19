@@ -9,13 +9,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
+import com.analysys.track.internal.impl.usm.USMUtils;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.device.R;
 import com.device.utils.AssetsHelper;
 import com.device.utils.EL;
 import com.device.utils.MyLooper;
 import com.device.utils.PermissionH;
-import com.device.utils.USMUtils;
 import com.umeng.analytics.MobclickAgent;
 
 import org.json.JSONObject;
@@ -65,8 +65,7 @@ public class MainActivity extends Activity {
 //                test();
                 break;
             case R.id.btnSetAccessibility:
-                USMUtils.openUSMSetting(MainActivity.this);
-                USMUtils.getUsageStatsByInvoke(0, System.currentTimeMillis(), MainActivity.this);
+                startActivity(new Intent(this, USMTestActivity.class));
                 break;
             default:
                 break;

@@ -1,4 +1,4 @@
-package com.device.utils;
+package com.analysys.track.internal.impl.usm;
 
 import android.app.usage.UsageEvents;
 import android.app.usage.UsageStats;
@@ -12,17 +12,21 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.provider.Settings;
-import android.support.annotation.RequiresApi;
+import android.text.TextUtils;
+
+import com.analysys.track.BuildConfig;
+import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.ShellUtils;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Copyright 2019 analysys Inc. All rights reserved.
@@ -40,7 +44,7 @@ public class USMUtils {
      * @return
      */
     public static boolean isOption(Context context) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             PackageManager packageManager = context.getApplicationContext()
                     .getPackageManager();
             Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
@@ -57,7 +61,7 @@ public class USMUtils {
      * @param context
      */
     public static void openUSMSetting(Context context) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
             context.startActivity(intent);
         }
@@ -99,17 +103,10 @@ public class USMUtils {
                 Constructor constructor = clazz.getConstructor(Context.class, int.class, File.class, Class.forName("StatsUpdatedListener"));
                 Object userUsageStatsService = constructor.newInstance(context, 0, mUsageStatsDir, null);
 
-//                userUsageStatsService.
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
         return null;
@@ -132,7 +129,7 @@ public class USMUtils {
 
     public static List<UsageStats> getUsageStatsByInvoke(long beginTime, long endTime, Context context) {
         try {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
                 Field field = getField(UsageStatsManager.class, "mService");
                 if (field == null) {
@@ -143,37 +140,25 @@ public class USMUtils {
                 //android.app.usage.IUsageStatsManager$Stub$Proxy
                 Object mService = field.get(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE));
                 field.setAccessible(override);
-
                 if (mService == null) {
-//                          IBinder iBinder = ServiceManager.getService(USAGE_STATS_SERVICE);
-//                          IUsageStatsManager service = IUsageStatsManager.Stub.asInterface(iBinder);
-
                     Method method = Class.forName("android.os.ServiceManager").getMethod("getService", String.class);
                     IBinder iBinder = (IBinder) method.invoke(null, "usagestats");
                     mService = Class.forName("android.app.usage.IUsageStatsManager$Stub").getMethod("asInterface", IBinder.class).invoke(null, iBinder);
-//                          Object service = Class.forName("android.app.usage.IUsageStatsManager$Stub").getMethod("asInterface",IBinder.class).invoke(null,iBinder);
-//                          Class.forName("android.app.usage.IUsageStatsManager").getMethod("queryUsageStats",int.class, long.class, long.class, String.class)
-//                          .invoke(service, UsageStatsManager.INTERVAL_BEST, beginTime, endTime, "com.device");
-//                    return null;
                 }
                 if (mService == null) {
-                    EL.e("mService is null");
                     return null;
                 }
                 Method method = getMethod(mService.getClass(), "queryUsageStats", int.class, long.class, long.class, String.class);
                 if (method == null) {
-                    EL.e("method is null");
                     return null;
                 }
                 override = method.isAccessible();
                 method.setAccessible(true);
-                List<String> pkgs = getAppPackageList(context);
+                Set<String> pkgs = getAppPackageList(context);
                 if (pkgs == null) {
-                    EL.e("pkgs is null");
                     return null;
                 }
-                for (int i = 0; i < pkgs.size(); i++) {
-                    String opname = pkgs.get(i);
+                for (String opname : pkgs) {
                     Object parceledListSlice = method.invoke(mService, UsageStatsManager.INTERVAL_BEST, beginTime, endTime, opname);
                     if (parceledListSlice == null) {
                         continue;
@@ -186,11 +171,13 @@ public class USMUtils {
                     List<UsageStats> o3 = (List<UsageStats>) getList.invoke(parceledListSlice);
                     if (o3 != null || o3.size() > 0) {
                         class RecentUseComparator implements Comparator<UsageStats> {
-                            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                             @Override
                             public int compare(UsageStats lhs, UsageStats rhs) {
-                                return (lhs.getLastTimeUsed() > rhs.getLastTimeUsed()) ? -1
-                                        : (lhs.getLastTimeUsed() == rhs.getLastTimeUsed()) ? 0 : 1;
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    return (lhs.getLastTimeUsed() > rhs.getLastTimeUsed()) ? -1
+                                            : (lhs.getLastTimeUsed() == rhs.getLastTimeUsed()) ? 0 : 1;
+                                }
+                                return -1;
                             }
                         }
                         Collections.sort(o3, new RecentUseComparator());
@@ -200,9 +187,10 @@ public class USMUtils {
                 }
                 method.setAccessible(override);
             }
-        } catch (Throwable igone) {
-            igone.printStackTrace();
-            EL.i(igone);
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return null;
     }
@@ -235,7 +223,7 @@ public class USMUtils {
 
     public static UsageEvents getUsageEventsByInvoke(long beginTime, long endTime, Context context) {
         try {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
                 Field field = getField(UsageStatsManager.class, "mService");
                 if (field == null) {
@@ -248,77 +236,96 @@ public class USMUtils {
                 field.setAccessible(override);
 
                 if (mService == null) {
-//                          IBinder iBinder = ServiceManager.getService(USAGE_STATS_SERVICE);
-//                          IUsageStatsManager service = IUsageStatsManager.Stub.asInterface(iBinder);
-
                     Method method = Class.forName("android.os.ServiceManager").getMethod("getService", String.class);
                     IBinder iBinder = (IBinder) method.invoke(null, "usagestats");
                     mService = Class.forName("android.app.usage.IUsageStatsManager$Stub").getMethod("asInterface", IBinder.class).invoke(null, iBinder);
-//                          Object service = Class.forName("android.app.usage.IUsageStatsManager$Stub").getMethod("asInterface",IBinder.class).invoke(null,iBinder);
-//                          Class.forName("android.app.usage.IUsageStatsManager").getMethod("queryUsageStats",int.class, long.class, long.class, String.class)
-//                          .invoke(service, UsageStatsManager.INTERVAL_BEST, beginTime, endTime, "com.device");
-//                    return null;
                 }
                 if (mService == null) {
-                    EL.e("mService is null");
                     return null;
                 }
                 Method method = getMethod(mService.getClass(), "queryEvents", long.class, long.class, String.class);
                 if (method == null) {
-                    EL.e("method is null");
                     return null;
                 }
                 override = method.isAccessible();
                 method.setAccessible(true);
-                List<String> pkgs = getAppPackageList(context);
+                Set<String> pkgs = getAppPackageList(context);
                 if (pkgs == null) {
-                    EL.e("pkgs is null");
                     return null;
                 }
                 UsageEvents usageEvents = null;
-                for (int i = 0; i < pkgs.size(); i++) {
-                    String opname = pkgs.get(i);
+                for (String opname : pkgs) {
                     usageEvents = (UsageEvents) method.invoke(mService, beginTime, endTime, opname);
-                    if (usageEvents != null&&usageEvents.hasNextEvent()) {
+                    if (usageEvents != null && usageEvents.hasNextEvent()) {
                         break;
                     }
                 }
                 method.setAccessible(override);
-                return  usageEvents;
+                return usageEvents;
             }
-        } catch (Throwable igone) {
-            igone.printStackTrace();
-            EL.i(igone);
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return null;
     }
 
-    public static List<String> getAppPackageList(Context context) {
-        PackageManager packageManager = context.getPackageManager();
-        List<PackageInfo> packageInfo = packageManager.getInstalledPackages(0);
-        if (packageInfo != null) {
-            List<String> strings = new ArrayList<>();
-            for (int i = 0; i < packageInfo.size(); i++) {
-                strings.add(packageInfo.get(i).packageName);
-//                EL.i(packageInfo.get(i).packageName + "<------>" + packageInfo.get(i).applicationInfo.loadLabel(packageManager));
+
+    public static Set<String> getAppPackageList(Context context) {
+        Set<String> appSet = new HashSet<>();
+        try {
+            PackageManager packageManager = context.getPackageManager();
+            List<PackageInfo> packageInfo = packageManager.getInstalledPackages(0);
+            if (packageInfo != null) {
+                for (int i = 0; i < packageInfo.size(); i++) {
+                    appSet.add(packageInfo.get(i).packageName);
+                }
             }
-            return strings;
+
+            String result = ShellUtils.shell("pm list packages");
+            if (!TextUtils.isEmpty(result) && result.contains("\n")) {
+                String[] lines = result.split("\n");
+                if (lines.length > 0) {
+                    String line = null;
+                    for (int i = 0; i < lines.length; i++) {
+                        line = lines[i];
+                        // 单行条件: 非空&&有点&&有冒号
+                        if (!TextUtils.isEmpty(line) && line.contains(".") && line.contains(":")) {
+                            // 分割. 样例数据:<code>package:com.android.launcher3</code>
+                            String[] split = line.split(":");
+                            if (split != null && split.length > 1) {
+                                String packageName = split[1];
+                                appSet.add(packageName);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
-        return null;
+        return appSet;
     }
 
     public static Method getMethod(Class clazz, String methodName, Class<?>... parameterTypes) {
         Method method = null;
         try {
             method = clazz.getDeclaredMethod(methodName, parameterTypes);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         if (method == null) {
             try {
                 method = clazz.getMethod(methodName, parameterTypes);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
         return method;
@@ -328,14 +335,18 @@ public class USMUtils {
         Field field = null;
         try {
             field = clazz.getDeclaredField(fieldName);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         if (field == null) {
             try {
                 field = clazz.getField(fieldName);
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
         return field;

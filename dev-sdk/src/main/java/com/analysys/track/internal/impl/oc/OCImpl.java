@@ -19,6 +19,7 @@ import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
+import com.analysys.track.internal.impl.usm.USMImpl;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.utils.AccessibilityHelper;
@@ -30,7 +31,6 @@ import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PermissionUtils;
-import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.data.Base64Utils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -40,15 +40,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @Copyright 2019 sanbo Inc. All rights reserved.
@@ -136,6 +133,12 @@ public class OCImpl {
                     if (!isAllowOC && !isAllowXXX) {
                         if (EGContext.DEBUG_OC) {
                             ELOG.d(EGContext.TAG_OC, " 屏幕不亮 且不锁屏，不需要采集OC和XXX，即将停止工作");
+                        }
+                        return;
+                    }
+                    if (USMImpl.isUSMAvailable(mContext)) {
+                        if (EGContext.DEBUG_OC) {
+                            ELOG.d(EGContext.TAG_OC, "辅助功能可用 , 停止OC工作");
                         }
                         return;
                     }
