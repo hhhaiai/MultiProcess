@@ -10,6 +10,7 @@ import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.net.NetInfo;
+import com.analysys.track.internal.impl.usm.USMImpl;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.DeflterCompressUtils;
 import com.analysys.track.utils.ELOG;
@@ -343,6 +344,13 @@ public class UploadImpl {
                     }
                 } else {
                     TableProcess.getInstance(mContext).deleteNet();
+                }
+            }
+            //组装USM数据
+            if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM, true)) {
+                JSONArray usmJson = USMImpl.getUSMInfo(mContext);
+                if (usmJson != null && usmJson.length() > 0) {
+                    object.putOpt(UploadKey.USMInfo.NAME, usmJson);
                 }
             }
         } catch (Throwable e) {
