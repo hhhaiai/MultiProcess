@@ -68,7 +68,7 @@ public class USMImpl {
                     }
                     if (openEvent == null) {
                         openEvent = new USMInfo(event.getTimeStamp(), event.getPackageName());
-                        openEvent.setCollectionType("4");
+                        openEvent.setCollectionType("5");
                         openEvent.setNetType(NetworkUtils.getNetworkType(context));
                         openEvent.setApplicationType(AppSnapshotImpl.getInstance(context)
                                 .getAppType(event.getPackageName()));
