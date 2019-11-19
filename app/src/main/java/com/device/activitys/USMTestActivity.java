@@ -7,7 +7,6 @@ import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -20,12 +19,12 @@ import com.device.R;
 import com.device.utils.EL;
 import com.device.utils.USMUtils;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -66,91 +65,27 @@ public class USMTestActivity extends Activity {
         builder.append("包名数:").append(stringList.size()).append("\n\n\n\n").append("---------\n");
 
         UsageEvents usageStats = USMUtils.getUsageEvents(System.currentTimeMillis() - 3600 * 1000, System.currentTimeMillis(), this);
-        List<UsageEvents.Event> events = new ArrayList<>();
         if (usageStats != null) {
+            JSONArray jsonArray = new JSONArray();
+            OCInfo openEvent = null;
             while (usageStats.hasNextEvent()) {
                 UsageEvents.Event event = new UsageEvents.Event();
                 usageStats.getNextEvent(event);
-                events.add(event);
+                if (openEvent == null) {
+                    openEvent = new OCInfo(event.getTimeStamp(), event.getPackageName());
+                } else {
+                    if (!openEvent.getPkgName().equals(event.getPackageName())) {
+                        openEvent.setCloseTime(event.getTimeStamp());
+                        jsonArray.put(openEvent.toJson());
+                    }
+                }
             }
-        }
-
-        class RecentUseComparator implements Comparator<UsageEvents.Event> {
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-            @Override
-            public int compare(UsageEvents.Event lhs, UsageEvents.Event rhs) {
-                return (lhs.getTimeStamp() > rhs.getTimeStamp()) ? -1
-                        : (lhs.getTimeStamp() == rhs.getTimeStamp()) ? 0 : 1;
-            }
-        }
-        Collections.sort(events, new RecentUseComparator());
-
-        for (int i = 0; i < events.size(); i++) {
             try {
-                UsageEvents.Event event = events.get(i);
-                builder.append(event.getPackageName()).append("|").append(packageManager.getPackageInfo(event.getPackageName(), 0).applicationInfo.loadLabel(packageManager)).append("\n");
-                builder.append("\t[").append("TimeStamp:").append(dateFormat.format(event.getTimeStamp())).append("]\n");
-                builder.append("\t[").append("ClassName:").append(event.getClassName()).append("]\n");
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-                    builder.append("\t[").append("ShortcutId:").append(event.getShortcutId()).append("]\n");
-                }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    builder.append("\t[").append("AppStandbyBucket:").append(event.getAppStandbyBucket()).append("]\n");
-                }
-                Configuration configuration = event.getConfiguration();
-                if (configuration != null) {
-                    builder.append("\t[").append("Configuration:").append(configuration.toString()).append("]\n");
-                }
-
-                String typeString = null;
-                switch (event.getEventType()) {
-                    case UsageEvents.Event.NONE:
-                        typeString = "NONE: ";
-                        break;
-                    case UsageEvents.Event.ACTIVITY_RESUMED:
-                        typeString = "ACTIVITY_RESUMED: ";
-                        break;
-                    case UsageEvents.Event.ACTIVITY_STOPPED:
-                        typeString = "ACTIVITY_STOPPED: ";
-                        break;
-                    case UsageEvents.Event.ACTIVITY_PAUSED:
-                        typeString = "ACTIVITY_PAUSED: ";
-                        break;
-                    case UsageEvents.Event.CONFIGURATION_CHANGE:
-                        typeString = "CONFIGURATION_CHANGE: ";
-                        break;
-                    case UsageEvents.Event.DEVICE_SHUTDOWN:
-                        typeString = "DEVICE_SHUTDOWN: ";
-                        break;
-                    case UsageEvents.Event.DEVICE_STARTUP:
-                        typeString = "DEVICE_STARTUP: ";
-                        break;
-                    case UsageEvents.Event.FOREGROUND_SERVICE_START:
-                        typeString = "FOREGROUND_SERVICE_START:";
-                        break;
-                    case UsageEvents.Event.FOREGROUND_SERVICE_STOP:
-                        typeString = "FOREGROUND_SERVICE_STOP: ";
-                        break;
-                    case UsageEvents.Event.KEYGUARD_HIDDEN:
-                        typeString = "KEYGUARD_HIDDEN: ";
-                        break;
-                    case UsageEvents.Event.KEYGUARD_SHOWN:
-                        typeString = "KEYGUARD_SHOWN: ";
-                        break;
-                    case UsageEvents.Event.SCREEN_INTERACTIVE:
-                        typeString = "SCREEN_INTERACTIVE: ";
-                        break;
-                    case UsageEvents.Event.USER_INTERACTION:
-                        typeString = "USER_INTERACTION: ";
-                        break;
-                }
-                builder.append("\t[").append("EventType:").append(typeString).append("]\n");
-                builder.append("\n");
-            } catch (Throwable e) {
+                textView.setText(jsonArray.toString(2));
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-        textView.setText(builder.toString());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
