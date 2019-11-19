@@ -1,5 +1,8 @@
 package com.analysys.track.internal.impl.usm;
 
+import com.analysys.track.BuildConfig;
+import com.analysys.track.utils.BuglyUtils;
+
 import org.json.JSONObject;
 
 public class USMInfo {
@@ -32,6 +35,9 @@ public class USMInfo {
             jsonObject.putOpt("NT", netType);
             jsonObject.putOpt("ETDM", extendedMap.toJson());
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
             //JSONException
         }
         return jsonObject;
@@ -54,6 +60,9 @@ public class USMInfo {
                 jsonObject.putOpt("AT", applicationType);
                 jsonObject.putOpt("ST", switchType);
             } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
                 //JSONException
             }
             return jsonObject;

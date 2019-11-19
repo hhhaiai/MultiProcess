@@ -7,8 +7,10 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
+import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -23,6 +25,9 @@ public class USMImpl {
             UsageEvents usageStats = USMUtils.getUsageEvents(0, System.currentTimeMillis(), context);
             return usageStats != null;
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
 
         }
         return false;
@@ -38,6 +43,9 @@ public class USMImpl {
             //SPHelper.setLongValue2SP(context, LAST_UPLOAD_TIME, end);
             return getUSMInfo(context, pre_time, end);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return null;
     }
@@ -72,6 +80,9 @@ public class USMImpl {
                             openEvent.setAppName((String) applicationInfo.loadLabel(packageManager));
                             openEvent.setVersionCode(packageInfo.versionName + "|" + packageInfo.versionCode);
                         } catch (Throwable e) {
+                            if (BuildConfig.ENABLE_BUGLY) {
+                                BuglyUtils.commitError(e);
+                            }
                         }
                     } else {
                         if (!openEvent.getPkgName().equals(event.getPackageName())) {
@@ -84,6 +95,9 @@ public class USMImpl {
                 return jsonArray;
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return null;
     }

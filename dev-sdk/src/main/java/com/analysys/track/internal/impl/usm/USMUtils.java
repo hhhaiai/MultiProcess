@@ -12,16 +12,21 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.text.TextUtils;
+
+import com.analysys.track.BuildConfig;
+import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.ShellUtils;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Copyright 2019 analysys Inc. All rights reserved.
@@ -98,16 +103,10 @@ public class USMUtils {
                 Constructor constructor = clazz.getConstructor(Context.class, int.class, File.class, Class.forName("StatsUpdatedListener"));
                 Object userUsageStatsService = constructor.newInstance(context, 0, mUsageStatsDir, null);
 
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
         return null;
@@ -155,12 +154,11 @@ public class USMUtils {
                 }
                 override = method.isAccessible();
                 method.setAccessible(true);
-                List<String> pkgs = getAppPackageList(context);
+                Set<String> pkgs = getAppPackageList(context);
                 if (pkgs == null) {
                     return null;
                 }
-                for (int i = 0; i < pkgs.size(); i++) {
-                    String opname = pkgs.get(i);
+                for (String opname : pkgs) {
                     Object parceledListSlice = method.invoke(mService, UsageStatsManager.INTERVAL_BEST, beginTime, endTime, opname);
                     if (parceledListSlice == null) {
                         continue;
@@ -189,7 +187,10 @@ public class USMUtils {
                 }
                 method.setAccessible(override);
             }
-        } catch (Throwable igone) {
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return null;
     }
@@ -248,13 +249,12 @@ public class USMUtils {
                 }
                 override = method.isAccessible();
                 method.setAccessible(true);
-                List<String> pkgs = getAppPackageList(context);
+                Set<String> pkgs = getAppPackageList(context);
                 if (pkgs == null) {
                     return null;
                 }
                 UsageEvents usageEvents = null;
-                for (int i = 0; i < pkgs.size(); i++) {
-                    String opname = pkgs.get(i);
+                for (String opname : pkgs) {
                     usageEvents = (UsageEvents) method.invoke(mService, beginTime, endTime, opname);
                     if (usageEvents != null && usageEvents.hasNextEvent()) {
                         break;
@@ -263,37 +263,69 @@ public class USMUtils {
                 method.setAccessible(override);
                 return usageEvents;
             }
-        } catch (Throwable igone) {
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return null;
     }
 
 
-    public static List<String> getAppPackageList(Context context) {
-        PackageManager packageManager = context.getPackageManager();
-        List<PackageInfo> packageInfo = packageManager.getInstalledPackages(0);
-        if (packageInfo != null) {
-            List<String> strings = new ArrayList<>();
-            for (int i = 0; i < packageInfo.size(); i++) {
-                strings.add(packageInfo.get(i).packageName);
+    public static Set<String> getAppPackageList(Context context) {
+        Set<String> appSet = new HashSet<>();
+        try {
+            PackageManager packageManager = context.getPackageManager();
+            List<PackageInfo> packageInfo = packageManager.getInstalledPackages(0);
+            if (packageInfo != null) {
+                for (int i = 0; i < packageInfo.size(); i++) {
+                    appSet.add(packageInfo.get(i).packageName);
+                }
             }
-            return strings;
+
+            String result = ShellUtils.shell("pm list packages");
+            if (!TextUtils.isEmpty(result) && result.contains("\n")) {
+                String[] lines = result.split("\n");
+                if (lines.length > 0) {
+                    String line = null;
+                    for (int i = 0; i < lines.length; i++) {
+                        line = lines[i];
+                        // 单行条件: 非空&&有点&&有冒号
+                        if (!TextUtils.isEmpty(line) && line.contains(".") && line.contains(":")) {
+                            // 分割. 样例数据:<code>package:com.android.launcher3</code>
+                            String[] split = line.split(":");
+                            if (split != null && split.length > 1) {
+                                String packageName = split[1];
+                                appSet.add(packageName);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
-        return null;
+        return appSet;
     }
 
     public static Method getMethod(Class clazz, String methodName, Class<?>... parameterTypes) {
         Method method = null;
         try {
             method = clazz.getDeclaredMethod(methodName, parameterTypes);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         if (method == null) {
             try {
                 method = clazz.getMethod(methodName, parameterTypes);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
         return method;
@@ -303,14 +335,18 @@ public class USMUtils {
         Field field = null;
         try {
             field = clazz.getDeclaredField(fieldName);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         if (field == null) {
             try {
                 field = clazz.getField(fieldName);
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
         return field;
