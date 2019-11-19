@@ -16,7 +16,7 @@ import org.json.JSONArray;
 
 public class USMImpl {
 
-    private static final String STARTTIME = "USMImpl_ST";
+    public static final String LAST_UPLOAD_TIME = "USMImpl_ST";
 
     public static boolean isUSMAvailable(Context context) {
         try {
@@ -30,12 +30,12 @@ public class USMImpl {
 
     public static JSONArray getUSMInfo(Context context) {
         try {
-            long pre_time = SPHelper.getLongValueFromSP(context, STARTTIME, -1);
+            long pre_time = SPHelper.getLongValueFromSP(context, LAST_UPLOAD_TIME, -1);
             long end = System.currentTimeMillis();
             if (pre_time == -1) {
                 pre_time = end - (EGContext.TIME_HOUR * 6);
             }
-            SPHelper.setLongValue2SP(context, STARTTIME, end);
+            //SPHelper.setLongValue2SP(context, LAST_UPLOAD_TIME, end);
             return getUSMInfo(context, pre_time, end);
         } catch (Throwable e) {
         }
