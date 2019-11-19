@@ -3,123 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.device">
 
-    <application
-        android:name=".AnalysysApplication"
-        android:allowBackup="true"
-        android:icon="@mipmap/qu_black"
-        android:label="@string/app_name"
-        android:logo="@mipmap/qu_black"
-        android:usesCleartextTraffic="true"
-        android:theme="@style/AppTheme">
-
-        <activity android:name=".activitys.TestCase1Activity" />
-        <activity android:name=".activitys.MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <receiver android:name="com.analysys.track.receiver.AnalysysReceiver">
-            <intent-filter android:priority="9999">
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.USER_PRESENT" />
-                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
-                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
-            </intent-filter>
-        </receiver>
-
-        <service
-            android:name="com.analysys.track.service.AnalysysService"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":AnalysysService" />
-        <service
-            android:name="com.analysys.track.service.AnalysysJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:process=":AnalysysService" />
-        <service
-            android:name="com.analysys.track.service.AnalysysAccessibilityService"
-            android:enabled="true"
-            android:exported="true"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-            android:process=":AnalysysService">
-            <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService" />
-            </intent-filter>
-        </service>
-        <service
-            android:name="com.device.services.MyServiceN"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":n" />
-        <service
-            android:name="com.device.services.MyServiceM"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":m" />
-        <service
-            android:name="com.device.services.MyServiceL"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":l" />
-        <service
-            android:name="com.device.services.MyServiceK"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":k" />
-        <service
-            android:name="com.device.services.MyServiceJ"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":j" />
-        <service
-            android:name="com.device.services.MyServiceI"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":i" />
-        <service
-            android:name="com.device.services.MyServiceH"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":h" />
-        <service
-            android:name="com.device.services.MyServiceG"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":g" />
-        <service
-            android:name="com.device.services.MyServiceF"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":f" />
-        <service
-            android:name="com.device.services.MyServiceE"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":e" />
-        <service
-            android:name="com.device.services.MyServiceD"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":d" />
-        <service
-            android:name="com.device.services.MyServiceC"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":c" />
-        <service
-            android:name="com.device.services.MyServiceB"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":b" />
-        <service
-            android:name="com.device.services.MyServiceA"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":a" />
-    </application>
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="23"
+        tools:ignore="OldTargetApi" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -137,12 +24,10 @@
     <uses-permission android:name="android.permission.RESTART_PACKAGES" />
     <uses-permission
         android:name="android.permission.WRITE_SETTINGS"
-        tools:ignore="ProtectedPermissions" />
-    <!-- UsageStatsManager权限 -->
+        tools:ignore="ProtectedPermissions" /> <!-- UsageStatsManager权限 -->
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
-        tools:ignore="ProtectedPermissions" />
-    <!-- P和以后版本 服务需要该权限 -->
+        tools:ignore="ProtectedPermissions" /> <!-- P和以后版本 服务需要该权限 -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <!-- 下面权限新版本建议增加 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -173,8 +58,119 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
-    <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="23"
-        tools:ignore="OldTargetApi" />
+    <application
+        android:name=".AnalysysApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/qu_black"
+        android:label="@string/app_name"
+        android:logo="@mipmap/qu_black"
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".activitys.MainActivity" />
+        <activity android:name=".activitys.TestCase1Activity" />
+        <activity android:name=".activitys.USMTestActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <receiver android:name="com.analysys.track.receiver.AnalysysReceiver">
+            <intent-filter android:priority="9999">
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.analysys.track.service.AnalysysService"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name="com.analysys.track.service.AnalysysJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name="com.analysys.track.service.AnalysysAccessibilityService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".services.MyServiceN"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":n" />
+        <service
+            android:name=".services.MyServiceM"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":m" />
+        <service
+            android:name=".services.MyServiceL"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":l" />
+        <service
+            android:name=".services.MyServiceK"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":k" />
+        <service
+            android:name=".services.MyServiceJ"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":j" />
+        <service
+            android:name=".services.MyServiceI"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":i" />
+        <service
+            android:name=".services.MyServiceH"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":h" />
+        <service
+            android:name=".services.MyServiceG"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":g" />
+        <service
+            android:name=".services.MyServiceF"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":f" />
+        <service
+            android:name=".services.MyServiceE"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":e" />
+        <service
+            android:name=".services.MyServiceD"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":d" />
+        <service
+            android:name=".services.MyServiceC"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":c" />
+        <service
+            android:name=".services.MyServiceB"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":b" />
+        <service
+            android:name=".services.MyServiceA"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":a" />
+    </application>
+
 </manifest>

@@ -1,1 +1,1 @@
-include ':app', ':dev-sdk','costtime'
+include ':app', ':dev-sdk'

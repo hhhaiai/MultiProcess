@@ -3,9 +3,7 @@ package com.device.activitys;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -43,12 +41,6 @@ public class MainActivity extends Activity {
         mContext = this;
         setContentView(R.layout.activity_main);
         reqPer();
-        new AlertDialog.Builder(this).setMessage("设置辅助功能?").setNegativeButton("打开", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                USMUtils.openUSMSetting(MainActivity.this);
-            }
-        });
     }
 
     @Override
@@ -71,6 +63,10 @@ public class MainActivity extends Activity {
                 EL.i("click btnGoTestMainActivity");
                 startActivity(new Intent(this, TestCase1Activity.class));
 //                test();
+                break;
+            case R.id.btnSetAccessibility:
+                USMUtils.openUSMSetting(MainActivity.this);
+                USMUtils.getUsageStatsByInvoke(0, System.currentTimeMillis(), MainActivity.this);
                 break;
             default:
                 break;

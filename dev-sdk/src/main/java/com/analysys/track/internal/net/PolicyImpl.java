@@ -274,8 +274,10 @@ public class PolicyImpl {
             clear();
             populatePolicyInfo(serverPolicy, policyInfo);
 
-            //只在策略处理进程存储
-            saveHotFixPatch(serverPolicy);
+            if (BuildConfig.enableHotFix) {
+                //只在策略处理进程存储
+                saveHotFixPatch(serverPolicy);
+            }
 
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========解析热更部分完毕，即将缓存 888====");

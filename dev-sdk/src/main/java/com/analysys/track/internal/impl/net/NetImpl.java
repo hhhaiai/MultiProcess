@@ -23,14 +23,11 @@ import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -119,17 +116,24 @@ public class NetImpl {
         try {
             JSONArray array = TableProcess.getInstance(context).selectNet(1024 * 1024);
             if (array == null || array.length() == 0) {
-                return pkgs;
+                return map;
             }
             array = (JSONArray) array.get(0);
             for (int i = 0; array != null && i < array.length(); i++) {
-                JSONObject netInfoObject = (JSONObject) array.get(i);
-                NetInfo info = NetInfo.fromJson(netInfoObject);
+                String pkg_name = (String) array.get(i);
+                String values[] = pkg_name.split("_");
+                if (values == null || values.length < 2) {
+                    continue;
+                }
+                NetInfo info = new NetInfo();
+                info.pkgname = values[0];
+                info.appname = values[1];
                 map.put(info.pkgname, info);
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return pkgs;
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return map;
     }
@@ -140,13 +144,14 @@ public class NetImpl {
     public HashMap<String, NetInfo> getNetInfo() {
         try {
             pkgs = getCacheInfo();
-            //本次扫描的时间戳
-            long time = System.currentTimeMillis();
+
             //重置打开状态
             Collection<NetInfo> infoCollection1 = pkgs.values();
             for (NetInfo info : infoCollection1) {
                 info.isOpen = false;
             }
+            //本次扫描的时间戳
+            long time = System.currentTimeMillis();
             api_4 = getApi4(context);
             proc_56 = getProc56(context);
             usm = getUsm(context);
@@ -158,8 +163,10 @@ public class NetImpl {
                     String result = runShell(cmd);
                     //解析原始信息存到pkgs里面
                     resolve(cmd, result, time);
-                } catch (Throwable throwable) {
-                    //某一行解析异常
+                } catch (Throwable e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                 }
             }
             //最后剩下的就是上一次扫描有 但是这一次扫描没有的应用 加关闭符号
@@ -169,27 +176,64 @@ public class NetImpl {
                 if (info.isOpen) {
                     continue;
                 }
+
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.i(info.appname + "[死了,判断关闭节点]");
+                }
+
+                List<NetInfo.ScanningInfo> scanningInfos = TableProcess.getInstance(context).selectScanningInfoByPkg(info.pkgname, true);
                 // 死了 添加 关闭节点 判断上一个是关闭节点 不新加
-                List<NetInfo.TcpInfo> tcpInfos = info.scanningInfos.get(info.scanningInfos.size() - 1).tcpInfos;
-                if (tcpInfos == null || tcpInfos.isEmpty()) {
-                    //有不操作
-                    continue;
+                if (scanningInfos != null && scanningInfos.size() > 0) {
+                    List<NetInfo.TcpInfo> tcpInfos = scanningInfos.get(0).tcpInfos;
+                    if (tcpInfos == null || tcpInfos.isEmpty()) {
+                        if (EGContext.FLAG_DEBUG_INNER) {
+                            ELOG.i(info.appname + "[死了][有关闭节点-不操作]");
+                        }
+                        //有不操作
+                        continue;
+                    }
+                }
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.i(info.appname + "[死了][无关闭节点-添加关闭节点]");
                 }
                 //没有添加关闭节点
                 NetInfo.ScanningInfo scanningInfo = new NetInfo.ScanningInfo();
                 scanningInfo.time = time;
+                scanningInfo.pkgname = info.pkgname;
+                scanningInfo.appname = info.appname;
+                if (info.scanningInfos == null) {
+                    info.scanningInfos = new ArrayList<>();
+                }
                 info.scanningInfos.add(scanningInfo);
             }
 
             //存数据库
-            saveNetInfoToDb(pkgs);
+            savePkgToDb(pkgs);
+            saveScanningInfos(pkgs);
 
-        } catch (Throwable throwable) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i("netimpl error " + throwable.getMessage());
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
             }
         }
         return pkgs;
+    }
+
+    private void saveScanningInfos(HashMap<String, NetInfo> pkgs) {
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i("[存ScanningInfo列表][开始]");
+        }
+        for (String string : pkgs.keySet()) {
+            List<NetInfo.ScanningInfo> scanningInfos = pkgs.get(string).scanningInfos;
+            if (scanningInfos != null) {
+                for (int i = 0; i < scanningInfos.size(); i++) {
+                    TableProcess.getInstance(context).insertScanningInfo(scanningInfos.get(i));
+                }
+            }
+        }
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i("[存ScanningInfo列表][结束]");
+        }
     }
 
     private String getUsm(Context mContext) {
@@ -208,8 +252,8 @@ public class NetImpl {
                 if (usm == null) {
                     return null;
                 }
-                long ts = System.currentTimeMillis();
-                List<UsageStats> usageStats = usm.queryUsageStats(UsageStatsManager.INTERVAL_BEST, 0, ts);
+                long ts = System.currentTimeMillis() - EGContext.TIME_HOUR * 1;
+                List<UsageStats> usageStats = usm.queryUsageStats(UsageStatsManager.INTERVAL_BEST, ts, System.currentTimeMillis());
                 if (usageStats == null || usageStats.size() == 0) {
                     return null;
                 }
@@ -227,11 +271,14 @@ public class NetImpl {
         return null;
     }
 
-    private void saveNetInfoToDb(HashMap<String, NetInfo> pkgs) {
+    private void savePkgToDb(HashMap<String, NetInfo> pkgs) {
 
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.d(EGContext.LOGTAG_INNER, "[存App列表][" + pkgs.keySet().size() + "]");
+        }
         JSONArray array = new JSONArray();
         for (NetInfo netInfo : pkgs.values()) {
-            array.put(netInfo.toJson());
+            array.put(netInfo.pkgname + "_" + netInfo.appname);
         }
         if (array.length() > 0) {
             TableProcess.getInstance(context).deleteNet();
@@ -239,9 +286,11 @@ public class NetImpl {
         TableProcess.getInstance(context).insertNet(array.toString());
         if (EGContext.FLAG_DEBUG_INNER) {
             try {
-                ELOG.i("更新数据:" + array.toString(2));
-            } catch (JSONException ignored) {
-
+                ELOG.i("[存App列表]" + array.toString(2));
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
     }
@@ -277,9 +326,13 @@ public class NetImpl {
                     if (info == null) {
                         info = new NetInfo();
                         info.pkgname = pkgName;
-                        ApplicationInfo info1 = manager.getApplicationInfo(pkgName, 0);
-                        info.appname = (String) info1.loadLabel(manager);
                         pkgs.put(pkgName, info);
+                    }
+                    if (info.appname == null) {
+                        ApplicationInfo info1 = manager.getApplicationInfo(pkgName, 0);
+                        if (info1 != null) {
+                            info.appname = (String) info1.loadLabel(manager);
+                        }
                     }
                     info.isOpen = true;
                     if (info.scanningInfos == null) {
@@ -297,6 +350,9 @@ public class NetImpl {
                         scanningInfo.time = time;
                         scanningInfo.api_4 = api_4;
                         scanningInfo.proc_56 = proc_56;
+                        scanningInfo.usm = usm;
+                        scanningInfo.pkgname = info.pkgname;
+                        scanningInfo.appname = info.appname;
                         scanningInfo.usm = usm;
                         info.scanningInfos.add(scanningInfo);
                     }
@@ -353,6 +409,9 @@ public class NetImpl {
 
 
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return pkgName;
     }
@@ -379,10 +438,10 @@ public class NetImpl {
                 builder.append(line).append("\n");
             }
             return builder.toString();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         } finally {
             try {
                 if (bufferedReader != null) {
@@ -394,8 +453,10 @@ public class NetImpl {
                 if (fileInputStream != null) {
                     fileInputStream.close();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
         return null;

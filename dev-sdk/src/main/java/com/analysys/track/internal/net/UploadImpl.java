@@ -9,6 +9,7 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
+import com.analysys.track.internal.impl.net.NetInfo;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.DeflterCompressUtils;
 import com.analysys.track.utils.ELOG;
@@ -27,6 +28,7 @@ import org.json.JSONObject;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -551,7 +553,10 @@ public class UploadImpl {
             // 按time值delete xxxinfo表和proc表
             TableProcess.getInstance(mContext).deleteByIDXXX(idList);
 
+            //删除上次扫描的包名
             TableProcess.getInstance(mContext).deleteNet();
+            //删除上次上传的id
+            TableProcess.getInstance(mContext).deleteScanningInfosById();
             if (idList != null && idList.size() > 0) {
                 idList.clear();
             }
@@ -617,7 +622,29 @@ public class UploadImpl {
                     arr = TableProcess.getInstance(mContext).selectXXX(useFulLength);
                     break;
                 case MODULE_NET:
-                    arr = TableProcess.getInstance(mContext).selectNet(useFulLength);
+                    HashMap<String, NetInfo> map = new HashMap<>();
+                    List<NetInfo.ScanningInfo> scanningInfos =
+                            TableProcess.getInstance(mContext).selectAllScanningInfos(useFulLength);
+                    for (int i = 0; scanningInfos != null && i < scanningInfos.size(); i++) {
+                        NetInfo.ScanningInfo scanningInfo = (NetInfo.ScanningInfo) scanningInfos.get(i);
+                        String pkg = scanningInfo.pkgname;
+                        if (TextUtils.isEmpty(pkg)) {
+                            continue;
+                        }
+                        NetInfo netInfo = map.get(pkg);
+                        if (netInfo == null) {
+                            netInfo = new NetInfo();
+                            netInfo.pkgname = scanningInfo.pkgname;
+                            netInfo.appname = scanningInfo.appname;
+                            netInfo.scanningInfos = new ArrayList<>();
+                            map.put(pkg, netInfo);
+                        }
+                        netInfo.scanningInfos.add(scanningInfo);
+                    }
+                    arr = new JSONArray();
+                    for (String pkg : map.keySet()) {
+                        arr.put(map.get(pkg).toJson());
+                    }
                     break;
                 default:
                     break;

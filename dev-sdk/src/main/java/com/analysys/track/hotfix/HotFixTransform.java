@@ -246,14 +246,10 @@ public class HotFixTransform {
             }
             method.setAccessible(true);
             return (T) method.invoke(object, pram);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return null;
     }
@@ -314,16 +310,10 @@ public class HotFixTransform {
             constructor.setAccessible(true);
             T o = constructor.newInstance(pram);
             return o;
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
+            if(BuildConfig.ENABLE_BUGLY){
+                BuglyUtils.commitError(e);
+            }
         }
         return null;
     }

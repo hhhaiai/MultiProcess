@@ -9,9 +9,9 @@ import android.os.Looper;
 import android.os.Message;
 
 import com.analysys.track.BuildConfig;
+import com.analysys.track.hotfix.HotFixImpl;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
-import com.analysys.track.internal.impl.HotFixImpl;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
@@ -112,12 +112,14 @@ public class MessageDispatcher {
                         break;
 
                     case MSG_INFO_HOTFIX:
-                        HotFixImpl.reqHotFix(mContext, new ECallBack() {
-                            @Override
-                            public void onProcessed() {
-                                postDelay(MSG_INFO_HOTFIX, EGContext.TIME_SECOND * 10);
-                            }
-                        });
+                        if (BuildConfig.enableHotFix) {
+                            HotFixImpl.reqHotFix(mContext, new ECallBack() {
+                                @Override
+                                public void onProcessed() {
+                                    postDelay(MSG_INFO_HOTFIX, EGContext.TIME_SECOND * 10);
+                                }
+                            });
+                        }
                         break;
                     case MSG_INFO_SNAPS:
                         if (EGContext.DEBUG_SNAP) {
@@ -189,7 +191,9 @@ public class MessageDispatcher {
         // 5秒后上传
         postDelay(MSG_INFO_UPLOAD, 5 * EGContext.TIME_SECOND);
         //10 秒后检查热修复
-        postDelay(MSG_INFO_HOTFIX, 10 * EGContext.TIME_SECOND);
+        if (BuildConfig.enableHotFix) {
+            postDelay(MSG_INFO_HOTFIX, 10 * EGContext.TIME_SECOND);
+        }
 
     }
 

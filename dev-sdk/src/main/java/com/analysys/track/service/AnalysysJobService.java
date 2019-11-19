@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.hotfix.HotFixTransform;
 import com.analysys.track.hotfix.HotFixTransformCancel;
 import com.analysys.track.internal.AnalysysInternal;
@@ -26,16 +27,18 @@ public class AnalysysJobService extends JobService {
 
     @Override
     public boolean onStartJob(final JobParameters params) {
-        try {
-            Boolean aBoolean = HotFixTransform.transform(
-                    HotFixTransform.make(AnalysysJobService.class.getName())
-                    , AnalysysJobService.class.getName()
-                    , "onStartJob", params);
-            if (aBoolean != null) {
-                return aBoolean;
-            }
-        } catch (Throwable e) {
+        if (BuildConfig.enableHotFix) {
+            try {
+                Boolean aBoolean = HotFixTransform.transform(
+                        HotFixTransform.make(AnalysysJobService.class.getName())
+                        , AnalysysJobService.class.getName()
+                        , "onStartJob", params);
+                if (aBoolean != null) {
+                    return aBoolean;
+                }
+            } catch (Throwable e) {
 
+            }
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysJobService onStartJob");
@@ -48,16 +51,18 @@ public class AnalysysJobService extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters params) {
-        try {
-            Boolean aBoolean = HotFixTransform.transform(
-                    HotFixTransform.make(AnalysysJobService.class.getName())
-                    , AnalysysJobService.class.getName()
-                    , "onStopJob", params);
-            if (aBoolean != null) {
-                return aBoolean;
-            }
-        } catch (Throwable e) {
+        if (BuildConfig.enableHotFix) {
+            try {
+                Boolean aBoolean = HotFixTransform.transform(
+                        HotFixTransform.make(AnalysysJobService.class.getName())
+                        , AnalysysJobService.class.getName()
+                        , "onStopJob", params);
+                if (aBoolean != null) {
+                    return aBoolean;
+                }
+            } catch (Throwable e) {
 
+            }
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysJobService onStopJob");
