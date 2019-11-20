@@ -44,13 +44,16 @@ public class USMUtils {
      * @return
      */
     public static boolean isOption(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            PackageManager packageManager = context.getApplicationContext()
-                    .getPackageManager();
-            Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-            List<ResolveInfo> list = packageManager.queryIntentActivities(intent,
-                    PackageManager.MATCH_DEFAULT_ONLY);
-            return list.size() > 0;
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                PackageManager packageManager = context.getApplicationContext()
+                        .getPackageManager();
+                Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                List<ResolveInfo> list = packageManager.queryIntentActivities(intent,
+                        PackageManager.MATCH_DEFAULT_ONLY);
+                return list.size() > 0;
+            }
+        } catch (Throwable e) {
         }
         return false;
     }
@@ -61,9 +64,12 @@ public class USMUtils {
      * @param context
      */
     public static void openUSMSetting(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-            context.startActivity(intent);
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                context.startActivity(intent);
+            }
+        } catch (Throwable e) {
         }
     }
 
@@ -71,22 +77,25 @@ public class USMUtils {
     public static List<UsageStats> getUsageStats(long beginTime, long endTime, Context context) {
         List<UsageStats> usageStats = null;
 
-        //api
-        usageStats = getUsageStatsByAPI(beginTime, endTime, context);
-        if (usageStats != null && usageStats.size() > 0) {
-            return usageStats;
-        }
+        try {
+            //api
+            usageStats = getUsageStatsByAPI(beginTime, endTime, context);
+            if (usageStats != null && usageStats.size() > 0) {
+                return usageStats;
+            }
 
-        //反射传别人的包名
-        usageStats = getUsageStatsByInvoke(beginTime, endTime, context);
-        if (usageStats != null && usageStats.size() > 0) {
-            return usageStats;
-        }
+            //反射传别人的包名
+            usageStats = getUsageStatsByInvoke(beginTime, endTime, context);
+            if (usageStats != null && usageStats.size() > 0) {
+                return usageStats;
+            }
 
-        //直接尝试读数据库 有root 手机好使
-        usageStats = getUsageStatsByDataBase(beginTime, endTime, context);
-        if (usageStats != null && usageStats.size() > 0) {
-            return usageStats;
+            //直接尝试读数据库 有root 手机好使
+            usageStats = getUsageStatsByDataBase(beginTime, endTime, context);
+            if (usageStats != null && usageStats.size() > 0) {
+                return usageStats;
+            }
+        } catch (Throwable e) {
         }
         return usageStats;
 
@@ -94,35 +103,41 @@ public class USMUtils {
 
 
     private static List<UsageStats> getUsageStatsByDataBase(long beginTime, long endTime, Context context) {
-        File systemDataDir = new File(Environment.getDataDirectory(), "system");
-        File mUsageStatsDir = new File(systemDataDir, "usagestats");
-        if (mUsageStatsDir.exists() && mUsageStatsDir.isDirectory()) {
-            //  UserUsageStatsService(Context context, int userId, File usageStatsDir,StatsUpdatedListener listener)
-            try {
-                Class clazz = Class.forName("com.android.server.usage.UserUsageStatsService");
-                Constructor constructor = clazz.getConstructor(Context.class, int.class, File.class, Class.forName("StatsUpdatedListener"));
-                Object userUsageStatsService = constructor.newInstance(context, 0, mUsageStatsDir, null);
+        try {
+            File systemDataDir = new File(Environment.getDataDirectory(), "system");
+            File mUsageStatsDir = new File(systemDataDir, "usagestats");
+            if (mUsageStatsDir.exists() && mUsageStatsDir.isDirectory()) {
+                //  UserUsageStatsService(Context context, int userId, File usageStatsDir,StatsUpdatedListener listener)
+                try {
+                    Class clazz = Class.forName("com.android.server.usage.UserUsageStatsService");
+                    Constructor constructor = clazz.getConstructor(Context.class, int.class, File.class, Class.forName("StatsUpdatedListener"));
+                    Object userUsageStatsService = constructor.newInstance(context, 0, mUsageStatsDir, null);
 
-            } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                } catch (Throwable e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                 }
             }
+        } catch (Throwable e) {
         }
         return null;
     }
 
     public static List<UsageStats> getUsageStatsByAPI(long beginTime, long endTime, Context context) {
         List<UsageStats> queryUsageStats = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            long ts = System.currentTimeMillis();
-            UsageStatsManager usageStatsManager = (UsageStatsManager) context.getApplicationContext()
-                    .getSystemService(Context.USAGE_STATS_SERVICE);
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                long ts = System.currentTimeMillis();
+                UsageStatsManager usageStatsManager = (UsageStatsManager) context.getApplicationContext()
+                        .getSystemService(Context.USAGE_STATS_SERVICE);
 
-            if (usageStatsManager != null) {
-                queryUsageStats = usageStatsManager.queryUsageStats(
-                        UsageStatsManager.INTERVAL_BEST, beginTime, endTime);
+                if (usageStatsManager != null) {
+                    queryUsageStats = usageStatsManager.queryUsageStats(
+                            UsageStatsManager.INTERVAL_BEST, beginTime, endTime);
+                }
             }
+        } catch (Throwable e) {
         }
         return queryUsageStats;
     }
@@ -196,27 +211,33 @@ public class USMUtils {
     }
 
     public static UsageEvents getUsageEvents(long beginTime, long endTime, Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            UsageEvents usageEvents;
-            usageEvents = getUsageEventsByApi(beginTime, endTime, context);
-            if (usageEvents != null && usageEvents.hasNextEvent()) {
-                return usageEvents;
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                UsageEvents usageEvents;
+                usageEvents = getUsageEventsByApi(beginTime, endTime, context);
+                if (usageEvents != null && usageEvents.hasNextEvent()) {
+                    return usageEvents;
+                }
+                usageEvents = getUsageEventsByInvoke(beginTime, endTime, context);
+                if (usageEvents != null && usageEvents.hasNextEvent()) {
+                    return usageEvents;
+                }
             }
-            usageEvents = getUsageEventsByInvoke(beginTime, endTime, context);
-            if (usageEvents != null && usageEvents.hasNextEvent()) {
-                return usageEvents;
-            }
+        } catch (Throwable e) {
         }
         return null;
 
     }
 
     private static UsageEvents getUsageEventsByApi(long beginTime, long endTime, Context context) {
-        UsageStatsManager usageStatsManager = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            usageStatsManager = (UsageStatsManager) context.getApplicationContext()
-                    .getSystemService(Context.USAGE_STATS_SERVICE);
-            return usageStatsManager.queryEvents(beginTime, endTime);
+        try {
+            UsageStatsManager usageStatsManager = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                usageStatsManager = (UsageStatsManager) context.getApplicationContext()
+                        .getSystemService(Context.USAGE_STATS_SERVICE);
+                return usageStatsManager.queryEvents(beginTime, endTime);
+            }
+        } catch (Throwable e) {
         }
         return null;
     }
