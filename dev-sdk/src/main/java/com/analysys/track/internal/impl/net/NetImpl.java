@@ -37,6 +37,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.analysys.track.internal.impl.oc.ProcUtils.RUNNING_OC_RESULT;
+
 /**
  * @Copyright 2019 analysys Inc. All rights reserved.
  * @Description: 网络信息获取
@@ -140,7 +142,7 @@ public class NetImpl {
     }
 
     String api_4;
-    JSONObject proc_56;
+    JSONArray proc_56;
 
     public HashMap<String, NetInfo> getNetInfo() {
         try {
@@ -379,9 +381,12 @@ public class NetImpl {
         }
     }
 
-    private JSONObject getProc56(Context context) {
-        if ((Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24)) {
-            return ProcUtils.getInstance(context).getRunningInfo();
+    private JSONArray getProc56(Context context) {
+        try {
+            if ((Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24)) {
+                return (JSONArray) ProcUtils.getInstance(context).getRunningInfo().opt(RUNNING_OC_RESULT);
+            }
+        } catch (Throwable e) {
         }
         return null;
     }

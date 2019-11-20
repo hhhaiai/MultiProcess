@@ -87,7 +87,7 @@ public class NetInfo {
         public String pkgname;
         public String appname;
         public String api_4;
-        public JSONObject proc_56;
+        public JSONArray proc_56;
         public String usm;
         public long time;
         public List<TcpInfo> tcpInfos;
@@ -98,7 +98,7 @@ public class NetInfo {
             scanningInfo.pkgname = object.optString("APN");
             scanningInfo.appname = object.optString("AN");
             scanningInfo.api_4 = object.optString("API4");
-            scanningInfo.proc_56 = object.optJSONObject("PROC56");
+            scanningInfo.proc_56 = object.optJSONArray("PROC56");
             scanningInfo.usm = object.optString("USM");
             scanningInfo.time = object.optLong("ST");
             scanningInfo.tcpInfos = new ArrayList<>();
