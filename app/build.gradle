@@ -103,6 +103,8 @@ dependencies {
     implementation 'com.umeng.umsdk:common:2.0.0'
     implementation 'com.umeng.umsdk:utdid:1.1.5.3'
 
+    implementation files("libs/miit_mdid_1.0.10.aar")
+
     // // 网络不好时下载失败
     //    //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
     //    implementation 'com.tencent.bugly:crashreport:latest.release'

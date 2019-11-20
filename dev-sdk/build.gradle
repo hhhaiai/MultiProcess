@@ -83,8 +83,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     testImplementation 'org.robolectric:robolectric:3.0'
-
-
+    compileOnly files("libs/miit_mdid_1.0.10.aar")
 }
 
 

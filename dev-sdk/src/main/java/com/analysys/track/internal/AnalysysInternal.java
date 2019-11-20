@@ -18,6 +18,7 @@ import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.MultiProcessChecker;
+import com.analysys.track.utils.OAIDHelper;
 import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
@@ -160,6 +161,9 @@ public class AnalysysInternal {
             clear();
         }
 
+        if (Build.VERSION.SDK_INT >= 29) {
+            OAIDHelper.tryGetOaidAndSave(ctx);
+        }
 
         try {
             // 9. 清除以前的SP和DB

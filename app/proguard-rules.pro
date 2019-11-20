@@ -62,3 +62,5 @@ public static final int *;
   public *;
 }
 -dontwarn com.analysys.track.**
+
+-keep class com.bun.miitmdid.core.** {*;}
