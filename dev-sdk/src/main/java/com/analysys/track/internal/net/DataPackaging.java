@@ -58,7 +58,7 @@ public class DataPackaging {
             JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.DeviceId, devImpl.getDeviceId(),
                     DataController.SWITCH_OF_DEVICE_ID);
             JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.OAID, devImpl.getOAID(),
-                    DataController.SWITCH_OF_DEVICE_ID);
+                    DataController.SWITCH_OF_OAID);
             JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.DeviceModel, Build.MODEL,
                     DataController.SWITCH_OF_DEVICE_MODEL);
             JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.MAC, devImpl.getMac(),
