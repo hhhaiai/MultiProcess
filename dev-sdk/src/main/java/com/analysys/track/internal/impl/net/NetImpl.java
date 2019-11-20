@@ -15,6 +15,7 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.oc.ProcUtils;
+import com.analysys.track.internal.impl.usm.USMImpl;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
@@ -143,6 +144,10 @@ public class NetImpl {
 
     public HashMap<String, NetInfo> getNetInfo() {
         try {
+            if (USMImpl.isUSMAvailable(context)) {
+                //USM可用 不工作
+                return null;
+            }
             pkgs = getCacheInfo();
 
             //重置打开状态

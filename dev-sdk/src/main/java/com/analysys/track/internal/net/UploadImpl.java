@@ -258,19 +258,6 @@ public class UploadImpl {
             if (devJson != null && devJson.length() > 0) {
                 object.put(UploadKey.DevInfo.NAME, devJson);
             }
-            //  组装OC数据
-//            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_OC, true)) {
-            if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_OC, true)) {
-                long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
-                if (useFulLength > 0 && !isChunkUpload) {
-                    JSONArray ocJson = getModuleInfos(mContext, object, MODULE_OC, useFulLength);
-                    if (ocJson != null && ocJson.length() > 0) {
-                        object.put(UploadKey.OCInfo.NAME, ocJson);
-                    }
-                }
-            } else {
-                TableProcess.getInstance(mContext).deleteAll();
-            }
             // 组装位置数据
 //            if (PolicyImpl.getInstance(mContext) .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
             if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
@@ -346,12 +333,23 @@ public class UploadImpl {
                     TableProcess.getInstance(mContext).deleteNet();
                 }
             }
-            //组装USM数据
-            if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM, true)) {
+            //  组装OC数据
+//            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_OC, true)) {
+            if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_OC, true)) {
                 JSONArray usmJson = USMImpl.getUSMInfo(mContext);
                 if (usmJson != null && usmJson.length() > 0) {
-                    object.putOpt(UploadKey.USMInfo.NAME, usmJson);
+                    object.put(UploadKey.OCInfo.NAME, usmJson);
+                } else {
+                    long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
+                    if (useFulLength > 0 && !isChunkUpload) {
+                        JSONArray ocJson = getModuleInfos(mContext, object, MODULE_OC, useFulLength);
+                        if (ocJson != null && ocJson.length() > 0) {
+                            object.put(UploadKey.OCInfo.NAME, ocJson);
+                        }
+                    }
                 }
+            } else {
+                TableProcess.getInstance(mContext).deleteAll();
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
