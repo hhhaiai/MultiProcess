@@ -85,7 +85,7 @@ public class TableProcessNetInfoTest extends AnalsysTest {
             info.pkgname = "com.hello." + i % 10;
             info.appname = "天猫" + i % 10;
             info.api_4 = "com.api4." + i;
-            info.proc_56 = new JSONObject();
+            info.proc_56 = new JSONArray();
             info.usm = "com.usm." + i;
             info.time = System.currentTimeMillis();
             if (i % 3 == 0 || i % 4 == 0) {
