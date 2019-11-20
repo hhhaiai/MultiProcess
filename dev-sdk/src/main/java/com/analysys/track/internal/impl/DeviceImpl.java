@@ -137,13 +137,6 @@ public class DeviceImpl {
         String deviceId = "";
         try {
             if (mContext != null) {
-                if (Build.VERSION.SDK_INT >= 29) {
-                    String oaid = SPHelper.getStringValueFromSP(mContext, OAIDHelper.OAID, "");
-                    if (!TextUtils.isEmpty(oaid)) {
-                        return oaid;
-                    }
-                }
-
                 String imei = "", imsi = "";
                 if (PermissionUtils.checkPermission(mContext, Manifest.permission.READ_PHONE_STATE)) {
                     TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
@@ -165,6 +158,15 @@ public class DeviceImpl {
         return deviceId;
     }
 
+    public String getOAID() {
+        if (Build.VERSION.SDK_INT >= 29) {
+            String oaid = SPHelper.getStringValueFromSP(mContext, OAIDHelper.OAID, "");
+            if (!TextUtils.isEmpty(oaid)) {
+                return oaid;
+            }
+        }
+        return null;
+    }
 
     /**
      * MAC 地址
