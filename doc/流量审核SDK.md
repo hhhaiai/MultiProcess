@@ -2,20 +2,19 @@
 
 ## 版本变动
 
-* **版本号**: `4.3.0.4|20191113`
+* **版本号**: `4.3.0.5|20191121`
 * **版本变动**:
         1. 优化部分功能
 
 
 ### 1. 拷贝jar到对应项目中.
 
-* 若是Gradle(`Android studio`/`Intellij idea`)环境：
+#### Eclipse SDK 集成
+将需要的 jar 包拷贝到本地工程 libs 子目录下；在Eclipse中右键工程根目录，选择 property —> Java Build Path —> Libraries ，然后点击 Add External JARs... 选择指向 jar 的路径，点击 OK，即导入成功。（ADT17 及以上不需要手动导入）
 
-`File` -> `Project Structure` -> `Module` -> `Dependencies` -> `Add...` -> `Library...` -> `Attach Classes`. 选中`analysys_track_*.jar`
-
-* 若是Ant(Eclipse)环境：
-
-将SDK拷入项目`libs`目录下，选中`analysys_track_*.jar`右键`Build Path` -> `Add to Build Path`
+#### AndroidStudio SDK 集成
+选择 SDK 功能组件并下载，解压.zip 文件得到相应 jar 包（例如：x.x.x.jar等），在 Android Studio 的项目工程 libs 目录中拷入相关组件 jar 包。
+右键 Android Studio 的项目工程; 选择 Open Module Settings → 在 Project Structure 弹出框中 → 选择 Dependencies 选项卡 → 点击左下"＋" → 选择 jar 包类型 → 引入相应的 jar 包。
 
 
 ### 2. 配置Manifest
