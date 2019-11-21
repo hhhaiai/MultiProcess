@@ -525,7 +525,7 @@ public class NetImpl {
                     .append(ipx16, 8, 12).append(":")
                     .append(ipx16, 12, 16).append(":")
                     .append(ipx16, 16, 20).append(":")
-                    .append(ipx16.substring(20, 24).equals("0000") ? "0" : ipx16.substring(20, 24)).append(":")
+                    .append("0000".equals(ipx16.substring(20, 24)) ? "0" : ipx16.substring(20, 24)).append(":")
                     .append(Integer.parseInt(ipx16.substring(30, 32), 16)).append(".")
                     .append(Integer.parseInt(ipx16.substring(28, 30), 16)).append(".")
                     .append(Integer.parseInt(ipx16.substring(26, 28), 16)).append(".")

@@ -28,6 +28,7 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.OAIDHelper;
 import com.analysys.track.utils.PermissionUtils;
@@ -784,24 +785,21 @@ public class DeviceImpl {
     public String getIDFA() {
         String idfa = "";
         try {
-            new Thread(new Runnable() {
+            idfa = SPHelper.getStringValueFromSP(mContext, EGContext.SP_APP_IDFA, "");
+            if (!idfa.isEmpty()) {
+                return idfa;
+            }
+            EThreadPool.execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         AdvertisingIdClient.AdInfo adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);// 阻塞调用，需放在子线程处理
                         String advertisingId = adInfo.getId();
                         SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_IDFA, advertisingId);
-                    } catch (Exception e) {
-                        if (BuildConfig.ENABLE_BUGLY) {
-                            BuglyUtils.commitError(e);
-                        }
+                    } catch (Throwable e) {
                     }
                 }
-            }).start();
-            idfa = SPHelper.getStringValueFromSP(mContext, EGContext.SP_APP_IDFA, "");
-            if (!idfa.isEmpty()) {
-                return idfa;
-            }
+            });
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
