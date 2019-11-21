@@ -24,6 +24,8 @@ public class UploadKey {
         public static final String DeviceBrand = "DB";
         // 设备Id，由IMEI-IMSI-AndroidId组成，如：863363036038592-460019031508084-144379774dc1c0b8
         public static final String DeviceId = "DI";
+        //OAID 厂商联盟的id,需要SDK集成方集成了相关SDK才可以获取
+        public static final String OAID = "OAID";
         // 设备型号 , 如：“Lenovo S760”
         public static final String DeviceModel = "DM";
         // 设备MAC地址，如：“6c:5c:14:25:be:ba”

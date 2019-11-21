@@ -28,10 +28,9 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
+import com.analysys.track.utils.OAIDHelper;
 import com.analysys.track.utils.PermissionUtils;
-import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -159,6 +158,15 @@ public class DeviceImpl {
         return deviceId;
     }
 
+    public String getOAID() {
+        if (Build.VERSION.SDK_INT >= 29) {
+            String oaid = SPHelper.getStringValueFromSP(mContext, OAIDHelper.OAID, "");
+            if (!TextUtils.isEmpty(oaid)) {
+                return oaid;
+            }
+        }
+        return null;
+    }
 
     /**
      * MAC 地址

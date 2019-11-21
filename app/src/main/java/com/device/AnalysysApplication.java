@@ -7,6 +7,7 @@ import android.os.StrictMode;
 import android.support.multidex.MultiDex;
 
 import com.analysys.track.AnalysysTracker;
+import com.bun.miitmdid.core.JLibrary;
 import com.device.impls.MultiProcessWorker;
 import com.device.utils.EL;
 import com.tencent.bugly.Bugly;
@@ -27,6 +28,8 @@ public class AnalysysApplication extends Application {
     @Override
     public void onCreate() {
 
+
+        JLibrary.InitEntry(this);
         // init  bugly
         Bugly.init(getApplicationContext(), "8fea5d1877", true);
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()

@@ -37,6 +37,7 @@ public class DataController {
     public static boolean SWITCH_OF_SYSTEM_VERSION = true;
     public static boolean SWITCH_OF_DEVICE_BRAND = true;
     public static boolean SWITCH_OF_DEVICE_ID = true;
+    public static boolean SWITCH_OF_OAID = true;
     public static boolean SWITCH_OF_DEVICE_MODEL = true;
     public static boolean SWITCH_OF_MAC = true;
     public static boolean SWITCH_OF_SERIALNUMBER = true;
