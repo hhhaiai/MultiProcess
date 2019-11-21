@@ -147,7 +147,7 @@ AnalysysTracker.setDebugMode( boolean isDebug);
   public *;
 }
 -dontwarn com.analysys.track.**
-
+-keep class com.bun.miitmdid.core.** {*;}
 ```
 
 ### 5. 适配Android P及以上版本网络
