@@ -209,10 +209,15 @@ public class DeviceImpl {
     private String getMacByAndridAPI() {
         String macAddress = "";
         try {
-            WifiManager wifi = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+            WifiManager wifi = (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             if (PermissionUtils.checkPermission(mContext, permission.ACCESS_WIFI_STATE)) {
-                WifiInfo info = wifi.getConnectionInfo();
-                macAddress = info.getMacAddress();
+                WifiInfo info = null;
+                if (wifi != null) {
+                    info = wifi.getConnectionInfo();
+                }
+                if (info != null) {
+                    macAddress = info.getMacAddress();
+                }
 
             } else {
                 macAddress = DEFALT_MAC;
@@ -749,36 +754,41 @@ public class DeviceImpl {
 
     public String getBuildSupportedAbis() {
         try {
-            return stringArrayToString(Build.SUPPORTED_ABIS);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                return stringArrayToString(Build.SUPPORTED_ABIS);
+            }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
             }
-            return "";
         }
-
+        return "";
     }
 
     public String getBuildSupportedAbis32() {
         try {
-            return stringArrayToString(Build.SUPPORTED_32_BIT_ABIS);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                return stringArrayToString(Build.SUPPORTED_32_BIT_ABIS);
+            }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
             }
-            return "";
         }
+        return "";
     }
 
     public String getBuildSupportedAbis64() {
         try {
-            return stringArrayToString(Build.SUPPORTED_64_BIT_ABIS);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                return stringArrayToString(Build.SUPPORTED_64_BIT_ABIS);
+            }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
             }
-            return "";
         }
+        return "";
     }
 
 

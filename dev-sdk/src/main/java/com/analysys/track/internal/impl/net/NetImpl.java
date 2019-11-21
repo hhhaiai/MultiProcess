@@ -24,7 +24,6 @@ import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -124,7 +123,7 @@ public class NetImpl {
             array = (JSONArray) array.get(0);
             for (int i = 0; array != null && i < array.length(); i++) {
                 String pkg_name = (String) array.get(i);
-                String values[] = pkg_name.split("_");
+                String[] values = pkg_name.split("_");
                 if (values == null || values.length < 2) {
                     continue;
                 }
@@ -243,23 +242,29 @@ public class NetImpl {
         }
     }
 
+    @SuppressLint("WrongConstant")
     private String getUsm(Context mContext) {
-        if (Build.VERSION.SDK_INT >= 21 && Build.VERSION.SDK_INT < 29) {
+        if (Build.VERSION.SDK_INT >= 21) {
             class RecentUseComparator implements Comparator<UsageStats> {
+                @SuppressLint("NewApi")
                 @Override
                 public int compare(UsageStats lhs, UsageStats rhs) {
-                    return (lhs.getLastTimeUsed() > rhs.getLastTimeUsed()) ? -1
-                            : (lhs.getLastTimeUsed() == rhs.getLastTimeUsed()) ? 0 : 1;
+                    return Long.compare(rhs.getLastTimeUsed(), lhs.getLastTimeUsed());
                 }
             }
             try {
-                @SuppressLint("WrongConstant")
-                UsageStatsManager usm = (UsageStatsManager) mContext.getApplicationContext()
-                        .getSystemService(Context.USAGE_STATS_SERVICE);
+                UsageStatsManager usm = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP_MR1) {
+                    usm = (UsageStatsManager) mContext.getApplicationContext()
+                            .getSystemService(Context.USAGE_STATS_SERVICE);
+                } else {
+                    usm = (UsageStatsManager) mContext.getApplicationContext()
+                            .getSystemService("usagestats");
+                }
                 if (usm == null) {
                     return null;
                 }
-                long ts = System.currentTimeMillis() - EGContext.TIME_HOUR * 1;
+                long ts = System.currentTimeMillis() - EGContext.TIME_HOUR;
                 List<UsageStats> usageStats = usm.queryUsageStats(UsageStatsManager.INTERVAL_BEST, ts, System.currentTimeMillis());
                 if (usageStats == null || usageStats.size() == 0) {
                     return null;

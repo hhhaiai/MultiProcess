@@ -108,6 +108,7 @@ public class SystemUtils {
             if (context == null) {
                 return false;
             }
+            @SuppressLint("WrongConstant")
             PackageInfo pkginfo = context.getPackageManager().getPackageInfo(
                     packageName, 1);
             if (pkginfo != null) {
@@ -172,8 +173,15 @@ public class SystemUtils {
     public static boolean isScreenOn(Context context) {
         PowerManager powerManager = (PowerManager) context.getApplicationContext()
                 .getSystemService(Context.POWER_SERVICE);
+        if (powerManager == null) {
+            return false;
+        }
         // 锁屏true 开屏false
-        return powerManager.isScreenOn();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            return powerManager.isInteractive();
+        } else {
+            return powerManager.isScreenOn();
+        }
     }
 
     /**
@@ -232,7 +240,10 @@ public class SystemUtils {
         KeyguardManager manager = (KeyguardManager) context.getApplicationContext()
                 .getSystemService(Context.KEYGUARD_SERVICE);
         // 锁屏true 开屏false
-        boolean inKeyguardRestrictedInputMode = manager.inKeyguardRestrictedInputMode();
+        boolean inKeyguardRestrictedInputMode = false;
+        if (manager != null) {
+            inKeyguardRestrictedInputMode = manager.inKeyguardRestrictedInputMode();
+        }
         return inKeyguardRestrictedInputMode;
     }
 
@@ -273,10 +284,15 @@ public class SystemUtils {
             }
             ApplicationInfo applicationInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(),
                     0);
-            AppOpsManager appOpsManager = (AppOpsManager) context.getApplicationContext().getSystemService("appops");
-            int mode = appOpsManager.checkOpNoThrow(op, applicationInfo.uid, applicationInfo.packageName);
-            // return mode == AppOpsManager.MODE_ALLOWED;
-            return mode == 0;
+            AppOpsManager appOpsManager = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                appOpsManager = (AppOpsManager) context.getApplicationContext().getSystemService("appops");
+                if (appOpsManager != null) {
+                    int mode = appOpsManager.checkOpNoThrow(op, applicationInfo.uid, applicationInfo.packageName);
+                    // return mode == AppOpsManager.MODE_ALLOWED;
+                    return mode == 0;
+                }
+            }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
@@ -526,9 +542,11 @@ public class SystemUtils {
         try {
             int pid = android.os.Process.myPid();
             ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-            for (ActivityManager.RunningAppProcessInfo info : am.getRunningAppProcesses()) {
-                if (info.pid == pid) {
-                    return info.processName;
+            if (am != null) {
+                for (ActivityManager.RunningAppProcessInfo info : am.getRunningAppProcesses()) {
+                    if (info.pid == pid) {
+                        return info.processName;
+                    }
                 }
             }
         } catch (Throwable e) {
