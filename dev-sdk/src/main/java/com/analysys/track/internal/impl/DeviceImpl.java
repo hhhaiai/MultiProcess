@@ -134,25 +134,26 @@ public class DeviceImpl {
      */
     @SuppressWarnings("deprecation")
     public String getDeviceId() {
-        String deviceId = "";
+        String deviceId = "", imei = "", imsi = "";
         try {
             if (mContext != null) {
-                String imei = "", imsi = "";
                 if (PermissionUtils.checkPermission(mContext, Manifest.permission.READ_PHONE_STATE)) {
                     TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
                     imei = tm.getDeviceId();
                     imsi = tm.getSubscriberId();
                 }
-                String androidId = android.provider.Settings.System.getString(mContext.getContentResolver(),
-                        Settings.Secure.ANDROID_ID);
-                deviceId = (TextUtils.isEmpty(imei) ? "null" : imei) + "-" + (TextUtils.isEmpty(imsi) ? "null" : imsi)
-                        + "-" + (TextUtils.isEmpty(androidId) ? "null" : androidId);
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
             }
-            deviceId = "";
+        }
+        try {
+            String androidId = Settings.System.getString(mContext.getContentResolver(),
+                    Settings.Secure.ANDROID_ID);
+            deviceId = (TextUtils.isEmpty(imei) ? "null" : imei) + "-" + (TextUtils.isEmpty(imsi) ? "null" : imsi)
+                    + "-" + (TextUtils.isEmpty(androidId) ? "null" : androidId);
+        } catch (Throwable e) {
         }
 
         return deviceId;
