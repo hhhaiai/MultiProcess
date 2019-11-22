@@ -153,7 +153,7 @@ public class HotFixTransform {
     }
 
     private static boolean hasDexFile(String path) {
-        boolean hasdex = path != null && !path.equals("") && new File(path).isFile();
+        boolean hasdex = path != null && !"".equals(path) && new File(path).isFile();
         if (hasdex) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(EGContext.HOT_FIX_TAG, "dex 存在 path = " + path);

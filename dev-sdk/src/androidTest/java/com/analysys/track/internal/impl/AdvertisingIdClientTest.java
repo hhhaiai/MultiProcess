@@ -20,7 +20,7 @@ public class AdvertisingIdClientTest {
             AdvertisingIdClient.AdInfo info2 = AdvertisingIdClient.getAdvertisingIdInfo(mContext);
 
             assertNotNull(info1);
-            assertEquals(info1, info2);
+            assertEquals(info1.getId(), info2.getId());
         } catch (Exception e) {
             e.printStackTrace();
         }

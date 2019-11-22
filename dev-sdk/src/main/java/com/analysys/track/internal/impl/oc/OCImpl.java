@@ -581,30 +581,46 @@ public class OCImpl {
      *
      * @param aliveList
      */
+    @SuppressLint("WrongConstant")
     public void processOCByUsageStatsManager(JSONArray aliveList) {
         class RecentUseComparator implements Comparator<UsageStats> {
             @Override
             public int compare(UsageStats lhs, UsageStats rhs) {
-                return (lhs.getLastTimeUsed() > rhs.getLastTimeUsed()) ? -1
-                        : (lhs.getLastTimeUsed() == rhs.getLastTimeUsed()) ? 0 : 1;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    return Long.compare(rhs.getLastTimeUsed(), lhs.getLastTimeUsed());
+                }
+                return 0;
             }
         }
         try {
-            @SuppressLint("WrongConstant")
-            UsageStatsManager usm = (UsageStatsManager) mContext.getApplicationContext()
-                    .getSystemService(Context.USAGE_STATS_SERVICE);
+            UsageStatsManager usm = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                usm = (UsageStatsManager) mContext.getApplicationContext()
+                        .getSystemService(Context.USAGE_STATS_SERVICE);
+            } else {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    usm = (UsageStatsManager) mContext.getApplicationContext()
+                            .getSystemService("usagestats");
+                }
+            }
             if (usm == null) {
                 getAliveAppByProc(aliveList);
                 return;
             }
             long ts = System.currentTimeMillis();
-            List<UsageStats> usageStats = usm.queryUsageStats(UsageStatsManager.INTERVAL_BEST, ts - 10 * 1000, ts);
+            List<UsageStats> usageStats = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                usageStats = usm.queryUsageStats(UsageStatsManager.INTERVAL_BEST, ts - 10 * 1000, ts);
+            }
             if (usageStats == null || usageStats.size() == 0) {
                 getAliveAppByProc(aliveList);
                 return;
             }
             Collections.sort(usageStats, new RecentUseComparator());
-            String usmPkg = usageStats.get(0).getPackageName();
+            String usmPkg = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                usmPkg = usageStats.get(0).getPackageName();
+            }
             if (!TextUtils.isEmpty(usmPkg)) {
                 processSignalPkgName(usmPkg, UploadKey.OCInfo.COLLECTIONTYPE_USAGESTATSMANAGER);
             } else {

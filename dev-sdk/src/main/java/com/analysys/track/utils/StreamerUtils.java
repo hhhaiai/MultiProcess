@@ -1,13 +1,48 @@
 package com.analysys.track.utils;
 
+import android.database.Cursor;
+import android.os.Build;
+
 import com.analysys.track.BuildConfig;
 
 import java.io.Closeable;
 import java.net.HttpURLConnection;
+import java.nio.channels.FileLock;
+import java.util.zip.ZipFile;
 
 public class StreamerUtils {
 
     public static void safeClose(AutoCloseable closeable) {
+        if (closeable != null) {
+            try {
+                if (Build.VERSION.SDK_INT > 18) {
+                    closeable.close();
+                }
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
+            }
+        }
+    }
+
+    public static void safeClose(FileLock closeable) {
+        if (closeable != null) {
+            try {
+                if (Build.VERSION.SDK_INT > 18) {
+                    closeable.close();
+                } else {
+                    closeable.release();
+                }
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
+            }
+        }
+    }
+
+    public static void safeClose(Closeable closeable) {
         if (closeable != null) {
             try {
                 closeable.close();
@@ -19,7 +54,19 @@ public class StreamerUtils {
         }
     }
 
-    public static void safeClose(Closeable closeable) {
+    public static void safeClose(Cursor closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
+            }
+        }
+    }
+
+    public static void safeClose(ZipFile closeable) {
         if (closeable != null) {
             try {
                 closeable.close();
