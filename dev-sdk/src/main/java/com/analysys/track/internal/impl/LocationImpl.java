@@ -524,103 +524,106 @@ public class LocationImpl {
                 try {
                     JSONObject obj = null;
                     // https://blog.csdn.net/itfootball/article/details/25421015
-                    List<CellInfo> infos = mTelephonyManager.getAllCellInfo();
-                    if (infos != null && infos.size() > 0) {
-                        int tempCid = -1;// cid
-                        int tempLac = -1;// lac
-                        int strength = -1;// 信号强度
-                        String key = null;
-                        for (CellInfo info : infos) {
-                            tempCid = -1;
-                            tempLac = -1;
-                            strength = -1;
-                            if (info instanceof CellInfoCdma) {
-                                CellInfoCdma cdma = (CellInfoCdma) info;
-                                tempCid = cdma.getCellIdentity().getBasestationId();
-                                tempLac = cdma.getCellIdentity().getNetworkId();
-                                key = tempCid + "|" + tempLac;
-//                                ELOG.e("CellInfoCdma:: "+ tempCid);
-                                if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
-                                    cid.add(key);
-                                    obj = new JSONObject();
-                                    strength = cdma.getCellSignalStrength().getDbm();
-                                    obj = getBaseStationInfoObj(obj, tempLac, tempCid, strength, "0", 0,
-                                            cdma.getCellSignalStrength().getCdmaEcio(), 0);
-                                    tempCdmaMap.put(strength + "|" + key, obj);
-                                    tempJsonObj = new JSONObject();
-                                    tempJsonObj.put("stren", strength);
-                                    tempJsonObj.put("mapKey", strength + "|" + key);
-//                                    tempJsonObj.put("ecio",cdma.getCellSignalStrength().getCdmaEcio());
-                                    cdmaList.add(tempJsonObj);
-                                }
-                            } else if (info instanceof CellInfoGsm) {
-                                CellInfoGsm gsm = (CellInfoGsm) info;
-                                tempCid = gsm.getCellIdentity().getCid();
-                                tempLac = gsm.getCellIdentity().getLac();
-                                key = tempCid + "|" + tempLac;
-//                                ELOG.e("CellInfoGsm:: "+ tempCid);
-                                if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
-                                    cid.add(key);
-                                    obj = new JSONObject();
-                                    strength = gsm.getCellSignalStrength().getDbm();
-                                    obj = getBaseStationInfoObj(obj, tempLac, tempCid, strength,
-                                            UploadKey.LocationInfo.BaseStationInfo.PSC + "&"
-                                                    + gsm.getCellIdentity().getPsc(),
-                                            0, 0, 0);
-                                    tempGsmMap.put(strength + "|" + key, obj);
-                                    tempJsonObj = new JSONObject();
-                                    tempJsonObj.put("stren", strength);
-                                    tempJsonObj.put("mapKey", strength + "|" + key);
-                                    gsmList.add(tempJsonObj);
-                                }
-                            } else if (info instanceof CellInfoLte) {
-                                CellInfoLte lte = (CellInfoLte) info;
-                                tempCid = lte.getCellIdentity().getPci();
-                                tempLac = lte.getCellIdentity().getTac();
-                                key = tempCid + "|" + tempLac;
-//                                ELOG.e("CellInfoLte:: "+ tempCid);
-                                if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
-                                    cid.add(key);
-                                    obj = new JSONObject();
-                                    strength = lte.getCellSignalStrength().getDbm();
-                                    String lteString = lte.getCellSignalStrength().toString();
-                                    obj = getBaseStationInfoObj(obj, tempLac, tempCid, strength,
-                                            UploadKey.LocationInfo.BaseStationInfo.PCI + "&"
-                                                    + lte.getCellIdentity().getPci(),
-                                            strength, 0,
-                                            Integer.parseInt(lteString.substring(lteString.indexOf("rsrq=") + 5,
-                                                    lteString.indexOf(" rssnr="))));
-                                    tempCdmaMap.put(strength + "|" + key, obj);
-                                    tempJsonObj = new JSONObject();
-                                    tempJsonObj.put("stren", strength);
-                                    tempJsonObj.put("mapKey", strength + "|" + key);
-//                                    tempJsonObj.put("rsrp",lte.getCellSignalStrength().getRsrp());
-                                    cdmaList.add(tempJsonObj);
-                                }
-                            } else if (info instanceof CellInfoWcdma) {
-                                CellInfoWcdma wcdma = (CellInfoWcdma) info;
-                                tempCid = wcdma.getCellIdentity().getCid();
-                                tempLac = wcdma.getCellIdentity().getLac();
-                                key = tempCid + "|" + tempLac;
-//                                ELOG.e("CellInfoWcdma:: "+ tempCid);
-                                if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
-                                    cid.add(key);
-                                    obj = new JSONObject();
-                                    strength = wcdma.getCellSignalStrength().getDbm();
-                                    obj = getBaseStationInfoObj(obj, tempLac, tempCid, strength,
-                                            UploadKey.LocationInfo.BaseStationInfo.PSC + "&"
-                                                    + wcdma.getCellIdentity().getPsc(),
-                                            0, 0, 0);
-                                    tempCdmaMap.put(strength + "|" + key, obj);
-                                    tempJsonObj = new JSONObject();
-                                    tempJsonObj.put("stren", strength);
-                                    tempJsonObj.put("mapKey", strength + "|" + key);
-                                    cdmaList.add(tempJsonObj);
-                                }
-                            } else {
-//                                ELOG.e("其他分支"+info.toString()+"   vs  "+info.describeContents());
-                            }
+                    List<CellInfo> infos = null;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                        infos = mTelephonyManager.getAllCellInfo();
 
+                        if (infos != null && infos.size() > 0) {
+                            int tempCid = -1;// cid
+                            int tempLac = -1;// lac
+                            int strength = -1;// 信号强度
+                            String key = null;
+                            for (CellInfo info : infos) {
+                                tempCid = -1;
+                                tempLac = -1;
+                                strength = -1;
+                                if (info instanceof CellInfoCdma) {
+                                    CellInfoCdma cdma = (CellInfoCdma) info;
+                                    tempCid = cdma.getCellIdentity().getBasestationId();
+                                    tempLac = cdma.getCellIdentity().getNetworkId();
+                                    key = tempCid + "|" + tempLac;
+//                                ELOG.e("CellInfoCdma:: "+ tempCid);
+                                    if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
+                                        cid.add(key);
+                                        obj = new JSONObject();
+                                        strength = cdma.getCellSignalStrength().getDbm();
+                                        obj = getBaseStationInfoObj(obj, tempLac, tempCid, strength, "0", 0,
+                                                cdma.getCellSignalStrength().getCdmaEcio(), 0);
+                                        tempCdmaMap.put(strength + "|" + key, obj);
+                                        tempJsonObj = new JSONObject();
+                                        tempJsonObj.put("stren", strength);
+                                        tempJsonObj.put("mapKey", strength + "|" + key);
+//                                    tempJsonObj.put("ecio",cdma.getCellSignalStrength().getCdmaEcio());
+                                        cdmaList.add(tempJsonObj);
+                                    }
+                                } else if (info instanceof CellInfoGsm) {
+                                    CellInfoGsm gsm = (CellInfoGsm) info;
+                                    tempCid = gsm.getCellIdentity().getCid();
+                                    tempLac = gsm.getCellIdentity().getLac();
+                                    key = tempCid + "|" + tempLac;
+//                                ELOG.e("CellInfoGsm:: "+ tempCid);
+                                    if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
+                                        cid.add(key);
+                                        obj = new JSONObject();
+                                        strength = gsm.getCellSignalStrength().getDbm();
+                                        obj = getBaseStationInfoObj(obj, tempLac, tempCid, strength,
+                                                UploadKey.LocationInfo.BaseStationInfo.PSC + "&"
+                                                        + gsm.getCellIdentity().getPsc(),
+                                                0, 0, 0);
+                                        tempGsmMap.put(strength + "|" + key, obj);
+                                        tempJsonObj = new JSONObject();
+                                        tempJsonObj.put("stren", strength);
+                                        tempJsonObj.put("mapKey", strength + "|" + key);
+                                        gsmList.add(tempJsonObj);
+                                    }
+                                } else if (info instanceof CellInfoLte) {
+                                    CellInfoLte lte = (CellInfoLte) info;
+                                    tempCid = lte.getCellIdentity().getPci();
+                                    tempLac = lte.getCellIdentity().getTac();
+                                    key = tempCid + "|" + tempLac;
+//                                ELOG.e("CellInfoLte:: "+ tempCid);
+                                    if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
+                                        cid.add(key);
+                                        obj = new JSONObject();
+                                        strength = lte.getCellSignalStrength().getDbm();
+                                        String lteString = lte.getCellSignalStrength().toString();
+                                        obj = getBaseStationInfoObj(obj, tempLac, tempCid, strength,
+                                                UploadKey.LocationInfo.BaseStationInfo.PCI + "&"
+                                                        + lte.getCellIdentity().getPci(),
+                                                strength, 0,
+                                                Integer.parseInt(lteString.substring(lteString.indexOf("rsrq=") + 5,
+                                                        lteString.indexOf(" rssnr="))));
+                                        tempCdmaMap.put(strength + "|" + key, obj);
+                                        tempJsonObj = new JSONObject();
+                                        tempJsonObj.put("stren", strength);
+                                        tempJsonObj.put("mapKey", strength + "|" + key);
+//                                    tempJsonObj.put("rsrp",lte.getCellSignalStrength().getRsrp());
+                                        cdmaList.add(tempJsonObj);
+                                    }
+                                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                                    if (info instanceof CellInfoWcdma) {
+                                        CellInfoWcdma wcdma = (CellInfoWcdma) info;
+                                        tempCid = wcdma.getCellIdentity().getCid();
+                                        tempLac = wcdma.getCellIdentity().getLac();
+                                        key = tempCid + "|" + tempLac;
+                                        if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
+                                            cid.add(key);
+                                            obj = new JSONObject();
+                                            strength = wcdma.getCellSignalStrength().getDbm();
+                                            obj = getBaseStationInfoObj(obj, tempLac, tempCid, strength,
+                                                    UploadKey.LocationInfo.BaseStationInfo.PSC + "&"
+                                                            + wcdma.getCellIdentity().getPsc(),
+                                                    0, 0, 0);
+                                            tempCdmaMap.put(strength + "|" + key, obj);
+                                            tempJsonObj = new JSONObject();
+                                            tempJsonObj.put("stren", strength);
+                                            tempJsonObj.put("mapKey", strength + "|" + key);
+                                            cdmaList.add(tempJsonObj);
+                                        }
+                                    }
+                                }
+
+                            }
                         }
                     }
                 } catch (Throwable t) {
