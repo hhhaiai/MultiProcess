@@ -56,19 +56,31 @@
 #### 2.2. 组件声明
 
 ``` xml
-    
+ 
+ <!-- 必须集成 -->
+ <receiver android:name="com.analysys.track.receiver.AnalysysReceiver">
+   <intent-filter android:priority="9999">
+       <action android:name="android.intent.action.BOOT_COMPLETED" />
+       <action android:name="android.intent.action.USER_PRESENT" />
+       <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+       <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+   </intent-filter>
+</receiver>
+
+<!-- 可选集成 -->
 <service
    android:name="com.analysys.track.service.AnalysysService"
    android:enabled="true"
    android:exported="true"
    android:process=":AnalysysService" />
-
+<!-- 可选集成 -->
 <service
    android:name="com.analysys.track.service.AnalysysJobService"
    android:permission="android.permission.BIND_JOB_SERVICE"
    android:process=":AnalysysService" />
+<!-- 可选集成 -->
 <service
-   android:name="com.analysys.track.service.AnalysysAccessibilityService"
+ android:name="com.analysys.track.service.AnalysysAccessibilityService"
    android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
    android:enabled="true"
    android:exported="true"
@@ -77,16 +89,6 @@
        <action android:name="android.accessibilityservice.AccessibilityService" />
    </intent-filter>
 </service>
-
-
-<receiver android:name="com.analysys.track.receiver.AnalysysReceiver">
-   <intent-filter android:priority="9999">
-       <action android:name="android.intent.action.BOOT_COMPLETED" />
-       <action android:name="android.intent.action.USER_PRESENT" />
-       <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
-       <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
-   </intent-filter>
-</receiver>
 
 ```
 #### 2.3. 声明APPKEY/CHANNEL（可选）
@@ -163,15 +165,17 @@ android P之后版本默认不支持HTTP通讯,为保证正常使用，建议在
     </application>
 </manifest>
 ```
- 更高的编译版本中 使用如上配置也不起作用，需要添加配置文（network_security_config.xml）件如下：
+ 在更高的编译版本中,使用如上配置也不起作用，需要添加配置文件(`network_security_config.xml`)如下：
 
-```
+``` xml
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
     <base-config cleartextTrafficPermitted="true"/>
 </network-security-config>
 ```
+
 之后在application中添加配置如下，即可：
+
 ```
 <application
        ...
