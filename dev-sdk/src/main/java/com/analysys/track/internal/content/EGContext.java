@@ -19,6 +19,7 @@ public class EGContext {
     public static final String SDK_TYPE = "Android";
     public static final String LOGTAG_USER = "analysys";
     public static final String UPLOAD_HEAD_APPV = "appVer";
+    public static final int FLAG_START_COUNT = 20;
     public static String LOGTAG_INNER;
     public static boolean FLAG_DEBUG_USER = false;
 

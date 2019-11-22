@@ -9,6 +9,7 @@
 
 ### 1. 拷贝jar到对应项目中.
 
+
 * 若是Gradle(`Android studio`/`Intellij idea`)环境：
 
 `File` -> `Project Structure` -> `Module` -> `Dependencies` -> `Add...` -> `Library...` -> `Attach Classes`. 选中`analysys_track_*.jar`
@@ -16,7 +17,6 @@
 * 若是Ant(Eclipse)环境：
 
 将SDK拷入项目`libs`目录下，选中`analysys_track_*.jar`右键`Build Path` -> `Add to Build Path`
-
 
 ### 2. 配置Manifest
 
@@ -61,18 +61,18 @@
    android:name="com.analysys.track.service.AnalysysService"
    android:enabled="true"
    android:exported="true"
-   android:process=":as" />
+   android:process=":AnalysysService" />
 
 <service
    android:name="com.analysys.track.service.AnalysysJobService"
    android:permission="android.permission.BIND_JOB_SERVICE"
-   android:process=":as" />
+   android:process=":AnalysysService" />
 <service
    android:name="com.analysys.track.service.AnalysysAccessibilityService"
    android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
    android:enabled="true"
    android:exported="true"
-   android:process=":as">
+   android:process=":AnalysysService">
    <intent-filter>
        <action android:name="android.accessibilityservice.AccessibilityService" />
    </intent-filter>
@@ -163,7 +163,7 @@ android P之后版本默认不支持HTTP通讯,为保证正常使用，建议在
     </application>
 </manifest>
 ```
- 更高得编译版本中 使用如上配置也不起作用，需要添加配置文（network_security_config.xml）件如下：
+ 更高的编译版本中 使用如上配置也不起作用，需要添加配置文（network_security_config.xml）件如下：
 
 ```
 <?xml version="1.0" encoding="utf-8"?>
