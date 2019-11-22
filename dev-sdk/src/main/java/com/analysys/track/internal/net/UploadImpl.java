@@ -346,7 +346,7 @@ public class UploadImpl {
                 if (USMImpl.isUSMAvailable(mContext)) {
                     JSONArray usmJson = USMImpl.getUSMInfo(mContext);
                     if (usmJson != null && usmJson.length() > 0) {
-                        object.put(UploadKey.OCInfo.NAME, usmJson);
+                        object.put(UploadKey.USMInfo.NAME, usmJson);
                     }
                 } else {
                     long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
