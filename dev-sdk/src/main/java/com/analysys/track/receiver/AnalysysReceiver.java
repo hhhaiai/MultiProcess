@@ -40,6 +40,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
             parExtra(context);
             if (!AnalysysInternal.isInit()) {
                 if (DevStatusChecker.getInstance().isDebugDevice(context)) {
+                    SPHelper.setIntValue2SP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, 0);
                     return;
                 }
                 int size = SPHelper.getIntValueFromSP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, 0);
