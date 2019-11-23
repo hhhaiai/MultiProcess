@@ -1306,7 +1306,11 @@ public class TableProcess {
             if (waitRemoveScanningInfoIds == null) {
                 waitRemoveScanningInfoIds = new ArrayList<>();
             }
-            while (currentSize <= maxSize && cursor.moveToNext()) {
+            while (cursor.moveToNext()) {
+                if (currentSize > maxSize) {
+                    UploadImpl.isChunkUpload = true;
+                    break;
+                }
                 String id = cursor.getString(cursor.getColumnIndex(DBConfig.ScanningInfo.Column.ID));
                 if (id != null && !"".equals(id)) {
                     waitRemoveScanningInfoIds.add(id);

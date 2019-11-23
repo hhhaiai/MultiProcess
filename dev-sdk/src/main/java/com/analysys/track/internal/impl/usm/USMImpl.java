@@ -54,6 +54,12 @@ public class USMImpl {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             return null;
         }
+        if (end - start <= 0) {
+            return null;
+        }
+        if (end - start >= EGContext.TIME_HOUR * 24 * 2) {
+            start = end - EGContext.TIME_HOUR * 24 * 2;
+        }
         try {
             PackageManager packageManager = context.getPackageManager();
             UsageEvents usageStats = USMUtils.getUsageEvents(start, end, context);
