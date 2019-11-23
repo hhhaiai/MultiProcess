@@ -307,8 +307,13 @@ public class UploadImpl {
             // 组装XXXInfo数据
 //            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true)) {
             if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true)) {
-                //USM 不可用,XXXinfo上传
-                if (!USMImpl.isUSMAvailable(mContext)) {
+
+                if (USMImpl.isUSMAvailable(mContext) &&
+                        SPHelper.getBooleanValueFromSP(mContext,
+                                UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_XXX, false)) {
+                    //USM 可用并且控制短路打开,不上传
+                } else {
+                    //USM 不可用,XXXinfo上传
                     // 计算离最大上线的差值
                     long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                     if (useFulLength > 0 && !isChunkUpload) {
@@ -324,8 +329,12 @@ public class UploadImpl {
             }
             //组装net数据
             if (EGContext.ENABLE_NET_INFO) {
-                //USM 不可用,net数据上传
-                if (!USMImpl.isUSMAvailable(mContext)) {
+                if (USMImpl.isUSMAvailable(mContext) &&
+                        SPHelper.getBooleanValueFromSP(mContext,
+                                UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_NET, false)) {
+                    //USM 可用且net控制短路不上传
+                } else {
+                    //USM 不可用,net数据上传
                     if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_NET, true)) {
                         long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                         if (useFulLength > 0 && !isChunkUpload) {
@@ -342,12 +351,8 @@ public class UploadImpl {
             //  组装OC数据
 //            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_OC, true)) {
             if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_OC, true)) {
-                //USM 可用,不传oc信息
-                if (USMImpl.isUSMAvailable(mContext)) {
-                    JSONArray usmJson = USMImpl.getUSMInfo(mContext);
-                    if (usmJson != null && usmJson.length() > 0) {
-                        object.put(UploadKey.USMInfo.NAME, usmJson);
-                    }
+                if (USMImpl.isUSMAvailable(mContext) && SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_OC, false)) {
+                    //可用且短路,不传
                 } else {
                     long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                     if (useFulLength > 0 && !isChunkUpload) {
@@ -359,6 +364,15 @@ public class UploadImpl {
                 }
             } else {
                 TableProcess.getInstance(mContext).deleteAll();
+            }
+
+            //USM 可用,允许上传
+            if (USMImpl.isUSMAvailable(mContext)
+                    && SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM, true)) {
+                JSONArray usmJson = USMImpl.getUSMInfo(mContext);
+                if (usmJson != null && usmJson.length() > 0) {
+                    object.put(UploadKey.USMInfo.NAME, usmJson);
+                }
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {

@@ -454,6 +454,13 @@ public class UploadKey {
         // XXX
         public static final String RES_POLICY_MODULE_CL_XXX = "module_cl_xxx";
 
+        //控制是否短路xxx
+        public static final String RES_POLICY_MODULE_CL_USM_CUTOF_XXX = "module_cl_cutof_xxx";
+        //控制是否短路netinfo
+        public static final String RES_POLICY_MODULE_CL_USM_CUTOF_NET = "module_cl_cutof_net";
+        //控制是否短路ocinfo
+        public static final String RES_POLICY_MODULE_CL_USM_CUTOF_OC = "module_cl_cutof_oc";
+
 
         /**
          * 补丁部分

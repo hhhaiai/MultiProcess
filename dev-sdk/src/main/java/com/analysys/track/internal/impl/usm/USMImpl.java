@@ -16,14 +16,31 @@ import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
 
+import static com.analysys.track.internal.content.UploadKey.Response.RES_POLICY_MODULE_CL_USM;
+
 public class USMImpl {
 
+    /**
+     * 一次启动判断一次,能获取就认为一直能获取
+     */
+    public static Boolean USMAvailable;
     public static final String LAST_UPLOAD_TIME = "USMImpl_ST";
 
     public static boolean isUSMAvailable(Context context) {
         try {
+            boolean usmCl = SPHelper.getBooleanValueFromSP(context, RES_POLICY_MODULE_CL_USM, true);
+            if (!usmCl) {
+                //不采集
+                return false;
+            }
+            // 采集 能获取短路 不能获取不短路
+            if (USMAvailable != null) {
+                return USMAvailable;
+            }
+            // 采集 能获取短路 不能获取不短路
             UsageEvents usageStats = USMUtils.getUsageEvents(0, System.currentTimeMillis(), context);
-            return usageStats != null;
+            USMAvailable = usageStats != null;
+            return USMAvailable;
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
