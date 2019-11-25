@@ -149,8 +149,8 @@ public class SystemUtils {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(exception);
             }
-            throw null;
         }
+        return "";
     }
 
     /**
