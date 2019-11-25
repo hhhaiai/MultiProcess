@@ -136,9 +136,11 @@ public class OCImpl {
                         }
                         return;
                     }
-                    if (USMImpl.isUSMAvailable(mContext)) {
+                    if (USMImpl.isUSMAvailable(mContext) &&
+                            SPHelper.getBooleanValueFromSP(mContext,
+                                    UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_OC, false)) {
                         if (EGContext.DEBUG_OC) {
-                            ELOG.d(EGContext.TAG_OC, "辅助功能可用 , 停止OC工作");
+                            ELOG.d(EGContext.TAG_OC, "辅助功能可用 并 被短路 , 停止OC工作");
                         }
                         return;
                     }

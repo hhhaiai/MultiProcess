@@ -19,6 +19,7 @@ import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.reflectinon.EContextHelper;
+import com.analysys.track.utils.sp.SPHelper;
 
 
 /**
@@ -149,12 +150,14 @@ public class MessageDispatcher {
                         });
                         break;
                     case MSG_INFO_NETS:
-                        long ocDurTime = OCImpl.getInstance(mContext).getOCDurTime();
                         ELOG.d(EGContext.TAG_SNAP, " 收到 net 信息。。心跳。。");
+                        //策略控制netinfo轮训取数时间默认30秒
+                        final int time = SPHelper.getIntValueFromSP(mContext, EGContext.SP_NET_CYCLE,
+                                EGContext.TIME_SECOND * 30);
                         NetImpl.getInstance(mContext).dumpNet(new ECallBack() {
                             @Override
                             public void onProcessed() {
-                                postDelay(MSG_INFO_NETS, EGContext.TIME_SECOND * 30);
+                                postDelay(MSG_INFO_NETS, time);
                             }
                         });
                         break;

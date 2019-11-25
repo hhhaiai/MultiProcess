@@ -14,6 +14,7 @@ import android.text.TextUtils;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.impl.usm.USMImpl;
 import com.analysys.track.internal.work.ECallBack;
@@ -22,6 +23,7 @@ import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.reflectinon.EContextHelper;
+import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
 
@@ -145,9 +147,12 @@ public class NetImpl {
 
     public HashMap<String, NetInfo> getNetInfo() {
         try {
-            if (USMImpl.isUSMAvailable(context)) {
-                //USM可用 不工作
+            if (USMImpl.isUSMAvailable(context) &&
+                    SPHelper.getBooleanValueFromSP(context,
+                            UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_NET, false)) {
+                //USM可用&&控制短路 不工作
                 return null;
+                //否则工作
             }
             pkgs = getCacheInfo();
 
