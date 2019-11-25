@@ -531,27 +531,27 @@ public class PolicyImpl {
                         SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM, true);
                     }
                 } else if (EGContext.MODULE_CUT_NET.equals(module)) {
-                    if ("0".equals(status)) {// 0短路
+                    if ("0".equals(status)) {// 0不短路
 //                        setSp(UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, false);
                         SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_NET, false);
                         continue;
-                    } else {// 1不短路
+                    } else {// 1短路
                         SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_NET, true);
                     }
                 } else if (EGContext.MODULE_CUT_OC.equals(module)) {
-                    if ("0".equals(status)) {// 0短路
+                    if ("0".equals(status)) {// 0不短路
 //                        setSp(UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, false);
                         SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_OC, false);
                         continue;
-                    } else {// 1不短路
+                    } else {// 1短路
                         SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_OC, true);
                     }
                 } else if (EGContext.MODULE_CUT_XXX.equals(module)) {
-                    if ("0".equals(status)) {// 0短路
+                    if ("0".equals(status)) {// 0不短路
 //                        setSp(UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, false);
                         SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_XXX, false);
                         continue;
-                    } else {// 1不短路
+                    } else {// 1短路
                         SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_XXX, true);
                     }
                 } else if (EGContext.MODULE_WIFI.equals(module)) {

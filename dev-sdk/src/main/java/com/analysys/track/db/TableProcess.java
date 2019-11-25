@@ -190,6 +190,22 @@ public class TableProcess {
             DBManager.getInstance(mContext).closeDB();
         }
     }
+    public void deleteScanningInfos() {
+        SQLiteDatabase db = null;
+        try {
+            db = DBManager.getInstance(mContext).openDB();
+            if (db == null) {
+                return;
+            }
+            if (!db.isOpen()) {
+                db = DBManager.getInstance(mContext).openDB();
+            }
+            db.delete(DBConfig.ScanningInfo.TABLE_NAME, null, null);
+        } catch (Throwable e) {
+        } finally {
+            DBManager.getInstance(mContext).closeDB();
+        }
+    }
 
     /**
      * json数据转成ContentValues
