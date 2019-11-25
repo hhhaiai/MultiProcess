@@ -184,7 +184,7 @@ public class USMUtils {
                         continue;
                     }
                     List<UsageStats> o3 = (List<UsageStats>) getList.invoke(parceledListSlice);
-                    if (o3 != null || o3.size() > 0) {
+                    if (o3 != null && o3.size() > 0) {
                         class RecentUseComparator implements Comparator<UsageStats> {
                             @Override
                             public int compare(UsageStats lhs, UsageStats rhs) {

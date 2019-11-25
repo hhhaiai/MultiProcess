@@ -356,7 +356,7 @@ public class TableProcess {
     public void insertOC(ContentValues cv) {
 
         try {
-            if (cv == null && cv.size() < 1) {
+            if (cv == null || cv.size() < 1) {
                 return;
             }
             if (cv.containsKey(DBConfig.OC.Column.ACT) && cv.containsKey(DBConfig.OC.Column.AOT)) {
