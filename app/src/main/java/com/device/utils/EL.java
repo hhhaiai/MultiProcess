@@ -442,7 +442,7 @@ public class EL {
     private static String getCallStaceInfo() {
         Exception callStack = new Exception("debug_info call stack.");
         StringBuilder sb = new StringBuilder();
-        StackTraceElement stackElement[] = Thread.currentThread().getStackTrace();
+        StackTraceElement[] stackElement = Thread.currentThread().getStackTrace();
         // 现在文件
         boolean currentFile = false;
         // 现在文件多重调用
@@ -1178,7 +1178,7 @@ public class EL {
             sb.append(CONTENT_LOG_EMPTY);
             return String.valueOf(sb);
         }
-        String ss[] = new String[]{};
+        String[] ss = new String[]{};
         String temp = null;
         if (log.contains("\n")) {
             ss = log.split("\n");
