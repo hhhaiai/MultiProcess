@@ -335,6 +335,7 @@ public class UploadImpl {
                     //USM 可用且net控制短路不上传
                 } else {
                     //USM 不可用,net数据上传
+                    //net允许采集,上传
                     if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_NET, true)) {
                         long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                         if (useFulLength > 0 && !isChunkUpload) {
@@ -343,8 +344,10 @@ public class UploadImpl {
                                 object.put(UploadKey.NETInfo.NAME, netJson);
                             }
                         }
+                        //net不允许采集,清除数据库
                     } else {
                         TableProcess.getInstance(mContext).deleteNet();
+                        TableProcess.getInstance(mContext).deleteScanningInfos();
                     }
                 }
             }

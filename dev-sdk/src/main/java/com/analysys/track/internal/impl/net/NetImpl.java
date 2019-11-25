@@ -17,6 +17,7 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.impl.usm.USMImpl;
+import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
@@ -153,6 +154,10 @@ public class NetImpl {
                 //USM可用&&控制短路 不工作
                 return null;
                 //否则工作
+            }
+            //net不允许采集,不工作,默认允许true
+            if(!SPHelper.getBooleanValueFromSP(context, UploadKey.Response.RES_POLICY_MODULE_CL_NET,true)){
+                return null;
             }
             pkgs = getCacheInfo();
 
