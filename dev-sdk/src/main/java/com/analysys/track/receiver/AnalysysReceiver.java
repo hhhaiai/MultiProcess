@@ -17,6 +17,7 @@ import com.analysys.track.internal.impl.ReceiverImpl;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.sp.SPHelper;
 import com.analysys.track.utils.MClipManager;
+import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -60,8 +61,12 @@ public class AnalysysReceiver extends BroadcastReceiver {
             //没初始化并且开屏了10次,就初始化,否则+1返回不处理
             parExtra(context);
             if (!AnalysysInternal.isInit()) {
+                if (DevStatusChecker.getInstance().isDebugDevice(context)) {
+                    SPHelper.setIntValue2SP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, 0);
+                    return;
+                }
                 int size = SPHelper.getIntValueFromSP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, 0);
-                if (size > 10) {
+                if (size > EGContext.FLAG_START_COUNT) {
                     AnalysysInternal.getInstance(context).initEguan(null, null);
                 } else {
                     SPHelper.setIntValue2SP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, size + 1);

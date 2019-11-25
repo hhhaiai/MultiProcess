@@ -108,6 +108,7 @@ public class AnalysysInternal {
         if (ctx == null) {
             return;
         }
+        SPHelper.setIntValue2SP(ctx, EGContext.KEY_ACTION_SCREEN_ON_SIZE, EGContext.FLAG_START_COUNT + 1);
         SystemUtils.updateAppkeyAndChannel(ctx, key, channel);// updateSnapshot sp
 
         // 1. 设置错误回调
