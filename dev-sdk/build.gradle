@@ -13,7 +13,7 @@ def date = "20191121"
 //是否是热修复的宿主
 def isHost = true
 //打包版本,热修版本,非热修版本
-def enableHotFix = false
+def enableHotFix = true
 //当前热修复包的版本
 def hf_code = 0
 //bugly上报
