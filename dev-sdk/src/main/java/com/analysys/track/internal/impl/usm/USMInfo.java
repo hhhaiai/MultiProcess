@@ -5,6 +5,8 @@ import com.analysys.track.utils.BuglyUtils;
 
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+
 public class USMInfo {
     private long closeTime;
     private long openTime;
@@ -29,6 +31,26 @@ public class USMInfo {
         try {
             jsonObject.putOpt("ACT", closeTime);
             jsonObject.putOpt("AOT", openTime);
+            jsonObject.putOpt("APN", pkgName);
+            jsonObject.putOpt("AN", appName);
+            jsonObject.putOpt("AVC", versionCode);
+            jsonObject.putOpt("NT", netType);
+            jsonObject.putOpt("ETDM", extendedMap.toJson());
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
+            //JSONException
+        }
+        return jsonObject;
+    }
+
+    public JSONObject toJsonForMatTime() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+            jsonObject.putOpt("AOT", dateFormat.format(openTime));
+            jsonObject.putOpt("ACT", dateFormat.format(closeTime));
             jsonObject.putOpt("APN", pkgName);
             jsonObject.putOpt("AN", appName);
             jsonObject.putOpt("AVC", versionCode);

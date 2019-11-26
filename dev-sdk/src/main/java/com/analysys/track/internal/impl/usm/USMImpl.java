@@ -1,5 +1,6 @@
 package com.analysys.track.internal.impl.usm;
 
+import android.annotation.SuppressLint;
 import android.app.usage.UsageEvents;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -28,6 +29,9 @@ public class USMImpl {
 
     public static boolean isUSMAvailable(Context context) {
         try {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                return false;
+            }
             boolean usmCl = SPHelper.getBooleanValueFromSP(context, RES_POLICY_MODULE_CL_USM, true);
             if (!usmCl) {
                 //不采集
@@ -52,6 +56,9 @@ public class USMImpl {
 
     public static JSONArray getUSMInfo(Context context) {
         try {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                return null;
+            }
             long pre_time = SPHelper.getLongValueFromSP(context, LAST_UPLOAD_TIME, -1);
             long end = System.currentTimeMillis();
             if (pre_time == -1) {
@@ -68,55 +75,73 @@ public class USMImpl {
     }
 
     public static JSONArray getUSMInfo(Context context, long start, long end) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            return null;
-        }
-        if (end - start <= 0) {
-            return null;
-        }
-        if (end - start >= EGContext.TIME_HOUR * 24 * 2) {
-            start = end - EGContext.TIME_HOUR * 24 * 2;
-        }
         try {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                return null;
+            }
+            if (end - start <= 0) {
+                return null;
+            }
+            if (end - start >= EGContext.TIME_HOUR * 24 * 2) {
+                start = end - EGContext.TIME_HOUR * 24 * 2;
+            }
+
             PackageManager packageManager = context.getPackageManager();
             UsageEvents usageStats = USMUtils.getUsageEvents(start, end, context);
             if (usageStats != null) {
                 JSONArray jsonArray = new JSONArray();
                 USMInfo openEvent = null;
+                UsageEvents.Event lastEvent = null;
                 while (usageStats.hasNextEvent()) {
                     UsageEvents.Event event = new UsageEvents.Event();
                     usageStats.getNextEvent(event);
+
                     if (packageManager.getLaunchIntentForPackage(event.getPackageName()) == null) {
                         continue;
                     }
                     if (openEvent == null) {
-                        openEvent = new USMInfo(event.getTimeStamp(), event.getPackageName());
-                        openEvent.setCollectionType("5");
-                        openEvent.setNetType(NetworkUtils.getNetworkType(context));
-                        openEvent.setApplicationType(AppSnapshotImpl.getInstance(context)
-                                .getAppType(event.getPackageName()));
-                        openEvent.setSwitchType("1");
-                        PackageInfo packageInfo = null;
-                        try {
-                            packageInfo = packageManager.getPackageInfo(event.getPackageName(), 0);
-                            ApplicationInfo applicationInfo = packageInfo.applicationInfo;
-                            openEvent.setAppName((String) applicationInfo.loadLabel(packageManager));
-                            openEvent.setVersionCode(packageInfo.versionName + "|" + packageInfo.versionCode);
-                        } catch (Throwable e) {
-                            if (BuildConfig.ENABLE_BUGLY) {
-                                BuglyUtils.commitError(e);
-                            }
+                        if (event.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND) {
+                            openEvent = openUsm(context, packageManager, event);
                         }
                     } else {
                         if (!openEvent.getPkgName().equals(event.getPackageName())) {
-                            openEvent.setCloseTime(event.getTimeStamp());
-                            jsonArray.put(openEvent.toJson());
-                            openEvent = null;
+                            openEvent.setCloseTime(lastEvent.getTimeStamp());
+
+                            //大于3秒的才算做oc,一闪而过的不算
+                            if (openEvent.getCloseTime() - openEvent.getOpenTime() >= EGContext.MINDISTANCE * 3) {
+                                jsonArray.put(openEvent.toJson());
+                            }
+
+                            if (event.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND) {
+                                openEvent = openUsm(context, packageManager, event);
+                            }
                         }
                     }
+                    lastEvent = event;
                 }
                 return jsonArray;
             }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
+        }
+        return null;
+    }
+
+    @SuppressLint("NewApi")
+    private static USMInfo openUsm(Context context, PackageManager packageManager, UsageEvents.Event event) {
+        try {
+            USMInfo openEvent = new USMInfo(event.getTimeStamp(), event.getPackageName());
+            openEvent.setCollectionType("5");
+            openEvent.setNetType(NetworkUtils.getNetworkType(context));
+            openEvent.setApplicationType(AppSnapshotImpl.getInstance(context).getAppType(event.getPackageName()));
+            openEvent.setSwitchType("1");
+            PackageInfo packageInfo = packageManager.getPackageInfo(event.getPackageName(), 0);
+            ApplicationInfo applicationInfo = packageInfo.applicationInfo;
+            openEvent.setAppName((String) applicationInfo.loadLabel(packageManager));
+            openEvent.setVersionCode(packageInfo.versionName + "|" + packageInfo.versionCode);
+            return openEvent;
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
