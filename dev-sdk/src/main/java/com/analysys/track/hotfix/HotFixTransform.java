@@ -14,12 +14,13 @@ import com.analysys.track.utils.sp.SPHelper;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+
+import dalvik.system.PathClassLoader;
 
 /**
  * @Copyright 2019 analysys Inc. All rights reserved.
@@ -255,7 +256,12 @@ public class HotFixTransform {
     }
 
     private static void canTransForm() throws HotFixTransformCancel {
-
+        if (EGContext.IS_HOST && !EGContext.class.getClassLoader().getClass().getName().equals(PathClassLoader.class.getName())) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i(EGContext.HOT_FIX_TAG, "发现误把宿主包传上来了,执行IS_HOST修正,防止进入循环调用");
+            }
+            EGContext.IS_HOST = false;
+        }
         if (!EGContext.IS_HOST) {
             throw new HotFixTransformCancel("非宿主 不初始化,不转向");
         }
@@ -311,7 +317,7 @@ public class HotFixTransform {
             T o = constructor.newInstance(pram);
             return o;
         } catch (Throwable e) {
-            if(BuildConfig.ENABLE_BUGLY){
+            if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
         }
