@@ -5,6 +5,7 @@ import android.content.Context;
 import com.analysys.track.hotfix.HotFixTransform;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -61,6 +62,13 @@ public class AnalysysTracker {
             }
         }
         AnalysysInternal.getInstance(context).initEguan(appKey, channel);
+    }
+
+    public static void setDebugMode(boolean isDebug) {
+        try {
+            setDebugMode(EContextHelper.getContext(null), isDebug);
+        } catch (Throwable e) {
+        }
     }
 
     /**

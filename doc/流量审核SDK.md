@@ -148,6 +148,9 @@ AnalysysTracker.setDebugMode( boolean isDebug);
   public *;
 }
 -dontwarn com.analysys.track.**
+```
+如果您集成了[MSA SDK](http://www.msa-alliance.cn)还需要添加以下混淆.如果已添请忽略无需重复添加.
+```
 -keep class com.bun.miitmdid.core.** {*;}
 ```
 
