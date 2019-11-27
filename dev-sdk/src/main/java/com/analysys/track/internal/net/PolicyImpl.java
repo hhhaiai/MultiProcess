@@ -201,6 +201,13 @@ public class PolicyImpl {
         SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_TIMER_INTERVAL);
         SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_CTRL_LIST);
         SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_OC);
+
+        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_NET);
+        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM);
+        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_XXX);
+        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_NET);
+        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_OC);
+
         SPHelper.removeKey(mContext, EGContext.SP_OC_CYCLE);
         SPHelper.removeKey(mContext, EGContext.SP_NET_CYCLE);
         SPHelper.removeKey(mContext, EGContext.SP_LOCATION_CYCLE);
