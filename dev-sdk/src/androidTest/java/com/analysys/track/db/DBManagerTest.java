@@ -2,6 +2,8 @@ package com.analysys.track.db;
 
 import com.analysys.track.AnalsysTest;
 
+import org.json.JSONArray;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,10 +17,10 @@ import static org.junit.Assert.assertEquals;
 public class DBManagerTest extends AnalsysTest {
     @Before
     public void bif() {
-        File f = mContext.getDatabasePath("ev2.data");
-        if (f.exists()) {
-            f.delete();
-        }
+//        File f = mContext.getDatabasePath("ev2.data");
+//        if (f.exists()) {
+//            f.delete();
+//        }
     }
 
     @Test
@@ -47,17 +49,32 @@ public class DBManagerTest extends AnalsysTest {
 
     @Test
     public void openDB() throws InterruptedException {
+       // TableProcess.getInstance(mContext).deleteNet();
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                TableProcess.getInstance(mContext).insertNet("hetlo");
-                TableProcess.getInstance(mContext).insertNet("her3lo");
-                TableProcess.getInstance(mContext).insertNet("hegflo");
-                TableProcess.getInstance(mContext).insertNet("hefdlo");
-                TableProcess.getInstance(mContext).insertNet("hefdao");
-                TableProcess.getInstance(mContext).insertTempId(hashCode() + "3213123");
-                TableProcess.getInstance(mContext).insertTempId(hashCode() + "fd23");
-                TableProcess.getInstance(mContext).insertTempId(hashCode() + "32sdfa3123");
+                try {
+                    Thread.sleep((long) (Math.random() * 100 + 1));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                JSONArray jsonArray = new JSONArray();
+                jsonArray.put(hashCode() + "-" + Math.random() + "");
+                TableProcess.getInstance(mContext).insertNet(jsonArray.toString());
+            }
+        };
+        Runnable delRun = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep((long) (Math.random() * 20 + 1));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                File f = mContext.getDatabasePath("ev2.data");
+                if (f.exists()) {
+                    f.delete();
+                }
             }
         };
         List<Thread> threads = new ArrayList<>(50);
@@ -66,10 +83,15 @@ public class DBManagerTest extends AnalsysTest {
             threads.add(thread);
             thread.start();
         }
+//        Thread del = new Thread(delRun);
+//        threads.add(del);
+//        del.start();
         for (Thread thread :
                 threads) {
             thread.join();
         }
+        JSONArray jsonArray = TableProcess.getInstance(mContext).selectNet(Integer.MAX_VALUE);
+        Assert.assertNotNull(jsonArray);
     }
 
     @Test

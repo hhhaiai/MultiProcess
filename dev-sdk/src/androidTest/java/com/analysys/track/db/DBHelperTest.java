@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 public class DBHelperTest extends AnalsysTest {
     @Test
     public void getInstance() throws InterruptedException {
-        final HashSet<DBHelper> helpers = new HashSet();
+        final HashSet<DBHelper> helpers = new HashSet<>();
         Runnable run = new Runnable() {
             @Override
             public void run() {
