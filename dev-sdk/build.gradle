@@ -15,7 +15,7 @@ def isHost = true
 //打包版本,热修版本,非热修版本
 def enableHotFix = true
 //当前热修复包的版本
-def hf_code = 0
+def hf_code = 123
 //bugly上报
 def ENABLE_BUGLY = false
 

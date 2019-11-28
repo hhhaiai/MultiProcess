@@ -58,15 +58,7 @@ public class HotFixTransform {
         if (!isInit()) {
             synchronized (HotFixTransform.class) {
                 if (!isInit()) {
-                    String path = null;
-                    if (ProcessUtils.isMainProcess(context)) {
-                        path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH_TEMP, "");
-                        if (hasDexFile(path)) {
-                            SPHelper.setStringValue2SP(context, EGContext.HOT_FIX_PATH, path);
-                        }
-                    }
-                    path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH, "");
-
+                    String path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH, "");
                     boolean enable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
                     if (enable && hasDexFile(path)) {
                         setAnalClassloader(context, path);
