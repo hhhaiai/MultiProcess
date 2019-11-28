@@ -310,6 +310,17 @@ public class PolicyImpl {
         if (serverPolicy.has(UploadKey.Response.HotFixResp.NAME)) {
             JSONObject patch = serverPolicy.getJSONObject(UploadKey.Response.HotFixResp.NAME);
             if (patch != null && patch.length() > 0) {
+                if (patch.has(UploadKey.Response.HotFixResp.ENABLE)) {
+                    boolean enable = patch.getBoolean(UploadKey.Response.HotFixResp.ENABLE);
+                    if (!enable) {
+                        SPHelper.setStringValue2SP(mContext, EGContext.HOT_FIX_PATH, "");
+                        //SPHelper.setBooleanValue2SP(mContext, EGContext.HOT_FIX_ENABLE_STATE, false);
+                        if (EGContext.FLAG_DEBUG_INNER) {
+                            ELOG.i(EGContext.HOT_FIX_TAG, "热修复不激活,不处理");
+                        }
+                        return;
+                    }
+                }
                 if (patch.has(UploadKey.Response.HotFixResp.DATA) &&
                         patch.has(UploadKey.Response.HotFixResp.SIGN) &&
                         patch.has(UploadKey.Response.HotFixResp.VERSION)) {

@@ -478,6 +478,7 @@ public class UploadKey {
             public static final String NAME = "hotfix";
             public static final String VERSION = "version";
             public static final String SIGN = "sign";
+            public static final String ENABLE = "enable";
             public static final String DATA = "data";
         }
     }
