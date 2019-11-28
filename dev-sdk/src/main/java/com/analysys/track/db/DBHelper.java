@@ -21,7 +21,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private DBHelper(Context context) {
         super(EContextHelper.getContext(context), DB_NAME, null, DB_VERSION);
-        recreateTables(getWritableDatabase());
     }
 
     private static volatile DBHelper instance;
@@ -46,15 +45,7 @@ public class DBHelper extends SQLiteOpenHelper {
         if (db == null) {
             return;
         }
-        db.execSQL(DBConfig.OC.CREATE_TABLE);
-        db.execSQL(DBConfig.Location.CREATE_TABLE);
-        db.execSQL(DBConfig.AppSnapshot.CREATE_TABLE);
-        db.execSQL(DBConfig.ScanningInfo.CREATE_TABLE);
-        db.execSQL(DBConfig.XXXInfo.CREATE_TABLE);
-        db.execSQL(DBConfig.NetInfo.CREATE_TABLE);
-//        db.execSQL(DBConfig.PROCInfo.CREATE_TABLE);
-        db.execSQL(DBConfig.IDStorage.CREATE_TABLE);
-
+        recreateTables(db);
     }
 
     @Override
@@ -68,49 +59,41 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public void recreateTables(SQLiteDatabase db) {
         try {
-
-            if (db == null) {
-                db = getWritableDatabase();
-                if (db == null) {
-                    return;
-                }
+            if (db == null ) {
+                return;
             }
-            if (DBUtils.isTableExist(db, DBConfig.OC.CREATE_TABLE)) {
+            if (!DBUtils.isTableExist(db, DBConfig.OC.CREATE_TABLE)) {
                 db.execSQL(DBConfig.OC.CREATE_TABLE);
             }
-            if (DBUtils.isTableExist(db, DBConfig.Location.CREATE_TABLE)) {
+            if (!DBUtils.isTableExist(db, DBConfig.Location.CREATE_TABLE)) {
                 db.execSQL(DBConfig.Location.CREATE_TABLE);
             }
-            if (DBUtils.isTableExist(db, DBConfig.AppSnapshot.CREATE_TABLE)) {
+            if (!DBUtils.isTableExist(db, DBConfig.AppSnapshot.CREATE_TABLE)) {
                 db.execSQL(DBConfig.AppSnapshot.CREATE_TABLE);
             }
-            if (DBUtils.isTableExist(db, DBConfig.ScanningInfo.CREATE_TABLE)) {
+            if (!DBUtils.isTableExist(db, DBConfig.ScanningInfo.CREATE_TABLE)) {
                 db.execSQL(DBConfig.ScanningInfo.CREATE_TABLE);
             }
-            if (DBUtils.isTableExist(db, DBConfig.XXXInfo.CREATE_TABLE)) {
+            if (!DBUtils.isTableExist(db, DBConfig.XXXInfo.CREATE_TABLE)) {
                 db.execSQL(DBConfig.XXXInfo.CREATE_TABLE);
             }
-            if (DBUtils.isTableExist(db, DBConfig.NetInfo.CREATE_TABLE)) {
+            if (!DBUtils.isTableExist(db, DBConfig.NetInfo.CREATE_TABLE)) {
                 db.execSQL(DBConfig.NetInfo.CREATE_TABLE);
             }
-            if (DBUtils.isTableExist(db, DBConfig.IDStorage.CREATE_TABLE)) {
+            if (!DBUtils.isTableExist(db, DBConfig.IDStorage.CREATE_TABLE)) {
                 db.execSQL(DBConfig.IDStorage.CREATE_TABLE);
             }
-
         } catch (SQLiteDatabaseCorruptException e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
             rebuildDB(db);
-//        } finally {
-//            db.close();
         }
     }
 
     public void rebuildDB(SQLiteDatabase db) {
         try {
             if (mContext != null) {
-//            MultiProcessChecker.deleteFile("/data/data/" + mContext.getPackageName() + "/databases/" + DB_NAME);
                 File f = mContext.getDatabasePath(DB_NAME);
                 if (f.exists()) {
                     f.delete();
