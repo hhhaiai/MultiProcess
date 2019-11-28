@@ -7,7 +7,6 @@ import com.analysys.track.internal.impl.net.NetInfo;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +19,7 @@ public class TableProcessNetInfoTest extends AnalsysTest {
 
     @Before
     public void setUp() throws Exception {
-        DBHelper.getInstance(mContext).rebuildDB(null);
+        DBHelper.getInstance(mContext).delDbFile(null);
     }
 
     @Test
