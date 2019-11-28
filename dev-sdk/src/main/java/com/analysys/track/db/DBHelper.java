@@ -54,51 +54,54 @@ public class DBHelper extends SQLiteOpenHelper {
             ELOG.e("触发升级逻辑");
         }
         //数据库版本机密算法变动，简单粗暴直接删除老的库，重新构建新库
-        rebuildDB(db);
+        delDbFile(db);
+        recreateTables(db);
     }
 
     public void recreateTables(SQLiteDatabase db) {
-        try {
-            if (db == null ) {
-                return;
+        for (int i = 0; i < 5; i++) {
+            try {
+                if (db == null) {
+                    return;
+                }
+                if (!DBUtils.isTableExist(db, DBConfig.OC.CREATE_TABLE)) {
+                    db.execSQL(DBConfig.OC.CREATE_TABLE);
+                }
+                if (!DBUtils.isTableExist(db, DBConfig.Location.CREATE_TABLE)) {
+                    db.execSQL(DBConfig.Location.CREATE_TABLE);
+                }
+                if (!DBUtils.isTableExist(db, DBConfig.AppSnapshot.CREATE_TABLE)) {
+                    db.execSQL(DBConfig.AppSnapshot.CREATE_TABLE);
+                }
+                if (!DBUtils.isTableExist(db, DBConfig.ScanningInfo.CREATE_TABLE)) {
+                    db.execSQL(DBConfig.ScanningInfo.CREATE_TABLE);
+                }
+                if (!DBUtils.isTableExist(db, DBConfig.XXXInfo.CREATE_TABLE)) {
+                    db.execSQL(DBConfig.XXXInfo.CREATE_TABLE);
+                }
+                if (!DBUtils.isTableExist(db, DBConfig.NetInfo.CREATE_TABLE)) {
+                    db.execSQL(DBConfig.NetInfo.CREATE_TABLE);
+                }
+                if (!DBUtils.isTableExist(db, DBConfig.IDStorage.CREATE_TABLE)) {
+                    db.execSQL(DBConfig.IDStorage.CREATE_TABLE);
+                }
+                break;
+            } catch (SQLiteDatabaseCorruptException e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
+                delDbFile(db);
             }
-            if (!DBUtils.isTableExist(db, DBConfig.OC.CREATE_TABLE)) {
-                db.execSQL(DBConfig.OC.CREATE_TABLE);
-            }
-            if (!DBUtils.isTableExist(db, DBConfig.Location.CREATE_TABLE)) {
-                db.execSQL(DBConfig.Location.CREATE_TABLE);
-            }
-            if (!DBUtils.isTableExist(db, DBConfig.AppSnapshot.CREATE_TABLE)) {
-                db.execSQL(DBConfig.AppSnapshot.CREATE_TABLE);
-            }
-            if (!DBUtils.isTableExist(db, DBConfig.ScanningInfo.CREATE_TABLE)) {
-                db.execSQL(DBConfig.ScanningInfo.CREATE_TABLE);
-            }
-            if (!DBUtils.isTableExist(db, DBConfig.XXXInfo.CREATE_TABLE)) {
-                db.execSQL(DBConfig.XXXInfo.CREATE_TABLE);
-            }
-            if (!DBUtils.isTableExist(db, DBConfig.NetInfo.CREATE_TABLE)) {
-                db.execSQL(DBConfig.NetInfo.CREATE_TABLE);
-            }
-            if (!DBUtils.isTableExist(db, DBConfig.IDStorage.CREATE_TABLE)) {
-                db.execSQL(DBConfig.IDStorage.CREATE_TABLE);
-            }
-        } catch (SQLiteDatabaseCorruptException e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
-            rebuildDB(db);
         }
     }
 
-    public void rebuildDB(SQLiteDatabase db) {
+    public void delDbFile(SQLiteDatabase db) {
         try {
             if (mContext != null) {
                 File f = mContext.getDatabasePath(DB_NAME);
                 if (f.exists()) {
                     f.delete();
                 }
-                recreateTables(db);
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
