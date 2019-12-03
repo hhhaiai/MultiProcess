@@ -54,7 +54,6 @@
 #### 2.2. 组件声明
 
 ``` xml
- 
  <!-- 必须集成 -->
  <receiver android:name="com.analysys.track.receiver.AnalysysReceiver">
    <intent-filter android:priority="9999">
@@ -87,7 +86,6 @@
        <action android:name="android.accessibilityservice.AccessibilityService" />
    </intent-filter>
 </service>
-
 ```
 #### 2.3. 声明APPKEY/CHANNEL（可选）
 
@@ -131,7 +129,6 @@ AnalysysTracker.init(context,"appkey","my-channel");
 #### 3.2. 设置debug模式
 
 ``` java
-
 AnalysysTracker.setDebugMode( boolean isDebug);
 ```
 * 参数
@@ -192,7 +189,6 @@ android P之后版本默认不支持HTTP通讯,为保证正常使用，建议在
 * build.gradle
     
 ``` groovy
-
 android {
     buildTypes {
         release {
@@ -206,7 +202,5 @@ android {
 * multidex-config.pro
 
 ``` groovy
-
 -keep class com.analysys.track.** { *; } 
-
 ```
