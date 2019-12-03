@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.hotfix.HotFixTransform;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
@@ -24,30 +25,34 @@ public class AnalysysService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        try {
-            IBinder iBinder = HotFixTransform.transform(
-                    HotFixTransform.make(AnalysysService.class.getName())
-                    , AnalysysService.class.getName()
-                    , "onBind", intent);
-            if (iBinder != null) {
-                return iBinder;
-            }
-        } catch (Throwable e) {
+        if (BuildConfig.enableHotFix) {
+            try {
+                IBinder iBinder = HotFixTransform.transform(
+                        HotFixTransform.make(AnalysysService.class.getName())
+                        , AnalysysService.class.getName()
+                        , "onBind", intent);
+                if (iBinder != null) {
+                    return iBinder;
+                }
+            } catch (Throwable e) {
 
+            }
         }
         return null;
     }
 
     @Override
     public void onCreate() {
-        try {
-            HotFixTransform.transform(
-                    HotFixTransform.make(AnalysysService.class.getName())
-                    , AnalysysService.class.getName()
-                    , "onCreate");
-            return;
-        } catch (Throwable e) {
+        if (BuildConfig.enableHotFix) {
+            try {
+                HotFixTransform.transform(
+                        HotFixTransform.make(AnalysysService.class.getName())
+                        , AnalysysService.class.getName()
+                        , "onCreate");
+                return;
+            } catch (Throwable e) {
 
+            }
         }
         super.onCreate();
 
@@ -60,17 +65,19 @@ public class AnalysysService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        try {
-            Integer o = HotFixTransform.transform(
-                    HotFixTransform.make(AnalysysService.class.getName())
-                    , AnalysysService.class.getName()
-                    , "onStartCommand", intent, flags, startId);
-            if (o != null) {
-                return o;
-            }
-            return Service.START_STICKY;
-        } catch (Throwable e) {
+        if (BuildConfig.enableHotFix) {
+            try {
+                Integer o = HotFixTransform.transform(
+                        HotFixTransform.make(AnalysysService.class.getName())
+                        , AnalysysService.class.getName()
+                        , "onStartCommand", intent, flags, startId);
+                if (o != null) {
+                    return o;
+                }
+                return Service.START_STICKY;
+            } catch (Throwable e) {
 
+            }
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysService onStartCommand");
@@ -80,14 +87,16 @@ public class AnalysysService extends Service {
 
     @Override
     public void onDestroy() {
-        try {
-            HotFixTransform.transform(
-                    HotFixTransform.make(AnalysysService.class.getName())
-                    , AnalysysService.class.getName()
-                    , "onDestroy");
-            return;
-        } catch (Throwable e) {
+        if (BuildConfig.enableHotFix) {
+            try {
+                HotFixTransform.transform(
+                        HotFixTransform.make(AnalysysService.class.getName())
+                        , AnalysysService.class.getName()
+                        , "onDestroy");
+                return;
+            } catch (Throwable e) {
 
+            }
         }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysService onDestroy");

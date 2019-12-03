@@ -9,16 +9,18 @@ import android.os.Looper;
 import android.os.Message;
 
 import com.analysys.track.BuildConfig;
+import com.analysys.track.hotfix.HotFixImpl;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
-import com.analysys.track.internal.impl.HotFixImpl;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.NinjaUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
+import com.analysys.track.utils.sp.SPHelper;
 
 
 /**
@@ -72,6 +74,10 @@ public class MessageDispatcher {
                         break;
 
                     case MSG_INFO_UPLOAD:
+                        if (NinjaUtils.isLowMemory(mContext)) {
+                            postDelay(MSG_INFO_UPLOAD, EGContext.TIME_SECOND * 5);
+                            break;
+                        }
                         if (EGContext.DEBUG_UPLOAD) {
                             ELOG.i(EGContext.TAG_UPLOAD, "上行检测，心跳。。。。");
                         }
@@ -112,12 +118,14 @@ public class MessageDispatcher {
                         break;
 
                     case MSG_INFO_HOTFIX:
-                        HotFixImpl.reqHotFix(mContext, new ECallBack() {
-                            @Override
-                            public void onProcessed() {
-                                postDelay(MSG_INFO_HOTFIX, EGContext.TIME_SECOND * 10);
-                            }
-                        });
+                        if (BuildConfig.enableHotFix) {
+                            HotFixImpl.reqHotFix(mContext, new ECallBack() {
+                                @Override
+                                public void onProcessed() {
+                                    postDelay(MSG_INFO_HOTFIX, EGContext.TIME_SECOND * 10);
+                                }
+                            });
+                        }
                         break;
                     case MSG_INFO_SNAPS:
                         if (EGContext.DEBUG_SNAP) {
@@ -147,12 +155,18 @@ public class MessageDispatcher {
                         });
                         break;
                     case MSG_INFO_NETS:
-                        long ocDurTime = OCImpl.getInstance(mContext).getOCDurTime();
+                        if (NinjaUtils.isLowMemory(mContext)) {
+                            postDelay(MSG_INFO_NETS, EGContext.TIME_SECOND * 30);
+                            break;
+                        }
                         ELOG.d(EGContext.TAG_SNAP, " 收到 net 信息。。心跳。。");
+                        //策略控制netinfo轮训取数时间默认30秒
+                        final int time = SPHelper.getIntValueFromSP(mContext, EGContext.SP_NET_CYCLE,
+                                EGContext.TIME_SECOND * 30);
                         NetImpl.getInstance(mContext).dumpNet(new ECallBack() {
                             @Override
                             public void onProcessed() {
-                                postDelay(MSG_INFO_NETS, EGContext.TIME_SECOND * 30);
+                                postDelay(MSG_INFO_NETS, time);
                             }
                         });
                         break;
@@ -189,7 +203,9 @@ public class MessageDispatcher {
         // 5秒后上传
         postDelay(MSG_INFO_UPLOAD, 5 * EGContext.TIME_SECOND);
         //10 秒后检查热修复
-        postDelay(MSG_INFO_HOTFIX, 10 * EGContext.TIME_SECOND);
+        if (BuildConfig.enableHotFix) {
+            postDelay(MSG_INFO_HOTFIX, 10 * EGContext.TIME_SECOND);
+        }
 
     }
 

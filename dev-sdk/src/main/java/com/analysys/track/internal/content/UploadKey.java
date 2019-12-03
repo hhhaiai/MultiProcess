@@ -24,6 +24,8 @@ public class UploadKey {
         public static final String DeviceBrand = "DB";
         // 设备Id，由IMEI-IMSI-AndroidId组成，如：863363036038592-460019031508084-144379774dc1c0b8
         public static final String DeviceId = "DI";
+        //OAID 厂商联盟的id,需要SDK集成方集成了相关SDK才可以获取
+        public static final String OAID = "OAID";
         // 设备型号 , 如：“Lenovo S760”
         public static final String DeviceModel = "DM";
         // 设备MAC地址，如：“6c:5c:14:25:be:ba”
@@ -249,6 +251,9 @@ public class UploadKey {
     public static class NETInfo {
         public static final String NAME = "NETInfo";
     }
+    public static class USMInfo {
+        public static final String NAME = "USMInfo";
+    }
     /**
      * @Copyright © 2019 sanbo Inc. All rights reserved.
      * @Description: 内部使用的XXXinfo
@@ -427,6 +432,7 @@ public class UploadKey {
         // OC
         public static final String RES_POLICY_MODULE_CL_OC = "module_cl_oc";
         public static final String RES_POLICY_MODULE_CL_NET = "module_cl_net";
+        public static final String RES_POLICY_MODULE_CL_USM = "module_cl_USM";
         // SNAPSHOT
         public static final String RES_POLICY_MODULE_CL_SNAPSHOT = "module_cl_snapshot";
         // LOCATION
@@ -448,6 +454,13 @@ public class UploadKey {
         // XXX
         public static final String RES_POLICY_MODULE_CL_XXX = "module_cl_xxx";
 
+        //控制是否短路xxx
+        public static final String RES_POLICY_MODULE_CL_USM_CUTOF_XXX = "module_cl_cutof_xxx";
+        //控制是否短路netinfo
+        public static final String RES_POLICY_MODULE_CL_USM_CUTOF_NET = "module_cl_cutof_net";
+        //控制是否短路ocinfo
+        public static final String RES_POLICY_MODULE_CL_USM_CUTOF_OC = "module_cl_cutof_oc";
+
 
         /**
          * 补丁部分
@@ -465,6 +478,7 @@ public class UploadKey {
             public static final String NAME = "hotfix";
             public static final String VERSION = "version";
             public static final String SIGN = "sign";
+            public static final String OPERA = "opera";
             public static final String DATA = "data";
         }
     }

@@ -19,7 +19,8 @@ public class EGContext {
     public static final String SDK_TYPE = "Android";
     public static final String LOGTAG_USER = "analysys";
     public static final String UPLOAD_HEAD_APPV = "appVer";
-    public static final boolean ENABLE_NET_INFO = false;
+    public static final int FLAG_START_COUNT = 20;
+    public static final boolean ENABLE_NET_INFO = true;
     public static String LOGTAG_INNER;
     public static boolean FLAG_DEBUG_USER = false;
 
@@ -44,6 +45,7 @@ public class EGContext {
     //获取间隔时间
     public static final String SP_SNAPSHOT_CYCLE = "SP_SNAPSHOT_CYCLE";
     public static final String SP_LOCATION_CYCLE = "SP_LOCATION_CYCLE";
+    public static final String SP_NET_CYCLE = "SP_NET_CYCLE";
     public static final String SP_OC_CYCLE = "SP_OC_CYCLE";
 
     public static final String SP_APP_SNAP = "S_SNAP_TIME";
@@ -206,7 +208,7 @@ public class EGContext {
     public static final String MULTI_FILE_UPLOAD_RETRY = "M_TMP";
     public static final String MULTI_FILE_UPLOAD = "M_UP";
 
-    // 上传模块
+    // 上传模块  1 传 0 不传
     public static final String MODULE_OC = "M_OC";
     public static final String MODULE_SNAPSHOT = "M_SNAP";
     public static final String MODULE_LOCATION = "M_LOC";
@@ -214,6 +216,11 @@ public class EGContext {
     public static final String MODULE_BASE = "M_BASE";
     public static final String MODULE_DEV = "M_DEV";
     public static final String MODULE_XXX = "M_XXX";
+    public static final String MODULE_USM = "M_USM";
+    public static final String MODULE_NET = "M_NET";
+    public static final String MODULE_CUT_NET = "M_CUT_NET";
+    public static final String MODULE_CUT_OC = "M_CUT_OC";
+    public static final String MODULE_CUT_XXX = "M_CUT_XXX";
     public static final String SPUTIL = "sptrack";
     /**
      * 判断是否debug App列表

@@ -28,10 +28,10 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.MultiProcessChecker;
+import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.NetworkUtils;
+import com.analysys.track.utils.OAIDHelper;
 import com.analysys.track.utils.PermissionUtils;
-import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -135,30 +135,40 @@ public class DeviceImpl {
      */
     @SuppressWarnings("deprecation")
     public String getDeviceId() {
-        String deviceId = "";
+        String deviceId = "", imei = "", imsi = "";
         try {
             if (mContext != null) {
-                String imei = "", imsi = "";
                 if (PermissionUtils.checkPermission(mContext, Manifest.permission.READ_PHONE_STATE)) {
                     TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
                     imei = tm.getDeviceId();
                     imsi = tm.getSubscriberId();
                 }
-                String androidId = android.provider.Settings.System.getString(mContext.getContentResolver(),
-                        Settings.Secure.ANDROID_ID);
-                deviceId = (TextUtils.isEmpty(imei) ? "null" : imei) + "-" + (TextUtils.isEmpty(imsi) ? "null" : imsi)
-                        + "-" + (TextUtils.isEmpty(androidId) ? "null" : androidId);
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
             }
-            deviceId = "";
+        }
+        try {
+            String androidId = Settings.System.getString(mContext.getContentResolver(),
+                    Settings.Secure.ANDROID_ID);
+            deviceId = (TextUtils.isEmpty(imei) ? "null" : imei) + "-" + (TextUtils.isEmpty(imsi) ? "null" : imsi)
+                    + "-" + (TextUtils.isEmpty(androidId) ? "null" : androidId);
+        } catch (Throwable e) {
         }
 
         return deviceId;
     }
 
+    public String getOAID() {
+        if (Build.VERSION.SDK_INT >= 29) {
+            String oaid = SPHelper.getStringValueFromSP(mContext, OAIDHelper.OAID, "");
+            if (!TextUtils.isEmpty(oaid)) {
+                return oaid;
+            }
+        }
+        return null;
+    }
 
     /**
      * MAC 地址
@@ -199,10 +209,15 @@ public class DeviceImpl {
     private String getMacByAndridAPI() {
         String macAddress = "";
         try {
-            WifiManager wifi = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+            WifiManager wifi = (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             if (PermissionUtils.checkPermission(mContext, permission.ACCESS_WIFI_STATE)) {
-                WifiInfo info = wifi.getConnectionInfo();
-                macAddress = info.getMacAddress();
+                WifiInfo info = null;
+                if (wifi != null) {
+                    info = wifi.getConnectionInfo();
+                }
+                if (info != null) {
+                    macAddress = info.getMacAddress();
+                }
 
             } else {
                 macAddress = DEFALT_MAC;
@@ -739,60 +754,62 @@ public class DeviceImpl {
 
     public String getBuildSupportedAbis() {
         try {
-            return stringArrayToString(Build.SUPPORTED_ABIS);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                return stringArrayToString(Build.SUPPORTED_ABIS);
+            }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
             }
-            return "";
         }
-
+        return "";
     }
 
     public String getBuildSupportedAbis32() {
         try {
-            return stringArrayToString(Build.SUPPORTED_32_BIT_ABIS);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                return stringArrayToString(Build.SUPPORTED_32_BIT_ABIS);
+            }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
             }
-            return "";
         }
+        return "";
     }
 
     public String getBuildSupportedAbis64() {
         try {
-            return stringArrayToString(Build.SUPPORTED_64_BIT_ABIS);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                return stringArrayToString(Build.SUPPORTED_64_BIT_ABIS);
+            }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
             }
-            return "";
         }
+        return "";
     }
 
 
     public String getIDFA() {
         String idfa = "";
         try {
-            new Thread(new Runnable() {
+            idfa = SPHelper.getStringValueFromSP(mContext, EGContext.SP_APP_IDFA, "");
+            if (!idfa.isEmpty()) {
+                return idfa;
+            }
+            EThreadPool.execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         AdvertisingIdClient.AdInfo adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);// 阻塞调用，需放在子线程处理
                         String advertisingId = adInfo.getId();
                         SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_IDFA, advertisingId);
-                    } catch (Exception e) {
-                        if (BuildConfig.ENABLE_BUGLY) {
-                            BuglyUtils.commitError(e);
-                        }
+                    } catch (Throwable e) {
                     }
                 }
-            }).start();
-            idfa = SPHelper.getStringValueFromSP(mContext, EGContext.SP_APP_IDFA, "");
-            if (!idfa.isEmpty()) {
-                return idfa;
-            }
+            });
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);

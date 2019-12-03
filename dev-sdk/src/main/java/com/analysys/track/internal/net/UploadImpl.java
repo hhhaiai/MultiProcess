@@ -9,6 +9,8 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
+import com.analysys.track.internal.impl.net.NetInfo;
+import com.analysys.track.internal.impl.usm.USMImpl;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.DeflterCompressUtils;
 import com.analysys.track.utils.ELOG;
@@ -27,6 +29,7 @@ import org.json.JSONObject;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -255,19 +258,6 @@ public class UploadImpl {
             if (devJson != null && devJson.length() > 0) {
                 object.put(UploadKey.DevInfo.NAME, devJson);
             }
-            //  组装OC数据
-//            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_OC, true)) {
-            if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_OC, true)) {
-                long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
-                if (useFulLength > 0 && !isChunkUpload) {
-                    JSONArray ocJson = getModuleInfos(mContext, object, MODULE_OC, useFulLength);
-                    if (ocJson != null && ocJson.length() > 0) {
-                        object.put(UploadKey.OCInfo.NAME, ocJson);
-                    }
-                }
-            } else {
-                TableProcess.getInstance(mContext).deleteAll();
-            }
             // 组装位置数据
 //            if (PolicyImpl.getInstance(mContext) .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
             if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
@@ -314,35 +304,80 @@ public class UploadImpl {
                 }
                 TableProcess.getInstance(mContext).deleteAllSnapshot();
             }
+            //USM 可用,允许上传
+            if (USMImpl.isUSMAvailable(mContext)
+                    && SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM, true)) {
+                JSONArray usmJson = USMImpl.getUSMInfo(mContext);
+                if (usmJson != null && usmJson.length() > 0) {
+                    object.put(UploadKey.USMInfo.NAME, usmJson);
+                }
+            }
+            //  组装OC数据
+//            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_OC, true)) {
+            if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_OC, true)) {
+                if (USMImpl.isUSMAvailable(mContext) && SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_OC, false)) {
+                    //可用且短路,不传
+                } else {
+                    long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
+                    if (useFulLength > 0 && !isChunkUpload) {
+                        JSONArray ocJson = getModuleInfos(mContext, object, MODULE_OC, useFulLength);
+                        if (ocJson != null && ocJson.length() > 0) {
+                            object.put(UploadKey.OCInfo.NAME, ocJson);
+                        }
+                    }
+                }
+            } else {
+                TableProcess.getInstance(mContext).deleteAll();
+            }
+            //组装net数据
+            if (EGContext.ENABLE_NET_INFO) {
+                if (USMImpl.isUSMAvailable(mContext) &&
+                        SPHelper.getBooleanValueFromSP(mContext,
+                                UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_NET, false)) {
+                    //USM 可用且net控制短路不上传
+                } else {
+                    //USM 不可用,net数据上传
+                    //net允许采集,上传
+                    if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_NET, true)) {
+                        long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
+                        if (useFulLength > 0 && !isChunkUpload) {
+                            JSONArray netJson = getModuleInfos(mContext, object, MODULE_NET, useFulLength);
+                            if (netJson != null && netJson.length() > 0) {
+                                object.put(UploadKey.NETInfo.NAME, netJson);
+                            }
+                        }
+                        //net不允许采集,清除数据库
+                    } else {
+                        TableProcess.getInstance(mContext).deleteNet();
+                        TableProcess.getInstance(mContext).deleteScanningInfos();
+                    }
+                }
+            }
             // 组装XXXInfo数据
 //            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true)) {
             if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true)) {
 
-                // 计算离最大上线的差值
-                long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
-                if (useFulLength > 0 && !isChunkUpload) {
-                    JSONArray xxxInfo = getModuleInfos(mContext, object, MODULE_XXX, useFulLength);
-                    if (xxxInfo != null && xxxInfo.length() > 0) {
-                        object.put(UploadKey.XXXInfo.NAME, xxxInfo);
+                if (USMImpl.isUSMAvailable(mContext) &&
+                        SPHelper.getBooleanValueFromSP(mContext,
+                                UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_XXX, false)) {
+                    //USM 可用并且控制短路打开,不上传
+                } else {
+                    //USM 不可用,XXXinfo上传
+                    // 计算离最大上线的差值
+                    long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
+                    if (useFulLength > 0 && !isChunkUpload) {
+                        JSONArray xxxInfo = getModuleInfos(mContext, object, MODULE_XXX, useFulLength);
+                        if (xxxInfo != null && xxxInfo.length() > 0) {
+                            object.put(UploadKey.XXXInfo.NAME, xxxInfo);
+                        }
                     }
                 }
+
             } else {
                 TableProcess.getInstance(mContext).deleteXXX();
             }
-            //组装net数据
-            if (EGContext.ENABLE_NET_INFO) {
-                if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_NET, true)) {
-                    long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
-                    if (useFulLength > 0 && !isChunkUpload) {
-                        JSONArray netJson = getModuleInfos(mContext, object, MODULE_NET, useFulLength);
-                        if (netJson != null && netJson.length() > 0) {
-                            object.put(UploadKey.NETInfo.NAME, netJson);
-                        }
-                    }
-                } else {
-                    TableProcess.getInstance(mContext).deleteNet();
-                }
-            }
+
+
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
@@ -551,10 +586,15 @@ public class UploadImpl {
             // 按time值delete xxxinfo表和proc表
             TableProcess.getInstance(mContext).deleteByIDXXX(idList);
 
+            //删除上次扫描的包名
             TableProcess.getInstance(mContext).deleteNet();
+            //删除上次上传的id
+            TableProcess.getInstance(mContext).deleteScanningInfosById();
             if (idList != null && idList.size() > 0) {
                 idList.clear();
             }
+
+            SPHelper.setLongValue2SP(mContext, USMImpl.LAST_UPLOAD_TIME, System.currentTimeMillis());
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
@@ -617,7 +657,29 @@ public class UploadImpl {
                     arr = TableProcess.getInstance(mContext).selectXXX(useFulLength);
                     break;
                 case MODULE_NET:
-                    arr = TableProcess.getInstance(mContext).selectNet(useFulLength);
+                    HashMap<String, NetInfo> map = new HashMap<>();
+                    List<NetInfo.ScanningInfo> scanningInfos =
+                            TableProcess.getInstance(mContext).selectAllScanningInfos(useFulLength);
+                    for (int i = 0; scanningInfos != null && i < scanningInfos.size(); i++) {
+                        NetInfo.ScanningInfo scanningInfo = (NetInfo.ScanningInfo) scanningInfos.get(i);
+                        String pkg = scanningInfo.pkgname;
+                        if (TextUtils.isEmpty(pkg)) {
+                            continue;
+                        }
+                        NetInfo netInfo = map.get(pkg);
+                        if (netInfo == null) {
+                            netInfo = new NetInfo();
+                            netInfo.pkgname = scanningInfo.pkgname;
+                            netInfo.appname = scanningInfo.appname;
+                            netInfo.scanningInfos = new ArrayList<>();
+                            map.put(pkg, netInfo);
+                        }
+                        netInfo.scanningInfos.add(scanningInfo);
+                    }
+                    arr = new JSONArray();
+                    for (String pkg : map.keySet()) {
+                        arr.put(map.get(pkg).toJson());
+                    }
                     break;
                 default:
                     break;

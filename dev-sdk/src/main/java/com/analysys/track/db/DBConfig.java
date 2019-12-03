@@ -124,6 +124,46 @@ public class DBConfig {
         }
     }
 
+    public static class ScanningInfo {
+        // 表名
+        public static final String TABLE_NAME = "e_sif";
+        // 建表
+        public static final String CREATE_TABLE = String.format(
+                "create table if not exists %s (" +
+                        "%s %s," +
+                        "%s %s," +
+                        "%s %s," +
+                        "%s %s," +
+                        "%s %s," +
+                        "%s %s," +
+                        "%s %s)",
+                TABLE_NAME,
+                Column.ID, DBType.AUTOINCREMENT,
+                Column.PKG, DBType.VARCHAR_HUNDRED,
+                Column.TIME, DBType.VARCHAR_HUNDRED,
+                Column.DATA, DBType.TEXT,
+                Column.L_RA, DBType.TEXT,
+                Column.L_RB, DBType.TEXT,
+                Column.L_RC, DBType.TEXT
+
+        );
+
+        public static class Column {
+            public static final String ID = "id";
+            // 应用包名
+            public static final String PKG = "s_p";
+            // 时间
+            public static final String TIME = "s_t";
+            // 数据
+            public static final String DATA = "s_d";
+
+            // 备用字段 text 类型
+            public static final String L_RA = "l_ra";
+            public static final String L_RB = "l_rb";
+            public static final String L_RC = "l_rc";
+        }
+    }
+
     public static class Location {
         // 表名
         public static final String TABLE_NAME = "e_l";
@@ -171,6 +211,7 @@ public class DBConfig {
             public static final String L_RC = "xxx_rc";
         }
     }
+
     public static class NetInfo {
         // 表名
         public static final String TABLE_NAME = "e_n";

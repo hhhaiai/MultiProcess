@@ -5,7 +5,7 @@
  清除程序入口
 '
 echo ">>>>clean project<<<<"
-dir=("app" "dev-sdk" )
+dir=("app" "dev-sdk" "buildSrc")
 for element in ${dir[@]}
 do
     #clean task
@@ -13,6 +13,7 @@ do
     rm -rf $element/bin/
     rm -rf $element/gen/
     rm -rf $element/.externalNativeBuild
+    rm -rf $element/.gradle
 done
 
 rm -rf build/

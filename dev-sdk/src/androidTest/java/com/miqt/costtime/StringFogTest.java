@@ -1,5 +1,7 @@
 package com.miqt.costtime;
 
+import com.analysys.plugin.StringFog;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,19 +19,23 @@ public class StringFogTest {
         String[] keys = new String[]{
                 "中())(*&^%$#$%^文",
                 "aaabbb",
-                "aa bb cc ",
+                "aa \nbb cc ",
                 ".,/,/.,!@#$%^&*())(*&^%$#$%^&*()",
                 "=====",
                 "-123",
                 "miqt",
+                "\n",
+                "\\",
         };
         String[] textCase = new String[]{
                 "中文())(*&^%$#$%^",
                 "aaabbb",
                 "aa bb cc ",
-                ".,/,/.,!@#$%^&*())(*&^%$#$%^&*()",
+                ".,/,/.,!@#$%^&*())(*&^\n%$#$%^&*()",
                 "=====",
                 "-123",
+                "\n",
+                "\\",
         };
         for (String key : keys) {
             for (String text : textCase) {

@@ -3,15 +3,13 @@ package com.device;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
-import android.os.StrictMode;
 import android.support.multidex.MultiDex;
 
 import com.analysys.track.AnalysysTracker;
-import com.device.impls.MultiProcessWorker;
+import com.bun.miitmdid.core.JLibrary;
 import com.device.utils.EL;
 import com.tencent.bugly.Bugly;
 import com.umeng.analytics.MobclickAgent;
-import com.umeng.commonsdk.UMConfigure;
 
 
 /**
@@ -27,19 +25,21 @@ public class AnalysysApplication extends Application {
     @Override
     public void onCreate() {
 
+
+        JLibrary.InitEntry(this);
         // init  bugly
         Bugly.init(getApplicationContext(), "8fea5d1877", true);
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                .detectAll()
-                .penaltyLog()
-                .build());
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                .detectAll()
-                .penaltyLog()
-                .build());
+//        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+//                .detectAll()
+//                .penaltyLog()
+//                .build());
+//        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+//                .detectAll()
+//                .penaltyLog()
+//                .build());
         super.onCreate();
         initAnalysys();
-        MultiProcessWorker.runServices(this);
+        //MultiProcessWorker.runServices(this);
         EL.init(this);
     }
 
@@ -54,16 +54,16 @@ public class AnalysysApplication extends Application {
         AnalysysTracker.setDebugMode(this, false);
 
         //init umeng
-        if (!getCurrentProcessName().contains(":")) {
-            MobclickAgent.setSessionContinueMillis(10);
-            MobclickAgent.setCatchUncaughtExceptions(true);
-        }
-        UMConfigure.setProcessEvent(true);
-        UMConfigure.setEncryptEnabled(true);
-        UMConfigure.setLogEnabled(true);
-
-
-        UMConfigure.init(this, "5b4c140cf43e4822b3000077", "track-demo-dev", UMConfigure.DEVICE_TYPE_PHONE, "99108ea07f30c2afcafc1c5248576bc5");
+//        if (!getCurrentProcessName().contains(":")) {
+//            MobclickAgent.setSessionContinueMillis(10);
+//            MobclickAgent.setCatchUncaughtExceptions(true);
+//        }
+//        UMConfigure.setProcessEvent(true);
+//        UMConfigure.setEncryptEnabled(true);
+//        UMConfigure.setLogEnabled(true);
+//
+//
+//        UMConfigure.init(this, "5b4c140cf43e4822b3000077", "track-demo-dev", UMConfigure.DEVICE_TYPE_PHONE, "99108ea07f30c2afcafc1c5248576bc5");
 
 
     }

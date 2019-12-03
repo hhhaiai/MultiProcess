@@ -19,5 +19,13 @@
         android:onClick="onClick"
         android:text="跳转至测试页面" />
 
+    <Button
+        android:id="@+id/btnSetAccessibility"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:onClick="onClick"
+        android:text="USM查看" />
+
 
 </LinearLayout>

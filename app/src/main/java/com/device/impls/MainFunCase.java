@@ -368,7 +368,7 @@ public class MainFunCase {
                 int max = 0, min = Integer.MAX_VALUE;
                 long time = System.currentTimeMillis();
                 for (int i = 0; i < test_size; i++) {
-                    String result[] = {
+                    String[] result = {
                             "cat /proc/net/tcp",
                             "cat /proc/net/tcp6",
                             "cat /proc/net/udp",

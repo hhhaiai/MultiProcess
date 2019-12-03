@@ -18,6 +18,7 @@ import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.MultiProcessChecker;
+import com.analysys.track.utils.OAIDHelper;
 import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
@@ -107,6 +108,7 @@ public class AnalysysInternal {
         if (ctx == null) {
             return;
         }
+        SPHelper.setIntValue2SP(ctx, EGContext.KEY_ACTION_SCREEN_ON_SIZE, EGContext.FLAG_START_COUNT + 1);
         SystemUtils.updateAppkeyAndChannel(ctx, key, channel);// updateSnapshot sp
 
         // 1. 设置错误回调
@@ -160,6 +162,9 @@ public class AnalysysInternal {
             clear();
         }
 
+        if (Build.VERSION.SDK_INT >= 29) {
+            OAIDHelper.tryGetOaidAndSave(ctx);
+        }
 
         try {
             // 9. 清除以前的SP和DB

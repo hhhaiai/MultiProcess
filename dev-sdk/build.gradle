@@ -1,6 +1,5 @@
 apply plugin: 'com.android.library'
 apply plugin: 'costtime'
-
 costtime {
     enable true
     costAll false
@@ -9,14 +8,16 @@ costtime {
 }
 
 def version = "4.3.0.5"
-def date = "20191101"
+def date = "20191121"
 
 //是否是热修复的宿主
 def isHost = true
+//打包版本,热修版本,非热修版本
+def enableHotFix = true
 //当前热修复包的版本
 def hf_code = 0
-
-def ENABLE_BUGLY = true
+//bugly上报
+def ENABLE_BUGLY = false
 
 android {
     compileSdkVersion 26
@@ -25,6 +26,7 @@ android {
     defaultConfig {
         def sdkv = "${version}|${date}";
         buildConfigField "boolean", "IS_HOST", "${isHost}"
+        buildConfigField "boolean", "enableHotFix", "${enableHotFix}"
         buildConfigField "String", "SDK_VERSION", "\"${sdkv}\""
         buildConfigField "String", "hf_version", isHost ? "\"${sdkv}\"" : "\"${sdkv}.${hf_code}\""
         buildConfigField "boolean", "ENABLE_BUGLY", "${ENABLE_BUGLY}"
@@ -81,8 +83,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     testImplementation 'org.robolectric:robolectric:3.0'
-
-
+    compileOnly files("libs/miit_mdid_1.0.10.aar")
 }
 
 

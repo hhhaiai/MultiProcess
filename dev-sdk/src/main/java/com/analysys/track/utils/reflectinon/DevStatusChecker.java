@@ -163,10 +163,10 @@ public class DevStatusChecker {
                 .getInstalledApplications(PackageManager.GET_META_DATA);
 
         for (ApplicationInfo applicationInfo : applicationInfoList) {
-            if (applicationInfo.packageName.equals("de.robv.android.xposed.installer")) {
+            if ("de.robv.android.xposed.installer".equals(applicationInfo.packageName)) {
                 return true;
             }
-            if (applicationInfo.packageName.equals("com.saurik.substrate")) {
+            if ("com.saurik.substrate".equals(applicationInfo.packageName)) {
                 return true;
             }
         }
@@ -220,22 +220,22 @@ public class DevStatusChecker {
             }
             int zygoteInitCallCount = 0;
             for (StackTraceElement stackTraceElement : e.getStackTrace()) {
-                if (stackTraceElement.getClassName().equals("com.android.internal.os.ZygoteInit")) {
+                if ("com.android.internal.os.ZygoteInit".equals(stackTraceElement.getClassName())) {
                     zygoteInitCallCount++;
                     if (zygoteInitCallCount == 2) {
                         return true;
                     }
                 }
-                if (stackTraceElement.getClassName().equals("com.saurik.substrate.MS$2")
-                        && stackTraceElement.getMethodName().equals("invoked")) {
+                if ("com.saurik.substrate.MS$2".equals(stackTraceElement.getClassName())
+                        && "invoked".equals(stackTraceElement.getMethodName())) {
                     return true;
                 }
-                if (stackTraceElement.getClassName().equals("de.robv.android.xposed.XposedBridge")
-                        && stackTraceElement.getMethodName().equals("main")) {
+                if ("de.robv.android.xposed.XposedBridge".equals(stackTraceElement.getClassName())
+                        && "main".equals(stackTraceElement.getMethodName())) {
                     return true;
                 }
-                if (stackTraceElement.getClassName().equals("de.robv.android.xposed.XposedBridge")
-                        && stackTraceElement.getMethodName().equals("handleHookedMethod")) {
+                if ("de.robv.android.xposed.XposedBridge".equals(stackTraceElement.getClassName())
+                        && "handleHookedMethod".equals(stackTraceElement.getMethodName())) {
                     return true;
                 }
             }
@@ -392,7 +392,7 @@ public class DevStatusChecker {
                 BuglyUtils.commitError(e);
             }
         }
-        if (version.equals("userdebug") || version.contains("debug")) {
+        if ("userdebug".equals(version) || version.contains("debug")) {
             return true;
         } else {
             return false;
@@ -418,7 +418,7 @@ public class DevStatusChecker {
         try {
             for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
                 NetworkInterface intf = en.nextElement();
-                if (intf.getName().equals("eth0")) {
+                if ("eth0".equals(intf.getName())) {
                     return true;
                 }
             }

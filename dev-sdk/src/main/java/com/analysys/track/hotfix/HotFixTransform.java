@@ -14,12 +14,13 @@ import com.analysys.track.utils.sp.SPHelper;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+
+import dalvik.system.PathClassLoader;
 
 /**
  * @Copyright 2019 analysys Inc. All rights reserved.
@@ -57,15 +58,7 @@ public class HotFixTransform {
         if (!isInit()) {
             synchronized (HotFixTransform.class) {
                 if (!isInit()) {
-                    String path = null;
-                    if (ProcessUtils.isMainProcess(context)) {
-                        path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH_TEMP, "");
-                        if (hasDexFile(path)) {
-                            SPHelper.setStringValue2SP(context, EGContext.HOT_FIX_PATH, path);
-                        }
-                    }
-                    path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH, "");
-
+                    String path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH, "");
                     boolean enable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
                     if (enable && hasDexFile(path)) {
                         setAnalClassloader(context, path);
@@ -153,7 +146,7 @@ public class HotFixTransform {
     }
 
     private static boolean hasDexFile(String path) {
-        boolean hasdex = path != null && !path.equals("") && new File(path).isFile();
+        boolean hasdex = path != null && !"".equals(path) && new File(path).isFile();
         if (hasdex) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(EGContext.HOT_FIX_TAG, "dex 存在 path = " + path);
@@ -246,20 +239,21 @@ public class HotFixTransform {
             }
             method.setAccessible(true);
             return (T) method.invoke(object, pram);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return null;
     }
 
     private static void canTransForm() throws HotFixTransformCancel {
-
+        if (EGContext.IS_HOST && !EGContext.class.getClassLoader().getClass().getName().equals(PathClassLoader.class.getName())) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i(EGContext.HOT_FIX_TAG, "发现误把宿主包传上来了,执行IS_HOST修正,防止进入循环调用");
+            }
+            EGContext.IS_HOST = false;
+        }
         if (!EGContext.IS_HOST) {
             throw new HotFixTransformCancel("非宿主 不初始化,不转向");
         }
@@ -314,16 +308,10 @@ public class HotFixTransform {
             constructor.setAccessible(true);
             T o = constructor.newInstance(pram);
             return o;
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return null;
     }

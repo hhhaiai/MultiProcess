@@ -14,23 +14,23 @@ import android.text.TextUtils;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.ProcUtils;
+import com.analysys.track.internal.impl.usm.USMImpl;
+import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.reflectinon.EContextHelper;
+import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,6 +38,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+
+import static com.analysys.track.internal.impl.oc.ProcUtils.RUNNING_OC_RESULT;
 
 /**
  * @Copyright 2019 analysys Inc. All rights reserved.
@@ -119,34 +121,53 @@ public class NetImpl {
         try {
             JSONArray array = TableProcess.getInstance(context).selectNet(1024 * 1024);
             if (array == null || array.length() == 0) {
-                return pkgs;
+                return map;
             }
             array = (JSONArray) array.get(0);
             for (int i = 0; array != null && i < array.length(); i++) {
-                JSONObject netInfoObject = (JSONObject) array.get(i);
-                NetInfo info = NetInfo.fromJson(netInfoObject);
+                String pkg_name = (String) array.get(i);
+                String[] values = pkg_name.split("_");
+                if (values == null || values.length < 2) {
+                    continue;
+                }
+                NetInfo info = new NetInfo();
+                info.pkgname = values[0];
+                info.appname = values[1];
                 map.put(info.pkgname, info);
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return pkgs;
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return map;
     }
 
     String api_4;
-    JSONObject proc_56;
+    JSONArray proc_56;
 
     public HashMap<String, NetInfo> getNetInfo() {
         try {
+            if (USMImpl.isUSMAvailable(context) &&
+                    SPHelper.getBooleanValueFromSP(context,
+                            UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_NET, false)) {
+                //USM可用&&控制短路 不工作
+                return null;
+                //否则工作
+            }
+            //net不允许采集,不工作,默认允许true
+            if(!SPHelper.getBooleanValueFromSP(context, UploadKey.Response.RES_POLICY_MODULE_CL_NET,true)){
+                return null;
+            }
             pkgs = getCacheInfo();
-            //本次扫描的时间戳
-            long time = System.currentTimeMillis();
+
             //重置打开状态
             Collection<NetInfo> infoCollection1 = pkgs.values();
             for (NetInfo info : infoCollection1) {
                 info.isOpen = false;
             }
+            //本次扫描的时间戳
+            long time = System.currentTimeMillis();
             api_4 = getApi4(context);
             proc_56 = getProc56(context);
             usm = getUsm(context);
@@ -158,8 +179,10 @@ public class NetImpl {
                     String result = runShell(cmd);
                     //解析原始信息存到pkgs里面
                     resolve(cmd, result, time);
-                } catch (Throwable throwable) {
-                    //某一行解析异常
+                } catch (Throwable e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BuglyUtils.commitError(e);
+                    }
                 }
             }
             //最后剩下的就是上一次扫描有 但是这一次扫描没有的应用 加关闭符号
@@ -169,47 +192,90 @@ public class NetImpl {
                 if (info.isOpen) {
                     continue;
                 }
+
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.i(info.appname + "[死了,判断关闭节点]");
+                }
+
+                List<NetInfo.ScanningInfo> scanningInfos = TableProcess.getInstance(context).selectScanningInfoByPkg(info.pkgname, true);
                 // 死了 添加 关闭节点 判断上一个是关闭节点 不新加
-                List<NetInfo.TcpInfo> tcpInfos = info.scanningInfos.get(info.scanningInfos.size() - 1).tcpInfos;
-                if (tcpInfos == null || tcpInfos.isEmpty()) {
-                    //有不操作
-                    continue;
+                if (scanningInfos != null && scanningInfos.size() > 0) {
+                    List<NetInfo.TcpInfo> tcpInfos = scanningInfos.get(0).tcpInfos;
+                    if (tcpInfos == null || tcpInfos.isEmpty()) {
+                        if (EGContext.FLAG_DEBUG_INNER) {
+                            ELOG.i(info.appname + "[死了][有关闭节点-不操作]");
+                        }
+                        //有不操作
+                        continue;
+                    }
+                }
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.i(info.appname + "[死了][无关闭节点-添加关闭节点]");
                 }
                 //没有添加关闭节点
                 NetInfo.ScanningInfo scanningInfo = new NetInfo.ScanningInfo();
                 scanningInfo.time = time;
+                scanningInfo.pkgname = info.pkgname;
+                scanningInfo.appname = info.appname;
+                if (info.scanningInfos == null) {
+                    info.scanningInfos = new ArrayList<>();
+                }
                 info.scanningInfos.add(scanningInfo);
             }
 
             //存数据库
-            saveNetInfoToDb(pkgs);
+            savePkgToDb(pkgs);
+            saveScanningInfos(pkgs);
 
-        } catch (Throwable throwable) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i("netimpl error " + throwable.getMessage());
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
             }
         }
         return pkgs;
     }
 
+    private void saveScanningInfos(HashMap<String, NetInfo> pkgs) {
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i("[存ScanningInfo列表][开始]");
+        }
+        for (String string : pkgs.keySet()) {
+            List<NetInfo.ScanningInfo> scanningInfos = pkgs.get(string).scanningInfos;
+            if (scanningInfos != null) {
+                for (int i = 0; i < scanningInfos.size(); i++) {
+                    TableProcess.getInstance(context).insertScanningInfo(scanningInfos.get(i));
+                }
+            }
+        }
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i("[存ScanningInfo列表][结束]");
+        }
+    }
+
+    @SuppressLint("WrongConstant")
     private String getUsm(Context mContext) {
-        if (Build.VERSION.SDK_INT >= 21 && Build.VERSION.SDK_INT < 29) {
+        if (Build.VERSION.SDK_INT >= 21) {
             class RecentUseComparator implements Comparator<UsageStats> {
+                @SuppressLint("NewApi")
                 @Override
                 public int compare(UsageStats lhs, UsageStats rhs) {
-                    return (lhs.getLastTimeUsed() > rhs.getLastTimeUsed()) ? -1
-                            : (lhs.getLastTimeUsed() == rhs.getLastTimeUsed()) ? 0 : 1;
+                    return Long.compare(rhs.getLastTimeUsed(), lhs.getLastTimeUsed());
                 }
             }
             try {
-                @SuppressLint("WrongConstant")
-                UsageStatsManager usm = (UsageStatsManager) mContext.getApplicationContext()
-                        .getSystemService(Context.USAGE_STATS_SERVICE);
+                UsageStatsManager usm = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP_MR1) {
+                    usm = (UsageStatsManager) mContext.getApplicationContext()
+                            .getSystemService(Context.USAGE_STATS_SERVICE);
+                } else {
+                    usm = (UsageStatsManager) mContext.getApplicationContext()
+                            .getSystemService("usagestats");
+                }
                 if (usm == null) {
                     return null;
                 }
-                long ts = System.currentTimeMillis();
-                List<UsageStats> usageStats = usm.queryUsageStats(UsageStatsManager.INTERVAL_BEST, 0, ts);
+                long ts = System.currentTimeMillis() - EGContext.TIME_HOUR;
+                List<UsageStats> usageStats = usm.queryUsageStats(UsageStatsManager.INTERVAL_BEST, ts, System.currentTimeMillis());
                 if (usageStats == null || usageStats.size() == 0) {
                     return null;
                 }
@@ -227,11 +293,14 @@ public class NetImpl {
         return null;
     }
 
-    private void saveNetInfoToDb(HashMap<String, NetInfo> pkgs) {
+    private void savePkgToDb(HashMap<String, NetInfo> pkgs) {
 
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.d(EGContext.LOGTAG_INNER, "[存App列表][" + pkgs.keySet().size() + "]");
+        }
         JSONArray array = new JSONArray();
         for (NetInfo netInfo : pkgs.values()) {
-            array.put(netInfo.toJson());
+            array.put(netInfo.pkgname + "_" + netInfo.appname);
         }
         if (array.length() > 0) {
             TableProcess.getInstance(context).deleteNet();
@@ -239,9 +308,11 @@ public class NetImpl {
         TableProcess.getInstance(context).insertNet(array.toString());
         if (EGContext.FLAG_DEBUG_INNER) {
             try {
-                ELOG.i("更新数据:" + array.toString(2));
-            } catch (JSONException ignored) {
-
+                ELOG.i("[存App列表]" + array.toString(2));
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
     }
@@ -277,9 +348,13 @@ public class NetImpl {
                     if (info == null) {
                         info = new NetInfo();
                         info.pkgname = pkgName;
-                        ApplicationInfo info1 = manager.getApplicationInfo(pkgName, 0);
-                        info.appname = (String) info1.loadLabel(manager);
                         pkgs.put(pkgName, info);
+                    }
+                    if (info.appname == null) {
+                        ApplicationInfo info1 = manager.getApplicationInfo(pkgName, 0);
+                        if (info1 != null) {
+                            info.appname = (String) info1.loadLabel(manager);
+                        }
                     }
                     info.isOpen = true;
                     if (info.scanningInfos == null) {
@@ -297,6 +372,9 @@ public class NetImpl {
                         scanningInfo.time = time;
                         scanningInfo.api_4 = api_4;
                         scanningInfo.proc_56 = proc_56;
+                        scanningInfo.usm = usm;
+                        scanningInfo.pkgname = info.pkgname;
+                        scanningInfo.appname = info.appname;
                         scanningInfo.usm = usm;
                         info.scanningInfos.add(scanningInfo);
                     }
@@ -318,9 +396,12 @@ public class NetImpl {
         }
     }
 
-    private JSONObject getProc56(Context context) {
-        if ((Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24)) {
-            return ProcUtils.getInstance(context).getRunningInfo();
+    private JSONArray getProc56(Context context) {
+        try {
+            if ((Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24)) {
+                return (JSONArray) ProcUtils.getInstance(context).getRunningInfo().opt(RUNNING_OC_RESULT);
+            }
+        } catch (Throwable e) {
         }
         return null;
     }
@@ -353,6 +434,9 @@ public class NetImpl {
 
 
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         }
         return pkgName;
     }
@@ -379,10 +463,10 @@ public class NetImpl {
                 builder.append(line).append("\n");
             }
             return builder.toString();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         } finally {
             try {
                 if (bufferedReader != null) {
@@ -394,8 +478,10 @@ public class NetImpl {
                 if (fileInputStream != null) {
                     fileInputStream.close();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
             }
         }
         return null;
@@ -454,7 +540,7 @@ public class NetImpl {
                     .append(ipx16, 8, 12).append(":")
                     .append(ipx16, 12, 16).append(":")
                     .append(ipx16, 16, 20).append(":")
-                    .append(ipx16.substring(20, 24).equals("0000") ? "0" : ipx16.substring(20, 24)).append(":")
+                    .append("0000".equals(ipx16.substring(20, 24)) ? "0" : ipx16.substring(20, 24)).append(":")
                     .append(Integer.parseInt(ipx16.substring(30, 32), 16)).append(".")
                     .append(Integer.parseInt(ipx16.substring(28, 30), 16)).append(".")
                     .append(Integer.parseInt(ipx16.substring(26, 28), 16)).append(".")
