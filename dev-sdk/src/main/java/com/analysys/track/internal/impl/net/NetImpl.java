@@ -102,12 +102,12 @@ public class NetImpl {
         if (!MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_NET, EGContext.TIME_SECOND * 2, System.currentTimeMillis())) {
             //没抢到锁
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i("netimpl 没得到锁");
+                ELOG.i(BuildConfig.tag_netinfo,"netimpl 没得到锁");
             }
             return;
         }
         if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i("netimpl 得到锁 执行");
+            ELOG.i(BuildConfig.tag_netinfo,"netimpl 得到锁 执行");
         }
         getNetInfo();
         MultiProcessChecker.getInstance().setLockLastModifyTime(context, EGContext.FILES_SYNC_NET, System.currentTimeMillis());
@@ -194,7 +194,7 @@ public class NetImpl {
                 }
 
                 if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.i(info.appname + "[死了,判断关闭节点]");
+                    ELOG.i(BuildConfig.tag_netinfo,info.appname + "[死了,判断关闭节点]");
                 }
 
                 List<NetInfo.ScanningInfo> scanningInfos = TableProcess.getInstance(context).selectScanningInfoByPkg(info.pkgname, true);
@@ -203,14 +203,14 @@ public class NetImpl {
                     List<NetInfo.TcpInfo> tcpInfos = scanningInfos.get(0).tcpInfos;
                     if (tcpInfos == null || tcpInfos.isEmpty()) {
                         if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i(info.appname + "[死了][有关闭节点-不操作]");
+                            ELOG.i(BuildConfig.tag_netinfo,info.appname + "[死了][有关闭节点-不操作]");
                         }
                         //有不操作
                         continue;
                     }
                 }
                 if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.i(info.appname + "[死了][无关闭节点-添加关闭节点]");
+                    ELOG.i(BuildConfig.tag_netinfo,info.appname + "[死了][无关闭节点-添加关闭节点]");
                 }
                 //没有添加关闭节点
                 NetInfo.ScanningInfo scanningInfo = new NetInfo.ScanningInfo();
@@ -237,7 +237,7 @@ public class NetImpl {
 
     private void saveScanningInfos(HashMap<String, NetInfo> pkgs) {
         if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i("[存ScanningInfo列表][开始]");
+            ELOG.i(BuildConfig.tag_netinfo,"[存ScanningInfo列表][开始]");
         }
         for (String string : pkgs.keySet()) {
             List<NetInfo.ScanningInfo> scanningInfos = pkgs.get(string).scanningInfos;
@@ -248,7 +248,7 @@ public class NetImpl {
             }
         }
         if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i("[存ScanningInfo列表][结束]");
+            ELOG.i(BuildConfig.tag_netinfo,"[存ScanningInfo列表][结束]");
         }
     }
 
@@ -296,7 +296,7 @@ public class NetImpl {
     private void savePkgToDb(HashMap<String, NetInfo> pkgs) {
 
         if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.d(EGContext.LOGTAG_INNER, "[存App列表][" + pkgs.keySet().size() + "]");
+            ELOG.d(BuildConfig.tag_netinfo, "[存App列表][" + pkgs.keySet().size() + "]");
         }
         JSONArray array = new JSONArray();
         for (NetInfo netInfo : pkgs.values()) {
@@ -308,7 +308,7 @@ public class NetImpl {
         TableProcess.getInstance(context).insertNet(array.toString());
         if (EGContext.FLAG_DEBUG_INNER) {
             try {
-                ELOG.i("[存App列表]" + array.toString(2));
+                ELOG.i(BuildConfig.tag_netinfo,"[存App列表]" + array.toString(2));
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
                     BuglyUtils.commitError(e);

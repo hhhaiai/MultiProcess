@@ -56,7 +56,7 @@ public class AppSnapshotImpl {
 //            }
             if (!SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
                 if (EGContext.DEBUG_SNAP) {
-                    ELOG.i(EGContext.TAG_SNAP, "动态调整关闭采集安装列表。。。");
+                    ELOG.i(BuildConfig.tag_snap, "动态调整关闭采集安装列表。。。");
                 }
 
                 if (callBack != null) {
@@ -76,13 +76,13 @@ public class AppSnapshotImpl {
                 long time = SPHelper.getLongValueFromSP(mContext, EGContext.SP_APP_SNAP, 0);
                 long dur = now - time;
                 if (EGContext.DEBUG_SNAP) {
-                    ELOG.i(EGContext.TAG_SNAP, "通过多进程验证。  time： " + time + " ----间隔：" + dur);
+                    ELOG.i(BuildConfig.tag_snap, "通过多进程验证。  time： " + time + " ----间隔：" + dur);
                 }
 
                 //大于三个小时才可以工作
                 if (dur > durByPolicy || time == 0) {
                     if (EGContext.DEBUG_SNAP) {
-                        ELOG.i(EGContext.TAG_SNAP, " 大于3小时可以开始工作 ");
+                        ELOG.i(BuildConfig.tag_snap, " 大于3小时可以开始工作 ");
                     }
                     SPHelper.setLongValue2SP(mContext, EGContext.SP_APP_SNAP, now);
                     if (SystemUtils.isMainThread()) {
@@ -107,7 +107,7 @@ public class AppSnapshotImpl {
                     }
                 } else {
                     if (EGContext.DEBUG_SNAP) {
-                        ELOG.i(EGContext.TAG_SNAP, " 小于3小时");
+                        ELOG.i(BuildConfig.tag_snap, " 小于3小时");
                     }
                     //多进程解锁
                     MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, time);
@@ -118,7 +118,7 @@ public class AppSnapshotImpl {
 
             } else {
                 if (EGContext.DEBUG_SNAP) {
-                    ELOG.d(EGContext.TAG_SNAP, "多进程并发，停止操作。。。。");
+                    ELOG.d(BuildConfig.tag_snap, "多进程并发，停止操作。。。。");
                 }
                 if (callBack != null) {
                     callBack.onProcessed();
@@ -148,12 +148,12 @@ public class AppSnapshotImpl {
             // 1. 获取现在的安装列表。所有标志位都是default(3)
             List<JSONObject> memoryData = getCurrentSnapshots();
             if (EGContext.DEBUG_SNAP) {
-                ELOG.i(EGContext.TAG_SNAP, " 获取安装列表: " + memoryData.size());
+                ELOG.i(BuildConfig.tag_snap, " 获取安装列表: " + memoryData.size());
             }
 
             if (memoryData.size() < 1) {
                 if (EGContext.DEBUG_SNAP) {
-                    ELOG.i(EGContext.TAG_SNAP, " 获取安装列表失败。。 ");
+                    ELOG.i(BuildConfig.tag_snap, " 获取安装列表失败。。 ");
                 }
                 return;
             }
@@ -217,7 +217,7 @@ public class AppSnapshotImpl {
             dbMap.put(apn, dbJson);
         }
         if (EGContext.DEBUG_SNAP) {
-            ELOG.i(EGContext.TAG_SNAP, " DB存储数据:" + dbMap.size());
+            ELOG.i(BuildConfig.tag_snap, " DB存储数据:" + dbMap.size());
         }
         // 2. memoryData数据生成map
         Map<String, JSONObject> memMap = new HashMap<String, JSONObject>();
@@ -231,7 +231,7 @@ public class AppSnapshotImpl {
             memMap.put(apn, memJson);
         }
         if (EGContext.DEBUG_SNAP) {
-            ELOG.i(EGContext.TAG_SNAP, " 内存存储数据:" + memMap.size());
+            ELOG.i(BuildConfig.tag_snap, " 内存存储数据:" + memMap.size());
         }
 
 
@@ -261,7 +261,7 @@ public class AppSnapshotImpl {
                     BuglyUtils.commitError(e);
                 }
                 if (EGContext.DEBUG_SNAP) {
-                    ELOG.e(EGContext.TAG_SNAP, e);
+                    ELOG.e(BuildConfig.tag_snap, e);
                 }
             }
         }
@@ -293,7 +293,7 @@ public class AppSnapshotImpl {
                     BuglyUtils.commitError(e);
                 }
                 if (EGContext.DEBUG_SNAP) {
-                    ELOG.e(EGContext.TAG_SNAP, e);
+                    ELOG.e(BuildConfig.tag_snap, e);
                 }
             }
         }
@@ -589,7 +589,7 @@ public class AppSnapshotImpl {
             return;
         }
         if (EGContext.DEBUG_SNAP) {
-            ELOG.d(EGContext.TAG_SNAP, " 处理广播接收到的信息 包:" + pkgName + "----type: " + type);
+            ELOG.d(BuildConfig.tag_snap, " 处理广播接收到的信息 包:" + pkgName + "----type: " + type);
         }
         if (SystemUtils.isMainThread()) {
             // 数据库操作修改包名和类型
@@ -620,7 +620,7 @@ public class AppSnapshotImpl {
             } else if (type == 1) {
 
                 if (EGContext.DEBUG_SNAP) {
-                    ELOG.d(EGContext.TAG_SNAP, " 真正处理卸载...." + pkgName);
+                    ELOG.d(BuildConfig.tag_snap, " 真正处理卸载...." + pkgName);
                 }
                 // 卸载时候，不能获取版本，会出现解析版本异常
                 TableProcess.getInstance(mContext).updateSnapshot(pkgName, EGContext.SNAP_SHOT_UNINSTALL, "");
@@ -631,7 +631,7 @@ public class AppSnapshotImpl {
                 PackageInfo pi = pm.getPackageInfo(pkgName, 0);
                 String avc = pi.versionName + "|" + pi.versionCode;
                 if (EGContext.DEBUG_SNAP) {
-                    ELOG.d(EGContext.TAG_SNAP, " 真正处理更新...." + pkgName + "----- " + avc);
+                    ELOG.d(BuildConfig.tag_snap, " 真正处理更新...." + pkgName + "----- " + avc);
                 }
                 TableProcess.getInstance(mContext).updateSnapshot(pkgName, EGContext.SNAP_SHOT_UPDATE, avc);
                 // SNAP_SHOT_UPDATE 解锁
@@ -643,7 +643,7 @@ public class AppSnapshotImpl {
                 BuglyUtils.commitError(e);
             }
             if (EGContext.DEBUG_SNAP) {
-                ELOG.e(EGContext.TAG_SNAP, e);
+                ELOG.e(BuildConfig.tag_snap, e);
             }
         }
     }

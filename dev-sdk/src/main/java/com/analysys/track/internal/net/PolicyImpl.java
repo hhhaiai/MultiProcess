@@ -73,7 +73,7 @@ public class PolicyImpl {
      */
     private void saveNewPolicyToLocal(PolicyInfo newPolicy) {
         if (EGContext.DEBUG_UPLOAD) {
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========保存策略  开始处理  1111====");
+            ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========保存策略  开始处理  1111====");
         }
         // 策略保存。
         long timerInterval = newPolicy.getTimerInterval() > 0 ? newPolicy.getTimerInterval() : EGContext.TIME_HOUR * 6;
@@ -94,43 +94,43 @@ public class PolicyImpl {
         String ctrlList = newPolicy.getCtrlList() == null ? "" : String.valueOf(newPolicy.getCtrlList());
         SPHelper.setStringValue2SP(mContext, UploadKey.Response.RES_POLICY_CTRL_LIST, ctrlList);
         if (EGContext.DEBUG_UPLOAD) {
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========保存策略 SP保存完毕 2222====");
+            ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========保存策略 SP保存完毕 2222====");
         }
         try {
             // 可信设备上再进行操作
             if (!DevStatusChecker.getInstance().isDebugDevice(mContext)) {
                 if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=======保存策略 可信设备  3.1 ===");
+                    ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=======保存策略 可信设备  3.1 ===");
                 }
                 //热更部分保存: 现在保存sign、version
                 SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, newPolicy.getHotfixVersion());
                 SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, newPolicy.getHotfixSign());
 
                 if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========可信设备 缓存版本号完毕 3.2====");
+                    ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========可信设备 缓存版本号完毕 3.2====");
                 }
                 // 热更新部分直接缓存成文件
                 if (!TextUtils.isEmpty(newPolicy.getHotfixData())) {
                     if (EGContext.DEBUG_UPLOAD) {
-                        ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========可信设备 缓存完毕完毕，即将加载 3.2====");
+                        ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========可信设备 缓存完毕完毕，即将加载 3.2====");
                     }
                     //保存本地
                     saveFileAndLoad(newPolicy.getHotfixVersion(), newPolicy.getHotfixData());
 
                 }
                 if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========可信设备 处理完毕 3.3====");
+                    ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========可信设备 处理完毕 3.3====");
                 }
             } else {
                 if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========调试设备 清除本地缓存文件名  4.1====");
+                    ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========调试设备 清除本地缓存文件名  4.1====");
                 }
 
                 SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, "");
                 SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, "");
 
                 if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========调试设备  清除本地文件  4.2 ====");
+                    ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========调试设备  清除本地文件  4.2 ====");
                 }
                 File dir = mContext.getFilesDir();
                 String[] ss = dir.list();
@@ -141,7 +141,7 @@ public class PolicyImpl {
                 }
 
                 if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========调试设备  清除完毕  4.3 ====缓存的版本: " + SPHelper.getStringValueFromSP(mContext, UploadKey.Response.RES_POLICY_VERSION, ""));
+                    ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========调试设备  清除完毕  4.3 ====缓存的版本: " + SPHelper.getStringValueFromSP(mContext, UploadKey.Response.RES_POLICY_VERSION, ""));
                 }
 
                 printInfo();
@@ -247,14 +247,14 @@ public class PolicyImpl {
         try {
 
             if (EGContext.DEBUG_UPLOAD) {
-                ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========开始策略处理 1=====");
+                ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========开始策略处理 1=====");
             }
 
             if (serverPolicy == null || serverPolicy.length() <= 0) {
                 return;
             }
             if (EGContext.DEBUG_UPLOAD) {
-                ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========策略初测测试完毕 2=====");
+                ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========策略初测测试完毕 2=====");
             }
             /**
              * 没有策略版本号直接放弃处理
@@ -266,7 +266,7 @@ public class PolicyImpl {
                 return;
             }
             if (EGContext.DEBUG_UPLOAD) {
-                ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========策略为有效策略 3=====");
+                ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========策略为有效策略 3=====");
             }
             PolicyInfo policyInfo = PolicyInfo.getInstance();
             String policy_version = serverPolicy.optString(UploadKey.Response.RES_POLICY_VERSION);
@@ -277,7 +277,7 @@ public class PolicyImpl {
                 return;
             }
             if (EGContext.DEBUG_UPLOAD) {
-                ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========策略为新增策略 4====");
+                ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========策略为新增策略 4====");
             }
             clear();
             populatePolicyInfo(serverPolicy, policyInfo);
@@ -288,7 +288,7 @@ public class PolicyImpl {
             }
 
             if (EGContext.DEBUG_UPLOAD) {
-                ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========解析热更部分完毕，即将缓存 888====");
+                ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========解析热更部分完毕，即将缓存 888====");
             }
             saveNewPolicyToLocal(policyInfo);
 
@@ -316,7 +316,7 @@ public class PolicyImpl {
                         SPHelper.setStringValue2SP(mContext, EGContext.HOT_FIX_PATH, "");
                         //SPHelper.setBooleanValue2SP(mContext, EGContext.HOT_FIX_ENABLE_STATE, false);
                         if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i(EGContext.HOT_FIX_TAG, "热修复重置[下次重启使用宿主]");
+                            ELOG.i(BuildConfig.tag_hotfix, "热修复重置[下次重启使用宿主]");
                         }
                         return;
                     }
@@ -347,11 +347,11 @@ public class PolicyImpl {
                                 SPHelper.setStringValue2SP(mContext, EGContext.HOT_FIX_PATH, file.getAbsolutePath());
                                 SPHelper.setBooleanValue2SP(mContext, EGContext.HOT_FIX_ENABLE_STATE, true);
                                 if (EGContext.FLAG_DEBUG_INNER) {
-                                    ELOG.i(EGContext.HOT_FIX_TAG, "新的热修复包下载成功");
+                                    ELOG.i(BuildConfig.tag_hotfix, "新的热修复包下载成功");
                                 }
                             } catch (Throwable e) {
                                 if (EGContext.FLAG_DEBUG_INNER) {
-                                    ELOG.i(EGContext.HOT_FIX_TAG, "新的热修复包下载失败");
+                                    ELOG.i(BuildConfig.tag_hotfix, "新的热修复包下载失败");
                                 }
                             }
                         }
@@ -395,7 +395,7 @@ public class PolicyImpl {
             }
         }
         if (EGContext.DEBUG_UPLOAD) {
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========解析失败策略完毕  555====");
+            ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========解析失败策略完毕  555====");
         }
         // 客户端上传时间间隔
         if (serverPolicy.has(UploadKey.Response.RES_POLICY_TIMER_INTERVAL)) {
@@ -412,7 +412,7 @@ public class PolicyImpl {
 
 
         if (EGContext.DEBUG_UPLOAD) {
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========解析间隔时间完毕  666====");
+            ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========解析间隔时间完毕  666====");
         }
         // 动态采集模块
         if (serverPolicy.has(UploadKey.Response.RES_POLICY_CTRL_LIST)) {
@@ -422,7 +422,7 @@ public class PolicyImpl {
             }
         }
         if (EGContext.DEBUG_UPLOAD) {
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========动态采集模快解析完毕 777====");
+            ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========动态采集模快解析完毕 777====");
         }
         /**
          * 解析热更新下发内容
@@ -796,7 +796,7 @@ public class PolicyImpl {
 
     public void updatePolicyForReceiver(Intent intent) {
         if (EGContext.DEBUG_UPLOAD) {
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========同步策略 收到广播 1====");
+            ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========同步策略 收到广播 1====");
         }
         if (intent == null || !EGContext.ACTION_UPDATE_POLICY.equals(intent.getAction())) {
             return;
@@ -806,11 +806,11 @@ public class PolicyImpl {
 
         String currentPName = ProcessUtils.getCurrentProcessName(mContext);
         if (EGContext.DEBUG_UPLOAD) {
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========同步策略 验证进程名 2" + currentPName + "|" + pname);
+            ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========同步策略 验证进程名 2" + currentPName + "|" + pname);
         }
         if (currentPName.equals(pname)) {
             if (EGContext.DEBUG_UPLOAD) {
-                ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========同步策略 收到广播 进程相同 2.1====");
+                ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========同步策略 收到广播 进程相同 2.1====");
             }
             return;
         }
@@ -828,13 +828,13 @@ public class PolicyImpl {
             if (PolicyInfo.getInstance() == null || !version.equals(PolicyInfo.getInstance().getPolicyVer())) {
                 populatePolicyInfo(object, PolicyInfo.getInstance());
                 if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========同步策略 解析PolicyInfo完毕 3====");
+                    ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========同步策略 解析PolicyInfo完毕 3====");
                 }
             }
 
             //只更新Sp,不用更新文件
             if (EGContext.DEBUG_UPLOAD) {
-                ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========同步策略 开始更新sp 4====");
+                ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========同步策略 开始更新sp 4====");
             }
 
 
@@ -858,28 +858,28 @@ public class PolicyImpl {
             String ctrlList = newPolicy.getCtrlList() == null ? "" : String.valueOf(newPolicy.getCtrlList());
             SPHelper.setStringValue2SP(mContext, UploadKey.Response.RES_POLICY_CTRL_LIST, ctrlList);
             if (EGContext.DEBUG_UPLOAD) {
-                ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========同步策略  sp更新完毕 5====");
+                ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========同步策略  sp更新完毕 5====");
             }
 
             if (EGContext.DEBUG_UPLOAD) {
-                ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=======同步策略 热更部分开始  6 ===");
+                ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=======同步策略 热更部分开始  6 ===");
             }
             // 可信设备上再进行操作
             if (!DevStatusChecker.getInstance().isDebugDevice(mContext)) {
                 if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=======同步策略 非调试设备 6.1 ===");
+                    ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=======同步策略 非调试设备 6.1 ===");
                 }
                 //热更部分保存: 现在保存sign、version
                 SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, newPolicy.getHotfixVersion());
                 SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, newPolicy.getHotfixSign());
 
                 if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========同步策略 非调试设备 缓存版本号完毕 7====");
+                    ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========同步策略 非调试设备 缓存版本号完毕 7====");
                 }
                 // 热更新部分
                 if (!TextUtils.isEmpty(newPolicy.getHotfixData())) {
                     if (EGContext.DEBUG_UPLOAD) {
-                        ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========同步策略 非调试设备，不存文件,即将加载hotfix 8====");
+                        ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========同步策略 非调试设备，不存文件,即将加载hotfix 8====");
                     }
                     //别的进程已经保存完了,这里直接重新加载一下就行了
                     //saveFileAndLoad(newPolicy.getHotfixVersion(), newPolicy.getHotfixData());
@@ -892,11 +892,11 @@ public class PolicyImpl {
 
                 }
                 if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========同步策略 非调试设备 处理完毕 9====");
+                    ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========同步策略 非调试设备 处理完毕 9====");
                 }
             } else {
                 if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========同步策略 调试设备 更新sp hotfix  6.2====");
+                    ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========同步策略 调试设备 更新sp hotfix  6.2====");
                 }
 
                 SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, "");
@@ -904,7 +904,7 @@ public class PolicyImpl {
 
 
                 if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========同步策略  调试设备  更新完毕 7====缓存的版本: " + SPHelper.getStringValueFromSP(mContext, UploadKey.Response.RES_POLICY_VERSION, ""));
+                    ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========同步策略  调试设备  更新完毕 7====缓存的版本: " + SPHelper.getStringValueFromSP(mContext, UploadKey.Response.RES_POLICY_VERSION, ""));
                 }
             }
 
@@ -920,31 +920,31 @@ public class PolicyImpl {
     public void printInfo() {
         //最后打印对一下数据是不是对的
         if (EGContext.DEBUG_UPLOAD) {
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========同步策略 打印对一下数据对不对 ");
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", UploadKey.
+            ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========同步策略 打印对一下数据对不对 ");
+            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.
                     Response.RES_POLICY_VERSION + ":" +
                     SPHelper.getStringValueFromSP(mContext, UploadKey.Response.RES_POLICY_VERSION, ""));
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", UploadKey.
+            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.
                     Response.RES_POLICY_FAIL_COUNT + ":" +
                     SPHelper.getIntValueFromSP(mContext, UploadKey.Response.RES_POLICY_FAIL_COUNT, -1));
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", UploadKey.
+            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.
                     Response.RES_POLICY_FAIL_TRY_DELAY + ":" +
                     SPHelper.getLongValueFromSP(mContext, UploadKey.Response.RES_POLICY_FAIL_TRY_DELAY, -1));
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", UploadKey.
+            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.
                     Response.RES_POLICY_TIMER_INTERVAL + ":" +
                     SPHelper.getLongValueFromSP(mContext, UploadKey.Response.RES_POLICY_TIMER_INTERVAL, -1));
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", UploadKey.
+            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.
                     Response.RES_POLICY_CTRL_LIST + ":" +
                     SPHelper.getStringValueFromSP(mContext, UploadKey.Response.RES_POLICY_CTRL_LIST, ""));
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", UploadKey.Response.PatchResp.PATCH_VERSION + "_HotFix:" +
+            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.Response.PatchResp.PATCH_VERSION + "_HotFix:" +
                     SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, ""));
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", UploadKey.Response.PatchResp.PATCH_SIGN + "_HotFix:" +
+            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.Response.PatchResp.PATCH_SIGN + "_HotFix:" +
                     SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, ""));
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", UploadKey.Response.PatchResp.PATCH_VERSION + "_HotFix:" +
+            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.Response.PatchResp.PATCH_VERSION + "_HotFix:" +
                     SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, ""));
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", UploadKey.Response.PatchResp.PATCH_SIGN + "_HotFix:" +
+            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.Response.PatchResp.PATCH_SIGN + "_HotFix:" +
                     SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, ""));
-            ELOG.i(EGContext.TAG_UPLOAD + "[POLICY]", "=========同步策略 打印对一下数据对不对结束 ");
+            ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========同步策略 打印对一下数据对不对结束 ");
         }
     }
 

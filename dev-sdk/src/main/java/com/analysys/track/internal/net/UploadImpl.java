@@ -50,7 +50,7 @@ public class UploadImpl {
         try {
 
             if (EGContext.DEBUG_UPLOAD) {
-                ELOG.i(EGContext.TAG_UPLOAD, "inside upload...");
+                ELOG.i(BuildConfig.tag_upload, "inside upload...");
             }
             // 1. 没网络停止工作
             if (!NetworkUtils.isNetworkAlive(mContext)) {
@@ -74,7 +74,7 @@ public class UploadImpl {
             final int failNum = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);
             if (failNum > 0) {
                 if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i(EGContext.TAG_UPLOAD, "失败重试。。。。failNum：" + failNum);
+                    ELOG.i(BuildConfig.tag_upload, "失败重试。。。。failNum：" + failNum);
                 }
 //                int maxFailCount = PolicyImpl.getInstance(mContext).getSP()
 //                        .getInt(UploadKey.Response.RES_POLICY_FAIL_COUNT, EGContext.FAIL_COUNT_DEFALUT);
@@ -103,7 +103,7 @@ public class UploadImpl {
                             @Override
                             public void run() {
                                 if (EGContext.DEBUG_UPLOAD) {
-                                    ELOG.i(EGContext.TAG_UPLOAD, "失败重试 [" + failNum + "] 。即将进入发送。。。。");
+                                    ELOG.i(BuildConfig.tag_upload, "失败重试 [" + failNum + "] 。即将进入发送。。。。");
                                 }
                                 doUploadImpl();
 
@@ -111,12 +111,12 @@ public class UploadImpl {
                         });
                     } else {
                         if (EGContext.DEBUG_UPLOAD) {
-                            ELOG.i(EGContext.TAG_UPLOAD, "失败重试 时间间隔不对。即将停止。。。");
+                            ELOG.i(BuildConfig.tag_upload, "失败重试 时间间隔不对。即将停止。。。");
                         }
                     }
                 } else {
                     if (EGContext.DEBUG_UPLOAD) {
-                        ELOG.i(EGContext.TAG_UPLOAD, "失败重试。。。多进程并发。。中断发送。");
+                        ELOG.i(BuildConfig.tag_upload, "失败重试。。。多进程并发。。中断发送。");
                     }
                 }
                 return;
@@ -128,19 +128,19 @@ public class UploadImpl {
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.MULTI_FILE_UPLOAD, EGContext.TIME_SECOND * 3, now)) {
                 long lastReqTime = SPHelper.getLongValueFromSP(mContext, EGContext.LASTQUESTTIME, 0);
                 if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i(EGContext.TAG_UPLOAD, "lastReqTime:" + lastReqTime + "--->上传间隔：" + (System.currentTimeMillis() - lastReqTime));
+                    ELOG.i(BuildConfig.tag_upload, "lastReqTime:" + lastReqTime + "--->上传间隔：" + (System.currentTimeMillis() - lastReqTime));
                 }
 
                 if ((now - lastReqTime) < EGContext.TIME_HOUR * 6) {
                     MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.MULTI_FILE_UPLOAD, System.currentTimeMillis());
 
                     if (EGContext.DEBUG_UPLOAD) {
-                        ELOG.e(EGContext.TAG_UPLOAD, "小于6小时停止工作");
+                        ELOG.e(BuildConfig.tag_upload, "小于6小时停止工作");
                     }
                     return;
                 } else {
                     if (EGContext.DEBUG_UPLOAD) {
-                        ELOG.i(EGContext.TAG_UPLOAD, "大于6小时可以工作");
+                        ELOG.i(BuildConfig.tag_upload, "大于6小时可以工作");
                     }
                     MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.MULTI_FILE_UPLOAD, System.currentTimeMillis());
 
@@ -149,7 +149,7 @@ public class UploadImpl {
                         @Override
                         public void run() {
                             if (EGContext.DEBUG_UPLOAD) {
-                                ELOG.i(EGContext.TAG_UPLOAD, "正常模式。。。即将进入发送。。。。");
+                                ELOG.i(BuildConfig.tag_upload, "正常模式。。。即将进入发送。。。。");
                             }
                             doUploadImpl();
                         }
@@ -159,7 +159,7 @@ public class UploadImpl {
 
             } else {
                 if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i(EGContext.TAG_UPLOAD, "正常模式。。。多进程并发。。中断发送。");
+                    ELOG.i(BuildConfig.tag_upload, "正常模式。。。多进程并发。。中断发送。");
                 }
                 //多进程并发导致中断了
                 return;
@@ -181,14 +181,14 @@ public class UploadImpl {
     public void doUploadImpl() {
         try {
             if (EGContext.DEBUG_UPLOAD) {
-                ELOG.i(EGContext.TAG_UPLOAD, "inside doUploadImpl。。。即将发送");
+                ELOG.i(BuildConfig.tag_upload, "inside doUploadImpl。。。即将发送");
             }
             SPHelper.setLongValue2SP(mContext, EGContext.LASTQUESTTIME, System.currentTimeMillis());
             isChunkUpload = false;
             isUploading = true;
             String uploadInfo = getInfo();
             if (EGContext.DEBUG_UPLOAD) {
-                ELOG.i(EGContext.TAG_UPLOAD, uploadInfo);
+                ELOG.i(BuildConfig.tag_upload, uploadInfo);
             }
             if (TextUtils.isEmpty(uploadInfo)) {
                 isUploading = false;
@@ -286,13 +286,13 @@ public class UploadImpl {
             if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                 if (EGContext.DEBUG_SNAP) {
-                    ELOG.i(EGContext.TAG_SNAP, " 上传允许组装 安装列表。。。useFulLength：" + useFulLength + " -----isChunkUpload-->" + isChunkUpload);
+                    ELOG.i(BuildConfig.tag_snap, " 上传允许组装 安装列表。。。useFulLength：" + useFulLength + " -----isChunkUpload-->" + isChunkUpload);
                 }
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray snapshotJar = getModuleInfos(mContext, object, MODULE_SNAPSHOT, useFulLength);
 
                     if (EGContext.DEBUG_SNAP) {
-                        ELOG.i(EGContext.TAG_SNAP, " 上传获取 安装列表。。：" + snapshotJar.length());
+                        ELOG.i(BuildConfig.tag_snap, " 上传获取 安装列表。。：" + snapshotJar.length());
                     }
                     if (snapshotJar != null && snapshotJar.length() > 0) {
                         object.put(UploadKey.AppSnapshotInfo.NAME, snapshotJar);
@@ -300,7 +300,7 @@ public class UploadImpl {
                 }
             } else {
                 if (EGContext.DEBUG_SNAP) {
-                    ELOG.i(EGContext.TAG_SNAP, " 上传不允许组装 ，即将清除数据 ");
+                    ELOG.i(BuildConfig.tag_snap, " 上传不允许组装 ，即将清除数据 ");
                 }
                 TableProcess.getInstance(mContext).deleteAllSnapshot();
             }
@@ -383,12 +383,12 @@ public class UploadImpl {
                 BuglyUtils.commitError(e);
             }
             if (EGContext.DEBUG_UPLOAD) {
-                ELOG.e(EGContext.TAG_UPLOAD, e);
+                ELOG.e(BuildConfig.tag_upload, e);
             }
         }
 
         if (EGContext.DEBUG_UPLOAD) {
-            ELOG.i(EGContext.TAG_UPLOAD, " =========上行key=============" + object.length() + " ======================");
+            ELOG.i(BuildConfig.tag_upload, " =========上行key=============" + object.length() + " ======================");
         }
         return object.toString();
     }
@@ -446,7 +446,7 @@ public class UploadImpl {
                 String code = String.valueOf(object.opt(UploadKey.Response.RES_CODE));
                 if (code != null) {
                     if (EGContext.DEBUG_UPLOAD) {
-                        ELOG.i(EGContext.TAG_UPLOAD, "========收到code-----" + code);
+                        ELOG.i(BuildConfig.tag_upload, "========收到code-----" + code);
                     }
                     if (EGContext.HTTP_STATUS_200.equals(code)) {
                         EguanIdUtils.getInstance(mContext).setId(json);
@@ -455,7 +455,7 @@ public class UploadImpl {
                     } else if (EGContext.HTTP_STATUS_500.equals(code)) {
 
                         if (EGContext.DEBUG_UPLOAD) {
-                            ELOG.i(EGContext.TAG_UPLOAD, "========收到500策略-----");
+                            ELOG.i(BuildConfig.tag_upload, "========收到500策略-----");
                         }
                         isChunkUpload = false;
                         int numb = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);

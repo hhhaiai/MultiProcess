@@ -7,17 +7,34 @@ costtime {
     enableLog true
 }
 
+//region SDK版本号
 def version = "4.3.0.5"
 def date = "20191121"
+//endregion
 
+//region 热修复相关
 //是否是热修复的宿主
 def isHost = true
 //打包版本,热修版本,非热修版本
 def enableHotFix = true
 //当前热修复包的版本
-def hf_code = 0
-//bugly上报
+def hf_code = 123
+//endregion
+
+//region bugly上报
 def ENABLE_BUGLY = false
+//endregion
+
+//region 内部日志相关
+def logcat = true //开关
+def tag_hotfix = "analysys_hotfix" //热修复 tag
+def tag_snap = "analysys_snap"//安装列表tag
+def tag_upload = "analysys_upload"//上传的tag
+def tag_oc = "analysys_oc"//oc的tag
+def tag_usm = "analysys_usm"//usm的tag
+def tag_netinfo = "analysys_netinfo"//网络扫描的tag
+def tag_loc = "analysys_loc"//位置信息的tag
+//endregion
 
 android {
     compileSdkVersion 26
@@ -30,6 +47,14 @@ android {
         buildConfigField "String", "SDK_VERSION", "\"${sdkv}\""
         buildConfigField "String", "hf_version", isHost ? "\"${sdkv}\"" : "\"${sdkv}.${hf_code}\""
         buildConfigField "boolean", "ENABLE_BUGLY", "${ENABLE_BUGLY}"
+        buildConfigField "boolean", "logcat", "${logcat}"
+        buildConfigField "String", "tag_hotfix", "\"${tag_hotfix}\""
+        buildConfigField "String", "tag_snap", "\"${tag_snap}\""
+        buildConfigField "String", "tag_upload", "\"${tag_upload}\""
+        buildConfigField "String", "tag_oc", "\"${tag_oc}\""
+        buildConfigField "String", "tag_usm", "\"${tag_usm}\""
+        buildConfigField "String", "tag_netinfo", "\"${tag_netinfo}\""
+        buildConfigField "String", "tag_loc", "\"${tag_loc}\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
