@@ -28,7 +28,7 @@ public class AnalysysApplication extends Application {
 
         JLibrary.InitEntry(this);
         // init  bugly
-        Bugly.init(getApplicationContext(), "8fea5d1877", true);
+        Bugly.init(getApplicationContext(), "7752552892442721d", true);
 //        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
 //                .detectAll()
 //                .penaltyLog()

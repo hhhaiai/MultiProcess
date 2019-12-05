@@ -288,7 +288,7 @@ public class EGContext {
     public static final boolean DEBUG_LOCATION = false;
     public static String TAG_LOC;
     // 执行上传URL控制
-    public static final boolean DEBUG_URL = false;
+    public static final boolean DEBUG_URL = true;
 
     static {
         //调整。解决编译时到处可见打印字段问题。
