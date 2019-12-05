@@ -6,27 +6,7 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.BuglyUtils;
 
 public class RefleUtils {
-    /**
-     * 是否包含方法
-     *
-     * @param className
-     * @param methodName
-     * @param parameterTypes
-     * @return
-     */
-    public static boolean hasMethod(String className, String methodName, Class<?>... parameterTypes) {
-        try {
-            if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)) {
-                return false;
-            }
-            return hasMethod(Class.forName(className), methodName, parameterTypes);
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
-        }
-        return false;
-    }
+
 
     /**
      * 是否包含方法
@@ -41,7 +21,9 @@ public class RefleUtils {
             if (clazz == null || TextUtils.isEmpty(methodName)) {
                 return false;
             }
-            if (clazz != null) {
+            if (parameterTypes == null || parameterTypes.length == 0) {
+                return clazz.getMethod(methodName) != null;
+            } else {
                 return clazz.getMethod(methodName, parameterTypes) != null;
             }
         } catch (Throwable e) {

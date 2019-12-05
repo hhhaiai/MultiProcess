@@ -24,7 +24,6 @@ import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.reflectinon.PatchHelper;
-import com.analysys.track.utils.reflectinon.Reflecer;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.File;
@@ -36,7 +35,6 @@ public class AnalysysInternal {
 
     // 初始化反射模快
     private AnalysysInternal() {
-        Reflecer.init();
     }
 
     public static AnalysysInternal getInstance(Context context) {

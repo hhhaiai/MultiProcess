@@ -477,9 +477,8 @@ public class LocationImpl {
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 jsonArray = new JSONArray();
                 try {
-                    if (Build.VERSION.SDK_INT < 29 && RefleUtils.hasMethod(mTelephonyManager.getClass().getName(), "getNeighboringCellInfo",
-                            List.class)) {
-                        List<NeighboringCellInfo> list = mTelephonyManager.getNeighboringCellInfo();
+                    if (Build.VERSION.SDK_INT < 29 && RefleUtils.hasMethod(mTelephonyManager.getClass(), "getNeighboringCellInfo")) {
+                        List<NeighboringCellInfo> list = (List<NeighboringCellInfo>) mTelephonyManager.getClass().getMethod("getNeighboringCellInfo").invoke(mTelephonyManager);
                         if (list != null && list.size() > 0) {
                             baseStationSort(list);
                             int tempCid = -1, tempLac = -1;
