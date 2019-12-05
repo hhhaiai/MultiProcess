@@ -598,7 +598,7 @@ public class TableProcess {
     public void insertLocation(JSONObject locationInfo) {
         try {
             if (EGContext.DEBUG_LOCATION) {
-                ELOG.i(EGContext.TAG_LOC, " 位置信息即将插入DB .....");
+                ELOG.i(BuildConfig.tag_loc, " 位置信息即将插入DB .....");
             }
             ContentValues cv = null;
             String locationTime = null;
@@ -626,7 +626,7 @@ public class TableProcess {
                     }
                     long result = db.insert(DBConfig.Location.TABLE_NAME, null, cv);
                     if (EGContext.DEBUG_LOCATION) {
-                        ELOG.i(EGContext.TAG_LOC, " 位置信息插入DB 完毕 time[" + locationTime + "]，结果: " + result);
+                        ELOG.i(BuildConfig.tag_loc, " 位置信息插入DB 完毕 time[" + locationTime + "]，结果: " + result);
                     }
                 }
             }

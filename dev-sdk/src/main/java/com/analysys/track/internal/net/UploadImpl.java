@@ -264,12 +264,12 @@ public class UploadImpl {
 
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                 if (EGContext.DEBUG_LOCATION) {
-                    ELOG.i(EGContext.TAG_LOC, "  上传允许采集位置信息，即将获取数据  useFulLength：" + useFulLength + "----isChunkUpload：" + isChunkUpload);
+                    ELOG.i(BuildConfig.tag_loc, "  上传允许采集位置信息，即将获取数据  useFulLength：" + useFulLength + "----isChunkUpload：" + isChunkUpload);
                 }
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray locationInfo = getModuleInfos(mContext, object, MODULE_LOCATION, useFulLength);
                     if (EGContext.DEBUG_LOCATION) {
-                        ELOG.i(EGContext.TAG_LOC, "  上传位置信息：" + locationInfo.length());
+                        ELOG.i(BuildConfig.tag_loc, "  上传位置信息：" + locationInfo.length());
                     }
                     if (locationInfo != null && locationInfo.length() > 0) {
                         object.put(UploadKey.LocationInfo.NAME, locationInfo);
@@ -277,7 +277,7 @@ public class UploadImpl {
                 }
             } else {
                 if (EGContext.DEBUG_LOCATION) {
-                    ELOG.i(EGContext.TAG_LOC, "  上传不允许采集位置信息，即将清除本地数据 ");
+                    ELOG.i(BuildConfig.tag_loc, "  上传不允许采集位置信息，即将清除本地数据 ");
                 }
                 TableProcess.getInstance(mContext).deleteAllLocation();
             }

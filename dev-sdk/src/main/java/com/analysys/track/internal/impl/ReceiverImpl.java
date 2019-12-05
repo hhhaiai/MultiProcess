@@ -34,7 +34,7 @@ public class ReceiverImpl {
     public void process(Context context, Intent intent) {
 
         if (EGContext.DEBUG_RECEIVER) {
-            ELOG.d(EGContext.TAG_RECEIVER + intent.toString());
+            ELOG.d(BuildConfig.tag_recerver + intent.toString());
         }
 
         context = context.getApplicationContext();

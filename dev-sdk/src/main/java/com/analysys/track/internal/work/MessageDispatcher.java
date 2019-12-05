@@ -93,7 +93,7 @@ public class MessageDispatcher {
 
                     case MSG_INFO_WBG:
                         if (EGContext.DEBUG_LOCATION) {
-                            ELOG.i(EGContext.TAG_LOC, "收到定位信息。。。。");
+                            ELOG.i(BuildConfig.tag_loc, "收到定位信息。。。。");
                         }
                         LocationImpl.getInstance(mContext).tryGetLocationInfo(new ECallBack() {
 
@@ -102,14 +102,14 @@ public class MessageDispatcher {
 
 //                                long time = LocationImpl.getInstance(mContext).getDurTime();
 //                                if (EGContext.DEBUG_LOCATION) {
-//                                    ELOG.i(EGContext.TAG_LOC, "收到定位信息回调。。" + SystemUtils.getTime(time) + "后继续发起请求。。。");
+//                                    ELOG.i(BuildConfig.tag_loc, "收到定位信息回调。。" + SystemUtils.getTime(time) + "后继续发起请求。。。");
 //                                }
 //                                // 按照差距时间发送延迟工作消息
 //                                postDelay(MSG_INFO_WBG, time);
 
 
                                 if (EGContext.DEBUG_LOCATION) {
-                                    ELOG.i(EGContext.TAG_LOC, "收到定位信息回调。。30秒后继续发起请求。。。");
+                                    ELOG.i(BuildConfig.tag_loc, "收到定位信息回调。。30秒后继续发起请求。。。");
                                 }
                                 // 30秒检查一次是否可以发送。
                                 postDelay(MSG_INFO_WBG, EGContext.TIME_SECOND * 30);

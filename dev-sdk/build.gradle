@@ -34,6 +34,7 @@ def tag_oc = "analysys_oc"//oc的tag
 def tag_usm = "analysys_usm"//usm的tag
 def tag_netinfo = "analysys_netinfo"//网络扫描的tag
 def tag_loc = "analysys_loc"//位置信息的tag
+def tag_recerver = "analysys_recerver"//广播接收的tag
 //endregion
 
 android {
@@ -42,11 +43,13 @@ android {
 
     defaultConfig {
         def sdkv = "${version}|${date}";
+
         buildConfigField "boolean", "IS_HOST", "${isHost}"
         buildConfigField "boolean", "enableHotFix", "${enableHotFix}"
         buildConfigField "String", "SDK_VERSION", "\"${sdkv}\""
         buildConfigField "String", "hf_version", isHost ? "\"${sdkv}\"" : "\"${sdkv}.${hf_code}\""
         buildConfigField "boolean", "ENABLE_BUGLY", "${ENABLE_BUGLY}"
+
         buildConfigField "boolean", "logcat", "${logcat}"
         buildConfigField "String", "tag_hotfix", "\"${tag_hotfix}\""
         buildConfigField "String", "tag_snap", "\"${tag_snap}\""
@@ -55,6 +58,8 @@ android {
         buildConfigField "String", "tag_usm", "\"${tag_usm}\""
         buildConfigField "String", "tag_netinfo", "\"${tag_netinfo}\""
         buildConfigField "String", "tag_loc", "\"${tag_loc}\""
+        buildConfigField "String", "tag_recerver", "\"${tag_recerver}\""
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

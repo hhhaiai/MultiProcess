@@ -21,7 +21,7 @@ public class EGContext {
     public static final String UPLOAD_HEAD_APPV = "appVer";
     public static final int FLAG_START_COUNT = 20;
     public static final boolean ENABLE_NET_INFO = true;
-    public static String LOGTAG_INNER;
+    public static final String LOGTAG_INNER = "analysys";
     public static boolean FLAG_DEBUG_USER = false;
 
 
@@ -257,7 +257,6 @@ public class EGContext {
     public static boolean IS_HOST = BuildConfig.IS_HOST;
     //dex文件损坏,默认是没有dex文件的,所以默认为true
     public static boolean DEX_ERROR = false;
-    public static final String HOT_FIX_TAG = "ANALYSYSHOTFIX";
     public static final String HOTFIX_VERSION = "HF";
     public static final String HOTFIX_CACHE_DIR = "/analysys_cache_hf/";
     public static final String HOTFIX_TIME = "hf_time";
@@ -272,33 +271,16 @@ public class EGContext {
 
     // 上传模快日志控制
     public static final boolean DEBUG_UPLOAD = false || BuildConfig.logcat;
-    public static String TAG_UPLOAD;
     // OC模快日志控制
     public static final boolean DEBUG_OC = false || BuildConfig.logcat;
     //热修复打印
     public static final boolean DEBUG_HF = false || BuildConfig.logcat;
-    public static String TAG_OC;
     // 安装列表部分日志控制
     public static final boolean DEBUG_SNAP = false || BuildConfig.logcat;
-    public static String TAG_SNAP;
     // 广播日志控制
     public static final boolean DEBUG_RECEIVER = false || BuildConfig.logcat;
-    public static String TAG_RECEIVER;
     // 位置日志打印
     public static final boolean DEBUG_LOCATION = false || BuildConfig.logcat;
-    public static String TAG_LOC;
     // 执行上传URL控制
-    public static final boolean DEBUG_URL = false || BuildConfig.logcat;
-
-    static {
-        //调整。解决编译时到处可见打印字段问题。
-        if (FLAG_DEBUG_INNER) {
-            LOGTAG_INNER = "analysys";
-            TAG_RECEIVER = LOGTAG_INNER + ".rece";
-            TAG_SNAP = LOGTAG_INNER + ".snap";
-            TAG_OC = LOGTAG_INNER + ".oc";
-            TAG_LOC = LOGTAG_INNER + ".loc";
-            TAG_UPLOAD = LOGTAG_INNER + ".upload";
-        }
-    }
+    public static final boolean DEBUG_URL = false;
 }
