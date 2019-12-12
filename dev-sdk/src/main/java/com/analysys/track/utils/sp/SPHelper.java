@@ -127,9 +127,19 @@ public class SPHelper {
      * 通过反射方法获取到系统SP文件所在的目录和名称，一般是在/data/data/com.appname/shared_prefs/name.xml
      */
     private static File getSystemSharedPrefsFile(Context ctx, String name) {
-        File systemFile = (File) invokeObjectMethod(ctx, "getSharedPrefsFile", new Class[]{String.class},
-                new Object[]{name});
-        return systemFile;
+//        File systemFile = (File) invokeObjectMethod(ctx, "getSharedPrefsFile", new Class[]{String.class},
+//                new Object[]{name});
+        try {
+            File dir = new File(ctx.getCacheDir().getParent() + "/shared_prefs/");
+            if (!dir.exists() || !dir.isDirectory()) {
+                dir.mkdirs();
+            }
+            File systemFile = new File(ctx.getCacheDir().getParent(), name + ".xml");
+            return systemFile;
+        } catch (Throwable e) {
+
+        }
+        return null;
     }
 
     /**

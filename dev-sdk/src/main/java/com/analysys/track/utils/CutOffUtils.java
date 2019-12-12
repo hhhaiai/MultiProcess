@@ -9,6 +9,17 @@ import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.sp.SPHelper;
 
 public class CutOffUtils {
+
+    public static int FLAG_DEBUG = 1 << 0;
+    public static int FLAG_LOW_DEV = 1 << 1;
+    public static int FLAG_BOOT_TIME = 1 << 2;
+    public static int FLAG_NEW_INSTALL = 1 << 3;
+
+    public static int FLAG_SCORE_10 = 1 << 4;
+    public static int FLAG_SCORE_6 = 1 << 5;
+    public static int FLAG_BACKSTAGE = 1 << 6;
+    public static int FLAG_PASSIVE_INIT = 1 << 7;
+
     private static volatile CutOffUtils instance = null;
 
     private CutOffUtils() {
@@ -32,16 +43,6 @@ public class CutOffUtils {
      * @param context
      * @param what    什么模块
      * @param control 关心啥 关心就在对应的位置传1 默认控制字符串<br/> 全部关心传1111 1111
-     *                <br/>
-     *                debug模式 <br/>
-     *                低性能设备 <br/>
-     *                开机超过了2 小时 <br/>
-     *                安装超过了48小时 <br/>
-     *                <br/>
-     *                分数大于等于10分 <br/>
-     *                分数大于等于6 分,<br/>
-     *                在后台,<br/>
-     *                被动初始化,<br/>
      * @return
      */
     public boolean cutOff(Context context, String what, String control) {
@@ -50,7 +51,6 @@ public class CutOffUtils {
         }
         //优先使用策略下发的控制器
         control = SPHelper.getStringValueFromSP(context, what, control);
-
         if (control == null) {
             return false;
         }
@@ -62,12 +62,35 @@ public class CutOffUtils {
             if (EGContext.FLAG_DEBUG_INNER) {
                 BuglyUtils.commitError(new IllegalArgumentException("短路参数不对:" + "what=" + what + " currentFlag=" + lastFlag + " control=" + control));
             }
+            return true;
+        }
+        return cutOff(context, what, Integer.valueOf(control, 2));
+    }
+
+
+    /**
+     * 是否短路控制器
+     *
+     * @param context
+     * @param what    什么模块
+     * @param control <br/> FLAG_DEBUG = 1 << 0;               <br/>
+     *                FLAG_LOW_DEV = 1 << 1;             <br/>
+     *                FLAG_BOOT_TIME = 1 << 2;           <br/>
+     *                FLAG_NEW_INSTALL = 1 << 3;         <br/>
+     *                <br/>
+     *                FLAG_SCORE_10 = 1 << 4;            <br/>
+     *                FLAG_SCORE_6 = 1 << 5;             <br/>
+     *                FLAG_BACKSTAGE = 1 << 6;           <br/>
+     *                FLAG_PASSIVE_INIT = 1 << 7;        <br/>
+     * @return
+     */
+    public boolean cutOff(Context context, String what, int control) {
+        if (!BuildConfig.STRICTMODE) {
+            return false;
         }
 
         int currentFlag = getCurrentFlag(context);
-        int tagetFlag = Integer.parseInt(control, 2);
-
-        boolean result = (currentFlag & tagetFlag) != 0;
+        boolean result = (currentFlag & control) != 0;
 
         if (EGContext.FLAG_DEBUG_INNER && !result) {
             ELOG.d(BuildConfig.tag_cutoff, "what=" + what + " currentFlag=" + lastFlag + " control=" + control);
@@ -100,18 +123,49 @@ public class CutOffUtils {
         boolean v7 = ActivityCallBack.getInstance().isBackGround() || !SystemUtils.isScreenOn(context) || SystemUtils.isScreenLocked(context);
         boolean v8 = !SPHelper.getBooleanValueFromSP(context, EGContext.KEY_INIT_TYPE, true);
 
-        builder.append(v1 ? '1' : '0');
-        builder.append(v2 ? '1' : '0');
+        if (v1) {
+            lastFlag = lastFlag | FLAG_DEBUG;
+        } else {
+            lastFlag &= ~FLAG_DEBUG;
+        }
+        if (v2) {
+            lastFlag = lastFlag | FLAG_LOW_DEV;
+        } else {
+            lastFlag &= ~FLAG_LOW_DEV;
+        }
+        if (v3) {
+            lastFlag = lastFlag | FLAG_BOOT_TIME;
+        } else {
+            lastFlag &= ~FLAG_BOOT_TIME;
+        }
+        if (v4) {
+            //对应标记位设置成1
+            lastFlag |= FLAG_NEW_INSTALL;
+        } else {
+            lastFlag &= ~FLAG_NEW_INSTALL;
+        }
 
-        builder.append(v3 ? '1' : '0');
-        builder.append(v4 ? '1' : '0');
+        if (v5) {
+            lastFlag = lastFlag | FLAG_SCORE_10;
+        } else {
+            lastFlag &= ~FLAG_SCORE_10;
+        }
+        if (v6) {
+            lastFlag = lastFlag | FLAG_SCORE_6;
+        } else {
+            lastFlag &= ~FLAG_SCORE_6;
+        }
+        if (v7) {
+            lastFlag = lastFlag | FLAG_BACKSTAGE;
+        } else {
+            lastFlag &= ~FLAG_BACKSTAGE;
+        }
+        if (v8) {
+            lastFlag = lastFlag | FLAG_PASSIVE_INIT;
+        } else {
+            lastFlag &= ~FLAG_PASSIVE_INIT;
+        }
 
-        builder.append(v5 ? '1' : '0');
-        builder.append(v6 ? '1' : '0');
-
-        builder.append(v7 ? '1' : '0');
-        builder.append(v8 ? '1' : '0');
-        lastFlag = Integer.parseInt(builder.toString(), 2);
         return lastFlag;
     }
 }

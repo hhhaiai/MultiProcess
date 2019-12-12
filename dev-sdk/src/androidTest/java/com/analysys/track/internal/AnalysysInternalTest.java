@@ -25,7 +25,7 @@ public class AnalysysInternalTest extends TestCase {
     public void initEguan() {
         String appkey = "testappkey";
         String channel = "testchannel";
-        AnalysysInternal.getInstance(mContext).initEguan(appkey, channel);
+        AnalysysInternal.getInstance(mContext).initEguan(appkey, channel,true);
 
         Assert.assertEquals(SystemUtils.getAppKey(mContext), appkey);
         Assert.assertEquals(SystemUtils.getAppChannel(mContext), channel);

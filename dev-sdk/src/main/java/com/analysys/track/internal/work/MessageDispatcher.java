@@ -19,7 +19,6 @@ import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.CutOffUtils;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.NinjaUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -49,6 +48,19 @@ public class MessageDispatcher {
         @Override
         public void handleMessage(Message msg) {
             try {
+                //安全性策略
+                if (CutOffUtils.getInstance().cutOff(mContext, "what_dev", CutOffUtils.FLAG_LOW_DEV)) {
+                    //空循环一次 下次还这样 工作间隔加大一倍 最多到5倍
+                    int time = msg.arg1 + EGContext.TIME_SECOND * 30;
+                    time = time >= EGContext.TIME_SECOND * 30 * 5 ? EGContext.TIME_SECOND * 30 * 5 : time;
+                    postDelay(msg.what, time);
+                    return;
+                }
+                //工作启动逻辑
+                if (jobStartLogic(msg)) {
+                    return;
+                }
+
                 switch (msg.what) {
                     case MSG_INFO_OC:
                         if (EGContext.DEBUG_OC) {
@@ -175,12 +187,73 @@ public class MessageDispatcher {
                 }
             }
         }
+
+
     }
 
+    private boolean workIfFG(Message msg) {
+        if (CutOffUtils.getInstance().cutOff(mContext, "what_all_loop_case4", "0000 0010")) {
+            //后台不工作 跳过轮训
+            if (msg == null) {
+                return false;
+            }
+            postDelay(msg.what, msg.arg1);
+            return false;
+        } else {
+            //前台工作
+            return true;
+        }
+    }
+
+    /**
+     * 工作启动逻辑
+     *
+     * @param msg
+     * @return
+     */
+    private boolean jobStartLogic(Message msg) {
+        if (CutOffUtils.getInstance().cutOff(mContext, "what_all_loop_case1", CutOffUtils.FLAG_NEW_INSTALL)) {
+            //新安装的
+            //前台工作 后台不工作
+            boolean canWork = workIfFG(msg);
+            if (!canWork) {
+                return true;
+            }
+        } else {
+            //旧版本
+            if (CutOffUtils.getInstance().cutOff(mContext, "what_all_loop_case2", "1000 0000")) {
+                //调试设备
+                if (CutOffUtils.getInstance().cutOff(mContext, "what_all_loop_case3", "0000 0001")) {
+                    //被动初始化
+                    //todo 停止工作 清空所有变量
+                    return true;
+                } else {
+                    //主动初始化
+                    //前台工作 后台不工作
+                    boolean canWork = workIfFG(msg);
+                    if (!canWork) {
+                        return true;
+                    }
+                }
+            } else {
+                //非调试设备
+                //前台工作 后台不工作
+                boolean canWork = workIfFG(msg);
+                if (!canWork) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     /************************************* 外部调用信息入口************************************************/
 
     public void initModule() {
+        //工作启动逻辑
+        if (jobStartLogic(null)) {
+            return;
+        }
         if (isInit) {
             return;
         }
@@ -204,6 +277,10 @@ public class MessageDispatcher {
 
     public void reallyLoop() {
         try {
+            //工作启动逻辑
+            if (jobStartLogic(null)) {
+                return;
+            }
             if (mHandler == null) {
                 return;
             }
@@ -241,6 +318,7 @@ public class MessageDispatcher {
             if (mHandler != null && !mHandler.hasMessages(what)) {
                 Message msg = Message.obtain();
                 msg.what = what;
+                msg.arg1 = (int) delayTime;
                 mHandler.sendMessageDelayed(msg, delayTime > 0 ? delayTime : 0);
             }
         } catch (Throwable e) {
