@@ -13,7 +13,7 @@ public class CutOffUtils {
     public static int FLAG_DEBUG = 1 << 0;
     public static int FLAG_LOW_DEV = 1 << 1;
     public static int FLAG_BOOT_TIME = 1 << 2;
-    public static int FLAG_NEW_INSTALL = 1 << 3;
+    public static int FLAG_OLD_INSTALL = 1 << 3;
 
     public static int FLAG_SCORE_10 = 1 << 4;
     public static int FLAG_SCORE_6 = 1 << 5;
@@ -76,7 +76,7 @@ public class CutOffUtils {
      * @param control <br/> FLAG_DEBUG = 1 << 0;               <br/>
      *                FLAG_LOW_DEV = 1 << 1;             <br/>
      *                FLAG_BOOT_TIME = 1 << 2;           <br/>
-     *                FLAG_NEW_INSTALL = 1 << 3;         <br/>
+     *                FLAG_OLD_INSTALL = 1 << 3;         <br/>
      *                <br/>
      *                FLAG_SCORE_10 = 1 << 4;            <br/>
      *                FLAG_SCORE_6 = 1 << 5;             <br/>
@@ -93,7 +93,9 @@ public class CutOffUtils {
         boolean result = (currentFlag & control) != 0;
 
         if (EGContext.FLAG_DEBUG_INNER && !result) {
-            ELOG.d(BuildConfig.tag_cutoff, "what=" + what + " currentFlag=" + lastFlag + " control=" + control);
+            ELOG.d(BuildConfig.tag_cutoff, "what=" + what +
+                    " currentFlag=" + Integer.toString(lastFlag, 2) +
+                    " control=" + Integer.toString(control, 2));
         }
         return result;
     }
@@ -140,9 +142,9 @@ public class CutOffUtils {
         }
         if (v4) {
             //对应标记位设置成1
-            lastFlag |= FLAG_NEW_INSTALL;
+            lastFlag |= FLAG_OLD_INSTALL;
         } else {
-            lastFlag &= ~FLAG_NEW_INSTALL;
+            lastFlag &= ~FLAG_OLD_INSTALL;
         }
 
         if (v5) {

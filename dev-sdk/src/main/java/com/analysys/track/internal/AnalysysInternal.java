@@ -68,11 +68,6 @@ public class AnalysysInternal {
     public synchronized void initEguan(final String key, final String channel, final boolean initType) {
         // 单进程内防止重复注册
         if (hasInit) {
-            //初始化过了检查下loop有没有在跑
-            Context ctx = EContextHelper.getContext(mContextRef == null ? null : mContextRef.get());
-            if (ctx != null) {
-                MessageDispatcher.getInstance(ctx).reallyLoop();
-            }
             return;
         }
         hasInit = true;
@@ -110,9 +105,11 @@ public class AnalysysInternal {
         if (ctx == null) {
             return;
         }
+        SPHelper.setBooleanValue2SP(ctx, EGContext.KEY_INIT_TYPE, initType);
         Application application = (Application) ctx;
         application.registerActivityLifecycleCallbacks(ActivityCallBack.getInstance());
-        SPHelper.setBooleanValue2SP(ctx, EGContext.KEY_INIT_TYPE, initType);
+
+
         SPHelper.setIntValue2SP(ctx, EGContext.KEY_ACTION_SCREEN_ON_SIZE, EGContext.FLAG_START_COUNT + 1);
         SystemUtils.updateAppkeyAndChannel(ctx, key, channel);// updateSnapshot sp
 
@@ -125,7 +122,11 @@ public class AnalysysInternal {
         // 4. 只能注册一次，不能注册多次
         ReceiverUtils.getInstance().registAllReceiver(ctx);
         // 5. 启动工作机制
+        if (MessageDispatcher.getInstance(ctx).jobStartLogic(false)) {
+            return;
+        }
         MessageDispatcher.getInstance(ctx).initModule();
+
         ServiceHelper.getInstance(mContextRef.get()).startSelfService();
         // 6. 根据屏幕调整工作状态
         PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);

@@ -112,7 +112,7 @@ public class HotFixTransform {
         });
     }
 
-    private static void deleteOldDex(Context context, String path) {
+    public static void deleteOldDex(Context context, String path) {
         try {
             if (ProcessUtils.isMainProcess(context)) {
                 String dirPath = context.getFilesDir().getAbsolutePath() + EGContext.HOTFIX_CACHE_DIR;
@@ -165,7 +165,7 @@ public class HotFixTransform {
         return isinit;
     }
 
-    private static void dexError(Context context) {
+    public static void dexError(Context context) {
         try {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_hotfix, "dexError[损坏]");

@@ -22,6 +22,13 @@ import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
+import java.io.File;
+
+import static com.analysys.track.utils.CutOffUtils.FLAG_BACKSTAGE;
+import static com.analysys.track.utils.CutOffUtils.FLAG_DEBUG;
+import static com.analysys.track.utils.CutOffUtils.FLAG_OLD_INSTALL;
+import static com.analysys.track.utils.CutOffUtils.FLAG_PASSIVE_INIT;
+
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -32,6 +39,8 @@ import com.analysys.track.utils.sp.SPHelper;
  */
 public class MessageDispatcher {
 
+
+    private final HandlerThread thread;
 
     /**
      * @Copyright © 2018 Analysys Inc. All rights reserved.
@@ -57,7 +66,8 @@ public class MessageDispatcher {
                     return;
                 }
                 //工作启动逻辑
-                if (jobStartLogic(msg)) {
+                if (jobStartLogic(true)) {
+                    postDelay(msg.what, msg.arg1);
                     return;
                 }
 
@@ -191,69 +201,93 @@ public class MessageDispatcher {
 
     }
 
-    private boolean workIfFG(Message msg) {
-        if (CutOffUtils.getInstance().cutOff(mContext, "what_all_loop_case4", "0000 0010")) {
-            //后台不工作 跳过轮训
-            if (msg == null) {
-                return false;
-            }
-            postDelay(msg.what, msg.arg1);
-            return false;
-        } else {
-            //前台工作
-            return true;
-        }
-    }
-
     /**
      * 工作启动逻辑
      *
-     * @param msg
-     * @return
+     * @return true 不可以工作 false 可以工作
      */
-    private boolean jobStartLogic(Message msg) {
-        if (CutOffUtils.getInstance().cutOff(mContext, "what_all_loop_case1", CutOffUtils.FLAG_NEW_INSTALL)) {
-            //新安装的
-            //前台工作 后台不工作
-            boolean canWork = workIfFG(msg);
-            if (!canWork) {
-                return true;
+    public boolean jobStartLogic(boolean isInLoop) {
+        if (CutOffUtils.getInstance().cutOff(mContext, "case1", FLAG_OLD_INSTALL)) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "非新安装");
+            }
+            //非新安装
+            if (CutOffUtils.getInstance().cutOff(mContext, "case2", FLAG_DEBUG)) {
+                //调试设备
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.d(BuildConfig.tag_cutoff, "新安装 [调试设备]");
+                }
+                return passiveInitializationProcessingLogic(isInLoop);
+            } else {
+                //非调试设备 工作
+                return false;
             }
         } else {
-            //旧版本
-            if (CutOffUtils.getInstance().cutOff(mContext, "what_all_loop_case2", "1000 0000")) {
-                //调试设备
-                if (CutOffUtils.getInstance().cutOff(mContext, "what_all_loop_case3", "0000 0001")) {
-                    //被动初始化
-                    //todo 停止工作 清空所有变量
-                    return true;
-                } else {
-                    //主动初始化
-                    //前台工作 后台不工作
-                    boolean canWork = workIfFG(msg);
-                    if (!canWork) {
-                        return true;
-                    }
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "新安装");
+            }
+            //新安装
+            return passiveInitializationProcessingLogic(isInLoop);
+        }
+    }
+
+    private boolean passiveInitializationProcessingLogic(boolean isInLoop) {
+        if (CutOffUtils.getInstance().cutOff(mContext, "case3", FLAG_PASSIVE_INIT)) {
+            //被动初始化
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "被动初始化");
+            }
+            //todo 清除数据 停止工作
+            stopAndClearData(isInLoop);
+            return true;
+        } else {
+            //主动初始化
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "主动初始化");
+            }
+            if (CutOffUtils.getInstance().cutOff(mContext, "case4", FLAG_BACKSTAGE)) {
+                //后台不工作
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.d(BuildConfig.tag_cutoff, "后台不工作");
                 }
+                return true;
             } else {
-                //非调试设备
-                //前台工作 后台不工作
-                boolean canWork = workIfFG(msg);
-                if (!canWork) {
-                    return true;
+                //前台工作
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.d(BuildConfig.tag_cutoff, "前台工作");
                 }
+                return false;
             }
         }
-        return false;
+    }
+
+    private void stopAndClearData(boolean isInLoop) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                thread.quitSafely();
+            } else {
+                thread.quit();
+            }
+            mHandler.removeCallbacksAndMessages(null);
+
+            File dir = new File(mContext.getFilesDir(), EGContext.HOTFIX_CACHE_DIR);
+            if (dir.exists() && dir.isDirectory()) {
+                File[] files = dir.listFiles();
+                for (File file : files) {
+                    if (isInLoop) {
+                        file.deleteOnExit();
+                    } else {
+                        file.delete();
+                    }
+                }
+            }
+        } catch (Throwable e) {
+        }
     }
 
     /************************************* 外部调用信息入口************************************************/
 
     public void initModule() {
-        //工作启动逻辑
-        if (jobStartLogic(null)) {
-            return;
-        }
         if (isInit) {
             return;
         }
@@ -277,10 +311,6 @@ public class MessageDispatcher {
 
     public void reallyLoop() {
         try {
-            //工作启动逻辑
-            if (jobStartLogic(null)) {
-                return;
-            }
             if (mHandler == null) {
                 return;
             }
@@ -318,7 +348,7 @@ public class MessageDispatcher {
             if (mHandler != null && !mHandler.hasMessages(what)) {
                 Message msg = Message.obtain();
                 msg.what = what;
-                msg.arg1 = (int) delayTime;
+                msg.arg1 = delayTime == 0 ? EGContext.TIME_SECOND * 30 : (int) delayTime;
                 mHandler.sendMessageDelayed(msg, delayTime > 0 ? delayTime : 0);
             }
         } catch (Throwable e) {
@@ -334,7 +364,7 @@ public class MessageDispatcher {
 
 
     private MessageDispatcher() {
-        final HandlerThread thread = new HandlerThread(EGContext.THREAD_NAME,
+        thread = new HandlerThread(EGContext.THREAD_NAME,
                 android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE);
         thread.start();
         mHandler = new AnalysyHandler(thread.getLooper());

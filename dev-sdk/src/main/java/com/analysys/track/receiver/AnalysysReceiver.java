@@ -6,18 +6,14 @@ import android.content.Intent;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.hotfix.HotFixTransformCancel;
 import com.analysys.track.hotfix.HotFixTransform;
-import com.analysys.track.internal.AnalysysInternal;
-import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.ReceiverImpl;
+import com.analysys.track.utils.CutOffUtils;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.sp.SPHelper;
 import com.analysys.track.utils.MClipManager;
-import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -61,13 +57,14 @@ public class AnalysysReceiver extends BroadcastReceiver {
             //没初始化并且开屏了10次,就初始化,否则+1返回不处理
             parExtra(context);
             if (!AnalysysInternal.isInit()) {
-                if (DevStatusChecker.getInstance().isDebugDevice(context)) {
+                if (CutOffUtils.getInstance().cutOff(context, "what_recerver", CutOffUtils.FLAG_DEBUG)) {
+                    //调试设备清零
                     SPHelper.setIntValue2SP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, 0);
                     return;
                 }
                 int size = SPHelper.getIntValueFromSP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, 0);
                 if (size > EGContext.FLAG_START_COUNT) {
-                    AnalysysInternal.getInstance(context).initEguan(null, null,false);
+                    AnalysysInternal.getInstance(context).initEguan(null, null, false);
                 } else {
                     SPHelper.setIntValue2SP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, size + 1);
                     return;

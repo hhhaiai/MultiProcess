@@ -167,7 +167,7 @@ public class PolicyImpl {
      */
     public void saveFileAndLoad(String version, String data) throws UnsupportedEncodingException {
         // 保存文件到本地
-        File file = new File(mContext.getFilesDir(), version + ".dex");
+        File file = new File(mContext.getFilesDir(), EGContext.HOTFIX_CACHE_DIR + version + ".dex");
         Memory2File.savePatch(data, file);
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("保存文件成功: " + file.getAbsolutePath());
