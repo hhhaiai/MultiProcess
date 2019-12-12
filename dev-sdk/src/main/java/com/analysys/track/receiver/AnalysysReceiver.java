@@ -67,7 +67,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
                 }
                 int size = SPHelper.getIntValueFromSP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, 0);
                 if (size > EGContext.FLAG_START_COUNT) {
-                    AnalysysInternal.getInstance(context).initEguan(null, null);
+                    AnalysysInternal.getInstance(context).initEguan(null, null,false);
                 } else {
                     SPHelper.setIntValue2SP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, size + 1);
                     return;

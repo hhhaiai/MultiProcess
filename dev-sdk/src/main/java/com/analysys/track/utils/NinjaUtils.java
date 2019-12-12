@@ -2,6 +2,12 @@ package com.analysys.track.utils;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.os.SystemClock;
+
+import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.sp.SPHelper;
+
+import java.io.File;
 
 /**
  * @Copyright 2019 analysys Inc. All rights reserved.
@@ -14,13 +20,104 @@ import android.content.Context;
 public class NinjaUtils {
 
     /**
-     * 判断是否是低内存
+     * 是否首次安装过去了 time 小时
+     *
+     * @param context
+     * @return
      */
-    public static boolean isLowMemory(Context context) {
+    public static boolean newInstall(Context context, long diffTime) {
         try {
-            if (context == null) {
+            if (diffTime <= 0) {
                 return false;
             }
+            long time = SPHelper.getLongValueFromSP(context, EGContext.SP_INSTALL_TIME, -1);
+            if (time == -1) {
+                SPHelper.setLongValue2SP(context, EGContext.SP_INSTALL_TIME, System.currentTimeMillis());
+                return true;
+            } else if ((System.currentTimeMillis() - time) <= diffTime) {
+                return true;
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static boolean checkOldFile(Context context) {
+        String[] oldSPfiles = new String[]{
+//                "ev2.data",
+//                "ana_sp_xml_v2.xml",
+//                "ana_sp_xml_v2.sp",
+
+                "ana_sp_xml.xml",
+                "ana_sp_xml.sp",
+                "sputil.xml",
+                "sputil.sp",
+        };
+        String[] oldSQLfiles = new String[]{
+//                "ev2.data",
+//                "ana_sp_xml_v2.xml",
+//                "ana_sp_xml_v2.sp",
+                "e.data",
+                "deanag.data",
+        };
+        for (String str : oldSPfiles
+        ) {
+            File file = new File(context.getCacheDir().getParent() + "/shared_prefs/", str);
+            if (file.exists() && file.isFile()) {
+                SPHelper.setLongValue2SP(context, EGContext.SP_INSTALL_TIME, 0);
+                return true;
+            }
+        }
+        for (String str : oldSQLfiles
+        ) {
+            File file = context.getDatabasePath(str);
+            if (file.exists() && file.isFile()) {
+                SPHelper.setLongValue2SP(context, EGContext.SP_INSTALL_TIME, 0);
+                return true;
+            }
+        }
+
+
+        return false;
+    }
+
+    /**
+     * 是否开机后过去了 difftime 时间
+     *
+     * @param diffTime
+     * @return
+     */
+    public static boolean bootTimeMore(long diffTime) {
+        long time = SystemClock.elapsedRealtime();
+        return time >= diffTime;
+    }
+
+    public static Boolean isLowDev;
+
+    /**
+     * 判断是否是低内存
+     *
+     * @param context
+     * @return
+     */
+    public static boolean isLowDev(Context context) {
+        try {
+            if (isLowDev != null) {
+                if (!isLowDev) {
+                    isLowDev = isLowMemoryUse(context);
+                }
+            } else {
+                isLowDev = isLowMemoryUse(context) || isLowDevice(context);
+            }
+            return isLowDev;
+        } catch (Throwable e) {
+        }
+        return false;
+    }
+
+    private static boolean isLowMemoryUse(Context context) {
+        try {
             ActivityManager inst = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
             float u = 0;
             if (inst != null) {
@@ -55,6 +152,51 @@ public class NinjaUtils {
             return u >= 80;
         } catch (Throwable e) {
         }
+        return false;
+    }
+
+    /**
+     * | RAM | condition | Year Class |
+     * |----:|----------:|-----------:|
+     * |768MB| 1 core    | 2009       |
+     * |     | 2+ cores  | 2010       |
+     * |  1GB| <1.3GHz   | 2011       |  <---low device
+     * |     | 1.3GHz+   | 2012       |
+     * |1.5GB| <1.8GHz   | 2012       |
+     * |     | 1.8GHz+   | 2013       |
+     * |  2GB|           | 2013       |
+     * |  3GB|           | 2014       |
+     * |  5GB|           | 2015       |
+     * | more|           | 2016       |
+     */
+    private static boolean isLowDevice(Context context) {
+        try {
+            if (context == null) {
+                return false;
+            }
+            float num = DeviceInfo.getCPUMaxFreqKHz();
+            float hz = num / 1024F / 1024;
+
+            float cores = DeviceInfo.getNumberOfCPUCores();
+
+            num = DeviceInfo.getTotalMemory(context);
+            float memory = num / 1024F / 1024 / 1024;
+
+            if (memory == DeviceInfo.DEVICEINFO_UNKNOWN
+                    || hz == DeviceInfo.DEVICEINFO_UNKNOWN
+                    || cores == DeviceInfo.DEVICEINFO_UNKNOWN) {
+                return false;
+            }
+
+            if (memory <= 1.1 && hz <= 1.4) {
+                return true;
+            }
+            if (cores == 1) {
+                return true;
+            }
+        } catch (Throwable e) {
+        }
+
         return false;
     }
 

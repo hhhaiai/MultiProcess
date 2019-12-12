@@ -17,6 +17,7 @@ import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.CutOffUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.NinjaUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -74,10 +75,6 @@ public class MessageDispatcher {
                         break;
 
                     case MSG_INFO_UPLOAD:
-                        if (NinjaUtils.isLowMemory(mContext)) {
-                            postDelay(MSG_INFO_UPLOAD, EGContext.TIME_SECOND * 5);
-                            break;
-                        }
                         if (EGContext.DEBUG_UPLOAD) {
                             ELOG.i(BuildConfig.tag_upload, "上行检测，心跳。。。。");
                         }
@@ -155,10 +152,6 @@ public class MessageDispatcher {
                         });
                         break;
                     case MSG_INFO_NETS:
-                        if (NinjaUtils.isLowMemory(mContext)) {
-                            postDelay(MSG_INFO_NETS, EGContext.TIME_SECOND * 30);
-                            break;
-                        }
                         ELOG.d(BuildConfig.tag_snap, " 收到 net 信息。。心跳。。");
                         //策略控制netinfo轮训取数时间默认30秒
                         final int time = SPHelper.getIntValueFromSP(mContext, EGContext.SP_NET_CYCLE,

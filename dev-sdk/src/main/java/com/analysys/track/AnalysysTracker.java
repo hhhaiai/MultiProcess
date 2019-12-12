@@ -61,7 +61,7 @@ public class AnalysysTracker {
 
             }
         }
-        AnalysysInternal.getInstance(context).initEguan(appKey, channel);
+        AnalysysInternal.getInstance(context).initEguan(appKey, channel, true);
     }
 
     public static void setDebugMode(boolean isDebug) {

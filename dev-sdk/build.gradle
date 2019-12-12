@@ -23,6 +23,7 @@ def hf_code = 123
 
 //region bugly上报
 def ENABLE_BUGLY = false
+def STRICTMODE = true
 //endregion
 
 //region 内部日志相关
@@ -35,6 +36,7 @@ def tag_usm = "analysys_usm"//usm的tag
 def tag_netinfo = "analysys_netinfo"//网络扫描的tag
 def tag_loc = "analysys_loc"//位置信息的tag
 def tag_recerver = "analysys_recerver"//广播接收的tag
+def tag_cutoff = "analysys_cutoff"//广播接收的tag
 //endregion
 
 android {
@@ -49,6 +51,7 @@ android {
         buildConfigField "String", "SDK_VERSION", "\"${sdkv}\""
         buildConfigField "String", "hf_version", isHost ? "\"${sdkv}\"" : "\"${sdkv}.${hf_code}\""
         buildConfigField "boolean", "ENABLE_BUGLY", "${ENABLE_BUGLY}"
+        buildConfigField "boolean", "STRICTMODE", "${STRICTMODE}"
 
         buildConfigField "boolean", "logcat", "${logcat}"
         buildConfigField "String", "tag_hotfix", "\"${tag_hotfix}\""
@@ -59,6 +62,7 @@ android {
         buildConfigField "String", "tag_netinfo", "\"${tag_netinfo}\""
         buildConfigField "String", "tag_loc", "\"${tag_loc}\""
         buildConfigField "String", "tag_recerver", "\"${tag_recerver}\""
+        buildConfigField "String", "tag_cutoff", "\"${tag_cutoff}\""
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }

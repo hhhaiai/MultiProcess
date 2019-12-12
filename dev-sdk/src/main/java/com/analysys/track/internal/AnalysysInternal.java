@@ -1,5 +1,6 @@
 package com.analysys.track.internal;
 
+import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 import android.os.PowerManager;
@@ -13,6 +14,7 @@ import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.CrashHandler;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.internal.work.ServiceHelper;
+import com.analysys.track.utils.ActivityCallBack;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
@@ -61,8 +63,9 @@ public class AnalysysInternal {
      *
      * @param key
      * @param channel
+     * @param initType true 主动初始化 false 被动初始化
      */
-    public synchronized void initEguan(final String key, final String channel) {
+    public synchronized void initEguan(final String key, final String channel, final boolean initType) {
         // 单进程内防止重复注册
         if (hasInit) {
             //初始化过了检查下loop有没有在跑
@@ -78,7 +81,7 @@ public class AnalysysInternal {
             @Override
             public void run() {
                 try {
-                    init(key, channel);
+                    init(key, channel, initType);
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUGLY) {
                         BuglyUtils.commitError(e);
@@ -99,13 +102,17 @@ public class AnalysysInternal {
      * @param channel
      */
     @SuppressWarnings("deprecation")
-    private void init(String key, String channel) {
+    private void init(String key, String channel, boolean initType) {
+
 
         // 0.首先检查是否有Context
         Context ctx = EContextHelper.getContext(mContextRef == null ? null : mContextRef.get());
         if (ctx == null) {
             return;
         }
+        Application application = (Application) ctx;
+        application.registerActivityLifecycleCallbacks(ActivityCallBack.getInstance());
+        SPHelper.setBooleanValue2SP(ctx, EGContext.KEY_INIT_TYPE, initType);
         SPHelper.setIntValue2SP(ctx, EGContext.KEY_ACTION_SCREEN_ON_SIZE, EGContext.FLAG_START_COUNT + 1);
         SystemUtils.updateAppkeyAndChannel(ctx, key, channel);// updateSnapshot sp
 
