@@ -230,14 +230,6 @@ public class PolicyImpl {
 
     }
 
-//    public void setSp(String key, boolean value) {
-//        getEditor().putBoolean(key, value).apply();
-//    }
-//
-//    public boolean getValueFromSp(String key, boolean defaultValue) {
-//        return getSP().getBoolean(key, defaultValue);
-//    }
-
     /**
      * 策略解析并保存。(服务器返回时间单位为秒)
      *
@@ -245,16 +237,15 @@ public class PolicyImpl {
      */
     public void saveRespParams(JSONObject serverPolicy) {
         try {
-
             if (EGContext.DEBUG_UPLOAD) {
-                ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========开始策略处理 1=====");
+                ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========saveRespParams  开始处理 1=====");
             }
 
             if (serverPolicy == null || serverPolicy.length() <= 0) {
                 return;
             }
             if (EGContext.DEBUG_UPLOAD) {
-                ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========策略初测测试完毕 2=====");
+                ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========saveRespParams 策略非空 2=====");
             }
             /**
              * 没有策略版本号直接放弃处理
@@ -266,21 +257,24 @@ public class PolicyImpl {
                 return;
             }
             if (EGContext.DEBUG_UPLOAD) {
-                ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========策略为有效策略 3=====");
+                ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========saveRespParams 策略为有效策略 =====");
             }
-            PolicyInfo policyInfo = PolicyInfo.getInstance();
             String policy_version = serverPolicy.optString(UploadKey.Response.RES_POLICY_VERSION);
             if (!isNewPolicy(policy_version)) {
                 if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i(" not new version policy, will return");
+                    ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========saveRespParams not new version policy, will return =====");
                 }
                 return;
             }
             if (EGContext.DEBUG_UPLOAD) {
-                ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========策略为新增策略 4====");
+                ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========saveRespParams 策略为新增策略 4====");
             }
+            // todo 为什么清除? 不是追加，替换？
             clear();
-            populatePolicyInfo(serverPolicy, policyInfo);
+
+            PolicyInfo policyInfo = PolicyInfo.getInstance();
+            // 解析策略到内存模型
+            parsePolicyToMemoryModule(serverPolicy, policyInfo);
 
             if (BuildConfig.enableHotFix) {
                 //只在策略处理进程存储
@@ -364,7 +358,7 @@ public class PolicyImpl {
         }
     }
 
-    private void populatePolicyInfo(JSONObject serverPolicy, PolicyInfo policyInfo) throws JSONException {
+    private void parsePolicyToMemoryModule(JSONObject serverPolicy, PolicyInfo policyInfo) throws JSONException {
         if (serverPolicy == null || policyInfo == null) {
             return;
         }
@@ -826,7 +820,7 @@ public class PolicyImpl {
                 return;
             }
             if (PolicyInfo.getInstance() == null || !version.equals(PolicyInfo.getInstance().getPolicyVer())) {
-                populatePolicyInfo(object, PolicyInfo.getInstance());
+                parsePolicyToMemoryModule(object, PolicyInfo.getInstance());
                 if (EGContext.DEBUG_UPLOAD) {
                     ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========同步策略 解析PolicyInfo完毕 3====");
                 }
