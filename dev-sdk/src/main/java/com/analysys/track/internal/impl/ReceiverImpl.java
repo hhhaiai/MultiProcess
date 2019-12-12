@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
@@ -33,7 +34,7 @@ public class ReceiverImpl {
     public void process(Context context, Intent intent) {
 
         if (EGContext.DEBUG_RECEIVER) {
-            ELOG.d(EGContext.TAG_RECEIVER + intent.toString());
+            ELOG.d(BuildConfig.tag_recerver + intent.toString());
         }
 
         context = context.getApplicationContext();
@@ -48,7 +49,7 @@ public class ReceiverImpl {
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST,
                     EGContext.TIME_SECOND * 2, currentTime)) {
                 if (EGContext.DEBUG_RECEIVER) {
-                    ELOG.i(EGContext.TAG_SNAP, "安装app:" + packageName);
+                    ELOG.i(BuildConfig.tag_snap, "安装app:" + packageName);
                 }
                 AppSnapshotImpl.getInstance(context)
                         .processAppModifyMsg(packageName,
@@ -57,7 +58,7 @@ public class ReceiverImpl {
 
             } else {
 //                if (EGContext.DEBUG_RECEIVER) {
-//                    ELOG.v(EGContext.TAG_SNAP, "安装app:" + packageName + "---->多进程中断");
+//                    ELOG.v(BuildConfig.tag_snap, "安装app:" + packageName + "---->多进程中断");
 //                }
                 return;
             }
@@ -72,7 +73,7 @@ public class ReceiverImpl {
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST,
                     EGContext.TIME_SECOND * 2, currentTime)) {
                 if (EGContext.DEBUG_RECEIVER) {
-                    ELOG.i(EGContext.TAG_SNAP, "卸载app:" + packageName);
+                    ELOG.i(BuildConfig.tag_snap, "卸载app:" + packageName);
                 }
                 AppSnapshotImpl.getInstance(context)
                         .processAppModifyMsg(packageName,
@@ -80,7 +81,7 @@ public class ReceiverImpl {
                                 currentTime);
             } else {
 //                if (EGContext.DEBUG_RECEIVER) {
-//                    ELOG.v(EGContext.TAG_SNAP, "卸载app:" + packageName + "---->多进程中断");
+//                    ELOG.v(BuildConfig.tag_snap, "卸载app:" + packageName + "---->多进程中断");
 //                }
                 return;
             }
@@ -94,7 +95,7 @@ public class ReceiverImpl {
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST,
                     EGContext.TIME_SECOND * 2, currentTime)) {
                 if (EGContext.DEBUG_RECEIVER) {
-                    ELOG.i(EGContext.TAG_SNAP, "更新app:" + packageName);
+                    ELOG.i(BuildConfig.tag_snap, "更新app:" + packageName);
                 }
                 AppSnapshotImpl.getInstance(context)
                         .processAppModifyMsg(packageName,
@@ -102,7 +103,7 @@ public class ReceiverImpl {
                                 currentTime);
             } else {
 //                if (EGContext.DEBUG_RECEIVER) {
-//                    ELOG.v(EGContext.TAG_SNAP, "更新app:" + packageName + "---->多进程中断");
+//                    ELOG.v(BuildConfig.tag_snap, "更新app:" + packageName + "---->多进程中断");
 //                }
                 return;
             }

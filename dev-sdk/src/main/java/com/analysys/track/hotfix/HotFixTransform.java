@@ -86,7 +86,7 @@ public class HotFixTransform {
                 if (MYCLASS_NAME.contains(name)) {
                     dexError(context);
                     if (EGContext.DEBUG_HF) {
-                        ELOG.v(EGContext.HOT_FIX_TAG, "[DEX损坏]:" + name + "[not found]");
+                        ELOG.v(BuildConfig.tag_hotfix, "[DEX损坏]:" + name + "[not found]");
                     }
                 }
             }
@@ -128,12 +128,12 @@ public class HotFixTransform {
                 for (File file : files) {
                     if (TextUtils.isEmpty(path)) {
                         boolean b = file.delete();
-                        ELOG.i(EGContext.HOT_FIX_TAG, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
+                        ELOG.i(BuildConfig.tag_hotfix, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
                         continue;
                     }
                     if (!path.contains(file.getName())) {
                         boolean b = file.delete();
-                        ELOG.i(EGContext.HOT_FIX_TAG, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
+                        ELOG.i(BuildConfig.tag_hotfix, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
                     }
 
                 }
@@ -149,11 +149,11 @@ public class HotFixTransform {
         boolean hasdex = path != null && !"".equals(path) && new File(path).isFile();
         if (hasdex) {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i(EGContext.HOT_FIX_TAG, "dex 存在 path = " + path);
+                ELOG.i(BuildConfig.tag_hotfix, "dex 存在 path = " + path);
             }
         } else {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i(EGContext.HOT_FIX_TAG, "dex 不存在 path = " + path);
+                ELOG.i(BuildConfig.tag_hotfix, "dex 不存在 path = " + path);
             }
         }
         return hasdex;
@@ -168,7 +168,7 @@ public class HotFixTransform {
     private static void dexError(Context context) {
         try {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(EGContext.HOT_FIX_TAG, "dexError[损坏]");
+                ELOG.e(BuildConfig.tag_hotfix, "dexError[损坏]");
             }
             EGContext.DEX_ERROR = true;
             //<editor-fold desc="删掉dex文件 其他进程 只改状态 保证删除的时候只有主进程的时候操作，避免主进程和主进程不同步删除出现异常">
@@ -184,7 +184,7 @@ public class HotFixTransform {
             SPHelper.setStringValue2SP(EContextHelper.getContext(null), EGContext.HOT_FIX_PATH, "");
             //激活状态设置为不激活
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i(EGContext.HOT_FIX_TAG, "dexError path = " + path);
+                ELOG.i(BuildConfig.tag_hotfix, "dexError path = " + path);
             }
             SPHelper.setBooleanValue2SP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
             //重新设置classloader
@@ -235,7 +235,7 @@ public class HotFixTransform {
             }
 
             if (method == null) {
-                ELOG.e(EGContext.HOT_FIX_TAG, "[" + classname + "." + methodName + "]" + "No function found corresponding to the parameter type");
+                ELOG.e(BuildConfig.tag_hotfix, "[" + classname + "." + methodName + "]" + "No function found corresponding to the parameter type");
             }
             method.setAccessible(true);
             return (T) method.invoke(object, pram);
@@ -250,7 +250,7 @@ public class HotFixTransform {
     private static void canTransForm() throws HotFixTransformCancel {
         if (EGContext.IS_HOST && !EGContext.class.getClassLoader().getClass().getName().equals(PathClassLoader.class.getName())) {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i(EGContext.HOT_FIX_TAG, "发现误把宿主包传上来了,执行IS_HOST修正,防止进入循环调用");
+                ELOG.i(BuildConfig.tag_hotfix, "发现误把宿主包传上来了,执行IS_HOST修正,防止进入循环调用");
             }
             EGContext.IS_HOST = false;
         }
@@ -303,7 +303,7 @@ public class HotFixTransform {
             }
 
             if (constructor == null) {
-                ELOG.e(EGContext.HOT_FIX_TAG, "[" + classname + "]" + "not has parameter type constructor,if this is a innerClass");
+                ELOG.e(BuildConfig.tag_hotfix, "[" + classname + "]" + "not has parameter type constructor,if this is a innerClass");
             }
             constructor.setAccessible(true);
             T o = constructor.newInstance(pram);
