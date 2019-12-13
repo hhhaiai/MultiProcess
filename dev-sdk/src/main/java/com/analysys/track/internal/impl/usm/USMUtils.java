@@ -15,7 +15,9 @@ import android.provider.Settings;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.ShellUtils;
 
 import java.io.File;
@@ -244,6 +246,12 @@ public class USMUtils {
 
     public static UsageEvents getUsageEventsByInvoke(long beginTime, long endTime, Context context) {
         try {
+            if (context.getApplicationInfo().targetSdkVersion >= 28 || Build.VERSION.SDK_INT >= 28) {
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.d("usm 命中hide api 不调用");
+                }
+                return null;
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
                 Field field = getField(UsageStatsManager.class, "mService");

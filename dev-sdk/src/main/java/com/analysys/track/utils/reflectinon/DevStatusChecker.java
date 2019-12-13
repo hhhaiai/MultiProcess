@@ -137,11 +137,15 @@ public class DevStatusChecker {
 
     @SuppressWarnings("deprecation")
     private boolean isDeveloperMode(Context context) {
-        if (Build.VERSION.SDK_INT >= 17) {
-            return (Settings.Secure.getInt(context.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
-        } else {
-            return (Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
+        try {
+            if (Build.VERSION.SDK_INT >= 17) {
+                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
+            } else {
+                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
+            }
+        } catch (Throwable e) {
         }
+        return false;
     }
 
     /**
