@@ -22,6 +22,7 @@ import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.JsonUtils;
@@ -30,7 +31,6 @@ import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
-import com.analysys.track.utils.reflectinon.RefleUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -477,8 +477,10 @@ public class LocationImpl {
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 jsonArray = new JSONArray();
                 try {
-                    if (Build.VERSION.SDK_INT < 29 && RefleUtils.hasMethod(mTelephonyManager.getClass(), "getNeighboringCellInfo")) {
-                        List<NeighboringCellInfo> list = (List<NeighboringCellInfo>) mTelephonyManager.getClass().getMethod("getNeighboringCellInfo").invoke(mTelephonyManager);
+//                    if (Build.VERSION.SDK_INT < 29 && ClazzUtils.hasMethod(mTelephonyManager.getClass(), "getNeighboringCellInfo")) {
+                    if (Build.VERSION.SDK_INT < 29) {
+                        List<NeighboringCellInfo> list = (List<NeighboringCellInfo>) ClazzUtils.invokeObjectMethod(mTelephonyManager, "getNeighboringCellInfo");
+//                        List<NeighboringCellInfo> list = (List<NeighboringCellInfo>) mTelephonyManager.getClass().getMethod("getNeighboringCellInfo").invoke(mTelephonyManager);
                         if (list != null && list.size() > 0) {
                             baseStationSort(list);
                             int tempCid = -1, tempLac = -1;
