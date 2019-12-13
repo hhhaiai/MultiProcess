@@ -698,11 +698,7 @@ public class DeviceImpl {
      */
     public String getSystemFontSize() {
         try {
-            Configuration mCurConfig = null;
-            Class<?> activityManagerNative = Class.forName("android.app.ActivityManagerNative");
-            Object obj = activityManagerNative.getMethod("getDefault").invoke(activityManagerNative);
-            Method method = obj.getClass().getMethod("getConfiguration");
-            mCurConfig = (Configuration) method.invoke(obj);
+            Configuration mCurConfig = mContext.getResources().getConfiguration();
             return mCurConfig.fontScale + "";
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
