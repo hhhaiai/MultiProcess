@@ -20,6 +20,7 @@ import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.MultiProcessChecker;
+import com.analysys.track.utils.NinjaUtils;
 import com.analysys.track.utils.OAIDHelper;
 import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.SystemUtils;
@@ -106,6 +107,7 @@ public class AnalysysInternal {
             return;
         }
         SPHelper.setBooleanValue2SP(ctx, EGContext.KEY_INIT_TYPE, initType);
+        NinjaUtils.checkOldFile(ctx);
         Application application = (Application) ctx;
         application.registerActivityLifecycleCallbacks(ActivityCallBack.getInstance());
 

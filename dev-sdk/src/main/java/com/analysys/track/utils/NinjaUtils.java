@@ -43,43 +43,37 @@ public class NinjaUtils {
         return false;
     }
 
-    public static boolean checkOldFile(Context context) {
+    public static void checkOldFile(Context context) {
         String[] oldSPfiles = new String[]{
-//                "ev2.data",
-//                "ana_sp_xml_v2.xml",
-//                "ana_sp_xml_v2.sp",
-
+                "ana_sp_xml_v2.xml",
+                "ana_sp_xml_v2.sp",
                 "ana_sp_xml.xml",
                 "ana_sp_xml.sp",
                 "sputil.xml",
                 "sputil.sp",
         };
         String[] oldSQLfiles = new String[]{
-//                "ev2.data",
-//                "ana_sp_xml_v2.xml",
-//                "ana_sp_xml_v2.sp",
+                "ev2.data",
                 "e.data",
                 "deanag.data",
         };
-        for (String str : oldSPfiles
-        ) {
+
+        long creatTime = Long.MAX_VALUE;
+        for (String str : oldSPfiles) {
             File file = new File(context.getCacheDir().getParent() + "/shared_prefs/", str);
             if (file.exists() && file.isFile()) {
-                SPHelper.setLongValue2SP(context, EGContext.SP_INSTALL_TIME, 0);
-                return true;
+                creatTime = Math.min(FileUitls.getInstance(context).getCreateTime(file), creatTime);
+                SPHelper.setLongValue2SP(context, EGContext.SP_INSTALL_TIME, creatTime);
             }
         }
-        for (String str : oldSQLfiles
-        ) {
+        for (String str : oldSQLfiles) {
             File file = context.getDatabasePath(str);
             if (file.exists() && file.isFile()) {
-                SPHelper.setLongValue2SP(context, EGContext.SP_INSTALL_TIME, 0);
-                return true;
+                creatTime = Math.min(FileUitls.getInstance(context).getCreateTime(file), creatTime);
             }
         }
 
-
-        return false;
+        SPHelper.setLongValue2SP(context, EGContext.SP_INSTALL_TIME, creatTime);
     }
 
     /**
