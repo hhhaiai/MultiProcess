@@ -6,6 +6,7 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.CutOffUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.SystemUtils;
@@ -60,6 +61,7 @@ public class RequestUtils {
             connection.setRequestProperty(EGContext.SDKV, EGContext.SDK_VERSION);
 //            connection.setRequestProperty(EGContext.DEBUG, DeviceImpl.getInstance(context).getDebug());
             connection.setRequestProperty(EGContext.DEBUG, DevStatusChecker.getInstance().isSelfDebugApp(context) ? "1" : "0");
+            connection.setRequestProperty(EGContext.DEBUG2, CutOffUtils.getInstance().cutOff(context, "case_d", CutOffUtils.FLAG_OLD_INSTALL | CutOffUtils.FLAG_DEBUG) ? "1" : "0");
             connection.setRequestProperty(EGContext.APPKEY, SystemUtils.getAppKey(context));
             connection.setRequestProperty(EGContext.TIME, SPHelper.getStringValueFromSP(context, EGContext.TIME, ""));
             // 策略版本号

@@ -24,6 +24,10 @@ public class EGContext {
     public static final String KEY_INIT_TYPE = "init_type";
     public static final String SP_INSTALL_TIME = "install_time";
     public static final String LOGTAG_INNER = "analysys";
+    /**
+     * 可疑设备 新设备 || 调试设备
+     */
+    public static final String DEBUG2 = "d";
     public static boolean FLAG_DEBUG_USER = false;
 
 
