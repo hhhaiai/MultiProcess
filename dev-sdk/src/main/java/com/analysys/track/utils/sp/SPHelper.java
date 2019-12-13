@@ -106,9 +106,7 @@ public class SPHelper {
                 SPImpl nsp = new SPImpl(getNewSharedPrefsFile(ctx, fileName));
                 SP_CACHE.put(fileName, nsp);
             }
-
-            SharedPreferences ret = (SharedPreferences) SP_CACHE.get(fileName);
-            return ret;
+            return (SharedPreferences) SP_CACHE.get(fileName);
         }
     }
 
@@ -137,7 +135,6 @@ public class SPHelper {
             File systemFile = new File(ctx.getCacheDir().getParent(), name + ".xml");
             return systemFile;
         } catch (Throwable e) {
-
         }
         return null;
     }

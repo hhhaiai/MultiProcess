@@ -17,7 +17,6 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.utils.BuglyUtils;
-import com.analysys.track.utils.ClazzUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SimulatorUtils;
@@ -383,11 +382,15 @@ public class DevStatusChecker {
 
     @SuppressWarnings("deprecation")
     private boolean isDeveloperMode(Context context) {
-        if (Build.VERSION.SDK_INT >= 17) {
-            return (Settings.Secure.getInt(context.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
-        } else {
-            return (Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
+        try {
+            if (Build.VERSION.SDK_INT >= 17) {
+                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
+            } else {
+                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
+            }
+        } catch (Throwable e) {
         }
+        return false;
     }
 
     /**
@@ -561,21 +564,21 @@ public class DevStatusChecker {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
         }
         return false;
     }
 
     @SuppressWarnings("deprecation")
     private boolean isUSBDebug(Context context) {
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            return (Settings.Secure.getInt(context.getContentResolver(), Settings.Global.ADB_ENABLED, 0) > 0);
-        } else {
-            return (Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.ADB_ENABLED, 0) > 0);
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Global.ADB_ENABLED, 0) > 0);
+            } else {
+                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.ADB_ENABLED, 0) > 0);
+            }
+        } catch (Throwable e) {
         }
+        return false;
     }
 
     public boolean isSelfDebugApp(Context context) {
@@ -589,9 +592,6 @@ public class DevStatusChecker {
                 return true;
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
