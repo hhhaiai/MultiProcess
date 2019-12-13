@@ -244,6 +244,10 @@ public class USMUtils {
 
     public static UsageEvents getUsageEventsByInvoke(long beginTime, long endTime, Context context) {
         try {
+            if (context.getApplicationInfo().targetSdkVersion >= 28 || Build.VERSION.SDK_INT >= 28) {
+                return null;
+            }
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
                 Field field = getField(UsageStatsManager.class, "mService");
