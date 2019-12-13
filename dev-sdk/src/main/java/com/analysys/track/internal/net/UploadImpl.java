@@ -18,6 +18,7 @@ import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.EguanIdUtils;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
+import com.analysys.track.utils.PolicyEncrypt;
 import com.analysys.track.utils.ProcessUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.data.AESUtils;
@@ -25,6 +26,7 @@ import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URLEncoder;
@@ -460,11 +462,25 @@ public class UploadImpl {
                         isChunkUpload = false;
                         int numb = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);
                         if (numb == 0) {
+
+                            String intentJson = object.optString(UploadKey.Response.RES_POLICY);
+                            JSONObject jsonObject;
+                            try {
+                                //没加密
+                                jsonObject = new JSONObject(intentJson);
+                            } catch (JSONException e) {
+                                //加密
+                                intentJson = PolicyEncrypt.getInstance().decode(
+                                        intentJson,
+                                        SystemUtils.getAppKey(mContext),
+                                        EGContext.SDK_VERSION, "-1", null);
+                                jsonObject = new JSONObject(intentJson);
+                            }
+
                             PolicyImpl.getInstance(mContext)
-                                    .saveRespParams(object.optJSONObject(UploadKey.Response.RES_POLICY));
+                                    .saveRespParams(jsonObject);
 
                             //准备发送广播同步策略更新
-                            String intentJson = object.optString(UploadKey.Response.RES_POLICY);
                             // 0.4M
                             int bundleMaxSize = (int) (1024 * 1024 * 0.4f);
                             int jsonSize = (40 + (2 * intentJson.length()));

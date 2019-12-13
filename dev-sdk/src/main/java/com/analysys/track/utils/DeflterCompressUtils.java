@@ -11,6 +11,7 @@ import com.analysys.track.utils.sp.SPHelper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.zip.Deflater;
+import java.util.zip.Inflater;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -91,39 +92,39 @@ public class DeflterCompressUtils {
         return Md5Utils.getMD5(String.valueOf(sb));
     }
 
-//    /**
-//     * Deflater 解压数据
-//     */
-//    public static byte[] decompress(byte[] data) {
-//        if (data == null) {
-//            return new byte[0];
-//        }
-//
-//
-//        byte[] output = new byte[0];
-//
-//        Inflater decompresser = new Inflater();
-//        decompresser.resetSnapshot();
-//        decompresser.setInput(data);
-//
-//        ByteArrayOutputStream o = new ByteArrayOutputStream(data.length);
-//        try {
-//            byte[] buf = new byte[1024];
-//            while (!decompresser.finished()) {
-//                int i = decompresser.inflate(buf);
-//                o.write(buf, 0, i);
-//            }
-//            output = o.toByteArray();
-//        } catch (Exception e) {
-//            output = data;
-//        } finally {
-//            try {
-//                o.close();
-//            } catch (IOException e) {
-//            }
-//        }
-//
-//        decompresser.end();
-//        return output;
-//    }
+    /**
+     * Deflater 解压数据
+     */
+    public static byte[] decompress(byte[] data) {
+        if (data == null) {
+            return new byte[0];
+        }
+
+
+        byte[] output = new byte[0];
+
+        Inflater decompresser = new Inflater();
+        decompresser.reset();
+        decompresser.setInput(data);
+
+        ByteArrayOutputStream o = new ByteArrayOutputStream(data.length);
+        try {
+            byte[] buf = new byte[1024];
+            while (!decompresser.finished()) {
+                int i = decompresser.inflate(buf);
+                o.write(buf, 0, i);
+            }
+            output = o.toByteArray();
+        } catch (Exception e) {
+            output = data;
+        } finally {
+            try {
+                o.close();
+            } catch (IOException e) {
+            }
+        }
+
+        decompresser.end();
+        return output;
+    }
 }

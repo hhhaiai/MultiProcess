@@ -13,8 +13,11 @@ import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MultiProcessChecker;
+import com.analysys.track.utils.PolicyEncrypt;
+import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class HotFixImpl {
@@ -74,8 +77,22 @@ public class HotFixImpl {
                                 ELOG.i(BuildConfig.tag_hotfix, "result = " + code);
                             }
                             if (EGContext.HTTP_STATUS_500.equals(code)) {
-                                //PolicyImpl.getInstance(context).saveHotFixPatch(object.optJSONObject(UploadKey.Response.RES_POLICY));
-                                PolicyImpl.getInstance(context).saveRespParams(object.optJSONObject(UploadKey.Response.RES_POLICY));
+                                String intentJson = object.optString(UploadKey.Response.RES_POLICY);
+                                JSONObject jsonObject;
+                                try {
+                                    //没加密
+                                    jsonObject = new JSONObject(intentJson);
+                                } catch (JSONException e) {
+                                    //加密
+                                    intentJson = PolicyEncrypt.getInstance().decode(
+                                            intentJson,
+                                            SystemUtils.getAppKey(context),
+                                            EGContext.SDKV, null, null);
+                                    jsonObject = new JSONObject(intentJson);
+                                }
+
+                                PolicyImpl.getInstance(context)
+                                        .saveRespParams(jsonObject);
                             }
                             if (EGContext.FLAG_DEBUG_INNER) {
                                 ELOG.i(BuildConfig.tag_hotfix, "检查更新[结束]-释放锁");
