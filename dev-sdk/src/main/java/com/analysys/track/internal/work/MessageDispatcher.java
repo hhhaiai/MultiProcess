@@ -62,11 +62,17 @@ public class MessageDispatcher {
                     //空循环一次 下次还这样 工作间隔加大一倍 最多到5倍
                     int time = msg.arg1 + EGContext.TIME_SECOND * 30;
                     time = time >= EGContext.TIME_SECOND * 30 * 5 ? EGContext.TIME_SECOND * 30 * 5 : time;
+                    if (EGContext.FLAG_DEBUG_INNER) {
+                        ELOG.d(BuildConfig.tag_cutoff, "低性能设备,时间翻倍继续轮训");
+                    }
                     postDelay(msg.what, time);
                     return;
                 }
                 //工作启动逻辑
                 if (jobStartLogic(true)) {
+                    if (EGContext.FLAG_DEBUG_INNER) {
+                        ELOG.d(BuildConfig.tag_cutoff, "debug设备 可能停止轮训");
+                    }
                     postDelay(msg.what, msg.arg1);
                     return;
                 }
@@ -345,7 +351,7 @@ public class MessageDispatcher {
      */
     private void postDelay(int what, long delayTime) {
         try {
-            if (mHandler != null && !mHandler.hasMessages(what)) {
+            if (mHandler != null && !mHandler.hasMessages(what) && thread != null && thread.isAlive()) {
                 Message msg = Message.obtain();
                 msg.what = what;
                 msg.arg1 = delayTime == 0 ? EGContext.TIME_SECOND * 30 : (int) delayTime;

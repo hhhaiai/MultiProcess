@@ -18,14 +18,7 @@ public class CutOffUtilsTest extends AnalsysTest {
 
     @Test
     public void cutOff() {
-        CutOffUtils.getInstance().cutOff(mContext, "hello", "1111 1111");
-        CutOffUtils.getInstance().cutOff(mContext, "hello", "1111 tret");
-        CutOffUtils.getInstance().cutOff(mContext, "hello", "wrweqr 1111");
-        CutOffUtils.getInstance().cutOff(mContext, "hello", "00000000");
-        CutOffUtils.getInstance().cutOff(mContext, "hello", "00000 1111");
-        CutOffUtils.getInstance().cutOff(mContext, "hello", "111100 111000001");
-        CutOffUtils.getInstance().cutOff(mContext, "hello", "1111 0");
-        CutOffUtils.getInstance().cutOff(mContext, "hello", "000");
+
     }
 
     @Test
