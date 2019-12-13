@@ -1,22 +1,20 @@
 package com.analysys.plugin;
 
-import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * @Copyright 2019 analysys Inc. All rights reserved.
- * @Description: 字符串加密实现类
- * @Version: 1.0
- * @Create: 2019-11-13 11:20:25
+ * @Copyright "2019" analysys Inc. All rights reserved.
+ * @Description: 字符串加密
+ * @Version: "1"."0"
+ * @Create: "2019"-"12"-"07" "12":"58":"44"
  * @author: miqt
  * @mail: miqingtang@analysys.com.cn
  */
 public class StringFog {
-
-
     public static final StringFogImpl FOG = new StringFogImpl();
 
     public static String encrypt(String data, String key) {
-
         return FOG.encrypt(data, key);
     }
 
@@ -29,51 +27,44 @@ public class StringFog {
     }
 
     public final static class StringFogImpl implements IStringFog {
+        private final Map<String, String> hset = new HashMap<>();
 
-        private static final String CHARSET_NAME_UTF_8 = "UTF-8";
+        public StringFogImpl() {
+            hset.put("android.telephony.TelephonyManager", "1");
+            hset.put("getNeighboringCellInfo", "2");
+            hset.put("ActivityManagerNative", "3");
+            hset.put("getDefault", "4");
+            hset.put("android.app.ActivityThread", "5");
+            hset.put("currentActivityThread", "6");
+            hset.put("getApplication", "7");
+            hset.put("android.app.usage.IUsageStatsManager$Stub", "8");
+            hset.put("asInterface", "9");
+            hset.put("android.app.usage.UsageStatsManager", "10");
+            hset.put("android.bluetooth.BluetoothAdapter", "11");
+            hset.put("mService", "12");
+            hset.put("android.os.ServiceManager", "13");
+            hset.put("getService", "14");
+            hset.put("queryUsageStats", "15");
+            hset.put("getDefaultAdapter", "16");
+            hset.put("com.android.server.usage.UserUsageStatsService", "17");
+            hset.put("getList", "18");
+            hset.put("queryEvents", "19");
+            hset.put("usagestats", "20");
+        }
 
         @Override
         public String encrypt(String data, String key) {
-            String newData;
-            try {
-                newData = new String(Base64.encode(xor(data.getBytes(CHARSET_NAME_UTF_8), key), Base64.NO_WRAP));
-            } catch (UnsupportedEncodingException e) {
-                newData = new String(Base64.encode(xor(data.getBytes(), key), Base64.NO_WRAP));
-            }
-            return newData;
+            return hset.get(data);
         }
 
         @Override
         public String decrypt(String data, String key) {
-            String newData;
-            try {
-                newData = new String(xor(Base64.decode(data, Base64.NO_WRAP), key), CHARSET_NAME_UTF_8);
-            } catch (UnsupportedEncodingException e) {
-                newData = new String(xor(Base64.decode(data, Base64.NO_WRAP), key));
-            }
-            return newData;
+            return data;
         }
 
         @Override
         public boolean overflow(String data, String key) {
-            return data != null && data.length() * 4 / 3 >= 65535;
+            return data == null || !hset.containsKey(data);
         }
-
-        public byte[] xor(byte[] data, String key) {
-            int len = data.length;
-            int lenKey = key.length();
-            int i = 0;
-            int j = 0;
-            while (i < len) {
-                if (j >= lenKey) {
-                    j = 0;
-                }
-                data[i] = (byte) (data[i] ^ key.charAt(j));
-                i++;
-                j++;
-            }
-            return data;
-        }
-
     }
 }

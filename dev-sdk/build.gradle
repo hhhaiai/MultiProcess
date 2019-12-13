@@ -36,7 +36,8 @@ def tag_usm = "analysys_usm"//usm的tag
 def tag_netinfo = "analysys_netinfo"//网络扫描的tag
 def tag_loc = "analysys_loc"//位置信息的tag
 def tag_recerver = "analysys_recerver"//广播接收的tag
-def tag_cutoff = "analysys_cutoff"//广播接收的tag
+def tag_cutoff = "analysys_cutoff"//短路的tag
+def tag_stringfog = "analysys_stringfog"//字符串混淆的tag
 //endregion
 
 android {
@@ -63,6 +64,7 @@ android {
         buildConfigField "String", "tag_loc", "\"${tag_loc}\""
         buildConfigField "String", "tag_recerver", "\"${tag_recerver}\""
         buildConfigField "String", "tag_cutoff", "\"${tag_cutoff}\""
+        buildConfigField "String", "tag_stringfog", "\"${tag_stringfog}\""
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }

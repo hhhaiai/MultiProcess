@@ -47,4 +47,11 @@ public class StringFogTest {
     }
 
 
+    @Test
+    public void g() {
+        String g = StringFog_G.FOG.g();
+        Assert.assertNotNull(g);
+    }
+
+
 }
