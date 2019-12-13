@@ -58,10 +58,11 @@ public class DevStatusChecker {
         return HOLDER.INSTANCE;
     }
 
+    private String mShellPropCache;
+
     /**
      * <pre>
      *   调试设备:
-     *
      *
      * </pre>
      *
@@ -88,11 +89,13 @@ public class DevStatusChecker {
 
 
         //增加复用
-        String shellProp = ShellUtils.shell("getprop");
+        if(TextUtils.isEmpty(mShellPropCache)) {
+            mShellPropCache = ShellUtils.shell("getprop");
+        }
         String buildProp = SystemUtils.getContentFromFile("/system/build.prop");
 
         // 2. 设备是debug的
-        if (isDebugRom(context, shellProp, buildProp)) {
+        if (isDebugRom(context, mShellPropCache, buildProp)) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "设备是debug的");
             }
@@ -106,7 +109,7 @@ public class DevStatusChecker {
             return true;
         }
         // 4. 有线判断
-        if (hasEmulatorWifi(shellProp, buildProp) || hasEth0Interface()) {
+        if (hasEmulatorWifi(mShellPropCache, buildProp) || hasEth0Interface()) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "有线判断");
             }

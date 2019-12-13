@@ -342,6 +342,7 @@ public class NetImpl {
                         && pkgName.contains(".")
                         && !pkgName.contains(":")
                         && !pkgName.contains("/")
+                        // TODO 耗时---------------------
                         && manager.getLaunchIntentForPackage(pkgName) != null) {
 
                     NetInfo info = pkgs.get(pkgName);
