@@ -8,7 +8,7 @@ costtime {
 }
 
 def version = "4.3.0.5"
-def date = "20191213"
+def date = "20191212"
 
 //是否是热修复的宿主
 def isHost = false
