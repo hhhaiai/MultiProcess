@@ -533,6 +533,25 @@ public class SystemUtils {
     }
 
     /**
+     * 非主线程调用
+     */
+    public static void runOnWorkThread(final Runnable runnable) {
+        if (runnable == null) {
+            return;
+        }
+        if (isMainThread()) {
+            EThreadPool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    runnable.run();
+                }
+            });
+        } else {
+            runnable.run();
+        }
+    }
+
+    /**
      * 获取当前进程的名称
      *
      * @param context

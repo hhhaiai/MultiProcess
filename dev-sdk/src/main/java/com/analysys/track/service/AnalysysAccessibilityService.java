@@ -112,18 +112,12 @@ public class AnalysysAccessibilityService extends AccessibilityService {
                 return;
             }
             final String pkg = pkgName.toString().trim();
-            if (SystemUtils.isMainThread()) {
-                EThreadPool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        OCImpl.getInstance(mContext).processSignalPkgName(pkg, UploadKey.OCInfo.COLLECTIONTYPE_ACCESSIBILITY);
-                    }
-                });
-
-            } else {
-                OCImpl.getInstance(mContext).processSignalPkgName(pkg, UploadKey.OCInfo.COLLECTIONTYPE_ACCESSIBILITY);
-            }
-
+            SystemUtils.runOnWorkThread(new Runnable() {
+                @Override
+                public void run() {
+                    OCImpl.getInstance(mContext).processSignalPkgName(pkg, UploadKey.OCInfo.COLLECTIONTYPE_ACCESSIBILITY);
+                }
+            });
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);

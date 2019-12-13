@@ -67,28 +67,17 @@ public class OCImpl {
             if (durTime > 0) {
                 // 多进程锁定文件工作。
                 if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_OC, EGContext.TIME_SECOND * 2, System.currentTimeMillis())) {
-
-                    if (SystemUtils.isMainThread()) {
-                        EThreadPool.execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                processOC();
-                                //oc开始处理重置标记位.
-                                MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_OC, System.currentTimeMillis());
-                                if (callback != null) {
-                                    callback.onProcessed();
-                                }
+                    SystemUtils.runOnWorkThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            processOC();
+                            //oc开始处理重置标记位.
+                            MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_OC, System.currentTimeMillis());
+                            if (callback != null) {
+                                callback.onProcessed();
                             }
-                        });
-                    } else {
-                        processOC();
-                        //oc开始处理重置标记位.
-                        MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_OC, System.currentTimeMillis());
-                        if (callback != null) {
-                            callback.onProcessed();
                         }
-                    }
-
+                    });
                 } else {
                     if (EGContext.DEBUG_OC) {
                         ELOG.v(BuildConfig.tag_oc, "多进程并发。停止处理 。。。");
@@ -671,19 +660,13 @@ public class OCImpl {
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext,
                     EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST,
                     EGContext.TIME_SECOND, System.currentTimeMillis())) {
-
-                if (SystemUtils.isMainThread()) {
-                    EThreadPool.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            processScreenOff();
-                            MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST, System.currentTimeMillis());
-                        }
-                    });
-                } else {
-                    processScreenOff();
-                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST, System.currentTimeMillis());
-                }
+                SystemUtils.runOnWorkThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        processScreenOff();
+                        MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST, System.currentTimeMillis());
+                    }
+                });
             } else {
                 // 多进程抢占
                 return;

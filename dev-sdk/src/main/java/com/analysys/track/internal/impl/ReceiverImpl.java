@@ -7,7 +7,6 @@ import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.MessageDispatcher;
@@ -54,7 +53,7 @@ public class ReceiverImpl {
                 AppSnapshotImpl.getInstance(context)
                         .processAppModifyMsg(packageName,
                                 Integer.parseInt(EGContext.SNAP_SHOT_INSTALL),
-                                currentTime);
+                                EGContext.FILES_SYNC_SNAP_ADD_BROADCAST);
 
             } else {
 //                if (EGContext.DEBUG_RECEIVER) {
@@ -78,7 +77,7 @@ public class ReceiverImpl {
                 AppSnapshotImpl.getInstance(context)
                         .processAppModifyMsg(packageName,
                                 Integer.parseInt(EGContext.SNAP_SHOT_UNINSTALL),
-                                currentTime);
+                                EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST);
             } else {
 //                if (EGContext.DEBUG_RECEIVER) {
 //                    ELOG.v(BuildConfig.tag_snap, "卸载app:" + packageName + "---->多进程中断");
@@ -100,7 +99,7 @@ public class ReceiverImpl {
                 AppSnapshotImpl.getInstance(context)
                         .processAppModifyMsg(packageName,
                                 Integer.parseInt(EGContext.SNAP_SHOT_UPDATE),
-                                currentTime);
+                                EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST);
             } else {
 //                if (EGContext.DEBUG_RECEIVER) {
 //                    ELOG.v(BuildConfig.tag_snap, "更新app:" + packageName + "---->多进程中断");

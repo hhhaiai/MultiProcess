@@ -85,26 +85,17 @@ public class AppSnapshotImpl {
                         ELOG.i(BuildConfig.tag_snap, " 大于3小时可以开始工作 ");
                     }
                     SPHelper.setLongValue2SP(mContext, EGContext.SP_APP_SNAP, now);
-                    if (SystemUtils.isMainThread()) {
-                        EThreadPool.execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                getSnapShotInfo();
-                                MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, System.currentTimeMillis());
-                                if (callBack != null) {
-                                    callBack.onProcessed();
-                                }
-
+                    SystemUtils.runOnWorkThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            getSnapShotInfo();
+                            MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, System.currentTimeMillis());
+                            if (callBack != null) {
+                                callBack.onProcessed();
                             }
-                        });
-                    } else {
-                        getSnapShotInfo();
-                        // 5. 解锁多进程
-                        MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_APPSNAPSHOT, System.currentTimeMillis());
-                        if (callBack != null) {
-                            callBack.onProcessed();
+
                         }
-                    }
+                    });
                 } else {
                     if (EGContext.DEBUG_SNAP) {
                         ELOG.i(BuildConfig.tag_snap, " 小于3小时");
@@ -582,31 +573,25 @@ public class AppSnapshotImpl {
      *
      * @param pkgName
      * @param type
-     * @param time
+     * @param lockFileName
      */
-    public void processAppModifyMsg(final String pkgName, final int type, final long time) {
+    public void processAppModifyMsg(final String pkgName, final int type, final String lockFileName) {
         if (TextUtils.isEmpty(pkgName)) {
             return;
         }
         if (EGContext.DEBUG_SNAP) {
             ELOG.d(BuildConfig.tag_snap, " 处理广播接收到的信息 包:" + pkgName + "----type: " + type);
         }
-        if (SystemUtils.isMainThread()) {
-            // 数据库操作修改包名和类型
-            EThreadPool.execute(new Runnable() {
-                @Override
-                public void run() {
-                    realProcessInThread(type, pkgName, time);
-                }
-            });
-        } else {
-            realProcessInThread(type, pkgName, time);
-        }
-
-
+        // 数据库操作修改包名和类型
+        SystemUtils.runOnWorkThread(new Runnable() {
+            @Override
+            public void run() {
+                realProcessInThread(type, pkgName, lockFileName);
+            }
+        });
     }
 
-    private void realProcessInThread(int type, String pkgName, long time) {
+    private void realProcessInThread(int type, String pkgName, String lockFileName) {
         try {
             PackageManager pm = mContext.getPackageManager();
             if (type == 0) {
@@ -615,8 +600,6 @@ public class AppSnapshotImpl {
                 if (pi != null && pm.getLaunchIntentForPackage(pkgName) != null) {
                     TableProcess.getInstance(mContext).insertSnapshot(getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL));
                 }
-                MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST, System.currentTimeMillis());
-
             } else if (type == 1) {
 
                 if (EGContext.DEBUG_SNAP) {
@@ -625,8 +608,6 @@ public class AppSnapshotImpl {
                 // 卸载时候，不能获取版本，会出现解析版本异常
                 TableProcess.getInstance(mContext).updateSnapshot(pkgName, EGContext.SNAP_SHOT_UNINSTALL, "");
                 // SNAP_SHOT_UNINSTALL 解锁
-                MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST,
-                        System.currentTimeMillis());
             } else if (type == 2) {
                 PackageInfo pi = pm.getPackageInfo(pkgName, 0);
                 String avc = pi.versionName + "|" + pi.versionCode;
@@ -635,8 +616,6 @@ public class AppSnapshotImpl {
                 }
                 TableProcess.getInstance(mContext).updateSnapshot(pkgName, EGContext.SNAP_SHOT_UPDATE, avc);
                 // SNAP_SHOT_UPDATE 解锁
-                MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST,
-                        System.currentTimeMillis());
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
@@ -645,6 +624,9 @@ public class AppSnapshotImpl {
             if (EGContext.DEBUG_SNAP) {
                 ELOG.e(BuildConfig.tag_snap, e);
             }
+        }
+        if (!TextUtils.isEmpty(lockFileName)) {
+            MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, lockFileName, System.currentTimeMillis());
         }
     }
 

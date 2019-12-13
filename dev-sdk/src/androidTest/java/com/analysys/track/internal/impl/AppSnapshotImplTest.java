@@ -37,7 +37,7 @@ public class AppSnapshotImplTest extends AnalsysTest {
     public void processAppModifyMsg() {
         for (int i = 0; i < 200; i++) {
             appSnapshot.processAppModifyMsg("com.aaa.bbb" + i, Integer.parseInt(EGContext.SNAP_SHOT_INSTALL),
-                    System.currentTimeMillis());
+                    null);
         }
         //这里只测试耗时，不测试数据库操作，这一块的测试放到TableProcessTest进行
         //TableProcess.getInstance(mContext).selectSnapshot()

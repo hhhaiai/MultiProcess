@@ -217,7 +217,7 @@ public class MessageDispatcher {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.d(BuildConfig.tag_cutoff, "非新安装");
             }
-            //非新安装
+            //调试设备
             if (CutOffUtils.getInstance().cutOff(mContext, "case2", FLAG_DEBUG)) {
                 //调试设备
                 if (EGContext.FLAG_DEBUG_INNER) {

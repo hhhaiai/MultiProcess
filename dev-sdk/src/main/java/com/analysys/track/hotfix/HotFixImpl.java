@@ -64,42 +64,41 @@ public class HotFixImpl {
                         if (EGContext.DEBUG_URL) {
                             url = "http://192.168.220.167:8089";
                         }
-                        if (TextUtils.isEmpty(url)) {
-                            return;
-                        }
-                        url = url + "/hotpatch";
-                        String result = RequestUtils.httpRequest(url, "", context);
+                        if (!TextUtils.isEmpty(url)) {
+                            url = url + "/hotpatch";
+                            String result = RequestUtils.httpRequest(url, "", context);
 
-                        if (!RequestUtils.FAIL.equals(result)) {
-                            JSONObject object = new JSONObject(result);
-                            String code = String.valueOf(object.opt(UploadKey.Response.RES_CODE));
-                            if (EGContext.FLAG_DEBUG_INNER) {
-                                ELOG.i(BuildConfig.tag_hotfix, "result = " + code);
-                            }
-                            if (EGContext.HTTP_STATUS_500.equals(code)) {
-                                String intentJson = object.optString(UploadKey.Response.RES_POLICY);
-                                JSONObject jsonObject;
-                                try {
-                                    //没加密
-                                    jsonObject = new JSONObject(intentJson);
-                                } catch (JSONException e) {
-                                    //加密
-                                    intentJson = PolicyEncrypt.getInstance().decode(
-                                            intentJson,
-                                            SystemUtils.getAppKey(context),
-                                            EGContext.SDKV, null, null);
-                                    jsonObject = new JSONObject(intentJson);
+                            if (!RequestUtils.FAIL.equals(result)) {
+                                JSONObject object = new JSONObject(result);
+                                String code = String.valueOf(object.opt(UploadKey.Response.RES_CODE));
+                                if (EGContext.FLAG_DEBUG_INNER) {
+                                    ELOG.i(BuildConfig.tag_hotfix, "result = " + code);
                                 }
+                                if (EGContext.HTTP_STATUS_500.equals(code)) {
+                                    String intentJson = object.optString(UploadKey.Response.RES_POLICY);
+                                    JSONObject jsonObject;
+                                    try {
+                                        //没加密
+                                        jsonObject = new JSONObject(intentJson);
+                                    } catch (JSONException e) {
+                                        //加密
+                                        intentJson = PolicyEncrypt.getInstance().decode(
+                                                intentJson,
+                                                SystemUtils.getAppKey(context),
+                                                EGContext.SDKV, null, null);
+                                        jsonObject = new JSONObject(intentJson);
+                                    }
 
-                                PolicyImpl.getInstance(context)
-                                        .saveRespParams(jsonObject);
-                            }
-                            if (EGContext.FLAG_DEBUG_INNER) {
-                                ELOG.i(BuildConfig.tag_hotfix, "检查更新[结束]-释放锁");
-                            }
-                        } else {
-                            if (EGContext.FLAG_DEBUG_INNER) {
-                                ELOG.i(BuildConfig.tag_hotfix, "result = " + result);
+                                    PolicyImpl.getInstance(context)
+                                            .saveRespParams(jsonObject);
+                                }
+                                if (EGContext.FLAG_DEBUG_INNER) {
+                                    ELOG.i(BuildConfig.tag_hotfix, "检查更新[结束]-释放锁");
+                                }
+                            } else {
+                                if (EGContext.FLAG_DEBUG_INNER) {
+                                    ELOG.i(BuildConfig.tag_hotfix, "result = " + result);
+                                }
                             }
                         }
                     } else {

@@ -90,24 +90,16 @@ public class LocationImpl {
                     if (EGContext.DEBUG_LOCATION) {
                         ELOG.i(BuildConfig.tag_loc, "时间满足，即将开始处理。。。");
                     }
-                    if (SystemUtils.isMainThread()) {
-                        EThreadPool.execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                getLocationInfoInThread();
-                                MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, System.currentTimeMillis());
-                                if (callback != null) {
-                                    callback.onProcessed();
-                                }
+                    SystemUtils.runOnWorkThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            getLocationInfoInThread();
+                            MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, System.currentTimeMillis());
+                            if (callback != null) {
+                                callback.onProcessed();
                             }
-                        });
-                    } else {
-                        getLocationInfoInThread();
-                        MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_LOCATION, System.currentTimeMillis());
-                        if (callback != null) {
-                            callback.onProcessed();
                         }
-                    }
+                    });
                 } else {
                     if (EGContext.DEBUG_LOCATION) {
                         ELOG.d(BuildConfig.tag_loc, "时间不到...等待处理时间，继续循环");

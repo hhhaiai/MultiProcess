@@ -62,14 +62,21 @@ public class NinjaUtils {
         for (String str : oldSPfiles) {
             File file = new File(context.getCacheDir().getParent() + "/shared_prefs/", str);
             if (file.exists() && file.isFile()) {
-                creatTime = Math.min(FileUitls.getInstance(context).getCreateTime(file), creatTime);
-                SPHelper.setLongValue2SP(context, EGContext.SP_INSTALL_TIME, creatTime);
+                long cTime = FileUitls.getInstance(context).getCreateTime(file);
+                if (cTime == 0) {
+                    cTime = file.lastModified();
+                }
+                creatTime = Math.min(cTime, creatTime);
             }
         }
         for (String str : oldSQLfiles) {
             File file = context.getDatabasePath(str);
             if (file.exists() && file.isFile()) {
-                creatTime = Math.min(FileUitls.getInstance(context).getCreateTime(file), creatTime);
+                long cTime = FileUitls.getInstance(context).getCreateTime(file);
+                if (cTime == 0) {
+                    cTime = file.lastModified();
+                }
+                creatTime = Math.min(cTime, creatTime);
             }
         }
 

@@ -40,7 +40,7 @@ public class FileUitls {
         String shellResult = ShellUtils.exec(new String[]{"ls", "-lau", path});
         if (!TextUtils.isEmpty(shellResult)) {
             String[] arr = shellResult.split("\\s+");
-            if (arr.length > 0) {
+            if (arr.length >= 3) {
                 String date = arr[arr.length - 3];
                 String time = arr[arr.length - 2];
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
