@@ -1,9 +1,11 @@
-package com.analysys.track.utils;
+package com.analysys.track.utils.reflectinon;
 
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.ELOG;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -78,6 +80,9 @@ public class ClazzUtils {
 
     }
 
+    public static Object invokeObjectMethod(Object o, String methodName) {
+        return invokeObjectMethod(o, methodName, null, null);
+    }
 
     public static Object invokeObjectMethod(Object o, String methodName, Class<?>[] argsClass, Object[] args) {
         if (o == null || methodName == null) {
@@ -164,4 +169,31 @@ public class ClazzUtils {
 
         return returnValue;
     }
+
+    /**
+     * 是否包含方法
+     *
+     * @param clazz
+     * @param methodName
+     * @param parameterTypes
+     * @return
+     */
+    public static boolean hasMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+        try {
+            if (clazz == null || TextUtils.isEmpty(methodName)) {
+                return false;
+            }
+            if (parameterTypes == null || parameterTypes.length == 0) {
+                return clazz.getMethod(methodName) != null;
+            } else {
+                return clazz.getMethod(methodName, parameterTypes) != null;
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
+        }
+        return false;
+    }
+
 }
