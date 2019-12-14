@@ -42,14 +42,6 @@ public class PolicyInfo implements Serializable {
     private JSONArray CtrlList;
     private String Module;
     private String Status;
-    /**
-     * 是否使用实时策略，1不使用0使用
-     */
-//    private int UseRTP = EGContext.DEFAULT;
-    /**
-     * 是否实时上传[非实时分析策略下，是否实时上传]0不实时上传，1实时上传
-     */
-//    private int UseRTL = EGContext.DEFAULT;
     private String SecModule;
     private String SecStatus;
     private String DeuFreq;
@@ -72,6 +64,7 @@ public class PolicyInfo implements Serializable {
     private String mHotfixData;
     private String mHotfixSign;
     private String mHotfixVersion;
+    private String mHotfixMethons;
 
 
     private PolicyInfo() {
@@ -112,21 +105,6 @@ public class PolicyInfo implements Serializable {
         return FailCount;
     }
 
-//    public int isUseRTP() {
-//        return UseRTP;
-//    }
-
-//    public int isUseRTL() {
-//        return UseRTL;
-//    }
-
-//    public int getUseRTP() {
-//        return UseRTP;
-//    }
-
-//    public int getUseRTL() {
-//        return UseRTL;
-//    }
 
     public void setFailCount(int failCount) {
         FailCount = failCount;
@@ -156,13 +134,6 @@ public class PolicyInfo implements Serializable {
         CtrlList = ctrlList;
     }
 
-//    public void setUseRTP(int useRTP) {
-//        UseRTP = useRTP;
-//    }
-
-//    public void setUseRTL(int useRTL) {
-//        UseRTL = useRTL;
-//    }
 
     public String getModule() {
         return Module;
@@ -326,6 +297,23 @@ public class PolicyInfo implements Serializable {
 
     public void setHotfixVersion(String hotfixVersion) {
         this.mHotfixVersion = hotfixVersion;
+    }
+
+    public String getHotfixMethons() {
+        return mHotfixMethons;
+    }
+
+    public void setHotfixMethons(String hotfixMethons) {
+        this.mHotfixMethons = hotfixMethons;
+    }
+
+    /**
+     * 清除内存数据
+     */
+    public void clearMemoryData() {
+        //  清理比较大的内存变量
+        setHotfixMethons("");
+        setHotfixData("");
     }
 
     private static class Holder {

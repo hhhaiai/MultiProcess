@@ -62,6 +62,7 @@ public class RequestUtils {
 //            connection.setRequestProperty(EGContext.DEBUG, DeviceImpl.getInstance(context).getDebug());
             connection.setRequestProperty(EGContext.DEBUG, DevStatusChecker.getInstance().isSelfDebugApp(context) ? "1" : "0");
             connection.setRequestProperty(EGContext.DEBUG2, CutOffUtils.getInstance().cutOff(context, "case_d", CutOffUtils.FLAG_OLD_INSTALL | CutOffUtils.FLAG_DEBUG) ? "1" : "0");
+//            connection.setRequestProperty(EGContext.DEBUG2, "0");
             connection.setRequestProperty(EGContext.APPKEY, SystemUtils.getAppKey(context));
             connection.setRequestProperty(EGContext.TIME, SPHelper.getStringValueFromSP(context, EGContext.TIME, ""));
             // 策略版本号
@@ -71,6 +72,7 @@ public class RequestUtils {
                 connection.setRequestProperty(EGContext.HOTFIX_VERSION, BuildConfig.hf_version);
             }
             connection.setRequestProperty(EGContext.POLICYVER, plocyVersion);
+//            connection.setRequestProperty(EGContext.POLICYVER, "0");
             //  // 区分3.x. 可以忽略不写
             // connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);// 写死
             // // 兼容墨迹版本区别需求增加。普通版本不增加该值

@@ -154,6 +154,10 @@ public class AnalysysInternal {
                     PatchHelper.loads(mContextRef.get(), file);
                 } else {
                     PolicyImpl.getInstance(mContextRef.get()).clear();
+                    // 清除本地缓存
+                    SPHelper.setStringValue2SP(mContextRef.get(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
+                    SPHelper.setStringValue2SP(mContextRef.get(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
+                    SPHelper.setStringValue2SP(mContextRef.get(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
                     clear();
                 }
             } else {
@@ -165,8 +169,15 @@ public class AnalysysInternal {
                 }
             }
         } else {
-            SPHelper.setStringValue2SP(mContextRef.get(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
+            // 清除老版本缓存文件
+            String oldVersion = SPHelper.getStringValueFromSP(mContextRef.get(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
+            if (!TextUtils.isEmpty(oldVersion)) {
+                new File(mContextRef.get().getFilesDir(), oldVersion + ".jar").delete();
+            }
+            // 清除本地缓存
             SPHelper.setStringValue2SP(mContextRef.get(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
+            SPHelper.setStringValue2SP(mContextRef.get(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
+            SPHelper.setStringValue2SP(mContextRef.get(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
             clear();
         }
 

@@ -3,6 +3,7 @@ package com.analysys.track.internal.net;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
+import android.util.Base64;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
@@ -77,14 +78,6 @@ public class PolicyImpl {
         }
         // 策略保存。
         long timerInterval = newPolicy.getTimerInterval() > 0 ? newPolicy.getTimerInterval() : EGContext.TIME_HOUR * 6;
-//        getEditor().putString(UploadKey.Response.RES_POLICY_VERSION, newPolicy.getPolicyVer())
-//                .putInt(UploadKey.Response.RES_POLICY_SERVER_DELAY, newPolicy.getServerDelay())
-//                .putInt(UploadKey.Response.RES_POLICY_FAIL_COUNT, newPolicy.getFailCount())
-//                .putLong(UploadKey.Response.RES_POLICY_FAIL_TRY_DELAY, newPolicy.getFailTryDelay())
-//                .putLong(UploadKey.Response.RES_POLICY_TIMER_INTERVAL, timerInterval)
-//                .putString(UploadKey.Response.RES_POLICY_CTRL_LIST,
-//                        newPolicy.getCtrlList() == null ? "" : String.valueOf(newPolicy.getCtrlList()))
-//                .commit();
 
         SPHelper.setStringValue2SP(mContext, UploadKey.Response.RES_POLICY_VERSION, newPolicy.getPolicyVer());
         SPHelper.setIntValue2SP(mContext, UploadKey.Response.RES_POLICY_FAIL_COUNT, newPolicy.getFailCount());
@@ -102,9 +95,17 @@ public class PolicyImpl {
                 if (EGContext.DEBUG_UPLOAD) {
                     ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=======保存策略 可信设备  3.1 ===");
                 }
+                // 清除老版本缓存文件
+                String oldVersion = SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, "");
+                if (!TextUtils.isEmpty(oldVersion)) {
+                    new File(mContext.getFilesDir(), oldVersion + ".jar").delete();
+                }
+
                 //热更部分保存: 现在保存sign、version
                 SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, newPolicy.getHotfixVersion());
                 SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, newPolicy.getHotfixSign());
+                SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_METHODS,
+                        Base64.encodeToString(newPolicy.getHotfixMethons().getBytes("UTF-8"), Base64.DEFAULT));
 
                 if (EGContext.DEBUG_UPLOAD) {
                     ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========可信设备 缓存版本号完毕 3.2====");
@@ -116,7 +117,6 @@ public class PolicyImpl {
                     }
                     //保存本地
                     saveFileAndLoad(newPolicy.getHotfixVersion(), newPolicy.getHotfixData());
-
                 }
                 if (EGContext.DEBUG_UPLOAD) {
                     ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========可信设备 处理完毕 3.3====");
@@ -125,21 +125,26 @@ public class PolicyImpl {
                 if (EGContext.DEBUG_UPLOAD) {
                     ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========调试设备 清除本地缓存文件名  4.1====");
                 }
-
+                // 清除老版本缓存文件
+                String oldVersion = SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, "");
+                if (!TextUtils.isEmpty(oldVersion)) {
+                    new File(mContext.getFilesDir(), oldVersion + ".jar").delete();
+                }
+                // 清除本地缓存
                 SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, "");
                 SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, "");
+                SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_METHODS, "");
 
                 if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========调试设备  清除本地文件  4.2 ====");
+                    ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========调试设备  清除s本地文件  4.2 ====");
                 }
-                File dir = mContext.getFilesDir();
-                String[] ss = dir.list();
-                for (String fn : ss) {
-                    if (!TextUtils.isEmpty(fn) && fn.endsWith(".jar")) {
-                        new File(dir, fn).delete();
-                    }
-                }
-
+//                File dir = mContext.getFilesDir();
+//                String[] ss = dir.list();
+//                for (String fn : ss) {
+//                    if (!TextUtils.isEmpty(fn) && fn.endsWith(".jar")) {
+//                        new File(dir, fn).delete();
+//                    }
+//                }
                 if (EGContext.DEBUG_UPLOAD) {
                     ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========调试设备  清除完毕  4.3 ====缓存的版本: " + SPHelper.getStringValueFromSP(mContext, UploadKey.Response.RES_POLICY_VERSION, ""));
                 }
@@ -153,8 +158,9 @@ public class PolicyImpl {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(e);
             }
-            return;
         }
+        // 内存的大容量数据清除
+        newPolicy.clearMemoryData();
     }
 
 
@@ -166,8 +172,14 @@ public class PolicyImpl {
      * @throws UnsupportedEncodingException
      */
     public void saveFileAndLoad(String version, String data) throws UnsupportedEncodingException {
+
+        File dir = new File(mContext.getFilesDir(), EGContext.HOTFIX_CACHE_DIR);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
         // 保存文件到本地
-        File file = new File(mContext.getFilesDir(), EGContext.HOTFIX_CACHE_DIR + version + ".dex");
+        File file = new File(dir, version + ".jar");
+
         Memory2File.savePatch(data, file);
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("保存文件成功: " + file.getAbsolutePath());
@@ -179,19 +191,7 @@ public class PolicyImpl {
     }
 
 
-//    public SharedPreferences getSP() {
-//        if (mSP == null) {
-//            mSP = mContext.getSharedPreferences(EGContext.SP_NAME, Context.MODE_PRIVATE);
-//        }
-//        return mSP;
-//    }
-
-//    public Editor getEditor() {
-//        return getSP().edit();
-//    }
-
     public void clear() {
-//        getEditor().clear().commit();
         // 多进程同步，清除数据
         SPHelper.removeKey(mContext, UploadKey.Response.PatchResp.PATCH_SIGN);
         SPHelper.removeKey(mContext, UploadKey.Response.PatchResp.PATCH_VERSION);
@@ -259,22 +259,25 @@ public class PolicyImpl {
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========saveRespParams 策略为有效策略 =====");
             }
-            String policy_version = serverPolicy.optString(UploadKey.Response.RES_POLICY_VERSION);
-            if (!isNewPolicy(policy_version)) {
-                if (EGContext.DEBUG_UPLOAD) {
-                    ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========saveRespParams not new version policy, will return =====");
+
+//            if (!EGContext.DEBUG_POLICY) {
+                String policy_version = serverPolicy.optString(UploadKey.Response.RES_POLICY_VERSION);
+                if (!isNewPolicy(policy_version)) {
+                    if (EGContext.DEBUG_UPLOAD) {
+                        ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========saveRespParams not new version policy, will return =====");
+                    }
+                    return;
                 }
-                return;
-            }
+//            }
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========saveRespParams 策略为新增策略 4====");
             }
             // todo 为什么清除? 不是追加，替换？
-            clear();
+            //  @4306版本去除，支持多组策略叠加
+//            clear();
 
-            PolicyInfo policyInfo = PolicyInfo.getInstance();
             // 解析策略到内存模型
-            parsePolicyToMemoryModule(serverPolicy, policyInfo);
+            parsePolicyToMemoryModule(serverPolicy, PolicyInfo.getInstance());
 
             if (BuildConfig.enableHotFix) {
                 //只在策略处理进程存储
@@ -284,7 +287,7 @@ public class PolicyImpl {
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========解析热更部分完毕，即将缓存 888====");
             }
-            saveNewPolicyToLocal(policyInfo);
+            saveNewPolicyToLocal(PolicyInfo.getInstance());
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
@@ -319,9 +322,9 @@ public class PolicyImpl {
                         patch.has(UploadKey.Response.HotFixResp.SIGN) &&
                         patch.has(UploadKey.Response.HotFixResp.VERSION)) {
                     String data = patch.getString(UploadKey.Response.HotFixResp.DATA);
-                    String sign = patch.getString(UploadKey.Response.PatchResp.PATCH_SIGN);
+                    String sign = patch.getString(UploadKey.Response.HotFixResp.SIGN);
                     String version = patch
-                            .getString(UploadKey.Response.PatchResp.PATCH_VERSION);
+                            .getString(UploadKey.Response.HotFixResp.VERSION);
 
                     String code = Md5Utils.getMD5(data + "@" + version);
                     if (sign != null && sign.contains(code)) {
@@ -332,7 +335,7 @@ public class PolicyImpl {
                         }
                         String path = "hf_" + version + ".dex";
                         File file = new File(dir, path);
-                        if (file != null) {
+                        if (file.exists()) {
                             try {
                                 Memory2File.savePatch(data, file);
                                 //默认这个dex 是正常的完整的
@@ -362,17 +365,9 @@ public class PolicyImpl {
         if (serverPolicy == null || policyInfo == null) {
             return;
         }
-        String policy_version = serverPolicy.optString(UploadKey.Response.RES_POLICY_VERSION);
-        policyInfo.setPolicyVer(policy_version);// 策略版本
-
-
-//            if (serverPolicy.has(UploadKey.Response.RES_POLICY_SERVER_DELAY)) {
-//                policyInfo
-//                        .setServerDelay(serverPolicy.optInt(UploadKey.Response.RES_POLICY_SERVER_DELAY) * 1000);
-//            }
-        /**
-         * 失败策略处理
-         */
+        // 策略版本
+        policyInfo.setPolicyVer(serverPolicy.optString(UploadKey.Response.RES_POLICY_VERSION));
+        // 失败策略处理
         if (serverPolicy.has(UploadKey.Response.RES_POLICY_FAIL)) {
 
             JSONObject fail = serverPolicy.getJSONObject(UploadKey.Response.RES_POLICY_FAIL);
@@ -389,7 +384,7 @@ public class PolicyImpl {
             }
         }
         if (EGContext.DEBUG_UPLOAD) {
-            ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========解析失败策略完毕  555====");
+            ELOG.i(BuildConfig.tag_upload + "[POLICY]", "========parsePolicyToMemoryModule====解析失败策略完毕===");
         }
         // 客户端上传时间间隔
         if (serverPolicy.has(UploadKey.Response.RES_POLICY_TIMER_INTERVAL)) {
@@ -406,7 +401,7 @@ public class PolicyImpl {
 
 
         if (EGContext.DEBUG_UPLOAD) {
-            ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========解析间隔时间完毕  666====");
+            ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=====parsePolicyToMemoryModule====解析间隔时间完毕====");
         }
         // 动态采集模块
         if (serverPolicy.has(UploadKey.Response.RES_POLICY_CTRL_LIST)) {
@@ -416,7 +411,7 @@ public class PolicyImpl {
             }
         }
         if (EGContext.DEBUG_UPLOAD) {
-            ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========动态采集模快解析完毕 777====");
+            ELOG.i(BuildConfig.tag_upload + "[POLICY]", "======parsePolicyToMemoryModule===动态采集模快解析完毕 ===");
         }
         /**
          * 解析热更新下发内容
@@ -424,14 +419,28 @@ public class PolicyImpl {
         if (serverPolicy.has(UploadKey.Response.PatchResp.PATCH_RESP_NAME)) {
             JSONObject patch = serverPolicy.getJSONObject(UploadKey.Response.PatchResp.PATCH_RESP_NAME);
             if (patch != null && patch.length() > 0) {
+                if (patch.has(UploadKey.Response.HotFixResp.OPERA)) {
+                    String reset = patch.optString(UploadKey.Response.HotFixResp.OPERA, "");
+                    if (UploadKey.Response.HotFixResp.RESET.equals(reset)) {
+                        // 清除老版本缓存文件
+                        String oldVersion = SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, "");
+                        if (!TextUtils.isEmpty(oldVersion)) {
+                            new File(mContext.getFilesDir(), oldVersion + ".jar").delete();
+                        }
+                        // 清除本地缓存
+                        SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, "");
+                        SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, "");
+                        return;
+                    }
+                }
                 if (patch.has(UploadKey.Response.PatchResp.PATCH_DATA)) {
-                    String data = patch.getString(UploadKey.Response.PatchResp.PATCH_DATA);
+                    String data = patch.optString(UploadKey.Response.PatchResp.PATCH_DATA, "");
                     if (!TextUtils.isEmpty(data)) {
                         policyInfo.setHotfixData(data);
                     }
                 }
                 if (patch.has(UploadKey.Response.PatchResp.PATCH_SIGN)) {
-                    String sign = patch.getString(UploadKey.Response.PatchResp.PATCH_SIGN);
+                    String sign = patch.optString(UploadKey.Response.PatchResp.PATCH_SIGN, "");
                     if (!TextUtils.isEmpty(sign)) {
                         policyInfo.setHotfixSign(sign);
                     }
@@ -439,11 +448,19 @@ public class PolicyImpl {
                 }
                 if (patch.has(UploadKey.Response.PatchResp.PATCH_VERSION)) {
                     String version = patch
-                            .getString(UploadKey.Response.PatchResp.PATCH_VERSION);
+                            .optString(UploadKey.Response.PatchResp.PATCH_VERSION, "");
                     if (!TextUtils.isEmpty(version)) {
                         policyInfo.setHotfixVersion(version);
                     }
                 }
+                if (patch.has(UploadKey.Response.PatchResp.PATCH_METHODS)) {
+                    String methods = patch
+                            .optString(UploadKey.Response.PatchResp.PATCH_METHODS, "");
+                    if (!TextUtils.isEmpty(methods)) {
+                        policyInfo.setHotfixMethons(methods);
+                    }
+                }
+
             }
         }
 

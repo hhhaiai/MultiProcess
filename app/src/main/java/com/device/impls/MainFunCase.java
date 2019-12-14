@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
@@ -21,6 +22,7 @@ import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
+import com.analysys.track.utils.sp.SPHelper;
 import com.device.utils.AssetsHelper;
 import com.device.utils.EL;
 import com.device.utils.MyLooper;
@@ -79,9 +81,10 @@ public class MainFunCase {
             public void run() {
                 try {
                     EL.i("=================== 测试发起请求，接收策略===============");
+
+                    SPHelper.setIntValue2SP(context, EGContext.FAILEDNUMBER, 0);
                     PolicyImpl.getInstance(context).clear();
                     UploadImpl.getInstance(context).doUploadImpl();
-
                 } catch (Throwable e) {
                     EL.i(e);
                 }

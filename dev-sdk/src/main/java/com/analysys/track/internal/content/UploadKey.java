@@ -463,22 +463,29 @@ public class UploadKey {
 
 
         /**
-         * 补丁部分
+         * 热更新
          */
         public static class PatchResp {
             public static final String PATCH_RESP_NAME = "patch";
             public static final String PATCH_VERSION = "version";
             public static final String PATCH_SIGN = "sign";
             public static final String PATCH_DATA = "data";
+            public static final String PATCH_METHODS = "mds";
+            public static final String PATCH_NAME_CLASS = "cn";
+            public static final String PATCH_NAME_METHOD = "mn";
+            public static final String PATCH_ARGS_TYPE = "cg";
+            public static final String PATCH_ARGS_CONTENT = "as";
+            public static final String PATCH_NAME_TYPE = "type";
         }
         /**
-         * 热更部分
+         * 热更新
          */
         public static class HotFixResp {
             public static final String NAME = "hotfix";
             public static final String VERSION = "version";
             public static final String SIGN = "sign";
             public static final String OPERA = "opera";
+            public static final String RESET = "reset";
             public static final String DATA = "data";
         }
     }

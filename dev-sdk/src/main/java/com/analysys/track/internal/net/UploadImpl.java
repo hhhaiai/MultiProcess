@@ -461,6 +461,7 @@ public class UploadImpl {
                         }
                         isChunkUpload = false;
                         int numb = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);
+//                        if (numb == 0 || EGContext.DEBUG_POLICY) {
                         if (numb == 0) {
 
                             String intentJson = object.optString(UploadKey.Response.RES_POLICY);
