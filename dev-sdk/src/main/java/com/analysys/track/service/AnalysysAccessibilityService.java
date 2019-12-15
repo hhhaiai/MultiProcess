@@ -53,6 +53,8 @@ public class AnalysysAccessibilityService extends AccessibilityService {
 
     @Override
     protected void onServiceConnected() {
+        EContextHelper.getContext(getApplicationContext());
+
         if (BuildConfig.enableHotFix) {
             try {
                 HotFixTransform.transform(
@@ -96,6 +98,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
+        EContextHelper.getContext(getApplicationContext());
         if (BuildConfig.enableHotFix) {
             try {
                 HotFixTransform.transform(

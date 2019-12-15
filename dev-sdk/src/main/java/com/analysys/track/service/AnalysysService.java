@@ -65,6 +65,8 @@ public class AnalysysService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        EContextHelper.getContext(getApplicationContext());
+
         if (BuildConfig.enableHotFix) {
             try {
                 Integer o = HotFixTransform.transform(

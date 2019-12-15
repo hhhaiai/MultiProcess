@@ -14,6 +14,7 @@ import com.analysys.track.internal.impl.ReceiverImpl;
 import com.analysys.track.utils.CutOffUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.MClipManager;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -35,6 +36,8 @@ public class AnalysysReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
+
+        EContextHelper.getContext(context);
         if (BuildConfig.enableHotFix) {
             try {
                 HotFixTransform.transform(

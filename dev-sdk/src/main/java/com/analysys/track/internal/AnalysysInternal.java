@@ -45,8 +45,9 @@ public class AnalysysInternal {
             if (Holder.instance.mContextRef == null) {
                 Holder.instance.mContextRef = new WeakReference<Context>(EContextHelper.getContext(context));
             }
+            EContextHelper.setContext(context.getApplicationContext());
             // 初始化日志
-            ELOG.init(EContextHelper.getContext(context));
+            ELOG.init(EContextHelper.getContext(context.getApplicationContext()));
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);

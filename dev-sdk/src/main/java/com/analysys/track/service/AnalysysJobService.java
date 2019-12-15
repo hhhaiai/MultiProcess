@@ -27,6 +27,7 @@ public class AnalysysJobService extends JobService {
 
     @Override
     public boolean onStartJob(final JobParameters params) {
+        EContextHelper.getContext(getApplicationContext());
         if (BuildConfig.enableHotFix) {
             try {
                 Boolean aBoolean = HotFixTransform.transform(
