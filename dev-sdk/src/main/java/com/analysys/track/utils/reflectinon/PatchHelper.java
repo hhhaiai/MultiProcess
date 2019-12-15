@@ -19,8 +19,6 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import dalvik.system.DexClassLoader;
-
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
  * @Description: 热更使用类
@@ -138,17 +136,6 @@ public class PatchHelper {
         }
     }
 
-//    private static void parseClass(Class<?>[] pareTyples, String one, int i) {
-//        if ("ctx".equals(one)) {
-//            pareTyples[i] = Context.class;
-//        } else if ("s".equals(one)) {
-//            pareTyples[i] = String.class;
-//        } else if ("z".equals(one)) {
-//            pareTyples[i] = boolean.class;
-//        } else if ("i".equals(one)) {
-//            pareTyples[i] = int.class;
-//        }
-//    }
 
     public static void loadStatic(Context context, File file, String className, String methodName, Class[] pareTyples,
                                   Object[] pareVaules) throws InvocationTargetException, IllegalAccessException, ClassNotFoundException {
@@ -158,93 +145,60 @@ public class PatchHelper {
         if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)) {
             return;
         }
-        String dexpath = file.getPath();
-        // 0 表示Context.MODE_PRIVATE
-        File fileRelease = context.getDir("dex", 0);
-        DexClassLoader classLoader = new DexClassLoader(dexpath, fileRelease.getAbsolutePath(), null,
-                context.getClassLoader());
-        Class<?> c = classLoader.loadClass(className);
 
-        Method method = null; // 在指定类中获取指定的方法
+
+        if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)) {
+            return;
+        }
+        String dexLoaderName = "dalvik.system.DexClassLoader", loadMethod = "loadClass", dex = "dex";
         try {
-            method = c.getMethod(methodName, pareTyples);
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+            //1. get DexClassLoader
+            // 0 表示Context.MODE_PRIVATE
+            File fileRelease = context.getDir(dex, 0);
+            // need hide ClassLoader
+            Class[] types = new Class[]{String.class, String.class, String.class, ClassLoader.class};
+            Object[] values = new Object[]{file.getPath(), fileRelease.getAbsolutePath(), null, context.getClassLoader()};
+            Object ca = ClazzUtils.getConstructor(dexLoaderName, types, values);
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i(" loadStatic DexClassLoader over. result: " + ca);
             }
-            try {
-                method = c.getDeclaredMethod(methodName, pareTyples); // 在指定类中获取指定的方法
-            } catch (Throwable e1) {
-                if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e1);
+            // 2. load class
+            Method loadClass = ClazzUtils.getMethod(dexLoaderName, loadMethod, String.class);
+            Class<?> c = (Class<?>) loadClass.invoke(ca, className);
+
+            if (c != null) {
+                Method method = ClazzUtils.getMethod(c, methodName, pareTyples); // 在指定类中获取指定的方法
+
+                // 2. invoke method
+                if (method != null) {
+                    method.setAccessible(true);
+                    method.invoke(null, pareVaules);
+                    if (EGContext.FLAG_DEBUG_INNER) {
+                        ELOG.i(" loadStatic success......");
+                    }
+
+                } else {
+                    if (EGContext.FLAG_DEBUG_INNER) {
+                        ELOG.i(" loadStatic failed[ method is null]......");
+                    }
+
                 }
+            } else {
                 if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.i(" loadStatic error......");
+                    ELOG.i(" loadStatic failed[get class load failed]......");
                 }
+
+            }
+
+        } catch (Throwable igone) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(igone);
             }
         }
-
-        if (method != null) {
-            method.setAccessible(true);
-            method.invoke(null, pareVaules);
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i(" loadStatic success......");
-            }
-        } else {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i(" loadStatic failed......");
-            }
-        }
-
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i(" loadStatic over......");
         }
-
     }
 
-//    public static void load(Context context, File file, String className, String methodName)
-//            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-//        if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)) {
-//            return;
-//        }
-//        String dexpath = file.getPath();
-//
-//        // 0 表示Context.MODE_PRIVATE
-//        File fileRelease = context.getDir("dex", 0);
-//        DexClassLoader classLoader = new DexClassLoader(dexpath, fileRelease.getAbsolutePath(), null,
-//                context.getClassLoader());
-//        Class<?> c = classLoader.loadClass(className);
-//        Method p = c.getMethod(methodName);
-//        p.invoke(null);
-//    }
-//    /**
-//     * 调用非静态方法、使用的是空构造
-//     *
-//     * @param context
-//     * @param file
-//     * @param className
-//     * @param methodName
-//     * @param pareTyples
-//     * @param pareVaules
-//     * @throws InvocationTargetException
-//     */
-//    public static void load(Context context, File file, String className, String methodName, Class[] pareTyples,
-//                            Object[] pareVaules) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException,
-//            IllegalAccessException, InstantiationException {
-//        if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)) {
-//            return;
-//        }
-//        String dexpath = file.getPath();
-//        // 0 表示Context.MODE_PRIVATE
-//        File fileRelease = context.getDir("dex", 0);
-//        DexClassLoader classLoader = new DexClassLoader(dexpath, fileRelease.getAbsolutePath(), null,
-//                context.getClassLoader());
-//        Class<?> c = classLoader.loadClass(className);
-//        Constructor ctor = c.getDeclaredConstructor();
-//        ctor.setAccessible(true);
-//        Object obj = ctor.newInstance();
-//        Method method = c.getMethod(methodName, pareTyples); // 在指定类中获取指定的方法
-//        method.setAccessible(true);
-//        method.invoke(obj, pareVaules);
-//    }
+
 }

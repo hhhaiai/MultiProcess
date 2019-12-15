@@ -11,7 +11,6 @@ import android.util.Log;
 
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
@@ -20,8 +19,8 @@ import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.net.UploadImpl;
-import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
+import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 import com.device.utils.AssetsHelper;
 import com.device.utils.EL;
@@ -33,6 +32,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -491,10 +491,8 @@ public class MainFunCase {
             }
             EL.i(builder.toString());
             bufferedReader.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            EL.e(e);
         }
     }
 
@@ -509,6 +507,12 @@ public class MainFunCase {
     }
 
     private static void runCaseP21(final Context mContext) {
+        try {
+            PatchHelper.loadStatic(mContext, new File("/data/local/tmp/temp_005.jar"), "com.device.impls.Test", "init",
+                    new Class[]{Context.class, String.class}, new Object[]{mContext, "test"});
+        } catch (Exception e) {
+            EL.e(e);
+        }
     }
 
     /********************************** 功能实现区 ************************************/

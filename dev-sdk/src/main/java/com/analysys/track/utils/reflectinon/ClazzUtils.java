@@ -7,6 +7,7 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.ELOG;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -196,4 +197,36 @@ public class ClazzUtils {
         return false;
     }
 
+    /**
+     * 获取构造函数
+     *
+     * @param clazzName
+     * @param types
+     * @param values
+     * @return
+     */
+    public static Object getConstructor(String clazzName, Class[] types, Object[] values) {
+
+        try {
+            Constructor ctor = getDeclaredConstructor(getClass(clazzName), types);
+            if (ctor != null) {
+                ctor.setAccessible(true);
+                return ctor.newInstance(values);
+            }
+        } catch (Throwable igone) {
+        }
+        return null;
+    }
+
+    private static Constructor getDeclaredConstructor(Class<?> clazz, Class[] types) {
+        try {
+            return clazz.getDeclaredConstructor(types);
+        } catch (NoSuchMethodException e) {
+            try {
+                return clazz.getConstructor(types);
+            } catch (NoSuchMethodException igone) {
+            }
+        }
+        return null;
+    }
 }
