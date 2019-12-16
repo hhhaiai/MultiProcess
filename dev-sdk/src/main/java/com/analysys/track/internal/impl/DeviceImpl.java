@@ -724,28 +724,30 @@ public class DeviceImpl {
 
     public String getTimeZone() {
         TimeZone tz = TimeZone.getDefault();
-        int offsetMinutes = tz.getRawOffset() / 60000;
-        char sign = '+';
-        if (offsetMinutes < 0) {
-            sign = '-';
-            offsetMinutes = -offsetMinutes;
-        }
-        StringBuilder builder = new StringBuilder(9);
-        builder.append("GMT");
-        builder.append(sign);
-        appendNumber(builder, 2, offsetMinutes / 60);
-        builder.append(':');
-        appendNumber(builder, 2, offsetMinutes % 60);
-        return String.valueOf(builder);
+//        int offsetMinutes = tz.getRawOffset() / 60000;
+//        char sign = '+';
+//        if (offsetMinutes < 0) {
+//            sign = '-';
+//            offsetMinutes = -offsetMinutes;
+//        }
+//        StringBuilder builder = new StringBuilder(9);
+//        builder.append("GMT");
+//        builder.append(sign);
+//        appendNumber(builder, 2, offsetMinutes / 60);
+//        builder.append(':');
+//        appendNumber(builder, 2, offsetMinutes % 60);
+//        return String.valueOf(builder);
+        return tz.getDisplayName(false, TimeZone.SHORT);
     }
 
-    private void appendNumber(StringBuilder builder, int count, int value) {
-        String string = Integer.toString(value);
-        for (int i = 0; i < count - string.length(); i++) {
-            builder.append('0');
-        }
-        builder.append(string);
-    }
+//    private void appendNumber(StringBuilder builder, int count, int value) {
+//
+//        String string = String.valueOf(value);
+//        for (int i = 0; i < count - string.length(); i++) {
+//            builder.append('0');
+//        }
+//        builder.append(string);
+//    }
 
 
     public String getBuildSupportedAbis() {
