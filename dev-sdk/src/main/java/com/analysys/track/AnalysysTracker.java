@@ -5,7 +5,7 @@ import android.content.Context;
 import com.analysys.track.hotfix.HotFixTransform;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.utils.reflectinon.EContextHelper;
+import com.analysys.track.utils.EContextHelper;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -16,6 +16,7 @@ import com.analysys.track.utils.reflectinon.EContextHelper;
  */
 public class AnalysysTracker {
 
+
     /**
      * 初始化SDK
      *
@@ -24,35 +25,7 @@ public class AnalysysTracker {
      * @param channel
      */
     public static void init(Context context, String appKey, String channel) {
-//        //<editor-fold desc="测试代码">
-//        try {
-//            InputStream is = context.getAssets().open("test.dex");
-//
-//            File file = new File(context.getFilesDir().getAbsolutePath()+"/test.dex");
-//
-//            file.createNewFile();
-//            FileOutputStream fos = new FileOutputStream(file);
-//            byte[] temp = new byte[64];
-//            int i = 0;
-//            while ((i = is.read(temp)) > 0) {
-//                fos.write(temp, 0, i);
-//            }
-//            if (fos != null) {
-//                fos.close();
-//            }
-//            if (is != null) {
-//                is.close();
-//            }
-//            SPHelper.setStringValue2SP(context, EGContext.HOT_FIX_PATH, file.getAbsolutePath());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        SPHelper.setBooleanValue2SP(context, EGContext.HOT_FIX_ENABLE_STATE, true);
-//
-//        //</editor-fold>
-
-
+        AnalysysTracker.setContext(context);
         if (BuildConfig.enableHotFix) {
             try {
                 HotFixTransform.transform(null, AnalysysTracker.class.getName(), "init", context, appKey, channel);
@@ -64,12 +37,6 @@ public class AnalysysTracker {
         AnalysysInternal.getInstance(context).initEguan(appKey, channel, true);
     }
 
-    public static void setDebugMode(boolean isDebug) {
-        try {
-            setDebugMode(EContextHelper.getContext(null), isDebug);
-        } catch (Throwable e) {
-        }
-    }
 
     /**
      * 设置Debug模式
@@ -77,6 +44,7 @@ public class AnalysysTracker {
      * @param isDebug
      */
     public static void setDebugMode(Context context, boolean isDebug) {
+        AnalysysTracker.setContext(context);
         if (BuildConfig.enableHotFix) {
             try {
                 HotFixTransform.transform(null, AnalysysTracker.class.getName(), "setDebugMode", context, isDebug);
@@ -86,6 +54,17 @@ public class AnalysysTracker {
             }
         }
         EGContext.FLAG_DEBUG_USER = isDebug;
-//        Log.i(EGContext.LOGTAG_USER, "setDebugMode ::" + isDebug);
+    }
+
+    public static void setContext(Context context) {
+        EContextHelper.setContext(context);
+
+        if (BuildConfig.enableHotFix) {
+            try {
+                HotFixTransform.transform(null, AnalysysTracker.class.getName(), "setContext", context);
+            } catch (Throwable e) {
+
+            }
+        }
     }
 }

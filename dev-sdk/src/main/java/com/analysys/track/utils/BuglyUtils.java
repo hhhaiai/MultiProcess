@@ -2,8 +2,6 @@ package com.analysys.track.utils;
 
 import android.content.Context;
 
-import com.analysys.track.utils.reflectinon.EContextHelper;
-
 import java.lang.reflect.Method;
 
 /**
@@ -40,8 +38,7 @@ public class BuglyUtils {
     private static void setTag(Class<?> clazz, int tag) {
         try {
             Method setUserSceneTag = clazz.getMethod("setUserSceneTag", Context.class, int.class);
-            setUserSceneTag.invoke(null, EContextHelper.getContext(null
-            ), tag);
+            setUserSceneTag.invoke(null, EContextHelper.getContext(), tag);
         } catch (Throwable e) {
 
         }

@@ -13,7 +13,6 @@ import android.util.SparseArray;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -176,7 +175,7 @@ public class ELOG {
 
     public static void init(Context context) {
         if (EGContext.FLAG_DEBUG_INNER) {
-            mContext = EContextHelper.getContext(context);
+            mContext = EContextHelper.getContext();
         }
     }
 
@@ -520,7 +519,7 @@ public class ELOG {
                                     .append(wrapperString(cc));
                         } else {
                             sb.append("\n").append(content_title_begin).append("\n").append(CONTENT_LINE)
-                                    .append(String.format(content_simple_callstack, SystemUtils.getCurrentProcessName(EContextHelper.getContext(mContext)), ste.getClassName(),
+                                    .append(String.format(content_simple_callstack, SystemUtils.getCurrentProcessName(EContextHelper.getContext()), ste.getClassName(),
                                             ste.getMethodName(), ste.getLineNumber()));
                             // 上一层会处理
                             // .append("\n");
@@ -534,7 +533,7 @@ public class ELOG {
                                     .append("Native方法:" + (!ste.isNativeMethod() ? "不是" : "是")).append("\n")
                                     .append("调用堆栈详情:").append("\n").append(wrapperString(cc));
                         } else {
-                            sb.append(String.format(content_simple_callstack, SystemUtils.getCurrentProcessName(EContextHelper.getContext(mContext)), ste.getClassName(),
+                            sb.append(String.format(content_simple_callstack, SystemUtils.getCurrentProcessName(EContextHelper.getContext()), ste.getClassName(),
                                     ste.getMethodName(), ste.getLineNumber()));
                         }
                     }

@@ -15,12 +15,12 @@ import com.analysys.track.internal.impl.net.NetInfo;
 import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.data.Base64Utils;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -1366,7 +1366,7 @@ public class TableProcess {
 
     private void init(Context context) {
         if (mContext == null) {
-            mContext = EContextHelper.getContext(context);
+            mContext = EContextHelper.getContext();
         }
     }
 

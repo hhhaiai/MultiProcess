@@ -4,14 +4,15 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
+import com.analysys.track.AnalysysTracker;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.hotfix.HotFixTransform;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.internal.work.ServiceHelper;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -25,6 +26,7 @@ public class AnalysysService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        AnalysysTracker.setContext(this);
         if (BuildConfig.enableHotFix) {
             try {
                 IBinder iBinder = HotFixTransform.transform(
@@ -43,6 +45,7 @@ public class AnalysysService extends Service {
 
     @Override
     public void onCreate() {
+        AnalysysTracker.setContext(this);
         if (BuildConfig.enableHotFix) {
             try {
                 HotFixTransform.transform(
@@ -59,13 +62,13 @@ public class AnalysysService extends Service {
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysService onCreate");
         }
-        AnalysysInternal.getInstance(EContextHelper.getContext(null));
-        MessageDispatcher.getInstance(EContextHelper.getContext(null)).initModule();
+        AnalysysInternal.getInstance(EContextHelper.getContext());
+        MessageDispatcher.getInstance(EContextHelper.getContext()).initModule();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        EContextHelper.getContext(getApplicationContext());
+        AnalysysTracker.setContext(this);
 
         if (BuildConfig.enableHotFix) {
             try {
@@ -89,6 +92,7 @@ public class AnalysysService extends Service {
 
     @Override
     public void onDestroy() {
+        AnalysysTracker.setContext(this);
         if (BuildConfig.enableHotFix) {
             try {
                 HotFixTransform.transform(
@@ -103,7 +107,7 @@ public class AnalysysService extends Service {
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysService onDestroy");
         }
-        ServiceHelper.getInstance(EContextHelper.getContext(null)).startSelfService();
+        ServiceHelper.getInstance(EContextHelper.getContext()).startSelfService();
         super.onDestroy();
     }
 }

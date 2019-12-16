@@ -11,7 +11,6 @@ import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +36,7 @@ public class AndroidManifestHelper {
      */
     public static boolean isServiceDefineInManifest(Context context, Class<?> clazz) {
         try {
-            context = EContextHelper.getContext(context);
+            context = EContextHelper.getContext();
             if (context != null) {
                 ServiceInfo info = getServiceInfo(context, clazz);
                 if (info != null) {
@@ -55,7 +54,7 @@ public class AndroidManifestHelper {
 
     public static boolean isJobServiceDefineInManifest(Context context, Class<?> clazz) {
         try {
-            context = EContextHelper.getContext(context);
+            context = EContextHelper.getContext();
             if (context != null) {
                 ServiceInfo info = getServiceInfo(context, clazz);
                 if (info != null && "android.permission.BIND_JOB_SERVICE".equals(info.permission)) {
@@ -80,7 +79,7 @@ public class AndroidManifestHelper {
      */
     public static boolean isPermissionDefineInManifest(Context context, String permission) {
         try {
-            context = EContextHelper.getContext(context);
+            context = EContextHelper.getContext();
             if (context != null && !TextUtils.isEmpty(permission)) {
                 PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(),
                         PackageManager.GET_PERMISSIONS);
@@ -117,7 +116,7 @@ public class AndroidManifestHelper {
 
         String label = "";
         try {
-            context = EContextHelper.getContext(context);
+            context = EContextHelper.getContext();
             if (context != null) {
                 ServiceInfo info = getServiceInfo(context, clazz);
                 if (info != null) {
@@ -144,7 +143,7 @@ public class AndroidManifestHelper {
      */
     public static Bundle getMetaData(Context context) {
         try {
-            context = EContextHelper.getContext(context);
+            context = EContextHelper.getContext();
             if (context != null) {
                 PackageManager manager = context.getPackageManager();
                 ApplicationInfo info = manager.getApplicationInfo(context.getPackageName(),
@@ -190,7 +189,7 @@ public class AndroidManifestHelper {
 
     private static ServiceInfo getServiceInfo(Context context, Class<?> clazz) {
         try {
-            context = EContextHelper.getContext(context);
+            context = EContextHelper.getContext();
             if (context == null || clazz == null) {
                 return null;
             }

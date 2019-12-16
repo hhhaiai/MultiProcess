@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -33,7 +32,7 @@ public class MultiProcessChecker {
      */
     public boolean createLockFile(Context cxt, String fileName, long time) {
         try {
-            cxt = EContextHelper.getContext(cxt);
+            cxt = EContextHelper.getContext();
             if (cxt == null) {
                 return false;
             }
@@ -66,7 +65,7 @@ public class MultiProcessChecker {
      */
     private long getLockFileLastModifyTime(Context cxt, String fileName) {
         try {
-            cxt = EContextHelper.getContext(cxt);
+            cxt = EContextHelper.getContext();
             if (cxt != null) {
                 File dev = new File(cxt.getFilesDir(), fileName);
                 if (!dev.exists()) {
@@ -96,7 +95,7 @@ public class MultiProcessChecker {
      */
     public synchronized boolean setLockLastModifyTime(Context cxt, String fileName, long time) {
         try {
-            cxt = EContextHelper.getContext(cxt);
+            cxt = EContextHelper.getContext();
             if (cxt != null) {
                 File dev = new File(cxt.getFilesDir(), fileName);
                 if (!dev.exists()) {
@@ -151,7 +150,7 @@ public class MultiProcessChecker {
      */
     public synchronized boolean isNeedWorkByLockFile(Context cxt, String lock, long time, long now) {
         try {
-            cxt = EContextHelper.getContext(cxt);
+            cxt = EContextHelper.getContext();
             if (cxt == null) {
                 return false;
             }

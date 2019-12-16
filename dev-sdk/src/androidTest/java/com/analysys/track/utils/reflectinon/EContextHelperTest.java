@@ -3,9 +3,11 @@ package com.analysys.track.utils.reflectinon;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 
+import com.analysys.track.AnalysysTracker;
 import com.analysys.track.hotfix.HotFixTransformCancel;
 import com.analysys.track.hotfix.HotFixTransform;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.junit.Before;
@@ -27,11 +29,11 @@ public class EContextHelperTest {
     public void getContext() {
         this.context = context.getApplicationContext();
         assertNotNull(this.context);
-        Context context = EContextHelper.getContext(this.context);
+        Context context = EContextHelper.getContext();
 
         assertEquals(context, this.context);
 
-        context = EContextHelper.getContext(null);
+        context = EContextHelper.getContext();
 
         assertEquals(context, this.context);
     }
@@ -43,11 +45,11 @@ public class EContextHelperTest {
     public void getContextByHotFix() {
         this.context = context.getApplicationContext();
         assertNotNull(this.context);
-        Context context = EContextHelper.getContext(this.context);
+        AnalysysTracker.setContext(context);
 
         assertEquals(context, this.context);
 
-        context = EContextHelper.getContext(null);
+        AnalysysTracker.setContext(context);
 
         assertEquals(context, this.context);
         String path = "/data/user/0/com.device/fileshf_track_v4.3.0.5_20191023.dex";

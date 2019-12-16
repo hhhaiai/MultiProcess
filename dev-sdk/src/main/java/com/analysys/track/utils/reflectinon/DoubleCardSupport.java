@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PermissionUtils;
 
@@ -35,7 +36,7 @@ public class DoubleCardSupport {
     public String getIMEIS(Context context) {
         List<String> imeis = new ArrayList<String>();
         try {
-            context = EContextHelper.getContext(context);
+            context = EContextHelper.getContext();
             if (context == null) {
                 return "";
             }
@@ -94,7 +95,7 @@ public class DoubleCardSupport {
     public String getIMSIS(Context context) {
         List<String> imsis = new ArrayList<String>();
         try {
-            context = EContextHelper.getContext(context);
+            context = EContextHelper.getContext();
             if (context == null) {
                 return "";
             }

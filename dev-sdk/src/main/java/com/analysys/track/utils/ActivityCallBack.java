@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
+import com.analysys.track.AnalysysTracker;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ActivityCallBack implements Application.ActivityLifecycleCallbacks {
@@ -30,7 +32,7 @@ public class ActivityCallBack implements Application.ActivityLifecycleCallbacks 
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-
+        AnalysysTracker.setContext(activity);
     }
 
     @Override
@@ -40,7 +42,6 @@ public class ActivityCallBack implements Application.ActivityLifecycleCallbacks 
 
     @Override
     public void onActivityResumed(Activity activity) {
-
     }
 
     @Override

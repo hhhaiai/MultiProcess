@@ -12,13 +12,12 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -512,7 +511,7 @@ public class AppSnapshotImpl {
         } else {
             try {
                 // 3. 使用系统方法判断
-                mContext = EContextHelper.getContext(mContext);
+                mContext = EContextHelper.getContext();
                 if (mContext == null) {
                     return false;
                 }
@@ -643,7 +642,7 @@ public class AppSnapshotImpl {
 
     public static AppSnapshotImpl getInstance(Context context) {
         if (Holder.INSTANCE.mContext == null) {
-            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
+            Holder.INSTANCE.mContext = EContextHelper.getContext();
         }
         return Holder.INSTANCE;
     }

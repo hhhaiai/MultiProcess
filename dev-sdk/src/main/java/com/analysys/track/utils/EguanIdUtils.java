@@ -9,7 +9,6 @@ import android.text.TextUtils;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONObject;
@@ -315,7 +314,7 @@ public class EguanIdUtils {
 
     private void init(Context cxt) {
         if (mContext == null) {
-            cxt = EContextHelper.getContext(cxt);
+            cxt = EContextHelper.getContext();
             if (cxt != null) {
                 mContext = cxt;
             }

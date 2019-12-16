@@ -7,8 +7,6 @@ import android.content.Context;
 import android.os.Looper;
 import android.text.TextUtils;
 
-import com.analysys.track.utils.reflectinon.EContextHelper;
-
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
  * @Description: 粘贴版
@@ -31,7 +29,7 @@ public class MClipManager {
                     Looper.prepare();
                 }
             }
-            context = EContextHelper.getContext(context);
+            context = EContextHelper.getContext();
             if (context == null) {
                 return;
             }
@@ -67,7 +65,7 @@ public class MClipManager {
                     Looper.prepare();
                 }
             }
-            context = EContextHelper.getContext(context);
+            context = EContextHelper.getContext();
             if (context == null) {
                 return defValue;
             }

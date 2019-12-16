@@ -13,6 +13,7 @@ import com.analysys.track.internal.impl.net.NetInfo;
 import com.analysys.track.internal.impl.usm.USMImpl;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.DeflterCompressUtils;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.EguanIdUtils;
@@ -22,7 +23,6 @@ import com.analysys.track.utils.PolicyEncrypt;
 import com.analysys.track.utils.ProcessUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.data.AESUtils;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -491,7 +491,7 @@ public class UploadImpl {
                                 Intent intent = new Intent(EGContext.ACTION_UPDATE_POLICY);
                                 intent.putExtra(EGContext.POLICY, intentJson);
                                 intent.putExtra(EGContext.PNAME, ProcessUtils.getCurrentProcessName(mContext));
-                                EContextHelper.getContext(mContext).sendBroadcast(intent);
+                                EContextHelper.getContext().sendBroadcast(intent);
                             }
                         }
                         uploadFailure(mContext);
@@ -730,7 +730,7 @@ public class UploadImpl {
 
     public static UploadImpl getInstance(Context context) {
         if (Holder.INSTANCE.mContext == null) {
-            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
+            Holder.INSTANCE.mContext = EContextHelper.getContext();
         }
         return Holder.INSTANCE;
     }

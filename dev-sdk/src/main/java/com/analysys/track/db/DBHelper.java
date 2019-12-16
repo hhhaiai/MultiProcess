@@ -8,8 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import java.io.File;
 
@@ -20,7 +20,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static Context mContext = null;
 
     private DBHelper(Context context) {
-        super(EContextHelper.getContext(context), DB_NAME, null, DB_VERSION);
+        super(EContextHelper.getContext(), DB_NAME, null, DB_VERSION);
     }
 
     private static volatile DBHelper instance;
@@ -30,7 +30,7 @@ public class DBHelper extends SQLiteOpenHelper {
             synchronized (DBHelper.class) {
                 if (instance == null) {
                     if (mContext == null) {
-                        mContext = EContextHelper.getContext(context);
+                        mContext = EContextHelper.getContext();
                     }
                     instance = new DBHelper(context);
                 }

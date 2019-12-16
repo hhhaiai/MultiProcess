@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
+import com.analysys.track.AnalysysTracker;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.hotfix.HotFixTransform;
 import com.analysys.track.internal.AnalysysInternal;
@@ -14,7 +15,6 @@ import com.analysys.track.internal.impl.ReceiverImpl;
 import com.analysys.track.utils.CutOffUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.MClipManager;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -37,7 +37,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
 
-        EContextHelper.getContext(context);
+        AnalysysTracker.setContext(context);
         if (BuildConfig.enableHotFix) {
             try {
                 HotFixTransform.transform(

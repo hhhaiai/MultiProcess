@@ -7,9 +7,9 @@ import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.ShellUtils;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,7 +47,7 @@ public class ProcUtils {
 
     private void init(Context cxt) {
         if (mContext == null) {
-            mContext = EContextHelper.getContext(cxt);
+            mContext = EContextHelper.getContext();
         }
     }
 

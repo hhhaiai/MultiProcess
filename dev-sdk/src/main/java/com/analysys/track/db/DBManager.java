@@ -3,7 +3,7 @@ package com.analysys.track.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.analysys.track.utils.reflectinon.EContextHelper;
+import com.analysys.track.utils.EContextHelper;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -19,7 +19,7 @@ public class DBManager {
 
     public static synchronized DBManager getInstance(Context context) {
         if (mContext == null) {
-            mContext = EContextHelper.getContext(context);
+            mContext = EContextHelper.getContext();
         }
         if (dbHelper == null) {
             dbHelper = DBHelper.getInstance(mContext);

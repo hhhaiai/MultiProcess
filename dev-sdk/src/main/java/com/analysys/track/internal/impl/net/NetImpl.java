@@ -17,13 +17,12 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.impl.usm.USMImpl;
-import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MultiProcessChecker;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -415,7 +414,7 @@ public class NetImpl {
         ActivityManager am = null;
         try {
             if (mContext == null) {
-                mContext = EContextHelper.getContext(mContext);
+                mContext = EContextHelper.getContext();
             }
             if (mContext != null) {
                 am = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);

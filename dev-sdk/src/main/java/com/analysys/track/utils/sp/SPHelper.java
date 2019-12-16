@@ -251,6 +251,17 @@ public class SPHelper {
         getEditor(ctx).putString(key, value).apply();
     }
 
+    public static void setStringValue2SPCommit(Context ctx, String key, String value) {
+        if (TextUtils.isEmpty(key)) {
+            return;
+        }
+        getEditor(ctx).putString(key, value).commit();
+    }
+
+    public static void setBooleanValue2SPCommit(Context ctx, String key, boolean value) {
+        getEditor(ctx).putBoolean(key, value).commit();
+    }
+
     /**
      * @param ctx
      * @param key

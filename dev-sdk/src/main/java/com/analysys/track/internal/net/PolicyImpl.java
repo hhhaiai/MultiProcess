@@ -11,13 +11,13 @@ import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.model.PolicyInfo;
 import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.Memory2File;
 import com.analysys.track.utils.ProcessUtils;
 import com.analysys.track.utils.data.Md5Utils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -47,7 +47,7 @@ public class PolicyImpl {
 
     public static PolicyImpl getInstance(Context context) {
         if (mContext == null) {
-            mContext = EContextHelper.getContext(context);
+            mContext = EContextHelper.getContext();
         }
         return PolicyImpl.Holder.INSTANCE;
     }
@@ -261,13 +261,13 @@ public class PolicyImpl {
             }
 
 //            if (!EGContext.DEBUG_POLICY) {
-                String policy_version = serverPolicy.optString(UploadKey.Response.RES_POLICY_VERSION);
-                if (!isNewPolicy(policy_version)) {
-                    if (EGContext.DEBUG_UPLOAD) {
-                        ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========saveRespParams not new version policy, will return =====");
-                    }
-                    return;
+            String policy_version = serverPolicy.optString(UploadKey.Response.RES_POLICY_VERSION);
+            if (!isNewPolicy(policy_version)) {
+                if (EGContext.DEBUG_UPLOAD) {
+                    ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========saveRespParams not new version policy, will return =====");
                 }
+                return;
+            }
 //            }
             if (EGContext.DEBUG_UPLOAD) {
                 ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========saveRespParams 策略为新增策略 4====");
@@ -335,16 +335,18 @@ public class PolicyImpl {
                         }
                         String path = "hf_" + version + ".dex";
                         File file = new File(dir, path);
-                        if (file.exists()) {
+                        if (file!=null) {
                             try {
                                 Memory2File.savePatch(data, file);
                                 //默认这个dex 是正常的完整的
                                 EGContext.DEX_ERROR = false;
 //                                SPHelper.setStringValue2SP(mContext, EGContext.HOT_FIX_PATH_TEMP, file.getAbsolutePath());
-                                SPHelper.setStringValue2SP(mContext, EGContext.HOT_FIX_PATH, file.getAbsolutePath());
-                                SPHelper.setBooleanValue2SP(mContext, EGContext.HOT_FIX_ENABLE_STATE, true);
+                                SPHelper.setStringValue2SPCommit(mContext, EGContext.HOT_FIX_PATH, file.getAbsolutePath());
+                                SPHelper.setBooleanValue2SPCommit(mContext, EGContext.HOT_FIX_ENABLE_STATE, true);
                                 if (EGContext.FLAG_DEBUG_INNER) {
-                                    ELOG.i(BuildConfig.tag_hotfix, "新的热修复包下载成功");
+                                    String p = SPHelper.getStringValueFromSP(mContext, EGContext.HOT_FIX_PATH, "");
+                                    boolean e = SPHelper.getBooleanValueFromSP(mContext, EGContext.HOT_FIX_ENABLE_STATE, false);
+                                    ELOG.i(BuildConfig.tag_hotfix, "新的热修复包下载成功:[path]" + p + "[enable]" + e);
                                 }
                             } catch (Throwable e) {
                                 if (EGContext.FLAG_DEBUG_INNER) {

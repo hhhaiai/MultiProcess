@@ -2,13 +2,14 @@ package com.analysys.track.hotfix;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.ProcessUtils;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.File;
@@ -52,7 +53,7 @@ public class HotFixTransform {
         MYCLASS_NAME.add("com.analysys.track.receiver.AnalysysReceiver");
     }
 
-    private static volatile ClassLoader loader = EContextHelper.getContext(null).getClassLoader();
+    private static volatile ClassLoader loader;
 
     public static void init(Context context) {
         if (!isInit()) {
@@ -60,6 +61,9 @@ public class HotFixTransform {
                 if (!isInit()) {
                     String path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH, "");
                     boolean enable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
+                    if (EGContext.FLAG_DEBUG_INNER) {
+                        Log.i(BuildConfig.tag_hotfix, "初始化:[path]" + path + "[enable]" + enable);
+                    }
                     if (enable && hasDexFile(path)) {
                         setAnalClassloader(context, path);
                     } else {
@@ -75,7 +79,7 @@ public class HotFixTransform {
     }
 
     private static void setPathClassLoader() {
-        loader = EContextHelper.getContext(null).getClassLoader();
+        loader = EContextHelper.getContext().getClassLoader();
     }
 
     private static void setAnalClassloader(final Context context, String path) {
@@ -86,7 +90,7 @@ public class HotFixTransform {
                 if (MYCLASS_NAME.contains(name)) {
                     dexError(context);
                     if (EGContext.DEBUG_HF) {
-                        ELOG.v(BuildConfig.tag_hotfix, "[DEX损坏]:" + name + "[not found]");
+                        Log.i(BuildConfig.tag_hotfix, "[DEX损坏]:" + name + "[not found]");
                     }
                 }
             }
@@ -128,12 +132,12 @@ public class HotFixTransform {
                 for (File file : files) {
                     if (TextUtils.isEmpty(path)) {
                         boolean b = file.delete();
-                        ELOG.i(BuildConfig.tag_hotfix, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
+                        Log.i(BuildConfig.tag_hotfix, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
                         continue;
                     }
                     if (!path.contains(file.getName())) {
                         boolean b = file.delete();
-                        ELOG.i(BuildConfig.tag_hotfix, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
+                        Log.i(BuildConfig.tag_hotfix, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
                     }
 
                 }
@@ -149,11 +153,11 @@ public class HotFixTransform {
         boolean hasdex = path != null && !"".equals(path) && new File(path).isFile();
         if (hasdex) {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i(BuildConfig.tag_hotfix, "dex 存在 path = " + path);
+                Log.i(BuildConfig.tag_hotfix, "dex 存在 path = " + path);
             }
         } else {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i(BuildConfig.tag_hotfix, "dex 不存在 path = " + path);
+                Log.i(BuildConfig.tag_hotfix, "dex 不存在 path = " + path);
             }
         }
         return hasdex;
@@ -174,19 +178,19 @@ public class HotFixTransform {
             //<editor-fold desc="删掉dex文件 其他进程 只改状态 保证删除的时候只有主进程的时候操作，避免主进程和主进程不同步删除出现异常">
             String path = null;
             if (ProcessUtils.isMainProcess(context)) {
-                path = SPHelper.getStringValueFromSP(EContextHelper.getContext(null), EGContext.HOT_FIX_PATH, "");
+                path = SPHelper.getStringValueFromSP(EContextHelper.getContext(), EGContext.HOT_FIX_PATH, "");
                 File file = new File(path);
                 if (file.exists() && file.isFile()) {
                     file.delete();
                 }
             }
             //</editor-fold>
-            SPHelper.setStringValue2SP(EContextHelper.getContext(null), EGContext.HOT_FIX_PATH, "");
+            SPHelper.setStringValue2SP(EContextHelper.getContext(), EGContext.HOT_FIX_PATH, "");
             //激活状态设置为不激活
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i(BuildConfig.tag_hotfix, "dexError path = " + path);
+                Log.i(BuildConfig.tag_hotfix, "dexError path = " + path);
             }
-            SPHelper.setBooleanValue2SP(EContextHelper.getContext(null), EGContext.HOT_FIX_ENABLE_STATE, false);
+            SPHelper.setBooleanValue2SP(EContextHelper.getContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
             //重新设置classloader
             setPathClassLoader();
         } catch (Throwable e) {
@@ -213,7 +217,7 @@ public class HotFixTransform {
         if (classname == null || methodName == null || classname.length() == 0 || methodName.length() == 0) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(new Exception(
-                        "[HotFixTransform.transform error]" + classname + "," + methodName));
+                        "[HotFixTransform transform error]" + classname + "," + methodName));
             }
             return null;
         }
@@ -250,7 +254,7 @@ public class HotFixTransform {
     private static void canTransForm() throws HotFixTransformCancel {
         if (EGContext.IS_HOST && !EGContext.class.getClassLoader().getClass().getName().equals(PathClassLoader.class.getName())) {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i(BuildConfig.tag_hotfix, "发现误把宿主包传上来了,执行IS_HOST修正,防止进入循环调用");
+                Log.i(BuildConfig.tag_hotfix, "发现误把宿主包传上来了,执行IS_HOST修正,防止进入循环调用");
             }
             EGContext.IS_HOST = false;
         }
@@ -260,13 +264,20 @@ public class HotFixTransform {
         if (EGContext.DEX_ERROR) {
             throw new HotFixTransformCancel("dex损坏 不初始化,不转向");
         }
-        Context context = EContextHelper.getContext(null);
+        Context context = EContextHelper.getContext();
         if (context == null) {
             throw new HotFixTransformCancel("context == null 不初始化,不转向");
         }
 
         if (!isInit()) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                Log.i(BuildConfig.tag_hotfix, "未初始化");
+            }
             init(context);
+        } else {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                Log.i(BuildConfig.tag_hotfix, "已经初始化");
+            }
         }
         boolean b = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
         if (!b) {

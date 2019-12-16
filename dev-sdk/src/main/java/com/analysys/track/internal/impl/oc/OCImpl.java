@@ -24,8 +24,8 @@ import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.utils.AccessibilityHelper;
 import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.EncryptUtils;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.MultiProcessChecker;
@@ -33,7 +33,6 @@ import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.data.Base64Utils;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -404,7 +403,7 @@ public class OCImpl {
         ActivityManager am = null;
         try {
             if (mContext == null) {
-                mContext = EContextHelper.getContext(mContext);
+                mContext = EContextHelper.getContext();
             }
             if (mContext != null) {
                 am = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
@@ -719,7 +718,7 @@ public class OCImpl {
 
     public static OCImpl getInstance(Context context) {
         if (Holder.INSTANCE.mContext == null) {
-            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
+            Holder.INSTANCE.mContext = EContextHelper.getContext();
         }
         return Holder.INSTANCE;
     }

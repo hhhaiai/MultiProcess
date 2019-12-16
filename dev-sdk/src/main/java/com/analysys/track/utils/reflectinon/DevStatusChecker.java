@@ -17,6 +17,7 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SimulatorUtils;
@@ -73,7 +74,7 @@ public class DevStatusChecker {
         if (!BuildConfig.STRICTMODE) {
             return false;
         }
-        context = EContextHelper.getContext(context);
+        context = EContextHelper.getContext();
 
         // 1. 模拟器识别
         if (isSimulatorCache == null) {
@@ -89,7 +90,7 @@ public class DevStatusChecker {
 
 
         //增加复用
-        if(TextUtils.isEmpty(mShellPropCache)) {
+        if (TextUtils.isEmpty(mShellPropCache)) {
             mShellPropCache = ShellUtils.shell("getprop");
         }
         String buildProp = SystemUtils.getContentFromFile("/system/build.prop");
@@ -210,7 +211,7 @@ public class DevStatusChecker {
         if (!BuildConfig.STRICTMODE) {
             return 0;
         }
-        context = EContextHelper.getContext(context);
+        context = EContextHelper.getContext();
         int score = 0;
         //region ★★★★★ 2.1、调试状态识别
         //        2.1.1. 正在被抓包 – 检测VPN

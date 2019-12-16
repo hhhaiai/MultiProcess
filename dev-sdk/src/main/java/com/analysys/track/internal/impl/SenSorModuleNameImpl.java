@@ -11,8 +11,8 @@ import com.analysys.track.internal.content.DataController;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -37,7 +37,7 @@ public class SenSorModuleNameImpl {
 
     public static SenSorModuleNameImpl getInstance(Context context) {
         if (SenSorModuleNameImpl.Holder.INSTANCE.mContext == null) {
-            SenSorModuleNameImpl.Holder.INSTANCE.mContext = EContextHelper.getContext(context);
+            SenSorModuleNameImpl.Holder.INSTANCE.mContext = EContextHelper.getContext();
         }
 
         return SenSorModuleNameImpl.Holder.INSTANCE;

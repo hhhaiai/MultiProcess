@@ -18,8 +18,8 @@ import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.CutOffUtils;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.File;
@@ -169,7 +169,7 @@ public class MessageDispatcher {
 
                                 //EGContext.snap_complete = true;
                                 Intent intent = new Intent(EGContext.ACTION_MTC_LOCK);
-                                EContextHelper.getContext(null).sendBroadcast(intent);
+                                EContextHelper.getContext().sendBroadcast(intent);
 
                                 if (EGContext.DEBUG_SNAP) {
                                     ELOG.d(BuildConfig.tag_snap, "收到安装列表检测回调。。30秒后继续发起请求。。。");
@@ -387,7 +387,7 @@ public class MessageDispatcher {
 
     private void init(Context context) {
         if (Holder.INSTANCE.mContext == null) {
-            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
+            Holder.INSTANCE.mContext = EContextHelper.getContext();
 
         }
     }

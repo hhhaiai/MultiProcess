@@ -10,10 +10,10 @@ import com.analysys.track.internal.content.DataController;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.PermissionUtils;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,7 +38,7 @@ public class WifiImpl {
 
     public static WifiImpl getInstance(Context context) {
         if (WifiImpl.Holder.INSTANCE.mContext == null) {
-            WifiImpl.Holder.INSTANCE.mContext = EContextHelper.getContext(context);
+            WifiImpl.Holder.INSTANCE.mContext = EContextHelper.getContext();
         }
 
         return WifiImpl.Holder.INSTANCE;

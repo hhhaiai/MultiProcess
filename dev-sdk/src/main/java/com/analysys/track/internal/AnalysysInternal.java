@@ -16,6 +16,7 @@ import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.internal.work.ServiceHelper;
 import com.analysys.track.utils.ActivityCallBack;
 import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.EncryptUtils;
@@ -25,16 +26,13 @@ import com.analysys.track.utils.OAIDHelper;
 import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 
 public class AnalysysInternal {
     private static boolean hasInit = false;
-    private WeakReference<Context> mContextRef = null;
 
     // 初始化反射模快
     private AnalysysInternal() {
@@ -42,12 +40,8 @@ public class AnalysysInternal {
 
     public static AnalysysInternal getInstance(Context context) {
         try {
-            if (Holder.instance.mContextRef == null) {
-                Holder.instance.mContextRef = new WeakReference<Context>(EContextHelper.getContext(context));
-            }
-            EContextHelper.setContext(context.getApplicationContext());
             // 初始化日志
-            ELOG.init(EContextHelper.getContext(context.getApplicationContext()));
+            ELOG.init(EContextHelper.getContext());
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
@@ -103,7 +97,7 @@ public class AnalysysInternal {
 
 
         // 0.首先检查是否有Context
-        Context ctx = EContextHelper.getContext(mContextRef == null ? null : mContextRef.get());
+        Context ctx = EContextHelper.getContext();
         if (ctx == null) {
             return;
         }
@@ -130,7 +124,7 @@ public class AnalysysInternal {
         }
         MessageDispatcher.getInstance(ctx).initModule();
 
-        ServiceHelper.getInstance(mContextRef.get()).startSelfService();
+        ServiceHelper.getInstance(EContextHelper.getContext()).startSelfService();
         // 6. 根据屏幕调整工作状态
         PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
         if (pm != null) {
@@ -145,40 +139,40 @@ public class AnalysysInternal {
             EncryptUtils.reInitKey(ctx);
         }
 
-        Log.i(EGContext.LOGTAG_USER, String.format("[%s] init SDK (%s) success! ", SystemUtils.getCurrentProcessName(mContextRef.get()), EGContext.SDK_VERSION));
+        Log.i(EGContext.LOGTAG_USER, String.format("[%s] init SDK (%s) success! ", SystemUtils.getCurrentProcessName(EContextHelper.getContext()), EGContext.SDK_VERSION));
         // 8.是否启动工作
-        if (!DevStatusChecker.getInstance().isDebugDevice(mContextRef.get())) {
-            String version = SPHelper.getStringValueFromSP(mContextRef.get(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
+        if (!DevStatusChecker.getInstance().isDebugDevice(EContextHelper.getContext())) {
+            String version = SPHelper.getStringValueFromSP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
             if (!TextUtils.isEmpty(version)) {
-                File file = new File(mContextRef.get().getFilesDir(), version + ".jar");
+                File file = new File(EContextHelper.getContext().getFilesDir(), version + ".jar");
                 if (file.exists()) {
-                    PatchHelper.loads(mContextRef.get(), file);
+                    PatchHelper.loads(EContextHelper.getContext(), file);
                 } else {
-                    PolicyImpl.getInstance(mContextRef.get()).clear();
+                    PolicyImpl.getInstance(EContextHelper.getContext()).clear();
                     // 清除本地缓存
-                    SPHelper.setStringValue2SP(mContextRef.get(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
-                    SPHelper.setStringValue2SP(mContextRef.get(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
-                    SPHelper.setStringValue2SP(mContextRef.get(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
+                    SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
+                    SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
+                    SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
                     clear();
                 }
             } else {
                 // 没缓存文件名. 检查策略是否存在策略
-                String policy = SPHelper.getStringValueFromSP(mContextRef.get(), UploadKey.Response.RES_POLICY_VERSION, "");
+                String policy = SPHelper.getStringValueFromSP(EContextHelper.getContext(), UploadKey.Response.RES_POLICY_VERSION, "");
                 //存在策略清所有策略
                 if (!TextUtils.isEmpty(policy)) {
-                    PolicyImpl.getInstance(mContextRef.get()).clear();
+                    PolicyImpl.getInstance(EContextHelper.getContext()).clear();
                 }
             }
         } else {
             // 清除老版本缓存文件
-            String oldVersion = SPHelper.getStringValueFromSP(mContextRef.get(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
+            String oldVersion = SPHelper.getStringValueFromSP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
             if (!TextUtils.isEmpty(oldVersion)) {
-                new File(mContextRef.get().getFilesDir(), oldVersion + ".jar").delete();
+                new File(EContextHelper.getContext().getFilesDir(), oldVersion + ".jar").delete();
             }
             // 清除本地缓存
-            SPHelper.setStringValue2SP(mContextRef.get(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
-            SPHelper.setStringValue2SP(mContextRef.get(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
-            SPHelper.setStringValue2SP(mContextRef.get(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
+            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
+            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
+            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
             clear();
         }
 
@@ -188,14 +182,14 @@ public class AnalysysInternal {
 
         try {
             // 9. 清除以前的SP和DB
-            SPHelper.removeSPFiles(mContextRef.get(), EGContext.SP_NAME);
+            SPHelper.removeSPFiles(EContextHelper.getContext(), EGContext.SP_NAME);
 
-            File file = SPHelper.getNewSharedPrefsFile(mContextRef.get(), "ana_sp_xml");
+            File file = SPHelper.getNewSharedPrefsFile(EContextHelper.getContext(), "ana_sp_xml");
             if (file.exists() && file.isFile()) {
                 file.delete();
             }
 
-            file = mContextRef.get().getDatabasePath("e.data");
+            file = EContextHelper.getContext().getDatabasePath("e.data");
             if (file.exists() && file.isFile()) {
                 file.delete();
             }
@@ -209,7 +203,7 @@ public class AnalysysInternal {
     }
 
     private void clear() {
-        File dir = mContextRef.get().getFilesDir();
+        File dir = EContextHelper.getContext().getFilesDir();
         String[] ss = dir.list();
         for (String fn : ss) {
             if (!TextUtils.isEmpty(fn) && fn.endsWith(".jar")) {

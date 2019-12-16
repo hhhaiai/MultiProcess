@@ -4,15 +4,15 @@ import android.annotation.TargetApi;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 
+import com.analysys.track.AnalysysTracker;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.hotfix.HotFixTransform;
-import com.analysys.track.hotfix.HotFixTransformCancel;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.internal.work.ServiceHelper;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -27,7 +27,7 @@ public class AnalysysJobService extends JobService {
 
     @Override
     public boolean onStartJob(final JobParameters params) {
-        EContextHelper.getContext(getApplicationContext());
+        AnalysysTracker.setContext(this);
         if (BuildConfig.enableHotFix) {
             try {
                 Boolean aBoolean = HotFixTransform.transform(
@@ -52,6 +52,7 @@ public class AnalysysJobService extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters params) {
+        AnalysysTracker.setContext(this);
         if (BuildConfig.enableHotFix) {
             try {
                 Boolean aBoolean = HotFixTransform.transform(
@@ -68,7 +69,7 @@ public class AnalysysJobService extends JobService {
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysJobService onStopJob");
         }
-        ServiceHelper.getInstance(EContextHelper.getContext(null)).startSelfService();
+        ServiceHelper.getInstance(EContextHelper.getContext()).startSelfService();
         return false;
     }
 

@@ -6,16 +6,16 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.view.accessibility.AccessibilityEvent;
 
+import com.analysys.track.AnalysysTracker;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.hotfix.HotFixTransform;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.SystemUtils;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 
 
 /**
@@ -29,6 +29,7 @@ import com.analysys.track.utils.reflectinon.EContextHelper;
 public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onCreate() {
+        AnalysysTracker.setContext(this);
         if (BuildConfig.enableHotFix) {
             try {
                 HotFixTransform.transform(
@@ -46,14 +47,14 @@ public class AnalysysAccessibilityService extends AccessibilityService {
             ELOG.i("AnalysysAccessibilityService onCreate");
         }
         super.onCreate();
-        mContext = EContextHelper.getContext(null);
+        mContext = EContextHelper.getContext();
     }
 
     private Context mContext;
 
     @Override
     protected void onServiceConnected() {
-        EContextHelper.getContext(getApplicationContext());
+        AnalysysTracker.setContext(this);
 
         if (BuildConfig.enableHotFix) {
             try {
@@ -70,7 +71,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
         }
         try {
             super.onServiceConnected();
-            mContext = EContextHelper.getContext(null);
+            mContext = EContextHelper.getContext();
             settingAccessibilityInfo();
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
@@ -98,7 +99,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        EContextHelper.getContext(getApplicationContext());
+        AnalysysTracker.setContext(this);
         if (BuildConfig.enableHotFix) {
             try {
                 HotFixTransform.transform(
@@ -133,6 +134,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
 
     @Override
     public void onInterrupt() {
+        AnalysysTracker.setContext(this);
         if (BuildConfig.enableHotFix) {
             try {
                 HotFixTransform.transform(

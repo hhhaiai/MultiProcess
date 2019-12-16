@@ -18,7 +18,6 @@ import android.text.TextUtils;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.File;
@@ -81,7 +80,7 @@ public class SystemUtils {
      */
     public static boolean isApkDebugable(Context context, String packageName) {
         try {
-            context = EContextHelper.getContext(context);
+            context = EContextHelper.getContext();
             if (context == null) {
                 return false;
             }
@@ -416,7 +415,7 @@ public class SystemUtils {
      * @return
      */
     public static String getAppKey(Context context) {
-        Context cxt = EContextHelper.getContext(context);
+        Context cxt = EContextHelper.getContext();
         String appkey = EGContext.VALUE_APPKEY;
         if (!TextUtils.isEmpty(appkey)) {
             return appkey;
@@ -452,7 +451,7 @@ public class SystemUtils {
     public static String getAppChannel(Context context) {
         String channel = "";
         try {
-            Context cxt = EContextHelper.getContext(context);
+            Context cxt = EContextHelper.getContext();
             if (cxt == null) {
                 return channel;
             }
