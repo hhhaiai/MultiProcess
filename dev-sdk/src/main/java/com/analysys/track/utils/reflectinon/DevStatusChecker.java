@@ -631,7 +631,7 @@ public class DevStatusChecker {
      * @param buildProp
      * @return
      */
-    private boolean isDebugRom(Context context, String shellProp, String buildProp) {
+    public boolean isDebugRom(Context context, String shellProp, String buildProp) {
 
         String version = "";
         try {

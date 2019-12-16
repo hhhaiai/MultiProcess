@@ -7,22 +7,29 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.FileObserver;
 import android.support.annotation.Nullable;
+import android.telephony.NeighboringCellInfo;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
+import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.net.NetInfo;
 import com.analysys.track.internal.impl.oc.OCImpl;
+import com.analysys.track.internal.impl.usm.USMUtils;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.net.UploadImpl;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
+import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 import com.device.utils.AssetsHelper;
+import com.device.utils.EContextHelper;
 import com.device.utils.EL;
 import com.device.utils.MyLooper;
 
@@ -501,6 +508,37 @@ public class MainFunCase {
     }
 
     private static void runCaseP19(final Context mContext) {
+        EL.i("----测试灰名单-----");
+        try {
+            TelephonyManager mTelephonyManager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+            List<NeighboringCellInfo> list = (List<NeighboringCellInfo>) ClazzUtils.invokeObjectMethod(mTelephonyManager, "getNeighboringCellInfo");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            DeviceImpl.getInstance(mContext).getBluetoothAddress(mContext);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            DevStatusChecker.getInstance().isDebugRom(mContext, null, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            USMUtils.getUsageEventsByInvoke(0, System.currentTimeMillis(), mContext);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            EContextHelper.getContext(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static void runCaseP20(final Context mContext) {
