@@ -546,8 +546,9 @@ public class MainFunCase {
 
     private static void runCaseP21(final Context mContext) {
         try {
-            PatchHelper.loadStatic(mContext, new File("/data/local/tmp/temp_005.jar"), "com.device.impls.Test", "init",
-                    new Class[]{Context.class, String.class}, new Object[]{mContext, "test"});
+            PatchHelper.tryLoadMethod(mContext, "com.analysys.Ab",
+                    "init", "android.content.Context",
+                    null, new File("/data/user/0/com.device/files/.analysys_cache_hf/test.jar"));
         } catch (Exception e) {
             EL.e(e);
         }

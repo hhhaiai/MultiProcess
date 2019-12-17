@@ -276,7 +276,7 @@ public class EGContext {
     public static final boolean FLAG_DEBUG_INNER = true || BuildConfig.logcat;
 
     // 上传模快日志控制
-    public static final boolean DEBUG_UPLOAD = false || BuildConfig.logcat;
+    public static final boolean DEBUG_UPLOAD = true || BuildConfig.logcat;
     // OC模快日志控制
     public static final boolean DEBUG_OC = false || BuildConfig.logcat;
     //热修复打印

@@ -17,7 +17,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -36,7 +35,7 @@ public class PatchHelper {
             public void run() {
                 loadInThread(context, file);
             }
-        }, 20000);
+        }, 2000);
 //        loadInThread(context, file);
     }
 
@@ -87,14 +86,15 @@ public class PatchHelper {
         return false;
     }
 
-    private static void tryLoadMethod(Context context, String className, String methodName, String argsType, String argsBody, File file) throws IllegalAccessException, ClassNotFoundException, InvocationTargetException {
+    public static void tryLoadMethod(Context context, String className, String methodName, String argsType, String argsBody, File file) throws IllegalAccessException, ClassNotFoundException, InvocationTargetException {
         if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i(String.format("[%s , %s , %s , %s]", className, methodName, argsType, argsBody));
+            ELOG.i(BuildConfig.tag_upload, String.format("[%s , %s , %s , %s]", className, methodName, argsType, argsBody));
         }
-        // [cn.test.A , start , ctx|s|s , ctx|appkey|channel]
+
         Class<?>[] argsTypeClazzs = null;
         Object[] argsValues = null;
-        if (argsType.contains("|")) {
+
+        if (argsType != null) {
             String[] temp = argsType.split("\\|");
             for (int i = 0; i < temp.length; i++) {
                 if (argsTypeClazzs == null) {
@@ -104,36 +104,35 @@ public class PatchHelper {
                 if (!TextUtils.isEmpty(one)) {
                     argsTypeClazzs[i] = Class.forName(one);
                 }
-//                parseClass(argsTypeClazzs, one, i);
             }
-//            Log.i("sanbo", "Class========>" + Arrays.asList(argsTypeClazzs));
-            if (argsBody.contains("|")) {
-                String[] tempBody = argsBody.split("\\|");
-                for (int i = 0; i < tempBody.length; i++) {
-                    if (argsValues == null) {
-                        argsValues = new Object[tempBody.length];
-                    }
-                    String one = tempBody[i];
-                    parseArgs(context, argsTypeClazzs, argsValues, one, i);
-                }
-//                Log.i("sanbo", "value======>" + Arrays.asList(argsValues));
+        }
+        String[] tempBody = null;
+        if (argsBody != null) {
+            tempBody = argsBody.split("\\|");
+        }
 
+        if (argsTypeClazzs != null) {
+            argsValues = new Object[argsTypeClazzs.length];
+            for (int i = 0; i < argsTypeClazzs.length; i++) {
+                Class<?> type = argsTypeClazzs[i];
+                if (type == Context.class) {
+                    argsValues[i] = context;
+                    continue;
+                }
+                String one = null;
+                if (tempBody != null && i < tempBody.length) {
+                    one = tempBody[i];
+                }
+                if (type == int.class) {
+                    argsValues[i] = Integer.parseInt(one);
+                } else if (type == boolean.class) {
+                    argsValues[i] = Boolean.parseBoolean(one);
+                } else if (type == String.class) {
+                    argsValues[i] = one;
+                }
             }
         }
         loadStatic(context, file, className, methodName, argsTypeClazzs, argsValues);
-    }
-
-    private static void parseArgs(Context context, Class<?>[] pareTyples, Object[] pareVaules, String one, int i) {
-        Class<?> type = pareTyples[i];
-        if (type == Context.class) {
-            pareVaules[i] = context;
-        } else if (type == int.class) {
-            pareVaules[i] = Integer.parseInt(one);
-        } else if (type == boolean.class) {
-            pareVaules[i] = Boolean.parseBoolean(one);
-        } else if (type == String.class) {
-            pareVaules[i] = one;
-        }
     }
 
 
@@ -150,39 +149,23 @@ public class PatchHelper {
         if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)) {
             return;
         }
-        String dexLoaderName = "dalvik.system.DexClassLoader", loadMethod = "loadClass", dex = "dex";
+        String baseStr = "dalvik.system.DexClassLoader_loadClass";
+        String[] baseAge = baseStr.split("_");
+        String dexLoaderName = baseAge[0], loadMethod = baseAge[1];
         try {
             //1. get DexClassLoader
-            // 0 表示Context.MODE_PRIVATE
-            File fileRelease = context.getDir(dex, 0);
             // need hide ClassLoader
             Class[] types = new Class[]{String.class, String.class, String.class, ClassLoader.class};
-            Object[] values = new Object[]{file.getPath(), fileRelease.getAbsolutePath(), null, context.getClassLoader()};
+            Object[] values = new Object[]{file.getPath(), context.getCacheDir().getAbsolutePath(), null, ClazzUtils.invokeObjectMethod(context, "getClassLoader")};
             Object ca = ClazzUtils.newInstance(dexLoaderName, types, values);
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(" loadStatic DexClassLoader over. result: " + ca);
             }
             // 2. load class
-            Method loadClass = ClazzUtils.getMethod(dexLoaderName, loadMethod, String.class);
-            Class<?> c = (Class<?>) loadClass.invoke(ca, className);
-
+            Class<?> c = (Class<?>) ClazzUtils.invokeObjectMethod(ca, loadMethod, new Class[]{String.class}, new Object[]{className});
             if (c != null) {
-                Method method = ClazzUtils.getMethod(c, methodName, pareTyples); // 在指定类中获取指定的方法
-
                 // 2. invoke method
-                if (method != null) {
-                    method.setAccessible(true);
-                    method.invoke(null, pareVaules);
-                    if (EGContext.FLAG_DEBUG_INNER) {
-                        ELOG.i(" loadStatic success......");
-                    }
-
-                } else {
-                    if (EGContext.FLAG_DEBUG_INNER) {
-                        ELOG.i(" loadStatic failed[ method is null]......");
-                    }
-
-                }
+                ClazzUtils.invokeStaticMethod(c, methodName, pareTyples, pareVaules);
             } else {
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i(" loadStatic failed[get class load failed]......");

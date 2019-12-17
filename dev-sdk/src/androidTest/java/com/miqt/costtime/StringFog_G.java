@@ -53,6 +53,9 @@ public class StringFog_G {
             hset.put("getTimeStamp", "age");
             hset.put("getEventType", "TAG");
             hset.put("getNextEvent", "byte");
+            hset.put("dalvik.system.DexClassLoader", "com.analysys.Init");
+            hset.put("getClassLoader", "init");
+            hset.put("dalvik.system.DexClassLoader_loadClass", "v4.3_20191217");
         }
 
 

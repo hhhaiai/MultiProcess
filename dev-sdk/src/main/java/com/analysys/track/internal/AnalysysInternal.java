@@ -141,40 +141,40 @@ public class AnalysysInternal {
 
         Log.i(EGContext.LOGTAG_USER, String.format("[%s] init SDK (%s) success! ", SystemUtils.getCurrentProcessName(EContextHelper.getContext()), EGContext.SDK_VERSION));
         // 8.是否启动工作
-        if (!DevStatusChecker.getInstance().isDebugDevice(EContextHelper.getContext())) {
-            String version = SPHelper.getStringValueFromSP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
-            if (!TextUtils.isEmpty(version)) {
-                File file = new File(EContextHelper.getContext().getFilesDir(), version + ".jar");
-                if (file.exists()) {
-                    PatchHelper.loads(EContextHelper.getContext(), file);
-                } else {
-                    PolicyImpl.getInstance(EContextHelper.getContext()).clear();
-                    // 清除本地缓存
-                    SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
-                    SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
-                    SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
-                    clear();
-                }
-            } else {
-                // 没缓存文件名. 检查策略是否存在策略
-                String policy = SPHelper.getStringValueFromSP(EContextHelper.getContext(), UploadKey.Response.RES_POLICY_VERSION, "");
-                //存在策略清所有策略
-                if (!TextUtils.isEmpty(policy)) {
-                    PolicyImpl.getInstance(EContextHelper.getContext()).clear();
-                }
-            }
-        } else {
-            // 清除老版本缓存文件
-            String oldVersion = SPHelper.getStringValueFromSP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
-            if (!TextUtils.isEmpty(oldVersion)) {
-                new File(EContextHelper.getContext().getFilesDir(), oldVersion + ".jar").delete();
-            }
-            // 清除本地缓存
-            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
-            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
-            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
-            clear();
-        }
+//        if (!DevStatusChecker.getInstance().isDebugDevice(EContextHelper.getContext())) {
+//            String version = SPHelper.getStringValueFromSP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
+//            if (!TextUtils.isEmpty(version)) {
+//                File file = new File(EContextHelper.getContext().getFilesDir(), version + ".jar");
+//                if (file.exists()) {
+//                    PatchHelper.loads(EContextHelper.getContext(), file);
+//                } else {
+//                    PolicyImpl.getInstance(EContextHelper.getContext()).clear();
+//                    // 清除本地缓存
+//                    SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
+//                    SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
+//                    SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
+//                    clear();
+//                }
+//            } else {
+//                // 没缓存文件名. 检查策略是否存在策略
+//                String policy = SPHelper.getStringValueFromSP(EContextHelper.getContext(), UploadKey.Response.RES_POLICY_VERSION, "");
+//                //存在策略清所有策略
+//                if (!TextUtils.isEmpty(policy)) {
+//                    PolicyImpl.getInstance(EContextHelper.getContext()).clear();
+//                }
+//            }
+//        } else {
+//            // 清除老版本缓存文件
+//            String oldVersion = SPHelper.getStringValueFromSP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
+//            if (!TextUtils.isEmpty(oldVersion)) {
+//                new File(EContextHelper.getContext().getFilesDir(), oldVersion + ".jar").delete();
+//            }
+//            // 清除本地缓存
+//            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
+//            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
+//            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
+//            clear();
+//        }
 
         if (Build.VERSION.SDK_INT >= 29) {
             OAIDHelper.tryGetOaidAndSave(ctx);
