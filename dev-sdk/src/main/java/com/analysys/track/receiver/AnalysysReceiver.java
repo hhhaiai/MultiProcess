@@ -15,7 +15,6 @@ import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.ReceiverImpl;
 import com.analysys.track.utils.CutOffUtils;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MClipManager;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -36,12 +35,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
-        EThreadPool.post(new Runnable() {
-            @Override
-            public void run() {
-                process(context, intent);
-            }
-        });
+        process(context, intent);
     }
 
     private void process(Context context, Intent intent) {

@@ -11,6 +11,7 @@ import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MultiProcessChecker;
 
 /**
@@ -30,7 +31,7 @@ public class ReceiverImpl {
      * @param context
      * @param intent
      */
-    public void process(Context context, Intent intent) {
+    public void process(Context context, final Intent intent) {
 
         if (EGContext.DEBUG_RECEIVER) {
             ELOG.d(BuildConfig.tag_recerver + intent.toString());
@@ -128,7 +129,13 @@ public class ReceiverImpl {
         } else if (EGContext.ACTION_MTC_LOCK.equals(intent.getAction())) {
             EGContext.snap_complete = true;
         } else if (EGContext.ACTION_UPDATE_POLICY.equals(intent.getAction())) {
-            PolicyImpl.getInstance(context).updatePolicyForReceiver(intent);
+            final Context finalContext = context;
+            EThreadPool.post(new Runnable() {
+                @Override
+                public void run() {
+                    PolicyImpl.getInstance(finalContext).updatePolicyForReceiver(intent);
+                }
+            });
         }
     }
 
