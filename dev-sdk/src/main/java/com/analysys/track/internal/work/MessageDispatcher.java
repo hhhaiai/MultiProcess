@@ -215,6 +215,11 @@ public class MessageDispatcher {
      * @return true 不可以工作 false 可以工作
      */
     public boolean jobStartLogic(boolean isInLoop) {
+        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "[警告] 检测到目前在UI线程,应切换到工作线程工作");
+            }
+        }
         if (CutOffUtils.getInstance().cutOff(mContext, "case1", FLAG_OLD_INSTALL)) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.d(BuildConfig.tag_cutoff, "非新安装");
@@ -245,7 +250,6 @@ public class MessageDispatcher {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.d(BuildConfig.tag_cutoff, "被动初始化");
             }
-            //todo 清除数据 停止工作
             stopAndClearData(isInLoop);
             return true;
         } else {
@@ -271,16 +275,32 @@ public class MessageDispatcher {
 
     private void stopAndClearData(boolean isInLoop) {
         try {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "被动初始化调试设备 清除数据");
+            }
+
+            mHandler.removeCallbacksAndMessages(null);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                 thread.quitSafely();
             } else {
                 thread.quit();
             }
-            mHandler.removeCallbacksAndMessages(null);
 
-            File dir = new File(mContext.getFilesDir(), EGContext.HOTFIX_FILE_DIR);
-            if (dir.exists() && dir.isDirectory()) {
-                File[] files = dir.listFiles();
+
+            File dexDir = new File(mContext.getFilesDir(), EGContext.HOTFIX_FILE_DIR);
+            if (dexDir.exists() && dexDir.isDirectory()) {
+                File[] files = dexDir.listFiles();
+                for (File file : files) {
+                    if (isInLoop) {
+                        file.deleteOnExit();
+                    } else {
+                        file.delete();
+                    }
+                }
+            }
+            File odexdDir = new File(mContext.getFilesDir(), EGContext.HOTFIX_CACHE_DIR);
+            if (odexdDir.exists() && odexdDir.isDirectory()) {
+                File[] files = odexdDir.listFiles();
                 for (File file : files) {
                     if (isInLoop) {
                         file.deleteOnExit();
