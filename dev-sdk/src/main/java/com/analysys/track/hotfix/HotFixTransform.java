@@ -136,12 +136,16 @@ public class HotFixTransform {
                 for (File file : files) {
                     if (TextUtils.isEmpty(path)) {
                         boolean b = file.delete();
-                        Log.i(BuildConfig.tag_hotfix, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
+                        if (EGContext.FLAG_DEBUG_INNER) {
+                            Log.i(BuildConfig.tag_hotfix, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
+                        }
                         continue;
                     }
                     if (!path.contains(file.getName())) {
                         boolean b = file.delete();
-                        Log.i(BuildConfig.tag_hotfix, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
+                        if (EGContext.FLAG_DEBUG_INNER) {
+                            Log.i(BuildConfig.tag_hotfix, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
+                        }
                     }
 
                 }

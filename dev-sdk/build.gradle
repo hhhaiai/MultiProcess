@@ -18,7 +18,7 @@ def isHost = true
 //打包版本,热修版本,非热修版本
 def enableHotFix = true
 //当前热修复包的版本
-def hf_code = 1216
+def hf_code = 0
 //endregion
 
 //region bugly上报
@@ -27,7 +27,7 @@ def STRICTMODE = false
 //endregion
 
 //region 内部日志相关
-def logcat = false //开关
+def logcat = true //开关
 def tag_hotfix = "analysys_hotfix" //热修复 tag
 def tag_snap = "analysys_snap"//安装列表tag
 def tag_upload = "analysys_upload"//上传的tag

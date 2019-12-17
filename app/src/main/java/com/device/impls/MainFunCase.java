@@ -180,7 +180,7 @@ public class MainFunCase {
 
                     if (o != null && o.has(EGContext.TEXT_DEBUG_APP)) {
                         String pkg = o.optString(EGContext.TEXT_DEBUG_APP);
-                        if ( SystemUtils.hasLaunchIntentForPackage(pm,pkg) && !ll.contains(pkg)) {
+                        if (SystemUtils.hasLaunchIntentForPackage(pm, pkg) && !ll.contains(pkg)) {
                             ll.add(pkg);
                         }
                     }
@@ -236,7 +236,7 @@ public class MainFunCase {
 
                     if (o != null && o.has(EGContext.TEXT_DEBUG_APP)) {
                         String pkg = o.optString(EGContext.TEXT_DEBUG_APP);
-                        if ( SystemUtils.hasLaunchIntentForPackage(pm,pkg) && !ll.contains(pkg)) {
+                        if (SystemUtils.hasLaunchIntentForPackage(pm, pkg) && !ll.contains(pkg)) {
                             ll.add(pkg);
                         }
                     }
@@ -549,7 +549,7 @@ public class MainFunCase {
         try {
             PatchHelper.tryLoadMethod(mContext, "com.analysys.Ab",
                     "init", "android.content.Context",
-                    null, new File("/data/user/0/com.device/files/.analysys_cache_hf/test.jar"));
+                    null, new File("/data/user/0/com.device/files/.analysys_file/test.jar"));
         } catch (Exception e) {
             EL.e(e);
         }

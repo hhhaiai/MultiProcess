@@ -35,12 +35,16 @@ public class PatchHelper {
             public void run() {
                 loadInThread(context, file);
             }
-        }, 2000);
+        }, 20000);
 //        loadInThread(context, file);
     }
 
     private static boolean loadInThread(Context context, File file) {
         try {
+
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_hotfix, "patch:" + file.getAbsolutePath());
+            }
             String s = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_METHODS, "");
 //            Log.i("sanbo", "原始字符串-------->" + s);
             if (TextUtils.isEmpty(s)) {
