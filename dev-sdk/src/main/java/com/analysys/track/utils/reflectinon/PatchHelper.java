@@ -158,7 +158,7 @@ public class PatchHelper {
             // need hide ClassLoader
             Class[] types = new Class[]{String.class, String.class, String.class, ClassLoader.class};
             Object[] values = new Object[]{file.getPath(), fileRelease.getAbsolutePath(), null, context.getClassLoader()};
-            Object ca = ClazzUtils.getConstructor(dexLoaderName, types, values);
+            Object ca = ClazzUtils.newInstance(dexLoaderName, types, values);
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(" loadStatic DexClassLoader over. result: " + ca);
             }

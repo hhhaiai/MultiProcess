@@ -82,7 +82,7 @@ public class ClazzUtils {
     }
 
     public static Object invokeObjectMethod(Object o, String methodName) {
-        return invokeObjectMethod(o, methodName, null, null);
+        return invokeObjectMethod(o, methodName, (Class<?>[]) null, null);
     }
 
     public static Object invokeObjectMethod(Object o, String methodName, Class<?>[] argsClass, Object[] args) {
@@ -99,6 +99,23 @@ public class ClazzUtils {
         }
 
         return returnValue;
+    }
+
+    public static Object invokeObjectMethod(Object o, String methodName, String[] argsClassNames, Object[] args) {
+        if (o == null || methodName == null) {
+            return null;
+        }
+        if (argsClassNames != null) {
+            Class[] argsClass = new Class[argsClassNames.length];
+            for (int i = 0; i < argsClassNames.length; i++) {
+                try {
+                    argsClass[i] = Class.forName(argsClassNames[i]);
+                } catch (Throwable e) {
+                }
+            }
+            return invokeObjectMethod(o, methodName, argsClass, args);
+        }
+        return null;
     }
 
 
@@ -199,7 +216,7 @@ public class ClazzUtils {
      * @param values
      * @return
      */
-    public static Object getConstructor(String clazzName, Class[] types, Object[] values) {
+    public static Object newInstance(String clazzName, Class[] types, Object[] values) {
 
         try {
             Constructor ctor = getDeclaredConstructor(getClass(clazzName), types);
@@ -212,11 +229,21 @@ public class ClazzUtils {
         return null;
     }
 
+    public static Object newInstance(String clazzName) {
+        return newInstance(clazzName, null, null);
+    }
+
     private static Constructor getDeclaredConstructor(Class<?> clazz, Class[] types) {
         try {
+            if (types == null) {
+                return clazz.getDeclaredConstructor();
+            }
             return clazz.getDeclaredConstructor(types);
         } catch (NoSuchMethodException e) {
             try {
+                if (types == null) {
+                    return clazz.getConstructor();
+                }
                 return clazz.getConstructor(types);
             } catch (NoSuchMethodException igone) {
             }

@@ -37,7 +37,7 @@ public class USMUtilsTest extends AnalsysTest {
             long time = 0;
             long timeEnd = 0;
             int count = 0;
-            UsageEvents usageEvents = USMUtils.getUsageEvents(System.currentTimeMillis() - stime, System.currentTimeMillis(), mContext);
+            UsageEvents usageEvents = (UsageEvents) USMUtils.getUsageEvents(System.currentTimeMillis() - stime, System.currentTimeMillis(), mContext);
             if (usageEvents == null) {
               continue;
             }

@@ -50,6 +50,7 @@ public class USMTestActivity extends Activity {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void setView() {
         try {
+            long lasttime = System.currentTimeMillis() - 3600 * 1000 * 1;
             JSONArray jsonArray = USMImpl.getUSMInfo(USMTestActivity.this, lasttime, System.currentTimeMillis());
             lasttime = System.currentTimeMillis();
             if (jsonArray == null) {

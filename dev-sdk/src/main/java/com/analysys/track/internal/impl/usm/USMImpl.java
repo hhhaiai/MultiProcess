@@ -13,6 +13,7 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.NetworkUtils;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -42,7 +43,7 @@ public class USMImpl {
                 return USMAvailable;
             }
             // 采集 能获取短路 不能获取不短路
-            UsageEvents usageStats = USMUtils.getUsageEvents(0, System.currentTimeMillis(), context);
+            Object usageStats = USMUtils.getUsageEvents(0, System.currentTimeMillis(), context);
             USMAvailable = usageStats != null;
             return USMAvailable;
         } catch (Throwable e) {
@@ -87,32 +88,40 @@ public class USMImpl {
             }
 
             PackageManager packageManager = context.getPackageManager();
-            UsageEvents usageStats = USMUtils.getUsageEvents(start, end, context);
+            Object usageStats = USMUtils.getUsageEvents(start, end, context);
             if (usageStats != null) {
                 JSONArray jsonArray = new JSONArray();
                 USMInfo openEvent = null;
-                UsageEvents.Event lastEvent = null;
-                while (usageStats.hasNextEvent()) {
-                    UsageEvents.Event event = new UsageEvents.Event();
-                    usageStats.getNextEvent(event);
+                Object lastEvent = null;
+                boolean hasNext = false;
+                while (true) {
+                    boolean b = (boolean) ClazzUtils.invokeObjectMethod(usageStats, "hasNextEvent");
+                    if (!b) {
+                        break;
+                    }
+                    Object event = ClazzUtils.newInstance("android.app.usage.UsageEvents$Event");
 
-                    if (packageManager.getLaunchIntentForPackage(event.getPackageName()) == null) {
+                    ClazzUtils.invokeObjectMethod(usageStats, "getNextEvent", new String[]{"android.app.usage.UsageEvents$Event"}
+                            , new Object[]{event});
+
+                    if (packageManager.getLaunchIntentForPackage(getPackageName(event)) == null) {
                         continue;
                     }
                     if (openEvent == null) {
-                        if (event.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND) {
+
+                        if (getEventType(event) == UsageEvents.Event.MOVE_TO_FOREGROUND) {
                             openEvent = openUsm(context, packageManager, event);
                         }
                     } else {
-                        if (!openEvent.getPkgName().equals(event.getPackageName())) {
-                            openEvent.setCloseTime(lastEvent.getTimeStamp());
+                        if (!openEvent.getPkgName().equals(getPackageName(event))) {
+                            openEvent.setCloseTime(getTimeStamp(lastEvent));
 
                             //大于3秒的才算做oc,一闪而过的不算
                             if (openEvent.getCloseTime() - openEvent.getOpenTime() >= EGContext.MINDISTANCE * 3) {
                                 jsonArray.put(openEvent.toJson());
                             }
 
-                            if (event.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND) {
+                            if (getEventType(event) == UsageEvents.Event.MOVE_TO_FOREGROUND) {
                                 openEvent = openUsm(context, packageManager, event);
                             }
                         }
@@ -129,15 +138,27 @@ public class USMImpl {
         return null;
     }
 
+    public static String getPackageName(Object object) {
+        return (String) ClazzUtils.invokeObjectMethod(object, "getPackageName");
+    }
+
+    public static long getTimeStamp(Object object) {
+        return (long) ClazzUtils.invokeObjectMethod(object, "getTimeStamp");
+    }
+
+    public static int getEventType(Object object) {
+        return (int) ClazzUtils.invokeObjectMethod(object, "getEventType");
+    }
+
     @SuppressLint("NewApi")
-    private static USMInfo openUsm(Context context, PackageManager packageManager, UsageEvents.Event event) {
+    private static USMInfo openUsm(Context context, PackageManager packageManager, Object event) {
         try {
-            USMInfo openEvent = new USMInfo(event.getTimeStamp(), event.getPackageName());
+            USMInfo openEvent = new USMInfo(getTimeStamp(event), getPackageName(event));
             openEvent.setCollectionType("5");
             openEvent.setNetType(NetworkUtils.getNetworkType(context));
-            openEvent.setApplicationType(AppSnapshotImpl.getInstance(context).getAppType(event.getPackageName()));
+            openEvent.setApplicationType(AppSnapshotImpl.getInstance(context).getAppType(getPackageName(event)));
             openEvent.setSwitchType("1");
-            PackageInfo packageInfo = packageManager.getPackageInfo(event.getPackageName(), 0);
+            PackageInfo packageInfo = packageManager.getPackageInfo(getPackageName(event), 0);
             ApplicationInfo applicationInfo = packageInfo.applicationInfo;
             openEvent.setAppName((String) applicationInfo.loadLabel(packageManager));
             openEvent.setVersionCode(packageInfo.versionName + "|" + packageInfo.versionCode);
