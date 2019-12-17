@@ -264,7 +264,8 @@ public class EGContext {
     //dex文件损坏,默认是没有dex文件的,所以默认为true
     public static boolean DEX_ERROR = false;
     public static final String HOTFIX_VERSION = "HF";
-    public static final String HOTFIX_CACHE_DIR = "/.analysys_cache_hf/";
+    public static final String HOTFIX_FILE_DIR = "/.analysys_file/";
+    public static final String HOTFIX_CACHE_DIR = "/.analysys_cache/";
     public static final String HOTFIX_TIME = "hf_time";
 
 

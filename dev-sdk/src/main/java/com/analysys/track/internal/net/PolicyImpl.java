@@ -173,7 +173,7 @@ public class PolicyImpl {
      */
     public void saveFileAndLoad(String version, String data) throws UnsupportedEncodingException {
 
-        File dir = new File(mContext.getFilesDir(), EGContext.HOTFIX_CACHE_DIR);
+        File dir = new File(mContext.getFilesDir(), EGContext.HOTFIX_FILE_DIR);
         if (!dir.exists()) {
             dir.mkdirs();
         }
@@ -328,7 +328,7 @@ public class PolicyImpl {
 
                     String code = Md5Utils.getMD5(data + "@" + version);
                     if (sign != null && sign.contains(code)) {
-                        String dirPath = mContext.getFilesDir().getAbsolutePath() + EGContext.HOTFIX_CACHE_DIR;
+                        String dirPath = mContext.getFilesDir().getAbsolutePath() + EGContext.HOTFIX_FILE_DIR;
                         File dir = new File(dirPath);
                         if (!dir.exists() || !dir.isDirectory()) {
                             dir.mkdirs();

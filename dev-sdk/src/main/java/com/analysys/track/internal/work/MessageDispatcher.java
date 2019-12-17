@@ -11,10 +11,12 @@ import android.os.Message;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.hotfix.HotFixImpl;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
+import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.CutOffUtils;
@@ -276,7 +278,7 @@ public class MessageDispatcher {
             }
             mHandler.removeCallbacksAndMessages(null);
 
-            File dir = new File(mContext.getFilesDir(), EGContext.HOTFIX_CACHE_DIR);
+            File dir = new File(mContext.getFilesDir(), EGContext.HOTFIX_FILE_DIR);
             if (dir.exists() && dir.isDirectory()) {
                 File[] files = dir.listFiles();
                 for (File file : files) {
@@ -287,6 +289,12 @@ public class MessageDispatcher {
                     }
                 }
             }
+
+            PolicyImpl.getInstance(EContextHelper.getContext()).clear();
+            // 清除本地缓存
+            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
+            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
+            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
         } catch (Throwable e) {
         }
     }
