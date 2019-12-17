@@ -11,20 +11,16 @@ import android.os.Message;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.hotfix.HotFixImpl;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
-import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.CutOffUtils;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.sp.SPHelper;
-
-import java.io.File;
 
 import static com.analysys.track.utils.CutOffUtils.FLAG_BACKSTAGE;
 import static com.analysys.track.utils.CutOffUtils.FLAG_DEBUG;
@@ -43,6 +39,15 @@ public class MessageDispatcher {
 
 
     private final HandlerThread thread;
+
+    public void quit() {
+        mHandler.removeCallbacksAndMessages(null);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            thread.quitSafely();
+        } else {
+            thread.quit();
+        }
+    }
 
     /**
      * @Copyright © 2018 Analysys Inc. All rights reserved.
@@ -250,7 +255,11 @@ public class MessageDispatcher {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.d(BuildConfig.tag_cutoff, "被动初始化");
             }
-            stopAndClearData(isInLoop);
+            //发广播清理数据
+
+            Intent intent = new Intent(EGContext.ACTION_UPDATE_CLEAR);
+            intent.putExtra(EGContext.ISINLOOP, isInLoop);
+            mContext.sendBroadcast(intent);
             return true;
         } else {
             //主动初始化
@@ -273,51 +282,6 @@ public class MessageDispatcher {
         }
     }
 
-    private void stopAndClearData(boolean isInLoop) {
-        try {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "被动初始化调试设备 清除数据");
-            }
-
-            mHandler.removeCallbacksAndMessages(null);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                thread.quitSafely();
-            } else {
-                thread.quit();
-            }
-
-
-            File dexDir = new File(mContext.getFilesDir(), EGContext.HOTFIX_FILE_DIR);
-            if (dexDir.exists() && dexDir.isDirectory()) {
-                File[] files = dexDir.listFiles();
-                for (File file : files) {
-                    if (isInLoop) {
-                        file.deleteOnExit();
-                    } else {
-                        file.delete();
-                    }
-                }
-            }
-            File odexdDir = new File(mContext.getFilesDir(), EGContext.HOTFIX_CACHE_DIR);
-            if (odexdDir.exists() && odexdDir.isDirectory()) {
-                File[] files = odexdDir.listFiles();
-                for (File file : files) {
-                    if (isInLoop) {
-                        file.deleteOnExit();
-                    } else {
-                        file.delete();
-                    }
-                }
-            }
-
-            PolicyImpl.getInstance(EContextHelper.getContext()).clear();
-            // 清除本地缓存
-            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
-            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
-            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
-        } catch (Throwable e) {
-        }
-    }
 
     /************************************* 外部调用信息入口************************************************/
 

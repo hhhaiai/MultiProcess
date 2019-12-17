@@ -23,7 +23,7 @@ def hf_code = 0
 
 //region bugly上报
 def ENABLE_BUGLY = false
-def STRICTMODE = false
+def STRICTMODE = true
 //endregion
 
 //region 内部日志相关
