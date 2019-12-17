@@ -13,6 +13,7 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.NetworkUtils;
+import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -104,7 +105,7 @@ public class USMImpl {
                     ClazzUtils.invokeObjectMethod(usageStats, "getNextEvent", new String[]{"android.app.usage.UsageEvents$Event"}
                             , new Object[]{event});
 
-                    if (packageManager.getLaunchIntentForPackage(getPackageName(event)) == null) {
+                    if (!SystemUtils.hasLaunchIntentForPackage(packageManager,getPackageName(event))) {
                         continue;
                     }
                     if (openEvent == null) {

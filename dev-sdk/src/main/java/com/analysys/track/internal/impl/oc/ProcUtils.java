@@ -10,6 +10,7 @@ import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.ShellUtils;
+import com.analysys.track.utils.SystemUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -127,11 +128,9 @@ public class ProcUtils {
                     int pid = info.getPid();
                     String pkg = info.getPkgName();
 
-                    if (pm != null) {
-                        intent = pm.getLaunchIntentForPackage(pkg);
-                    }
 
-                    if (intent != null) {
+
+                    if ( SystemUtils.hasLaunchIntentForPackage(pm,pkg)) {
                         int oomScore = getOOMScore(pid, pkg);
                         String cpuset = getCpuset(pid, pkg);
                         String cgroup = getCgroup(pid, pkg);

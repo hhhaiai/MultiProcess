@@ -247,7 +247,7 @@ public class OCImpl {
                                 && pkgName.contains(".")
                                 && !pkgName.contains(":")
                                 && !pkgName.contains("/")
-                                && pm.getLaunchIntentForPackage(pkgName) != null) {
+                                && SystemUtils.hasLaunchIntentForPackage(pm, pkgName)) {
                             pkgs.add(pkgName);
                         }
                     }

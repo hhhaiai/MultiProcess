@@ -23,6 +23,7 @@ import com.analysys.track.internal.impl.usm.USMUtils;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.net.UploadImpl;
+import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
@@ -179,7 +180,7 @@ public class MainFunCase {
 
                     if (o != null && o.has(EGContext.TEXT_DEBUG_APP)) {
                         String pkg = o.optString(EGContext.TEXT_DEBUG_APP);
-                        if (pm.getLaunchIntentForPackage(pkg) != null && !ll.contains(pkg)) {
+                        if ( SystemUtils.hasLaunchIntentForPackage(pm,pkg) && !ll.contains(pkg)) {
                             ll.add(pkg);
                         }
                     }
@@ -235,7 +236,7 @@ public class MainFunCase {
 
                     if (o != null && o.has(EGContext.TEXT_DEBUG_APP)) {
                         String pkg = o.optString(EGContext.TEXT_DEBUG_APP);
-                        if (pm.getLaunchIntentForPackage(pkg) != null && !ll.contains(pkg)) {
+                        if ( SystemUtils.hasLaunchIntentForPackage(pm,pkg) && !ll.contains(pkg)) {
                             ll.add(pkg);
                         }
                     }

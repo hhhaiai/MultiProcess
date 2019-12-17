@@ -266,7 +266,7 @@ public class AppSnapshotImpl {
                 // 内存有，DB没有--> 插入
                 if (!dbMap.containsKey(memApn)) {
                     PackageInfo pi = pm.getPackageInfo(memApn, 0);
-                    if (pm.getLaunchIntentForPackage(memApn) != null) {
+                    if ( SystemUtils.hasLaunchIntentForPackage(pm,memApn)) {
                         TableProcess.getInstance(mContext).insertSnapshot(getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL));
                     }
                 } else {
@@ -429,7 +429,7 @@ public class AppSnapshotImpl {
             result = getPkgNamesByShell(result, SHELL_PM_LIST_PACKAGES);
             PackageInfo pi = null;
             for (String pkgName : result) {
-                if (!TextUtils.isEmpty(pkgName) && pm.getLaunchIntentForPackage(pkgName) != null) {
+                if (!TextUtils.isEmpty(pkgName) && SystemUtils.hasLaunchIntentForPackage(pm,pkgName)) {
                     pi = mContext.getPackageManager().getPackageInfo(pkgName, 0);
                     appInfo = AppSnapshotImpl.getInstance(mContext).getAppInfo(pi, pm, tag);
                     if (!appList.contains(appInfo)) {
@@ -547,7 +547,7 @@ public class AppSnapshotImpl {
         JSONObject appInfo = null;
 
         String pkg = pkgInfo.packageName;
-        if (!TextUtils.isEmpty(pkg) && pkg.contains(".") && packageManager.getLaunchIntentForPackage(pkg) != null) {
+        if (!TextUtils.isEmpty(pkg) && pkg.contains(".") && SystemUtils.hasLaunchIntentForPackage(packageManager,pkg)) {
             appInfo = new JSONObject();
             JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationPackageName,
                     pkgInfo.packageName, DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
@@ -596,7 +596,7 @@ public class AppSnapshotImpl {
             if (type == 0) {
                 PackageInfo pi = pm.getPackageInfo(pkgName, 0);
                 // SNAP_SHOT_INSTALL 解锁
-                if (pi != null && pm.getLaunchIntentForPackage(pkgName) != null) {
+                if (pi != null && SystemUtils.hasLaunchIntentForPackage(pm,pkgName)) {
                     TableProcess.getInstance(mContext).insertSnapshot(getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL));
                 }
             } else if (type == 1) {

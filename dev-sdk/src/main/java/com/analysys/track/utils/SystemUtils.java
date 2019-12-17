@@ -28,6 +28,7 @@ import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -99,6 +100,31 @@ public class SystemUtils {
         return false;
     }
 
+    private static HashSet<String> catchPackage = new HashSet<>();
+
+    /**
+     * getLaunchIntentForPackage 这个方法某些设备比较耗时 引起波动, 在这里缓存一下
+     *
+     * @param manager
+     * @param packageName
+     * @return
+     */
+    public static boolean hasLaunchIntentForPackage(PackageManager manager, String packageName) {
+        try {
+            if (manager == null || packageName == null) {
+                return false;
+            }
+            if (catchPackage.contains(packageName)) {
+                return true;
+            }
+            if (manager.getLaunchIntentForPackage(packageName) != null) {
+                catchPackage.add(packageName);
+                return true;
+            }
+        } catch (Throwable e) {
+        }
+        return false;
+    }
 
     /**
      * Method to reflectively invoke the SystemProperties.get command - which is the equivalent to the adb shell getProp

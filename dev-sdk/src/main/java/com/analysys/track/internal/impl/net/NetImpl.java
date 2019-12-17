@@ -23,6 +23,7 @@ import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MultiProcessChecker;
+import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -341,8 +342,7 @@ public class NetImpl {
                         && pkgName.contains(".")
                         && !pkgName.contains(":")
                         && !pkgName.contains("/")
-                        // TODO 耗时---------------------
-                        && manager.getLaunchIntentForPackage(pkgName) != null) {
+                        && SystemUtils.hasLaunchIntentForPackage(manager,pkgName)) {
 
                     NetInfo info = pkgs.get(pkgName);
                     if (info == null) {
