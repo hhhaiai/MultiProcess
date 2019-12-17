@@ -71,7 +71,7 @@ public class USMUtils {
                 usageEvents = getUsageEventsByApi(beginTime, endTime, context);
                 boolean b = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
                 if (usageEvents != null && b) {
-                  //  return usageEvents;
+                    return usageEvents;
                 }
                 usageEvents = getUsageEventsByInvoke(beginTime, endTime, context);
                 b = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
@@ -100,7 +100,7 @@ public class USMUtils {
     public static Object getUsageEventsByInvoke(long beginTime, long endTime, Context context) {
         try {
             if (context.getApplicationInfo().targetSdkVersion >= 28 || Build.VERSION.SDK_INT >= 28) {
-                // return null;
+                return null;
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

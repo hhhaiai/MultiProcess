@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
+import com.analysys.plugin.TimePrint;
 import com.analysys.track.AnalysysTracker;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.hotfix.HotFixTransform;
@@ -14,6 +15,7 @@ import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.ReceiverImpl;
 import com.analysys.track.utils.CutOffUtils;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MClipManager;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -32,11 +34,20 @@ import java.util.Random;
  */
 public class AnalysysReceiver extends BroadcastReceiver {
 
-
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(final Context context, final Intent intent) {
+        EThreadPool.post(new Runnable() {
+            @Override
+            public void run() {
+                process(context, intent);
+            }
+        });
+    }
 
-
+    private void process(Context context, Intent intent) {
+        if (EGContext.FLAG_DEBUG_INNER) {
+            TimePrint.start(BuildConfig.tag_recerver + " 广播 " + intent.getAction() + " process");
+        }
         AnalysysTracker.setContext(context);
         if (BuildConfig.enableHotFix) {
             try {
@@ -53,6 +64,9 @@ public class AnalysysReceiver extends BroadcastReceiver {
             ELOG.i("AnalysysReceiver onReceive");
         }
         if (intent == null) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                TimePrint.end(BuildConfig.tag_recerver + " 广播 " + intent.getAction() + " process");
+            }
             return;
         }
 
@@ -63,6 +77,9 @@ public class AnalysysReceiver extends BroadcastReceiver {
                 if (CutOffUtils.getInstance().cutOff(context, "what_recerver", CutOffUtils.FLAG_DEBUG)) {
                     //调试设备清零
                     SPHelper.setIntValue2SP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, 0);
+                    if (EGContext.FLAG_DEBUG_INNER) {
+                        TimePrint.end(BuildConfig.tag_recerver + " 广播 " + intent.getAction() + " process");
+                    }
                     return;
                 }
                 int size = SPHelper.getIntValueFromSP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, 0);
@@ -70,6 +87,9 @@ public class AnalysysReceiver extends BroadcastReceiver {
                     AnalysysInternal.getInstance(context).initEguan(null, null, false);
                 } else {
                     SPHelper.setIntValue2SP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, size + 1);
+                    if (EGContext.FLAG_DEBUG_INNER) {
+                        TimePrint.end(BuildConfig.tag_recerver + " 广播 " + intent.getAction() + " process");
+                    }
                     return;
                 }
             }
@@ -79,6 +99,9 @@ public class AnalysysReceiver extends BroadcastReceiver {
 
         ReceiverImpl.getInstance().process(context, intent);
 
+        if (EGContext.FLAG_DEBUG_INNER) {
+            TimePrint.end(BuildConfig.tag_recerver + " 广播 " + intent.getAction() + " process");
+        }
     }
 
     private void parExtra(Context context) {
