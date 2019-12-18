@@ -411,17 +411,20 @@ public class DevStatusChecker {
     }
 
     private boolean hName(Context context) {
-        PackageManager packageManager = context.getPackageManager();
-        List<ApplicationInfo> applicationInfoList = packageManager
-                .getInstalledApplications(PackageManager.GET_META_DATA);
+        try {
+            PackageManager packageManager = context.getPackageManager();
+            List<ApplicationInfo> applicationInfoList = packageManager
+                    .getInstalledApplications(PackageManager.GET_META_DATA);
 
-        for (ApplicationInfo applicationInfo : applicationInfoList) {
-            if ("de.robv.android.xposed.installer".equals(applicationInfo.packageName)) {
-                return true;
+            for (ApplicationInfo applicationInfo : applicationInfoList) {
+                if ("de.robv.android.xposed.installer".equals(applicationInfo.packageName)) {
+                    return true;
+                }
+                if ("com.saurik.substrate".equals(applicationInfo.packageName)) {
+                    return true;
+                }
             }
-            if ("com.saurik.substrate".equals(applicationInfo.packageName)) {
-                return true;
-            }
+        } catch (Throwable e) {
         }
         return false;
     }
@@ -705,8 +708,7 @@ public class DevStatusChecker {
             try {
                 isLock = Settings.System.getInt(
                         context.getContentResolver(), Settings.System.LOCK_PATTERN_ENABLED, 0) == 1;
-            }catch (Exception e){
-
+            } catch (Throwable e) {
             }
         }
         return isLock;

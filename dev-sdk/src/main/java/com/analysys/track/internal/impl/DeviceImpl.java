@@ -723,21 +723,13 @@ public class DeviceImpl {
     }
 
     public String getTimeZone() {
-        TimeZone tz = TimeZone.getDefault();
-//        int offsetMinutes = tz.getRawOffset() / 60000;
-//        char sign = '+';
-//        if (offsetMinutes < 0) {
-//            sign = '-';
-//            offsetMinutes = -offsetMinutes;
-//        }
-//        StringBuilder builder = new StringBuilder(9);
-//        builder.append("GMT");
-//        builder.append(sign);
-//        appendNumber(builder, 2, offsetMinutes / 60);
-//        builder.append(':');
-//        appendNumber(builder, 2, offsetMinutes % 60);
-//        return String.valueOf(builder);
-        return tz.getDisplayName(false, TimeZone.SHORT);
+        String result = "";
+        try {
+            TimeZone tz = TimeZone.getDefault();
+            result = tz.getDisplayName(false, TimeZone.SHORT);
+        } catch (Throwable e) {
+        }
+        return result;
     }
 
 //    private void appendNumber(StringBuilder builder, int count, int value) {
