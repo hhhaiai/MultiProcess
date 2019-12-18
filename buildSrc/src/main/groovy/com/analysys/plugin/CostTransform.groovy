@@ -64,7 +64,7 @@ public class CostTransform extends Transform {
                     directoryInput.file.eachFileRecurse { File file ->
                         def name = file.name
                         if (name.endsWith(".class") && !name.startsWith("R\$") &&
-                                !"R.class".equals(name) && !"BuildConfig.class".equals(name)) {
+                                !"R.class".equals(name) && !"BuildConfig.class".equals(name) && !name.contains("TimePrint")) {
 
                             println name + ' is changing...'
 

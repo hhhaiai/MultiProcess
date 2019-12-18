@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'costtime'
 costtime {
     enable true
-    costAll false
+    costAll true
     timeout 10
     enableLog true
 }
