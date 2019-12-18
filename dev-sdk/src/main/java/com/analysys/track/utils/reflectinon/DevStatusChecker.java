@@ -702,8 +702,12 @@ public class DevStatusChecker {
             KeyguardManager keyguardManager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
             isLock = keyguardManager.isKeyguardSecure() || keyguardManager.isDeviceSecure();
         } else {
-            isLock = Settings.System.getInt(
-                    context.getContentResolver(), Settings.System.LOCK_PATTERN_ENABLED, 0) == 1;
+            try {
+                isLock = Settings.System.getInt(
+                        context.getContentResolver(), Settings.System.LOCK_PATTERN_ENABLED, 0) == 1;
+            }catch (Exception e){
+
+            }
         }
         return isLock;
     }

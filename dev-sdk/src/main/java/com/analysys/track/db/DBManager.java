@@ -38,7 +38,9 @@ public class DBManager {
     public synchronized void closeDB() {
         if (mOpenWriteCounter.decrementAndGet() == 0) {
             // Closing database
-            db.close();
+            if (db != null) {
+                db.close();
+            }
         }
     }
 
