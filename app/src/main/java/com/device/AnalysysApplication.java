@@ -7,6 +7,7 @@ import android.support.multidex.MultiDex;
 
 import com.analysys.track.AnalysysTracker;
 import com.bun.miitmdid.core.JLibrary;
+import com.device.impls.MultiProcessWorker;
 import com.device.utils.EL;
 import com.tencent.bugly.Bugly;
 import com.umeng.analytics.MobclickAgent;
@@ -28,7 +29,7 @@ public class AnalysysApplication extends Application {
 
         JLibrary.InitEntry(this);
         // init  bugly
-        Bugly.init(getApplicationContext(), "7752552892442721d", false);
+        Bugly.init(getApplicationContext(), "8fea5d1877", false);
 //        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
 //                .detectAll()
 //                .penaltyLog()
@@ -39,7 +40,7 @@ public class AnalysysApplication extends Application {
 //                .build());
         super.onCreate();
         initAnalysys();
-        //MultiProcessWorker.runServices(this);
+        MultiProcessWorker.runServices(this);
         EL.init(this);
     }
 

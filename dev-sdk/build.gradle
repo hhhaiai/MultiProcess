@@ -22,7 +22,7 @@ def hf_code = 0
 //endregion
 
 //region bugly上报
-def ENABLE_BUGLY = false
+def ENABLE_BUGLY = true
 def STRICTMODE = true
 //endregion
 

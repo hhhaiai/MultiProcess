@@ -18,9 +18,8 @@ public class BuglyUtils {
         ELOG.i(throwable);
         try {
             Class clazz = Class.forName("com.tencent.bugly.crashreport.CrashReport");
-            setTag(clazz, 1002);
+            setTag(clazz, 138534);
             postException(throwable, clazz);
-            setTag(clazz, 1001);
         } catch (Throwable e) {
 
         }
