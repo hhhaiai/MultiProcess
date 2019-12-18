@@ -59,7 +59,7 @@ public class AnalysysTracker {
 
     public static void setContext(Context context) {
         if (!BuildConfig.IS_HOST || context == null) {
-            if(EGContext.FLAG_DEBUG_INNER){
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e("非宿主,不进行设置context");
             }
             return;

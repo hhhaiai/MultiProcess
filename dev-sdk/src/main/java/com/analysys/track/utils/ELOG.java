@@ -11,7 +11,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 
 import org.json.JSONArray;
@@ -273,11 +272,6 @@ public class ELOG {
      */
     private static void parserArgsMain(int level, Object[] args) {
         if (EGContext.FLAG_DEBUG_INNER) {
-            if (EGContext.DEBUG_HF) {
-                Log.v(BuildConfig.tag_hotfix,
-                        "[HOST]:" + EGContext.IS_HOST + "[VERSION]:" + EGContext.HOT_FIX_VERSION
-                );
-            }
             try {
                 String tag = DEFAULT_TAG;
                 if (!DEV_DEBUG) {
@@ -285,6 +279,11 @@ public class ELOG {
                     return;
                 }
                 StringBuilder sb = new StringBuilder();
+
+                if (EGContext.DEBUG_HF) {
+                    sb.append("[HOST]:" + EGContext.IS_HOST + "[VERSION]:" + EGContext.HOT_FIX_VERSION);
+                }
+
                 // 开始
                 if (isFormat) {
                     sb.append("\n");
