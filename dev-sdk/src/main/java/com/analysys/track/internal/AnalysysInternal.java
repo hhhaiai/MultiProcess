@@ -4,13 +4,10 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 import android.os.PowerManager;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.internal.content.UploadKey;
-import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.CrashHandler;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.internal.work.ServiceHelper;
@@ -25,8 +22,7 @@ import com.analysys.track.utils.NinjaUtils;
 import com.analysys.track.utils.OAIDHelper;
 import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.SystemUtils;
-import com.analysys.track.utils.reflectinon.DevStatusChecker;
-import com.analysys.track.utils.reflectinon.PatchHelper;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.File;
@@ -101,6 +97,8 @@ public class AnalysysInternal {
         if (ctx == null) {
             return;
         }
+        //禁止灰色 api logcat
+        ClazzUtils.unseal();
         SPHelper.setBooleanValue2SP(ctx, EGContext.KEY_INIT_TYPE, initType);
         NinjaUtils.checkOldFile(ctx);
         Application application = (Application) ctx;
@@ -166,7 +164,6 @@ public class AnalysysInternal {
         }
 
     }
-
 
 
     /**

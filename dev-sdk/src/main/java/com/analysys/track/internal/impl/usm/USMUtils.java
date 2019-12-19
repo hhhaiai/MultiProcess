@@ -99,10 +99,19 @@ public class USMUtils {
 
     public static Object getUsageEventsByInvoke(long beginTime, long endTime, Context context) {
         try {
-            if (context.getApplicationInfo().targetSdkVersion >= 28 || Build.VERSION.SDK_INT >= 28) {
+            if (endTime <= beginTime) {
                 return null;
             }
-
+            if (context == null) {
+                return null;
+            }
+            if (Build.VERSION.SDK_INT > 29) {
+                //未来 android 11 防止
+                return null;
+            }
+            if (!ClazzUtils.rawReflex && (context.getApplicationInfo().targetSdkVersion >= 28 || Build.VERSION.SDK_INT >= 28)) {
+                return null;
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Object mService = ClazzUtils.getObjectFieldObject(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
                 if (mService == null) {

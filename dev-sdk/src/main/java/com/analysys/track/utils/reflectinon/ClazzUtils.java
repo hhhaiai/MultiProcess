@@ -1,5 +1,6 @@
 package com.analysys.track.utils.reflectinon;
 
+import android.os.Build;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
@@ -11,19 +12,59 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import static android.os.Build.VERSION.SDK_INT;
+
 public class ClazzUtils {
+    private static Method forName;
+    private static Method getDeclaredMethod;
+    private static Method getMethod;
+    private static Method getField;
+    private static Method getDeclaredField;
+
+    public static boolean rawReflex = false;
+
+    static {
+        if (SDK_INT >= Build.VERSION_CODES.P && SDK_INT <= 29) {// android  9 10 版本
+            try {
+                forName = Class.class.getDeclaredMethod("forName", String.class);
+                getDeclaredMethod = Class.class.getDeclaredMethod("getDeclaredMethod", String.class, Class[].class);
+                getMethod = Class.class.getDeclaredMethod("getMethod", String.class, Class[].class);
+                getDeclaredField = Class.class.getDeclaredMethod("getDeclaredField", String.class);
+                getField = Class.class.getDeclaredMethod("getField", String.class);
+
+                //设置豁免所有hide api
+                Class<?> vmRuntimeClass = (Class<?>) forName.invoke(null, "dalvik.system.VMRuntime");
+                Method getRuntime = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", null);
+                Method setHiddenApiExemptions = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
+                Object sVmRuntime = getRuntime.invoke(null);
+                setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
+
+                rawReflex = true;
+            } catch (Throwable e) {
+                rawReflex = false;
+            }
+        }
+    }
+
+    public static void unseal() {
+    }
+
     public static Method getMethod(String clazzName, String methodName, Class<?>... parameterTypes) {
         return getMethod(getClass(clazzName), methodName, parameterTypes);
     }
 
     public static Method getMethod(Class clazz, String methodName, Class<?>... parameterTypes) {
+        if (clazz == null) {
+            return null;
+        }
         Method method = null;
         try {
-            if (parameterTypes == null || parameterTypes.length == 0) {
-                method = clazz.getDeclaredMethod(methodName);
-                method.setAccessible(true);
+            if (getDeclaredMethod != null) {
+                method = (Method) getDeclaredMethod.invoke(clazz, methodName, parameterTypes);
             } else {
                 method = clazz.getDeclaredMethod(methodName, parameterTypes);
+            }
+            if (method != null) {
                 method.setAccessible(true);
             }
         } catch (Throwable e) {
@@ -34,9 +75,18 @@ public class ClazzUtils {
         if (method == null) {
             try {
                 if (parameterTypes == null || parameterTypes.length == 0) {
-                    method = clazz.getMethod(methodName);
+                    if (getMethod != null) {
+                        method = (Method) getMethod.invoke(clazz, methodName, null);
+                    } else {
+                        method = clazz.getMethod(methodName);
+                    }
+
                 } else {
-                    method = clazz.getMethod(methodName, parameterTypes);
+                    if (getMethod != null) {
+                        method = (Method) getMethod.invoke(clazz, methodName, parameterTypes);
+                    } else {
+                        method = clazz.getMethod(methodName, parameterTypes);
+                    }
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
@@ -50,8 +100,15 @@ public class ClazzUtils {
     public static Field getField(Class clazz, String fieldName) {
         Field field = null;
         try {
-            field = clazz.getDeclaredField(fieldName);
-            field.setAccessible(true);
+            if (getDeclaredField != null) {
+                field = (Field) getDeclaredField.invoke(clazz, fieldName);
+            } else {
+                field = clazz.getDeclaredField(fieldName);
+            }
+
+            if (field != null) {
+                field.setAccessible(true);
+            }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
@@ -59,7 +116,11 @@ public class ClazzUtils {
         }
         if (field == null) {
             try {
-                field = clazz.getField(fieldName);
+                if (getField != null) {
+                    field = (Field) getField.invoke(clazz, fieldName);
+                } else {
+                    field = clazz.getField(fieldName);
+                }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
                     BuglyUtils.commitError(e);
@@ -74,6 +135,9 @@ public class ClazzUtils {
             return Object.class;
         }
         try {
+            if (forName != null) {
+                return (Class) forName.invoke(null, name);
+            }
             return Class.forName(name);
         } catch (Throwable e) {
             return Object.class;

@@ -33,6 +33,7 @@ import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.OAIDHelper;
 import com.analysys.track.utils.PermissionUtils;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.BufferedInputStream;
@@ -41,7 +42,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -108,11 +108,9 @@ public class DeviceImpl {
                 if (!PermissionUtils.checkPermission(context, Manifest.permission.BLUETOOTH)) {
                     return bluetoothMacAddress;
                 }
-                Field mServiceField = bluetoothAdapter.getClass().getDeclaredField("mService");
-                mServiceField.setAccessible(true);
-                Object btManagerService = mServiceField.get(bluetoothAdapter);
+                Object btManagerService = ClazzUtils.getObjectFieldObject(bluetoothAdapter, "mService");
                 if (btManagerService != null) {
-                    bluetoothMacAddress = (String) btManagerService.getClass().getMethod("getAddress").invoke(btManagerService);
+                    bluetoothMacAddress = (String) ClazzUtils.invokeObjectMethod(btManagerService, "getAddress");
                 }
             }
             if (TextUtils.isEmpty(bluetoothMacAddress) || DEFALT_MAC.equals(bluetoothMacAddress)) {
