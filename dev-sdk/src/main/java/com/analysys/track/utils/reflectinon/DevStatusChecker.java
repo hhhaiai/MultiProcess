@@ -724,16 +724,67 @@ public class DevStatusChecker {
      * @return
      */
     public boolean isSimulator(Context context) {
-        return SimulatorUtils.hasEmulatorBuild()
-                || SimulatorUtils.hasQEmuFiles()
-                || SimulatorUtils.hasQEmuDrivers()
-                || SimulatorUtils.hasAppAnalysisPackage(context)
-                || SimulatorUtils.hasTaintMemberVariables()
-                || SimulatorUtils.hasTaintClass()
-                || SimulatorUtils.hasTracerPid()
-                || SimulatorUtils.hasEmulatorAdb()
-                || SimulatorUtils.hasQemuBuildProps(context)
-                || SimulatorUtils.isVbox(context);
+        if (SimulatorUtils.hasEmulatorBuild()) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(BuildConfig.tag_cutoff, "hasEmulatorBuild");
+            }
+            return true;
+        }
+        if (SimulatorUtils.hasQEmuFiles()) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(BuildConfig.tag_cutoff, "hasQEmuFiles");
+            }
+            return true;
+        }
+        if (SimulatorUtils.hasQEmuDrivers()) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(BuildConfig.tag_cutoff, "hasQEmuDrivers");
+            }
+            return true;
+        }
+        if (SimulatorUtils.hasAppAnalysisPackage(context)) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(BuildConfig.tag_cutoff, "hasAppAnalysisPackage");
+            }
+            return true;
+        }
+        if (SimulatorUtils.hasTaintMemberVariables()) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(BuildConfig.tag_cutoff, "hasTaintMemberVariables");
+            }
+            return true;
+        }
+        if (SimulatorUtils.hasTaintClass()) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(BuildConfig.tag_cutoff, "hasTaintClass");
+            }
+            return true;
+        }
+        if (SimulatorUtils.hasTracerPid()) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(BuildConfig.tag_cutoff, "hasTracerPid");
+            }
+            return true;
+        }
+        if (SimulatorUtils.hasEmulatorAdb()) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(BuildConfig.tag_cutoff, "hasEmulatorAdb");
+            }
+            return true;
+        }
+        if (SimulatorUtils.hasQemuBuildProps(context)) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(BuildConfig.tag_cutoff, "hasQemuBuildProps");
+            }
+            return true;
+        }
+        if (SimulatorUtils.isVbox(context)) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(BuildConfig.tag_cutoff, "isVbox");
+            }
+            return true;
+        }
+        return false;
     }
 
     private static class HOLDER {

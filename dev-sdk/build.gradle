@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'costtime'
 costtime {
     enable true
-    costAll true
+    costAll false
     timeout 10
     enableLog true
 }
@@ -22,7 +22,7 @@ def hf_code = 0
 //endregion
 
 //region bugly上报
-def ENABLE_BUGLY = true
+def ENABLE_BUGLY = false
 def STRICTMODE = true
 //endregion
 
