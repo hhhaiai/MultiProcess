@@ -27,7 +27,6 @@ public class ActivityCallBack implements Application.ActivityLifecycleCallbacks 
     AtomicInteger num;
 
     private ActivityCallBack() {
-        num = new AtomicInteger(0);
     }
 
     @Override
@@ -37,7 +36,13 @@ public class ActivityCallBack implements Application.ActivityLifecycleCallbacks 
 
     @Override
     public void onActivityStarted(Activity activity) {
-        num.incrementAndGet();
+        try {
+            if (num == null) {
+                num = new AtomicInteger(0);
+            }
+            num.incrementAndGet();
+        } catch (Throwable e) {
+        }
     }
 
     @Override
@@ -51,7 +56,14 @@ public class ActivityCallBack implements Application.ActivityLifecycleCallbacks 
 
     @Override
     public void onActivityStopped(Activity activity) {
-        num.decrementAndGet();
+        try {
+            if (num == null) {
+                num = new AtomicInteger(0);
+            }
+            num.decrementAndGet();
+        } catch (Throwable e) {
+        }
+
     }
 
     @Override
@@ -65,6 +77,10 @@ public class ActivityCallBack implements Application.ActivityLifecycleCallbacks 
     }
 
     public boolean isBackGround() {
+        //app 初始化的时候,还没来得及回调. 默认是在前台
+        if (num == null) {
+            return false;
+        }
         return ActivityCallBack.getInstance().num.get() == 0;
     }
 }
