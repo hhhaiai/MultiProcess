@@ -108,15 +108,16 @@ public class ProcUtils {
      */
     private JSONObject processInfos(List<ProcessInfo> infos) {
         JSONObject object = new JSONObject();
-        Set<String> temp = new HashSet<String>();
-        Set<String> ocr = new HashSet<String>();
-        JSONArray resultArray = new JSONArray();
-        PackageManager pm = null;
-        Intent intent = null;
-        if (mContext != null) {
-            pm = mContext.getApplicationContext().getPackageManager();
-        }
         try {
+            Set<String> temp = new HashSet<String>();
+            Set<String> ocr = new HashSet<String>();
+            JSONArray resultArray = new JSONArray();
+            PackageManager pm = null;
+            Intent intent = null;
+            if (mContext != null) {
+                pm = mContext.getApplicationContext().getPackageManager();
+            }
+
 
             List<ProcessInfo> ss = new ArrayList<ProcessInfo>(infos);
             for (int i = 0; i < ss.size(); i++) {
@@ -129,8 +130,7 @@ public class ProcUtils {
                     String pkg = info.getPkgName();
 
 
-
-                    if ( SystemUtils.hasLaunchIntentForPackage(pm,pkg)) {
+                    if (SystemUtils.hasLaunchIntentForPackage(pm, pkg)) {
                         int oomScore = getOOMScore(pid, pkg);
                         String cpuset = getCpuset(pid, pkg);
                         String cgroup = getCgroup(pid, pkg);
@@ -222,8 +222,11 @@ public class ProcUtils {
     /***************************************************************************/
 
     private boolean isForeGroundByCpuset(String cpuset) {
-        if (!TextUtils.isEmpty(cpuset) && cpuset.contains("foreground")) {
-            return true;
+        try {
+            if (!TextUtils.isEmpty(cpuset) && cpuset.contains("foreground")) {
+                return true;
+            }
+        } catch (Throwable e) {
         }
         return false;
     }

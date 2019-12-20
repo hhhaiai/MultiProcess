@@ -159,10 +159,15 @@ public class SystemUtils {
      * 获取日期
      */
     public static String getDate() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        Date date = new Date(System.currentTimeMillis());
-        String time = simpleDateFormat.format(date);
-        return time;
+        try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date date = new Date(System.currentTimeMillis());
+            String time = simpleDateFormat.format(date);
+            return time;
+        } catch (Throwable e) {
+
+        }
+        return "";
     }
 
     /**
@@ -239,14 +244,18 @@ public class SystemUtils {
     @SuppressWarnings("deprecation")
     public static boolean isScreenLocked(Context context) {
 
-        KeyguardManager manager = (KeyguardManager) context.getApplicationContext()
-                .getSystemService(Context.KEYGUARD_SERVICE);
-        // 锁屏true 开屏false
-        boolean inKeyguardRestrictedInputMode = false;
-        if (manager != null) {
-            inKeyguardRestrictedInputMode = manager.inKeyguardRestrictedInputMode();
+        try {
+            KeyguardManager manager = (KeyguardManager) context.getApplicationContext()
+                    .getSystemService(Context.KEYGUARD_SERVICE);
+            // 锁屏true 开屏false
+            boolean inKeyguardRestrictedInputMode = false;
+            if (manager != null) {
+                inKeyguardRestrictedInputMode = manager.inKeyguardRestrictedInputMode();
+            }
+            return inKeyguardRestrictedInputMode;
+        } catch (Throwable e) {
         }
-        return inKeyguardRestrictedInputMode;
+        return true;
     }
 
     /**

@@ -401,7 +401,7 @@ public class AppSnapshotImpl {
                 }
             }
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
