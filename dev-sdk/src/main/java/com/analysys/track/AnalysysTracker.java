@@ -6,7 +6,6 @@ import com.analysys.track.hotfix.HotFixTransform;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.EContextHelper;
-import com.analysys.track.utils.ELOG;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -58,14 +57,7 @@ public class AnalysysTracker {
     }
 
     public static void setContext(Context context) {
-        if (!BuildConfig.IS_HOST || context == null) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e("非宿主,不进行设置context");
-            }
-            return;
-        }
         EContextHelper.setContext(context);
-
         if (BuildConfig.enableHotFix) {
             try {
                 HotFixTransform.transform(null, AnalysysTracker.class.getName(), "setContext", context);

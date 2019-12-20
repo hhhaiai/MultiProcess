@@ -27,7 +27,7 @@ def STRICTMODE = true
 //endregion
 
 //region 内部日志相关
-def logcat = false //开关
+def logcat = true //开关
 def tag_hotfix = "analysys_hotfix" //热修复 tag
 def tag_snap = "analysys_snap"//安装列表tag
 def tag_upload = "analysys_upload"//上传的tag
