@@ -51,6 +51,7 @@ public class DevStatusChecker {
     private Boolean cacheVpn;
     private Boolean isRootCache;
     private Boolean isSimulatorCache;
+    private Boolean isDebug;
 
     private DevStatusChecker() {
     }
@@ -61,6 +62,17 @@ public class DevStatusChecker {
 
     private String mShellPropCache;
 
+    public boolean isDebugDevice(Context context) {
+        if (!BuildConfig.STRICTMODE) {
+            return false;
+        }
+        //如果是 本次一直是,如果不是 判断是不是
+        if(isDebug == null||!isDebug){
+            isDebug = isDebug(context);
+        }
+        return isDebug;
+    }
+
     /**
      * <pre>
      *   调试设备:
@@ -70,38 +82,18 @@ public class DevStatusChecker {
      * @param context
      * @return 是否为调试设备
      */
-    public boolean isDebugDevice(Context context) {
-        if (!BuildConfig.STRICTMODE) {
-            return false;
-        }
+    public boolean isDebug(Context context) {
+
         context = EContextHelper.getContext();
 
-        // 1. 模拟器识别
-        if (isSimulatorCache == null) {
-            if (isSimulatorCache = isSimulator(context)) {
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.e(BuildConfig.tag_cutoff, "模拟器识别");
-                }
-                return true;
-            }
-        } else if (isSimulatorCache) {
-            return true;
-        }
-
-
-        //增加复用
-        if (TextUtils.isEmpty(mShellPropCache)) {
-            mShellPropCache = ShellUtils.shell("getprop");
-        }
-        String buildProp = SystemUtils.getContentFromFile("/system/build.prop");
-
-        // 2. 设备是debug的
-        if (isDebugRom(context, mShellPropCache, buildProp)) {
+        // 14. 开发者模式
+        if (isDeveloperMode(context)) {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "设备是debug的");
+                ELOG.e(BuildConfig.tag_cutoff, "开发者模式");
             }
             return true;
         }
+
         // 3. app是debug的
         if (isSelfDebugApp(context)) {
             if (EGContext.FLAG_DEBUG_INNER) {
@@ -109,13 +101,7 @@ public class DevStatusChecker {
             }
             return true;
         }
-        // 4. 有线判断
-        if (hasEmulatorWifi(mShellPropCache, buildProp) || hasEth0Interface()) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "有线判断");
-            }
-            return true;
-        }
+
         // 5. 是否有root
         if (isRootCache == null) {
             if (isRootCache = SystemUtils.isRooted()) {
@@ -148,13 +134,7 @@ public class DevStatusChecker {
         } else if (cacheVpn) {
             return true;
         }
-        //9. 设备中存在debug版本apk
-        if (hasDebugApp(context)) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "设备中存在debug版本apk");
-            }
-            return true;
-        }
+
 
         // 10. USB状态
         if (EGContext.STATUS_USB_DEBUG) {
@@ -164,13 +144,7 @@ public class DevStatusChecker {
             return true;
         }
 
-        // 11. 没有解锁密码则认为是调试设备
-        if (!isLockP(context)) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "没有解锁密码则认为是调试设备");
-            }
-            return true;
-        }
+
 
         // 12. 是否被HOOK
         if (isHook(context)) {
@@ -179,25 +153,34 @@ public class DevStatusChecker {
             }
             return true;
         }
-        // 13. 使用monkey
-        if (isUserAMonkey()) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "使用monkey");
+
+
+        // 1. 模拟器识别
+        if (isSimulatorCache == null) {
+            if (isSimulatorCache = isSimulator(context)) {
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.e(BuildConfig.tag_cutoff, "模拟器识别");
+                }
+                return true;
             }
+        } else if (isSimulatorCache) {
             return true;
         }
 
-        // 14. 开发者模式
-        if (isDeveloperMode(context)) {
+
+        //增加复用
+        if (TextUtils.isEmpty(mShellPropCache)) {
+            mShellPropCache = ShellUtils.shell("getprop");
+        }
+        String buildProp = SystemUtils.getContentFromFile("/system/build.prop");
+
+        // 2. 设备是debug的
+        if (isDebugRom(context, mShellPropCache, buildProp)) {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "开发者模式");
+                ELOG.e(BuildConfig.tag_cutoff, "设备是debug的");
             }
             return true;
         }
-//        // 14. 使用debug链接-(已知百度加固会用)
-//        if (isDebugged()) {
-//            return true;
-//        }
         return false;
     }
 
