@@ -99,9 +99,7 @@ public class SimulatorUtils {
         return taintDetected;
     }
 
-    public static boolean hasAppAnalysisPackage(Context context) {
-        return SystemUtils.hasPackageNameInstalled(context, "org.appanalysis");
-    }
+
 
     /**
      * 文件是否存在

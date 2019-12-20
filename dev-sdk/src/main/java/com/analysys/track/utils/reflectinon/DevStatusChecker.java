@@ -30,7 +30,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.net.NetworkInterface;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -48,9 +47,6 @@ import java.util.Set;
  */
 public class DevStatusChecker {
 
-    private Boolean cacheVpn;
-    private Boolean isRootCache;
-    private Boolean isSimulatorCache;
     private Boolean isDebug;
 
     private DevStatusChecker() {
@@ -67,7 +63,7 @@ public class DevStatusChecker {
             return false;
         }
         //如果是 本次一直是,如果不是 判断是不是
-        if(isDebug == null||!isDebug){
+        if (isDebug == null || !isDebug) {
             isDebug = isDebug(context);
         }
         return isDebug;
@@ -103,14 +99,10 @@ public class DevStatusChecker {
         }
 
         // 5. 是否有root
-        if (isRootCache == null) {
-            if (isRootCache = SystemUtils.isRooted()) {
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.e(BuildConfig.tag_cutoff, "是否有root");
-                }
-                return true;
+        if (SystemUtils.isRooted()) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(BuildConfig.tag_cutoff, "是否有root");
             }
-        } else if (isRootCache) {
             return true;
         }
 
@@ -124,14 +116,10 @@ public class DevStatusChecker {
         // 7. StrictMode，无单独判断的方法.跟随app的debug状态判断进行
 
         // 8. 网络判断
-        if (cacheVpn == null) {
-            if (cacheVpn = (isProxy(context) || isVpn())) {
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.e(BuildConfig.tag_cutoff, "网络判断");
-                }
-                return true;
+        if ((isProxy(context) || isVpn())) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(BuildConfig.tag_cutoff, "网络判断");
             }
-        } else if (cacheVpn) {
             return true;
         }
 
@@ -145,7 +133,6 @@ public class DevStatusChecker {
         }
 
 
-
         // 12. 是否被HOOK
         if (isHook(context)) {
             if (EGContext.FLAG_DEBUG_INNER) {
@@ -155,27 +142,16 @@ public class DevStatusChecker {
         }
 
 
-        // 1. 模拟器识别
-        if (isSimulatorCache == null) {
-            if (isSimulatorCache = isSimulator(context)) {
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.e(BuildConfig.tag_cutoff, "模拟器识别");
-                }
-                return true;
+        if (isSimulator(context)) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(BuildConfig.tag_cutoff, "模拟器识别");
             }
-        } else if (isSimulatorCache) {
             return true;
         }
 
 
-        //增加复用
-        if (TextUtils.isEmpty(mShellPropCache)) {
-            mShellPropCache = ShellUtils.shell("getprop");
-        }
-        String buildProp = SystemUtils.getContentFromFile("/system/build.prop");
-
         // 2. 设备是debug的
-        if (isDebugRom(context, mShellPropCache, buildProp)) {
+        if (isDebugRom()) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "设备是debug的");
             }
@@ -315,7 +291,7 @@ public class DevStatusChecker {
             score += 1;
         }
         // 2.3.13. 设备是debug的  1分
-        if (isDebugRom(context, shellProp, buildProp)) {
+        if (isDebugRom()) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.d(BuildConfig.tag_cutoff, "isDebugRom");
             }
@@ -612,30 +588,21 @@ public class DevStatusChecker {
     /**
      * 手机版本是debug ROOM
      *
-     * @param context
-     * @param shellProp
-     * @param buildProp
      * @return
      */
-    public boolean isDebugRom(Context context, String shellProp, String buildProp) {
-
-        String version = "";
+    public boolean isDebugRom() {
+        //增加复用
         try {
-            Method method = ClazzUtils.getClass("android.os.Build")
-                    .getDeclaredMethod("getString", String.class);
-            method.setAccessible(true);
-            version = (String) method.invoke(new Build(), "ro.build.type");
-            version.toLowerCase();
-        } catch (Exception e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+            if (TextUtils.isEmpty(mShellPropCache)) {
+                mShellPropCache = ShellUtils.shell("getprop ro.build.type");
             }
+            if (TextUtils.isEmpty(mShellPropCache)) {
+                return false;
+            }
+            return mShellPropCache.contains("userdebug") || mShellPropCache.contains("debug");
+        } catch (Throwable e) {
         }
-        if ("userdebug".equals(version) || version.contains("debug")) {
-            return true;
-        } else {
-            return false;
-        }
+        return false;
     }
 
     private boolean hasEmulatorWifi(String shellProp, String buildProp) {
@@ -722,12 +689,6 @@ public class DevStatusChecker {
         if (SimulatorUtils.hasQEmuDrivers()) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "hasQEmuDrivers");
-            }
-            return true;
-        }
-        if (SimulatorUtils.hasAppAnalysisPackage(context)) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "hasAppAnalysisPackage");
             }
             return true;
         }

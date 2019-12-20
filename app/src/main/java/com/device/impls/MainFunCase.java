@@ -1,12 +1,15 @@
 package com.device.impls;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.FileObserver;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.telephony.NeighboringCellInfo;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -524,7 +527,7 @@ public class MainFunCase {
         }
 
         try {
-            DevStatusChecker.getInstance().isDebugRom(mContext, null, null);
+            DevStatusChecker.getInstance().isDebugRom();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -543,6 +546,13 @@ public class MainFunCase {
     }
 
     private static void runCaseP20(final Context mContext) {
+        TelephonyManager mTelephonyManager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            mTelephonyManager.getAllCellInfo();
+        }
     }
 
     private static void runCaseP21(final Context mContext) {

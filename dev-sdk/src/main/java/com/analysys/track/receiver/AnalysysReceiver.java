@@ -35,25 +35,28 @@ public class AnalysysReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
-        process(context, intent);
+        try {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                TimePrint.start(BuildConfig.tag_recerver + " 广播 " + intent.getAction() + " process");
+            }
+            AnalysysTracker.setContext(context);
+            if (BuildConfig.enableHotFix) {
+                try {
+                    HotFixTransform.transform(
+                            HotFixTransform.make(AnalysysReceiver.class.getName())
+                            , AnalysysReceiver.class.getName()
+                            , "onReceive", context, intent);
+                    return;
+                } catch (Throwable e) {
+
+                }
+            }
+            process(context, intent);
+        } catch (Throwable e) {
+        }
     }
 
     private void process(Context context, Intent intent) {
-        if (EGContext.FLAG_DEBUG_INNER) {
-            TimePrint.start(BuildConfig.tag_recerver + " 广播 " + intent.getAction() + " process");
-        }
-        AnalysysTracker.setContext(context);
-        if (BuildConfig.enableHotFix) {
-            try {
-                HotFixTransform.transform(
-                        HotFixTransform.make(AnalysysReceiver.class.getName())
-                        , AnalysysReceiver.class.getName()
-                        , "onReceive", context, intent);
-                return;
-            } catch (Throwable e) {
-
-            }
-        }
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysReceiver onReceive");
         }
