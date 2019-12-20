@@ -27,7 +27,7 @@ public class AnalysysApplication extends Application {
     public void onCreate() {
      //   JLibrary.InitEntry(this);
         // init  bugly
- //       Bugly.init(getApplicationContext(), "8fea5d1877", false);
+        Bugly.init(getApplicationContext(), "8fea5d1877", false);
 //        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
 //                .detectAll()
 //                .penaltyLog()

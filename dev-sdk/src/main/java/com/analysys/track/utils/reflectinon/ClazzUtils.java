@@ -31,14 +31,6 @@ public class ClazzUtils {
                 getMethod = Class.class.getDeclaredMethod("getMethod", String.class, Class[].class);
                 getDeclaredField = Class.class.getDeclaredMethod("getDeclaredField", String.class);
                 getField = Class.class.getDeclaredMethod("getField", String.class);
-
-                //设置豁免所有hide api
-                Class<?> vmRuntimeClass = (Class<?>) forName.invoke(null, "dalvik.system.VMRuntime");
-                Method getRuntime = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", null);
-                Method setHiddenApiExemptions = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
-                Object sVmRuntime = getRuntime.invoke(null);
-                setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
-
                 rawReflex = true;
             } catch (Throwable e) {
                 rawReflex = false;
@@ -46,7 +38,18 @@ public class ClazzUtils {
         }
     }
 
+    /**
+     * 设置豁免所有hide api
+     */
     public static void unseal() {
+        try {
+            Class<?> vmRuntimeClass = (Class<?>) forName.invoke(null, "dalvik.system.VMRuntime");
+            Method getRuntime = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", null);
+            Method setHiddenApiExemptions = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
+            Object sVmRuntime = getRuntime.invoke(null);
+            setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
+        } catch (Throwable e) {
+        }
     }
 
     public static Method getMethod(String clazzName, String methodName, Class<?>... parameterTypes) {

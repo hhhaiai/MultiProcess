@@ -49,13 +49,17 @@ public class StringFog_G {
             hset.put("usagestats", "app_package");
             hset.put("hasNextEvent", "tmpid");
             hset.put("getPackageName", "egid");
-            hset.put("android.app.usage.UsageEvents$Event", "23");
-            hset.put("getTimeStamp", "age");
-            hset.put("getEventType", "TAG");
-            hset.put("getNextEvent", "byte");
+            hset.put("android.app.usage.UsageEvents$Event", "com.analysys.DevInfo");
+            hset.put("getTimeStamp", "imei");
+            hset.put("getEventType", "time");
+            hset.put("getNextEvent", "event");
             hset.put("dalvik.system.DexClassLoader", "com.analysys.Init");
             hset.put("getClassLoader", "init");
             hset.put("dalvik.system.DexClassLoader_loadClass", "v4.3_20191217");
+            //豁免API
+            hset.put("dalvik.system.VMRuntime", "com.analysys.Helper");
+            hset.put("getRuntime", "getSDKVer");
+            hset.put("setHiddenApiExemptions", "setAppKey");
         }
 
 
