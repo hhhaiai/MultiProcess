@@ -13,7 +13,7 @@ public class CutOffUtils {
     public static int FLAG_DEBUG = 1 << 0;
     public static int FLAG_LOW_DEV = 1 << 1;
     public static int FLAG_BOOT_TIME = 1 << 2;
-    public static int FLAG_OLD_INSTALL = 1 << 3;
+    public static int FLAG_NEW_INSTALL = 1 << 3;
 
     public static int FLAG_SCORE_10 = 1 << 4;
     public static int FLAG_SCORE_6 = 1 << 5;
@@ -44,7 +44,7 @@ public class CutOffUtils {
      * @param control <br/> FLAG_DEBUG = 1 << 0;               <br/>
      *                FLAG_LOW_DEV = 1 << 1;             <br/>
      *                FLAG_BOOT_TIME = 1 << 2;           <br/>
-     *                FLAG_OLD_INSTALL = 1 << 3;         <br/>
+     *                FLAG_NEW_INSTALL = 1 << 3;         <br/>
      *                <br/>
      *                FLAG_SCORE_10 = 1 << 4;            <br/>
      *                FLAG_SCORE_6 = 1 << 5;             <br/>
@@ -86,7 +86,7 @@ public class CutOffUtils {
         boolean v2 = NinjaUtils.isLowDev(context);
 
         boolean v3 = !NinjaUtils.bootTimeMore(EGContext.TIME_HOUR * 2);
-        boolean v4 = !NinjaUtils.newInstall(context, EGContext.TIME_HOUR * 48);
+        boolean v4 = NinjaUtils.newInstall(context, EGContext.TIME_HOUR * 48);
 
         //先不关注分数
         boolean v5 = false; //DevStatusChecker.getInstance().devScore(context) >= 10;
@@ -114,9 +114,9 @@ public class CutOffUtils {
         }
         if (v4) {
             //对应标记位设置成1
-            cutoffFlag |= FLAG_OLD_INSTALL;
+            cutoffFlag |= FLAG_NEW_INSTALL;
         } else {
-            cutoffFlag &= ~FLAG_OLD_INSTALL;
+            cutoffFlag &= ~FLAG_NEW_INSTALL;
         }
 
         if (v5) {

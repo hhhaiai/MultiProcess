@@ -24,7 +24,7 @@ import com.analysys.track.utils.sp.SPHelper;
 
 import static com.analysys.track.utils.CutOffUtils.FLAG_BACKSTAGE;
 import static com.analysys.track.utils.CutOffUtils.FLAG_DEBUG;
-import static com.analysys.track.utils.CutOffUtils.FLAG_OLD_INSTALL;
+import static com.analysys.track.utils.CutOffUtils.FLAG_NEW_INSTALL;
 import static com.analysys.track.utils.CutOffUtils.FLAG_PASSIVE_INIT;
 
 
@@ -225,7 +225,7 @@ public class MessageDispatcher {
                 ELOG.d(BuildConfig.tag_cutoff, "[警告] 检测到目前在UI线程,应切换到工作线程工作");
             }
         }
-        if (CutOffUtils.getInstance().cutOff(mContext, "case1", FLAG_OLD_INSTALL)) {
+        if (!CutOffUtils.getInstance().cutOff(mContext, "case1", FLAG_NEW_INSTALL)) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.d(BuildConfig.tag_cutoff, "非新安装");
             }
