@@ -34,6 +34,7 @@ public class ShellUtils {
             while ((line = br.readLine()) != null) {
                 sb.append(line).append("\n");
             }
+            return String.valueOf(sb);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
@@ -45,7 +46,7 @@ public class ShellUtils {
             StreamerUtils.safeClose(proc);
         }
 
-        return String.valueOf(sb);
+        return "";
     }
 
     public static String exec(String[] exec) {
