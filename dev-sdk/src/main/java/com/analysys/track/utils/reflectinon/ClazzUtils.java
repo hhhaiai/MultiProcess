@@ -57,95 +57,122 @@ public class ClazzUtils {
     }
 
     public static Method getMethod(Class clazz, String methodName, Class<?>... parameterTypes) {
-        if (clazz == null) {
+        if (clazz == null || TextUtils.isEmpty(methodName)) {
             return null;
         }
         Method method = null;
         try {
             if (getDeclaredMethod != null) {
                 method = (Method) getDeclaredMethod.invoke(clazz, methodName, parameterTypes);
-            } else {
-                method = clazz.getDeclaredMethod(methodName, parameterTypes);
-            }
-            if (method != null) {
-                method.setAccessible(true);
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
         }
-        if (method == null) {
-            try {
-                if (parameterTypes == null || parameterTypes.length == 0) {
-                    if (getMethod != null) {
-                        method = (Method) getMethod.invoke(clazz, methodName, null);
-                    } else {
-                        method = clazz.getMethod(methodName);
-                    }
-
-                } else {
-                    if (getMethod != null) {
-                        method = (Method) getMethod.invoke(clazz, methodName, parameterTypes);
-                    } else {
-                        method = clazz.getMethod(methodName, parameterTypes);
-                    }
-                }
-            } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
-                }
+        if (method != null) {
+            method.setAccessible(true);
+            return method;
+        }
+        try {
+            if (getMethod != null) {
+                method = (Method) getMethod.invoke(clazz, methodName, parameterTypes);
+            }
+        } catch (Throwable e) {
+        }
+        if (method != null) {
+            method.setAccessible(true);
+            return method;
+        }
+        try {
+            method = clazz.getDeclaredMethod(methodName,parameterTypes);
+        } catch (Throwable e) {
+        }
+        if (method != null) {
+            method.setAccessible(true);
+            return method;
+        }
+        try {
+            method = clazz.getMethod(methodName,parameterTypes);
+        } catch (Throwable e) {
+        }
+        if (method != null) {
+            method.setAccessible(true);
+            return method;
+        } else {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(new Exception(clazz.getName() + methodName + "not found !"));
             }
         }
         return method;
     }
 
     public static Field getField(Class clazz, String fieldName) {
+        if (clazz == null || TextUtils.isEmpty(fieldName)) {
+            return null;
+        }
         Field field = null;
         try {
             if (getDeclaredField != null) {
                 field = (Field) getDeclaredField.invoke(clazz, fieldName);
-            } else {
-                field = clazz.getDeclaredField(fieldName);
-            }
-
-            if (field != null) {
-                field.setAccessible(true);
             }
         } catch (Throwable e) {
+        }
+        if (field != null) {
+            field.setAccessible(true);
+            return field;
+        }
+        try {
+            if (getField != null) {
+                field = (Field) getField.invoke(clazz, fieldName);
+            }
+        } catch (Throwable e) {
+        }
+        if (field != null) {
+            field.setAccessible(true);
+            return field;
+        }
+        try {
+            field = clazz.getDeclaredField(fieldName);
+        } catch (Throwable e) {
+        }
+        if (field != null) {
+            field.setAccessible(true);
+            return field;
+        }
+        try {
+            field = clazz.getField(fieldName);
+        } catch (Throwable e) {
+        }
+        if (field != null) {
+            field.setAccessible(true);
+            return field;
+        } else {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BuglyUtils.commitError(new Exception(clazz.getName() + fieldName + "not found !"));
             }
         }
-        if (field == null) {
-            try {
-                if (getField != null) {
-                    field = (Field) getField.invoke(clazz, fieldName);
-                } else {
-                    field = clazz.getField(fieldName);
-                }
-            } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
-                }
-            }
-        }
-        return field;
+        return null;
     }
 
     public static Class getClass(String name) {
         if (TextUtils.isEmpty(name)) {
             return Object.class;
         }
-        try {
-            if (forName != null) {
-                return (Class) forName.invoke(null, name);
+        Class result = null;
+        if (forName != null) {
+            try {
+                result = (Class) forName.invoke(null, name);
+            } catch (Throwable e) {
+
             }
+        }
+        if (result != null) {
+            return result;
+        }
+        try {
             return Class.forName(name);
         } catch (Throwable e) {
-            return Object.class;
-        }
 
+        }
+        return Object.class;
     }
 
     public static Object invokeObjectMethod(Object o, String methodName) {
