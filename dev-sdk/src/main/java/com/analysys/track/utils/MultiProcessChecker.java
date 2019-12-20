@@ -123,6 +123,7 @@ public class MultiProcessChecker {
 //                        }
                     if (locks != null) {
                         locks.safeClose();
+                        mFilenameAndLocks.remove(fileName);
                     }
                 }
                 return true;

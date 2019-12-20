@@ -2,6 +2,8 @@ package com.analysys.track.utils;
 
 import android.content.Context;
 
+import com.analysys.track.internal.content.EGContext;
+
 import java.lang.reflect.Method;
 
 /**
@@ -15,7 +17,9 @@ import java.lang.reflect.Method;
 public class BuglyUtils {
 
     public static void commitError(Throwable throwable) {
-        ELOG.i(throwable);
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.e(throwable);
+        }
         try {
             Class clazz = Class.forName("com.tencent.bugly.crashreport.CrashReport");
             setTag(clazz, 138534);
