@@ -3,12 +3,8 @@ package com.device;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
-import android.support.multidex.MultiDex;
 
 import com.analysys.track.AnalysysTracker;
-import com.bun.miitmdid.core.JLibrary;
-import com.device.impls.MultiProcessWorker;
-import com.device.utils.EL;
 import com.tencent.bugly.Bugly;
 import com.umeng.analytics.MobclickAgent;
 
@@ -25,7 +21,7 @@ public class AnalysysApplication extends Application {
 
     @Override
     public void onCreate() {
-     //   JLibrary.InitEntry(this);
+        //   JLibrary.InitEntry(this);
         // init  bugly
         Bugly.init(getApplicationContext(), "8fea5d1877", false);
 //        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
@@ -38,8 +34,8 @@ public class AnalysysApplication extends Application {
 //                .build());
         super.onCreate();
         initAnalysys();
-       // MultiProcessWorker.runServices(this);
-      //  EL.init(this);
+        // MultiProcessWorker.runServices(this);
+        //  EL.init(this);
     }
 
     /**
@@ -48,7 +44,8 @@ public class AnalysysApplication extends Application {
     private void initAnalysys() {
 
         // 初始化接口:第二个参数填写您在平台申请的appKey,第三个参数填写
-        AnalysysTracker.init(this, "7752552892442721d", "WanDouJia");
+        AnalysysTracker.init(this, "iiiii", "WanDouJia");
+      //  AnalysysTracker.init(this, "fdfdf", "WanDouJia");
         // 设置打开debug模式，上线请置为false
         AnalysysTracker.setDebugMode(this, false);
 
@@ -85,6 +82,6 @@ public class AnalysysApplication extends Application {
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
-       // MultiDex.install(this);
+        // MultiDex.install(this);
     }
 }
