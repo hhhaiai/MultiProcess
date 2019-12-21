@@ -33,7 +33,7 @@ public class SimulatorUtils {
                     "/dev/socket/qemud"
                     , "/dev/qemu_pipe"
                     //-------------文件判断------------
-                    , "/init.goldfish.rc"
+//                    , "/init.goldfish.rc"
                     , "/system/lib/libc_malloc_debug_qemu.so"
                     , "/sys/qemu_trace"
                     , "/system/bin/qemu-props"
