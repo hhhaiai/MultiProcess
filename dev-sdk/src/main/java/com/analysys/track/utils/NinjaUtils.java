@@ -44,6 +44,10 @@ public class NinjaUtils {
 
     public static void checkOldFile(Context context) {
         try {
+            if (SPHelper.getLongValueFromSP(context, EGContext.SP_INSTALL_TIME, -1) != -1) {
+                return;
+            }
+
             String[] oldSPfiles = new String[]{
                     "ana_sp_xml_v2.xml",
                     "ana_sp_xml_v2.sp",
