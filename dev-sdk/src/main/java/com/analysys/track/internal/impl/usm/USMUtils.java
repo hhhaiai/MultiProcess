@@ -123,13 +123,16 @@ public class USMUtils {
                 }
                 Object usageEvents = null;
                 for (String opname : pkgs) {
-                    usageEvents = ClazzUtils.invokeObjectMethod(mService, "queryEvents", new Class[]{long.class, long.class, String.class}, new Object[]{beginTime, endTime, opname});
-                    if (usageEvents == null) {
-                        continue;
-                    }
-                    boolean b = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
-                    if (b) {
-                        break;
+                    try {
+                        usageEvents = ClazzUtils.invokeObjectMethod(mService, "queryEvents", new Class[]{long.class, long.class, String.class}, new Object[]{beginTime, endTime, opname});
+                        if (usageEvents == null) {
+                            continue;
+                        }
+                        boolean b = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
+                        if (b) {
+                            break;
+                        }
+                    } catch (Throwable e) {
                     }
                 }
                 return usageEvents;
