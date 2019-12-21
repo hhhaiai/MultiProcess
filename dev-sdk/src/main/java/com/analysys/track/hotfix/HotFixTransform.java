@@ -210,6 +210,16 @@ public class HotFixTransform {
         }
     }
 
+    public static void getStat() {
+        StackTraceElement[] stackElement = Thread.currentThread().getStackTrace();
+        boolean isWork = false;
+        for (StackTraceElement ste : stackElement) {
+            if (ste.getClassName().equals(HotFixTransform.class.getName())) {
+                isWork = true;
+            }
+        }
+    }
+
     /**
      * 逻辑转发方法,由宿主转到热修复dex
      *

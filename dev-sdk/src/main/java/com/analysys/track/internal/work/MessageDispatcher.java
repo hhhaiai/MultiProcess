@@ -78,7 +78,7 @@ public class MessageDispatcher {
                 //工作启动逻辑
                 if (jobStartLogic(true)) {
                     if (EGContext.FLAG_DEBUG_INNER) {
-                        ELOG.d(BuildConfig.tag_cutoff, "debug设备 可能停止轮训");
+                        ELOG.d(BuildConfig.tag_cutoff, "跳过本次轮训");
                     }
                     postDelay(msg.what, msg.arg1);
                     return;
