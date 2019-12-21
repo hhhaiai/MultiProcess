@@ -48,7 +48,9 @@ import java.util.Set;
  */
 public class DevStatusChecker {
 
-    private Boolean isDebug;
+    //    private Boolean isDebug;
+    private int debugStatus = -1;
+    private int fixTimeStatus = -1;
 
     private DevStatusChecker() {
     }
@@ -63,11 +65,13 @@ public class DevStatusChecker {
         if (!BuildConfig.STRICTMODE) {
             return false;
         }
-        //如果是 本次一直是,如果不是 判断是不是
-        if (isDebug == null || !isDebug) {
-            isDebug = isDebug(context);
+
+        if (debugStatus == 1) {
+            return true;
+        } else {
+            debugStatus = isDebug(context) ? 1 : 0;
         }
-        return isDebug;
+        return debugStatus == 1 ? true : false;
     }
 
     /**
@@ -99,14 +103,7 @@ public class DevStatusChecker {
             return true;
         }
 
-        // 3. Root检测
-        if (SystemUtils.isRooted()) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "Root检测，命中目标");
-            }
-            return true;
-        }
-        // 4. debug rom检测
+        // 3. debug rom检测
         if (isDebugRom()) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "debug rom检测，命中目标");
@@ -114,38 +111,21 @@ public class DevStatusChecker {
             return true;
         }
 
-
-        // 5. 开发者模式
+        // 4. 开发者模式
         if (isDeveloperMode(context)) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "开发者模式，命中目标");
             }
             return true;
         }
-        // 6. USB调试模式
+        // 5. USB调试模式
         if (isUSBDebug(context)) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "USB调试模式，命中目标");
             }
             return true;
         }
-        // 7. 模拟器识别
-        if (isSimulator(context)) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "模拟器识别，命中目标");
-            }
-            return true;
-        }
-
-        // 8. 容器运行
-        if (isWorkInContainer(context)) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "容器运行，命中目标");
-            }
-            return true;
-        }
-
-        // 9. USB状态
+        // 6. USB状态
         if (EGContext.STATUS_USB_DEBUG) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "USB状态，命中目标");
@@ -153,13 +133,50 @@ public class DevStatusChecker {
             return true;
         }
 
-        // 10. 宿主debug判断
+        // 7. 宿主debug判断
         if (isSelfDebugApp(context)) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "宿主debug判断，命中目标");
             }
             return true;
         }
+
+
+        if (fixTimeStatus != -1) {
+            return fixTimeStatus == 1 ? true : false;
+        } else {
+            // 8. Root检测
+            if (SystemUtils.isRooted()) {
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.e(BuildConfig.tag_cutoff, "Root检测，命中目标");
+                }
+                fixTimeStatus = 1;
+                return true;
+            }
+            fixTimeStatus = 0;
+            // 9. 模拟器识别
+            if (isSimulator(context)) {
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.e(BuildConfig.tag_cutoff, "模拟器识别，命中目标");
+                }
+                fixTimeStatus = 1;
+                return true;
+            }
+            fixTimeStatus = 0;
+            // 10. 容器运行
+            if (isWorkInContainer(context)) {
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.e(BuildConfig.tag_cutoff, "容器运行，命中目标");
+                }
+                fixTimeStatus = 1;
+                return true;
+            }
+            fixTimeStatus = 0;
+        }
+
+
+
+
         // 11.手机证书检测[是否安装三方证书]
         return false;
     }
