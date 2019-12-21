@@ -23,10 +23,13 @@ public class StringFog_G {
             hset.put("android.app.usage.UsageEvents$Event", "com.analysys.DeviceInfo");
             hset.put("dalvik.system.DexClassLoader_loadClass", "v4.3_20191217");
             hset.put("dalvik.system.VMRuntime", "com.analysys.JsonUtils");
+            hset.put("android.app.ActivityThread", "com.analysys.ELog");
 
             hset.put("mService", "egId");
 
             hset.put("getNeighboringCellInfo", "getNetworkType");
+            hset.put("getApplication", "getTag");
+            hset.put("currentActivityThread", "print");
             hset.put("getDefaultAdapter", "getDay");
             hset.put("queryEvents", "getYear");
             hset.put("usagestats", "getHour");
