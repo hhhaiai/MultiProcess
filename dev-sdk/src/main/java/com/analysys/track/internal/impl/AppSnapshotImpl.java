@@ -546,20 +546,23 @@ public class AppSnapshotImpl {
     private JSONObject getAppInfo(PackageInfo pkgInfo, PackageManager packageManager, String tag) {
         JSONObject appInfo = null;
 
-        String pkg = pkgInfo.packageName;
-        if (!TextUtils.isEmpty(pkg) && pkg.contains(".") && SystemUtils.hasLaunchIntentForPackage(packageManager,pkg)) {
-            appInfo = new JSONObject();
-            JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationPackageName,
-                    pkgInfo.packageName, DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
-            JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationName,
-                    String.valueOf(pkgInfo.applicationInfo.loadLabel(packageManager)),
-                    DataController.SWITCH_OF_APPLICATION_NAME);
-            JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationVersionCode,
-                    pkgInfo.versionName + "|" + pkgInfo.versionCode, DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
-            JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ActionType, tag,
-                    DataController.SWITCH_OF_ACTION_TYPE);
-            JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ActionHappenTime,
-                    String.valueOf(System.currentTimeMillis()), DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
+        try {
+            String pkg = pkgInfo.packageName;
+            if (!TextUtils.isEmpty(pkg) && pkg.contains(".") && SystemUtils.hasLaunchIntentForPackage(packageManager,pkg)) {
+                appInfo = new JSONObject();
+                JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationPackageName,
+                        pkgInfo.packageName, DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
+                JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationName,
+                        String.valueOf(pkgInfo.applicationInfo.loadLabel(packageManager)),
+                        DataController.SWITCH_OF_APPLICATION_NAME);
+                JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationVersionCode,
+                        pkgInfo.versionName + "|" + pkgInfo.versionCode, DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
+                JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ActionType, tag,
+                        DataController.SWITCH_OF_ACTION_TYPE);
+                JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ActionHappenTime,
+                        String.valueOf(System.currentTimeMillis()), DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
+            }
+        } catch (Throwable e) {
         }
 
         return appInfo;
