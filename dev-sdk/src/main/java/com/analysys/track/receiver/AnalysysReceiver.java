@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.analysys.plugin.TimePrint;
 import com.analysys.track.AnalysysTracker;
@@ -37,6 +38,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
     public void onReceive(final Context context, final Intent intent) {
         try {
             if (EGContext.FLAG_DEBUG_INNER) {
+                Log.d(BuildConfig.tag_recerver, " analysys 广播 " + intent.getAction());
                 TimePrint.start(BuildConfig.tag_recerver + " 广播 " + intent.getAction() + " process");
             }
             AnalysysTracker.setContext(context);

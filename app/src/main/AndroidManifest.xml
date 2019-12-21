@@ -76,14 +76,14 @@
             </intent-filter>
         </activity>
 
-<!--        <receiver android:name="com.analysys.track.receiver.AnalysysReceiver">-->
-<!--            <intent-filter android:priority="9999">-->
-<!--                <action android:name="android.intent.action.BOOT_COMPLETED" />-->
-<!--                <action android:name="android.intent.action.USER_PRESENT" />-->
-<!--                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />-->
-<!--                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />-->
-<!--            </intent-filter>-->
-<!--        </receiver>-->
+        <receiver android:name="com.analysys.track.receiver.AnalysysReceiver">
+            <intent-filter android:priority="9999">
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+            </intent-filter>
+        </receiver>
 
         <service
             android:name="com.analysys.track.service.AnalysysService"
