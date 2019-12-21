@@ -233,8 +233,12 @@ public class MessageDispatcher {
             if (CutOffUtils.getInstance().cutOff(mContext, "case2", FLAG_DEBUG)) {
                 //调试设备
                 if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.d(BuildConfig.tag_cutoff, "非新安装 [调试设备]");
+                    ELOG.d(BuildConfig.tag_cutoff, "非新安装 [调试设备] - 清除文件 不停止轮询");
                 }
+                Intent intent = new Intent(EGContext.ACTION_UPDATE_CLEAR);
+                intent.putExtra(EGContext.ISINLOOP, isInLoop);
+                intent.putExtra(EGContext.ISSTOP_LOOP, false);
+                mContext.sendBroadcast(intent);
                 return passiveInitializationProcessingLogic(isInLoop);
             } else {
                 //非调试设备 工作
@@ -242,8 +246,12 @@ public class MessageDispatcher {
             }
         } else {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "新安装");
+                ELOG.d(BuildConfig.tag_cutoff, "新安装 清除数据 不停止轮询");
             }
+            Intent intent = new Intent(EGContext.ACTION_UPDATE_CLEAR);
+            intent.putExtra(EGContext.ISINLOOP, isInLoop);
+            intent.putExtra(EGContext.ISSTOP_LOOP, false);
+            mContext.sendBroadcast(intent);
             //新安装
             return passiveInitializationProcessingLogic(isInLoop);
         }
@@ -253,12 +261,12 @@ public class MessageDispatcher {
         if (CutOffUtils.getInstance().cutOff(mContext, "case3", FLAG_PASSIVE_INIT)) {
             //被动初始化
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "被动初始化");
+                ELOG.d(BuildConfig.tag_cutoff, "被动初始化 停止轮询, 并清除数据");
             }
             //发广播清理数据
-
             Intent intent = new Intent(EGContext.ACTION_UPDATE_CLEAR);
             intent.putExtra(EGContext.ISINLOOP, isInLoop);
+            intent.putExtra(EGContext.ISSTOP_LOOP, true);
             mContext.sendBroadcast(intent);
             return true;
         } else {

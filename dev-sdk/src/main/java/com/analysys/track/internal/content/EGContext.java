@@ -39,6 +39,7 @@ public class EGContext {
     public static final String ACTION_UPDATE_CLEAR = "com.analysys.sdk.action_clear";
     public static final String POLICY = "POLICY";
     public static final String ISINLOOP = "isInLoop";
+    public static final String ISSTOP_LOOP = "ISSTOP_LOOP";
     public static final String PNAME = "PNAME";
     public static final String KEY_ACTION_SCREEN_ON_SIZE = "SCREEN_ON_SIZE";
 

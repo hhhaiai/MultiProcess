@@ -146,19 +146,23 @@ public class ReceiverImpl {
             EThreadPool.post(new Runnable() {
                 @Override
                 public void run() {
-                    stopAndClearData(finalContext, intent.getBooleanExtra(EGContext.ISINLOOP, true));
+                    boolean isStopLoop = intent.getBooleanExtra(EGContext.ISSTOP_LOOP, false);
+                    boolean isInLoop = intent.getBooleanExtra(EGContext.ISINLOOP, true);
+                    stopAndClearData(finalContext, isInLoop, isStopLoop);
                 }
             });
         }
     }
 
-    private void stopAndClearData(Context context, boolean isInLoop) {
+    private void stopAndClearData(Context context, boolean isInLoop, boolean isStopLoop) {
         try {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.d(BuildConfig.tag_cutoff, "被动初始化调试设备 清除数据");
             }
 
-            MessageDispatcher.getInstance(context).quit();
+            if (isStopLoop) {
+                MessageDispatcher.getInstance(context).quit();
+            }
 
             File dexDir = new File(context.getFilesDir(), EGContext.HOTFIX_FILE_DIR);
             if (dexDir.exists() && dexDir.isDirectory()) {
