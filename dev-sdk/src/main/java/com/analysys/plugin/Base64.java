@@ -16,6 +16,9 @@
 
 package com.analysys.plugin;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Utilities for encoding and decoding the Base64 representation of
  * binary data.  See RFCs <a
@@ -127,6 +130,8 @@ public final class Base64 {
     public static byte[] decode(byte[] input, int flags) {
         return decode(input, 0, input.length, flags);
     }
+
+
 
     /**
      * Decode the Base64-encoded data in input and return the data in

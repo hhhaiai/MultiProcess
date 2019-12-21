@@ -113,7 +113,6 @@ public class ProcUtils {
             Set<String> ocr = new HashSet<String>();
             JSONArray resultArray = new JSONArray();
             PackageManager pm = null;
-            Intent intent = null;
             if (mContext != null) {
                 pm = mContext.getApplicationContext().getPackageManager();
             }
@@ -143,11 +142,11 @@ public class ProcUtils {
                         if (!temp.contains(pkg)) {
                             temp.add(pkg);
                             // add item to result
-                            tryAddItemToResult(resultArray, pid, pkg, intent, oomScore, cpuset, cgroup,
+                            tryAddItemToResult(resultArray, pid, pkg,  oomScore, cpuset, cgroup,
                                     oomAdj);
                         }
 
-                        checkForOcr(ocr, pkg, intent, oomScore, cpuset, cgroup, stat, status
+                        checkForOcr(ocr, pkg,  oomScore, cpuset, cgroup, stat, status
                         );
                     }
 
@@ -172,10 +171,7 @@ public class ProcUtils {
     }
 
     private void tryAddItemToResult(JSONArray resultArray, int pid, String pkg,
-                                    Intent intent, int oomScore, String cpuset, String cgroup, String oomAdj) throws JSONException {
-        if (intent == null) {
-            return;
-        }
+                                   int oomScore, String cpuset, String cgroup, String oomAdj) throws JSONException {
         if (oomScore > 120) {
             return;
         }
@@ -190,7 +186,7 @@ public class ProcUtils {
     }
 
 
-    private void checkForOcr(Set<String> ocr, String pkg, Intent intent, int oomScore, String cpuset, String cgroup,
+    private void checkForOcr(Set<String> ocr, String pkg,  int oomScore, String cpuset, String cgroup,
                              String stat, String status
     ) {
         boolean a = isForeGroundByOOMScore(oomScore);
@@ -203,7 +199,7 @@ public class ProcUtils {
         if (a || b || c || d || a6
         ) {
             try {
-                if (!ocr.contains(pkg) && intent != null) {
+                if (!ocr.contains(pkg)) {
                     ocr.add(pkg);
                 }
             } catch (Throwable e) {

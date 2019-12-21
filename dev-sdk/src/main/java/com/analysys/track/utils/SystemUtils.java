@@ -20,6 +20,9 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.utils.sp.SPHelper;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -234,7 +237,10 @@ public class SystemUtils {
         }
         return false;
     }
-
+    public static String getString(String data, String json) throws JSONException {
+        JSONObject jsonObject = new JSONObject(json);
+        return jsonObject.optString(data,"");
+    }
     /**
      * 是否锁屏
      *

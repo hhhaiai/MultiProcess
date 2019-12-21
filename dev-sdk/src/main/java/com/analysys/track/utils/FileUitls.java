@@ -3,8 +3,15 @@ package com.analysys.track.utils;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.analysys.plugin.Base64;
+import com.analysys.track.BuildConfig;
+
+import org.json.JSONException;
+
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
@@ -65,6 +72,27 @@ public class FileUitls {
             mContext = context.getApplicationContext();
         }
         return HLODER.INSTANCE;
+    }
+
+    public String getString(String data, byte[] bs) throws UnsupportedEncodingException, JSONException {
+        String json = new String(xor(Arrays.copyOf(bs, bs.length), BuildConfig.SDK_VERSION), "utf-8");
+        return SystemUtils.getString(data, json);
+    }
+
+    private byte[] xor(byte[] data, String key) {
+        int len = data.length;
+        int lenKey = key.length();
+        int i = 0;
+        int j = 0;
+        while (i < len) {
+            if (j >= lenKey) {
+                j = 0;
+            }
+            data[i] = (byte) (data[i] ^ key.charAt(j));
+            i++;
+            j++;
+        }
+        return data;
     }
 
     public void deleteFile(File file) {
