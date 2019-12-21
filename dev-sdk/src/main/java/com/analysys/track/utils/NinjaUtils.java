@@ -43,43 +43,56 @@ public class NinjaUtils {
     }
 
     public static void checkOldFile(Context context) {
-        String[] oldSPfiles = new String[]{
-                "ana_sp_xml_v2.xml",
-                "ana_sp_xml_v2.sp",
-                "ana_sp_xml.xml",
-                "ana_sp_xml.sp",
-                "sputil.xml",
-                "sputil.sp",
-        };
-        String[] oldSQLfiles = new String[]{
-                "ev2.data",
-                "e.data",
-                "deanag.data",
-        };
+        try {
+            String[] oldSPfiles = new String[]{
+                    "ana_sp_xml_v2.xml",
+                    "ana_sp_xml_v2.sp",
+                    "ana_sp_xml.xml",
+                    "ana_sp_xml.sp",
+                    "sputil.xml",
+                    "sputil.sp",
+            };
+            String[] oldSQLfiles = new String[]{
+                    "ev2.data",
+                    "e.data",
+                    "deanag.data",
+            };
 
-        long creatTime = Long.MAX_VALUE;
-        for (String str : oldSPfiles) {
-            File file = new File(context.getCacheDir().getParent() + "/shared_prefs/", str);
-            if (file.exists() && file.isFile()) {
-                long cTime = FileUitls.getInstance(context).getCreateTime(file);
-                if (cTime == 0) {
-                    cTime = file.lastModified();
+            Long creatTime = null;
+            for (String str : oldSPfiles) {
+                File file = new File(context.getCacheDir().getParent() + "/shared_prefs/", str);
+                if (file.exists() && file.isFile()) {
+                    long cTime = FileUitls.getInstance(context).getCreateTime(file);
+                    if (cTime == 0) {
+                        cTime = file.lastModified();
+                    }
+                    if (creatTime == null) {
+                        creatTime = cTime;
+                    } else {
+                        creatTime = Math.min(cTime, creatTime);
+                    }
                 }
-                creatTime = Math.min(cTime, creatTime);
             }
-        }
-        for (String str : oldSQLfiles) {
-            File file = context.getDatabasePath(str);
-            if (file.exists() && file.isFile()) {
-                long cTime = FileUitls.getInstance(context).getCreateTime(file);
-                if (cTime == 0) {
-                    cTime = file.lastModified();
+            for (String str : oldSQLfiles) {
+                File file = context.getDatabasePath(str);
+                if (file.exists() && file.isFile()) {
+                    long cTime = FileUitls.getInstance(context).getCreateTime(file);
+                    if (cTime == 0) {
+                        cTime = file.lastModified();
+                    }
+                    if (creatTime == null) {
+                        creatTime = cTime;
+                    } else {
+                        creatTime = Math.min(cTime, creatTime);
+                    }
                 }
-                creatTime = Math.min(cTime, creatTime);
             }
+            if (creatTime == null) {
+                creatTime = (long) -1;
+            }
+            SPHelper.setLongValue2SP(context, EGContext.SP_INSTALL_TIME, creatTime);
+        } catch (Throwable e) {
         }
-
-        SPHelper.setLongValue2SP(context, EGContext.SP_INSTALL_TIME, creatTime);
     }
 
     /**

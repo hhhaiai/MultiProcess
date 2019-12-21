@@ -158,10 +158,13 @@ public class ReceiverImpl {
     private void stopAndClearData(Context context, boolean isInLoop, boolean isStopLoop) {
         try {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "被动初始化调试设备 清除数据");
+                ELOG.d(BuildConfig.tag_cutoff, "[清除数据]");
             }
 
             if (isStopLoop) {
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.d(BuildConfig.tag_cutoff, "[停止轮训]");
+                }
                 MessageDispatcher.getInstance(context).quit();
             }
 
