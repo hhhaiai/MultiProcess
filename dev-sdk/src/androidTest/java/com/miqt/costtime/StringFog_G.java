@@ -1,8 +1,11 @@
 package com.miqt.costtime;
 
 import com.analysys.track.BuildConfig;
+import com.analysys.track.internal.content.EGContext;
 
-import java.io.UnsupportedEncodingException;
+import org.json.JSONObject;
+import org.junit.Test;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,26 +48,22 @@ public class StringFog_G {
 
 
         public String g() {
-            StringBuilder builder = new StringBuilder();
-            for (String item : FOG.hset.keySet()
-            ) {
-                try {
-                    String byteS = Arrays.toString(FOG.xor(item.getBytes("utf-8"), BuildConfig.SDK_VERSION));
-                    builder
-                            .append("hset.put(\"")
-                            .append(FOG.hset.get(item))
-                            .append("\",")
-                            .append("new byte[]{")
-                            .append(byteS.substring(1, byteS.length() - 1))
-                            .append("});\n");
-                    builder.toString();
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+            String fog = null;
+            try {
+                JSONObject obj = new JSONObject();
+                for (String item : FOG.hset.keySet()
+                ) {
+                    obj.putOpt(hset.get(item), item);
                 }
+
+                String s = obj.toString();
+                String byteS = Arrays.toString(xor(s.getBytes("utf-8"), BuildConfig.SDK_VERSION));
+
+                fog = "private static final byte[] bs= new byte[]{" + byteS.substring(1, byteS.length() - 1) + "};";
+                System.out.println(fog);
+            } catch (Throwable e) {
             }
-
-
-            return builder.toString();
+            return fog;
         }
 
         private byte[] xor(byte[] data, String key) {
