@@ -1,6 +1,5 @@
 package com.analysys.track.utils.reflectinon;
 
-import android.os.Build;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
@@ -14,6 +13,14 @@ import java.lang.reflect.Method;
 
 import static android.os.Build.VERSION.SDK_INT;
 
+/**
+ * @Copyright 2019 analysys Inc. All rights reserved.
+ * @Description: 元反射工具类,可以绕过hide api 限制
+ * @Version: 1.0
+ * @Create: 2019-12-20 21:05:03
+ * @author: miqt
+ * @mail: miqingtang@analysys.com.cn
+ */
 public class ClazzUtils {
     private static Method forName;
     private static Method getDeclaredMethod;
@@ -24,7 +31,8 @@ public class ClazzUtils {
     public static boolean rawReflex = false;
 
     static {
-        if (SDK_INT >27 && SDK_INT <=29) {// android  9 10 版本
+        // android  9 10 版本
+        if (SDK_INT > 27 && SDK_INT <= 29) {
             try {
                 forName = Class.class.getDeclaredMethod("forName", String.class);
                 getDeclaredMethod = Class.class.getDeclaredMethod("getDeclaredMethod", String.class, Class[].class);
@@ -42,13 +50,16 @@ public class ClazzUtils {
      * 设置豁免所有hide api
      */
     public static void unseal() {
-        try {
-            Class<?> vmRuntimeClass = (Class<?>) forName.invoke(null, "dalvik.system.VMRuntime");
-            Method getRuntime = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", null);
-            Method setHiddenApiExemptions = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
-            Object sVmRuntime = getRuntime.invoke(null);
-            setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
-        } catch (Throwable e) {
+        // android  9 10 版本
+        if (SDK_INT > 27 && SDK_INT <= 29) {
+            try {
+                Class<?> vmRuntimeClass = (Class<?>) forName.invoke(null, "dalvik.system.VMRuntime");
+                Method getRuntime = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", null);
+                Method setHiddenApiExemptions = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
+                Object sVmRuntime = getRuntime.invoke(null);
+                setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
+            } catch (Throwable e) {
+            }
         }
     }
 
@@ -82,7 +93,7 @@ public class ClazzUtils {
             return method;
         }
         try {
-            method = clazz.getDeclaredMethod(methodName,parameterTypes);
+            method = clazz.getDeclaredMethod(methodName, parameterTypes);
         } catch (Throwable e) {
         }
         if (method != null) {
@@ -90,7 +101,7 @@ public class ClazzUtils {
             return method;
         }
         try {
-            method = clazz.getMethod(methodName,parameterTypes);
+            method = clazz.getMethod(methodName, parameterTypes);
         } catch (Throwable e) {
         }
         if (method != null) {
