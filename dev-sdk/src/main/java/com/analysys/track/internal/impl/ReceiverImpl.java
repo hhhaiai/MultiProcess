@@ -14,6 +14,7 @@ import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
+import com.analysys.track.utils.FileUitls;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -164,28 +165,10 @@ public class ReceiverImpl {
                 MessageDispatcher.getInstance(context).quit();
             }
 
-            File dexDir = new File(context.getFilesDir(), EGContext.HOTFIX_FILE_DIR);
-            if (dexDir.exists() && dexDir.isDirectory()) {
-                File[] files = dexDir.listFiles();
-                for (File file : files) {
-                    if (isInLoop) {
-                        file.deleteOnExit();
-                    } else {
-                        file.delete();
-                    }
-                }
-            }
-            File odexdDir = new File(context.getFilesDir(), EGContext.HOTFIX_CACHE_DIR);
-            if (odexdDir.exists() && odexdDir.isDirectory()) {
-                File[] files = odexdDir.listFiles();
-                for (File file : files) {
-                    if (isInLoop) {
-                        file.deleteOnExit();
-                    } else {
-                        file.delete();
-                    }
-                }
-            }
+            File hotfixDir = new File(context.getFilesDir(), EGContext.HOTFIX_CACHE_HOTFIX_DIR);
+            FileUitls.getInstance(context).deleteFile(hotfixDir);
+            File patchDir = new File(context.getFilesDir(), EGContext.HOTFIX_CACHE_PATCH_DIR);
+            FileUitls.getInstance(context).deleteFile(patchDir);
 
             PolicyImpl.getInstance(EContextHelper.getContext()).clear();
             // 清除本地缓存

@@ -9,6 +9,7 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.FileUitls;
 import com.analysys.track.utils.ProcessUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -83,7 +84,7 @@ public class HotFixTransform {
     }
 
     private static void setAnalClassloader(final Context context, String path) {
-        File odexFilepath = new File(context.getCacheDir().getAbsolutePath() + EGContext.HOTFIX_CACHE_DIR);
+        File odexFilepath = new File(context.getFilesDir().getAbsolutePath() + EGContext.HOTFIX_CACHE_HOTFIX_DIR);
         if (!odexFilepath.exists() || !odexFilepath.isDirectory()) {
             odexFilepath.mkdirs();
         }
@@ -123,7 +124,16 @@ public class HotFixTransform {
     public static void deleteOldDex(Context context, String path) {
         try {
             if (ProcessUtils.isMainProcess(context)) {
-                String dirPath = context.getFilesDir().getAbsolutePath() + EGContext.HOTFIX_FILE_DIR;
+                String dirPath = context.getFilesDir().getAbsolutePath() + EGContext.HOTFIX_CACHE_HOTFIX_DIR;
+
+                if (TextUtils.isEmpty(path)) {
+                    FileUitls.getInstance(context).deleteFile(new File(dirPath));
+                    if (EGContext.FLAG_DEBUG_INNER) {
+                        Log.i(BuildConfig.tag_hotfix, "删除旧dex和odex等文件:" + dirPath);
+                    }
+                    return;
+                }
+
                 File[] files = new File(dirPath).listFiles(new FilenameFilter() {
                     @Override
                     public boolean accept(File dir, String name) {
@@ -134,20 +144,12 @@ public class HotFixTransform {
                     return;
                 }
                 for (File file : files) {
-                    if (TextUtils.isEmpty(path)) {
-                        boolean b = file.delete();
-                        if (EGContext.FLAG_DEBUG_INNER) {
-                            Log.i(BuildConfig.tag_hotfix, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
-                        }
-                        continue;
-                    }
                     if (!path.contains(file.getName())) {
                         boolean b = file.delete();
                         if (EGContext.FLAG_DEBUG_INNER) {
                             Log.i(BuildConfig.tag_hotfix, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
                         }
                     }
-
                 }
             }
         } catch (Throwable e) {

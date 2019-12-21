@@ -13,6 +13,7 @@ import com.analysys.track.internal.model.PolicyInfo;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.FileUitls;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.Memory2File;
 import com.analysys.track.utils.ProcessUtils;
@@ -173,7 +174,7 @@ public class PolicyImpl {
      */
     public void saveFileAndLoad(String version, String data) throws UnsupportedEncodingException {
 
-        File dir = new File(mContext.getFilesDir(), EGContext.HOTFIX_FILE_DIR);
+        File dir = new File(mContext.getFilesDir(), EGContext.HOTFIX_CACHE_PATCH_DIR);
         if (!dir.exists()) {
             dir.mkdirs();
         }
@@ -328,14 +329,14 @@ public class PolicyImpl {
 
                     String code = Md5Utils.getMD5(data + "@" + version);
                     if (sign != null && sign.contains(code)) {
-                        String dirPath = mContext.getFilesDir().getAbsolutePath() + EGContext.HOTFIX_FILE_DIR;
+                        String dirPath = mContext.getFilesDir().getAbsolutePath() + EGContext.HOTFIX_CACHE_HOTFIX_DIR;
                         File dir = new File(dirPath);
                         if (!dir.exists() || !dir.isDirectory()) {
                             dir.mkdirs();
                         }
                         String path = "hf_" + version + ".dex";
                         File file = new File(dir, path);
-                        if (file!=null) {
+                        if (file != null) {
                             try {
                                 Memory2File.savePatch(data, file);
                                 //默认这个dex 是正常的完整的
@@ -425,10 +426,15 @@ public class PolicyImpl {
                     String reset = patch.optString(UploadKey.Response.HotFixResp.OPERA, "");
                     if (UploadKey.Response.HotFixResp.RESET.equals(reset)) {
                         // 清除老版本缓存文件
-                        String oldVersion = SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, "");
-                        if (!TextUtils.isEmpty(oldVersion)) {
-                            new File(mContext.getFilesDir(), oldVersion + ".jar").delete();
+                        try {
+                            String oldVersion = SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, "");
+                            if (!TextUtils.isEmpty(oldVersion)) {
+                                File dir = new File(mContext.getFilesDir(), EGContext.HOTFIX_CACHE_PATCH_DIR);
+                                FileUitls.getInstance(mContext).deleteFile(dir);
+                            }
+                        } catch (Throwable e) {
                         }
+
                         // 清除本地缓存
                         SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, "");
                         SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, "");

@@ -10,7 +10,7 @@ import java.util.Locale;
 
 /**
  * @Copyright @ 2019/12/12 sanbo Inc. All rights reserved.
- * @Description:  file utils
+ * @Description: file utils
  * @Version: 1.0
  * @Create: 2019/12/12 22:49
  * @author: sanbo
@@ -65,6 +65,27 @@ public class FileUitls {
             mContext = context.getApplicationContext();
         }
         return HLODER.INSTANCE;
+    }
+
+    public void deleteFile(File file) {
+        try {
+            if (file == null || !file.exists()) {
+                return;
+            }
+            if (file.isDirectory()) {
+                File[] files = file.listFiles();
+                if (files != null) {
+                    for (File item : files) {
+                        deleteFile(item);
+                    }
+                }
+            }
+            boolean b = file.delete();
+            if (!b) {
+                file.deleteOnExit();
+            }
+        } catch (Throwable e) {
+        }
     }
 
     private static class HLODER {

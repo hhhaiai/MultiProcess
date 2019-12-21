@@ -160,7 +160,7 @@ public class PatchHelper {
             //1. get DexClassLoader
             // need hide ClassLoader
             Class[] types = new Class[]{String.class, String.class, String.class, ClassLoader.class};
-            File odexFilepath = new File(context.getCacheDir().getAbsolutePath() + EGContext.HOTFIX_CACHE_DIR);
+            File odexFilepath = new File(context.getFilesDir().getAbsolutePath() + EGContext.HOTFIX_CACHE_PATCH_DIR);
             if (!odexFilepath.exists() || !odexFilepath.isDirectory()) {
                 odexFilepath.mkdirs();
             }
