@@ -66,9 +66,9 @@ public class SystemUtils {
         } catch (IllegalArgumentException e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
-            }
-            return false;
         }
+        }
+        return false;
     }
 
 

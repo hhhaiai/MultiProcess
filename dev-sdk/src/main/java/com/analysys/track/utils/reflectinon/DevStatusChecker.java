@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.lang.reflect.Field;
 import java.net.NetworkInterface;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -47,7 +48,9 @@ import java.util.Set;
  */
 public class DevStatusChecker {
 
-    private Boolean isDebug;
+    //    private Boolean isDebug;
+    private int debugStatus = -1;
+    private int fixTimeStatus = -1;
 
     private DevStatusChecker() {
     }
@@ -62,11 +65,13 @@ public class DevStatusChecker {
         if (!BuildConfig.STRICTMODE) {
             return false;
         }
-        //如果是 本次一直是,如果不是 判断是不是
-        if (isDebug == null || !isDebug) {
-            isDebug = isDebug(context);
+
+        if (debugStatus == 1) {
+            return true;
+        } else {
+            debugStatus = isDebug(context) ? 1 : 0;
         }
-        return isDebug;
+        return debugStatus == 1 ? true : false;
     }
 
     /**
@@ -82,235 +87,173 @@ public class DevStatusChecker {
 
         context = EContextHelper.getContext();
 
-        // 14. 开发者模式
-        if (isDeveloperMode(context)) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "开发者模式");
-            }
-            return true;
-        }
-
-        // 3. app是debug的
-        if (isSelfDebugApp(context)) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "app是debug的");
-            }
-            return true;
-        }
-
-        // 5. 是否有root
-        if (SystemUtils.isRooted()) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "是否有root");
-            }
-            return true;
-        }
-
-        // 6. USB调试模式
-        if (isUSBDebug(context)) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "USB调试模式");
-            }
-            return true;
-        }
-        // 7. StrictMode，无单独判断的方法.跟随app的debug状态判断进行
-
-        // 8. 网络判断
+        // 1. 抓包[VPN/系统代理]
         if ((isProxy(context) || isVpn())) {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "网络判断");
+                ELOG.e(BuildConfig.tag_cutoff, "抓包判断，命中目标");
             }
             return true;
         }
 
-
-        // 10. USB状态
-        if (EGContext.STATUS_USB_DEBUG) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "USB状态");
-            }
-            return true;
-        }
-
-
-        // 12. 是否被HOOK
+        // 2. hook检测
         if (isHook(context)) {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "是否被HOOK");
+                ELOG.e(BuildConfig.tag_cutoff, "HOOK检测，命中目标");
             }
             return true;
         }
 
-
-        if (isSimulator(context)) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "模拟器识别");
-            }
-            return true;
-        }
-
-
-        // 2. 设备是debug的
+        // 3. debug rom检测
         if (isDebugRom()) {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "设备是debug的");
+                ELOG.e(BuildConfig.tag_cutoff, "debug rom检测，命中目标");
             }
             return true;
         }
+
+        // 4. 开发者模式
+        if (isDeveloperMode(context)) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(BuildConfig.tag_cutoff, "开发者模式，命中目标");
+            }
+            return true;
+        }
+        // 5. USB调试模式
+        if (isUSBDebug(context)) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(BuildConfig.tag_cutoff, "USB调试模式，命中目标");
+            }
+            return true;
+        }
+        // 6. USB状态
+        if (EGContext.STATUS_USB_DEBUG) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(BuildConfig.tag_cutoff, "USB状态，命中目标");
+            }
+            return true;
+        }
+
+        // 7. 宿主debug判断
+        if (isSelfDebugApp(context)) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(BuildConfig.tag_cutoff, "宿主debug判断，命中目标");
+            }
+            return true;
+        }
+
+
+        if (fixTimeStatus != -1) {
+            return fixTimeStatus == 1 ? true : false;
+        } else {
+            // 8. Root检测
+            if (SystemUtils.isRooted()) {
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.e(BuildConfig.tag_cutoff, "Root检测，命中目标");
+                }
+                fixTimeStatus = 1;
+                return true;
+            }
+            fixTimeStatus = 0;
+            // 9. 模拟器识别
+            if (isSimulator(context)) {
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.e(BuildConfig.tag_cutoff, "模拟器识别，命中目标");
+                }
+                fixTimeStatus = 1;
+                return true;
+            }
+            fixTimeStatus = 0;
+            // 10. 容器运行
+            if (isWorkInContainer(context)) {
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.e(BuildConfig.tag_cutoff, "容器运行，命中目标");
+                }
+                fixTimeStatus = 1;
+                return true;
+            }
+            fixTimeStatus = 0;
+        }
+
+
+
+
+        // 11.手机证书检测[是否安装三方证书]
         return false;
     }
 
     /**
-     * 可疑设备打分
+     * 是否在容器运行
      *
      * @param context
-     * @return 分值 0 - 10 可能大于10  建议大于6分是可疑设备 , 大于10分一定是可疑设备 30分以上,直接停止工作
+     * @return
      */
-    public int devScore(Context context) {
-        if (!BuildConfig.STRICTMODE) {
-            return 0;
+    private boolean isWorkInContainer(Context context) {
+        String pkgName = context.getPackageName();
+        //1. 安装列表不包含自己,肯定不行
+        if (!SystemUtils.hasPackageNameInstalled(context, pkgName)) {
+            return true;
         }
-        context = EContextHelper.getContext();
-        int score = 0;
-        //region ★★★★★ 2.1、调试状态识别
-        //        2.1.1. 正在被抓包 – 检测VPN
-        if (isVpn()) {
-            score += 10;
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "isVpn");
+        // 2. /data/data/pkg/files
+        //   /data/user/0/pkg/files
+        // 下面代码兼容性文件比较严重，小米双开无法识别
+//        String fPath = context.getFilesDir().getAbsolutePath();
+//        L.i("file path:" + fPath);
+//        if (!fPath.startsWith("/data/data/" + pkgName + "/")
+//                && !fPath.startsWith("/data/user/0/" + pkgName + "/")
+//        ) {
+//            return true;
+//        }
+        // 3. 遍历文件夹
+        try {
+            File dir = new File("/data/data/" + pkgName + "/files");
+            if (dir.exists()) {
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.i("容器运行检测: " + dir.exists() + "----文件个数:" + dir.list().length + "-------->" + Arrays.asList(dir.list()));
+                }
+            } else {
+                dir.mkdirs();
             }
-            return score;
-        }
-//        2.1.2. 网络设置代理 – 检测wifi代理对象
-        if (isProxy(context)) {
-            score += 10;
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "isProxy");
+            if (!dir.exists()) {
+                return true;
             }
-            return score;
-        }
-//        2.1.3. HOOK检测
-        if (isHook(context)) {
-            score += 10;
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "isHook");
+            File temp = new File(dir, "test");
+            if (!temp.exists()) {
+                boolean result = temp.createNewFile();
+                if (!result) {
+                    return true;
+                }
             }
-            return score;
-        }
-//        2.1.4.  //todo 手机证书检测—三方安装证书[需要调研]
-//        2.1.5. 开发者模式
-        if (isDeveloperMode(context)) {
-            score += 10;
+        } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "isDeveloperMode");
+                ELOG.e(e);
             }
-            return score;
         }
-//        2.1.6. USB调试
-        if (isUSBDebug(context)) {
-            score += 10;
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "isUSBDebug");
-            }
-            return score;
-        }
-        //endregion
-        //region ★★★☆☆ 2.3、不安全设备识别
-        //        2.3.1. root设备     4分
-        if (SystemUtils.isRooted()) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "isRooted");
-            }
-            score += 4;
-        }
-//        2.3.2. //todo 容器运行 [特征需要增加]     3分
-//        2.3.3. 模拟器 [针对国内部分游戏玩家使用的就是模拟器，这项需要组合其他选项来使用]  3分
-        if (isSimulator(context)) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "isSimulator");
-            }
-            score += 3;
-        }
-//        2.3.4. 有线设备  2分
-        String shellProp = ShellUtils.shell("getprop");
-        String buildProp = SystemUtils.getContentFromFile("/system/build.prop");
-        if (hasEmulatorWifi(shellProp, buildProp) || hasEth0Interface()) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "hasEmulatorWifi");
-            }
-            score += 2;
-        }
-//        2.3.5. 设备里安装调试app数量 2分
-        if (hasDebugApp(context)) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "hasDebugApp");
-            }
-            score += 2;
-        }
-//        2.3.6. 自己的app是否为调试app 2分
-        if (isSelfDebugApp(context)) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "isSelfDebugApp");
-            }
-            score += 2;
-        }
-//        2.3.7. 是否为monkey模式  1分
-        if (isUserAMonkey()) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "isUserAMonkey");
-            }
-            score += 1;
-        }
-//        2.3.8. 是否为调试模式  [Debug.isDebuggerConnected] 1分
-        if (Debug.isDebuggerConnected()) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "isDebuggerConnected");
-            }
-            score += 1;
-        }
-//        2.3.9. 没有摄像头 1分
-        if (!hasCamera(context)) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "hasCamera");
-            }
-            score += 1;
-        }
-//        2.3.10.//todo 没有蓝牙   1分
-//        2.3.11. 没有光传感器  1分
-        if (!isSupportLightSensor(context)) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "isSupportLightSensor");
-            }
-            score += 1;
-        }
-//        2.3.12. 没有解锁密码  1分
-        if (!isLockP(context)) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "isLockP");
-            }
-            score += 1;
-        }
-        // 2.3.13. 设备是debug的  1分
-        if (isDebugRom()) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "isDebugRom");
-            }
-            score += 1;
-        }
-        //  2.3.13.. USB状态
-        if (EGContext.STATUS_USB_DEBUG) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "STATUS_USB_DEBUG");
-            }
-            score += 1;
-        }
-        //endregion
 
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.e(BuildConfig.tag_cutoff, "可疑设备评分->[" + score + "]");
+        // 4. 通过shell ps获取对应进程信息，理论上只有自己的包名和和子进程的。 必须包含自己包名
+        try {
+            String psInfo = ShellUtils.shell("ps");
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i("容器运行检测 shell ps: " + psInfo);
+            }
+            if (!TextUtils.isEmpty(psInfo) && !psInfo.contains(pkgName)) {
+                return true;
+            }
+        } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
         }
-        return score;
+
+
+//        // 5. pid check /proc/pid/cmdline
+//        int pid = android.os.Process.myPid();
+//        L.e("pid:" + pid);
+        // 6. classloader name check failed
+//        L.i("----------->" + getClass().getClassLoader().getClass().getName());
+//        L.i("---+++++++-->" + context.getClassLoader().getClass().getName());
+        return false;
     }
+
 
     private boolean isSupportLightSensor(Context context) {
         if (context == null) {
@@ -729,6 +672,158 @@ public class DevStatusChecker {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 可疑设备打分
+     *
+     * @param context
+     * @return 分值 0 - 10 可能大于10  建议大于6分是可疑设备 , 大于10分一定是可疑设备 30分以上,直接停止工作
+     */
+    public int devScore(Context context) {
+        if (!BuildConfig.STRICTMODE) {
+            return 0;
+        }
+        context = EContextHelper.getContext();
+        int score = 0;
+        //region ★★★★★ 2.1、调试状态识别
+        //        2.1.1. 正在被抓包 – 检测VPN
+        if (isVpn()) {
+            score += 10;
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "isVpn");
+            }
+            return score;
+        }
+//        2.1.2. 网络设置代理 – 检测wifi代理对象
+        if (isProxy(context)) {
+            score += 10;
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "isProxy");
+            }
+            return score;
+        }
+//        2.1.3. HOOK检测
+        if (isHook(context)) {
+            score += 10;
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "isHook");
+            }
+            return score;
+        }
+//        2.1.4.  //todo 手机证书检测—三方安装证书[需要调研]
+//        2.1.5. 开发者模式
+        if (isDeveloperMode(context)) {
+            score += 10;
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "isDeveloperMode");
+            }
+            return score;
+        }
+//        2.1.6. USB调试
+        if (isUSBDebug(context)) {
+            score += 10;
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "isUSBDebug");
+            }
+            return score;
+        }
+        //endregion
+        //region ★★★☆☆ 2.3、不安全设备识别
+        //        2.3.1. root设备     4分
+        if (SystemUtils.isRooted()) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "isRooted");
+            }
+            score += 4;
+        }
+//        2.3.2. //todo 容器运行 [特征需要增加]     3分
+//        2.3.3. 模拟器 [针对国内部分游戏玩家使用的就是模拟器，这项需要组合其他选项来使用]  3分
+        if (isSimulator(context)) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "isSimulator");
+            }
+            score += 3;
+        }
+//        2.3.4. 有线设备  2分
+        String shellProp = ShellUtils.shell("getprop");
+        String buildProp = SystemUtils.getContentFromFile("/system/build.prop");
+        if (hasEmulatorWifi(shellProp, buildProp) || hasEth0Interface()) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "hasEmulatorWifi");
+            }
+            score += 2;
+        }
+//        2.3.5. 设备里安装调试app数量 2分
+        if (hasDebugApp(context)) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "hasDebugApp");
+            }
+            score += 2;
+        }
+//        2.3.6. 自己的app是否为调试app 2分
+        if (isSelfDebugApp(context)) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "isSelfDebugApp");
+            }
+            score += 2;
+        }
+//        2.3.7. 是否为monkey模式  1分
+        if (isUserAMonkey()) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "isUserAMonkey");
+            }
+            score += 1;
+        }
+//        2.3.8. 是否为调试模式  [Debug.isDebuggerConnected] 1分
+        if (Debug.isDebuggerConnected()) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "isDebuggerConnected");
+            }
+            score += 1;
+        }
+//        2.3.9. 没有摄像头 1分
+        if (!hasCamera(context)) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "hasCamera");
+            }
+            score += 1;
+        }
+//        2.3.10.//todo 没有蓝牙   1分
+//        2.3.11. 没有光传感器  1分
+        if (!isSupportLightSensor(context)) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "isSupportLightSensor");
+            }
+            score += 1;
+        }
+//        2.3.12. 没有解锁密码  1分
+        if (!isLockP(context)) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "isLockP");
+            }
+            score += 1;
+        }
+        // 2.3.13. 设备是debug的  1分
+        if (isDebugRom()) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "isDebugRom");
+            }
+            score += 1;
+        }
+        //  2.3.13.. USB状态
+        if (EGContext.STATUS_USB_DEBUG) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d(BuildConfig.tag_cutoff, "STATUS_USB_DEBUG");
+            }
+            score += 1;
+        }
+        //endregion
+
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.e(BuildConfig.tag_cutoff, "可疑设备评分->[" + score + "]");
+        }
+        return score;
     }
 
     private static class HOLDER {
