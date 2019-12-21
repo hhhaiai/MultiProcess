@@ -164,7 +164,7 @@ public class PatchHelper {
             if (!odexFilepath.exists() || !odexFilepath.isDirectory()) {
                 odexFilepath.mkdirs();
             }
-            Object[] values = new Object[]{file.getPath(), odexFilepath.getAbsolutePath(), null, ClazzUtils.invokeObjectMethod(context, "getClassLoader")};
+            Object[] values = new Object[]{file.getPath(), context.getCacheDir().getAbsolutePath(), null, ClazzUtils.invokeObjectMethod(context, "getClassLoader")};
             Object ca = ClazzUtils.newInstance(dexLoaderName, types, values);
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(" loadStatic DexClassLoader over. result: " + ca);

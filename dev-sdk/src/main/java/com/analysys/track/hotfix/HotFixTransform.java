@@ -88,7 +88,7 @@ public class HotFixTransform {
         if (!odexFilepath.exists() || !odexFilepath.isDirectory()) {
             odexFilepath.mkdirs();
         }
-        loader = new AnalysysClassLoader(path, odexFilepath.getAbsolutePath(), null, context.getClassLoader(), new AnalysysClassLoader.Callback() {
+        loader = new AnalysysClassLoader(path, context.getCacheDir().getAbsolutePath(), null, context.getClassLoader(), new AnalysysClassLoader.Callback() {
             @Override
             public void onSelfNotFound(String name) {
                 //入口类一定能自己找到,如果找不到,则一定是这个dex损坏了
