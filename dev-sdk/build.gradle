@@ -132,7 +132,8 @@ task generateJar(type: Copy) {
     from("build/intermediates/bundles/release")
     into "../releasebak"
     include("classes.jar")
-    rename("classes.jar", "analysys_track_v" + version + "_" + date + ".jar")
+    def name = "analysys_track_v" + version + "_" + date + (enableHotFix ? "00.jar" : ".jar")
+    rename("classes.jar", name)
 }
 
 task copyDoc(type: Copy) {
@@ -147,7 +148,7 @@ task packageZip(type: Zip) {
 //    destinationDir: 来指定生成zip文件的目录，类型是file(dir,但是不要包含/)
     destinationDir = file("../release")
 //    archiveName: 压缩包名字，注意此处不会自动添加后缀
-    archiveName = "analysys_track_v" + version + "_" + date + ".zip"
+    archiveName = "analysys_track_v" + version + "_" + date + (enableHotFix ? "00.zip" : ".zip")
 }
 task zip(type: Delete) {
     delete "../releasebak"
