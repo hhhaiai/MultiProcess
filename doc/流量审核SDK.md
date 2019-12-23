@@ -105,8 +105,6 @@
 
 ### 3. 初始化接口
 
-#### 3.1. 初始化接口
-
 ``` java
 AnalysysTracker.init(Context context, String appkey,  String channel);
 ```
@@ -120,23 +118,13 @@ AnalysysTracker.init(Context context, String appkey,  String channel);
 * 调用方法
 
 ``` java
-AnalysysTracker.init(context,"appkey","my-channel");
+AnalysysTracker.init(context,"appkey","channel");
 ```
 
 * 备注
 
 需要在应用的自定义的Application类的onCreate函数里面调用。appkey允许xml设置和代码设置两种方式，当两种都设置时，优先级`代码设置appkey`优先级高于`XML设置appkey`
 
-
-#### 3.2. 设置debug模式
-
-``` java
-AnalysysTracker.setDebugMode(Context context, boolean isDebug);
-```
-* 参数
-    
-    * **context**: android上下文
-    * **isDebug**: 调试模式。上线设置成false. 否则上传数据地址为测试地址
 
 ### 4. 混淆保护
 
