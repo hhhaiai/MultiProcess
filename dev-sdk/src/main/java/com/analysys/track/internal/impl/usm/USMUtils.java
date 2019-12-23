@@ -66,6 +66,9 @@ public class USMUtils {
 
     public static Object getUsageEvents(long beginTime, long endTime, Context context) {
         try {
+            if (context.getApplicationInfo().targetSdkVersion > 27 || Build.VERSION.SDK_INT > 27) {
+                return null;
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Object usageEvents;
                 usageEvents = getUsageEventsByApi(beginTime, endTime, context);
@@ -99,6 +102,9 @@ public class USMUtils {
 
     public static Object getUsageEventsByInvoke(long beginTime, long endTime, Context context) {
         try {
+            if (context.getApplicationInfo().targetSdkVersion > 27 || Build.VERSION.SDK_INT > 27) {
+                return null;
+            }
             if (endTime <= beginTime) {
                 return null;
             }
