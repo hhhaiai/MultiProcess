@@ -2,9 +2,11 @@
 
 ## 版本变动
 
-* **版本号**: `4.3.0.5|20191121`
+* **版本号**: `4.3.0.6|20191213`
 * **版本变动**:
-        1. 优化部分功能
+
+    1. 解决已知问题
+    2. 优化性能
 
 
 ### 1. 拷贝jar到对应项目中.
@@ -111,7 +113,7 @@ AnalysysTracker.init(Context context, String appkey,  String channel);
 
 * 参数
 
-    * **Context**: 上下文
+    * **Context**: android上下文
     * **appkey**: 为添加应用后获取到的AppKey
     * **channel**: 应用的下载渠道ID
 
@@ -129,10 +131,11 @@ AnalysysTracker.init(context,"appkey","my-channel");
 #### 3.2. 设置debug模式
 
 ``` java
-AnalysysTracker.setDebugMode( boolean isDebug);
+AnalysysTracker.setDebugMode(Context context, boolean isDebug);
 ```
 * 参数
-
+    
+    * **context**: android上下文
     * **isDebug**: 调试模式。上线设置成false. 否则上传数据地址为测试地址
 
 ### 4. 混淆保护
@@ -146,7 +149,8 @@ AnalysysTracker.setDebugMode( boolean isDebug);
 }
 -dontwarn com.analysys.track.**
 ```
-如果您集成了[MSA SDK](http://www.msa-alliance.cn)还需要添加以下混淆.如果已添请忽略无需重复添加.
+
+android 10可以获取的有效ID减少，为解决该问题可以集成了[MSA SDK](http://www.msa-alliance.cn)。 如您已经集成，需要添加以下防混淆配置:
 ```
 -keep class com.bun.miitmdid.core.** {*;}
 ```

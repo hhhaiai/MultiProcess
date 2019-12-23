@@ -293,7 +293,7 @@ public class EGContext {
     // 位置日志打印
     public static final boolean DEBUG_LOCATION = false || BuildConfig.logcat;
     // 执行上传URL控制
-    public static final boolean DEBUG_URL = false;
+    public static final boolean DEBUG_URL = BuildConfig.DEBUG_URL;
 //    // 策略短路，能下发
 //    public static final boolean DEBUG_POLICY = true;
 }
