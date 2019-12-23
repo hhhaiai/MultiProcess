@@ -52,13 +52,13 @@ public class StringFog {
             try {
                 String result = FileUitls.getInstance(null).getString(data, bs);
                 if (EGContext.FLAG_DEBUG_INNER) {
-                    Log.d(BuildConfig.tag_stringfog, "[key=" + key + "][" + data + "]-->[" + result + "]");
+                    Log.d(BuildConfig.tag_stringfog + "1", "[key=" + key + "][" + data + "]-->[" + result + "]");
                 }
                 return result;
             } catch (Throwable e) {
             }
             if (EGContext.FLAG_DEBUG_INNER) {
-                Log.d(BuildConfig.tag_stringfog, "[key=" + key + "][" + data + "]-->[" + null + "]");
+                Log.d(BuildConfig.tag_stringfog + "1", "[key=" + key + "][" + data + "]-->[" + null + "]");
             }
             return "";
         }

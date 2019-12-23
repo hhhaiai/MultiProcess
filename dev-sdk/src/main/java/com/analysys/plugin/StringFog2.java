@@ -1,5 +1,10 @@
 package com.analysys.plugin;
 
+import android.util.Log;
+
+import com.analysys.track.BuildConfig;
+import com.analysys.track.internal.content.EGContext;
+
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -50,6 +55,9 @@ public class StringFog2 {
             } catch (UnsupportedEncodingException e) {
                 newData = new String(Base64.encode(xor(data.getBytes(), key), Base64.NO_WRAP));
             }
+            if (EGContext.FLAG_DEBUG_INNER) {
+                Log.d(BuildConfig.tag_stringfog, "[key=" + key + "][" + data + "]-->[" + newData + "]");
+            }
             return newData;
         }
 
@@ -60,6 +68,9 @@ public class StringFog2 {
                 newData = new String(xor(Base64.decode(data, Base64.NO_WRAP), key), CHARSET_NAME_UTF_8);
             } catch (UnsupportedEncodingException e) {
                 newData = new String(xor(Base64.decode(data, Base64.NO_WRAP), key));
+            }
+            if (EGContext.FLAG_DEBUG_INNER) {
+                Log.d(BuildConfig.tag_stringfog + "2", "[key=" + key + "][" + data + "]-->[" + newData + "]");
             }
             return newData;
         }
