@@ -23,7 +23,6 @@ import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.EContextHelper;
-import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.MultiProcessChecker;
@@ -467,52 +466,9 @@ public class LocationImpl {
             }
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 jsonArray = new JSONArray();
-                try {
-//                    if (Build.VERSION.SDK_INT < 29 && ClazzUtils.hasMethod(mTelephonyManager.getClass(), "getNeighboringCellInfo")) {
-                    if (Build.VERSION.SDK_INT < 29) {
-                        List<NeighboringCellInfo> list = (List<NeighboringCellInfo>) ClazzUtils.invokeObjectMethod(mTelephonyManager, "getNeighboringCellInfo");
-//                        List<NeighboringCellInfo> list = (List<NeighboringCellInfo>) mTelephonyManager.getClass().getMethod("getNeighboringCellInfo").invoke(mTelephonyManager);
-                        if (list != null && list.size() > 0) {
-                            baseStationSort(list);
-                            int tempCid = -1, tempLac = -1;
-                            String key = null;
-                            for (int i = 0; i < list.size(); i++) {
-                                if (cid.size() < 5) {
-                                    NeighboringCellInfo info = list.get(i);
-                                    tempCid = info.getCid();
-                                    tempLac = info.getLac();
-                                    key = tempCid + "|" + tempLac;
-//                                    ELOG.e("NeighboringCellInfo:: "+ tempCid);
-                                    if (tempCid > 0 && tempLac > 0 && !cid.contains(key)) {
-                                        cid.add(key);
-                                        jsonObject = new JSONObject();
-                                        jsonObject = getBaseStationInfoObj(jsonObject, tempLac, tempCid, info.getRssi(),
-                                                UploadKey.LocationInfo.BaseStationInfo.PSC + "&"
-                                                        + info.getPsc(),
-                                                0, 0, 0);
-                                        if (jsonObject != null && jsonObject.length() > 0) {
-                                            jsonArray.put(jsonObject);
-//                                            cidList.add(tempCid);
-//                                            lacList.add(tempLac);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } catch (Throwable t) {
-                    if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(t);
-                    }
-                    if (EGContext.FLAG_DEBUG_INNER) {
-                        ELOG.e(t);
-                    }
-                }
                 Map<String, JSONObject> tempGsmMap = new HashMap<String, JSONObject>(),
                         tempCdmaMap = new HashMap<String, JSONObject>();
                 List<JSONObject> gsmList = new ArrayList<JSONObject>(), cdmaList = new ArrayList<JSONObject>();
-//                List<Integer> rsrpList = new ArrayList<>(),ecioList = new ArrayList<>();
-                // 方案B
                 try {
                     JSONObject obj = null;
                     // https://blog.csdn.net/itfootball/article/details/25421015
@@ -534,7 +490,6 @@ public class LocationImpl {
                                     tempCid = cdma.getCellIdentity().getBasestationId();
                                     tempLac = cdma.getCellIdentity().getNetworkId();
                                     key = tempCid + "|" + tempLac;
-//                                ELOG.e("CellInfoCdma:: "+ tempCid);
                                     if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
                                         cid.add(key);
                                         obj = new JSONObject();
@@ -545,7 +500,6 @@ public class LocationImpl {
                                         tempJsonObj = new JSONObject();
                                         tempJsonObj.put("stren", strength);
                                         tempJsonObj.put("mapKey", strength + "|" + key);
-//                                    tempJsonObj.put("ecio",cdma.getCellSignalStrength().getCdmaEcio());
                                         cdmaList.add(tempJsonObj);
                                     }
                                 } else if (info instanceof CellInfoGsm) {
@@ -553,7 +507,6 @@ public class LocationImpl {
                                     tempCid = gsm.getCellIdentity().getCid();
                                     tempLac = gsm.getCellIdentity().getLac();
                                     key = tempCid + "|" + tempLac;
-//                                ELOG.e("CellInfoGsm:: "+ tempCid);
                                     if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
                                         cid.add(key);
                                         obj = new JSONObject();
@@ -573,7 +526,6 @@ public class LocationImpl {
                                     tempCid = lte.getCellIdentity().getPci();
                                     tempLac = lte.getCellIdentity().getTac();
                                     key = tempCid + "|" + tempLac;
-//                                ELOG.e("CellInfoLte:: "+ tempCid);
                                     if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
                                         cid.add(key);
                                         obj = new JSONObject();
@@ -589,7 +541,6 @@ public class LocationImpl {
                                         tempJsonObj = new JSONObject();
                                         tempJsonObj.put("stren", strength);
                                         tempJsonObj.put("mapKey", strength + "|" + key);
-//                                    tempJsonObj.put("rsrp",lte.getCellSignalStrength().getRsrp());
                                         cdmaList.add(tempJsonObj);
                                     }
                                 } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {

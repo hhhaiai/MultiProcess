@@ -33,6 +33,7 @@ import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.OAIDHelper;
 import com.analysys.track.utils.PermissionUtils;
+import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -103,17 +104,8 @@ public class DeviceImpl {
         String bluetoothMacAddress = DEFALT_MAC;
         try {
 
-            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            if (android.os.Build.VERSION.SDK_INT >= 23) {
-                if (!PermissionUtils.checkPermission(context, Manifest.permission.BLUETOOTH)) {
-                    return bluetoothMacAddress;
-                }
-                Object btManagerService = ClazzUtils.getObjectFieldObject(bluetoothAdapter, "mService");
-                if (btManagerService != null) {
-                    bluetoothMacAddress = (String) ClazzUtils.invokeObjectMethod(btManagerService, "getAddress");
-                }
-            }
-            if (TextUtils.isEmpty(bluetoothMacAddress) || DEFALT_MAC.equals(bluetoothMacAddress)) {
+            if (PermissionUtils.checkPermission(mContext, Manifest.permission.BLUETOOTH)) {
+                BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
                 bluetoothMacAddress = bluetoothAdapter.getAddress();
             }
             if (TextUtils.isEmpty(bluetoothMacAddress) || DEFALT_MAC.equals(bluetoothMacAddress)) {
@@ -628,8 +620,7 @@ public class DeviceImpl {
      */
     public String getBluetoothName() {
         try {
-            BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-            return adapter.getName();
+            return BluetoothAdapter.getDefaultAdapter().getName();
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
