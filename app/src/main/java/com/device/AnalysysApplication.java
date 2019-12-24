@@ -5,6 +5,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.analysys.track.AnalysysTracker;
+import com.device.impls.MultiProcessWorker;
 import com.tencent.bugly.Bugly;
 import com.umeng.analytics.MobclickAgent;
 
@@ -34,7 +35,7 @@ public class AnalysysApplication extends Application {
 //                .build());
         super.onCreate();
         initAnalysys();
-        // MultiProcessWorker.runServices(this);
+        MultiProcessWorker.runServices(this);
         //  EL.init(this);
     }
 

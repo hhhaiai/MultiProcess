@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.analysys.track.utils.ProcessUtils;
 import com.device.services.MyServiceA;
 import com.device.services.MyServiceB;
 import com.device.services.MyServiceC;
@@ -19,7 +20,6 @@ import com.device.services.MyServiceL;
 import com.device.services.MyServiceM;
 import com.device.services.MyServiceN;
 import com.device.utils.MyLooper;
-import com.analysys.track.utils.ProcessUtils;
 import com.umeng.analytics.MobclickAgent;
 
 
@@ -45,16 +45,16 @@ public class MultiProcessWorker {
         context.startService(new Intent(context, MyServiceB.class));
         context.startService(new Intent(context, MyServiceC.class));
         context.startService(new Intent(context, MyServiceD.class));
-        context.startService(new Intent(context, MyServiceE.class));
-        context.startService(new Intent(context, MyServiceF.class));
-        context.startService(new Intent(context, MyServiceG.class));
-        context.startService(new Intent(context, MyServiceH.class));
-        context.startService(new Intent(context, MyServiceI.class));
-        context.startService(new Intent(context, MyServiceJ.class));
-        context.startService(new Intent(context, MyServiceK.class));
-        context.startService(new Intent(context, MyServiceL.class));
-        context.startService(new Intent(context, MyServiceM.class));
-        context.startService(new Intent(context, MyServiceN.class));
+//        context.startService(new Intent(context, MyServiceE.class));
+//        context.startService(new Intent(context, MyServiceF.class));
+//        context.startService(new Intent(context, MyServiceG.class));
+//        context.startService(new Intent(context, MyServiceH.class));
+//        context.startService(new Intent(context, MyServiceI.class));
+//        context.startService(new Intent(context, MyServiceJ.class));
+//        context.startService(new Intent(context, MyServiceK.class));
+//        context.startService(new Intent(context, MyServiceL.class));
+//        context.startService(new Intent(context, MyServiceM.class));
+//        context.startService(new Intent(context, MyServiceN.class));
     }
 
     /**

@@ -110,24 +110,22 @@ public class MultiProcessChecker {
 //                    ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----setLockLastModifyTime-----set  success-----");
 //                }
 
-                // TODO 实测lastModified时间可能与time不一样，删除判断待确认
-//                if (dev.lastModified() == time) {
+                if (dev.lastModified() == time) {
 //                    if (EGContext.FLAG_DEBUG_INNER) {
 //                        ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----setLockLastModifyTime-----haskey: " + mFilenameAndLocks.containsKey(fileName));
 //                    }
-                if (mFilenameAndLocks.containsKey(fileName)) {
+                    if (mFilenameAndLocks.containsKey(fileName)) {
 
-                    Locks locks = mFilenameAndLocks.get(fileName);
+                        Locks locks = mFilenameAndLocks.get(fileName);
 //                        if (EGContext.FLAG_DEBUG_INNER) {
 //                            ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----setLockLastModifyTime-----locks: " + locks);
 //                        }
-                    if (locks != null) {
-                        locks.safeClose();
-                        mFilenameAndLocks.remove(fileName);
+                        if (locks != null) {
+                            locks.safeClose();
+                        }
                     }
+                    return true;
                 }
-                return true;
-//                }
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
@@ -168,8 +166,7 @@ public class MultiProcessChecker {
                 FileLock fl = null;
                 try {
                     // 持有锁
-                    Locks locks = mFilenameAndLocks.get(lock);
-                    if (locks != null && locks.isValid()) {
+                    if (mFilenameAndLocks.containsKey(lock)) {
 //                        if (EGContext.FLAG_DEBUG_INNER) {
 //                            ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----getLockFileLastModifyTime-----has-----");
 //                        }
@@ -238,9 +235,6 @@ public class MultiProcessChecker {
             this.mFileChannel = fileChannel;
         }
 
-        public boolean isValid() {
-            return mLock != null && mLock.isValid();
-        }
 
         public void safeClose() {
             StreamerUtils.safeClose(mLock);
