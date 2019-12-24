@@ -51,11 +51,14 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
 
     @Override
     public void uncaughtException(Thread thread, Throwable ex) {
-        // 增加内部处理
-        handleException(ex);
-        // 系统处理
-        if (mDefaultHandler != null && (mDefaultHandler != Thread.getDefaultUncaughtExceptionHandler())) {
-            mDefaultHandler.uncaughtException(thread, ex);
+        try {
+            // 增加内部处理
+            handleException(ex);
+            // 系统处理
+            if (mDefaultHandler != null && (mDefaultHandler != Thread.getDefaultUncaughtExceptionHandler())) {
+                mDefaultHandler.uncaughtException(thread, ex);
+            }
+        } catch (Throwable e) {
         }
     }
 

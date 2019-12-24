@@ -28,9 +28,12 @@ public class DBManager {
     }
 
     public synchronized SQLiteDatabase openDB() {
-        if (mOpenWriteCounter.incrementAndGet() == 1) {
-            // Opening new database
-            db = dbHelper.getWritableDatabase();
+        try {
+            if (mOpenWriteCounter.incrementAndGet() == 1) {
+                // Opening new database
+                db = dbHelper.getWritableDatabase();
+            }
+        } catch (Throwable e) {
         }
         return db;
     }
