@@ -45,6 +45,9 @@ android {
 
     defaultConfig {
         def sdkv = "${version}|${date}";
+        if (enableHotFix) {
+            sdkv += "00"
+        }
         if (isRelease) {
             ENABLE_BUGLY = false
             DEBUG_URL = false

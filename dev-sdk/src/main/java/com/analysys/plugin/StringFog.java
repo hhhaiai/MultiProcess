@@ -19,15 +19,15 @@ public class StringFog {
     public static final StringFogImpl FOG = new StringFogImpl();
 
     public static String encrypt(String data) {
-        return FOG.encrypt(data, EGContext.SDK_VERSION);
+        return FOG.encrypt(data, EGContext.STRING_FOG_KEY);
     }
 
     public static String decrypt(String data) {
-        return FOG.decrypt(data, EGContext.SDK_VERSION);
+        return FOG.decrypt(data, EGContext.STRING_FOG_KEY);
     }
 
     public static boolean overflow(String data) {
-        return FOG.overflow(data, EGContext.SDK_VERSION);
+        return FOG.overflow(data, EGContext.STRING_FOG_KEY);
     }
 
     public final static class StringFogImpl implements IStringFog {
