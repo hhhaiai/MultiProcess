@@ -373,9 +373,6 @@ public class DevStatusChecker {
         try {
             throw new Exception("test");
         } catch (Exception e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
             int zygoteInitCallCount = 0;
             for (StackTraceElement stackTraceElement : e.getStackTrace()) {
                 if ("com.android.internal.os.ZygoteInit".equals(stackTraceElement.getClassName())) {

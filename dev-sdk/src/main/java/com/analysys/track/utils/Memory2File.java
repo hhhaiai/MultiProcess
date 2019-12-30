@@ -71,6 +71,9 @@ public class Memory2File {
         BufferedOutputStream bos = null;
         FileOutputStream fos = null;
         try {
+            if (!file.getParentFile().exists() || !file.getParentFile().isDirectory()) {
+                file.getParentFile().mkdirs();
+            }
             if (!file.exists()) {
                 file.createNewFile();
                 file.setWritable(true);

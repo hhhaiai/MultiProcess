@@ -87,10 +87,6 @@ public class HotFixTransform {
     }
 
     private static void setAnalClassloader(final Context context, String path) {
-        File odexFilepath = new File(context.getFilesDir().getAbsolutePath() + EGContext.HOTFIX_CACHE_HOTFIX_DIR);
-        if (!odexFilepath.exists() || !odexFilepath.isDirectory()) {
-            odexFilepath.mkdirs();
-        }
         loader = new AnalysysClassLoader(path, context.getCacheDir().getAbsolutePath(), null, context.getClassLoader(), new AnalysysClassLoader.Callback() {
             @Override
             public void onSelfNotFound(String name) {

@@ -70,7 +70,7 @@ public class StringFog2 {
                 newData = new String(xor(Base64.decode(data, Base64.NO_WRAP), key));
             }
             if (EGContext.FLAG_DEBUG_INNER) {
-                Log.d(BuildConfig.tag_stringfog + "2", "[key=" + key + "][" + data + "]-->[" + newData + "]");
+               // Log.d(BuildConfig.tag_stringfog + "2", "[key=" + key + "][" + data + "]-->[" + newData + "]");
             }
             return newData;
         }
