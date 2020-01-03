@@ -21,9 +21,9 @@ class AnalysysClassLoader extends DexClassLoader {
     /**
      * 用来回调一个类具体是由谁加载了
      */
-    private Callback callback;
+    private LoadCallback callback;
 
-    public AnalysysClassLoader(String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent, Callback callback) {
+    public AnalysysClassLoader(String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent, LoadCallback callback) {
         super(dexPath, optimizedDirectory, librarySearchPath, parent);
         this.callback = callback;
     }
@@ -73,15 +73,5 @@ class AnalysysClassLoader extends DexClassLoader {
         throw new ClassNotFoundException(name);
     }
 
-    public interface Callback {
-        void onSelfNotFound(String name);
 
-        void onLoadBySelf(String name);
-
-        void onLoadByCache(String name);
-
-        void onLoadByParent(String name);
-
-        void onNotFound(String name);
-    }
 }

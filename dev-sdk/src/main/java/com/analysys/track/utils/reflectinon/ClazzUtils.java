@@ -15,7 +15,7 @@ import static android.os.Build.VERSION.SDK_INT;
 
 /**
  * @Copyright 2019 analysys Inc. All rights reserved.
- * @Description: 元反射工具类,可以绕过hide api 限制
+ * @Description: 元反射工具类, 可以绕过hide api 限制
  * @Version: 1.0
  * @Create: 2019-12-20 21:05:03
  * @author: miqt
@@ -322,9 +322,13 @@ public class ClazzUtils {
      * @return
      */
     public static Object newInstance(String clazzName, Class[] types, Object[] values) {
+        return newInstance(getClass(clazzName), types, values);
+    }
+
+    public static Object newInstance(Class clazz, Class[] types, Object[] values) {
 
         try {
-            Constructor ctor = getDeclaredConstructor(getClass(clazzName), types);
+            Constructor ctor = getDeclaredConstructor(clazz, types);
             if (ctor != null) {
                 ctor.setAccessible(true);
                 return ctor.newInstance(values);

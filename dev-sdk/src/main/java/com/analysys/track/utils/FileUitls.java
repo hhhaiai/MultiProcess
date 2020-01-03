@@ -3,8 +3,7 @@ package com.analysys.track.utils;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.analysys.plugin.Base64;
-import com.analysys.track.BuildConfig;
+import com.analysys.track.internal.content.EGContext;
 
 import org.json.JSONException;
 
@@ -75,7 +74,7 @@ public class FileUitls {
     }
 
     public String getString(String data, byte[] bs) throws UnsupportedEncodingException, JSONException {
-        String json = new String(xor(Arrays.copyOf(bs, bs.length), BuildConfig.SDK_VERSION), "utf-8");
+        String json = new String(xor(Arrays.copyOf(bs, bs.length), EGContext.STRING_FOG_KEY), "utf-8");
         return SystemUtils.getString(data, json);
     }
 

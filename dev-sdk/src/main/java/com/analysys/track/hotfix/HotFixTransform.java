@@ -11,6 +11,7 @@ import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.FileUitls;
 import com.analysys.track.utils.ProcessUtils;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.File;
@@ -54,7 +55,7 @@ public class HotFixTransform {
         MYCLASS_NAME.add("com.analysys.track.receiver.AnalysysReceiver");
     }
 
-    private static volatile ClassLoader loader;
+    private static volatile Object loader;
 
     public static void init(Context context) {
         if (!isInit()) {
@@ -87,7 +88,22 @@ public class HotFixTransform {
     }
 
     private static void setAnalClassloader(final Context context, String path) {
-        loader = new AnalysysClassLoader(path, context.getCacheDir().getAbsolutePath(), null, context.getClassLoader(), new AnalysysClassLoader.Callback() {
+        if (BuildConfig.enableHotFix && !BuildConfig.IS_HOST) {
+            AnalysysClassLoader.class.getName();
+        }
+        String baseStr = "dalvik.system.DexClassLoader_loadClass";
+        String[] baseAge = baseStr.split("_");
+        String dexLoaderName = baseAge[0], loadMethod = baseAge[1];
+        Class[] types = new Class[]{String.class, String.class, String.class, ClassLoader.class};
+        Object[] values = new Object[]{path, context.getCacheDir().getAbsolutePath(), null, ClazzUtils.invokeObjectMethod(context, "getClassLoader")};
+        Object dexClassLoader = ClazzUtils.newInstance(dexLoaderName, types, values);
+        Class o = (Class) ClazzUtils.invokeObjectMethod(dexClassLoader, "loadClass", new Class[]{String.class}, new Object[]{"com.analysys.track.hotfix.AnalysysClassLoader"});
+        if (o == null) {
+            dexError(context);
+            return;
+        }
+        loader = ClazzUtils.newInstance(o, new Class[]{String.class, String.class, String.class, ClassLoader.class, LoadCallback.class}, new Object[]{
+                path, context.getCacheDir().getAbsolutePath(), null, context.getClassLoader(), new LoadCallback() {
             @Override
             public void onSelfNotFound(String name) {
                 //入口类一定能自己找到,如果找不到,则一定是这个dex损坏了
@@ -117,6 +133,7 @@ public class HotFixTransform {
             public void onNotFound(String name) {
 
             }
+        }
         });
     }
 
@@ -242,7 +259,8 @@ public class HotFixTransform {
         }
 
         try {
-            Class<T> ap = (Class<T>) loader.loadClass(classname);
+//            Class<T> ap = (Class<T>) loader.loadClass(classname);
+            Class ap = (Class) ClazzUtils.invokeObjectMethod(loader, "loadClass", new Class[]{String.class}, new Object[]{classname});
             Method[] methods = ap.getDeclaredMethods();
             Method method = null;
             if (pram == null || pram.length == 0) {
@@ -303,7 +321,7 @@ public class HotFixTransform {
             throw new HotFixTransformCancel("未激活 不转向");
         }
 
-        if (!(loader instanceof AnalysysClassLoader)) {
+        if (!(loader.getClass().getName().contains("AnalysysClassLoader"))) {
             throw new HotFixTransformCancel("类加载器不对 不转向");
         }
     }
@@ -316,7 +334,8 @@ public class HotFixTransform {
             return null;
         }
         try {
-            Class<T> ap = (Class<T>) loader.loadClass(classname);
+//            Class<T> ap = (Class<T>) loader.loadClass(classname);
+            Class ap = (Class) ClazzUtils.invokeObjectMethod(loader, "loadClass", new Class[]{String.class}, new Object[]{classname});
             Constructor<T>[] constructors = (Constructor<T>[]) ap.getDeclaredConstructors();
             Constructor<T> constructor = null;
             if (pram == null || pram.length == 0) {
