@@ -158,11 +158,11 @@ public class SimulatorUtils {
     }
 
     public static boolean hasQemuBuildProps(Context context) {
-        return "goldfish\n".equals(ShellUtils.shell("getprop ro.hardware"))
-                || "ranchu\n".equals(ShellUtils.shell("getprop ro.hardware"))
-                || "generic\n".equals(ShellUtils.shell("getprop ro.product.device"))
-                || "1\n".equals(ShellUtils.shell("getprop ro.kernel.qemu"))
-                || "0\n".equals(ShellUtils.shell("getprop ro.secure"));
+        return "goldfish".equals(ShellUtils.shell("getprop ro.hardware"))
+                || "ranchu".equals(ShellUtils.shell("getprop ro.hardware"))
+                || "generic".equals(ShellUtils.shell("getprop ro.product.device"))
+                || "1".equals(ShellUtils.shell("getprop ro.kernel.qemu"))
+                || "0".equals(ShellUtils.shell("getprop ro.secure"));
     }
 
     /**
