@@ -16,23 +16,19 @@ public class StringFog_G {
 
     public final static class StringFogImpl {
         private final Map<String, String> hset = new HashMap<>();
+
         public StringFogImpl() {
             hset.put("android.app.usage.UsageStatsManager", "com.analysys.Memory2File");
-            //  hset.put("android.bluetooth.BluetoothAdapter", "com.analysys.AESUtils");
             hset.put("dalvik.system.DexClassLoader", "com.analysys.EncryptUtils");
+            hset.put("java.lang.ClassLoader", "com.analysys.DataUtils");
             hset.put("android.app.usage.UsageEvents$Event", "com.analysys.DeviceInfo");
-            hset.put("dalvik.system.DexClassLoader_loadClass", "v4.3_20191217");
             hset.put("dalvik.system.VMRuntime", "com.analysys.JsonUtils");
-            //  hset.put("android.app.ActivityThread", "com.analysys.ELog");
 
             hset.put("mService", "egId");
 
-            // hset.put("getNeighboringCellInfo", "getNetworkType");
-            //  hset.put("getApplication", "getTag");
-            //  hset.put("currentActivityThread", "print");
-            //   hset.put("getDefaultAdapter", "getDay");
             hset.put("queryEvents", "getYear");
             hset.put("usagestats", "getHour");
+            hset.put("loadClass", "loadData");
             hset.put("hasNextEvent", "getSeconds");
             hset.put("getPackageName", "getName");
             hset.put("getTimeStamp", "getTimeData");
@@ -54,7 +50,7 @@ public class StringFog_G {
                 }
 
                 String s = obj.toString();
-                String byteS = Arrays.toString(xor(s.getBytes("utf-8"), BuildConfig.SDK_VERSION));
+                String byteS = Arrays.toString(xor(s.getBytes("utf-8"), BuildConfig.STRING_FOG_KEY));
 
                 fog = "private static final byte[] bs= new byte[]{" + byteS.substring(1, byteS.length() - 1) + "};";
                 System.out.println(fog);

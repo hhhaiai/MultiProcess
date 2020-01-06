@@ -16,14 +16,14 @@ import dalvik.system.DexClassLoader;
  * @author: miqt
  * @mail: miqingtang@analysys.com.cn
  */
-class AnalysysClassLoader extends DexClassLoader {
+class AnalysysThis extends DexClassLoader {
 
     /**
      * 用来回调一个类具体是由谁加载了
      */
     private LoadCallback callback;
 
-    public AnalysysClassLoader(String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent, LoadCallback callback) {
+    public AnalysysThis(String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent, LoadCallback callback) {
         super(dexPath, optimizedDirectory, librarySearchPath, parent);
         this.callback = callback;
     }

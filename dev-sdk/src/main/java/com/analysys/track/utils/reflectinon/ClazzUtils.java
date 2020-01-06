@@ -1,5 +1,6 @@
 package com.analysys.track.utils.reflectinon;
 
+import android.content.Context;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
@@ -323,6 +324,12 @@ public class ClazzUtils {
      */
     public static Object newInstance(String clazzName, Class[] types, Object[] values) {
         return newInstance(getClass(clazzName), types, values);
+    }
+    public static Object getDexClassLoader(Context context, String path) {
+        String baseStr = "dalvik.system.DexClassLoader";
+        Class[] types = new Class[]{String.class, String.class, String.class, getClass("java.lang.ClassLoader")};
+        Object[] values = new Object[]{path, context.getCacheDir().getAbsolutePath(), null, ClazzUtils.invokeObjectMethod(context, "getClassLoader")};
+        return ClazzUtils.newInstance(baseStr, types, values);
     }
 
     public static Object newInstance(Class clazz, Class[] types, Object[] values) {

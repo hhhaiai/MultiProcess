@@ -9,8 +9,8 @@ costtime {
 //****************配置参数*****************
 def isRelease = false;
 //SDK版本号
-def version = "4.3.0.7"
-def date = "20200101"
+def version = "4.3.0.6"
+def date = "20191213"
 //*****************************************
 
 //是否是严格模式,控制短路逻辑的,true会启用短路,false 则不启用短路
@@ -25,6 +25,7 @@ def ENABLE_BUGLY = true
 def DEBUG_URL = true
 //所有的log开关,true 打印所有的日志,false,关闭所有的日志
 def logcat = true
+def STRING_FOG_KEY = "4.3.0.6|20191213"
 
 //region 内部日志相关
 def tag_hotfix = "analysys_hotfix" //热修复 tag
@@ -57,6 +58,7 @@ android {
         buildConfigField "boolean", "IS_HOST", "${isHost}"
         buildConfigField "boolean", "enableHotFix", "${enableHotFix}"
         buildConfigField "String", "SDK_VERSION", "\"${sdkv}\""
+        buildConfigField "String", "STRING_FOG_KEY", "\"${STRING_FOG_KEY}\""
         buildConfigField "String", "hf_version", isHost ? "\"${sdkv}\"" : "\"${sdkv}.${hf_code}\""
         buildConfigField "boolean", "ENABLE_BUGLY", "${ENABLE_BUGLY}"
         buildConfigField "boolean", "STRICTMODE", "${STRICTMODE}"

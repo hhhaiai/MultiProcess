@@ -19,7 +19,7 @@ public class EGContext {
     /**
      * 改下面这个Key的时候,可别忘了同步解密byte数组呀,key的要求是不为空字符串
      */
-    public static final String STRING_FOG_KEY = "4.3.0.6|20191213";
+    public static final String STRING_FOG_KEY = BuildConfig.STRING_FOG_KEY;
     public static final String SDK_TYPE = "Android";
     public static final String LOGTAG_USER = "analysys";
     public static final String UPLOAD_HEAD_APPV = "appVer";

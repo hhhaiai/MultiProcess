@@ -148,29 +148,15 @@ public class PatchHelper {
         if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)) {
             return;
         }
-
-
-        if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)) {
-            return;
-        }
-        String baseStr = "dalvik.system.DexClassLoader_loadClass";
-        String[] baseAge = baseStr.split("_");
-        String dexLoaderName = baseAge[0], loadMethod = baseAge[1];
         try {
             //1. get DexClassLoader
             // need hide ClassLoader
-            Class[] types = new Class[]{String.class, String.class, String.class, ClassLoader.class};
-            File odexFilepath = new File(context.getFilesDir().getAbsolutePath() + EGContext.HOTFIX_CACHE_PATCH_DIR);
-            if (!odexFilepath.exists() || !odexFilepath.isDirectory()) {
-                odexFilepath.mkdirs();
-            }
-            Object[] values = new Object[]{file.getPath(), context.getCacheDir().getAbsolutePath(), null, ClazzUtils.invokeObjectMethod(context, "getClassLoader")};
-            Object ca = ClazzUtils.newInstance(dexLoaderName, types, values);
+            Object ca = ClazzUtils.getDexClassLoader(context, file.getPath());
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(" loadStatic DexClassLoader over. result: " + ca);
             }
             // 2. load class
-            Class<?> c = (Class<?>) ClazzUtils.invokeObjectMethod(ca, loadMethod, new Class[]{String.class}, new Object[]{className});
+            Class<?> c = (Class<?>) ClazzUtils.invokeObjectMethod(ca, "loadClass", new Class[]{String.class}, new Object[]{className});
             if (c != null) {
                 // 2. invoke method
                 ClazzUtils.invokeStaticMethod(c, methodName, pareTyples, pareVaules);

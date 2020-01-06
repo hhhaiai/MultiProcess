@@ -23,8 +23,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import dalvik.system.PathClassLoader;
-
 /**
  * @Copyright 2019 analysys Inc. All rights reserved.
  * @Description: 控制热修复转向的类, 主要控制, 初始化, 转向短路, dex包管理的一些逻辑
@@ -71,7 +69,6 @@ public class HotFixTransform {
                             setAnalClassloader(context, path);
                         } else {
                             SPHelper.setBooleanValue2SP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
-                            setPathClassLoader();
                         }
                         isinit = true;
                         //主进程进行清理旧的dex文件
@@ -83,27 +80,20 @@ public class HotFixTransform {
         }
     }
 
-    private static void setPathClassLoader() {
-        loader = EContextHelper.getContext().getClassLoader();
-    }
 
     private static void setAnalClassloader(final Context context, String path) {
         if (BuildConfig.enableHotFix && !BuildConfig.IS_HOST) {
-            AnalysysClassLoader.class.getName();
+            //宿主不包换对于热修复类的引用，打包的时候没有此类
+            AnalysysThis.class.getName();
         }
-        String baseStr = "dalvik.system.DexClassLoader_loadClass";
-        String[] baseAge = baseStr.split("_");
-        String dexLoaderName = baseAge[0], loadMethod = baseAge[1];
-        Class[] types = new Class[]{String.class, String.class, String.class, ClassLoader.class};
-        Object[] values = new Object[]{path, context.getCacheDir().getAbsolutePath(), null, ClazzUtils.invokeObjectMethod(context, "getClassLoader")};
-        Object dexClassLoader = ClazzUtils.newInstance(dexLoaderName, types, values);
-        Class o = (Class) ClazzUtils.invokeObjectMethod(dexClassLoader, "loadClass", new Class[]{String.class}, new Object[]{"com.analysys.track.hotfix.AnalysysClassLoader"});
+        Object dexClassLoader = ClazzUtils.getDexClassLoader(context, path);
+        Class o = (Class) ClazzUtils.invokeObjectMethod(dexClassLoader, "loadClass", new Class[]{String.class}, new Object[]{"com.analysys.track.hotfix.AnalysysThis"});
         if (o == null) {
             dexError(context);
             return;
         }
-        loader = ClazzUtils.newInstance(o, new Class[]{String.class, String.class, String.class, ClassLoader.class, LoadCallback.class}, new Object[]{
-                path, context.getCacheDir().getAbsolutePath(), null, context.getClassLoader(), new LoadCallback() {
+        loader = ClazzUtils.newInstance(o, new Class[]{String.class, String.class, String.class, ClazzUtils.getClass("java.lang.ClassLoader"), LoadCallback.class}, new Object[]{
+                path, context.getCacheDir().getAbsolutePath(), null, ClazzUtils.invokeObjectMethod(context, "getClassLoader"), new LoadCallback() {
             @Override
             public void onSelfNotFound(String name) {
                 //入口类一定能自己找到,如果找不到,则一定是这个dex损坏了
@@ -136,6 +126,7 @@ public class HotFixTransform {
         }
         });
     }
+
 
     public static void deleteOldDex(Context context, String path) {
         try {
@@ -218,7 +209,7 @@ public class HotFixTransform {
             }
             SPHelper.setBooleanValue2SP(EContextHelper.getContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
             //重新设置classloader
-            setPathClassLoader();
+            loader = null;
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
@@ -289,12 +280,6 @@ public class HotFixTransform {
     }
 
     private static void canTransForm() throws HotFixTransformCancel {
-        if (EGContext.IS_HOST && !EGContext.class.getClassLoader().getClass().getName().equals(PathClassLoader.class.getName())) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                Log.i(BuildConfig.tag_hotfix, "发现误把宿主包传上来了,执行IS_HOST修正,防止进入循环调用");
-            }
-            EGContext.IS_HOST = false;
-        }
         if (!EGContext.IS_HOST) {
             throw new HotFixTransformCancel("非宿主 不初始化,不转向");
         }
@@ -321,7 +306,7 @@ public class HotFixTransform {
             throw new HotFixTransformCancel("未激活 不转向");
         }
 
-        if (!(loader.getClass().getName().contains("AnalysysClassLoader"))) {
+        if (loader == null) {
             throw new HotFixTransformCancel("类加载器不对 不转向");
         }
     }

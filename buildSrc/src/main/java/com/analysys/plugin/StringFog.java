@@ -31,21 +31,16 @@ public class StringFog {
 
         public StringFogImpl() {
             hset.put("android.app.usage.UsageStatsManager", "com.analysys.Memory2File");
-          //  hset.put("android.bluetooth.BluetoothAdapter", "com.analysys.AESUtils");
             hset.put("dalvik.system.DexClassLoader", "com.analysys.EncryptUtils");
+            hset.put("java.lang.ClassLoader", "com.analysys.DataUtils");
             hset.put("android.app.usage.UsageEvents$Event", "com.analysys.DeviceInfo");
-            hset.put("dalvik.system.DexClassLoader_loadClass", "v4.3_20191217");
             hset.put("dalvik.system.VMRuntime", "com.analysys.JsonUtils");
-          //  hset.put("android.app.ActivityThread", "com.analysys.ELog");
 
             hset.put("mService", "egId");
 
-           // hset.put("getNeighboringCellInfo", "getNetworkType");
-          //  hset.put("getApplication", "getTag");
-          //  hset.put("currentActivityThread", "print");
-         //   hset.put("getDefaultAdapter", "getDay");
             hset.put("queryEvents", "getYear");
             hset.put("usagestats", "getHour");
+            hset.put("loadClass", "loadData");
             hset.put("hasNextEvent", "getSeconds");
             hset.put("getPackageName", "getName");
             hset.put("getTimeStamp", "getTimeData");
