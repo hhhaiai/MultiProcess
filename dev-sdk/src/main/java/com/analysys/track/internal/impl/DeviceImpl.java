@@ -351,7 +351,7 @@ public class DeviceImpl {
         String serialNo = "";
         try {
             if (Build.VERSION.SDK_INT > 26) {
-                Class<?> clazz = Class.forName("android.os");
+                Class<?> clazz = Class.forName("android.os.Build");
                 Method method = clazz.getMethod("getSerial");
                 serialNo = (String) method.invoke(null);
             } else {
