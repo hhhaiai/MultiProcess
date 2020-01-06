@@ -34,6 +34,9 @@ public class ShellUtils {
             while ((line = br.readLine()) != null) {
                 sb.append(line).append("\n");
             }
+            if (sb.length() > 0) {
+                return sb.substring(0, sb.length() - 1);
+            }
             return String.valueOf(sb);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {

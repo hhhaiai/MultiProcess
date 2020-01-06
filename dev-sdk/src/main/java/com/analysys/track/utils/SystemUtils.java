@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
@@ -69,7 +68,7 @@ public class SystemUtils {
         } catch (IllegalArgumentException e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
-        }
+            }
         }
         return false;
     }
@@ -127,35 +126,6 @@ public class SystemUtils {
         } catch (Throwable e) {
         }
         return false;
-    }
-
-    /**
-     * Method to reflectively invoke the SystemProperties.get command - which is the equivalent to the adb shell getProp
-     * command.
-     *
-     * @param context  A {@link Context} object used to get the proper ClassLoader (just needs to be Application Context
-     *                 object)
-     * @param property A {@code String} object for the property to retrieve.
-     * @return {@code String} value of the property requested.
-     */
-    public static String getProp(Context context, String property) {
-        try {
-            ClassLoader classLoader = context.getClassLoader();
-            Class<?> systemProperties = classLoader.loadClass("android.os.SystemProperties");
-            Method get = systemProperties.getMethod("get", String.class);
-            Object[] params = {property};
-            return (String) get.invoke(systemProperties, params);
-        } catch (IllegalArgumentException iAE) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(iAE);
-            }
-            throw iAE;
-        } catch (Exception exception) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(exception);
-            }
-        }
-        return "";
     }
 
     /**
@@ -237,10 +207,12 @@ public class SystemUtils {
         }
         return false;
     }
+
     public static String getString(String data, String json) throws JSONException {
         JSONObject jsonObject = new JSONObject(json);
-        return jsonObject.optString(data,"");
+        return jsonObject.optString(data, "");
     }
+
     /**
      * 是否锁屏
      *

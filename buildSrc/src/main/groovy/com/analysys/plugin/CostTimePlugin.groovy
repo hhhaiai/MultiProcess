@@ -11,14 +11,14 @@ class CostTimePlugin implements Plugin<Project> {
     void apply(Project project) {
         project.extensions.create("costtime", CostTimeConfig)
         def android = project.extensions.android
-        boolean  islib = true
+        boolean islib = true
         if (android instanceof AppExtension) {
-            islib=false
+            islib = false
         }
 
-        android.registerTransform(new CostTransform(project,islib))
-        android.registerTransform(new StringFogTransform(project,islib))
-       // android.registerTransform(new StringFogTransform2(project,islib))
+        android.registerTransform(new CostTransform(project, islib))
+        android.registerTransform(new StringFogTransform(project, islib))
+        android.registerTransform(new StringFogTransform2(project, islib))
     }
 
 

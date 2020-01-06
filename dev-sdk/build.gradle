@@ -7,7 +7,7 @@ costtime {
     enableLog true
 }
 //****************配置参数*****************
-def isRelease = false;
+def isRelease = true;
 //SDK版本号
 def version = "4.3.0.6"
 def date = "20191213"

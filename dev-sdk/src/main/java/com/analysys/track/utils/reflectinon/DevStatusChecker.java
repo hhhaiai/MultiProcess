@@ -505,7 +505,7 @@ public class DevStatusChecker {
 
         try {
             // 2. 系统判断是否debug
-            if ("1".equals(SystemUtils.getProp(context, "ro.debuggable"))) {
+            if ("1".equals(ShellUtils.shell("getprop ro.debuggable"))) {
                 return true;
             }
             // 3.通过ApplicationInfo的flag判断
