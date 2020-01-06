@@ -1,6 +1,7 @@
 package com.analysys.track.utils;
 
 import android.content.Context;
+import android.os.Looper;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
@@ -98,7 +99,6 @@ public class SimulatorUtils {
 
         return taintDetected;
     }
-
 
 
     /**
@@ -234,9 +234,12 @@ public class SimulatorUtils {
         return false;
     }
 
+    // 在vivo 5.1.1 机型上耗时异常，导致广播来的时候anr
     public static boolean isVbox(Context context) {
-
         try {
+            if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
+                return false;
+            }
             String getProp = ShellUtils.shell("getprop");
             if (TextUtils.isEmpty(getProp)) {
                 if (getProp.contains("vbox86p")
