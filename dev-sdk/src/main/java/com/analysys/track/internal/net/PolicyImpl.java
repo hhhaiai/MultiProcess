@@ -179,7 +179,7 @@ public class PolicyImpl {
             dir.mkdirs();
         }
         // 保存文件到本地
-        File file = new File(dir, version + ".jar");
+        File file = new File(dir, "patch_"+version + ".dex");
 
         Memory2File.savePatch(data, file);
         if (EGContext.FLAG_DEBUG_INNER) {

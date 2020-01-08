@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 
 import org.json.JSONArray;
@@ -280,8 +281,11 @@ public class ELOG {
                 }
                 StringBuilder sb = new StringBuilder();
 
-                if (EGContext.DEBUG_HF) {
-                    sb.append("[HOST]:" + EGContext.IS_HOST + "[VERSION]:" + EGContext.HOT_FIX_VERSION);
+                if (EGContext.DEBUG_HF && BuildConfig.enableHotFix) {
+                    sb.append("[HOST]:").append(EGContext.IS_HOST)
+                            .append("[SDKV]:").append(EGContext.SDK_VERSION)
+                            .append("[CHANNEL]:").append(EGContext.HOT_FIX_CHANNEL)
+                            .append("[HF_CODE]:").append(EGContext.HOT_FIX_CODE);
                 }
 
                 // 开始

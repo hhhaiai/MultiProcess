@@ -70,7 +70,7 @@ public class RequestUtils {
             connection.setRequestProperty(EGContext.POLICYVER, plocyVersion);
             //当前热修版本
             if (!EGContext.IS_HOST) {
-                connection.setRequestProperty(EGContext.HOTFIX_VERSION, BuildConfig.hf_version);
+                connection.setRequestProperty(EGContext.HOTFIX_VERSION, BuildConfig.hf_code);
             }
             connection.setRequestProperty(EGContext.POLICYVER, plocyVersion);
 //            connection.setRequestProperty(EGContext.POLICYVER, "0");
