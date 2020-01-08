@@ -28,6 +28,21 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class PatchHelper {
 
+    public static void loads(final Context context) {
+        try {
+            File dir = new File(context.getFilesDir(), EGContext.HOTFIX_CACHE_PATCH_DIR);
+            String version = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_VERSION, "");
+            if (TextUtils.isEmpty(version)) {
+                return;
+            }
+            // 保存文件到本地
+            File file = new File(dir, version + ".jar");
+            if (file.exists() && file.isFile()) {
+                loads(context, file);
+            }
+        } catch (Throwable e) {
+        }
+    }
 
     public static void loads(final Context context, final File file) {
         EThreadPool.postDelayed(new Runnable() {

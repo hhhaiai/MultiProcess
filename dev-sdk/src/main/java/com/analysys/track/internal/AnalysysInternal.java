@@ -23,6 +23,7 @@ import com.analysys.track.utils.OAIDHelper;
 import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
+import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.File;
@@ -142,6 +143,8 @@ public class AnalysysInternal {
         if (Build.VERSION.SDK_INT >= 29) {
             OAIDHelper.tryGetOaidAndSave(ctx);
         }
+
+        PatchHelper.loads(ctx);
 
         try {
             // 9. 清除以前的SP和DB
