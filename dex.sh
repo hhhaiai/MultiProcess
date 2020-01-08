@@ -20,12 +20,10 @@ dx="dx.bat"
 #ecs="echo"
 
 unames=$(uname -s)
-n=${unames}
-
-if [[ $n =~ $cygwnin ]]
+if [[ ${unames} =~ $cygwnin ]]
 then
     // do nothing
-elif  [[ $n =~ $mingw ]]
+elif  [[ ${unames} =~ $mingw ]]
 then
     // do nothing
 else
