@@ -258,14 +258,11 @@ public class EGContext {
     /**
      * 热更是否开启 true 开启 false 关闭
      */
-    public static String HOT_FIX_ENABLE_STATE = SDK_VERSION + "_hf";
+    public static String HOT_FIX_CHANNEL = "hf_channel";
+    public static String HOT_FIX_ENABLE_STATE = HOT_FIX_CHANNEL + "_hf";
     //热更版本
-    public static String HOT_FIX_VERSION = BuildConfig.hf_version;
-    //热更文件路径
-    public static String HOT_FIX_PATH_TEMP = SDK_VERSION + "hf_temp";
-    public static String HOT_FIX_PATH = SDK_VERSION + "hp";
-    //热更文件哈希码
-    public static String HOT_FIX_HASH = "hf_hash";
+    public static String HOT_FIX_CODE = BuildConfig.hf_code;
+    public static String HOT_FIX_PATH = HOT_FIX_CHANNEL + "hp";
     //是否是宿主,打热修复包的时候设置为否
     public static boolean IS_HOST = BuildConfig.IS_HOST;
     //dex文件损坏,默认是没有dex文件的,所以默认为true
