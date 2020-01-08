@@ -5,7 +5,7 @@ import android.content.Context;
 import android.util.Log;
 
 /**
- * @Copyright © 2019 sanbo Inc. All rights reserved.
+ * @Copyright © 2019 analysys Inc. All rights reserved.
  * @Description: 测试DEX相关
  * @Version: 1.0
  * @Create: 2019-12-14 11:18
