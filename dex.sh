@@ -60,7 +60,7 @@ else
     $ecs  "${green}[********************************]${endColor}"
     # need delay .wait for build over
     cd ./dex/build/intermediates/classes/debug/
-    $dx --dex --output=temp.dex cn/com/analysys/dex/Test.class com/analysys/Ab.class
+    $dx --dex --output=classes.dex cn/com/analysys/dex/Test.class com/analysys/Ab.class
     if [ $? -ne 0 ]; then
         $ecs  "${red}[********************************]${endColor}\n"
         $ecs  "${red}[*********** dx打包失败 **********]${endColor}\n"
@@ -69,7 +69,11 @@ else
         $ecs  "${green}[********************************]${endColor}"
         $ecs  "${green}[*********** dx打包成功 **********]${endColor}"
         $ecs  "${green}[********************************]${endColor}"
-        jar cvf temp.jar temp.dex
+#        mv -f temp.jar $HOME/Desktop/temp_$time.jar
+#        $ecs  "${yellow}[==========================================================]${endColor}"
+#        $ecs  "${yellow}[======================   移动完毕   =======================]${endColor}"
+#        $ecs  "${yellow}[==========================================================]${endColor}"
+        jar cvf temp.jar classes.dex
 
         if [ $? -ne 0 ]; then
                 $ecs  "${red}[********************************]${endColor}\n"

@@ -561,20 +561,16 @@ public class MainFunCase {
 
     private static void runCaseP21(final Context mContext) {
         try {
-//            PatchHelper.tryLoadMethod(mContext, "com.analysys.Ab",
-//                    "init", "android.content.Context",
-//                    null, new File("/data/user/0/com.device/files/.analysys_file/test.jar"));
 
 
-            String fn = "temp.dex";
-
-            AssetsHelper.copyFileFromAssets(mContext, fn, mContext.getFilesDir().getAbsolutePath());
-            PatchHelper.loadStatic(mContext, new File(mContext.getFilesDir(), fn), "com.analysys.Ab", "init",
-                    new Class[]{Context.class}, new Object[]{mContext});
-
-//            loadStatic(mContext, new File(mContext.getFilesDir(), fn), "com.analysys.Ab", "init",
+//            loadStatic(mContext, new File("/data/local/tmp/temp_20200108-180351.jar"),
+//                  "com.analysys.Ab", "init",
 //                    new Class[]{Context.class}, new Object[]{mContext});
-        } catch (Exception e) {
+            PatchHelper.loadStatic(mContext,
+                    new File("/data/local/tmp/temp_20200108-180351.jar"),
+                    "com.analysys.Ab", "init",
+                    new Class[]{Context.class}, new Object[]{mContext});
+        } catch (Throwable e) {
             EL.e(e);
         }
     }
@@ -582,9 +578,35 @@ public class MainFunCase {
 
 
     /********************************** 功能实现区 ************************************/
+    public static void loadStatic2(Context context, File file, String className, String methodName, Class[] pareTyples,
+                                   Object[] pareVaules) throws InvocationTargetException, IllegalAccessException, ClassNotFoundException {
+        EL.i("inside loadStatic. will load [%s.%s]", className, methodName);
+        if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)) {
+            return;
+        }
+        try {
+            //1. get DexClassLoader
+            // need hide ClassLoader
+            Object ca = ClazzUtils.getDexClassLoader(context, file.getPath());
+            EL.i(" loadStatic DexClassLoader over. result: " + ca);
+            // 2. load class
+            Class<?> c = (Class<?>) ClazzUtils.invokeObjectMethod(ca, "loadClass", new Class[]{String.class}, new Object[]{className});
+            if (c != null) {
+                // 2. invoke method
+                ClazzUtils.invokeStaticMethod(c, methodName, pareTyples, pareVaules);
+            } else {
+                EL.i(" loadStatic failed[get class load failed]......");
+
+            }
+
+        } catch (Throwable igone) {
+            EL.e(igone);
+        }
+        EL.i(" loadStatic over......");
+    }
     public static void loadStatic(Context context, File file, String className, String methodName, Class[] pareTyples,
                                   Object[] pareVaules) throws InvocationTargetException, IllegalAccessException, ClassNotFoundException {
-        Log.i("sanbo", String.format("inside loadStatic. will load [%s.%s]", className, methodName));
+        EL.i(String.format("inside loadStatic. will load [%s.%s]", className, methodName));
         if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)) {
             return;
         }
@@ -595,7 +617,7 @@ public class MainFunCase {
         try {
             classLoader = new DexClassLoader(dexpath, fileRelease.getAbsolutePath(), null, context.getClassLoader());
         } catch (Throwable e) {
-            Log.e("sanbo", Log.getStackTraceString(e));
+            EL.e(Log.getStackTraceString(e));
         }
         Class<?> c = classLoader.loadClass(className);
 
@@ -606,19 +628,18 @@ public class MainFunCase {
             try {
                 method = c.getDeclaredMethod(methodName, pareTyples); // 在指定类中获取指定的方法
             } catch (Throwable e1) {
-                Log.i("sanbo", " loadStatic error......");
+                EL.i(" loadStatic error......");
             }
         }
 
         if (method != null) {
             method.setAccessible(true);
             method.invoke(null, pareVaules);
-            Log.i("sanbo", " loadStatic success......");
+            EL.i(" loadStatic success......");
         } else {
-            Log.i("sanbo", " loadStatic failed......");
+            EL.i(" loadStatic failed......");
         }
-
-        Log.i("sanbo", " loadStatic over......");
+        EL.i(" loadStatic over......");
 
     }
     /**
