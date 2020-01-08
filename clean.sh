@@ -5,7 +5,7 @@
  清除程序入口
 '
 echo ">>>>clean project<<<<"
-dir=("app" "dev-sdk" "buildSrc")
+dir=("app" "dev-sdk" "buildSrc" "dex")
 for element in ${dir[@]}
 do
     #clean task

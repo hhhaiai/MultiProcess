@@ -82,7 +82,7 @@ else
     $ecs  "${green}[******* graddew build 成功 *****]${endColor}"
     $ecs  "${green}[********************************]${endColor}"
     # need delay .wait for build over
-    cd ./app/build/intermediates/classes/debug/
+    cd ./dex/build/intermediates/classes/debug/
     $dx --dex --output=temp.dex com/device/impls/Test.class
     if [ $? -ne 0 ]; then
         $ecs  "${red}[********************************]${endColor}\n"
