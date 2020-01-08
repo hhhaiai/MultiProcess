@@ -5,7 +5,7 @@
 '
 echo "clean android studio cache! "
 echo ">>>>you must close android studio<<<<"
-dir=("app" "dev-sdk" "buildSrc")
+dir=("app" "dev-sdk" "buildSrc" "dex")
 
 for element in ${dir[@]}
 do

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-dir=("app" "dev-sdk" )
+dir=("app" "dev-sdk" "buildSrc" "dex")
 
 # clean  cache
 function clean()
