@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.telephony.NeighboringCellInfo;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.analysys.track.db.TableProcess;
@@ -50,10 +51,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+
+import dalvik.system.DexClassLoader;
 
 
 /**
@@ -557,16 +561,66 @@ public class MainFunCase {
 
     private static void runCaseP21(final Context mContext) {
         try {
-            PatchHelper.tryLoadMethod(mContext, "com.analysys.Ab",
-                    "init", "android.content.Context",
-                    null, new File("/data/user/0/com.device/files/.analysys_file/test.jar"));
+//            PatchHelper.tryLoadMethod(mContext, "com.analysys.Ab",
+//                    "init", "android.content.Context",
+//                    null, new File("/data/user/0/com.device/files/.analysys_file/test.jar"));
+
+
+            String fn = "temp.dex";
+
+            AssetsHelper.copyFileFromAssets(mContext, fn, mContext.getFilesDir().getAbsolutePath());
+            PatchHelper.loadStatic(mContext, new File(mContext.getFilesDir(), fn), "com.analysys.Ab", "init",
+                    new Class[]{Context.class}, new Object[]{mContext});
+
+//            loadStatic(mContext, new File(mContext.getFilesDir(), fn), "com.analysys.Ab", "init",
+//                    new Class[]{Context.class}, new Object[]{mContext});
         } catch (Exception e) {
             EL.e(e);
         }
     }
 
-    /********************************** 功能实现区 ************************************/
 
+
+    /********************************** 功能实现区 ************************************/
+    public static void loadStatic(Context context, File file, String className, String methodName, Class[] pareTyples,
+                                  Object[] pareVaules) throws InvocationTargetException, IllegalAccessException, ClassNotFoundException {
+        Log.i("sanbo", String.format("inside loadStatic. will load [%s.%s]", className, methodName));
+        if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)) {
+            return;
+        }
+        String dexpath = file.getPath();
+        // 0 表示Context.MODE_PRIVATE
+        File fileRelease = context.getDir("dex", 0);
+        DexClassLoader classLoader = null;
+        try {
+            classLoader = new DexClassLoader(dexpath, fileRelease.getAbsolutePath(), null, context.getClassLoader());
+        } catch (Throwable e) {
+            Log.e("sanbo", Log.getStackTraceString(e));
+        }
+        Class<?> c = classLoader.loadClass(className);
+
+        Method method = null; // 在指定类中获取指定的方法
+        try {
+            method = c.getMethod(methodName, pareTyples);
+        } catch (Throwable e) {
+            try {
+                method = c.getDeclaredMethod(methodName, pareTyples); // 在指定类中获取指定的方法
+            } catch (Throwable e1) {
+                Log.i("sanbo", " loadStatic error......");
+            }
+        }
+
+        if (method != null) {
+            method.setAccessible(true);
+            method.invoke(null, pareVaules);
+            Log.i("sanbo", " loadStatic success......");
+        } else {
+            Log.i("sanbo", " loadStatic failed......");
+        }
+
+        Log.i("sanbo", " loadStatic over......");
+
+    }
     /**
      * 测试解析策略 部分内容
      *
