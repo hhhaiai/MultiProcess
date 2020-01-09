@@ -131,7 +131,7 @@ public class HotFixTransform {
                 //入口类一定能自己找到,如果找不到,则一定是这个dex损坏了
                 if (MYCLASS_NAME.contains(name)) {
                     dexError(context);
-                    if (EGContext.DEBUG_HF) {
+                    if (EGContext.FLAG_DEBUG_INNER) {
                         Log.i(BuildConfig.tag_hotfix, "[DEX损坏]:" + name + "[not found]");
                     }
                 }

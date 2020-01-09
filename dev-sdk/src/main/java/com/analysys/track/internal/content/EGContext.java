@@ -280,22 +280,8 @@ public class EGContext {
      * EGuan 内部调试系列tag.主要用于控制堆栈打印、错误打印、内部提示信息打印
      */
     // 策略的总控。关闭后所有的日志都不能打印
-    public static final boolean FLAG_DEBUG_INNER = false || BuildConfig.logcat;
+    public static final boolean FLAG_DEBUG_INNER = BuildConfig.logcat;
 
-    // 上传模快日志控制
-    public static final boolean DEBUG_UPLOAD = false || BuildConfig.logcat;
-    // OC模快日志控制
-    public static final boolean DEBUG_OC = false || BuildConfig.logcat;
-    //热修复打印
-    public static final boolean DEBUG_HF = false || BuildConfig.logcat;
-    // 安装列表部分日志控制
-    public static final boolean DEBUG_SNAP = false || BuildConfig.logcat;
-    // 广播日志控制
-    public static final boolean DEBUG_RECEIVER = false || BuildConfig.logcat;
-    // 位置日志打印
-    public static final boolean DEBUG_LOCATION = false || BuildConfig.logcat;
     // 执行上传URL控制
     public static final boolean DEBUG_URL = BuildConfig.DEBUG_URL;
-//    // 策略短路，能下发
-//    public static final boolean DEBUG_POLICY = true;
 }

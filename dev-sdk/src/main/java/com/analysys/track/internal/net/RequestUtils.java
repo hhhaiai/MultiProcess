@@ -79,7 +79,7 @@ public class RequestUtils {
             // // 兼容墨迹版本区别需求增加。普通版本不增加该值
             connection.setRequestProperty(EGContext.UPLOAD_HEAD_APPV, SystemUtils.getAppV(context));
             // 打印请求头信息内容
-            if (EGContext.DEBUG_UPLOAD) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(BuildConfig.tag_upload, "========HTTP头： " + connection.getRequestProperties().toString());
             }
 

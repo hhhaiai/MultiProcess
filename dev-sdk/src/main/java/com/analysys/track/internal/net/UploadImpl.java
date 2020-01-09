@@ -51,7 +51,7 @@ public class UploadImpl {
     public void upload() {
         try {
 
-            if (EGContext.DEBUG_UPLOAD) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(BuildConfig.tag_upload, "inside upload...");
             }
             // 1. 没网络停止工作
@@ -75,7 +75,7 @@ public class UploadImpl {
             // 5. 失败重试
             final int failNum = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);
             if (failNum > 0) {
-                if (EGContext.DEBUG_UPLOAD) {
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i(BuildConfig.tag_upload, "失败重试。。。。failNum：" + failNum);
                 }
 //                int maxFailCount = PolicyImpl.getInstance(mContext).getSP()
@@ -104,7 +104,7 @@ public class UploadImpl {
 
                             @Override
                             public void run() {
-                                if (EGContext.DEBUG_UPLOAD) {
+                                if (EGContext.FLAG_DEBUG_INNER) {
                                     ELOG.i(BuildConfig.tag_upload, "失败重试 [" + failNum + "] 。即将进入发送。。。。");
                                 }
                                 doUploadImpl();
@@ -112,12 +112,12 @@ public class UploadImpl {
                             }
                         });
                     } else {
-                        if (EGContext.DEBUG_UPLOAD) {
+                        if (EGContext.FLAG_DEBUG_INNER) {
                             ELOG.i(BuildConfig.tag_upload, "失败重试 时间间隔不对。即将停止。。。");
                         }
                     }
                 } else {
-                    if (EGContext.DEBUG_UPLOAD) {
+                    if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.i(BuildConfig.tag_upload, "失败重试。。。多进程并发。。中断发送。");
                     }
                 }
@@ -129,19 +129,19 @@ public class UploadImpl {
             // 6. 多调用入口。增加进程锁同步。6小时只能发起一次(跟本地时间对比。可以忽略时间修改导致的不能上传)
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.MULTI_FILE_UPLOAD, EGContext.TIME_SECOND * 3, now)) {
                 long lastReqTime = SPHelper.getLongValueFromSP(mContext, EGContext.LASTQUESTTIME, 0);
-                if (EGContext.DEBUG_UPLOAD) {
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i(BuildConfig.tag_upload, "lastReqTime:" + lastReqTime + "--->上传间隔：" + (System.currentTimeMillis() - lastReqTime));
                 }
 
                 if ((now - lastReqTime) < EGContext.TIME_HOUR * 6) {
                     MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.MULTI_FILE_UPLOAD, System.currentTimeMillis());
 
-                    if (EGContext.DEBUG_UPLOAD) {
+                    if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.e(BuildConfig.tag_upload, "小于6小时停止工作");
                     }
                     return;
                 } else {
-                    if (EGContext.DEBUG_UPLOAD) {
+                    if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.i(BuildConfig.tag_upload, "大于6小时可以工作");
                     }
                     MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.MULTI_FILE_UPLOAD, System.currentTimeMillis());
@@ -150,7 +150,7 @@ public class UploadImpl {
                     EThreadPool.post(new Runnable() {
                         @Override
                         public void run() {
-                            if (EGContext.DEBUG_UPLOAD) {
+                            if (EGContext.FLAG_DEBUG_INNER) {
                                 ELOG.i(BuildConfig.tag_upload, "正常模式。。。即将进入发送。。。。");
                             }
                             doUploadImpl();
@@ -160,7 +160,7 @@ public class UploadImpl {
 
 
             } else {
-                if (EGContext.DEBUG_UPLOAD) {
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i(BuildConfig.tag_upload, "正常模式。。。多进程并发。。中断发送。");
                 }
                 //多进程并发导致中断了
@@ -170,7 +170,7 @@ public class UploadImpl {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
             }
-            if (EGContext.DEBUG_UPLOAD) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }
@@ -182,14 +182,14 @@ public class UploadImpl {
      */
     public void doUploadImpl() {
         try {
-            if (EGContext.DEBUG_UPLOAD) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(BuildConfig.tag_upload, "inside doUploadImpl。。。即将发送");
             }
             SPHelper.setLongValue2SP(mContext, EGContext.LASTQUESTTIME, System.currentTimeMillis());
             isChunkUpload = false;
             isUploading = true;
             String uploadInfo = getInfo();
-            if (EGContext.DEBUG_UPLOAD) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(BuildConfig.tag_upload, uploadInfo);
             }
             if (TextUtils.isEmpty(uploadInfo)) {
@@ -217,7 +217,7 @@ public class UploadImpl {
 //            int maxFailCount = PolicyImpl.getInstance(mContext).getSP()  .getInt(UploadKey.Response.RES_POLICY_FAIL_COUNT, EGContext.FAIL_COUNT_DEFALUT);
             // 3. 兼容多次分包的上传
             while (isChunkUpload && failNum < maxFailCount) {
-                if (EGContext.DEBUG_UPLOAD) {
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i("开始分包上传...");
                 }
                 isChunkUpload = false;
@@ -236,7 +236,7 @@ public class UploadImpl {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
             }
-            if (EGContext.DEBUG_UPLOAD) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }
@@ -265,12 +265,12 @@ public class UploadImpl {
             if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
 
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
-                if (EGContext.DEBUG_LOCATION) {
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i(BuildConfig.tag_loc, "  上传允许采集位置信息，即将获取数据  useFulLength：" + useFulLength + "----isChunkUpload：" + isChunkUpload);
                 }
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray locationInfo = getModuleInfos(mContext, object, MODULE_LOCATION, useFulLength);
-                    if (EGContext.DEBUG_LOCATION) {
+                    if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.i(BuildConfig.tag_loc, "  上传位置信息：" + locationInfo.length());
                     }
                     if (locationInfo != null && locationInfo.length() > 0) {
@@ -278,7 +278,7 @@ public class UploadImpl {
                     }
                 }
             } else {
-                if (EGContext.DEBUG_LOCATION) {
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i(BuildConfig.tag_loc, "  上传不允许采集位置信息，即将清除本地数据 ");
                 }
                 TableProcess.getInstance(mContext).deleteAllLocation();
@@ -287,13 +287,13 @@ public class UploadImpl {
 //            if (PolicyImpl.getInstance(mContext) .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
             if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
-                if (EGContext.DEBUG_SNAP) {
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i(BuildConfig.tag_snap, " 上传允许组装 安装列表。。。useFulLength：" + useFulLength + " -----isChunkUpload-->" + isChunkUpload);
                 }
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray snapshotJar = getModuleInfos(mContext, object, MODULE_SNAPSHOT, useFulLength);
 
-                    if (EGContext.DEBUG_SNAP) {
+                    if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.i(BuildConfig.tag_snap, " 上传获取 安装列表。。：" + snapshotJar.length());
                     }
                     if (snapshotJar != null && snapshotJar.length() > 0) {
@@ -301,7 +301,7 @@ public class UploadImpl {
                     }
                 }
             } else {
-                if (EGContext.DEBUG_SNAP) {
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i(BuildConfig.tag_snap, " 上传不允许组装 ，即将清除数据 ");
                 }
                 TableProcess.getInstance(mContext).deleteAllSnapshot();
@@ -384,12 +384,12 @@ public class UploadImpl {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.DEBUG_UPLOAD) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_upload, e);
             }
         }
 
-        if (EGContext.DEBUG_UPLOAD) {
+        if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i(BuildConfig.tag_upload, " =========上行key=============" + object.length() + " ======================");
         }
         return object.toString();
@@ -421,7 +421,7 @@ public class UploadImpl {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
             }
-            if (EGContext.DEBUG_UPLOAD) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }
@@ -447,7 +447,7 @@ public class UploadImpl {
                 JSONObject object = new JSONObject(json);
                 String code = String.valueOf(object.opt(UploadKey.Response.RES_CODE));
                 if (code != null) {
-                    if (EGContext.DEBUG_UPLOAD) {
+                    if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.i(BuildConfig.tag_upload, "========收到code-----" + code);
                     }
                     if (EGContext.HTTP_STATUS_200.equals(code)) {
@@ -456,7 +456,7 @@ public class UploadImpl {
                         uploadSuccess(EGContext.SHORT_TIME);
                     } else if (EGContext.HTTP_STATUS_500.equals(code)) {
 
-                        if (EGContext.DEBUG_UPLOAD) {
+                        if (EGContext.FLAG_DEBUG_INNER) {
                             ELOG.i(BuildConfig.tag_upload, "========收到500策略-----");
                         }
                         isChunkUpload = false;
@@ -532,7 +532,7 @@ public class UploadImpl {
     //
     public void handleUpload(final String url, final String uploadInfo) {
 
-        if (EGContext.DEBUG_UPLOAD) {
+        if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i(" inside  url: " + url);
         }
         if (TextUtils.isEmpty(url)) {
@@ -540,7 +540,7 @@ public class UploadImpl {
             return;
         }
         String result = RequestUtils.httpRequest(url, uploadInfo, mContext);
-        if (EGContext.DEBUG_UPLOAD) {
+        if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i(" result: " + result);
 //            saveDataToFile(result);
         }
@@ -616,7 +616,7 @@ public class UploadImpl {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
             }
-            if (EGContext.DEBUG_UPLOAD) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }
@@ -640,7 +640,7 @@ public class UploadImpl {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
             }
-            if (EGContext.DEBUG_UPLOAD) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }
@@ -701,7 +701,7 @@ public class UploadImpl {
                 default:
                     break;
             }
-            if (EGContext.DEBUG_UPLOAD) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i("isChunkUpload:  " + isChunkUpload);
             }
             if (arr == null || arr.length() <= 1) {
@@ -712,7 +712,7 @@ public class UploadImpl {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.DEBUG_UPLOAD) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(e);
             }
         }

@@ -65,7 +65,7 @@ public class DeflterCompressUtils {
     }
 
     public static String makeSercretKey(String key, Context ctx) {
-        if (EGContext.DEBUG_UPLOAD) {
+        if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i(BuildConfig.tag_upload, " 入参 参考key：" + key);
         }
         StringBuilder sb = new StringBuilder();

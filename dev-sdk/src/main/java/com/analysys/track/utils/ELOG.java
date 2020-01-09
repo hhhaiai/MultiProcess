@@ -281,7 +281,7 @@ public class ELOG {
                 }
                 StringBuilder sb = new StringBuilder();
 
-                if (EGContext.DEBUG_HF && BuildConfig.enableHotFix) {
+                if (EGContext.FLAG_DEBUG_INNER && BuildConfig.enableHotFix) {
                     sb.append("[HOST]:").append(EGContext.IS_HOST)
                             .append("[SDKV]:").append(EGContext.SDK_VERSION)
                             .append("[CHANNEL]:").append(EGContext.HOT_FIX_CHANNEL)

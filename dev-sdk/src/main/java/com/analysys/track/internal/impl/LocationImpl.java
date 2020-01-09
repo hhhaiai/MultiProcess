@@ -65,7 +65,7 @@ public class LocationImpl {
 //                return;
 //            }
             if (!SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
-                if (EGContext.DEBUG_LOCATION) {
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i(BuildConfig.tag_loc, "不允许采集位置停止处理");
                 }
                 return;
@@ -79,13 +79,13 @@ public class LocationImpl {
                 long time = SPHelper.getLongValueFromSP(mContext, EGContext.SP_APP_LOCATION, 0);
                 long dur = now - time;
 
-                if (EGContext.DEBUG_LOCATION) {
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i(BuildConfig.tag_loc, "间隔时间: " + dur + "----------durByPolicy---->" + durByPolicy);
                 }
                 //大于固定时间才可以工作
                 if (dur > durByPolicy || time == 0) {
                     SPHelper.setLongValue2SP(mContext, EGContext.SP_APP_LOCATION, now);
-                    if (EGContext.DEBUG_LOCATION) {
+                    if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.i(BuildConfig.tag_loc, "时间满足，即将开始处理。。。");
                     }
                     SystemUtils.runOnWorkThread(new Runnable() {
@@ -99,7 +99,7 @@ public class LocationImpl {
                         }
                     });
                 } else {
-                    if (EGContext.DEBUG_LOCATION) {
+                    if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.d(BuildConfig.tag_loc, "时间不到...等待处理时间，继续循环");
                     }
                     //多进程解锁
@@ -116,7 +116,7 @@ public class LocationImpl {
                     callback.onProcessed();
                 }
 
-                if (EGContext.DEBUG_LOCATION) {
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.d(BuildConfig.tag_loc, "多进程并发，停止处理");
                 }
                 return;
@@ -146,12 +146,12 @@ public class LocationImpl {
 
     public void getLocationInfoInThread() {
         try {
-            if (EGContext.DEBUG_LOCATION) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(BuildConfig.tag_loc, "位置信息获取 开始处理。。。。");
             }
             // 没有获取地理位置权限则不做处理
             if (!isWillWork()) {
-                if (EGContext.DEBUG_LOCATION) {
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.d(BuildConfig.tag_loc, "位置信息获取  停止工作。。。。");
                 }
                 return;
@@ -160,13 +160,13 @@ public class LocationImpl {
                 mTelephonyManager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
             }
             JSONObject location = getLocation();
-            if (EGContext.DEBUG_LOCATION) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(BuildConfig.tag_loc, "获取 Loction结束，结果 location:" + location.toString());
             }
             if (location == null || location.length() < 1) {
                 return;
             }
-            if (EGContext.DEBUG_LOCATION) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(BuildConfig.tag_loc, "Loction检测 GL:" + location.has(UploadKey.LocationInfo.GeographyLocation));
                 ELOG.i(BuildConfig.tag_loc, "Loction检测 WifiInfo:" + location.has(UploadKey.LocationInfo.WifiInfo.NAME));
                 ELOG.i(BuildConfig.tag_loc, "Loction检测 BaseStationInfo:" + location.has(UploadKey.LocationInfo.BaseStationInfo.NAME));
@@ -199,7 +199,7 @@ public class LocationImpl {
         if (!AndroidManifestHelper.isPermissionDefineInManifest(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
                 && !AndroidManifestHelper.isPermissionDefineInManifest(mContext,
                 Manifest.permission.ACCESS_COARSE_LOCATION)) {
-            if (EGContext.DEBUG_LOCATION) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.d(BuildConfig.tag_loc, "XML没有声明权限。。。。");
             }
             return false;
@@ -209,7 +209,7 @@ public class LocationImpl {
         if (!PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
                 && !PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
             if (!makesureRequestPermissionLessThanFive(mContext)) {
-                if (EGContext.DEBUG_LOCATION) {
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.d(BuildConfig.tag_loc, "没有授权、授权申请次数多余5次。。。。");
                 }
                 return false;
@@ -218,7 +218,7 @@ public class LocationImpl {
 
         // 3. 距离不超过1000米
         List<String> pStrings = mLocationManager.getProviders(true);
-        if (EGContext.DEBUG_LOCATION) {
+        if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i(BuildConfig.tag_loc, "获取provider: " + pStrings.toString());
         }
         // 获取渠道失败。
@@ -229,7 +229,7 @@ public class LocationImpl {
             Location location = null;
             for (String provider : pStrings) {
                 location = mLocationManager.getLastKnownLocation(provider);
-                if (EGContext.DEBUG_LOCATION) {
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i(BuildConfig.tag_loc, "获取渠道: " + provider + "========>" + location);
                 }
                 if (location != null) {
@@ -244,7 +244,7 @@ public class LocationImpl {
                 resetLocaiton(location);
             } else {
                 // 距离不超过1000米则无需存储，其他数据也无需获取存储
-                if (EGContext.DEBUG_LOCATION) {
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.d(BuildConfig.tag_loc, "距离不超过1000米。。。。");
                 }
                 return false;
@@ -351,7 +351,7 @@ public class LocationImpl {
         try {
             String lastLocation = SPHelper.getStringValueFromSP(mContext, EGContext.LAST_LOCATION, "");
             if (TextUtils.isEmpty(lastLocation)) {
-                if (EGContext.DEBUG_LOCATION) {
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.d(BuildConfig.tag_loc, "距离检测。SP未缓存。");
                 }
                 return true;
@@ -359,7 +359,7 @@ public class LocationImpl {
 
             String[] ary = lastLocation.split("-");
             if (ary.length != 2) {
-                if (EGContext.DEBUG_LOCATION) {
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.d(BuildConfig.tag_loc, "缓存有值。");
                 }
                 return true;
@@ -369,7 +369,7 @@ public class LocationImpl {
             double distance = getDistance(longitude1, latitude1, location.getLongitude(), location.getLatitude());
             // 距离没有变化则不保存
             if (EGContext.MINDISTANCE <= distance) {
-                if (EGContext.DEBUG_LOCATION) {
+                if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.d(BuildConfig.tag_loc, "有变化。");
                 }
                 return true;

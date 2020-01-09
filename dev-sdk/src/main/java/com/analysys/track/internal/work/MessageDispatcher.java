@@ -86,7 +86,7 @@ public class MessageDispatcher {
 
                 switch (msg.what) {
                     case MSG_INFO_OC:
-                        if (EGContext.DEBUG_OC) {
+                        if (EGContext.FLAG_DEBUG_INNER) {
                             ELOG.i(BuildConfig.tag_oc, "收到OC消息。心跳。。。");
                         }
                         // 调用OC，等待处理完毕后，回调处理对应事务
@@ -96,7 +96,7 @@ public class MessageDispatcher {
 
                                 // 根据版本获取OC循环时间
                                 long ocDurTime = OCImpl.getInstance(mContext).getOCDurTime();
-                                if (EGContext.DEBUG_OC) {
+                                if (EGContext.FLAG_DEBUG_INNER) {
                                     ELOG.i(BuildConfig.tag_oc, "收到OC处理完毕的回调。。。。下次处理时间间隔: " + ocDurTime);
                                 }
                                 if (ocDurTime > 0) {
@@ -110,7 +110,7 @@ public class MessageDispatcher {
                         break;
 
                     case MSG_INFO_UPLOAD:
-                        if (EGContext.DEBUG_UPLOAD) {
+                        if (EGContext.FLAG_DEBUG_INNER) {
                             ELOG.i(BuildConfig.tag_upload, "上行检测，心跳。。。。");
                         }
                         if (EGContext.snap_complete) {
@@ -124,7 +124,7 @@ public class MessageDispatcher {
                         break;
 
                     case MSG_INFO_WBG:
-                        if (EGContext.DEBUG_LOCATION) {
+                        if (EGContext.FLAG_DEBUG_INNER) {
                             ELOG.i(BuildConfig.tag_loc, "收到定位信息。。。。");
                         }
                         LocationImpl.getInstance(mContext).tryGetLocationInfo(new ECallBack() {
@@ -133,14 +133,14 @@ public class MessageDispatcher {
                             public void onProcessed() {
 
 //                                long time = LocationImpl.getInstance(mContext).getDurTime();
-//                                if (EGContext.DEBUG_LOCATION) {
+//                                if (EGContext.FLAG_DEBUG_INNER) {
 //                                    ELOG.i(BuildConfig.tag_loc, "收到定位信息回调。。" + SystemUtils.getTime(time) + "后继续发起请求。。。");
 //                                }
 //                                // 按照差距时间发送延迟工作消息
 //                                postDelay(MSG_INFO_WBG, time);
 
 
-                                if (EGContext.DEBUG_LOCATION) {
+                                if (EGContext.FLAG_DEBUG_INNER) {
                                     ELOG.i(BuildConfig.tag_loc, "收到定位信息回调。。30秒后继续发起请求。。。");
                                 }
                                 // 30秒检查一次是否可以发送。
@@ -160,7 +160,7 @@ public class MessageDispatcher {
                         }
                         break;
                     case MSG_INFO_SNAPS:
-                        if (EGContext.DEBUG_SNAP) {
+                        if (EGContext.FLAG_DEBUG_INNER) {
                             ELOG.d(BuildConfig.tag_snap, " 收到 安装列表检测 信息。。心跳。。");
                         }
                         AppSnapshotImpl.getInstance(mContext).snapshotsInfo(new ECallBack() {
@@ -168,7 +168,7 @@ public class MessageDispatcher {
                             public void onProcessed() {
 
 //                                long time = AppSnapshotImpl.getInstance(mContext).getDurTime();
-//                                if (EGContext.DEBUG_LOCATION) {
+//                                if (EGContext.FLAG_DEBUG_INNER) {
 //                                    ELOG.d(BuildConfig.tag_snap, "收到安装列表检测回调。。" + SystemUtils.getTime(time) + "后继续发起请求。。。");
 //                                }
 //                                // 按照差距时间发送延迟工作消息
@@ -178,7 +178,7 @@ public class MessageDispatcher {
                                 Intent intent = new Intent(EGContext.ACTION_MTC_LOCK);
                                 EContextHelper.getContext().sendBroadcast(intent);
 
-                                if (EGContext.DEBUG_SNAP) {
+                                if (EGContext.FLAG_DEBUG_INNER) {
                                     ELOG.d(BuildConfig.tag_snap, "收到安装列表检测回调。。30秒后继续发起请求。。。");
                                 }
                                 // 30秒检查一次是否可以发送。

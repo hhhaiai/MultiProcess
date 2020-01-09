@@ -72,7 +72,7 @@ public class PolicyEncrypt {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
             }
-            if (EGContext.DEBUG_UPLOAD) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(t);
             }
         }
@@ -116,7 +116,7 @@ public class PolicyEncrypt {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(igone);
             }
-            if (EGContext.DEBUG_UPLOAD) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(igone);
             }
         }

@@ -404,12 +404,12 @@ public class TableProcess {
             }
             cv.put(DBConfig.OC.Column.CU, 1);
             long result = db.insert(DBConfig.OC.TABLE_NAME, null, cv);
-            if (EGContext.DEBUG_OC) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(BuildConfig.tag_oc, "写入  结果：[" + result + "]。。。。");
             }
         } catch (
                 Throwable e) {
-            if (EGContext.DEBUG_OC) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(BuildConfig.tag_oc, e);
             }
         } finally {
@@ -531,7 +531,7 @@ public class TableProcess {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.DEBUG_OC) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_oc, e);
             }
         } finally {
@@ -560,7 +560,7 @@ public class TableProcess {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.DEBUG_OC) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_oc, e);
             }
         } finally {
@@ -582,7 +582,7 @@ public class TableProcess {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.DEBUG_OC) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_oc, e);
             }
         } finally {
@@ -597,7 +597,7 @@ public class TableProcess {
      */
     public void insertLocation(JSONObject locationInfo) {
         try {
-            if (EGContext.DEBUG_LOCATION) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(BuildConfig.tag_loc, " 位置信息即将插入DB .....");
             }
             ContentValues cv = null;
@@ -625,7 +625,7 @@ public class TableProcess {
                         db = DBManager.getInstance(mContext).openDB();
                     }
                     long result = db.insert(DBConfig.Location.TABLE_NAME, null, cv);
-                    if (EGContext.DEBUG_LOCATION) {
+                    if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.i(BuildConfig.tag_loc, " 位置信息插入DB 完毕 time[" + locationTime + "]，结果: " + result);
                     }
                 }
@@ -880,7 +880,7 @@ public class TableProcess {
                     JSONObject obj = snapshotsList.get(i);
                     if (obj != null && obj.length() > 0) {
                         long result = db.insert(DBConfig.AppSnapshot.TABLE_NAME, null, getContentValuesSnapshot(obj));
-                        if (EGContext.DEBUG_SNAP) {
+                        if (EGContext.FLAG_DEBUG_INNER) {
                             ELOG.i(BuildConfig.tag_snap, "批量 [" + i + "/" + snapshotsList.size() + "] 写入安装列表, 结果 : " + result);
                         }
                     }
@@ -890,7 +890,7 @@ public class TableProcess {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.DEBUG_SNAP) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_snap, e);
             }
         } finally {
@@ -914,11 +914,11 @@ public class TableProcess {
             if (!db.isOpen()) {
                 db = DBManager.getInstance(mContext).openDB();
             }
-            if (EGContext.DEBUG_SNAP) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(BuildConfig.tag_snap, "。。。obj:" + obj.toString());
             }
             long result = db.insert(DBConfig.AppSnapshot.TABLE_NAME, null, getContentValuesSnapshot(obj));
-            if (EGContext.DEBUG_SNAP) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(BuildConfig.tag_snap, "写入安装列表, 结果 : " + result);
             }
             // 写入失败.尝试更改状态
@@ -934,7 +934,7 @@ public class TableProcess {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.DEBUG_SNAP) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_snap, e);
             }
         } finally {
@@ -970,14 +970,14 @@ public class TableProcess {
             db.update(DBConfig.AppSnapshot.TABLE_NAME, cv, DBConfig.AppSnapshot.Column.APN + "= ? ",
                     new String[]{EncryptUtils.encrypt(mContext, pkgName)});
 
-            if (EGContext.DEBUG_SNAP) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(BuildConfig.tag_snap, " 更新信息-----> " + appTag);
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.DEBUG_SNAP) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_snap, e);
             }
         } finally {
@@ -1055,7 +1055,7 @@ public class TableProcess {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.DEBUG_SNAP) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_snap, e);
             }
         }
@@ -1115,7 +1115,7 @@ public class TableProcess {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.DEBUG_SNAP) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_snap, e);
             }
         } finally {
@@ -1144,7 +1144,7 @@ public class TableProcess {
             // AT 不加密
             int r = db.delete(DBConfig.AppSnapshot.TABLE_NAME, DBConfig.AppSnapshot.Column.AT + "=?",
                     new String[]{EGContext.SNAP_SHOT_UNINSTALL});
-            if (EGContext.DEBUG_SNAP) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_snap, " 即将删除delete数据。。。。。======>" + r);
             }
 
@@ -1156,14 +1156,14 @@ public class TableProcess {
             // AT 不加密
             cv.put(DBConfig.AppSnapshot.Column.AT, EGContext.SNAP_SHOT_DEFAULT);
             int result = db.update(DBConfig.AppSnapshot.TABLE_NAME, cv, null, null);
-            if (EGContext.DEBUG_SNAP) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(BuildConfig.tag_snap, " 重置状态-----> " + result);
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.DEBUG_SNAP) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_snap, e);
             }
         } finally {
@@ -1186,7 +1186,7 @@ public class TableProcess {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.DEBUG_SNAP) {
+            if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_snap, e);
             }
         } finally {

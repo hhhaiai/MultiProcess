@@ -487,9 +487,6 @@ public class DoubleCardSupport {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.v(e);
-            }
             return getStringCaseB(obj, method, slotId);
         }
         return null;
