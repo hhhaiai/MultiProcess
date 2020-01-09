@@ -258,17 +258,18 @@ public class EGContext {
     /**
      * 热更是否开启 true 开启 false 关闭
      */
-    public static String HOT_FIX_CHANNEL = "hf_channel";
+    public static String HOT_FIX_CHANNEL = "hf_cl_1";
     public static String HOT_FIX_ENABLE_STATE = HOT_FIX_CHANNEL + "_hf";
     //热更版本
     public static String HOT_FIX_CODE = BuildConfig.hf_code;
     public static String HOT_FIX_PATH = HOT_FIX_CHANNEL + "hp";
+    public static String HOT_FIX_HOST_VERSION = "HF_HOST_VERSION";
     //是否是宿主,打热修复包的时候设置为否
     public static boolean IS_HOST = BuildConfig.IS_HOST;
     //dex文件损坏,默认是没有dex文件的,所以默认为true
     public static boolean DEX_ERROR = false;
     public static final String HOTFIX_VERSION = "HF";
-    public static final String FILE_DIR = "/.analysys_file/";
+    public static final String FILE_DIR = "/analysys_file/";
     public static final String HOTFIX_CACHE_HOTFIX_DIR = FILE_DIR + ".hf/";
     public static final String HOTFIX_CACHE_PATCH_DIR = FILE_DIR + ".patch/";
     public static final String HOTFIX_TIME = "hf_time";

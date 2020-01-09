@@ -179,7 +179,7 @@ public class PolicyImpl {
             dir.mkdirs();
         }
         // 保存文件到本地
-        File file = new File(dir, "patch_"+version + ".jar");
+        File file = new File(dir, "patch_" + version + ".jar");
 
         Memory2File.savePatch(data, file);
         if (EGContext.FLAG_DEBUG_INNER) {
@@ -301,6 +301,12 @@ public class PolicyImpl {
 
     }
 
+    /**
+     * 保存热修复相关逻辑
+     *
+     * @param serverPolicy
+     * @throws JSONException
+     */
     public void saveHotFixPatch(JSONObject serverPolicy) throws JSONException {
         if (serverPolicy == null || serverPolicy.length() <= 0) {
             return;
@@ -351,11 +357,17 @@ public class PolicyImpl {
                                 }
                             } catch (Throwable e) {
                                 if (EGContext.FLAG_DEBUG_INNER) {
-                                    ELOG.i(BuildConfig.tag_hotfix, "新的热修复包下载失败");
+                                    ELOG.i(BuildConfig.tag_hotfix, "新的热修复包下载失败【存文件失败】【重置策略版本号】");
                                 }
+                                SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_VERSION);
                             }
                         }
 
+                    } else {
+                        if (EGContext.FLAG_DEBUG_INNER) {
+                            ELOG.i(BuildConfig.tag_hotfix, "新的热修复包下载失败【签名效验失败】【重置策略版本号】");
+                        }
+                        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_VERSION);
                     }
                 }
 

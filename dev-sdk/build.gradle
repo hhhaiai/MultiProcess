@@ -9,7 +9,7 @@ costtime {
 //****************配置参数*****************
 def isRelease = false;
 //SDK版本号
-def version = "4.3.0.5|20200109"
+def version = "4.3.0.7|20200109"
 //*****************************************
 
 //是否是严格模式,控制短路逻辑的,true会启用短路,false 则不启用短路
@@ -147,7 +147,7 @@ task copyDoc(type: Copy) {
 }
 
 //https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Zip.html
-def zipPath = "../release/4.3.0.5_20200109/"
+def zipPath = "../release/4.3.0.7_20200109/"
 task packageZip(type: Zip) {
     from "../releasebak/"
 //    destinationDir: 来指定生成zip文件的目录，类型是file(dir,但是不要包含/)

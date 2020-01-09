@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
@@ -65,10 +66,12 @@ public class HotFixTransform {
                         if (EGContext.FLAG_DEBUG_INNER) {
                             Log.i(BuildConfig.tag_hotfix, "初始化:[path]" + path + "[enable]" + enable);
                         }
-                        if (enable && hasDexFile(path)) {
+                        if (enable && hasDexFile(context, path) && !isSdkUpdateInHost(context)) {
                             setAnalClassloader(context, path);
                         } else {
                             SPHelper.setBooleanValue2SP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
+                            SPHelper.setStringValue2SP(context, EGContext.HOT_FIX_PATH, "");
+                            path = null;
                         }
                         isinit = true;
                         //主进程进行清理旧的dex文件
@@ -78,6 +81,35 @@ public class HotFixTransform {
                 }
             }
         }
+    }
+
+    /**
+     * app 集成的SDK版本是否改变。
+     *
+     * @param context
+     * @return
+     */
+    private static boolean isSdkUpdateInHost(Context context) {
+        String hostV = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_HOST_VERSION, "");
+        if (TextUtils.isEmpty(hostV)) {
+            SPHelper.setStringValue2SP(context, EGContext.HOT_FIX_HOST_VERSION, EGContext.SDK_VERSION);
+            if (EGContext.FLAG_DEBUG_INNER) {
+                Log.i(BuildConfig.tag_hotfix, "热修宿主没变");
+            }
+            return false;
+        }
+        if (!hostV.equals(EGContext.SDK_VERSION)) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                Log.i(BuildConfig.tag_hotfix, "热修宿主变化【清除所有的旧热修dex包】");
+            }
+            return true;
+        } else {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                Log.i(BuildConfig.tag_hotfix, "热修宿主没变");
+            }
+            return false;
+        }
+
     }
 
 
@@ -125,6 +157,9 @@ public class HotFixTransform {
             }
         }
         });
+        if (EGContext.FLAG_DEBUG_INNER) {
+            Log.i(BuildConfig.tag_hotfix, "热修包应用成功:" + path);
+        }
     }
 
 
@@ -166,18 +201,25 @@ public class HotFixTransform {
         }
     }
 
-    private static boolean hasDexFile(String path) {
-        boolean hasdex = path != null && !"".equals(path) && new File(path).isFile();
-        if (hasdex) {
+    private static boolean hasDexFile(Context context, String path) {
+        if (TextUtils.isEmpty(path)) {
+            return false;
+        }
+        if (new File(path).isFile()) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 Log.i(BuildConfig.tag_hotfix, "dex 存在 path = " + path);
             }
+            return true;
         } else {
             if (EGContext.FLAG_DEBUG_INNER) {
                 Log.i(BuildConfig.tag_hotfix, "dex 不存在 path = " + path);
             }
+            if (EGContext.FLAG_DEBUG_INNER) {
+                Log.i(BuildConfig.tag_hotfix, "dex path 存在 文件实际不存在【清除策略号】下次重新获取" + path);
+            }
+            SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
+            return false;
         }
-        return hasdex;
     }
 
     private static volatile boolean isinit = false;
@@ -210,6 +252,10 @@ public class HotFixTransform {
             SPHelper.setBooleanValue2SP(EContextHelper.getContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
             //重新设置classloader
             loader = null;
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(BuildConfig.tag_hotfix, "dexError[损坏][重置策略版本号]");
+            }
+            SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
