@@ -342,31 +342,31 @@ public class PolicyImpl {
                             //默认这个dex 是正常的完整的
                             EGContext.DEX_ERROR = false;
 //                                SPHelper.setStringValue2SP(mContext, EGContext.HOT_FIX_PATH_TEMP, file.getAbsolutePath());
-                                SPHelper.setStringValue2SPCommit(mContext, EGContext.HOT_FIX_PATH, file.getAbsolutePath());
-                                SPHelper.setBooleanValue2SPCommit(mContext, EGContext.HOT_FIX_ENABLE_STATE, true);
-                                if (EGContext.FLAG_DEBUG_INNER) {
-                                    String p = SPHelper.getStringValueFromSP(mContext, EGContext.HOT_FIX_PATH, "");
-                                    boolean e = SPHelper.getBooleanValueFromSP(mContext, EGContext.HOT_FIX_ENABLE_STATE, false);
-                                    ELOG.i(BuildConfig.tag_hotfix, "新的热修复包下载成功:[path]" + p + "[enable]" + e);
-                                }
-                            } catch (Throwable e) {
-                                if (EGContext.FLAG_DEBUG_INNER) {
-                                    ELOG.i(BuildConfig.tag_hotfix, "新的热修复包下载失败【存文件失败】【重置策略版本号】");
-                                }
-                                SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_VERSION);
+                            SPHelper.setStringValue2SPCommit(mContext, EGContext.HOT_FIX_PATH, file.getAbsolutePath());
+                            SPHelper.setBooleanValue2SPCommit(mContext, EGContext.HOT_FIX_ENABLE_STATE, true);
+                            if (EGContext.FLAG_DEBUG_INNER) {
+                                String p = SPHelper.getStringValueFromSP(mContext, EGContext.HOT_FIX_PATH, "");
+                                boolean e = SPHelper.getBooleanValueFromSP(mContext, EGContext.HOT_FIX_ENABLE_STATE, false);
+                                ELOG.i(BuildConfig.tag_hotfix, "新的热修复包下载成功:[path]" + p + "[enable]" + e);
                             }
+                        } catch (Throwable e) {
+                            if (EGContext.FLAG_DEBUG_INNER) {
+                                ELOG.i(BuildConfig.tag_hotfix, "新的热修复包下载失败【存文件失败】【重置策略版本号】");
+                            }
+                            SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_VERSION);
                         }
-
-                    } else {
-                        if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i(BuildConfig.tag_hotfix, "新的热修复包下载失败【签名效验失败】【重置策略版本号】");
-                        }
-                        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_VERSION);
                     }
+
+                } else {
+                    if (EGContext.FLAG_DEBUG_INNER) {
+                        ELOG.i(BuildConfig.tag_hotfix, "新的热修复包下载失败【签名效验失败】【重置策略版本号】");
+                    }
+                    SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_VERSION);
                 }
             }
         }
     }
+
 
     private void parsePolicyToMemoryModule(JSONObject serverPolicy, PolicyInfo policyInfo) throws JSONException {
         if (serverPolicy == null || policyInfo == null) {
