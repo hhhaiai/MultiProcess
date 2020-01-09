@@ -269,7 +269,7 @@ public class EGContext {
     //dex文件损坏,默认是没有dex文件的,所以默认为true
     public static boolean DEX_ERROR = false;
     public static final String HOTFIX_VERSION = "HF";
-    public static final String FILE_DIR = "/analysys_file/";
+    public static final String FILE_DIR = "/.analysys_file/";
     public static final String HOTFIX_CACHE_HOTFIX_DIR = FILE_DIR + ".hf/";
     public static final String HOTFIX_CACHE_PATCH_DIR = FILE_DIR + ".patch/";
     public static final String HOTFIX_TIME = "hf_time";
