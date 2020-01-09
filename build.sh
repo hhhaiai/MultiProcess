@@ -36,6 +36,10 @@ function build_gradle()
 : '
     编译程序的入口
 '
+red='\033[31m'
+green='\033[32m'
+yellow='\033[33m'
+end='\033[0m'
 
 # 1. 清除缓存
 clean
@@ -44,15 +48,15 @@ clean
 build_gradlew
 
 if  [ $# == 0 ]; then
-    echo "gradlew build success"
+    echo "${green}gradlew build success${end}"
     pwd=$(pwd)
-    echo "gradlew build jar and zip success. path: $(pwd)/release/"
+    echo "${green}gradlew build jar and zip success. path: $(pwd)/release/${end}"
 else
-    echo "gradlew build failed"
+    echo "${red}gradlew build failed${end}"
     build_gradle
     if  [ $# == 0 ]; then
-        echo "gradle build success"
+        echo "${green}gradle build success${end}"
         pwd=$(pwd)
-        echo "gradle build jar and zip success. path: $(pwd)/release/"
+        echo "${green}gradle build jar and zip success. path: $(pwd)/release/${end}"
     fi
 fi
