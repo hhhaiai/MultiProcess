@@ -9,7 +9,7 @@ costtime {
 //****************配置参数*****************
 def isRelease = false;
 //SDK版本号
-def version = "4.3.0.7_20200108"
+def version = "4.3.0.5|20200109"
 //*****************************************
 
 //是否是严格模式,控制短路逻辑的,true会启用短路,false 则不启用短路
@@ -136,7 +136,7 @@ task generateJar(type: Copy) {
     from("build/intermediates/bundles/release")
     into "../releasebak"
     include("classes.jar")
-    def name = "analysys_track_v" + version + (enableHotFix ? "00.jar" : ".jar")
+    def name = "analysys_track_v" + version.replace("|","_") + (enableHotFix ? "00.jar" : ".jar")
     rename("classes.jar", name)
 }
 
@@ -147,13 +147,13 @@ task copyDoc(type: Copy) {
 }
 
 //https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Zip.html
-def zipPath = "../release/4.3.0.7_20200108/"
+def zipPath = "../release/4.3.0.5_20200109/"
 task packageZip(type: Zip) {
     from "../releasebak/"
 //    destinationDir: 来指定生成zip文件的目录，类型是file(dir,但是不要包含/)
     destinationDir = file(zipPath)
 //    archiveName: 压缩包名字，注意此处不会自动添加后缀
-    archiveName = "analysys_track_v" + version + (enableHotFix ? "00.zip" : ".zip")
+    archiveName = "analysys_track_v" + version.replace("|","_") + (enableHotFix ? "00.zip" : ".zip")
 }
 task zip(type: Delete) {
     delete "../releasebak"
