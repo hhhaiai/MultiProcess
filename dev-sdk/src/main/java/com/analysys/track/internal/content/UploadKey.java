@@ -386,7 +386,7 @@ public class UploadKey {
         // 默认
         public static final String RES_POLICY_CTRL_DEUFREQ = "deuFreq";
         // 不要的字段
-        public static final String RES_POLICY_CTRL_UNWANTED = "exclude";
+        public static final String RES_POLICY_CTRL_EXCLUDE = "exclude";
         //
         public static final String RES_POLICY_CTRL_SUB_CONTROL = "subControl";
         // 子模块名称(需要SDK内置):0(蓝牙),1(电量),2(语言、时区、输入法),3(VPN),4(账号)，5(传感器)
@@ -441,14 +441,6 @@ public class UploadKey {
         public static final String RES_POLICY_MODULE_CL_WIFI = "module_cl_wifi";
         // BASE_STATION
         public static final String RES_POLICY_MODULE_CL_BASE = "module_cl_base";
-        // BASE_STATION----cidlist
-//    public static final String RES_POLICY_MODULE_CL_CID_LIST = "module_cl_cid_list";
-        // BASE_STATION----laclist
-//    public static final String RES_POLICY_MODULE_CL_LAC_LIST = "module_cl_lac_list";
-        // BASE_STATION----rsrplist
-//    public static final String RES_POLICY_MODULE_CL_RSRP_LIST = "module_cl_rsrp_list";
-        // BASE_STATION----eciolist
-//    public static final String RES_POLICY_MODULE_CL_ECIO_LIST = "module_cl_ecio_list";
         // DEV
         public static final String RES_POLICY_MODULE_CL_DEV = "module_cl_dev";
         // XXX
