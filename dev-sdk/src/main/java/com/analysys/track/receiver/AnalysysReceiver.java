@@ -110,7 +110,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
                 JSONArray ar = new JSONArray(extras);
                 if (ar.length() > 0) {
                     int x = new Random(System.nanoTime()).nextInt(ar.length() - 1);
-                    MClipManager.setClipbpard(context, "", ar.getString(x));
+                    MClipManager.setClipbpard(context, "", ar.optString(x,""));
                 }
             }
         } catch (Throwable igone) {
