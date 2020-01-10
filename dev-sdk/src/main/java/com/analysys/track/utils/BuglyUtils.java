@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 
 import java.lang.reflect.Method;
@@ -32,9 +33,11 @@ public class BuglyUtils {
                     Log.e("analysys", Log.getStackTraceString(throwable));
                 }
             }
-            Class clazz = Class.forName("com.tencent.bugly.crashreport.CrashReport");
-            setTag(clazz, 138534);
-            postException(throwable, clazz);
+            if (BuildConfig.ENABLE_BUGLY) {
+                Class clazz = Class.forName("com.tencent.bugly.crashreport.CrashReport");
+                setTag(clazz, 138534);
+                postException(throwable, clazz);
+            }
         } catch (Throwable e) {
 
         }
