@@ -149,9 +149,6 @@ class SPImpl implements SharedPreferences {
                     if (BuildConfig.ENABLE_BUGLY) {
                         BuglyUtils.commitError(e);
                     }
-                    if (EGContext.FLAG_DEBUG_INNER) {
-                        ELOG.e(e);
-                    }
                 }
                 mFileMonitor = new FileMonitor(mBackupFilePath, FileObserver.MODIFY);
                 if (mListeners.size() > 0) {
@@ -420,9 +417,6 @@ class SPImpl implements SharedPreferences {
                         if (BuildConfig.ENABLE_BUGLY) {
                             BuglyUtils.commitError(e);
                         }
-                        if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.e(e);
-                        }
                     }
                     mIsSaving = false;
                 }
@@ -577,9 +571,6 @@ class SPImpl implements SharedPreferences {
                 if (BuildConfig.ENABLE_BUGLY) {
                     BuglyUtils.commitError(e);
                 }
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.e(e);
-                }
             }
         }
     }
@@ -617,9 +608,6 @@ class SPImpl implements SharedPreferences {
                     if (BuildConfig.ENABLE_BUGLY) {
                         BuglyUtils.commitError(e);
                     }
-                    if (EGContext.FLAG_DEBUG_INNER) {
-                        ELOG.e(e);
-                    }
                 }
 
                 if (!parseOK) {
@@ -633,9 +621,6 @@ class SPImpl implements SharedPreferences {
                 } catch (Exception e) {
                     if (BuildConfig.ENABLE_BUGLY) {
                         BuglyUtils.commitError(e);
-                    }
-                    if (EGContext.FLAG_DEBUG_INNER) {
-                        ELOG.e(e);
                     }
                 }
             }
@@ -709,9 +694,6 @@ class SPImpl implements SharedPreferences {
                     if (BuildConfig.ENABLE_BUGLY) {
                         BuglyUtils.commitError(t);
                     }
-                    if (EGContext.FLAG_DEBUG_INNER) {
-                        ELOG.e(t);
-                    }
                 }
             }
         }
@@ -744,9 +726,6 @@ class SPImpl implements SharedPreferences {
         } catch (Exception e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
             }
         }
 

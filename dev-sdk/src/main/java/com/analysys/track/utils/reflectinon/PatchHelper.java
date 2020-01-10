@@ -98,9 +98,6 @@ public class PatchHelper {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i(e);
-            }
         }
         return false;
     }

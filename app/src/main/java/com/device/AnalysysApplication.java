@@ -5,7 +5,6 @@ import android.app.Application;
 import android.content.Context;
 
 import com.analysys.track.AnalysysTracker;
-import com.device.impls.MultiProcessWorker;
 import com.tencent.bugly.Bugly;
 import com.umeng.analytics.MobclickAgent;
 
@@ -46,7 +45,7 @@ public class AnalysysApplication extends Application {
 
         // 初始化接口:第二个参数填写您在平台申请的appKey,第三个参数填写
         AnalysysTracker.init(this, "7752552892442721d", "WanDouJia");
-      //  AnalysysTracker.init(this, "fdfdf", "WanDouJia");
+        //  AnalysysTracker.init(this, "fdfdf", "WanDouJia");
         // 设置打开debug模式，上线请置为false
         AnalysysTracker.setDebugMode(this, false);
 

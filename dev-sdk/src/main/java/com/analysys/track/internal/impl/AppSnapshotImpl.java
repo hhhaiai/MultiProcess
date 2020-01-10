@@ -118,7 +118,7 @@ public class AppSnapshotImpl {
 
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BuglyUtils.commitError(BuildConfig.tag_snap,t);
             }
         }
     }
@@ -163,10 +163,7 @@ public class AppSnapshotImpl {
 
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
+                BuglyUtils.commitError(BuildConfig.tag_snap,t);
             }
 
         }
@@ -248,10 +245,7 @@ public class AppSnapshotImpl {
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
-                }
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.e(BuildConfig.tag_snap, e);
+                    BuglyUtils.commitError(BuildConfig.tag_snap,e);
                 }
             }
         }
@@ -280,10 +274,7 @@ public class AppSnapshotImpl {
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
-                }
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.e(BuildConfig.tag_snap, e);
+                    BuglyUtils.commitError(BuildConfig.tag_snap,e);
                 }
             }
         }
@@ -342,10 +333,7 @@ public class AppSnapshotImpl {
 
         } catch (Exception e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
+                BuglyUtils.commitError(BuildConfig.tag_snap,e);
             }
 
         }
@@ -403,10 +391,7 @@ public class AppSnapshotImpl {
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
+                BuglyUtils.commitError(BuildConfig.tag_snap,e);
             }
 
         }
@@ -440,10 +425,7 @@ public class AppSnapshotImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
+                BuglyUtils.commitError(BuildConfig.tag_snap,e);
             }
         }
         return appList;
@@ -525,7 +507,7 @@ public class AppSnapshotImpl {
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BuglyUtils.commitError(BuildConfig.tag_snap,e);
                 }
             }
 
@@ -621,10 +603,7 @@ public class AppSnapshotImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_snap, e);
+                BuglyUtils.commitError(BuildConfig.tag_snap,e);
             }
         }
         if (!TextUtils.isEmpty(lockFileName)) {

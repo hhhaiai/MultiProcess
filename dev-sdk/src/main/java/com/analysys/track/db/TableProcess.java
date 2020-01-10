@@ -63,9 +63,6 @@ public class TableProcess {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
-            }
         } finally {
             DBManager.getInstance(mContext).closeDB();
         }
@@ -279,9 +276,6 @@ public class TableProcess {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
-            }
         } finally {
             DBManager.getInstance(mContext).closeDB();
         }
@@ -352,9 +346,6 @@ public class TableProcess {
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
             }
             array = null;
         } finally {
@@ -529,10 +520,7 @@ public class TableProcess {
             }
         } catch (Exception e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_oc, e);
+                BuglyUtils.commitError(BuildConfig.tag_oc,e);
             }
         } finally {
             StreamerUtils.safeClose(cursor);
@@ -560,9 +548,6 @@ public class TableProcess {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_oc, e);
-            }
         } finally {
             DBManager.getInstance(mContext).closeDB();
         }
@@ -581,9 +566,6 @@ public class TableProcess {
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_oc, e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -633,9 +615,6 @@ public class TableProcess {
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -707,9 +686,6 @@ public class TableProcess {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
-            }
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -735,9 +711,6 @@ public class TableProcess {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
-            }
         } finally {
             DBManager.getInstance(mContext).closeDB();
         }
@@ -757,9 +730,7 @@ public class TableProcess {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
-            }
+
         } finally {
             DBManager.getInstance(mContext).closeDB();
         }
@@ -890,9 +861,6 @@ public class TableProcess {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_snap, e);
-            }
         } finally {
             DBManager.getInstance(mContext).closeDB();
         }
@@ -934,9 +902,6 @@ public class TableProcess {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_snap, e);
-            }
         } finally {
             DBManager.getInstance(mContext).closeDB();
         }
@@ -976,9 +941,6 @@ public class TableProcess {
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_snap, e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -1055,9 +1017,6 @@ public class TableProcess {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_snap, e);
-            }
         }
         return jsonObj;
     }
@@ -1115,9 +1074,6 @@ public class TableProcess {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_snap, e);
-            }
         } finally {
             StreamerUtils.safeClose(cursor);
             DBManager.getInstance(mContext).closeDB();
@@ -1163,9 +1119,6 @@ public class TableProcess {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_snap, e);
-            }
         } finally {
             DBManager.getInstance(mContext).closeDB();
         }
@@ -1185,9 +1138,6 @@ public class TableProcess {
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_snap, e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();

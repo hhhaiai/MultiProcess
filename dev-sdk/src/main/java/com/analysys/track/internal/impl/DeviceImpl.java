@@ -281,9 +281,6 @@ public class DeviceImpl {
                 if (BuildConfig.ENABLE_BUGLY) {
                     BuglyUtils.commitError(e);
                 }
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.e(e);
-                }
             } finally {
                 if (reader != null) {
                     reader.close();
@@ -315,9 +312,6 @@ public class DeviceImpl {
         } catch (Exception e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
             }
         } finally {
             if (br != null) {

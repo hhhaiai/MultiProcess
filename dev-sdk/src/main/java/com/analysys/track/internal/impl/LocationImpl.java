@@ -124,10 +124,7 @@ public class LocationImpl {
 
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
+                BuglyUtils.commitError(BuildConfig.tag_loc,t);
             }
         }
     }
@@ -178,10 +175,7 @@ public class LocationImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
+                BuglyUtils.commitError(BuildConfig.tag_loc,t);
             }
         }
     }
@@ -251,10 +245,7 @@ public class LocationImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
+                BuglyUtils.commitError(BuildConfig.tag_loc,t);
             }
         }
         return true;
@@ -293,7 +284,7 @@ public class LocationImpl {
             return true;
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BuglyUtils.commitError(BuildConfig.tag_loc,t);
             }
         }
         return false;
@@ -376,7 +367,7 @@ public class LocationImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BuglyUtils.commitError(BuildConfig.tag_loc,e);
             }
         }
         return false;
@@ -390,7 +381,7 @@ public class LocationImpl {
                         String.valueOf(System.currentTimeMillis()), DataController.SWITCH_OF_COLLECTION_TIME);
             } catch (Throwable t) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(t);
+                    BuglyUtils.commitError(BuildConfig.tag_loc,t);
                 }
             }
             try {
@@ -399,7 +390,7 @@ public class LocationImpl {
                         locationInfo, DataController.SWITCH_OF_GEOGRAPHY_LOCATION);
             } catch (Throwable t) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(t);
+                    BuglyUtils.commitError(BuildConfig.tag_loc,t);
                 }
             }
 
@@ -414,7 +405,7 @@ public class LocationImpl {
                     }
                 } catch (Throwable t) {
                     if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(t);
+                        BuglyUtils.commitError(BuildConfig.tag_loc,t);
                     }
                 }
             }
@@ -432,17 +423,14 @@ public class LocationImpl {
                     }
                 } catch (Throwable t) {
                     if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(t);
+                        BuglyUtils.commitError(BuildConfig.tag_loc,t);
                     }
                 }
 
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
+                BuglyUtils.commitError(BuildConfig.tag_loc,e);
             }
         }
         return locationJson;
@@ -571,10 +559,7 @@ public class LocationImpl {
                     }
                 } catch (Throwable t) {
                     if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(t);
-                    }
-                    if (EGContext.FLAG_DEBUG_INNER) {
-                        ELOG.e(t);
+                        BuglyUtils.commitError(BuildConfig.tag_loc,t);
                     }
                 }
                 if (gsmList != null && tempGsmMap != null) {
@@ -587,10 +572,7 @@ public class LocationImpl {
             }
         } catch (Exception e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
+                BuglyUtils.commitError(BuildConfig.tag_loc,e);
             }
         }
         return jsonArray;
@@ -618,10 +600,7 @@ public class LocationImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
+                BuglyUtils.commitError(BuildConfig.tag_loc,t);
             }
         }
     }
@@ -690,7 +669,7 @@ public class LocationImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BuglyUtils.commitError(BuildConfig.tag_loc,t);
             }
         }
         return jsonObject;

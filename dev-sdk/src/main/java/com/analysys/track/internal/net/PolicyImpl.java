@@ -151,9 +151,6 @@ public class PolicyImpl {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i(e);
-            }
         }
         // 内存的大容量数据清除
         newPolicy.clearMemoryData();
@@ -288,9 +285,6 @@ public class PolicyImpl {
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i(" not new version policy, will return");
             }
         }
 

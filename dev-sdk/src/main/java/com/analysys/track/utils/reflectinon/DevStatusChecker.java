@@ -516,9 +516,6 @@ public class DevStatusChecker {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
-            }
         }
 
 

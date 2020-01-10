@@ -74,9 +74,6 @@ public class AnalysysInternal {
                     if (BuildConfig.ENABLE_BUGLY) {
                         BuglyUtils.commitError(e);
                     }
-                    if (EGContext.FLAG_DEBUG_INNER) {
-                        ELOG.e(e);
-                    }
                 }
 
             }
@@ -200,9 +197,6 @@ public class AnalysysInternal {
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
             }
         }
     }

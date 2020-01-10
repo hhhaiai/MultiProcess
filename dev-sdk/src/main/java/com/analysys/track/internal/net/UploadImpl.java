@@ -168,11 +168,9 @@ public class UploadImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BuglyUtils.commitError(BuildConfig.tag_upload,t);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
-            }
+
         }
     }
 
@@ -231,14 +229,9 @@ public class UploadImpl {
             isUploading = false;
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BuglyUtils.commitError(BuildConfig.tag_upload,t);
             }
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
-            }
+
         }
     }
 
@@ -254,7 +247,7 @@ public class UploadImpl {
                 devJson = DataPackaging.getInstance().getDevInfo(mContext);
             } catch (Throwable t) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(t);
+                    BuglyUtils.commitError(BuildConfig.tag_upload,t);
                 }
             }
             if (devJson != null && devJson.length() > 0) {
@@ -382,10 +375,7 @@ public class UploadImpl {
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_upload, e);
+                BuglyUtils.commitError(BuildConfig.tag_upload,e);
             }
         }
 
@@ -419,10 +409,7 @@ public class UploadImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
+                BuglyUtils.commitError(BuildConfig.tag_upload,t);
             }
         }
 
@@ -520,10 +507,7 @@ public class UploadImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
+                BuglyUtils.commitError(BuildConfig.tag_upload,e);
             }
         }
     }
@@ -614,10 +598,7 @@ public class UploadImpl {
             SPHelper.setLongValue2SP(mContext, USMImpl.LAST_UPLOAD_TIME, System.currentTimeMillis());
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
+                BuglyUtils.commitError(BuildConfig.tag_upload,t);
             }
         }
     }
@@ -638,10 +619,7 @@ public class UploadImpl {
             SPHelper.setLongValue2SP(mContext, EGContext.RETRYTIME, SystemUtils.intervalTime(mContext));
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
+                BuglyUtils.commitError(BuildConfig.tag_upload,t);
             }
         }
 
@@ -710,10 +688,7 @@ public class UploadImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
+                BuglyUtils.commitError(BuildConfig.tag_upload,e);
             }
         }
         return arr;

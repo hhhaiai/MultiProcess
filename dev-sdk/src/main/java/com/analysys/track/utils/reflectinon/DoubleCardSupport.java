@@ -85,9 +85,6 @@ public class DoubleCardSupport {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.v(e);
-            }
         }
         return "";
     }
@@ -120,9 +117,6 @@ public class DoubleCardSupport {
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.v(e);
             }
         }
         return "";
@@ -183,9 +177,6 @@ public class DoubleCardSupport {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.v(e);
-            }
         }
     }
 
@@ -222,9 +213,6 @@ public class DoubleCardSupport {
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.v(e);
             }
         }
     }
@@ -277,9 +265,6 @@ public class DoubleCardSupport {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.v(e);
-            }
         }
     }
 
@@ -296,9 +281,6 @@ public class DoubleCardSupport {
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.v(e);
             }
         }
     }
@@ -324,9 +306,6 @@ public class DoubleCardSupport {
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.v(e);
             }
         }
     }
@@ -360,9 +339,6 @@ public class DoubleCardSupport {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.v(e);
-            }
         }
     }
 
@@ -386,9 +362,6 @@ public class DoubleCardSupport {
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.v(e);
             }
         }
     }
@@ -443,9 +416,6 @@ public class DoubleCardSupport {
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.v(e);
             }
         }
     }
@@ -510,9 +480,6 @@ public class DoubleCardSupport {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.v(e);
-            }
         }
         return null;
     }
@@ -543,9 +510,7 @@ public class DoubleCardSupport {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.v(e);
-            }
+
         }
         return null;
     }

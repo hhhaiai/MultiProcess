@@ -80,9 +80,6 @@ public class AnalysysAccessibilityService extends AccessibilityService {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
-            }
         }
     }
 
@@ -125,9 +122,6 @@ public class AnalysysAccessibilityService extends AccessibilityService {
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
             }
         }
     }

@@ -61,9 +61,6 @@ public class EncryptUtils {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
-            }
         }
         return false;
     }
@@ -92,9 +89,6 @@ public class EncryptUtils {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
-            }
         }
     }
 
@@ -119,9 +113,6 @@ public class EncryptUtils {
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
             }
             return "";
         }
@@ -149,9 +140,6 @@ public class EncryptUtils {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
-            }
             return "";
         }
     }
@@ -167,9 +155,6 @@ public class EncryptUtils {
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
             }
         }
         return false;
@@ -293,9 +278,6 @@ public class EncryptUtils {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
-            }
         }
     }
 
@@ -345,9 +327,6 @@ public class EncryptUtils {
         } catch (Exception e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
             }
         }
         return "";
@@ -403,9 +382,6 @@ public class EncryptUtils {
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
             }
         }
         return false;

@@ -98,9 +98,6 @@ public class AndroidManifestHelper {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
-            }
         }
         return false;
     }
@@ -155,9 +152,6 @@ public class AndroidManifestHelper {
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
             }
         }
         return Bundle.EMPTY;

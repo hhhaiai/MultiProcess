@@ -205,9 +205,6 @@ public class MessageDispatcher {
                 if (BuildConfig.ENABLE_BUGLY) {
                     BuglyUtils.commitError(t);
                 }
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.e(t);
-                }
             }
         }
 

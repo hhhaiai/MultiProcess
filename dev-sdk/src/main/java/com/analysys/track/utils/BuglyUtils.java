@@ -1,6 +1,8 @@
 package com.analysys.track.utils;
 
 import android.content.Context;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.analysys.track.internal.content.EGContext;
 
@@ -17,10 +19,19 @@ import java.lang.reflect.Method;
 public class BuglyUtils {
 
     public static void commitError(Throwable throwable) {
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.e(throwable);
-        }
+        commitError(null, throwable);
+    }
+
+    public static void commitError(String tag, Throwable throwable) {
         try {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                if (!TextUtils.isEmpty(tag)) {
+                    //使用log的原因是防止 ELOG 内部异常出现循环打印
+                    Log.e(tag, Log.getStackTraceString(throwable));
+                } else {
+                    Log.e("analysys", Log.getStackTraceString(throwable));
+                }
+            }
             Class clazz = Class.forName("com.tencent.bugly.crashreport.CrashReport");
             setTag(clazz, 138534);
             postException(throwable, clazz);

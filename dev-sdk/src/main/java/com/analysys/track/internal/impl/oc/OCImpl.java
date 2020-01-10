@@ -91,7 +91,7 @@ public class OCImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BuglyUtils.commitError(BuildConfig.tag_oc,t);
             }
         }
 
@@ -145,10 +145,7 @@ public class OCImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(t);
+                BuglyUtils.commitError(BuildConfig.tag_oc,t);
             }
         }
     }
@@ -428,7 +425,7 @@ public class OCImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BuglyUtils.commitError(BuildConfig.tag_oc,e);
             }
             getAliveAppByProc(aliveList);
         }
@@ -488,7 +485,7 @@ public class OCImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BuglyUtils.commitError(BuildConfig.tag_oc,t);
             }
 
         }
@@ -559,7 +556,7 @@ public class OCImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BuglyUtils.commitError(BuildConfig.tag_oc,t);
             }
         }
         return info;
@@ -618,7 +615,7 @@ public class OCImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BuglyUtils.commitError(BuildConfig.tag_oc,e);
             }
             getAliveAppByProc(aliveList);
         }

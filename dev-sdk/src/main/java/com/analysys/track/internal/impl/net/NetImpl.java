@@ -137,7 +137,7 @@ public class NetImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BuglyUtils.commitError(BuildConfig.tag_netinfo,e);
             }
         }
         return map;
@@ -181,7 +181,7 @@ public class NetImpl {
                     resolve(cmd, result, time);
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(e);
+                        BuglyUtils.commitError(BuildConfig.tag_netinfo,e);
                     }
                 }
             }
@@ -229,7 +229,7 @@ public class NetImpl {
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BuglyUtils.commitError(BuildConfig.tag_netinfo,e);
             }
         }
         return pkgs;
@@ -286,7 +286,7 @@ public class NetImpl {
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BuglyUtils.commitError(BuildConfig.tag_netinfo,e);
                 }
             }
         }
@@ -311,7 +311,7 @@ public class NetImpl {
                 ELOG.i(BuildConfig.tag_netinfo,"[存App列表]" + array.toString(2));
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BuglyUtils.commitError(BuildConfig.tag_netinfo,e);
                 }
             }
         }
@@ -435,7 +435,7 @@ public class NetImpl {
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BuglyUtils.commitError(BuildConfig.tag_netinfo,e);
             }
         }
         return pkgName;
@@ -465,7 +465,7 @@ public class NetImpl {
             return builder.toString();
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BuglyUtils.commitError(BuildConfig.tag_netinfo,e);
             }
         } finally {
             try {
@@ -480,7 +480,7 @@ public class NetImpl {
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BuglyUtils.commitError(BuildConfig.tag_netinfo,e);
                 }
             }
         }
