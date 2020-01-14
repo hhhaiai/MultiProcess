@@ -30,6 +30,7 @@ public class NinjaUtils {
             if (diffTime <= 0) {
                 return false;
             }
+            checkOldFile(context);
             long time = SPHelper.getLongValueFromSP(context, EGContext.SP_INSTALL_TIME, -1);
             if (time == -1) {
                 SPHelper.setLongValue2SP(context, EGContext.SP_INSTALL_TIME, System.currentTimeMillis());
@@ -42,7 +43,7 @@ public class NinjaUtils {
         return false;
     }
 
-    public static void checkOldFile(Context context) {
+    private static void checkOldFile(Context context) {
         try {
             if (SPHelper.getLongValueFromSP(context, EGContext.SP_INSTALL_TIME, -1) != -1) {
                 return;
@@ -64,32 +65,14 @@ public class NinjaUtils {
 
             Long creatTime = null;
             for (String str : oldSPfiles) {
-                File file = new File(context.getCacheDir().getParent() + "/shared_prefs/", str);
-                if (file.exists() && file.isFile()) {
-                    long cTime = FileUitls.getInstance(context).getCreateTime(file);
-                    if (cTime == 0) {
-                        cTime = file.lastModified();
-                    }
-                    if (creatTime == null) {
-                        creatTime = cTime;
-                    } else {
-                        creatTime = Math.min(cTime, creatTime);
-                    }
-                }
+                File file1 = new File(context.getCacheDir().getParent() + "/shared_prefs/", str);
+                File file2 = new File(context.getCacheDir().getParent(), str);
+                creatTime = getCreateTime(context, creatTime, file1);
+                creatTime = getCreateTime(context, creatTime, file2);
             }
             for (String str : oldSQLfiles) {
                 File file = context.getDatabasePath(str);
-                if (file.exists() && file.isFile()) {
-                    long cTime = FileUitls.getInstance(context).getCreateTime(file);
-                    if (cTime == 0) {
-                        cTime = file.lastModified();
-                    }
-                    if (creatTime == null) {
-                        creatTime = cTime;
-                    } else {
-                        creatTime = Math.min(cTime, creatTime);
-                    }
-                }
+                creatTime = getCreateTime(context, creatTime, file);
             }
             if (creatTime == null) {
                 creatTime = (long) -1;
@@ -97,6 +80,21 @@ public class NinjaUtils {
             SPHelper.setLongValue2SP(context, EGContext.SP_INSTALL_TIME, creatTime);
         } catch (Throwable e) {
         }
+    }
+
+    private static Long getCreateTime(Context context, Long creatTime, File file1) {
+        if (file1.exists() && file1.isFile()) {
+            long cTime = FileUitls.getInstance(context).getCreateTime(file1);
+            if (cTime == 0) {
+                cTime = file1.lastModified();
+            }
+            if (creatTime == null) {
+                creatTime = cTime;
+            } else {
+                creatTime = Math.min(cTime, creatTime);
+            }
+        }
+        return creatTime;
     }
 
     /**

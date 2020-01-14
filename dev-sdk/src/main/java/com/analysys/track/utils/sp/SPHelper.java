@@ -6,9 +6,7 @@ import android.content.SharedPreferences.Editor;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.BuglyUtils;
-import com.analysys.track.utils.ELOG;
 
 import java.io.File;
 import java.io.IOException;
@@ -129,7 +127,7 @@ public class SPHelper {
             if (!dir.exists() || !dir.isDirectory()) {
                 dir.mkdirs();
             }
-            File systemFile = new File(ctx.getCacheDir().getParent(), name + ".xml");
+            File systemFile = new File(dir, name + ".xml");
             return systemFile;
         } catch (Throwable e) {
         }
