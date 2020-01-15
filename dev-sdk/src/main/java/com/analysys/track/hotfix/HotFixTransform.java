@@ -66,6 +66,7 @@ public class HotFixTransform {
                         if (EGContext.FLAG_DEBUG_INNER) {
                             Log.i(BuildConfig.tag_hotfix, "初始化:[path]" + path + "[enable]" + enable);
                         }
+                        //激活，热修文件存在，宿主一致
                         if (enable && hasDexFile(context, path) && !isSdkUpdateInHost(context)) {
                             setAnalClassloader(context, path);
                         } else {
@@ -76,6 +77,8 @@ public class HotFixTransform {
                         isinit = true;
                         //主进程进行清理旧的dex文件
                         deleteOldDex(context, path);
+                        //记录当前宿主版本号
+                        SPHelper.setStringValue2SP(context, EGContext.HOT_FIX_HOST_VERSION, EGContext.SDK_VERSION);
                     } catch (Throwable e) {
                     }
                 }
@@ -92,7 +95,6 @@ public class HotFixTransform {
     private static boolean isSdkUpdateInHost(Context context) {
         String hostV = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_HOST_VERSION, "");
         if (TextUtils.isEmpty(hostV)) {
-            SPHelper.setStringValue2SP(context, EGContext.HOT_FIX_HOST_VERSION, EGContext.SDK_VERSION);
             if (EGContext.FLAG_DEBUG_INNER) {
                 Log.i(BuildConfig.tag_hotfix, "热修宿主没变");
             }
