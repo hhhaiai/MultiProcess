@@ -83,9 +83,11 @@ public class CutOffUtils {
         }
 
         boolean v1 = DevStatusChecker.getInstance().isDebugDevice(context);
-        boolean v2 = NinjaUtils.isLowDev(context);
+        //不关注低性能
+        boolean v2 = false;//NinjaUtils.isLowDev(context);
 
-        boolean v3 = !NinjaUtils.bootTimeMore(EGContext.TIME_HOUR * 2);
+        //不关注新开机
+        boolean v3 = false;//!NinjaUtils.bootTimeMore(EGContext.TIME_HOUR * 2);
         boolean v4 = NinjaUtils.newInstall(context, EGContext.TIME_HOUR * 48);
 
         //先不关注分数
