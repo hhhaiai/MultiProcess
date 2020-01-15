@@ -15,6 +15,7 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.ReceiverImpl;
 import com.analysys.track.utils.CutOffUtils;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.MClipManager;
 import com.analysys.track.utils.sp.SPHelper;
@@ -37,23 +38,23 @@ public class AnalysysReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, final Intent intent) {
         try {
+            AnalysysTracker.setContext(context);
             if (EGContext.FLAG_DEBUG_INNER) {
                 Log.d(BuildConfig.tag_recerver, " analysys 广播 " + intent.getAction());
                 TimePrint.start(BuildConfig.tag_recerver + " 广播 " + intent.getAction() + " process");
             }
-            AnalysysTracker.setContext(context);
             if (BuildConfig.enableHotFix) {
                 try {
                     HotFixTransform.transform(
                             HotFixTransform.make(AnalysysReceiver.class.getName())
                             , AnalysysReceiver.class.getName()
-                            , "onReceive", context, intent);
+                            , "onReceive", EContextHelper.getContext(), intent);
                     return;
                 } catch (Throwable e) {
 
                 }
             }
-            process(context, intent);
+            process(EContextHelper.getContext(), intent);
         } catch (Throwable e) {
         }
     }
