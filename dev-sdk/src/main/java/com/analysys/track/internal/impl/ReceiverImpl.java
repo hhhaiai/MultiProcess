@@ -168,16 +168,19 @@ public class ReceiverImpl {
                 MessageDispatcher.getInstance(context).quit();
             }
 
-            File hotfixDir = new File(context.getFilesDir(), EGContext.HOTFIX_CACHE_HOTFIX_DIR);
-            FileUitls.getInstance(context).deleteFile(hotfixDir);
-            File patchDir = new File(context.getFilesDir(), EGContext.HOTFIX_CACHE_PATCH_DIR);
-            FileUitls.getInstance(context).deleteFile(patchDir);
+            if (!BuildConfig.IS_HOST) {
+                File hotfixDir = new File(context.getFilesDir(), EGContext.HOTFIX_CACHE_HOTFIX_DIR);
+                FileUitls.getInstance(context).deleteFile(hotfixDir);
+                File patchDir = new File(context.getFilesDir(), EGContext.HOTFIX_CACHE_PATCH_DIR);
+                FileUitls.getInstance(context).deleteFile(patchDir);
+                PolicyImpl.getInstance(EContextHelper.getContext()).clear();
+                // 清除本地缓存
+                SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
+                SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
+                SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
+            }
 
-            PolicyImpl.getInstance(EContextHelper.getContext()).clear();
-            // 清除本地缓存
-            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
-            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
-            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
+
         } catch (Throwable e) {
         }
     }
