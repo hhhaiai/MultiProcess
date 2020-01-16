@@ -48,7 +48,7 @@ time=$(date "+%Y%m%d-%H%M%S")
 $ecs "${yellow}[==========================================================]${endColor}"
 $ecs  "${yellow}[======================   开始编译  =======================]${endColor}"
 $ecs  "${yellow}[==========================================================]${endColor}"
-./gradlew build
+./gradlew :dex:build
 
 if [ $? -ne 0 ]; then
     $ecs  "${red}[********************************]${endColor}\n"
@@ -59,8 +59,7 @@ else
     $ecs  "${green}[******* graddew build 成功 *****]${endColor}"
     $ecs  "${green}[********************************]${endColor}"
     # need delay .wait for build over
-    cd ./dex/build/intermediates/classes/debug/
-    $dx --dex --output=classes.dex cn/com/analysys/dex/Test.class com/analysys/Ab.class
+    $dx --dex --output=classes.dex  ./dex/build/intermediates/bundles/release/classes.jar
     if [ $? -ne 0 ]; then
         $ecs  "${red}[********************************]${endColor}\n"
         $ecs  "${red}[*********** dx打包失败 **********]${endColor}\n"
