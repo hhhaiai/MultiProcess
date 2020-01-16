@@ -26,6 +26,8 @@ public class UploadKey {
         public static final String DeviceId = "DI";
         //OAID 厂商联盟的id,需要SDK集成方集成了相关SDK才可以获取
         public static final String OAID = "OAID";
+        //策略版本，只有热修成功运行中，或者，patch运行后才有这个字段。
+        public static final String POLICYVER = "PV";
         // 设备型号 , 如：“Lenovo S760”
         public static final String DeviceModel = "DM";
         // 设备MAC地址，如：“6c:5c:14:25:be:ba”

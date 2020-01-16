@@ -11,7 +11,6 @@ import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.impl.SenSorModuleNameImpl;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.utils.BuglyUtils;
-import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EguanIdUtils;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.SystemUtils;
@@ -59,6 +58,10 @@ public class DataPackaging {
                     DataController.SWITCH_OF_DEVICE_ID);
             JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.OAID, devImpl.getOAID(),
                     DataController.SWITCH_OF_OAID);
+            if ((!BuildConfig.IS_HOST) || EGContext.patch_runing) {
+                String plocyVersion = SPHelper.getStringValueFromSP(context, UploadKey.Response.RES_POLICY_VERSION, "");
+                JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.POLICYVER, plocyVersion, DataController.SWITCH_OF_POLICYVER);
+            }
             JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.DeviceModel, Build.MODEL,
                     DataController.SWITCH_OF_DEVICE_MODEL);
             JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.MAC, devImpl.getMac(),

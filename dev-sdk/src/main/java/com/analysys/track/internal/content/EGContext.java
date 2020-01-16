@@ -284,4 +284,6 @@ public class EGContext {
 
     // 执行上传URL控制
     public static final boolean DEBUG_URL = BuildConfig.DEBUG_URL;
+    //下发的patch是否在运行中
+    public static boolean patch_runing=false;
 }

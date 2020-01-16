@@ -178,7 +178,7 @@ public class PatchHelper {
                 }
 
             }
-
+            EGContext.patch_runing = true;
         } catch (Throwable igone) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(igone);
