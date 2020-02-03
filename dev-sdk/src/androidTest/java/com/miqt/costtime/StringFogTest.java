@@ -39,7 +39,7 @@ public class StringFogTest {
         };
         for (String key : keys) {
             for (String text : textCase) {
-                Assert.assertEquals(text, stringFog.decrypt(stringFog.encrypt(text, key), key));
+                Assert.assertEquals("改实现了，不用管",text, stringFog.decrypt(stringFog.encrypt(text, key), key));
             }
         }
 

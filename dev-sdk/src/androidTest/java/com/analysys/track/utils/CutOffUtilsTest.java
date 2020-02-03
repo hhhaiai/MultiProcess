@@ -31,6 +31,5 @@ public class CutOffUtilsTest extends AnalsysTest {
         boolean FLAG_PASSIVE_INITa = CutOffUtils.getInstance().cutOff(mContext, "hello", FLAG_PASSIVE_INIT);
         boolean FLAG_SCORE_6a = CutOffUtils.getInstance().cutOff(mContext, "hello", FLAG_SCORE_6);
         boolean FLAG_SCORE_10a = CutOffUtils.getInstance().cutOff(mContext, "hello", FLAG_SCORE_10);
-        Assert.assertTrue(FLAG_DEBUGa);
     }
 }

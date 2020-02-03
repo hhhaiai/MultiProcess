@@ -7,7 +7,7 @@ costtime {
     enableLog true
 }
 //****************配置参数*****************
-def isRelease = false;
+def isRelease = true;
 //SDK版本号
 def version = "4.3.0.7|20200109"
 //*****************************************
@@ -81,7 +81,7 @@ android {
         debug {
             /**打开覆盖率统计开关*/
             //testCoverageEnabled = true
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {

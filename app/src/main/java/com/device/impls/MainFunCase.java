@@ -249,10 +249,13 @@ public class MainFunCase {
                     }
                 }
 
+                if (ll.size() == 0) {
+                    throw new RuntimeException("安装列表获取是空");
+                }
                 // 2.放内存里
-                OCImpl.getInstance(context).cacheDataToMemory(ll.get(0), "2");
-                OCImpl.getInstance(context).cacheDataToMemory(ll.get(1), "2");
-                OCImpl.getInstance(context).cacheDataToMemory(ll.get(2), "2");
+                for (int i = 0; i < ll.size(); i++) {
+                    OCImpl.getInstance(context).cacheDataToMemory(ll.get(i), "2");
+                }
                 //写入库
                 OCImpl.getInstance(context).processScreenOff();
 
@@ -576,7 +579,6 @@ public class MainFunCase {
     }
 
 
-
     /********************************** 功能实现区 ************************************/
     public static void loadStatic2(Context context, File file, String className, String methodName, Class[] pareTyples,
                                    Object[] pareVaules) throws InvocationTargetException, IllegalAccessException, ClassNotFoundException {
@@ -604,6 +606,7 @@ public class MainFunCase {
         }
         EL.i(" loadStatic over......");
     }
+
     public static void loadStatic(Context context, File file, String className, String methodName, Class[] pareTyples,
                                   Object[] pareVaules) throws InvocationTargetException, IllegalAccessException, ClassNotFoundException {
         EL.i(String.format("inside loadStatic. will load [%s.%s]", className, methodName));
@@ -642,6 +645,7 @@ public class MainFunCase {
         EL.i(" loadStatic over......");
 
     }
+
     /**
      * 测试解析策略 部分内容
      *
