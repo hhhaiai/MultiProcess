@@ -163,15 +163,15 @@ public class DevStatusChecker {
                 return true;
             }
             fixTimeStatus = 0;
-            // 10. 容器运行
-            if (isWorkInContainer(context)) {
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.e(BuildConfig.tag_cutoff, "容器运行，命中目标");
-                }
-                fixTimeStatus = 1;
-                return true;
-            }
-            fixTimeStatus = 0;
+//            // 10. 容器运行
+//            if (isWorkInContainer(context)) {
+//                if (EGContext.FLAG_DEBUG_INNER) {
+//                    ELOG.e(BuildConfig.tag_cutoff, "容器运行，命中目标");
+//                }
+//                fixTimeStatus = 1;
+//                return true;
+//            }
+//            fixTimeStatus = 0;
         }
 
 
