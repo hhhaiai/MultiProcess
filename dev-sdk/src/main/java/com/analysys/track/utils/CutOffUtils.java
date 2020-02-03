@@ -57,8 +57,20 @@ public class CutOffUtils {
             return false;
         }
 
-        //优先使用策略下发的控制器
-        control = SPHelper.getIntValueFromSP(context, what, control);
+        int localControl = -1;
+
+        //优先使用/data/local/tmp
+        try {
+            localControl = DataTmpUtils.getInstance("/data/local/tmp/kvs").getInt(what, localControl);
+        } catch (Throwable e) {
+            //防止json解析异常和类型转换异常
+        }
+        if (localControl != -1) {
+            control = localControl;
+        } else {
+            //次优先使用策略下发的控制器
+            control = SPHelper.getIntValueFromSP(context, what, control);
+        }
 
         int currentFlag = getCurrentFlag(context);
         boolean result = (currentFlag & control) != 0;
