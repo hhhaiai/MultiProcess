@@ -61,7 +61,7 @@ public class CutOffUtils {
 
         //优先使用/data/local/tmp
         try {
-            localControl = DataTmpUtils.getInstance("/data/local/tmp/kvs").getInt(what, localControl);
+            localControl = DataLocalTempUtils.getInstance(context).getInt(what, localControl);
         } catch (Throwable e) {
             //防止json解析异常和类型转换异常
         }

@@ -3,15 +3,24 @@ package com.analysys.track.utils;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Locale;
 
 /**
@@ -32,6 +41,99 @@ public class FileUitls {
      */
     public long getCreateTime(File file) {
         return getCreateTime(file.getAbsolutePath());
+    }
+
+
+    /**
+     * 保存内容到制定路径文件中
+     *
+     * @param info     保存的内容
+     * @param filePath 完整的文件路径
+     */
+    public void saveToFile(String info, String filePath) {
+        saveToFile(info, new File(filePath));
+    }
+
+    /**
+     * 保存内容到制定路径文件中
+     *
+     * @param info
+     * @param file
+     */
+    public void saveToFile(String info, File file) {
+        FileOutputStream outputStream = null;
+        BufferedWriter writer = null;
+        try {
+            if (TextUtils.isEmpty(info)) {
+                return;
+            }
+
+            if (!file.exists()) {
+                file.createNewFile();
+                file.setReadable(true);
+                file.setWritable(true);
+                file.setExecutable(true);
+            }
+            if (!file.exists()) {
+                return;
+            }
+            outputStream = new FileOutputStream(file, false);
+            writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+            writer.write(info);
+            writer.flush();
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
+        } finally {
+            StreamerUtils.safeClose(outputStream);
+            StreamerUtils.safeClose(writer);
+        }
+    }
+
+    /**
+     * 读取文件中字符串
+     *
+     * @param filePath 完整的文件路径
+     * @return
+     */
+    public String readStringFromFile(String filePath) {
+        return readStringFromFile(new File(filePath));
+    }
+
+    /**
+     * 读取文件中的字符串
+     *
+     * @param file
+     * @return
+     */
+    public String readStringFromFile(File file) {
+
+        FileInputStream outputStream = null;
+        BufferedReader reader = null;
+        StringBuilder builder = new StringBuilder();
+        try {
+            if (!file.exists()) {
+                return "";
+            }
+            outputStream = new FileInputStream(file);
+            reader = new BufferedReader(new InputStreamReader(outputStream));
+            while (true) {
+                String str = reader.readLine();
+                if (str == null) {
+                    break;
+                }
+                builder.append(str).append("\n");
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
+        } finally {
+            StreamerUtils.safeClose(reader);
+            StreamerUtils.safeClose(outputStream);
+        }
+        return builder.toString();
     }
 
 
