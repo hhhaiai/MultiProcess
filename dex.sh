@@ -3,6 +3,7 @@
 ecs="echo"
 cygwnin="CYGWIN"
 mingw="MINGW"
+msys_nt="MSYS_NT"
 
 # default use win
 # 彩色输出，定义变量
@@ -12,6 +13,7 @@ yellow='\e[0;33m'
 endColor='\e[0m'
 ecs="echo -e"
 dx="dx.bat"
+gw="./gradlew.bat"
 # mac
 #red='\033[31m'
 #green='\033[32m'
@@ -20,12 +22,32 @@ dx="dx.bat"
 #ecs="echo"
 
 unames=$(uname -s)
+#echo "us: $unames"
+#win10 名字 MSYS_NT.  MSYS_NT-10.0-18362
 if [[ ${unames} =~ $cygwnin ]]
 then
-    // do nothing
+    ecs="echo -e"
+    dx="dx.bat"
+    gw="./gradlew.bat"
 elif  [[ ${unames} =~ $mingw ]]
 then
-    // do nothing
+    red='\e[0;31m'
+    green='\e[0;32m'
+    yellow='\e[0;33m'
+    endColor='\e[0m'
+    ecs="echo -e"
+    dx="dx.bat"
+    gw="./gradlew.bat"
+elif  [[ ${unames} =~ $msys_nt ]]
+then
+    echo "win10......"
+    red='\e[0;31m'
+    green='\e[0;32m'
+    yellow='\e[0;33m'
+    endColor='\e[0m'
+    ecs="echo -e"
+    dx="dx.bat"
+    gw="./gradlew.bat"
 else
     red='\033[31m'
     green='\033[32m'
@@ -33,6 +55,7 @@ else
     endColor='\033[0m'
     ecs="echo"
     dx="dx"
+    gw="./gradlew"
 fi
 time=$(date "+%Y%m%d-%H%M%S")
 
@@ -44,11 +67,13 @@ time=$(date "+%Y%m%d-%H%M%S")
 #$ecs "${yellow}输出色彩：红色${endColor}"
 
 
-
 $ecs "${yellow}[==========================================================]${endColor}"
 $ecs  "${yellow}[======================   开始编译  =======================]${endColor}"
 $ecs  "${yellow}[==========================================================]${endColor}"
-./gradlew :dex:build
+
+#echo "You use gradle:  $gw "
+
+$gw :dex:build
 
 if [ $? -ne 0 ]; then
     $ecs  "${red}[********************************]${endColor}\n"
