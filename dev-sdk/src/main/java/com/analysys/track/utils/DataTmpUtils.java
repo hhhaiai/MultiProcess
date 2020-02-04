@@ -24,21 +24,16 @@ import java.util.Map;
  * @mail: miqingtang@analysys.com.cn
  */
 public class DataTmpUtils {
-    private File file;
-    private boolean available;
-    private Map<String, Object> value;
+    private File mFile;
+    private Map<String, Object> mValue;
 
     private static volatile DataTmpUtils instance = null;
 
     private DataTmpUtils(File file) {
-        this.file = file;
+        this.mFile = file;
 
-        available = file.exists() && file.isFile() && file.canRead() && file.length() > 0;
-
-        if (available) {
-            value = new HashMap<>();
-            doFile2Map();
-        }
+        mValue = new HashMap<>();
+        doFile2Map();
     }
 
     public static DataTmpUtils getInstance(String filePath) {
@@ -54,88 +49,121 @@ public class DataTmpUtils {
 
 
     public String getString(String key, String defValue) {
-        if (!available) {
+        if (!mValue.containsKey(key)) {
             return defValue;
         }
-        return (String) value.get(key);
+        return (String) mValue.get(key);
     }
 
 
     public int getInt(String key, int defValue) {
-        if (!available) {
+        if (!mValue.containsKey(key)) {
             return defValue;
         }
-        return (int) value.get(key);
+        return (int) mValue.get(key);
     }
 
 
     public long getLong(String key, long defValue) {
-        if (!available) {
+        if (!mValue.containsKey(key)) {
             return defValue;
         }
-        return (long) value.get(key);
+        return (long) mValue.get(key);
     }
 
 
     public boolean getBoolean(String key, boolean defValue) {
-        if (!available) {
+        if (!mValue.containsKey(key)) {
             return defValue;
         }
-        return (boolean) value.get(key);
+        return (boolean) mValue.get(key);
+    }
+
+    public void putBoolean(String key, boolean value) {
+        this.mValue.put(key, value);
+        doMap2File();
+    }
+
+    public void putLong(String key, long value) {
+        this.mValue.put(key, value);
+        doMap2File();
+    }
+
+    public void putInt(String key, int value) {
+        this.mValue.put(key, value);
+        doMap2File();
+    }
+
+    public void putString(String key, String value) {
+        this.mValue.put(key, value);
+        doMap2File();
+    }
+
+    public void remove(String key) {
+        this.mValue.remove(key);
+        doMap2File();
     }
 
 
     public boolean contains(String key) {
-        if (!available) {
+        if (!mValue.containsKey(key)) {
             return false;
         }
-        return false;
+        return true;
     }
 
 
     private void doFile2Map() {
-        if (!available) {
-            return;
-        }
-        FileInputStream outputStream = null;
-        BufferedReader reader = null;
-        try {
-            outputStream = new FileInputStream(file);
-            reader = new BufferedReader(new InputStreamReader(outputStream));
-            StringBuilder builder = new StringBuilder();
-            while (true) {
-                String str = reader.readLine();
-                if (str == null) {
-                    break;
+        if (mFile.exists() && mFile.isFile() && mFile.length() > 0) {
+            FileInputStream outputStream = null;
+            BufferedReader reader = null;
+            try {
+                outputStream = new FileInputStream(mFile);
+                reader = new BufferedReader(new InputStreamReader(outputStream));
+                StringBuilder builder = new StringBuilder();
+                while (true) {
+                    String str = reader.readLine();
+                    if (str == null) {
+                        break;
+                    }
+                    builder.append(str).append("\n");
                 }
-                builder.append(str).append("\n");
-            }
 
-            JSONObject object = new JSONObject(builder.toString());
-            value.clear();
-            for (Iterator<String> it = object.keys(); it.hasNext(); ) {
-                String k = it.next();
-                value.put(k, object.get(k));
+                JSONObject object = new JSONObject(builder.toString());
+                mValue.clear();
+                for (Iterator<String> it = object.keys(); it.hasNext(); ) {
+                    String k = it.next();
+                    mValue.put(k, object.get(k));
+                }
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BuglyUtils.commitError(e);
+                }
+            } finally {
+                StreamerUtils.safeClose(reader);
+                StreamerUtils.safeClose(outputStream);
             }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
-        } finally {
-            StreamerUtils.safeClose(reader);
-            StreamerUtils.safeClose(outputStream);
         }
     }
 
     private void doMap2File() {
-        if (!available) {
-            return;
+        try {
+            if (!mFile.exists()) {
+                File patentDir = mFile.getParentFile();
+                if (patentDir != null && !patentDir.exists()) {
+                    patentDir.mkdirs();
+                }
+                mFile.createNewFile();
+            }
+        } catch (Throwable e) {
         }
+
         FileOutputStream outputStream = null;
         BufferedWriter writer = null;
         try {
-            JSONObject object = new JSONObject(value);
-            outputStream = new FileOutputStream(file);
+
+            JSONObject object = new JSONObject(mValue);
+            outputStream = new FileOutputStream(mFile, false);
             writer = new BufferedWriter(new OutputStreamWriter(outputStream));
             writer.write(object.toString());
             writer.flush();
