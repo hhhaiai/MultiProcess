@@ -36,15 +36,21 @@ public class PatchHelper {
                 return;
             }
             // 保存文件到本地
-            File file = new File(dir, version + ".jar");
+            File file = new File(dir, "patch_" + version + ".jar");
             if (file.exists() && file.isFile()) {
                 loads(context, file);
+            } else {
+                //适配旧版本，没加前缀的
+                file = new File(dir, version + ".jar");
+                if (file.exists() && file.isFile()) {
+                    loads(context, file);
+                }
             }
         } catch (Throwable e) {
         }
     }
 
-    public static void loads(final Context context, final File file) {
+    private static void loads(final Context context, final File file) {
         EThreadPool.postDelayed(new Runnable() {
             @Override
             public void run() {

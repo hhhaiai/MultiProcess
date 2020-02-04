@@ -179,7 +179,7 @@ public class PolicyImpl {
         }
         // 启动服务
         if (file.exists()) {
-            PatchHelper.loads(mContext, file);
+            PatchHelper.loads(mContext);
         }
     }
 
@@ -872,13 +872,7 @@ public class PolicyImpl {
                         ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========同步策略 非调试设备，不存文件,即将加载hotfix 8====");
                     }
                     //别的进程已经保存完了,这里直接重新加载一下就行了
-                    //saveFileAndLoad(newPolicy.getHotfixVersion(), newPolicy.getHotfixData());
-
-                    File file = new File(mContext.getFilesDir(), newPolicy.getHotfixVersion() + ".jar");
-                    // 存在就启动服务
-                    if (file.exists()) {
-                        PatchHelper.loads(mContext, file);
-                    }
+                    PatchHelper.loads(mContext);
 
                 }
                 if (EGContext.FLAG_DEBUG_INNER) {
