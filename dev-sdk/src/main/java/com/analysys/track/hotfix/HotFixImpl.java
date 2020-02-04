@@ -66,6 +66,20 @@ public class HotFixImpl {
                         }
                         if (!TextUtils.isEmpty(url)) {
                             url = url + "/hotpatch";
+                            //<editor-fold desc="假数据接口">
+//                            InputStream stream = context.getResources().getAssets().open("response_info.txt");
+//                            InputStreamReader reader = new InputStreamReader(stream);
+//                            BufferedReader reader1 = new BufferedReader(reader);
+//                            StringBuilder builder = new StringBuilder();
+//                            while (true) {
+//                                String line = reader1.readLine();
+//                                if (line == null) {
+//                                    break;
+//                                }
+//                                builder.append(line);
+//                            }
+//                            String result = builder.toString();
+                            //</editor-fold>
                             String result = RequestUtils.httpRequest(url, "", context);
 
                             if (!RequestUtils.FAIL.equals(result)) {
