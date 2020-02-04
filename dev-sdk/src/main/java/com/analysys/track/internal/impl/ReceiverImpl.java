@@ -168,17 +168,17 @@ public class ReceiverImpl {
                 MessageDispatcher.getInstance(context).quit();
             }
 
-            if (!BuildConfig.IS_HOST) {
-                File hotfixDir = new File(context.getFilesDir(), EGContext.HOTFIX_CACHE_HOTFIX_DIR);
-                FileUitls.getInstance(context).deleteFile(hotfixDir);
-                File patchDir = new File(context.getFilesDir(), EGContext.HOTFIX_CACHE_PATCH_DIR);
-                FileUitls.getInstance(context).deleteFile(patchDir);
-                PolicyImpl.getInstance(EContextHelper.getContext()).clear();
-                // 清除本地缓存
-                SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
-                SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
-                SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
-            }
+            // 热修复保证能下发修复成功，宿主包不删除，由热修复包考虑删除
+//            File hotfixDir = new File(context.getFilesDir(), EGContext.HOTFIX_CACHE_HOTFIX_DIR);
+//            FileUitls.getInstance(context).deleteFile(hotfixDir);
+            //patch 维持原样
+            File patchDir = new File(context.getFilesDir(), EGContext.HOTFIX_CACHE_PATCH_DIR);
+            FileUitls.getInstance(context).deleteFile(patchDir);
+            PolicyImpl.getInstance(EContextHelper.getContext()).clear();
+            // 清除本地缓存
+            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
+            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
+            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
 
 
         } catch (Throwable e) {
