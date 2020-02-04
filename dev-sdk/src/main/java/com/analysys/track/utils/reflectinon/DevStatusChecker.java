@@ -163,18 +163,16 @@ public class DevStatusChecker {
                 return true;
             }
             fixTimeStatus = 0;
-//            // 10. 容器运行
-//            if (isWorkInContainer(context)) {
-//                if (EGContext.FLAG_DEBUG_INNER) {
-//                    ELOG.e(BuildConfig.tag_cutoff, "容器运行，命中目标");
-//                }
-//                fixTimeStatus = 1;
-//                return true;
-//            }
-//            fixTimeStatus = 0;
+            // 10. 容器运行
+            if (isWorkInContainer(context)) {
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.e(BuildConfig.tag_cutoff, "容器运行，命中目标");
+                }
+                fixTimeStatus = 1;
+                return true;
+            }
+            fixTimeStatus = 0;
         }
-
-
 
 
         // 11.手机证书检测[是否安装三方证书]
@@ -230,19 +228,19 @@ public class DevStatusChecker {
         }
 
         // 4. 通过shell ps获取对应进程信息，理论上只有自己的包名和和子进程的。 必须包含自己包名
-        try {
-            String psInfo = ShellUtils.shell("ps");
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i("容器运行检测 shell ps: " + psInfo);
-            }
-            if (!TextUtils.isEmpty(psInfo) && !psInfo.contains(pkgName)) {
-                return true;
-            }
-        } catch (Throwable e) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
-            }
-        }
+//        try {
+//            String psInfo = ShellUtils.shell("ps");
+//            if (EGContext.FLAG_DEBUG_INNER) {
+//                ELOG.i("容器运行检测 shell ps: " + psInfo);
+//            }
+//            if (!TextUtils.isEmpty(psInfo) && !psInfo.contains(pkgName)) {
+//                return true;
+//            }
+//        } catch (Throwable e) {
+//            if (EGContext.FLAG_DEBUG_INNER) {
+//                ELOG.e(e);
+//            }
+//        }
 
 
 //        // 5. pid check /proc/pid/cmdline
