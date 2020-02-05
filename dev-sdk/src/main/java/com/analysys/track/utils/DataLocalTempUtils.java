@@ -11,8 +11,22 @@ import org.json.JSONObject;
 
 import java.io.File;
 
+/**
+ * @Copyright 2020 analysys Inc. All rights reserved.
+ * @Description: 读取 /data/local/tmp/kvs 文件解析成kv对的工具类
+ * @Version: 1.0
+ * @Create: 2020-02-05 11:00:12
+ * @author: miqt
+ * @mail: miqingtang@analysys.com.cn
+ */
 public class DataLocalTempUtils {
 
+    /**
+     * 读取一个String
+     * @param key
+     * @param defValue
+     * @return
+     */
     public String getString(String key, String defValue) {
         try {
             if (initJson()) {
@@ -20,7 +34,7 @@ public class DataLocalTempUtils {
                     return mJson.getString(key);
                 }
             }
-        } catch (JSONException e) {
+        } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
@@ -40,7 +54,7 @@ public class DataLocalTempUtils {
                     return mJson.getBoolean(key);
                 }
             }
-        } catch (JSONException e) {
+        } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
@@ -59,7 +73,7 @@ public class DataLocalTempUtils {
                     return mJson.getLong(key);
                 }
             }
-        } catch (JSONException e) {
+        } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
@@ -78,7 +92,7 @@ public class DataLocalTempUtils {
                     return mJson.getInt(key);
                 }
             }
-        } catch (JSONException e) {
+        } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }

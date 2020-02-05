@@ -121,7 +121,7 @@ public class SPHelper {
             if (!dir.exists() || !dir.isDirectory()) {
                 dir.mkdirs();
             }
-            File systemFile = new File(dir, name + ".xml");
+            File systemFile = new File(ctx.getCacheDir().getParent(), name + ".xml");
             return systemFile;
         } catch (Throwable e) {
         }

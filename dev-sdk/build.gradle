@@ -7,7 +7,7 @@ costtime {
     enableLog true
 }
 //****************配置参数*****************
-def isRelease = true
+def isRelease = false
 //SDK版本号
 def version = "4.3.0.7|20200205"
 //*****************************************
@@ -21,7 +21,7 @@ def enableHotFix = true
 //当前热修复包的版本
 def hf_code = 1
 def ENABLE_BUGLY = true
-def DEBUG_URL = true
+def DEBUG_URL = false
 //所有的log开关,true 打印所有的日志,false,关闭所有的日志
 def logcat = true
 def STRING_FOG_KEY = "4.3.0.6|20191213"
@@ -44,14 +44,14 @@ android {
     buildToolsVersion '29.0.0'
 
     defaultConfig {
-        def sdkv = "${version}";
+        def sdkv = "${version}"
         if (enableHotFix) {
             sdkv += "00"
         }
         if (isRelease) {
             ENABLE_BUGLY = false
             DEBUG_URL = false
-            logcat = false
+            logcat = true
             STRICTMODE = true
         }
         buildConfigField "boolean", "IS_HOST", "${isHost}"
@@ -136,7 +136,7 @@ task generateJar(type: Copy) {
     from("build/intermediates/bundles/release")
     into "../releasebak"
     include("classes.jar")
-    def name = "analysys_track_v" + version.replace("|","_") + (enableHotFix ? "00.jar" : ".jar")
+    def name = "analysys_track_v" + version.replace("|", "_") + (enableHotFix ? "00.jar" : ".jar")
     rename("classes.jar", name)
 }
 
@@ -153,7 +153,7 @@ task packageZip(type: Zip) {
 //    destinationDir: 来指定生成zip文件的目录，类型是file(dir,但是不要包含/)
     destinationDir = file(zipPath)
 //    archiveName: 压缩包名字，注意此处不会自动添加后缀
-    archiveName = "analysys_track_v" + version.replace("|","_") + (enableHotFix ? "00.zip" : ".zip")
+    archiveName = "analysys_track_v" + version.replace("|", "_") + (enableHotFix ? "00.zip" : ".zip")
 }
 task zip(type: Delete) {
     delete "../releasebak"
