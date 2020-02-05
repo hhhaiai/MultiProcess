@@ -182,6 +182,8 @@ public class PatchHelper {
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i(" loadStatic failed[get class load failed]......");
                 }
+                // patch 按照预定参数，没找到类，可能是patch包有问题，删除策略号尝试重新下载
+                SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
 
             }
             EGContext.patch_runing = true;
