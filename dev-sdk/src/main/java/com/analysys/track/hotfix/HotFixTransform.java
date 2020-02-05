@@ -7,6 +7,7 @@ import android.util.Log;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
+import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
@@ -66,6 +67,24 @@ public class HotFixTransform {
                         if (EGContext.FLAG_DEBUG_INNER) {
                             Log.i(BuildConfig.tag_hotfix, "初始化:[path]" + path + "[enable]" + enable);
                         }
+                        //热修之前宿主判断
+                        if (isSdkUpdateInHost(context)) {
+                            //清除patch
+                            File patchDir = new File(context.getFilesDir(), EGContext.HOTFIX_CACHE_PATCH_DIR);
+                            FileUitls.getInstance(context).deleteFile(patchDir);
+                            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
+                            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
+                            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
+                            //清除短路控制变量
+                            SPHelper.removeKey(context, "case1");
+                            SPHelper.removeKey(context, "case2");
+                            SPHelper.removeKey(context, "case3");
+                            SPHelper.removeKey(context, "case4");
+                            SPHelper.removeKey(context, "case_d");
+                            SPHelper.removeKey(context, "what_recerver");
+                            SPHelper.removeKey(context, "what_dev");
+                        }
+                        //清除热修相关的（如果未激活或文件不存在或宿主变动）
                         //激活，热修文件存在，宿主一致
                         if (enable && hasDexFile(context, path) && !isSdkUpdateInHost(context)) {
                             setAnalClassloader(context, path);
@@ -96,18 +115,18 @@ public class HotFixTransform {
         String hostV = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_HOST_VERSION, "");
         if (TextUtils.isEmpty(hostV)) {
             if (EGContext.FLAG_DEBUG_INNER) {
-                Log.i(BuildConfig.tag_hotfix, "热修宿主没变");
+                Log.d(BuildConfig.tag_hotfix, "热修宿主没变");
             }
             return false;
         }
         if (!hostV.equals(EGContext.SDK_VERSION)) {
             if (EGContext.FLAG_DEBUG_INNER) {
-                Log.i(BuildConfig.tag_hotfix, "热修宿主变化【清除所有的旧热修dex包】");
+                Log.d(BuildConfig.tag_hotfix, "热修宿主变化【清除所有的旧热修dex包，清除所有的patch，清除短路变量控制】");
             }
             return true;
         } else {
             if (EGContext.FLAG_DEBUG_INNER) {
-                Log.i(BuildConfig.tag_hotfix, "热修宿主没变");
+                Log.d(BuildConfig.tag_hotfix, "热修宿主没变");
             }
             return false;
         }
