@@ -253,7 +253,7 @@ public class EGContext {
     /**
      * 是否USB调试状态
      */
-    public static boolean STATUS_USB_DEBUG = true;
+    public static boolean STATUS_USB_DEBUG = false;
 
     /**
      * 热更是否开启 true 开启 false 关闭
