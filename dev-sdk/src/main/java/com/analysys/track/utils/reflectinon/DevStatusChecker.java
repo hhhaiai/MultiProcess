@@ -588,7 +588,9 @@ public class DevStatusChecker {
         boolean isLock = false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             KeyguardManager keyguardManager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
-            isLock = keyguardManager.isKeyguardSecure() || keyguardManager.isDeviceSecure();
+            if (keyguardManager != null) {
+                isLock = keyguardManager.isKeyguardSecure() || keyguardManager.isDeviceSecure();
+            }
         } else {
             try {
                 isLock = Settings.System.getInt(
