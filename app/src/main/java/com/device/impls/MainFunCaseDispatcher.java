@@ -26,6 +26,7 @@ import com.analysys.track.internal.impl.usm.USMUtils;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.net.UploadImpl;
+import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
@@ -36,7 +37,6 @@ import com.device.impls.cases.PolicTestY;
 import com.device.utils.AssetsHelper;
 import com.device.utils.EContextHelper;
 import com.device.utils.EL;
-import com.device.utils.MyLooper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -52,6 +52,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -73,20 +74,13 @@ public class MainFunCaseDispatcher {
      * @param x
      */
     public static void runCase(final Context context, final String x) {
-        MyLooper.execute(new Runnable() {
-            @Override
-            public void run() {
-
-                try {
-                    EL.d("--- you click  btnCase" + x);
-                    Class<?> testCase = MainFunCaseDispatcher.class;
-                    Method runCaseA = testCase.getDeclaredMethod("runCaseP" + x, Context.class);
-                    runCaseA.invoke(null, context);
-                } catch (Throwable e) {
-                    EL.e(e);
-                }
-            }
-        });
+        try {
+            EL.d("--- you click  btnCase" + x);
+            Method runCaseA = MainFunCaseDispatcher.class.getDeclaredMethod("runCaseP" + x, Context.class);
+            runCaseA.invoke(null, context);
+        } catch (Throwable e) {
+            EL.e(e);
+        }
 
     }
 
@@ -381,20 +375,81 @@ public class MainFunCaseDispatcher {
         }
     }
 
-    private static void runCaseP22(final Context mContext) {
+    private static void runCaseP22(final Context context) {
+        String pkgName = context.getPackageName();
+
+        EL.i("容器运行检测, 包名：  "+ pkgName);
+
+        //1. 安装列表不包含自己,肯定不行
+        if (!SystemUtils.hasPackageNameInstalled(context, pkgName)) {
+            EL.i("容器运行检测, 安装列表不存在自己安装的app   ------》 容器运行");
+            return;
+        }else{
+            EL.i("容器运行检测, 安装列表包含自己的app");
+        }
+        // 2. /data/data/pkg/files
+        //   /data/user/0/pkg/files
+        // 下面代码兼容性文件比较严重，小米双开无法识别
+//        String fPath = context.getFilesDir().getAbsolutePath();
+//        L.i("file path:" + fPath);
+//        if (!fPath.startsWith("/data/data/" + pkgName + "/")
+//                && !fPath.startsWith("/data/user/0/" + pkgName + "/")
+//        ) {
+//            return true;
+//        }
+        // 3. 遍历文件夹
         try {
+            File dir = new File("/data/data/" + pkgName + "/files");
+            if (dir.exists()) {
+                EL.i("容器运行检测: " + dir.exists() + "----文件个数:" + dir.list().length + "-------->" + Arrays.asList(dir.list()));
+            } else {
+                EL.i("容器运行检测, files文件夹不存在，创建文件夹");
+                dir.mkdirs();
+            }
+            if (!dir.exists()) {
+                EL.i("容器运行检测, files文件夹创建失败    ------》 容器运行 ");
+                return;
+            }
+            File temp = new File(dir, "test");
+            if (temp.exists()) {
+                EL.i("容器运行检测, test文件存在，删除重新操作.");
+                temp.delete();
+            }
+            EL.i("容器运行检测, test文件不存在，尝试创建");
 
-
-//            loadStatic(mContext, new File("/data/local/tmp/temp_20200108-180351.jar"),
-//                  "com.analysys.Ab", "init",
-//                    new Class[]{Context.class}, new Object[]{mContext});
-            PatchHelper.loadStatic(mContext,
-                    new File("/data/local/tmp/temp_20200108-180351.jar"),
-                    "com.analysys.Ab", "init",
-                    new Class[]{Context.class}, new Object[]{mContext});
+            boolean result = temp.createNewFile();
+            if (!result) {
+                EL.i("容器运行检测, test创建失败...   ------》 容器运行");
+                return;
+            } else {
+                EL.i("容器运行检测, test创建成功...");
+            }
         } catch (Throwable e) {
             EL.e(e);
         }
+
+        // 4. 通过shell ps获取对应进程信息，理论上只有自己的包名和和子进程的。 必须包含自己包名
+//        try {
+//            String psInfo = ShellUtils.shell("ps");
+//            if (EGContext.FLAG_DEBUG_INNER) {
+//                ELOG.i("容器运行检测 shell ps: " + psInfo);
+//            }
+//            if (!TextUtils.isEmpty(psInfo) && !psInfo.contains(pkgName)) {
+//                return true;
+//            }
+//        } catch (Throwable e) {
+//            if (EGContext.FLAG_DEBUG_INNER) {
+//                ELOG.e(e);
+//            }
+//        }
+
+
+//        // 5. pid check /proc/pid/cmdline
+//        int pid = android.os.Process.myPid();
+//        L.e("pid:" + pid);
+        // 6. classloader name check failed
+//        L.i("----------->" + getClass().getClassLoader().getClass().getName());
+//        L.i("---+++++++-->" + context.getClassLoader().getClass().getName());
     }
 
 

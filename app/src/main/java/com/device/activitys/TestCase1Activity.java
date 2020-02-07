@@ -11,6 +11,7 @@ import com.device.impls.MainFunCaseDispatcher;
 import com.device.impls.MultiProcessFramework;
 import com.device.utils.EL;
 import com.analysys.track.utils.ProcessUtils;
+import com.device.utils.MyLooper;
 import com.umeng.analytics.MobclickAgent;
 
 
@@ -60,10 +61,15 @@ public class TestCase1Activity extends Activity {
 
     public void onClick(View view) {
         TextView tv = findViewById(view.getId());
-        String s = tv.getText().toString().trim().replace("caseP", "");
+        final String s = tv.getText().toString().trim().replace("caseP", "");
         EL.i("您点击了测试case:" + s);
         MobclickAgent.onEvent(this, "[" + ProcessUtils.getCurrentProcessName(this) + "]测试-case" + s);
-        MainFunCaseDispatcher.runCase(mContext, s);
+        MyLooper.execute(new Runnable() {
+            @Override
+            public void run() {
+                MainFunCaseDispatcher.runCase(mContext, s);
+            }
+        });
     }
 
 
