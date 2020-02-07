@@ -164,12 +164,17 @@ public class SystemUtils {
         }
     }
 
+    private static boolean isRoot = false;
+
     /**
      * Root状态判断
      *
      * @return
      */
     public static boolean isRooted() {
+        if (isRoot) {
+            return isRoot;
+        }
         // nexus 5x "/su/bin/"
         String[] paths = {"/sbin/su", "/system/bin/su", "/system/xbin/su", "/system/sbin/su", "/vendor/bin/su",
                 "/su/bin/su", "/system/sd/xbin/su", "/system/bin/failsafe/su", "/system/bin/failsafe/su",
@@ -188,6 +193,7 @@ public class SystemUtils {
                     if (!TextUtils.isEmpty(execResult) && execResult.length() >= 4) {
                         char flag = execResult.charAt(3);
                         if (flag == 's' || flag == 'x') {
+                            isRoot = true;
                             return true;
                         }
                     }
@@ -197,6 +203,7 @@ public class SystemUtils {
             for (String g : gg) {
                 String execResult = ShellUtils.exec(new String[]{g, "su"});
                 if (!TextUtils.isEmpty(execResult) && !"su not found".equals(execResult)) {
+                    isRoot = true;
                     return true;
                 }
             }
@@ -205,6 +212,7 @@ public class SystemUtils {
                 BuglyUtils.commitError(e);
             }
         }
+        isRoot = false;
         return false;
     }
 
