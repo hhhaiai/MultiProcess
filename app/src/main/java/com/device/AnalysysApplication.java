@@ -34,7 +34,7 @@ public class AnalysysApplication extends Application {
 //                .build());
         super.onCreate();
         initAnalysys();
-//        MultiProcessWorker.runServices(this);
+//        MultiProcessFramework.runServices(this);
         //  EL.init(this);
     }
 

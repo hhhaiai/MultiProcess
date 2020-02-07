@@ -31,7 +31,7 @@ import com.umeng.analytics.MobclickAgent;
  * @author: sanbo
  * @mail: xueyongfu@analysys.com.cn
  */
-public class MultiProcessWorker {
+public class MultiProcessFramework {
 
     private static final String TYPE_MSG = "MSG_TYPE";
 
@@ -112,7 +112,7 @@ public class MultiProcessWorker {
             final Bundle bundle = intent.getExtras();
             if (bundle != null && bundle.size() > 0) {
                 if (bundle.containsKey(TYPE_MSG)) {
-                    MultiCase.runCase(context, bundle.getInt(TYPE_MSG, -1));
+                    MultiProcessCaseDispatcher.runCase(context, bundle.getInt(TYPE_MSG, -1));
                 }
             }
         } catch (Throwable e) {

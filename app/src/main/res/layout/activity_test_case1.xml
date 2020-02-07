@@ -240,6 +240,7 @@
                 android:text="caseP15" />
 
         </TableRow>
+
         <TableRow>
 
             <Button
@@ -258,6 +259,7 @@
                 android:text="caseP18" />
 
         </TableRow>
+
         <TableRow>
 
             <Button
@@ -274,6 +276,63 @@
                 android:id="@+id/btnCaseP21"
                 android:onClick="onClick"
                 android:text="caseP21" />
+
+        </TableRow>
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/btnCaseP22"
+                android:onClick="onClick"
+                android:text="caseP22" />
+
+            <Button
+                android:id="@+id/btnCaseP23"
+                android:onClick="onClick"
+                android:text="caseP23" />
+
+            <Button
+                android:id="@+id/btnCaseP24"
+                android:onClick="onClick"
+                android:text="caseP24" />
+
+        </TableRow>
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/btnCaseP25"
+                android:onClick="onClick"
+                android:text="caseP25" />
+
+            <Button
+                android:id="@+id/btnCaseP26"
+                android:onClick="onClick"
+                android:text="caseP26" />
+
+            <Button
+                android:id="@+id/btnCaseP27"
+                android:onClick="onClick"
+                android:text="caseP27" />
+
+        </TableRow>
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/btnCaseP28"
+                android:onClick="onClick"
+                android:text="caseP28" />
+
+            <Button
+                android:id="@+id/btnCaseP29"
+                android:onClick="onClick"
+                android:text="caseP29" />
+
+            <Button
+                android:id="@+id/btnCaseP30"
+                android:onClick="onClick"
+                android:text="caseP30" />
 
         </TableRow>
 

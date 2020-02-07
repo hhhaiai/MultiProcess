@@ -4,7 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
-import com.device.impls.MultiProcessWorker;
+import com.device.impls.MultiProcessFramework;
 import com.device.utils.ServicesProcess;
 
 public class MyServiceJ extends Service {
@@ -26,7 +26,7 @@ public class MyServiceJ extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 //        EL.i("sanbo.proctest", "。。。。。" + mClassName + "。。。");
-        MultiProcessWorker.processCommand(this.getApplicationContext(), intent);
+        MultiProcessFramework.processCommand(this.getApplicationContext(), intent);
         return START_STICKY;
     }
 }

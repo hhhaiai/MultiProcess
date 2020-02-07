@@ -7,8 +7,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.device.R;
-import com.device.impls.MainFunCase;
-import com.device.impls.MultiProcessWorker;
+import com.device.impls.MainFunCaseDispatcher;
+import com.device.impls.MultiProcessFramework;
 import com.device.utils.EL;
 import com.analysys.track.utils.ProcessUtils;
 import com.umeng.analytics.MobclickAgent;
@@ -55,7 +55,7 @@ public class TestCase1Activity extends Activity {
         MobclickAgent.onEvent(this, "[" + ProcessUtils.getCurrentProcessName(this) + "]测试-caseP" + s);
 
         int x = Integer.parseInt(s);
-        MultiProcessWorker.postMultiMessages(this, x);
+        MultiProcessFramework.postMultiMessages(this, x);
     }
 
     public void onClick(View view) {
@@ -63,7 +63,7 @@ public class TestCase1Activity extends Activity {
         String s = tv.getText().toString().trim().replace("caseP", "");
         EL.i("您点击了测试case:" + s);
         MobclickAgent.onEvent(this, "[" + ProcessUtils.getCurrentProcessName(this) + "]测试-case" + s);
-        MainFunCase.runCase(mContext, s);
+        MainFunCaseDispatcher.runCase(mContext, s);
     }
 
 

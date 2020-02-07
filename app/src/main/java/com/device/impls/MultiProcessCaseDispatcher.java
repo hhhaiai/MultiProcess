@@ -2,16 +2,13 @@ package com.device.impls;
 
 
 import android.content.Context;
-import android.os.Handler;
 
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.LocationImpl;
-import com.analysys.track.internal.model.PolicyInfo;
 import com.analysys.track.internal.net.DataPackaging;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.net.UploadImpl;
-import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.service.AnalysysJobService;
 import com.analysys.track.service.AnalysysService;
@@ -23,7 +20,6 @@ import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.analysys.track.utils.sp.SPHelper;
 import com.device.utils.EL;
-import com.device.utils.MyLooper;
 
 import java.lang.reflect.Method;
 
@@ -35,7 +31,7 @@ import java.lang.reflect.Method;
  * @author: sanbo
  * @mail: xueyongfu@analysys.com.cn
  */
-public class MultiCase {
+public class MultiProcessCaseDispatcher {
 
     /**
      * 运行具体的case
@@ -45,9 +41,9 @@ public class MultiCase {
      */
     public static void runCase(Context context, int caseNum) {
 
-//        EL.d("--- MultiCase  you click  btnCase" + caseNum);
+//        EL.d("--- MultiProcessCaseDispatcher  you click  btnCase" + caseNum);
         try {
-            Class<?> testCase = MultiCase.class;
+            Class<?> testCase = MultiProcessCaseDispatcher.class;
             Method runCaseA = testCase.getDeclaredMethod("runCase" + caseNum, Context.class);
             runCaseA.invoke(null, context);
         } catch (Throwable e) {
