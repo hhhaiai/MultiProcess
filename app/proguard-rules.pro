@@ -64,3 +64,5 @@ public static final int *;
 -dontwarn com.analysys.track.**
 
 -keep class com.bun.miitmdid.core.** {*;}
+# 测试case反射调用的，不混淆
+-keep class com.device.impls.** {*;}
