@@ -378,13 +378,13 @@ public class MainFunCaseDispatcher {
     private static void runCaseP22(final Context context) {
         String pkgName = context.getPackageName();
 
-        EL.i("容器运行检测, 包名：  "+ pkgName);
+        EL.i("容器运行检测, 包名：  " + pkgName);
 
         //1. 安装列表不包含自己,肯定不行
         if (!SystemUtils.hasPackageNameInstalled(context, pkgName)) {
             EL.i("容器运行检测, 安装列表不存在自己安装的app   ------》 容器运行");
             return;
-        }else{
+        } else {
             EL.i("容器运行检测, 安装列表包含自己的app");
         }
         // 2. /data/data/pkg/files
