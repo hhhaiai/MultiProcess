@@ -222,13 +222,15 @@ public class MessageDispatcher {
                 ELOG.d(BuildConfig.tag_cutoff, "[警告] 检测到目前在UI线程,应切换到工作线程工作");
             }
         }
+
+        // 1. 非新安装
         if (!CutOffUtils.getInstance().cutOff(mContext, "case1", FLAG_NEW_INSTALL)) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.d(BuildConfig.tag_cutoff, "非新安装");
             }
             //调试设备
             if (CutOffUtils.getInstance().cutOff(mContext, "case2", FLAG_DEBUG)) {
-                //调试设备
+                //2. 调试设备
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.d(BuildConfig.tag_cutoff, "非新安装 [调试设备] - 清除文件 不停止轮询");
                 }
@@ -236,6 +238,7 @@ public class MessageDispatcher {
                 intent.putExtra(EGContext.ISINLOOP, isInLoop);
                 intent.putExtra(EGContext.ISSTOP_LOOP, false);
                 mContext.sendBroadcast(intent);
+                // 3. 是否主动初始化
                 return passiveInitializationProcessingLogic(isInLoop);
             } else {
                 //非调试设备 工作
@@ -256,7 +259,7 @@ public class MessageDispatcher {
 
     private boolean passiveInitializationProcessingLogic(boolean isInLoop) {
         if (CutOffUtils.getInstance().cutOff(mContext, "case3", FLAG_PASSIVE_INIT)) {
-            //被动初始化
+            // 1. 被动初始化，不工作
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.d(BuildConfig.tag_cutoff, "被动初始化 停止轮询, 并清除数据");
             }
@@ -267,18 +270,18 @@ public class MessageDispatcher {
             mContext.sendBroadcast(intent);
             return true;
         } else {
-            //主动初始化
+            //1. 主动初始化
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.d(BuildConfig.tag_cutoff, "主动初始化");
             }
             if (CutOffUtils.getInstance().cutOff(mContext, "case4", FLAG_BACKSTAGE)) {
-                //后台不工作
+                //2.1. 后台不工作
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.d(BuildConfig.tag_cutoff, "后台不工作");
                 }
                 return true;
             } else {
-                //前台工作
+                //2.2. 前台工作
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.d(BuildConfig.tag_cutoff, "前台工作");
                 }
