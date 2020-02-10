@@ -64,17 +64,17 @@ public class MessageDispatcher {
         @Override
         public void handleMessage(Message msg) {
             try {
-                //安全性策略
-                if (CutOffUtils.getInstance().cutOff(mContext, "what_dev", CutOffUtils.FLAG_LOW_DEV)) {
-                    //空循环一次 下次还这样 工作间隔加大一倍 最多到5倍
-                    int time = msg.arg1 + EGContext.TIME_SECOND * 30;
-                    time = time >= EGContext.TIME_SECOND * 30 * 5 ? EGContext.TIME_SECOND * 30 * 5 : time;
-                    if (EGContext.FLAG_DEBUG_INNER) {
-                        ELOG.d(BuildConfig.tag_cutoff, "低性能设备,时间翻倍继续轮训");
-                    }
-                    postDelay(msg.what, time);
-                    return;
-                }
+//                //安全性策略
+//                if (CutOffUtils.getInstance().cutOff(mContext, "what_dev", CutOffUtils.FLAG_LOW_DEV)) {
+//                    //空循环一次 下次还这样 工作间隔加大一倍 最多到5倍
+//                    int time = msg.arg1 + EGContext.TIME_SECOND * 30;
+//                    time = time >= EGContext.TIME_SECOND * 30 * 5 ? EGContext.TIME_SECOND * 30 * 5 : time;
+//                    if (EGContext.FLAG_DEBUG_INNER) {
+//                        ELOG.d(BuildConfig.tag_cutoff, "低性能设备,时间翻倍继续轮训");
+//                    }
+//                    postDelay(msg.what, time);
+//                    return;
+//                }
                 //工作启动逻辑
                 if (jobStartLogic(true)) {
                     if (EGContext.FLAG_DEBUG_INNER) {
