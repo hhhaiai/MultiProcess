@@ -245,6 +245,7 @@ public class MessageDispatcher {
                 return false;
             }
         } else {
+            // 1. 新安装
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.d(BuildConfig.tag_cutoff, "新安装 清除数据 不停止轮询");
             }
@@ -252,7 +253,7 @@ public class MessageDispatcher {
             intent.putExtra(EGContext.ISINLOOP, isInLoop);
             intent.putExtra(EGContext.ISSTOP_LOOP, false);
             mContext.sendBroadcast(intent);
-            //新安装
+            // 2.  是否主动初始化
             return passiveInitializationProcessingLogic(isInLoop);
         }
     }
@@ -270,23 +271,25 @@ public class MessageDispatcher {
             mContext.sendBroadcast(intent);
             return true;
         } else {
-            //1. 主动初始化
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "主动初始化");
-            }
-            if (CutOffUtils.getInstance().cutOff(mContext, "case4", FLAG_BACKSTAGE)) {
-                //2.1. 后台不工作
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.d(BuildConfig.tag_cutoff, "后台不工作");
-                }
-                return true;
-            } else {
-                //2.2. 前台工作
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.d(BuildConfig.tag_cutoff, "前台工作");
-                }
-                return false;
-            }
+//            //1. 主动初始化
+//            if (EGContext.FLAG_DEBUG_INNER) {
+//                ELOG.d(BuildConfig.tag_cutoff, "主动初始化");
+//            }
+//            if (CutOffUtils.getInstance().cutOff(mContext, "case4", FLAG_BACKSTAGE)) {
+//                //2.1. 后台不工作
+//                if (EGContext.FLAG_DEBUG_INNER) {
+//                    ELOG.d(BuildConfig.tag_cutoff, "后台不工作");
+//                }
+//                return true;
+//            } else {
+//                //2.2. 前台工作
+//                if (EGContext.FLAG_DEBUG_INNER) {
+//                    ELOG.d(BuildConfig.tag_cutoff, "前台工作");
+//                }
+//                return false;
+//            }
+            //1. 主动初始化,直接工作
+            return false;
         }
     }
 
