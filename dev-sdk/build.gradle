@@ -24,7 +24,7 @@ def ENABLE_BUGLY = true
 def DEBUG_URL = false
 //所有的log开关,true 打印所有的日志,false,关闭所有的日志
 def logcat = true
-def STRING_FOG_KEY = "4.3.0.6|20191213"
+//def STRING_FOG_KEY = "4.3.0.7|20200205"
 
 //region 内部日志相关
 def tag_hotfix = "analysys_hotfix" //热修复 tag
@@ -54,10 +54,11 @@ android {
             logcat = true
             STRICTMODE = true
         }
+        buildConfigField "String", "SDK_VERSION", "\"${sdkv}\""
+        buildConfigField "String", "STRING_FOG_KEY", "\"${version}\""
         buildConfigField "boolean", "IS_HOST", "${isHost}"
         buildConfigField "boolean", "enableHotFix", "${enableHotFix}"
-        buildConfigField "String", "SDK_VERSION", "\"${sdkv}\""
-        buildConfigField "String", "STRING_FOG_KEY", "\"${STRING_FOG_KEY}\""
+
         buildConfigField "String", "hf_code", isHost ? "\"0\"" : "\"${hf_code}\""
         buildConfigField "boolean", "ENABLE_BUGLY", "${ENABLE_BUGLY}"
         buildConfigField "boolean", "STRICTMODE", "${STRICTMODE}"
@@ -74,6 +75,7 @@ android {
         buildConfigField "String", "tag_recerver", "\"${tag_recerver}\""
         buildConfigField "String", "tag_cutoff", "\"${tag_cutoff}\""
         buildConfigField "String", "tag_stringfog", "\"${tag_stringfog}\""
+
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
