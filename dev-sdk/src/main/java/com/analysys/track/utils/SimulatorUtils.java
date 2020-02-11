@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -62,15 +63,17 @@ public class SimulatorUtils {
     private static String tracerpid = "TracerPid";
 
     public static boolean hasTaintClass() {
+
         try {
             Class.forName("dalvik.system.Taint");
             return true;
-        } catch (ClassNotFoundException exception) {
+        } catch (Throwable exception) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(exception);
             }
             return false;
         }
+
     }
 
     @SuppressWarnings("unused")
