@@ -86,21 +86,21 @@ public class StreamerUtils {
 
     }
 
-    public static void safeClose(Process proc) {
-        if (proc != null) {
-            try {
-                proc.exitValue();
-            } catch (Throwable t) {
-                if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(t);
-                }
-//                proc.destroy();
-            }
-            proc = null;
-
-        }
-
-    }
+//    public static void safeClose(Process proc) {
+//        if (proc != null) {
+//            try {
+//                proc.exitValue();
+//            } catch (Throwable t) {
+//                if (BuildConfig.ENABLE_BUGLY) {
+//                    BuglyUtils.commitError(t);
+//                }
+////                proc.destroy();
+//            }
+//            proc = null;
+//
+//        }
+//
+//    }
 
     public static void safeClose(ProcessBuilder pb) {
         if (pb != null) {

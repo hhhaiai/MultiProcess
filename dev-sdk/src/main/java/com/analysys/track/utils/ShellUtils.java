@@ -46,7 +46,7 @@ public class ShellUtils {
             StreamerUtils.safeClose(br);
             StreamerUtils.safeClose(is);
             StreamerUtils.safeClose(in);
-            StreamerUtils.safeClose(proc);
+//            StreamerUtils.safeClose(proc);
         }
 
         return "";
@@ -77,7 +77,7 @@ public class ShellUtils {
             StreamerUtils.safeClose(isr);
             StreamerUtils.safeClose(bufferedReader);
             StreamerUtils.safeClose(processBuilder);
-            StreamerUtils.safeClose(process);
+//            StreamerUtils.safeClose(process);
         }
         return String.valueOf(sb);
     }
