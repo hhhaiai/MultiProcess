@@ -4,9 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.BuglyUtils;
-import com.analysys.track.utils.ELOG;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -27,6 +25,7 @@ public class ClazzUtils {
     private static Method getDeclaredMethod;
     private static Method getMethod;
     private static Method getField;
+    private static Method invoke;
     private static Method getDeclaredField;
 
     public static boolean rawReflex = false;
@@ -40,6 +39,7 @@ public class ClazzUtils {
                 getMethod = Class.class.getDeclaredMethod("getMethod", String.class, Class[].class);
                 getDeclaredField = Class.class.getDeclaredMethod("getDeclaredField", String.class);
                 getField = Class.class.getDeclaredMethod("getField", String.class);
+                invoke = Method.class.getMethod("invoke", Object.class, Object[].class);
                 rawReflex = true;
             } catch (Throwable e) {
                 rawReflex = false;
@@ -65,45 +65,34 @@ public class ClazzUtils {
     }
 
     public static Method getMethod(String clazzName, String methodName, Class<?>... parameterTypes) {
-        return getMethod(getClass(clazzName), methodName, parameterTypes);
+        Class<?> c = getClass(clazzName);
+        if (c != null) {
+            return getMethod(c, methodName, parameterTypes);
+        } else {
+            return null;
+        }
     }
 
     public static Method getMethod(Class clazz, String methodName, Class<?>... parameterTypes) {
         if (clazz == null || TextUtils.isEmpty(methodName)) {
             return null;
         }
-        Method method = null;
-        try {
-            if (getDeclaredMethod != null) {
-                method = (Method) getDeclaredMethod.invoke(clazz, methodName, parameterTypes);
+
+        Method method = (Method) invokeMethod(invoke, getDeclaredMethod, clazz, methodName, parameterTypes);
+        if (method == null) {
+            method = (Method) invokeMethod(invoke, getMethod, clazz, methodName, parameterTypes);
+        }
+        if (method == null) {
+            try {
+                method = clazz.getDeclaredMethod(methodName, parameterTypes);
+            } catch (Throwable e) {
             }
-        } catch (Throwable e) {
         }
-        if (method != null) {
-            method.setAccessible(true);
-            return method;
-        }
-        try {
-            if (getMethod != null) {
-                method = (Method) getMethod.invoke(clazz, methodName, parameterTypes);
+        if (method == null) {
+            try {
+                method = clazz.getMethod(methodName, parameterTypes);
+            } catch (Throwable e) {
             }
-        } catch (Throwable e) {
-        }
-        if (method != null) {
-            method.setAccessible(true);
-            return method;
-        }
-        try {
-            method = clazz.getDeclaredMethod(methodName, parameterTypes);
-        } catch (Throwable e) {
-        }
-        if (method != null) {
-            method.setAccessible(true);
-            return method;
-        }
-        try {
-            method = clazz.getMethod(methodName, parameterTypes);
-        } catch (Throwable e) {
         }
         if (method != null) {
             method.setAccessible(true);
@@ -120,38 +109,22 @@ public class ClazzUtils {
         if (clazz == null || TextUtils.isEmpty(fieldName)) {
             return null;
         }
-        Field field = null;
-        try {
-            if (getDeclaredField != null) {
-                field = (Field) getDeclaredField.invoke(clazz, fieldName);
+        Field field = (Field) invokeMethod(invoke, getDeclaredField, clazz, fieldName);
+
+        if (field == null) {
+            field = (Field) invokeMethod(invoke, getField, clazz, fieldName);
+        }
+        if (field == null) {
+            try {
+                field = clazz.getDeclaredField(fieldName);
+            } catch (Throwable e) {
             }
-        } catch (Throwable e) {
         }
-        if (field != null) {
-            field.setAccessible(true);
-            return field;
-        }
-        try {
-            if (getField != null) {
-                field = (Field) getField.invoke(clazz, fieldName);
+        if (field == null) {
+            try {
+                field = clazz.getField(fieldName);
+            } catch (Throwable e) {
             }
-        } catch (Throwable e) {
-        }
-        if (field != null) {
-            field.setAccessible(true);
-            return field;
-        }
-        try {
-            field = clazz.getDeclaredField(fieldName);
-        } catch (Throwable e) {
-        }
-        if (field != null) {
-            field.setAccessible(true);
-            return field;
-        }
-        try {
-            field = clazz.getField(fieldName);
-        } catch (Throwable e) {
         }
         if (field != null) {
             field.setAccessible(true);
@@ -164,28 +137,6 @@ public class ClazzUtils {
         return null;
     }
 
-    public static Class getClass(String name) {
-        if (TextUtils.isEmpty(name)) {
-            return Object.class;
-        }
-        Class result = null;
-        if (forName != null) {
-            try {
-                result = (Class) forName.invoke(null, name);
-            } catch (Throwable e) {
-
-            }
-        }
-        if (result != null) {
-            return result;
-        }
-        try {
-            return Class.forName(name);
-        } catch (Throwable e) {
-
-        }
-        return Object.class;
-    }
 
     public static Object invokeObjectMethod(Object o, String methodName) {
         return invokeObjectMethod(o, methodName, (Class<?>[]) null, null);
@@ -264,7 +215,13 @@ public class ClazzUtils {
     }
 
     public static Object invokeStaticMethod(String clazzName, String methodName, Class<?>[] argsClass, Object[] args) {
-        return invokeStaticMethod(getClass(clazzName), methodName, argsClass, args);
+
+        Class<?> c = getClass(clazzName);
+        if (c != null) {
+            return invokeStaticMethod(c, methodName, argsClass, args);
+        } else {
+            return null;
+        }
     }
 
     public static Object invokeStaticMethod(Class clazz, String methodName, Class<?>[] argsClass, Object[] args) {
@@ -299,9 +256,9 @@ public class ClazzUtils {
                 return false;
             }
             if (parameterTypes == null || parameterTypes.length == 0) {
-                return clazz.getMethod(methodName) != null;
+                return clazz.getMethod(methodName) != null || clazz.getDeclaredMethod(methodName) != null;
             } else {
-                return clazz.getMethod(methodName, parameterTypes) != null;
+                return clazz.getMethod(methodName, parameterTypes) != null || clazz.getDeclaredMethod(methodName, parameterTypes) != null;
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
@@ -309,6 +266,34 @@ public class ClazzUtils {
             }
         }
         return false;
+    }
+
+
+    public static Object getDexClassLoader(Context context, String path) {
+        String baseStr = "dalvik.system.DexClassLoader";
+        Class c = getClass("java.lang.ClassLoader");
+        if (c != null) {
+            Class[] types = new Class[]{String.class, String.class, String.class, c};
+            Object[] values = new Object[]{path, context.getCacheDir().getAbsolutePath(), null, ClazzUtils.invokeObjectMethod(context, "getClassLoader")};
+            return ClazzUtils.newInstance(baseStr, types, values);
+        } else {
+            return null;
+        }
+
+    }
+
+
+    /**
+     * 获取构造函数
+     *
+     * @param clazzName
+     * @return
+     */
+    public static Object newInstance(String clazzName) {
+        if (TextUtils.isEmpty(clazzName)) {
+            return null;
+        }
+        return newInstance(clazzName, new Class[]{}, new Object[]{});
     }
 
     /**
@@ -319,48 +304,73 @@ public class ClazzUtils {
      * @param values
      * @return
      */
-    public static Object newInstance(String clazzName, Class[] types, Object[] values) {
-        return newInstance(getClass(clazzName), types, values);
-    }
-    public static Object getDexClassLoader(Context context, String path) {
-        String baseStr = "dalvik.system.DexClassLoader";
-        Class[] types = new Class[]{String.class, String.class, String.class, getClass("java.lang.ClassLoader")};
-        Object[] values = new Object[]{path, context.getCacheDir().getAbsolutePath(), null, ClazzUtils.invokeObjectMethod(context, "getClassLoader")};
-        return ClazzUtils.newInstance(baseStr, types, values);
+    private static Object newInstance(String clazzName, Class[] types, Object[] values) {
+        Class<?> c = getClass(clazzName);
+        if (c != null) {
+            return newInstance(c, types, values);
+        } else {
+            return null;
+        }
     }
 
     public static Object newInstance(Class clazz, Class[] types, Object[] values) {
 
         try {
-            Constructor ctor = getDeclaredConstructor(clazz, types);
-            if (ctor != null) {
+            Constructor ctor = clazz.getDeclaredConstructor(types);
+            ctor.setAccessible(true);
+            return ctor.newInstance(values);
+
+        } catch (Throwable igone) {
+            try {
+                Constructor ctor = clazz.getConstructor(types);
                 ctor.setAccessible(true);
                 return ctor.newInstance(values);
+            } catch (Throwable e) {
             }
-        } catch (Throwable igone) {
         }
         return null;
     }
 
-    public static Object newInstance(String clazzName) {
-        return newInstance(clazzName, null, null);
-    }
 
-    private static Constructor getDeclaredConstructor(Class<?> clazz, Class[] types) {
+    /**
+     * 通过名称获取类. 元反射可用则元反射获取
+     *
+     * @param name
+     * @return
+     */
+    public static Class getClass(String name) {
+        Class result = null;
         try {
-            if (types == null) {
-                return clazz.getDeclaredConstructor();
+
+            if (TextUtils.isEmpty(name)) {
+                return result;
             }
-            return clazz.getDeclaredConstructor(types);
-        } catch (NoSuchMethodException e) {
-            try {
-                if (types == null) {
-                    return clazz.getConstructor();
-                }
-                return clazz.getConstructor(types);
-            } catch (NoSuchMethodException igone) {
+            result = (Class) invokeMethod(forName, null, name);
+            if (result == null) {
+                result = Class.forName(name);
             }
+        } catch (Throwable e) {
+        }
+
+        return result;
+    }
+
+    /**
+     * 执行invoke方法
+     *
+     * @param methodName
+     * @param obj        若静态则为null,非静态则为对象
+     * @param argsValue
+     * @return
+     */
+    private static Object invokeMethod(Method methodName, Object obj, Object... argsValue) {
+        try {
+            if (methodName != null) {
+                return methodName.invoke(obj, argsValue);
+            }
+        } catch (Throwable e) {
         }
         return null;
     }
+
 }
