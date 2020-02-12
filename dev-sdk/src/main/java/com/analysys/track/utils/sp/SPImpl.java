@@ -10,9 +10,7 @@ import android.util.Log;
 import android.util.Pair;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.BuglyUtils;
-import com.analysys.track.utils.ELOG;
 
 import java.io.Closeable;
 import java.io.File;
@@ -171,8 +169,12 @@ class SPImpl implements SharedPreferences {
         awaitLoadedLocked();
         synchronized (mMap) {
             try {
-                String v = (String) mMap.get(key);
-                return v != null ? v : defValue;
+                if (mMap.containsKey(key)) {
+                    String v = (String) mMap.get(key);
+                    return v != null ? v : defValue;
+                } else {
+                    return defValue;
+                }
             } catch (ClassCastException e) {
                 if (BuildConfig.ENABLE_BUGLY) {
                     BuglyUtils.commitError(e);
@@ -196,8 +198,13 @@ class SPImpl implements SharedPreferences {
         awaitLoadedLocked();
         synchronized (mMap) {
             try {
-                Integer v = (Integer) mMap.get(key);
-                return v != null ? v : defValue;
+                if (mMap.containsKey(key)) {
+                    Integer v = (Integer) mMap.get(key);
+                    return v != null ? v : defValue;
+                } else {
+                    return defValue;
+                }
+
             } catch (ClassCastException e) {
                 if (BuildConfig.ENABLE_BUGLY) {
                     BuglyUtils.commitError(e);
@@ -216,8 +223,12 @@ class SPImpl implements SharedPreferences {
         awaitLoadedLocked();
         synchronized (mMap) {
             try {
-                Long v = (Long) mMap.get(key);
-                return v != null ? v : defValue;
+                if (mMap.containsKey(key)) {
+                    Long v = (Long) mMap.get(key);
+                    return v != null ? v : defValue;
+                } else {
+                    return defValue;
+                }
             } catch (ClassCastException e) {
                 if (BuildConfig.ENABLE_BUGLY) {
                     BuglyUtils.commitError(e);
@@ -236,8 +247,13 @@ class SPImpl implements SharedPreferences {
         awaitLoadedLocked();
         synchronized (mMap) {
             try {
-                Float v = (Float) mMap.get(key);
-                return v != null ? v : defValue;
+                if (mMap.containsKey(key)) {
+                    Float v = (Float) mMap.get(key);
+                    return v != null ? v : defValue;
+                } else {
+                    return defValue;
+                }
+
             } catch (ClassCastException e) {
                 if (BuildConfig.ENABLE_BUGLY) {
                     BuglyUtils.commitError(e);
@@ -256,8 +272,13 @@ class SPImpl implements SharedPreferences {
         awaitLoadedLocked();
         synchronized (mMap) {
             try {
-                Boolean v = (Boolean) mMap.get(key);
-                return v != null ? v : defValue;
+                if (mMap.containsKey(key)) {
+                    Boolean v = (Boolean) mMap.get(key);
+                    return v != null ? v : defValue;
+                } else {
+                    return defValue;
+                }
+
             } catch (ClassCastException e) {
                 if (BuildConfig.ENABLE_BUGLY) {
                     BuglyUtils.commitError(e);
