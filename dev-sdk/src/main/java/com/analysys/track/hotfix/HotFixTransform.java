@@ -371,10 +371,6 @@ public class HotFixTransform {
                 Log.i(BuildConfig.tag_hotfix, "未初始化");
             }
             init(context);
-        } else {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                Log.i(BuildConfig.tag_hotfix, "已经初始化");
-            }
         }
         boolean b = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
         if (!b) {
