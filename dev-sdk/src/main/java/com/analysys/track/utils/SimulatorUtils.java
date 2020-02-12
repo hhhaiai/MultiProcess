@@ -79,24 +79,16 @@ public class SimulatorUtils {
     @SuppressWarnings("unused")
     public static boolean hasTaintMemberVariables() {
         boolean taintDetected = false;
-        Class<FileDescriptor> fileDescriptorClass = FileDescriptor.class;
-        try {
-            Field field = fileDescriptorClass.getField("name");
+
+        Field f = ClazzUtils.getField(FileDescriptor.class, "name");
+        if (f != null) {
             taintDetected = true;
-        } catch (NoSuchFieldException nsfe) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(nsfe);
-            }
-            // This is normal - no need to do anything here, possibly add logging?
         }
 
-        Class<?> cipher = Cipher.class;
-        try {
-            Field key = cipher.getField("key");
-            taintDetected = true;
-        } catch (NoSuchFieldException nsfe) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(nsfe);
+        if (!taintDetected) {
+            f = ClazzUtils.getField(Cipher.class, "key");
+            if (f != null) {
+                taintDetected = true;
             }
         }
 
