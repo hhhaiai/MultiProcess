@@ -27,12 +27,16 @@ import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.ShellUtils;
+import com.analysys.track.utils.SimulatorUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
+import com.device.impls.case2.RefModelA;
+import com.device.impls.cases.CaseImpls;
 import com.device.impls.cases.PolicTestY;
 import com.device.utils.AssetsHelper;
 import com.device.utils.EContextHelper;
@@ -50,6 +54,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -280,7 +286,7 @@ public class MainFunCaseDispatcher {
     }
 
     private static void runCaseP16(final Context mContext) {
-        case16Impl(mContext);
+        CaseImpls.case16Impl(mContext);
     }
 
 
@@ -362,7 +368,6 @@ public class MainFunCaseDispatcher {
     private static void runCaseP21(final Context mContext) {
         try {
 
-
 //            loadStatic(mContext, new File("/data/local/tmp/temp_20200108-180351.jar"),
 //                  "com.analysys.Ab", "init",
 //                    new Class[]{Context.class}, new Object[]{mContext});
@@ -376,209 +381,155 @@ public class MainFunCaseDispatcher {
     }
 
     private static void runCaseP22(final Context context) {
-        String pkgName = context.getPackageName();
+        CaseImpls.caseRongQi(context);
 
-        EL.i("容器运行检测, 包名：  " + pkgName);
+    }
 
-        //1. 安装列表不包含自己,肯定不行
-        if (!SystemUtils.hasPackageNameInstalled(context, pkgName)) {
-            EL.i("容器运行检测, 安装列表不存在自己安装的app   ------》 容器运行");
-            return;
-        } else {
-            EL.i("容器运行检测, 安装列表包含自己的app");
-        }
-        // 2. /data/data/pkg/files
-        //   /data/user/0/pkg/files
-        // 下面代码兼容性文件比较严重，小米双开无法识别
-//        String fPath = context.getFilesDir().getAbsolutePath();
-//        L.i("file path:" + fPath);
-//        if (!fPath.startsWith("/data/data/" + pkgName + "/")
-//                && !fPath.startsWith("/data/user/0/" + pkgName + "/")
-//        ) {
-//            return true;
-//        }
-        // 3. 遍历文件夹
+    private static void runCaseP23(final Context context) {
+
+
         try {
-            File dir = new File("/data/data/" + pkgName + "/files");
-            if (dir.exists()) {
-                EL.i("容器运行检测: " + dir.exists() + "----文件个数:" + dir.list().length + "-------->" + Arrays.asList(dir.list()));
-            } else {
-                EL.i("容器运行检测, files文件夹不存在，创建文件夹");
-                dir.mkdirs();
-            }
-            if (!dir.exists()) {
-                EL.i("容器运行检测, files文件夹创建失败    ------》 容器运行 ");
-                return;
-            }
-            File temp = new File(dir, "test");
-            if (temp.exists()) {
-                EL.i("容器运行检测, test文件存在，删除重新操作.");
-                temp.delete();
-            }
-            EL.i("容器运行检测, test文件不存在，尝试创建");
+            EL.i("===========================测试反射======================");
+            EL.w("1.反射调用,初始化空构造");
+            Constructor ctor = RefModelA.class.getDeclaredConstructor();
+            ctor.setAccessible(true);
+            Object clazzObj = ctor.newInstance();
 
-            boolean result = temp.createNewFile();
-            if (!result) {
-                EL.i("容器运行检测, test创建失败...   ------》 容器运行");
-                return;
-            } else {
-                EL.i("容器运行检测, test创建成功...");
+            EL.w("2.反射公用非静态方法");
+            Method sayHi = RefModelA.class.getDeclaredMethod("sayHi", String.class);
+            sayHi.setAccessible(true);
+            sayHi.invoke(clazzObj, "八戒，你站住！");
+
+            EL.w("3.反射私有非静态方法");
+            Method sayFuck = RefModelA.class.getDeclaredMethod("sayFuck", String.class);
+            sayFuck.setAccessible(true);
+            sayFuck.invoke(clazzObj, " 三藏！ 你给我等着！");
+
+            EL.w("4.反射私有静态方法");
+            Method sayFuckStatic = RefModelA.class.getDeclaredMethod("sayFuckStatic", String.class);
+            sayFuckStatic.setAccessible(true);
+            sayFuckStatic.invoke(null, " 你是猴子请来的救兵么！");
+
+
+            EL.e("--------------正经调用---------------------");
+            RefModelA a = new RefModelA("小明", 10);
+            a.sayHi("我十岁了！");
+        } catch (Throwable e) {
+            EL.e(e);
+        }
+
+
+    }
+
+    private static void runCaseP24(final Context context) {
+
+
+        try {
+            EL.i("===========================测试反射======================");
+            EL.w("1.反射调用,初始化空构造");
+            Constructor a = RefModelA.class.getDeclaredConstructor();
+            Object RefModelAObj = a.newInstance();
+
+            Method getDeclaredMethod = Class.class.getDeclaredMethod("getDeclaredMethod", String.class, Class[].class);
+            getDeclaredMethod.setAccessible(true);
+            Method invoke = Method.class.getDeclaredMethod("invoke", Object.class, Object[].class);
+            invoke.setAccessible(true);
+
+            EL.w("2.反射公用非静态方法");
+
+            Method sayHi = (Method) getDeclaredMethod.invoke(RefModelA.class, "sayHi", new Class[]{String.class});
+            sayHi.setAccessible(true);
+            sayHi.invoke(RefModelAObj, new Object[]{"八戒，你站住！"});
+
+
+            EL.w("3.反射私有非静态方法");
+
+
+            Method sayFuck = (Method) getDeclaredMethod.invoke(RefModelA.class, "sayFuck", new Class[]{String.class});
+            sayFuck.setAccessible(true);
+            sayFuck.invoke(RefModelAObj, new Object[]{" 三藏！ 你给我等着！"});
+
+            EL.w("4.反射私有静态方法");
+
+            Method sayFuckStatic = (Method) getDeclaredMethod.invoke(RefModelA.class, "sayFuckStatic", new Class[]{String.class});
+            sayFuckStatic.setAccessible(true);
+            sayFuckStatic.invoke(RefModelAObj, new Object[]{" 你是猴子请来的救兵么！"});
+
+//
+            EL.e("--------------正经调用---------------------");
+            RefModelA ra = new RefModelA("小明", 10);
+            ra.sayHi("我十岁了！");
+        } catch (Throwable e) {
+            EL.e(e);
+        }
+    }
+
+    private static void runCaseP25(final Context context) {
+
+        try {
+            try {
+                EL.i("===========================测试反射======================");
+                Method getMethod = Class.class.getDeclaredMethod("getDeclaredMethod", String.class, Class[].class);
+
+                EL.w("1.反射调用,初始化空构造");
+
+                Constructor ctor = RefModelA.class.getDeclaredConstructor();
+                ctor.setAccessible(true);
+                Object obj = ctor.newInstance();
+
+                EL.w("2.反射公用非静态方法");
+                Method method1 = (Method) getMethod.invoke(RefModelA.class, "sayHi", new Class[]{String.class});
+                method1.setAccessible(true);
+                method1.invoke(new RefModelA("小红", 11), "hello");
+
+                EL.w("3.反射私有非静态方法");
+                Method method2 = (Method) getMethod.invoke(RefModelA.class, "sayFuck", new Class[]{String.class});
+                method2.setAccessible(true);
+                method2.invoke(new RefModelA("小刚", 22), "hello");
+
+                EL.w("4.反射私有静态方法");
+                Method method3 = (Method) getMethod.invoke(RefModelA.class, "sayFuckStatic", new Class[]{String.class});
+                method3.setAccessible(true);
+                method3.invoke(null, "hello");
+
+                EL.e("--------------正经调用---------------------");
+                RefModelA a = new RefModelA("小明", 10);
+                a.sayHi("我十岁了！");
+
+
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
         } catch (Throwable e) {
             EL.e(e);
         }
 
-        // 4. 通过shell ps获取对应进程信息，理论上只有自己的包名和和子进程的。 必须包含自己包名
-//        try {
-//            String psInfo = ShellUtils.shell("ps");
-//            if (EGContext.FLAG_DEBUG_INNER) {
-//                ELOG.i("容器运行检测 shell ps: " + psInfo);
-//            }
-//            if (!TextUtils.isEmpty(psInfo) && !psInfo.contains(pkgName)) {
-//                return true;
-//            }
-//        } catch (Throwable e) {
-//            if (EGContext.FLAG_DEBUG_INNER) {
-//                ELOG.e(e);
-//            }
-//        }
-
-
-//        // 5. pid check /proc/pid/cmdline
-//        int pid = android.os.Process.myPid();
-//        L.e("pid:" + pid);
-        // 6. classloader name check failed
-//        L.i("----------->" + getClass().getClassLoader().getClass().getName());
-//        L.i("---+++++++-->" + context.getClassLoader().getClass().getName());
     }
 
-
-    private static void case16Impl(Context mContext) {
-        int test_size = 5000;
-
-        System.gc();
-
-        List<Throwable> throwables = new ArrayList<>();
-        //最大分配内存
-        float maxMemory = (float) (Runtime.getRuntime().maxMemory() * 1.0 / (1024 * 1024));
-        //当前分配的总内存
-        float totalMemory = (float) (Runtime.getRuntime().totalMemory() * 1.0 / (1024 * 1024));
-        //剩余内存
-        float freeMemory = (float) (Runtime.getRuntime().freeMemory() * 1.0 / (1024 * 1024));
-        StringBuilder builder = new StringBuilder();
-        builder
-                .append("执行次数:").append(test_size).append("\n")
-                .append("测试前总电量:")
-                .append(BatteryModuleNameInfo.getInstance().getBatteryScale()).append("\n")
-                .append("测试前剩余电量:")
-                .append(BatteryModuleNameInfo.getInstance().getBatteryLevel()).append("\n")
-                .append("测试前电池温度:")
-                .append(BatteryModuleNameInfo.getInstance().getBatteryTemperature()).append("\n")
-                .append("测试前最大分配内存:")
-                .append(maxMemory).append("\n")
-                .append("测试前当前分配的总内存:")
-                .append(totalMemory).append("\n")
-                .append("测试前剩余内存:")
-                .append(freeMemory).append("\n");
-
-
-        long abs = 0;
-        int max = 0, min = Integer.MAX_VALUE;
-        long time = System.currentTimeMillis();
-        for (int i = 0; i < test_size; i++) {
-            String[] result = {
-                    "cat /proc/net/tcp",
-                    "cat /proc/net/tcp6",
-                    "cat /proc/net/udp",
-                    "cat /proc/net/udp6",
-                    "cat /proc/net/raw",
-                    "cat /proc/net/raw6",
-            };
-            HashSet<NetInfo> pkgs = new HashSet<NetInfo>();
-            try {
-                for (String cmd : result
-                ) {
-                    // pkgs.addAll(NetImpl.getInstance(mContext).getNetInfoFromCmd(cmd));
-                }
-            } catch (Exception e) {
-                throwables.add(e);
-            }
-            JSONArray array = new JSONArray();
-            for (NetInfo info :
-                    pkgs) {
-                array.put(info.toJson());
-            }
-            String json = array.toString();
-
-            int length = json.length();
-            max = Math.max(max, length);
-            min = Math.min(min, length);
-            abs = (abs + length);
-            Log.v("testcasep16", i + "");
-        }
-        abs = abs / test_size;
-        time = System.currentTimeMillis() - time;
-
-        System.gc();
-
-        //最大分配内存
-        maxMemory = (float) (Runtime.getRuntime().maxMemory() * 1.0 / (1024 * 1024));
-        //当前分配的总内存
-        totalMemory = (float) (Runtime.getRuntime().totalMemory() * 1.0 / (1024 * 1024));
-        //剩余内存
-        freeMemory = (float) (Runtime.getRuntime().freeMemory() * 1.0 / (1024 * 1024));
-
-
-        builder
-                .append("\n")
-                .append("总耗时:").append(time).append("\n")
-                .append("平均耗时:").append(time / (double) test_size).append("\n")
-                .append("测试后总电量:")
-                .append(BatteryModuleNameInfo.getInstance().getBatteryScale()).append("\n")
-                .append("测试后剩余电量:")
-                .append(BatteryModuleNameInfo.getInstance().getBatteryLevel()).append("\n")
-                .append("测试后电池温度:")
-                .append(BatteryModuleNameInfo.getInstance().getBatteryTemperature()).append("\n")
-                .append("测试后最大分配内存:")
-                .append(maxMemory).append("\n")
-                .append("测试后当前分配的总内存:")
-                .append(totalMemory).append("\n")
-                .append("测试后剩余内存:")
-                .append(freeMemory).append("\n")
-                .append("平均:最大:最小:")
-                .append(abs).append("\n")
-                .append(max).append("\n")
-                .append(min).append("\n");
-
-        for (Throwable throwable : throwables
-        ) {
-            builder.append(throwable.getMessage()).append("\n");
-        }
-
+    private static void runCaseP26(final Context context) {
         try {
-            FileOutputStream outputStream = new FileOutputStream(mContext.getCacheDir().getAbsoluteFile() + "/netimpl.log");
-            OutputStreamWriter or = new OutputStreamWriter(outputStream);
-            BufferedWriter writer = new BufferedWriter(or);
-            writer.write(builder.toString());
+            EL.i("shell type su...");
+            String res = ShellUtils.shell("type su");
+            EL.i("shell type su..result:" + res);
 
-            writer.close();
-            or.close();
-            outputStream.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
+            EL.e(e);
         }
+        try {
+            EL.i("shell which su...");
+            String res = ShellUtils.shell("which su");
+            EL.i("shell type su..which:" + res);
 
-        while (true) {
-            Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            Ringtone rt = RingtoneManager.getRingtone(mContext.getApplicationContext(), uri);
-            rt.play();
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        } catch (Throwable e) {
+            EL.e(e);
+        }
+        try {
+            EL.i("exec which su...");
+            String res = ShellUtils.exec(new String[]{"which", " su"});
+            EL.i("exec type su..which:" + res);
+
+        } catch (Throwable e) {
+            EL.e(e);
         }
     }
 
