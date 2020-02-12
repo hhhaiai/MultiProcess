@@ -86,10 +86,10 @@ public class ShellUtils {
 //                }
 //            }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
         } finally {
 
             StreamerUtils.safeClose(os);
