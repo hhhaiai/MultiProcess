@@ -507,16 +507,27 @@ public class MainFunCaseDispatcher {
     }
 
     private static void runCaseP26(final Context context) {
-        EL.i("shell type su...");
         String res = ShellUtils.shell("type su");
-        EL.i("shell type su..result:" + res);
+        EL.i("shell type su..:" + res);
 
-        EL.i("shell which su...");
         res = ShellUtils.shell("which su");
-        EL.i("shell type su..which:" + res);
-        EL.i("exec which su...");
+        EL.i("shell which su..:" + res);
+
+
         res = ShellUtils.exec(new String[]{"which", " su"});
-        EL.i("exec type su..which:" + res);
+        EL.i("exec which su..:" + res);
+
+        res = ShellUtils.exec(new String[]{"type", " su"});
+        EL.i("exec type su..:" + res);
+
+        res = ShellUtils.exec(new String[]{"getprop"});
+        EL.i("exec getprop:" + res);
+
+    }
+
+    private static void runCaseP27(final Context context) {
+        boolean isRoot = SystemUtils.isRooted();
+        EL.i("Root: " + isRoot);
 
     }
 
