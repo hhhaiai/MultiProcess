@@ -7,9 +7,9 @@ costtime {
     enableLog true
 }
 //****************配置参数*****************
-def isRelease = false
+def isRelease = true
 //SDK版本号
-def version = "4.3.0.7|20200205"
+def version = "4.3.0.7|20200212"
 //*****************************************
 
 //是否是严格模式,控制短路逻辑的,true会启用短路,false 则不启用短路
@@ -24,7 +24,7 @@ def ENABLE_BUGLY = true
 def DEBUG_URL = false
 //所有的log开关,true 打印所有的日志,false,关闭所有的日志
 def logcat = true
-//def STRING_FOG_KEY = "4.3.0.7|20200205"
+def STRING_FOG_KEY = "4.3.0.6|20191213"
 
 //region 内部日志相关
 def tag_hotfix = "analysys_hotfix" //热修复 tag
@@ -50,12 +50,12 @@ android {
         }
         if (isRelease) {
             ENABLE_BUGLY = false
-            DEBUG_URL = false
+            DEBUG_URL = true
             logcat = true
             STRICTMODE = true
         }
         buildConfigField "String", "SDK_VERSION", "\"${sdkv}\""
-        buildConfigField "String", "STRING_FOG_KEY", "\"${version}\""
+        buildConfigField "String", "STRING_FOG_KEY", "\"${STRING_FOG_KEY}\""
         buildConfigField "boolean", "IS_HOST", "${isHost}"
         buildConfigField "boolean", "enableHotFix", "${enableHotFix}"
 
@@ -149,7 +149,7 @@ task copyDoc(type: Copy) {
 }
 
 //https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Zip.html
-def zipPath = "../release/4.3.0.7_20200204/"
+def zipPath = "../release/4.3.0.7_20200212/"
 task packageZip(type: Zip) {
     from "../releasebak/"
 //    destinationDir: 来指定生成zip文件的目录，类型是file(dir,但是不要包含/)
