@@ -254,6 +254,9 @@ public class EguanIdUtils {
                 return "";
             }
             File file = new File(Environment.getExternalStorageDirectory(), EGContext.EGUANFILE);
+            if (!file.exists()) {
+                return "";
+            }
             br = new BufferedReader(new FileReader(file));
             StringBuffer sb = new StringBuffer();
             while ((readline = br.readLine()) != null) {
