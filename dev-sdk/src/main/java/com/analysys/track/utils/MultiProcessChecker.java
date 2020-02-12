@@ -107,22 +107,22 @@ public class MultiProcessChecker {
 //                    ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----setLockLastModifyTime-----set  success-----");
 //                }
 
-                if (dev.lastModified() == time) {
-//                    if (EGContext.FLAG_DEBUG_INNER) {
-//                        ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----setLockLastModifyTime-----haskey: " + mFilenameAndLocks.containsKey(fileName));
-//                    }
-                    if (mFilenameAndLocks.containsKey(fileName)) {
-
-                        Locks locks = mFilenameAndLocks.get(fileName);
-//                        if (EGContext.FLAG_DEBUG_INNER) {
-//                            ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----setLockLastModifyTime-----locks: " + locks);
+//                if (dev.lastModified() == time) {
+////                    if (EGContext.FLAG_DEBUG_INNER) {
+////                        ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----setLockLastModifyTime-----haskey: " + mFilenameAndLocks.containsKey(fileName));
+////                    }
+//                    if (mFilenameAndLocks.containsKey(fileName)) {
+//
+//                        Locks locks = mFilenameAndLocks.get(fileName);
+////                        if (EGContext.FLAG_DEBUG_INNER) {
+////                            ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----setLockLastModifyTime-----locks: " + locks);
+////                        }
+//                        if (locks != null) {
+//                            locks.safeClose();
 //                        }
-                        if (locks != null) {
-                            locks.safeClose();
-                        }
-                    }
-                    return true;
-                }
+//                    }
+//                    return true;
+//                }
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
