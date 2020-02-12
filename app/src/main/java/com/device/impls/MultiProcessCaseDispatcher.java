@@ -19,6 +19,7 @@ import com.analysys.track.utils.ProcessUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.analysys.track.utils.sp.SPHelper;
+import com.analysys.track.utils.sp.SPHelper2;
 import com.device.utils.EL;
 
 import java.lang.reflect.Method;
@@ -224,9 +225,22 @@ public class MultiProcessCaseDispatcher {
     }
 
     public static void runCase11(final Context context) {
+        EL.i("----runCase11-多进程写不同key----");
+        String s = ProcessUtils.getCurrentProcessName(context);
+        SPHelper.setStringValue2SP(context, s + "--s", s);
+        SPHelper.setIntValue2SP(context, s + "--i", (int) (Math.random() * 1000));
+        SPHelper.setBooleanValue2SP(context, s + "--b", true);
+        SPHelper.setLongValue2SP(context, s + "--l", Long.MAX_VALUE);
     }
 
     public static void runCase12(final Context context) {
+        EL.i("----runCase12-多进程取不同key----");
+        String s = ProcessUtils.getCurrentProcessName(context);
+        SPHelper.setStringValue2SP(context, s, s);
+        EL.i(s + "--s :" + SPHelper.getStringValueFromSP(context, s + "--s", ""));
+        EL.i(s + "--i :" + SPHelper.getIntValueFromSP(context, s + "--i", -1));
+        EL.i(s + "--b :" + SPHelper.getBooleanValueFromSP(context, s + "--b", false));
+        EL.i(s + "--l :" + SPHelper.getLongValueFromSP(context, s + "--l", -1));
     }
 
     public static void runCase13(final Context context) {
