@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 
 
 /**
@@ -110,7 +109,7 @@ public class ShellUtils {
                 process.destroy();
             }
         }
-        L.w("执行[ " + Arrays.asList(commands) + " ], 结果: " + resultSb.toString());
+//        L.w("执行[ " + Arrays.asList(commands) + " ], 结果: " + resultSb.toString());
         return resultSb.toString();
     }
 
