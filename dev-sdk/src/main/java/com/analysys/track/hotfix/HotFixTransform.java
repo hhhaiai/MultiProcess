@@ -62,7 +62,7 @@ public class HotFixTransform {
                 if (!isInit()) {
                     try {
                         String path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH, "");
-                        ELOG.e("sanbo","取出patch路径: " +path);
+//                        Log.e("sanbo","取出patch路径: " +path);
                         boolean enable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
                         if (EGContext.FLAG_DEBUG_INNER) {
                             Log.i(BuildConfig.tag_hotfix, "初始化:[path]" + path + "[enable]" + enable);

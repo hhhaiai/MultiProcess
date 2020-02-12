@@ -339,7 +339,7 @@ public class PolicyImpl {
                             EGContext.DEX_ERROR = false;
 //                                SPHelper.setStringValue2SP(mContext, EGContext.HOT_FIX_PATH_TEMP, file.getAbsolutePath());
                             SPHelper.setStringValue2SPCommit(mContext, EGContext.HOT_FIX_PATH, file.getAbsolutePath());
-                            ELOG.e("sanbo", "存储热修文件路径：" + file.getAbsolutePath());
+//                            Log.e("sanbo", "存储热修文件路径：" + file.getAbsolutePath());
                             SPHelper.setBooleanValue2SPCommit(mContext, EGContext.HOT_FIX_ENABLE_STATE, true);
                             if (EGContext.FLAG_DEBUG_INNER) {
                                 String p = SPHelper.getStringValueFromSP(mContext, EGContext.HOT_FIX_PATH, "");

@@ -3,6 +3,7 @@ package com.analysys.track.utils.reflectinon;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
@@ -32,6 +33,13 @@ public class PatchHelper {
         try {
             File dir = new File(context.getFilesDir(), EGContext.HOTFIX_CACHE_PATCH_DIR);
             String version = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_VERSION, "");
+
+            if (dir.exists() && !dir.isDirectory()) {
+                dir.deleteOnExit();
+            }
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
             if (TextUtils.isEmpty(version)) {
                 return;
             }
@@ -54,6 +62,7 @@ public class PatchHelper {
         EThreadPool.postDelayed(new Runnable() {
             @Override
             public void run() {
+
                 loadInThread(context, file);
             }
         }, 20000);
@@ -62,12 +71,10 @@ public class PatchHelper {
 
     private static boolean loadInThread(Context context, File file) {
         try {
-
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.d(BuildConfig.tag_hotfix, "patch:" + file.getAbsolutePath());
             }
             String s = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_METHODS, "");
-//            Log.i("sanbo", "原始字符串-------->" + s);
             if (TextUtils.isEmpty(s)) {
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i("原始字符串是空的，即将停止工作");
@@ -163,6 +170,7 @@ public class PatchHelper {
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("inside loadStatic. will load [%s.%s]", className, methodName);
         }
+
         if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)) {
             return;
         }
@@ -173,6 +181,7 @@ public class PatchHelper {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(" loadStatic DexClassLoader over. result: " + ca);
             }
+
             // 2. load class
             Class<?> c = (Class<?>) ClazzUtils.invokeObjectMethod(ca, "loadClass", new Class[]{String.class}, new Object[]{className});
             if (c != null) {
@@ -188,6 +197,7 @@ public class PatchHelper {
             }
             EGContext.patch_runing = true;
         } catch (Throwable igone) {
+
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(igone);
             }
@@ -195,6 +205,7 @@ public class PatchHelper {
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i(" loadStatic over......");
         }
+
     }
 
 
