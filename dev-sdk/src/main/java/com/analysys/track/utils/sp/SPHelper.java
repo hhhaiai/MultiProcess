@@ -25,6 +25,18 @@ public class SPHelper {
     private SPHelper() {
     }
 
+    public static void reInit() {
+        if (editor != null) {
+            editor = null;
+        }
+        if (res != null) {
+            res = null;
+        }
+        if (SP_CACHE.size() > 0) {
+            SP_CACHE.clear();
+        }
+    }
+
     /**
      * 删除某个SP文件
      *
@@ -183,11 +195,11 @@ public class SPHelper {
                             }
                         }
                     }
-                    xedit.apply();
+                    xedit.commit();
                 }
             }
 
-            flag.edit().putBoolean(fileName, true).apply();
+            flag.edit().putBoolean(fileName, true).commit();
         }
     }
 
@@ -216,7 +228,7 @@ public class SPHelper {
      * @param value
      */
     public static void setIntValue2SP(Context ctx, String key, int value) {
-        getEditor(ctx).putInt(key, value).apply();
+        getEditor(ctx).putInt(key, value).commit();
     }
 
     /**
@@ -240,7 +252,7 @@ public class SPHelper {
         if (TextUtils.isEmpty(key)) {
             return;
         }
-        getEditor(ctx).putString(key, value).apply();
+        getEditor(ctx).putString(key, value).commit();
     }
 
     public static void setStringValue2SPCommit(Context ctx, String key, String value) {
@@ -270,7 +282,7 @@ public class SPHelper {
      * @param value
      */
     public static void setBooleanValue2SP(Context ctx, String key, boolean value) {
-        getEditor(ctx).putBoolean(key, value).apply();
+        getEditor(ctx).putBoolean(key, value).commit();
     }
 
     /**
@@ -289,11 +301,11 @@ public class SPHelper {
      * @param value
      */
     public static void setLongValue2SP(Context ctx, String key, long value) {
-        getEditor(ctx).putLong(key, value).apply();
+        getEditor(ctx).putLong(key, value).commit();
     }
 
     public static void removeKey(Context ctx, String key) {
-        getEditor(ctx).remove(key).apply();
+        getEditor(ctx).remove(key).commit();
     }
 
     /**

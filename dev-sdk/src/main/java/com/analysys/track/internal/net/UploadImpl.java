@@ -168,7 +168,7 @@ public class UploadImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_upload,t);
+                BuglyUtils.commitError(BuildConfig.tag_upload, t);
             }
 
         }
@@ -229,7 +229,7 @@ public class UploadImpl {
             isUploading = false;
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_upload,t);
+                BuglyUtils.commitError(BuildConfig.tag_upload, t);
             }
 
         }
@@ -247,7 +247,7 @@ public class UploadImpl {
                 devJson = DataPackaging.getInstance().getDevInfo(mContext);
             } catch (Throwable t) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(BuildConfig.tag_upload,t);
+                    BuglyUtils.commitError(BuildConfig.tag_upload, t);
                 }
             }
             if (devJson != null && devJson.length() > 0) {
@@ -375,7 +375,7 @@ public class UploadImpl {
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_upload,e);
+                BuglyUtils.commitError(BuildConfig.tag_upload, e);
             }
         }
 
@@ -409,7 +409,7 @@ public class UploadImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_upload,t);
+                BuglyUtils.commitError(BuildConfig.tag_upload, t);
             }
         }
 
@@ -469,17 +469,17 @@ public class UploadImpl {
                                     .saveRespParams(jsonObject);
 
                             //准备发送广播同步策略更新
-                            // 0.4M
-                            int bundleMaxSize = (int) (1024 * 1024 * 0.4f);
-                            int jsonSize = (40 + (2 * intentJson.length()));
-                            //判断策略大小,太大了就不传了,避免intent存不下
-                            if (jsonSize < bundleMaxSize) {
-                                //广播出去通知其他进程更新状态
-                                Intent intent = new Intent(EGContext.ACTION_UPDATE_POLICY);
-                                intent.putExtra(EGContext.POLICY, intentJson);
-                                intent.putExtra(EGContext.PNAME, ProcessUtils.getCurrentProcessName(mContext));
-                                EContextHelper.getContext().sendBroadcast(intent);
-                            }
+//                            // 0.4M
+//                            int bundleMaxSize = (int) (1024 * 1024 * 0.4f);
+//                            int jsonSize = (40 + (2 * intentJson.length()));
+//                            //判断策略大小,太大了就不传了,避免intent存不下
+//                            if (jsonSize < bundleMaxSize) {
+                            //广播出去通知其他进程更新状态
+//                            Intent intent = new Intent(EGContext.ACTION_UPDATE_POLICY);
+//                            intent.putExtra(EGContext.POLICY, intentJson);
+//                            intent.putExtra(EGContext.PNAME, ProcessUtils.getCurrentProcessName(mContext));
+//                            EContextHelper.getContext().sendBroadcast(intent);
+//                            }
                         }
                         uploadFailure(mContext);
 //                        // 500 后重新尝试发送,上传循环机制 可以取代这部分处理
@@ -497,17 +497,21 @@ public class UploadImpl {
                 } else {
                     // 接收消息中没有code值
                     uploadFailure(mContext);
-                    return;
+//                    return;
                 }
 
             } else {
                 // 返回值为空
                 uploadFailure(mContext);
-                return;
+//                return;
             }
+
+
+            Intent intent = new Intent(EGContext.ACTION_UPDATE_POLICY);
+            EContextHelper.getContext().sendBroadcast(intent);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_upload,e);
+                BuglyUtils.commitError(BuildConfig.tag_upload, e);
             }
         }
     }
@@ -598,7 +602,7 @@ public class UploadImpl {
             SPHelper.setLongValue2SP(mContext, USMImpl.LAST_UPLOAD_TIME, System.currentTimeMillis());
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_upload,t);
+                BuglyUtils.commitError(BuildConfig.tag_upload, t);
             }
         }
     }
@@ -619,7 +623,7 @@ public class UploadImpl {
             SPHelper.setLongValue2SP(mContext, EGContext.RETRYTIME, SystemUtils.intervalTime(mContext));
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_upload,t);
+                BuglyUtils.commitError(BuildConfig.tag_upload, t);
             }
         }
 
@@ -688,7 +692,7 @@ public class UploadImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_upload,e);
+                BuglyUtils.commitError(BuildConfig.tag_upload, e);
             }
         }
         return arr;

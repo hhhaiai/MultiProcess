@@ -231,6 +231,10 @@ public class MultiProcessCaseDispatcher {
         SPHelper.setIntValue2SP(context, s + "--i", (int) (Math.random() * 1000));
         SPHelper.setBooleanValue2SP(context, s + "--b", true);
         SPHelper.setLongValue2SP(context, s + "--l", Long.MAX_VALUE);
+
+        EL.e(s + "  :" + SPHelper.getDefault(context).getAll().size());
+        EL.w(s + "  :" + SPHelper.getDefault(context).getAll().toString());
+
     }
 
     public static void runCase12(final Context context) {
@@ -241,6 +245,8 @@ public class MultiProcessCaseDispatcher {
         EL.i(s + "--i :" + SPHelper.getIntValueFromSP(context, s + "--i", -1));
         EL.i(s + "--b :" + SPHelper.getBooleanValueFromSP(context, s + "--b", false));
         EL.i(s + "--l :" + SPHelper.getLongValueFromSP(context, s + "--l", -1));
+        EL.e(s + "  :" + SPHelper.getDefault(context).getAll().size());
+        EL.w(s + "  :" + SPHelper.getDefault(context).getAll().toString());
     }
 
     public static void runCase13(final Context context) {
