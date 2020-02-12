@@ -20,23 +20,79 @@ public class ShellUtils {
      * @return
      */
     public static String shell(String cmd) {
-        return execCommand(new String[]{cmd});
+        if (TextUtils.isEmpty(cmd)) {
+            return null;
+        }
+        Process proc = null;
+        BufferedInputStream in = null;
+        BufferedReader br = null;
+        InputStreamReader is = null;
+        StringBuilder sb = new StringBuilder();
+        try {
+            proc = Runtime.getRuntime().exec(cmd);
+            in = new BufferedInputStream(proc.getInputStream());
+            is = new InputStreamReader(in);
+            br = new BufferedReader(is);
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+            if (sb.length() > 0) {
+                return sb.substring(0, sb.length() - 1);
+            }
+            return String.valueOf(sb);
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
+        } finally {
+            StreamerUtils.safeClose(br);
+            StreamerUtils.safeClose(is);
+            StreamerUtils.safeClose(in);
+            if (proc != null) {
+                proc.destroy();
+            }
+        }
+
+        return "";
     }
 
     public static String exec(String[] exec) {
-        StringBuffer sb = new StringBuffer();
-        for (String s : exec) {
-            sb.append(s).append(" ");
+        StringBuilder sb = new StringBuilder();
+        Process process = null;
+        ProcessBuilder processBuilder = new ProcessBuilder(exec);
+        BufferedReader bufferedReader = null;
+        InputStreamReader isr = null;
+        InputStream is = null;
+        try {
+            process = processBuilder.start();
+            is = process.getInputStream();
+            isr = new InputStreamReader(is);
+            bufferedReader = new BufferedReader(isr);
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
+        } finally {
+            StreamerUtils.safeClose(is);
+            StreamerUtils.safeClose(isr);
+            StreamerUtils.safeClose(bufferedReader);
+            StreamerUtils.safeClose(processBuilder);
+            if (process != null) {
+                process.destroy();
+            }
         }
-        return execCommand(new String[]{sb.toString()});
-
+        return String.valueOf(sb);
     }
-
 
     /**
      * 支持多个语句的shell
      *
-     * @param commands
+     * @param commands 每一个元素都是语句shell.示例 new String[]{"type su"}.
      * @return
      */
     private static String execCommand(String[] commands) {
@@ -68,6 +124,7 @@ public class ShellUtils {
             os.writeBytes("exit\n");
             os.flush();
 
+            // 循环打印指令，可能导致死等
             process.waitFor();
 
             is = process.getInputStream();

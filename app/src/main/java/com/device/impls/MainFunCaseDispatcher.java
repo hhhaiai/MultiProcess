@@ -507,30 +507,17 @@ public class MainFunCaseDispatcher {
     }
 
     private static void runCaseP26(final Context context) {
-        try {
-            EL.i("shell type su...");
-            String res = ShellUtils.shell("type su");
-            EL.i("shell type su..result:" + res);
+        EL.i("shell type su...");
+        String res = ShellUtils.shell("type su");
+        EL.i("shell type su..result:" + res);
 
-        } catch (Throwable e) {
-            EL.e(e);
-        }
-        try {
-            EL.i("shell which su...");
-            String res = ShellUtils.shell("which su");
-            EL.i("shell type su..which:" + res);
+        EL.i("shell which su...");
+        res = ShellUtils.shell("which su");
+        EL.i("shell type su..which:" + res);
+        EL.i("exec which su...");
+        res = ShellUtils.exec(new String[]{"which", " su"});
+        EL.i("exec type su..which:" + res);
 
-        } catch (Throwable e) {
-            EL.e(e);
-        }
-        try {
-            EL.i("exec which su...");
-            String res = ShellUtils.exec(new String[]{"which", " su"});
-            EL.i("exec type su..which:" + res);
-
-        } catch (Throwable e) {
-            EL.e(e);
-        }
     }
 
 
