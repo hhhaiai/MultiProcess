@@ -109,8 +109,12 @@ public class ClazzUtils {
         if (clazz == null || TextUtils.isEmpty(fieldName)) {
             return null;
         }
-        Field field = (Field) invokeMethod(invoke, getDeclaredField, clazz, fieldName);
 
+        if (!hasField(clazz, fieldName)) {
+            return null;
+        }
+
+        Field field = (Field) invokeMethod(invoke, getDeclaredField, clazz, fieldName);
         if (field == null) {
             field = (Field) invokeMethod(invoke, getField, clazz, fieldName);
         }
@@ -135,6 +139,24 @@ public class ClazzUtils {
             }
         }
         return null;
+    }
+
+    /**
+     * 是否有变量
+     *
+     * @param clazz
+     * @param fieldName
+     * @return
+     */
+    private static boolean hasField(Class clazz, String fieldName) {
+        Field[] fs = clazz.getFields();
+        for (Field f : fs) {
+            if (f.getName().equals(fieldName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
