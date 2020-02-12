@@ -185,18 +185,23 @@ public class SystemUtils {
             // 1. 文件判断, 文件存在则权限判断
             for (String path : paths) {
                 if (new File(path).exists()) {
-                    String execResult = ShellUtils.exec(new String[]{"ls", "-l", path});
-                    if (!TextUtils.isEmpty(execResult)
-                            && execResult.indexOf("root") != execResult.lastIndexOf("root")) {
-                        return true;
-                    }
-                    if (!TextUtils.isEmpty(execResult) && execResult.length() >= 4) {
-                        char flag = execResult.charAt(3);
-                        if (flag == 's' || flag == 'x') {
-                            isRoot = true;
-                            return true;
-                        }
-                    }
+//                    String execResult = ShellUtils.exec(new String[]{"ls", "-l", path});
+//                    if (!TextUtils.isEmpty(execResult)
+//                            && execResult.indexOf("root") != execResult.lastIndexOf("root")) {
+//                        isRoot = true;
+//                        return true;
+//                    }
+//                    if (!TextUtils.isEmpty(execResult) && execResult.length() >= 4) {
+//                        char flag = execResult.charAt(3);
+//                        if (flag == 's' || flag == 'x') {
+//                            isRoot = true;
+//                            return true;
+//                        }
+//                    }
+                    //有root的关键标志 识别为root设备
+
+                    isRoot = true;
+                    return isRoot;
                 }
             }
             // 2.命令行获取
@@ -204,7 +209,7 @@ public class SystemUtils {
                 String execResult = ShellUtils.exec(new String[]{g, "su"});
                 if (!TextUtils.isEmpty(execResult) && !"su not found".equals(execResult)) {
                     isRoot = true;
-                    return true;
+                    return isRoot;
                 }
             }
         } catch (Throwable e) {
@@ -213,7 +218,7 @@ public class SystemUtils {
             }
         }
         isRoot = false;
-        return false;
+        return isRoot;
     }
 
     public static String getString(String data, String json) throws JSONException {
