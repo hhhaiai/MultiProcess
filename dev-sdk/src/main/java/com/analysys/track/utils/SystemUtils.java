@@ -206,7 +206,7 @@ public class SystemUtils {
             }
             // 2.命令行获取
             for (String g : gg) {
-                String execResult = ShellUtils.exec(new String[]{g, "su"});
+                String execResult = ShellUtils.execCommand(new String[]{g+ " su"});
                 if (!TextUtils.isEmpty(execResult) && !"su not found".equals(execResult)) {
                     isRoot = true;
                     return isRoot;

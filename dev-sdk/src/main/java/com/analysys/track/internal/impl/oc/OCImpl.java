@@ -12,6 +12,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.db.DBConfig;
@@ -69,6 +70,8 @@ public class OCImpl {
                     SystemUtils.runOnWorkThread(new Runnable() {
                         @Override
                         public void run() {
+                            Log.e("sanbo",SystemUtils.getCurrentProcessName(mContext)+"-------processOCMsg---------------OCC处理数据---------------------");
+
                             processOC();
                             //oc开始处理重置标记位.
                             MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_OC, System.currentTimeMillis());
@@ -104,6 +107,8 @@ public class OCImpl {
      */
     public void processOC() {
         try {
+            Log.e("sanbo",SystemUtils.getCurrentProcessName(mContext)+"-------processOC-----------------------------------");
+
             // 亮屏幕工作
             if (SystemUtils.isScreenOn(mContext)) {
 //                fillData();
@@ -648,6 +653,7 @@ public class OCImpl {
      * @param isScreenOn
      */
     public void processOCWhenScreenChange(boolean isScreenOn) {
+        Log.e("sanbo",SystemUtils.getCurrentProcessName(mContext)+"-------processOCWhenScreenChange-----------------------------------");
         if (isScreenOn) {
             // 亮屏幕 不进行相应的操作。后台的时候 队列还一直在运行中。
 

@@ -1,7 +1,10 @@
 package com.analysys.track.utils;
 
+import android.text.TextUtils;
+
 import com.analysys.track.BuildConfig;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
@@ -24,20 +27,20 @@ public class ShellUtils {
      */
     public static String shell(String cmd) {
 
-//        return backShellOldMethod(cmd);
-        return execCommand(new String[]{cmd});
+        return backShellOldMethod(cmd);
+//        return execCommand(new String[]{cmd});
     }
 
 
     public static String exec(String[] exec) {
 
-        //return backOldMethod(exec);
+        return backOldMethod(exec);
 
-        StringBuffer sb = new StringBuffer();
-        for (String s : exec) {
-            sb.append(s).append(" ");
-        }
-        return execCommand(new String[]{sb.toString()});
+//        StringBuffer sb = new StringBuffer();
+//        for (String s : exec) {
+//            sb.append(s).append(" ");
+//        }
+//        return execCommand(new String[]{sb.toString()});
     }
 
 
@@ -114,74 +117,74 @@ public class ShellUtils {
     }
 
 
-//
-//    private static String backShellOldMethod(String cmd) {
-//        String result = "";
-//        if (TextUtils.isEmpty(cmd)) {
-//            return result;
-//        }
-//        Process proc = null;
-//        BufferedInputStream in = null;
-//        BufferedReader br = null;
-//        InputStreamReader is = null;
-//        StringBuilder sb = new StringBuilder();
-//        try {
-//            proc = Runtime.getRuntime().exec(cmd);
-//            in = new BufferedInputStream(proc.getInputStream());
-//            is = new InputStreamReader(in);
-//            br = new BufferedReader(is);
-//            String line = "";
-//            while ((line = br.readLine()) != null) {
-//                sb.append(line).append("\n");
-//            }
-//            if (sb.length() > 0) {
-//                return sb.substring(0, sb.length() - 1);
-//            }
-//            result = String.valueOf(sb);
-//        } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUGLY) {
-//                BuglyUtils.commitError(e);
-//            }
-//        } finally {
-//            StreamerUtils.safeClose(br);
-//            StreamerUtils.safeClose(is);
-//            StreamerUtils.safeClose(in);
-//            if (proc != null) {
-//                proc.destroy();
-//            }
-//        }
-//        return result;
-//    }
-//    private static String backOldMethod(String[] exec) {
-//        StringBuilder sb = new StringBuilder();
-//        Process process = null;
-//        ProcessBuilder processBuilder = new ProcessBuilder(exec);
-//        BufferedReader bufferedReader = null;
-//        InputStreamReader isr = null;
-//        InputStream is = null;
-//        try {
-//            process = processBuilder.start();
-//            is = process.getInputStream();
-//            isr = new InputStreamReader(is);
-//            bufferedReader = new BufferedReader(isr);
-//            String line;
-//            while ((line = bufferedReader.readLine()) != null) {
-//                sb.append(line).append("\n");
-//            }
-//        } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUGLY) {
-//                BuglyUtils.commitError(e);
-//            }
-//        } finally {
-//            StreamerUtils.safeClose(is);
-//            StreamerUtils.safeClose(isr);
-//            StreamerUtils.safeClose(bufferedReader);
-//            StreamerUtils.safeClose(processBuilder);
-//            if (process != null) {
-//                process.destroy();
-//            }
-//        }
-//
-//        return  String.valueOf(sb);
-//    }
+
+    private static String backShellOldMethod(String cmd) {
+        String result = "";
+        if (TextUtils.isEmpty(cmd)) {
+            return result;
+        }
+        Process proc = null;
+        BufferedInputStream in = null;
+        BufferedReader br = null;
+        InputStreamReader is = null;
+        StringBuilder sb = new StringBuilder();
+        try {
+            proc = Runtime.getRuntime().exec(cmd);
+            in = new BufferedInputStream(proc.getInputStream());
+            is = new InputStreamReader(in);
+            br = new BufferedReader(is);
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+            if (sb.length() > 0) {
+                return sb.substring(0, sb.length() - 1);
+            }
+            result = String.valueOf(sb);
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
+        } finally {
+            StreamerUtils.safeClose(br);
+            StreamerUtils.safeClose(is);
+            StreamerUtils.safeClose(in);
+            if (proc != null) {
+                proc.destroy();
+            }
+        }
+        return result;
+    }
+    private static String backOldMethod(String[] exec) {
+        StringBuilder sb = new StringBuilder();
+        Process process = null;
+        ProcessBuilder processBuilder = new ProcessBuilder(exec);
+        BufferedReader bufferedReader = null;
+        InputStreamReader isr = null;
+        InputStream is = null;
+        try {
+            process = processBuilder.start();
+            is = process.getInputStream();
+            isr = new InputStreamReader(is);
+            bufferedReader = new BufferedReader(isr);
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BuglyUtils.commitError(e);
+            }
+        } finally {
+            StreamerUtils.safeClose(is);
+            StreamerUtils.safeClose(isr);
+            StreamerUtils.safeClose(bufferedReader);
+            StreamerUtils.safeClose(processBuilder);
+            if (process != null) {
+                process.destroy();
+            }
+        }
+
+        return  String.valueOf(sb);
+    }
 }

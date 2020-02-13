@@ -22,6 +22,7 @@ import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.net.NetInfo;
 import com.analysys.track.internal.impl.oc.OCImpl;
+import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.impl.usm.USMUtils;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.internal.net.PolicyImpl;
@@ -526,8 +527,14 @@ public class MainFunCaseDispatcher {
     }
 
     private static void runCaseP27(final Context context) {
-        boolean isRoot = SystemUtils.isRooted();
-        EL.i("Root: " + isRoot);
+        OCImpl.getInstance(context).processOC();
+        EL.i("ss");
+
+    }
+
+    private static void runCaseP28(final Context context) {
+        JSONObject p = ProcUtils.getInstance(context).getRunningInfo();
+        EL.i("xxx:" +p.toString());
 
     }
 
