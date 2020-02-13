@@ -72,6 +72,8 @@ done
 rm -rf build/
 rm -rf release/
 rm -rf releasebak/
+rm -rf sh.exe.stackdump
+rm -rf classes.dex
 
 if  [ $# == 0 ]; then
     $ecs "${yellow} clean project success.${endColor} "

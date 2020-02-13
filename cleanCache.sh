@@ -25,6 +25,8 @@ rm -rf releasebak/
 rm -rf *.iml
 rm -rf .gradle/
 rm -rf .idea/
+rm -rf sh.exe.stackdump
+rm -rf classes.dex
 
 if  [ $# == 0 ]; then
     echo " clean project success. "
