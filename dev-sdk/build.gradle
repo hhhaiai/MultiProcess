@@ -9,14 +9,14 @@ costtime {
 //****************配置参数*****************
 def isRelease = true
 //SDK版本号
-def version = "4.3.0.7|20200212"
+def version = "4.3.0.7|20200211"
 //*****************************************
 
 //是否是严格模式,控制短路逻辑的,true会启用短路,false 则不启用短路
 def STRICTMODE = false
-//是否是热修复的宿主
+// 宿主包(jar):true , 热修复包(dex):false
 def isHost = true
-//打包版本,热修版本,非热修版本
+// 包含热修复功能:true ， 不包含热修复功能:false
 def enableHotFix = true
 //当前热修复包的版本
 def hf_code = 1
@@ -149,7 +149,8 @@ task copyDoc(type: Copy) {
 }
 
 //https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Zip.html
-def zipPath = "../release/4.3.0.7_20200212/"
+//def zipPath = "../release/4.3.0.7_20200212/"
+def zipPath = "../release/"
 task packageZip(type: Zip) {
     from "../releasebak/"
 //    destinationDir: 来指定生成zip文件的目录，类型是file(dir,但是不要包含/)
