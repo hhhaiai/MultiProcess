@@ -90,17 +90,26 @@ public class PolicyImpl {
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=======保存策略 可信设备  3.1 ===");
                 }
+
                 // 清除老版本缓存文件
                 String oldVersion = SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, "");
                 if (!TextUtils.isEmpty(oldVersion)) {
-                    new File(mContext.getFilesDir(), oldVersion + ".jar").delete();
+                    new File(mContext.getFilesDir(), oldVersion + ".jar").deleteOnExit();
                 }
 
                 //热更部分保存: 现在保存sign、version
-                SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, newPolicy.getHotfixVersion());
-                SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, newPolicy.getHotfixSign());
-                SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_METHODS,
-                        Base64.encodeToString(newPolicy.getHotfixMethons().getBytes("UTF-8"), Base64.DEFAULT));
+                if (!TextUtils.isEmpty(newPolicy.getHotfixVersion())) {
+                    SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, newPolicy.getHotfixVersion());
+                }
+                if (!TextUtils.isEmpty(newPolicy.getHotfixSign())) {
+                    SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, newPolicy.getHotfixSign());
+                }
+
+                if (!TextUtils.isEmpty(newPolicy.getHotfixMethons())) {
+                    SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_METHODS,
+                            Base64.encodeToString(newPolicy.getHotfixMethons().getBytes("UTF-8"), Base64.DEFAULT));
+                }
+
 
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========可信设备 缓存版本号完毕 3.2====");
