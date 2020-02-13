@@ -150,39 +150,41 @@ public class HotFixTransform {
         Class<?> clazzLoader = ClazzUtils.getClass("java.lang.ClassLoader");
         if (clazzLoader != null) {
             loader = ClazzUtils.newInstance(analysysThisClazz,
-                    new Class[]{String.class, String.class, String.class, clazzLoader, LoadCallback.class},
+                    new Class[]{String.class, String.class, String.class, clazzLoader
+//                            , LoadCallback.class
+                    },
                     new Object[]{path, context.getCacheDir().getAbsolutePath(), null, ClazzUtils.
-                            invokeObjectMethod(context, "getClassLoader"), new LoadCallback() {
-                        @Override
-                        public void onSelfNotFound(String name) {
-                            //入口类一定能自己找到,如果找不到,则一定是这个dex损坏了
-                            if (MYCLASS_NAME.contains(name)) {
-                                dexError(context);
-                                if (EGContext.FLAG_DEBUG_INNER) {
-                                    Log.i(BuildConfig.tag_hotfix, "[DEX损坏]:" + name + "[not found]");
-                                }
-                            }
-                        }
+                            invokeObjectMethod(context, "getClassLoader")
 
-                        @Override
-                        public void onLoadBySelf(String name) {
-                        }
+//                            , new LoadCallback() {
+//                        @Override
+//                        public void onSelfNotFound(String name) {
+//                            //入口类一定能自己找到,如果找不到,则一定是这个dex损坏了
+//                            if (MYCLASS_NAME.contains(name)) {
+//                                dexError(context);
+//                                if (EGContext.FLAG_DEBUG_INNER) {
+//                                    Log.i(BuildConfig.tag_hotfix, "[DEX损坏]:" + name + "[not found]");
+//                                }
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onLoadBySelf(String name) {
+//                        }
+//
+//                        @Override
+//                        public void onLoadByCache(String name) {
+//                        }
+//
+//                        @Override
+//                        public void onLoadByParent(String name) {
+//                        }
+//
+//                        @Override
+//                        public void onNotFound(String name) {
+//                        }
+//                    }
 
-                        @Override
-                        public void onLoadByCache(String name) {
-
-                        }
-
-                        @Override
-                        public void onLoadByParent(String name) {
-
-                        }
-
-                        @Override
-                        public void onNotFound(String name) {
-
-                        }
-                    }
                     });
         }
 

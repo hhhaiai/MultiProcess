@@ -18,14 +18,16 @@ import dalvik.system.DexClassLoader;
  */
 class AnalysysThis extends DexClassLoader {
 
-    /**
-     * 用来回调一个类具体是由谁加载了
-     */
-    private LoadCallback callback;
+//    /**
+//     * 用来回调一个类具体是由谁加载了
+//     */
+//    private LoadCallback callback;
 
-    public AnalysysThis(String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent, LoadCallback callback) {
+    public AnalysysThis(String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent
+//            , LoadCallback callback
+    ) {
         super(dexPath, optimizedDirectory, librarySearchPath, parent);
-        this.callback = callback;
+//        this.callback = callback;
     }
 
     @Override
@@ -33,43 +35,43 @@ class AnalysysThis extends DexClassLoader {
         //-------hotfix cache
         Class<?> c = findLoadedClass(name);
         if (c != null) {
-            if (callback != null) {
-                callback.onLoadByCache(name);
-            }
+//            if (callback != null) {
+//                callback.onLoadByCache(name);
+//            }
             return c;
         }
         //-------hotfix self
         try {
             c = findClass(name);
             if (c != null) {
-                if (callback != null) {
-                    callback.onLoadBySelf(name);
-                }
+//                if (callback != null) {
+//                    callback.onLoadBySelf(name);
+//                }
                 return c;
             }
         } catch (ClassNotFoundException e) {
 
         }
-        if (callback != null) {
-            callback.onSelfNotFound(name);
-        }
+//        if (callback != null) {
+//            callback.onSelfNotFound(name);
+//        }
         //--------host or parent
         try {
             if (getParent() != null) {
                 c = getParent().loadClass(name);
             }
             if (c != null) {
-                if (callback != null) {
-                    callback.onLoadByParent(name);
-                }
+//                if (callback != null) {
+//                    callback.onLoadByParent(name);
+//                }
                 return c;
             }
         } catch (ClassNotFoundException e) {
         }
-        //not found error
-        if (callback != null) {
-            callback.onNotFound(name);
-        }
+//        //not found error
+//        if (callback != null) {
+//            callback.onNotFound(name);
+//        }
         throw new ClassNotFoundException(name);
     }
 
