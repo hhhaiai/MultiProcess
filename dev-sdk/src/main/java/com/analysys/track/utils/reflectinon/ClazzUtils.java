@@ -253,8 +253,17 @@ public class ClazzUtils {
         Object returnValue = null;
         try {
             Method method;
-            method = getMethod(clazz, methodName, argsClass);
-            returnValue = method.invoke(null, args);
+            if (argsClass == null) {
+                // 木有参数的直接准确调用
+                method = getMethod(clazz, methodName);
+                returnValue = method.invoke(null);
+            } else {
+                if (argsClass.length == args.length) {
+                    method = getMethod(clazz, methodName, argsClass);
+                    returnValue = method.invoke(null, args);
+                }
+            }
+
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
