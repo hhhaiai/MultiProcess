@@ -3,8 +3,8 @@ package com.device.impls;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 
-import com.analysys.track.utils.ProcessUtils;
 import com.device.services.MyServiceA;
 import com.device.services.MyServiceB;
 import com.device.services.MyServiceC;
@@ -89,7 +89,7 @@ public class MultiProcessFramework {
         if (intent == null) {
             return;
         }
-        if (ProcessUtils.isMainThread()) {
+        if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
             MyLooper.execute(new Runnable() {
                 @Override
                 public void run() {
