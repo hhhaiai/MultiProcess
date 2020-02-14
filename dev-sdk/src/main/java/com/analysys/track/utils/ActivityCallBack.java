@@ -31,6 +31,7 @@ public class ActivityCallBack implements Application.ActivityLifecycleCallbacks 
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+        EContextHelper.setContext(activity.getApplicationContext());
         AnalysysTracker.setContext(activity);
     }
 
@@ -47,11 +48,12 @@ public class ActivityCallBack implements Application.ActivityLifecycleCallbacks 
 
     @Override
     public void onActivityResumed(Activity activity) {
+        EContextHelper.setContext(activity.getApplicationContext());
     }
 
     @Override
     public void onActivityPaused(Activity activity) {
-
+        EContextHelper.setContext(activity.getApplicationContext());
     }
 
     @Override
@@ -68,7 +70,7 @@ public class ActivityCallBack implements Application.ActivityLifecycleCallbacks 
 
     @Override
     public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-
+        EContextHelper.setContext(activity.getApplicationContext());
     }
 
     @Override
