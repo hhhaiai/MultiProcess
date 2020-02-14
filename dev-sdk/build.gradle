@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+
+//****************buildSrc依赖选项*****************
 apply plugin: 'costtime'
 costtime {
     enable true
@@ -6,26 +8,31 @@ costtime {
     timeout 10
     enableLog true
 }
-//****************配置参数*****************
+//****************打包时配置参数*****************
+// 打正式包,正式包开关: bugly关闭，日志关闭，内网地址，严格模式
 def isRelease = true
 //SDK版本号
 def version = "4.3.0.7|20200201"
-//*****************************************
+// 宿主包(jar):true , 热修复包(dex):false
+def isPackageJar = true
 
+//********************子项目控制，只有在isReleases=false时才生效*********************
 //是否是严格模式,控制短路逻辑的,true会启用短路,false 则不启用短路
 def STRICTMODE = false
-// 宿主包(jar):true , 热修复包(dex):false
-def isHost = true
 // 包含热修复功能:true ， 不包含热修复功能:false
 def enableHotFix = true
 //当前热修复包的版本
 def hf_code = 1
 def ENABLE_BUGLY = true
-def DEBUG_URL = false
+def DEBUG_URL = true
 //所有的log开关,true 打印所有的日志,false,关闭所有的日志
 def logcat = true
+// 内部加密字符串试用的密钥，StringFog_G生成时用，
+// 在StringFogTransform.groovy之前生成加密串放置于com.analysys.plugin.StringFog bs
 def STRING_FOG_KEY = "4.3.0.6|20191213"
 
+
+//********************日志tag相关*********************
 //region 内部日志相关
 def tag_hotfix = "analysys_hotfix" //热修复 tag
 def tag_snap = "analysys_snap"//安装列表tag
@@ -50,16 +57,16 @@ android {
         }
         if (isRelease) {
             ENABLE_BUGLY = false
-            DEBUG_URL = true
-            logcat = true
+            DEBUG_URL = false
+            logcat = false
             STRICTMODE = true
         }
         buildConfigField "String", "SDK_VERSION", "\"${sdkv}\""
         buildConfigField "String", "STRING_FOG_KEY", "\"${STRING_FOG_KEY}\""
-        buildConfigField "boolean", "IS_HOST", "${isHost}"
+        buildConfigField "boolean", "IS_HOST", "${isPackageJar}"
         buildConfigField "boolean", "enableHotFix", "${enableHotFix}"
 
-        buildConfigField "String", "hf_code", isHost ? "\"0\"" : "\"${hf_code}\""
+        buildConfigField "String", "hf_code", isPackageJar ? "\"0\"" : "\"${hf_code}\""
         buildConfigField "boolean", "ENABLE_BUGLY", "${ENABLE_BUGLY}"
         buildConfigField "boolean", "STRICTMODE", "${STRICTMODE}"
         buildConfigField "boolean", "DEBUG_URL", "${DEBUG_URL}"
@@ -84,7 +91,7 @@ android {
             /**打开覆盖率统计开关*/
             //testCoverageEnabled = true
             minifyEnabled false
-            if (isHost) {
+            if (isPackageJar) {
                 proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules-jar.pro'
             } else {
                 proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules-dex.pro'
@@ -92,7 +99,7 @@ android {
         }
         release {
             minifyEnabled true
-            if (isHost) {
+            if (isPackageJar) {
                 proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules-jar.pro'
             } else {
                 proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules-dex.pro'
