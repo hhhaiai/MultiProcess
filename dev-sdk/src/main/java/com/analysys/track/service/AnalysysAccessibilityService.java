@@ -8,7 +8,7 @@ import android.view.accessibility.AccessibilityEvent;
 
 import com.analysys.track.AnalysysTracker;
 import com.analysys.track.BuildConfig;
-import com.analysys.track.hotfix.HotFixTransform;
+import com.analysys.track.impl.HotFixTransform;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.OCImpl;

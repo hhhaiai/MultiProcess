@@ -1,7 +1,7 @@
 package com.analysys.track.internal.impl;
 
 import com.analysys.track.AnalsysTest;
-import com.analysys.track.hotfix.HotFixImpl;
+import com.analysys.track.impl.HotFixImpl;
 
 import org.junit.Test;
 

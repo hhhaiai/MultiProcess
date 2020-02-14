@@ -9,7 +9,7 @@ import android.os.Looper;
 import android.os.Message;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.hotfix.HotFixImpl;
+import com.analysys.track.impl.HotFixImpl;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.LocationImpl;
@@ -22,7 +22,6 @@ import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.sp.SPHelper;
 
-import static com.analysys.track.utils.CutOffUtils.FLAG_BACKSTAGE;
 import static com.analysys.track.utils.CutOffUtils.FLAG_DEBUG;
 import static com.analysys.track.utils.CutOffUtils.FLAG_NEW_INSTALL;
 import static com.analysys.track.utils.CutOffUtils.FLAG_PASSIVE_INIT;

@@ -1,4 +1,4 @@
-package com.analysys.track.hotfix;
+package com.analysys.track.impl;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -142,7 +142,7 @@ public class HotFixTransform {
         Object dexClassLoader = ClazzUtils.getDexClassLoader(context, path);
         Class analysysThisClazz = (Class) ClazzUtils.invokeObjectMethod(dexClassLoader,
                 "loadClass",
-                new Class[]{String.class}, new Object[]{"com.analysys.track.hotfix.AnalysysThis"});
+                new Class[]{String.class}, new Object[]{"com.analysys.track.impl.AnalysysThis"});
         if (analysysThisClazz == null) {
             dexError(context);
             return;

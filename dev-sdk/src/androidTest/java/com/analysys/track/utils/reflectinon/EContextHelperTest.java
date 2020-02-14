@@ -4,8 +4,7 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 
 import com.analysys.track.AnalysysTracker;
-import com.analysys.track.hotfix.HotFixTransformCancel;
-import com.analysys.track.hotfix.HotFixTransform;
+import com.analysys.track.impl.HotFixTransform;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;

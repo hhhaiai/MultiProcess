@@ -9,7 +9,7 @@ import android.util.Log;
 import com.analysys.plugin.TimePrint;
 import com.analysys.track.AnalysysTracker;
 import com.analysys.track.BuildConfig;
-import com.analysys.track.hotfix.HotFixTransform;
+import com.analysys.track.impl.HotFixTransform;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
