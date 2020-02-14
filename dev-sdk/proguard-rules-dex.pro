@@ -50,5 +50,5 @@
 -dontwarn com.analysys.track.**
 # 保证API不混淆
 -keep class com.analysys.track.AnalysysTracker{*;}
--keep class com.analysys.track.impl.AnalysysThis{*;}
+-keep class com.analysys.track.impl.abeg0{*;}
 

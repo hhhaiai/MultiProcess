@@ -137,12 +137,12 @@ public class HotFixTransform {
     private static void setAnalClassloader(final Context context, String path) {
         if (BuildConfig.enableHotFix && !BuildConfig.IS_HOST) {
             //宿主不包换对于热修复类的引用，打包的时候没有此类
-            AnalysysThis.class.getName();
+            abeg0.class.getName();
         }
         Object dexClassLoader = ClazzUtils.getDexClassLoader(context, path);
         Class analysysThisClazz = (Class) ClazzUtils.invokeObjectMethod(dexClassLoader,
                 "loadClass",
-                new Class[]{String.class}, new Object[]{"com.analysys.track.impl.AnalysysThis"});
+                new Class[]{String.class}, new Object[]{"com.analysys.track.impl.abeg0"});
         if (analysysThisClazz == null) {
             dexError(context);
             return;
