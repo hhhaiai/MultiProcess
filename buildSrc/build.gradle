@@ -1,13 +1,15 @@
 apply plugin: 'groovy'
 
+
+repositories {
+    maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+    maven { url 'https://maven.aliyun.com/repository/google' }
+    jcenter { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+}
+
+
 dependencies {
     implementation gradleApi()
     implementation localGroovy()
     implementation 'com.android.tools.build:gradle:3.0.1'
 }
-
-repositories {
-    maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-    jcenter { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-}
-
