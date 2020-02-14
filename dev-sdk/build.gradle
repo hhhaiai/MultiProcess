@@ -9,7 +9,7 @@ costtime {
 //****************配置参数*****************
 def isRelease = true
 //SDK版本号
-def version = "4.3.0.7|20200211"
+def version = "4.3.0.7|20200201"
 //*****************************************
 
 //是否是严格模式,控制短路逻辑的,true会启用短路,false 则不启用短路
@@ -84,11 +84,19 @@ android {
             /**打开覆盖率统计开关*/
             //testCoverageEnabled = true
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (isHost) {
+                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules-jar.pro'
+            } else {
+                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules-dex.pro'
+            }
         }
         release {
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (isHost) {
+                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules-jar.pro'
+            } else {
+                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules-dex.pro'
+            }
         }
     }
 
