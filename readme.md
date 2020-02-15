@@ -12,16 +12,46 @@
 ## release 包 验证步骤
 
 1. 最后打了release 包之后,需要验证的事项, 防止操作人打包失误.
-1. 验证jar包混淆了 ,  (开发自己来)
-1. 验证 hide api ,三个维度 , 1 使用谷歌扫描工具扫描不出来(开发自己来)2. logcat 无打印相关 hide api 信息 (开发测试都进行)过滤 hidden , 3 9,10 的设备, 不弹窗警告灰色api(开发测试都进行验证) 验证的时候新建一个app,里面什么都不集成 只有我们SDK
-1. 验证logcat 没有忘关(开发测试都验证)
-1. 验证上传地址是线上地址(开发测试都验证)
-1. 验证版本没有填错(开发测试都验证)
-1. 验证bugly上报,方法耗时上报关掉了(开发自己来)
+2. 验证jar包混淆了 ,  (开发自己来)
+3. 验证 hide api ,三个维度 ,
+    a. 使用谷歌扫描工具扫描不出来(开发自己来)
+    b. logcat 无打印相关 hide api 信息 (开发测试都进行)过滤 hidden ,
+    c. 9,10 的设备, 不弹窗警告灰色api(开发测试都进行验证) 验证的时候新建一个app,里面什么都不集成 只有我们SDK
+4. 验证logcat 没有忘关(开发测试都验证)
+5. 验证上传地址是线上地址(开发测试都验证)
+6. 验证版本没有填错(开发测试都验证)
+7. 验证bugly上报,方法耗时上报关掉了(开发自己来)
 
+## 字符串混淆相关
 
+### 新增混淆关键字步骤
+
+1. 把想增加的关键字kv对增加到 '.\buildSrc\src\main\java\com\analysys\plugin\StringFog.java'
+2. 复制 hset 全部内容，到 '.\dev-sdk\src\androidTest\java\com\miqt\costtime\StringFogPsGenerate.java'
+3. 运行 'StringFogPsGenerate' 的 generatePs 方法，获得ps的代码字符串
+4. 打开 '.\dev-sdk\src\main\java\com\analysys\plugin\StringFog.java'
+5. 用第4步获得的字符串，替换ps参数。
+6. 同步代码，运行 'StringFogPsGenerate' testPs方法，测试结果。完成。
+
+### 修改混淆加密key步骤
+
+1. 在 '.\analysys-dev-sdk\dev-sdk\build.gradle' 中修改 STRING_FOG_KEY。
+2. 新增混淆关键字步骤，2-6，执行操作即可。
 
 ## 更新日志
+
+### 4.3.0.7|20200215
+---------
+
+* 更新日期：`2020年2月15日`
+* 打包类型：线上版本
+* 分支: `dev`
+* 体积：
+* 更新内容：
+
+  1. 隐藏热修复，classloader
+  2. 提高判断debug设备的可靠性。
+  3. 详细内容，参考：[v4.3.0.7变更项](http://con.analysys.cn/pages/viewpage.action?pageId=27002228)
 
 ### 4.3.0.6|20191213
 ---------

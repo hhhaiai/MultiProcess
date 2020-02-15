@@ -12,7 +12,7 @@ costtime {
 // 打正式包,正式包开关: bugly关闭，日志关闭，内网地址，严格模式
 def isRelease = true
 //SDK版本号
-def version = "4.3.0.7|20200201"
+def version = "4.3.0.7|20200215"
 // 宿主包(jar):true , 热修复包(dex):false
 def isPackageJar = true
 
@@ -57,8 +57,8 @@ android {
         }
         if (isRelease) {
             ENABLE_BUGLY = false
-            DEBUG_URL = false
-            logcat = false
+            DEBUG_URL = true
+            logcat = true
             STRICTMODE = true
         }
         buildConfigField "String", "SDK_VERSION", "\"${sdkv}\""
@@ -164,8 +164,7 @@ task copyDoc(type: Copy) {
 }
 
 //https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Zip.html
-//def zipPath = "../release/4.3.0.7_20200212/"
-def zipPath = "../release/"
+def zipPath = "../release/4.3.0.7_20200215/"
 task packageZip(type: Zip) {
     from "../releasebak/"
 //    destinationDir: 来指定生成zip文件的目录，类型是file(dir,但是不要包含/)
