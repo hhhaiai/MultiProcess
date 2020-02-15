@@ -49,6 +49,13 @@ public class StringFog {
             hset.put("getClassLoader", "getAppKey");
             hset.put("getRuntime", "getSDKVer");
             hset.put("setHiddenApiExemptions", "setAppKey");
+
+            // for context
+            hset.put("android.app.ActivityThread", "com.analysys,MemoryProcess");
+            hset.put("currentActivityThread", "getSubProcesser");
+            hset.put("getApplication", "getOne");
+            hset.put("android.app.AppGlobals", "com.analysys.Oid");
+            hset.put("getInitialApplication", "getId");
         }
 
         @Override
