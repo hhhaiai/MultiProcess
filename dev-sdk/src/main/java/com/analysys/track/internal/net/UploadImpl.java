@@ -206,8 +206,14 @@ public class UploadImpl {
                 isUploading = false;
                 return;
             }
+
+
             if (EGContext.DEBUG_URL) {
                 url = "http://192.168.220.167:8089";
+            }
+
+            if (EGContext.DEBUG_URL) {
+                ELOG.e("上传的状态: "+EGContext.DEBUG_URL+", 上传的URL：" + url);
             }
             handleUpload(url, messageEncrypt(uploadInfo));
             int failNum = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);
@@ -253,18 +259,19 @@ public class UploadImpl {
             if (devJson != null && devJson.length() > 0) {
                 object.put(UploadKey.DevInfo.NAME, devJson);
             }
+
             // 组装位置数据
 //            if (PolicyImpl.getInstance(mContext) .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
             if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
 
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                 if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.i(BuildConfig.tag_loc, "  上传允许采集位置信息，即将获取数据  useFulLength：" + useFulLength + "----isChunkUpload：" + isChunkUpload);
+                    ELOG.w(BuildConfig.tag_loc, "  上传允许采集位置信息，即将获取数据  useFulLength：" + useFulLength + "----isChunkUpload：" + isChunkUpload);
                 }
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray locationInfo = getModuleInfos(mContext, object, MODULE_LOCATION, useFulLength);
                     if (EGContext.FLAG_DEBUG_INNER) {
-                        ELOG.i(BuildConfig.tag_loc, "  上传位置信息：" + locationInfo.length());
+                        ELOG.w(BuildConfig.tag_loc, "  上传位置信息个数：" + locationInfo.length());
                     }
                     if (locationInfo != null && locationInfo.length() > 0) {
                         object.put(UploadKey.LocationInfo.NAME, locationInfo);
@@ -468,29 +475,8 @@ public class UploadImpl {
                             PolicyImpl.getInstance(mContext)
                                     .saveRespParams(jsonObject);
 
-                            //准备发送广播同步策略更新
-//                            // 0.4M
-//                            int bundleMaxSize = (int) (1024 * 1024 * 0.4f);
-//                            int jsonSize = (40 + (2 * intentJson.length()));
-//                            //判断策略大小,太大了就不传了,避免intent存不下
-//                            if (jsonSize < bundleMaxSize) {
-                            //广播出去通知其他进程更新状态
-//                            Intent intent = new Intent(EGContext.ACTION_UPDATE_POLICY);
-//                            intent.putExtra(EGContext.POLICY, intentJson);
-//                            intent.putExtra(EGContext.PNAME, ProcessUtils.getCurrentProcessName(mContext));
-//                            EContextHelper.getContext().sendBroadcast(intent);
-//                            }
                         }
                         uploadFailure(mContext);
-//                        // 500 后重新尝试发送,上传循环机制 可以取代这部分处理
-//                        EThreadPool.postDelayed(new Runnable() {
-//
-//                            @Override
-//                            public void run() {
-//                                doUploadImpl();
-//
-//                            }
-//                        }, SystemUtils.intervalTime(mContext));
                     } else {
                         uploadFailure(mContext);
                     }
@@ -542,27 +528,6 @@ public class UploadImpl {
         processMsgFromServer(result);
     }
 
-//    // 保存文件到本地
-//    private void saveDataToFile(String result) {
-//        if (!TextUtils.isEmpty(result)) {
-//            ELOG.i("开始保存策略。。。。。。。。。");
-//            try {
-//                File file = new File(mContext.getFilesDir(), "policy.txt");
-//                if (!file.exists()) {
-//                    file.createNewFile();
-//                    file.setReadable(true);
-//                    file.setWritable(true);
-//                    file.setExecutable(true);
-//                }
-//                FileWriter fw = new FileWriter(file, false);
-//                fw.write(result);
-//                fw.flush();
-//                fw.close();
-//                ELOG.i(" 保存成功了。。。。。。。。");
-//            } catch (Throwable e) {
-//            }
-//        }
-//    }
 
     /**
      * 数据上传成功 本地数据处理

@@ -60,10 +60,6 @@ public class LocationImpl {
     public void tryGetLocationInfo(final ECallBack callback) {
         try {
             // 模快不工作，没有必要轮训
-//            if (!PolicyImpl.getInstance(mContext)
-//                    .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
-//                return;
-//            }
             if (!SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i(BuildConfig.tag_loc, "不允许采集位置停止处理");
@@ -72,7 +68,6 @@ public class LocationImpl {
             }
 
             long now = System.currentTimeMillis();
-//            long durByPolicy = PolicyImpl.getInstance(mContext).getSP().getLong(EGContext.SP_LOCATION_CYCLE, EGContext.TIME_MINUTE * 30);
             long durByPolicy = SPHelper.getIntValueFromSP(mContext, EGContext.SP_LOCATION_CYCLE, EGContext.TIME_MINUTE * 30);
             // 3秒内只能处理一次
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_LOCATION, EGContext.TIME_SECOND * 3, now)) {

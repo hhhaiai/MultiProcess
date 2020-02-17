@@ -187,6 +187,7 @@ public class TableProcess {
             DBManager.getInstance(mContext).closeDB();
         }
     }
+
     public void deleteScanningInfos() {
         SQLiteDatabase db = null;
         try {
@@ -520,7 +521,7 @@ public class TableProcess {
             }
         } catch (Exception e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_oc,e);
+                BuglyUtils.commitError(BuildConfig.tag_oc, e);
             }
         } finally {
             StreamerUtils.safeClose(cursor);
@@ -580,7 +581,7 @@ public class TableProcess {
     public void insertLocation(JSONObject locationInfo) {
         try {
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i(BuildConfig.tag_loc, " 位置信息即将插入DB .....");
+                ELOG.i(BuildConfig.tag_loc, " 位置信息即将插入DB insertLocation().....");
             }
             ContentValues cv = null;
             String locationTime = null;
@@ -628,6 +629,10 @@ public class TableProcess {
         Cursor cursor = null;
         SQLiteDatabase db = null;
         try {
+
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i(BuildConfig.tag_loc, " 查询位置信息 selectLocation().....");
+            }
             array = new JSONArray();
             db = DBManager.getInstance(mContext).openDB();
             if (db == null) {
@@ -697,6 +702,11 @@ public class TableProcess {
 
     public void deleteLocation() {
         try {
+
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i(BuildConfig.tag_loc, " 清除状态为1的位置信息  deleteLocation().....");
+            }
+
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if (db == null) {
                 return;
@@ -718,6 +728,10 @@ public class TableProcess {
 
     public void deleteAllLocation() {
         try {
+
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i(BuildConfig.tag_loc, " 清除所有的位置信息 deleteLocation().....");
+            }
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if (db == null) {
                 return;
