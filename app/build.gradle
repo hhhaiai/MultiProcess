@@ -36,11 +36,13 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules-jar.pro'
             signingConfig signingConfigs.myConfig
+            multiDexKeepProguard file('multidex-config.pro')
         }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules-jar.pro'
             signingConfig signingConfigs.myConfig
+            multiDexKeepProguard file('multidex-config.pro')
         }
     }
     // sourceSets {
