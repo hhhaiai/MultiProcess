@@ -284,8 +284,9 @@ public class ELOG {
                 if (EGContext.FLAG_DEBUG_INNER && BuildConfig.enableHotFix) {
                     sb.append("[HOST]:").append(EGContext.IS_HOST)
                             .append("[SDKV]:").append(EGContext.SDK_VERSION)
-                            .append("[CHANNEL]:").append(EGContext.HOT_FIX_CHANNEL)
-                            .append("[HF_CODE]:").append(EGContext.HOT_FIX_CODE);
+//                            .append("[CHANNEL]:").append(EGContext.HOT_FIX_CHANNEL)
+//                            .append("[HF_CODE]:").append(EGContext.HOT_FIX_CODE_DEBUG)
+                            ;
                 }
 
                 // 开始
