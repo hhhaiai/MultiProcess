@@ -1,119 +1,64 @@
-#!/bin/sh
-
-ecs="echo"
-cygwnin="CYGWIN"
-mingw="MINGW"
-msys_nt="MSYS_NT"
-
-# default use win
-# 彩色输出，定义变量
-red='\e[0;31m'
-green='\e[0;32m'
-yellow='\e[0;33m'
-endColor='\e[0m'
-ecs="echo -e"
-dx="dx.bat"
-gw="./gradlew.bat"
-# mac
-#red='\033[31m'
-#green='\033[32m'
-#yellow='\033[33m'
-#endColor='\033[0m'
-#ecs="echo"
-
-unames=$(uname -s)
-#echo "us: $unames"
-#win10 名字 MSYS_NT.  MSYS_NT-10.0-18362
-if [[ ${unames} =~ $cygwnin ]]
-then
-    ecs="echo -e"
-    dx="dx.bat"
-    gw="./gradlew.bat"
-elif  [[ ${unames} =~ $mingw ]]
-then
-    red='\e[0;31m'
-    green='\e[0;32m'
-    yellow='\e[0;33m'
-    endColor='\e[0m'
-    ecs="echo -e"
-    dx="dx.bat"
-    gw="./gradlew.bat"
-elif  [[ ${unames} =~ $msys_nt ]]
-then
-    echo "win10......"
-    red='\e[0;31m'
-    green='\e[0;32m'
-    yellow='\e[0;33m'
-    endColor='\e[0m'
-    ecs="echo -e"
-    dx="dx.bat"
-    gw="./gradlew.bat"
-else
-    red='\033[31m'
-    green='\033[32m'
-    yellow='\033[33m'
-    endColor='\033[0m'
-    ecs="echo"
-    dx="dx"
-    gw="./gradlew"
-fi
-time=$(date "+%Y%m%d-%H%M%S")
-
-## 红色打印
-#$ecs "${red}输出色彩：红色${endColor}"
-## 绿色打印
-#$ecs "${green}输出色彩：红色${endColor}"
-## 黄色打印
-#$ecs "${yellow}输出色彩：红色${endColor}"
+#!/usr/bin/env bash
 
 
-$ecs "${yellow}[==========================================================]${endColor}"
-$ecs  "${yellow}[======================   开始编译  =======================]${endColor}"
-$ecs  "${yellow}[==========================================================]${endColor}"
+source_common()
+{
+    pwd=$(cd `dirname $0`; pwd)
+    source $pwd/common.sh
+}
 
-#echo "You use gradle:  $gw "
+build()
+{
+    logw "[==========================================================]"
+    logw "[======================   开始编译  =======================]"
+    logw "[==========================================================]"
+    #echo "You use gradle:  $gw "
 
-$gw :dex:build
+    $gw :dex:build
 
-if [ $? -ne 0 ]; then
-    $ecs  "${red}[********************************]${endColor}\n"
-    $ecs  "${red}[**** graddew build 执行失败  ****]${endColor}\n"
-    $ecs  "${red}[********************************]${endColor}\n"
-else
-    $ecs  "${green}[********************************]${endColor}"
-    $ecs  "${green}[******* graddew build 成功 *****]${endColor}"
-    $ecs  "${green}[********************************]${endColor}"
-    # need delay .wait for build over
-    $dx --dex --output=classes.dex  ./dex/build/intermediates/bundles/release/classes.jar
     if [ $? -ne 0 ]; then
-        $ecs  "${red}[********************************]${endColor}\n"
-        $ecs  "${red}[*********** dx打包失败 **********]${endColor}\n"
-        $ecs  "${red}[********************************]${endColor}\n"
+        loge "[********************************]"
+        loge "[**** graddew build 执行失败  ****]"
+        loge "[********************************]"
     else
-        $ecs  "${green}[********************************]${endColor}"
-        $ecs  "${green}[*********** dx打包成功 **********]${endColor}"
-        $ecs  "${green}[********************************]${endColor}"
-#        mv -f temp.jar $HOME/Desktop/temp_$time.jar
-#        $ecs  "${yellow}[==========================================================]${endColor}"
-#        $ecs  "${yellow}[======================   移动完毕   =======================]${endColor}"
-#        $ecs  "${yellow}[==========================================================]${endColor}"
-        jar cvf temp.jar classes.dex
-
+        logi "[********************************]"
+        logi "[******* graddew build 成功 *****]"
+        logi "[********************************]"
+        # need delay .wait for build over
+        $dx --dex --output=classes.dex  ./dex/build/intermediates/bundles/release/classes.jar
         if [ $? -ne 0 ]; then
-                $ecs  "${red}[********************************]${endColor}\n"
-                $ecs  "${red}[***********jar打包失败 **********]${endColor}\n"
-                $ecs  "${red}[********************************]${endColor}\n"
-            else
-                $ecs  "${green}[********************************]${endColor}\n"
-                $ecs  "${green}[*********** 打jar成功 **********]${endColor}\n"
-                $ecs  "${green}[********************************]${endColor}\n"
-                mv -f temp.jar $HOME/Desktop/temp_$time.jar
-                $ecs  "${yellow}[==========================================================]${endColor}"
-                $ecs  "${yellow}[======================   移动完毕   =======================]${endColor}"
-                $ecs  "${yellow}[==========================================================]${endColor}"
-            fi
+            loge "[********************************]"
+            loge "[*********** dx打包失败 **********]"
+            loge "[********************************]"
+        else
+            logi "[********************************]"
+            logi "[*********** dx打包成功 **********]"
+            logi "[********************************]"
+            jar cvf temp.jar classes.dex
+
+            if [ $? -ne 0 ]; then
+                    loge "[********************************]"
+                    loge "[*********** jar打包失败 *********]"
+                    loge "[********************************]"
+                else
+                    logi "[********************************]"
+                    logi "[*********** 打jar成功 ***********]"
+                    logi "[********************************]"
+                    mv -f temp.jar $HOME/Desktop/temp_$time.jar
+                    logw "[==========================================================]"
+                    logw "[======================   移动完毕  =======================]"
+                    logw "[==========================================================]"
+                fi
+        fi
     fi
-fi
+}
 
 
 
+main()
+{
+    source_common
+    build
+}
+
+main
