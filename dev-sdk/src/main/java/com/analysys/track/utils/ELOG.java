@@ -301,6 +301,7 @@ public class ELOG {
                         sb.append(stackinfo);
                     }
                 }
+                sb.append("\n");
 
                 if (args[0] instanceof String) {
                     // if (isNeedWrapper) {
