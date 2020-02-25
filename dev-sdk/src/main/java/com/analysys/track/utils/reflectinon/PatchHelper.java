@@ -3,7 +3,6 @@ package com.analysys.track.utils.reflectinon;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
@@ -31,7 +30,7 @@ public class PatchHelper {
 
     public static void loads(final Context context) {
         try {
-            File dir = new File(context.getFilesDir(), EGContext.HOTFIX_CACHE_PATCH_DIR);
+            File dir = new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR);
             String version = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_VERSION, "");
 
             if (dir.exists() && !dir.isDirectory()) {

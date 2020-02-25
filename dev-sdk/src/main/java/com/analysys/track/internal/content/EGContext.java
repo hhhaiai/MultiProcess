@@ -271,14 +271,14 @@ public class EGContext {
     public static final String HOTFIX_VERSION = "HF";
     public static final String FILE_DIR = "/.analysys_file/";
     public static final String HOTFIX_CACHE_HOTFIX_DIR = FILE_DIR + ".hf/";
-    public static final String HOTFIX_CACHE_PATCH_DIR = FILE_DIR + ".patch/";
     public static final String HOTFIX_TIME = "hf_time";
 
 
     /**
      * pathch default version
      */
-    public static String TEXT_PATCH_VERSION = "_ptv";
+    public static String PATCH_VERSION = "_ptv";
+    public static final String PATCH_CACHE_DIR = FILE_DIR + ".patch/";
     /********************************************日志控制************************************************/
     /**
      * EGuan 内部调试系列tag.主要用于控制堆栈打印、错误打印、内部提示信息打印

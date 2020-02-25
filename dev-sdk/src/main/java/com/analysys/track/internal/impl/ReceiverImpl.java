@@ -172,7 +172,7 @@ public class ReceiverImpl {
 //            File hotfixDir = new File(context.getFilesDir(), EGContext.HOTFIX_CACHE_HOTFIX_DIR);
 //            FileUitls.getInstance(context).deleteFile(hotfixDir);
             //patch 维持原样
-            File patchDir = new File(context.getFilesDir(), EGContext.HOTFIX_CACHE_PATCH_DIR);
+            File patchDir = new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR);
             FileUitls.getInstance(context).deleteFile(patchDir);
             PolicyImpl.getInstance(EContextHelper.getContext()).clear();
             // 清除本地缓存

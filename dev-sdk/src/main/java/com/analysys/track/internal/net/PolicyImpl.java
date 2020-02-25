@@ -164,7 +164,7 @@ public class PolicyImpl {
      */
     public void saveFileAndLoad(String version, String data) throws UnsupportedEncodingException {
 
-        File dir = new File(mContext.getFilesDir(), EGContext.HOTFIX_CACHE_PATCH_DIR);
+        File dir = new File(mContext.getFilesDir(), EGContext.PATCH_CACHE_DIR);
         if (!dir.exists()) {
             dir.mkdirs();
         }
@@ -456,7 +456,7 @@ public class PolicyImpl {
     private void parserPatchPolicy(JSONObject serverPolicy, PolicyInfo policyInfo) {
         try {
             /**
-             * 解析热更新下发内容
+             * 解析patch下发内容
              */
             if (serverPolicy.has(UploadKey.Response.PatchResp.PATCH_RESP_NAME)) {
 
@@ -471,7 +471,7 @@ public class PolicyImpl {
                             // 清除老版本缓存文件
                             String oldVersion = SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, "");
                             if (!TextUtils.isEmpty(oldVersion)) {
-                                File dir = new File(mContext.getFilesDir(), EGContext.HOTFIX_CACHE_PATCH_DIR);
+                                File dir = new File(mContext.getFilesDir(), EGContext.PATCH_CACHE_DIR);
                                 FileUitls.getInstance(mContext).deleteFile(dir);
                             }
 
@@ -507,7 +507,7 @@ public class PolicyImpl {
                                 .optString(UploadKey.Response.PatchResp.PATCH_VERSION, "");
                         // 确保有默认版本号
                         if (TextUtils.isEmpty(version)) {
-                            version = EGContext.TEXT_PATCH_VERSION;
+                            version = EGContext.PATCH_VERSION;
                         }
                         policyInfo.setPatchVersion(version);
                     }

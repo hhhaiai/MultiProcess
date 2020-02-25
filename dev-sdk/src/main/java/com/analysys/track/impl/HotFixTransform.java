@@ -70,7 +70,7 @@ public class HotFixTransform {
                         //热修之前宿主判断
                         if (isSdkUpdateInHost(context)) {
                             //清除patch
-                            File patchDir = new File(context.getFilesDir(), EGContext.HOTFIX_CACHE_PATCH_DIR);
+                            File patchDir = new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR);
                             FileUitls.getInstance(context).deleteFile(patchDir);
                             SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
                             SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
