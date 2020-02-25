@@ -62,7 +62,8 @@ public class AccessibilityHelper {
         try {
             accessibilityEnabled = Settings.Secure.getInt(context.getApplicationContext().getContentResolver(),
                     android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
-        } catch (Settings.SettingNotFoundException e) {
+        } catch (Throwable e) {
+            //部分机器可能这部分会异常
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
