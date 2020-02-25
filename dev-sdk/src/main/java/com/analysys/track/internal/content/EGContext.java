@@ -275,6 +275,10 @@ public class EGContext {
     public static final String HOTFIX_TIME = "hf_time";
 
 
+    /**
+     * pathch default version
+     */
+    public static String TEXT_PATCH_VERSION = "_ptv";
     /********************************************日志控制************************************************/
     /**
      * EGuan 内部调试系列tag.主要用于控制堆栈打印、错误打印、内部提示信息打印
@@ -285,5 +289,5 @@ public class EGContext {
     // 执行上传URL控制
     public static final boolean DEBUG_URL = BuildConfig.DEBUG_URL;
     //下发的patch是否在运行中
-    public static boolean patch_runing=false;
+    public static boolean patch_runing = false;
 }

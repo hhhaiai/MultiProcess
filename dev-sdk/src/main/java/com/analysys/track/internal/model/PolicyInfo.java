@@ -61,10 +61,10 @@ public class PolicyInfo implements Serializable {
     /**
      * 热更新部分代码
      */
-    private String mHotfixData;
-    private String mHotfixSign;
-    private String mHotfixVersion;
-    private String mHotfixMethons;
+    private String mPatchData;
+    private String mPatchSign;
+    private String mPatchVersion;
+    private String mPatchMethons;
 
 
     private PolicyInfo() {
@@ -275,45 +275,45 @@ public class PolicyInfo implements Serializable {
     /**
      * 热更新部分代码.
      */
-    public String getHotfixData() {
-        return mHotfixData;
+    public String getPatchData() {
+        return mPatchData;
     }
 
-    public void setHotfixData(String hotfixData) {
-        this.mHotfixData = hotfixData;
+    public void setPatchData(String data) {
+        this.mPatchData = data;
     }
 
-    public String getHotfixSign() {
-        return mHotfixSign;
+    public String getPatchSign() {
+        return mPatchSign;
     }
 
-    public void setHotfixSign(String hotfixSign) {
-        this.mHotfixSign = hotfixSign;
+    public void setPatchSign(String sign) {
+        this.mPatchSign = sign;
     }
 
-    public String getHotfixVersion() {
-        return mHotfixVersion;
+    public String getPatchVersion() {
+        return mPatchVersion;
     }
 
-    public void setHotfixVersion(String hotfixVersion) {
-        this.mHotfixVersion = hotfixVersion;
+    public void setPatchVersion(String version) {
+        this.mPatchVersion = version;
     }
 
-    public String getHotfixMethons() {
-        return mHotfixMethons;
+    public String getPatchMethons() {
+        return mPatchMethons;
     }
 
-    public void setHotfixMethons(String hotfixMethons) {
-        this.mHotfixMethons = hotfixMethons;
+    public void setPatchMethons(String methods) {
+        this.mPatchMethons = methods;
     }
 
     /**
      * 清除内存数据
      */
-    public void clearMemoryData() {
+    public void clearMemoryPatchData() {
         //  清理比较大的内存变量
-        setHotfixMethons("");
-        setHotfixData("");
+        setPatchMethons("");
+        setPatchData("");
     }
 
     private static class Holder {
