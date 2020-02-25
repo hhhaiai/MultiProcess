@@ -213,7 +213,7 @@ public class UploadImpl {
             }
 
             if (EGContext.DEBUG_URL) {
-                ELOG.e("上传的状态: "+EGContext.DEBUG_URL+", 上传的URL：" + url);
+                ELOG.e("上传的状态: " + EGContext.DEBUG_URL + ", 上传的URL：" + url);
             }
             handleUpload(url, messageEncrypt(uploadInfo));
             int failNum = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);
@@ -472,8 +472,7 @@ public class UploadImpl {
                                 jsonObject = new JSONObject(intentJson);
                             }
 
-                            PolicyImpl.getInstance(mContext)
-                                    .saveRespParams(jsonObject);
+                            PolicyImpl.getInstance(mContext).saveRespParams(jsonObject);
 
                         }
                         uploadFailure(mContext);
