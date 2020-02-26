@@ -113,9 +113,9 @@ public class AnalysysInternal {
         // 4. 只能注册一次，不能注册多次
         ReceiverUtils.getInstance().registAllReceiver(ctx);
         // 5. 启动工作机制
-        if (MessageDispatcher.getInstance(ctx).jobStartLogic(false)) {
-            return;
-        }
+//        if (MessageDispatcher.getInstance(ctx).jobStartLogic(false)) {
+//            return;
+//        }
         MessageDispatcher.getInstance(ctx).initModule();
 
         ServiceHelper.getInstance(EContextHelper.getContext()).startSelfService();
