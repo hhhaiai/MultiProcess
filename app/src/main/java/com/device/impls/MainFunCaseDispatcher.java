@@ -20,16 +20,12 @@ import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
-import com.analysys.track.internal.impl.net.NetInfo;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.impl.usm.USMUtils;
-import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.net.UploadImpl;
-import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.ShellUtils;
-import com.analysys.track.utils.SimulatorUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
@@ -39,6 +35,7 @@ import com.analysys.track.utils.sp.SPHelper;
 import com.device.impls.case2.RefModelA;
 import com.device.impls.cases.CaseImpls;
 import com.device.impls.cases.PolicTestY;
+import com.device.impls.usmcase.USMCase;
 import com.device.utils.AssetsHelper;
 import com.device.utils.EContextHelper;
 import com.device.utils.EL;
@@ -47,20 +44,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 
@@ -535,7 +524,14 @@ public class MainFunCaseDispatcher {
     private static void runCaseP28(final Context context) {
         JSONObject p = ProcUtils.getInstance(context).getRunningInfo();
         EL.i("xxx:" +p.toString());
+    }
 
+
+    private static void runCaseP29(final Context context) {
+        USMCase.run(context);
+    }
+    private static void runCaseP30(final Context context) {
+        USMCase.simple(context);
     }
 
 

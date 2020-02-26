@@ -3,8 +3,11 @@ package com.device;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
+import android.os.StrictMode;
 
 import com.analysys.track.AnalysysTracker;
+import com.device.impls.MultiProcessFramework;
+import com.device.utils.EL;
 import com.tencent.bugly.Bugly;
 import com.umeng.analytics.MobclickAgent;
 
@@ -24,18 +27,18 @@ public class AnalysysApplication extends Application {
         //   JLibrary.InitEntry(this);
         // init  bugly
         Bugly.init(getApplicationContext(), "8fea5d1877", false);
-//        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-//                .detectAll()
-//                .penaltyLog()
-//                .build());
-//        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-//                .detectAll()
-//                .penaltyLog()
-//                .build());
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .detectAll()
+                .penaltyLog()
+                .build());
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                .detectAll()
+                .penaltyLog()
+                .build());
         super.onCreate();
         initAnalysys();
-//        MultiProcessFramework.runServices(this);
-        //  EL.init(this);
+        MultiProcessFramework.runServices(this);
+        EL.init(this);
     }
 
     /**
