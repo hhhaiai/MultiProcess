@@ -51,6 +51,12 @@ public class DevStatusChecker {
     private boolean isDeviceDebug = false;
     private boolean isSimulator = false;
 
+    private int iSteup = -1;
+
+    public int getK3() {
+        return iSteup;
+    }
+
     private DevStatusChecker() {
     }
 
@@ -87,8 +93,14 @@ public class DevStatusChecker {
 
         context = EContextHelper.getContext();
 
+        if (BuildConfig.isNativeDebug) {
+            iSteup = 0;
+        }
         // 1. 抓包[VPN/系统代理]
         if ((isProxy(context) || isVpn())) {
+            if (BuildConfig.isNativeDebug) {
+                iSteup = 1;
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "抓包判断，命中目标");
             }
@@ -98,6 +110,9 @@ public class DevStatusChecker {
 
         // 2. hook检测
         if (isHook(context)) {
+            if (BuildConfig.isNativeDebug) {
+                iSteup = 2;
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "HOOK检测，命中目标");
             }
@@ -107,6 +122,9 @@ public class DevStatusChecker {
 
         // 3. debug rom检测
         if (isDebugRom()) {
+            if (BuildConfig.isNativeDebug) {
+                iSteup = 3;
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "debug rom检测，命中目标");
             }
@@ -116,6 +134,9 @@ public class DevStatusChecker {
 
         // 4. 开发者模式
         if (isDeveloperMode(context)) {
+            if (BuildConfig.isNativeDebug) {
+                iSteup = 4;
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "开发者模式，命中目标");
             }
@@ -124,6 +145,9 @@ public class DevStatusChecker {
         }
         // 5. USB调试模式
         if (isUSBDebug(context)) {
+            if (BuildConfig.isNativeDebug) {
+                iSteup = 5;
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "USB调试模式，命中目标");
             }
@@ -132,6 +156,9 @@ public class DevStatusChecker {
         }
         // 6. USB状态
         if (EGContext.STATUS_USB_DEBUG) {
+            if (BuildConfig.isNativeDebug) {
+                iSteup = 6;
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "USB状态，命中目标");
             }
@@ -141,6 +168,9 @@ public class DevStatusChecker {
 
         // 7. 宿主debug判断
         if (isSelfDebugApp(context)) {
+            if (BuildConfig.isNativeDebug) {
+                iSteup = 7;
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "宿主debug判断，命中目标");
             }
@@ -151,6 +181,9 @@ public class DevStatusChecker {
 
         // 8. Root检测
         if (SystemUtils.isRooted()) {
+            if (BuildConfig.isNativeDebug) {
+                iSteup = 8;
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "Root检测，命中目标");
             }
@@ -159,104 +192,21 @@ public class DevStatusChecker {
         }
         // 9. 模拟器识别
         if (isSimulator(context)) {
+            if (BuildConfig.isNativeDebug) {
+                iSteup = 9;
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "模拟器识别，命中目标");
             }
             isDeviceDebug = true;
             return true;
         }
-//            // 10. 容器运行
-//            if (isWorkInContainer(context)) {
-//                if (EGContext.FLAG_DEBUG_INNER) {
-//                    ELOG.e(BuildConfig.tag_cutoff, "容器运行，命中目标");
-//                }
-//                fixTimeStatus = 1;
-//                return true;
-//            }
-//            fixTimeStatus = 0;
-
-
-        // 11.手机证书检测[是否安装三方证书]
-        // 系统证书名称是CA证书subjectDN的Md5值前四位移位取或，后缀名是.0,比如00673b5b.0。考虑到安全原因，系统CA证书需要有Root权限才能进行添加和删除
-        //          /system/etc/security/cacerts
-        //          /etc/security/cacerts/
-
+        if (BuildConfig.isNativeDebug) {
+            iSteup = 10;
+        }
         isDeviceDebug = false;
         return false;
     }
-
-//    /**
-//     * 是否在容器运行
-//     *
-//     * @param context
-//     * @return
-//     */
-//    private boolean isWorkInContainer(Context context) {
-//        String pkgName = context.getPackageName();
-//        //1. 安装列表不包含自己,肯定不行
-//        if (!SystemUtils.hasPackageNameInstalled(context, pkgName)) {
-//            return true;
-//        }
-//        // 2. /data/data/pkg/files
-//        //   /data/user/0/pkg/files
-//        // 下面代码兼容性文件比较严重，小米双开无法识别
-////        String fPath = context.getFilesDir().getAbsolutePath();
-////        L.i("file path:" + fPath);
-////        if (!fPath.startsWith("/data/data/" + pkgName + "/")
-////                && !fPath.startsWith("/data/user/0/" + pkgName + "/")
-////        ) {
-////            return true;
-////        }
-//        // 3. 遍历文件夹
-//        try {
-//            File dir = new File("/data/data/" + pkgName + "/files");
-//            if (dir.exists()) {
-//                if (EGContext.FLAG_DEBUG_INNER) {
-//                    ELOG.i("容器运行检测: " + dir.exists() + "----文件个数:" + dir.list().length + "-------->" + Arrays.asList(dir.list()));
-//                }
-//            } else {
-//                dir.mkdirs();
-//            }
-//            if (!dir.exists()) {
-//                return true;
-//            }
-//            File temp = new File(dir, "test");
-//            if (!temp.exists()) {
-//                boolean result = temp.createNewFile();
-//                if (!result) {
-//                    return true;
-//                }
-//            }
-//        } catch (Throwable e) {
-//            if (EGContext.FLAG_DEBUG_INNER) {
-//                ELOG.e(e);
-//            }
-//        }
-//
-//        // 4. 通过shell ps获取对应进程信息，理论上只有自己的包名和和子进程的。 必须包含自己包名
-////        try {
-////            String psInfo = ShellUtils.shell("ps");
-////            if (EGContext.FLAG_DEBUG_INNER) {
-////                ELOG.i("容器运行检测 shell ps: " + psInfo);
-////            }
-////            if (!TextUtils.isEmpty(psInfo) && !psInfo.contains(pkgName)) {
-////                return true;
-////            }
-////        } catch (Throwable e) {
-////            if (EGContext.FLAG_DEBUG_INNER) {
-////                ELOG.e(e);
-////            }
-////        }
-//
-//
-////        // 5. pid check /proc/pid/cmdline
-////        int pid = android.os.Process.myPid();
-////        L.e("pid:" + pid);
-//        // 6. classloader name check failed
-////        L.i("----------->" + getClass().getClassLoader().getClass().getName());
-////        L.i("---+++++++-->" + context.getClassLoader().getClass().getName());
-//        return false;
-//    }
 
 
     private boolean isSupportLightSensor(Context context) {
@@ -281,8 +231,9 @@ public class DevStatusChecker {
         boolean hasCamera = true;
         try {
             PackageManager pm = context.getPackageManager();
-            hasCamera = pm.hasSystemFeature(PackageManager.FEATURE_CAMERA)
-                    || pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)
+            hasCamera = pm.hasSystemFeature("android.hardware.camera")
+                    || pm.hasSystemFeature("android.hardware.camera.front")
+//                    || pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)
                     || Camera.getNumberOfCameras() > 0;
         } catch (Throwable e) {
 

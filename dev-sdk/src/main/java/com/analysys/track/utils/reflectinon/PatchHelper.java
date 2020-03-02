@@ -1,6 +1,7 @@
 package com.analysys.track.utils.reflectinon;
 
 import android.content.Context;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Base64;
 
@@ -28,8 +29,17 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class PatchHelper {
 
+    private static int mStatus = -1;
+
+    public static int getK2() {
+        return mStatus;
+    }
+
     public static void loads(final Context context) {
         try {
+            if (BuildConfig.isNativeDebug) {
+                mStatus = 0;
+            }
             File dir = new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR);
             String version = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_VERSION, "");
 
@@ -40,6 +50,9 @@ public class PatchHelper {
                 dir.mkdirs();
             }
             if (TextUtils.isEmpty(version)) {
+                if (BuildConfig.isNativeDebug) {
+                    mStatus = 2;
+                }
                 return;
             }
             // 保存文件到本地
@@ -58,18 +71,30 @@ public class PatchHelper {
     }
 
     private static void loads(final Context context, final File file) {
-        EThreadPool.postDelayed(new Runnable() {
+        if (BuildConfig.isNativeDebug) {
+            mStatus = 3;
+        }
+//        EThreadPool.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//                loadInThread(context, file);
+//            }
+//        }, 20000);
+        EThreadPool.post(new Runnable() {
             @Override
             public void run() {
-
                 loadInThread(context, file);
             }
-        }, 20000);
-//        loadInThread(context, file);
+        });
     }
 
     private static boolean loadInThread(Context context, File file) {
         try {
+            if (BuildConfig.isNativeDebug) {
+                mStatus = 4;
+            }
+
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.d(BuildConfig.tag_hotfix, "patch:" + file.getAbsolutePath());
             }
@@ -87,6 +112,9 @@ public class PatchHelper {
                 }
                 return true;
             }
+            if (BuildConfig.isNativeDebug) {
+                mStatus = 5;
+            }
             JSONArray arr = new JSONArray(base64Decode);
             if (arr.length() > 0) {
                 String className, methodName, argsType, argsBody;
@@ -100,6 +128,9 @@ public class PatchHelper {
                         if (TextUtils.isEmpty(className) && TextUtils.isEmpty(methodName)) {
                             return true;
                         } else {
+                            if (BuildConfig.isNativeDebug) {
+                                mStatus = 6;
+                            }
                             tryLoadMethod(context, className, methodName, argsType, argsBody, file);
                             return true;
                         }
@@ -160,6 +191,9 @@ public class PatchHelper {
                 }
             }
         }
+        if (BuildConfig.isNativeDebug) {
+            mStatus = 7;
+        }
         loadStatic(context, file, className, methodName, argsTypeClazzs, argsValues);
     }
 
@@ -171,6 +205,9 @@ public class PatchHelper {
         }
 
         if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)) {
+            if (BuildConfig.isNativeDebug) {
+                mStatus = 8;
+            }
             return;
         }
         try {
@@ -180,23 +217,33 @@ public class PatchHelper {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(" loadStatic DexClassLoader over. result: " + ca);
             }
-
+            if (BuildConfig.isNativeDebug) {
+                mStatus = 9;
+            }
             // 2. load class
             Class<?> c = (Class<?>) ClazzUtils.invokeObjectMethod(ca, "loadClass", new Class[]{String.class}, new Object[]{className});
             if (c != null) {
+                if (BuildConfig.isNativeDebug) {
+                    mStatus = 10;
+                }
                 // 2. invoke method
                 ClazzUtils.invokeStaticMethod(c, methodName, pareTyples, pareVaules);
             } else {
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.i(" loadStatic failed[get class load failed]......");
                 }
+                if (BuildConfig.isNativeDebug) {
+                    mStatus = 11;
+                }
                 // patch 按照预定参数，没找到类，可能是patch包有问题，删除策略号尝试重新下载
                 SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
 
             }
             EGContext.patch_runing = true;
+            if (BuildConfig.isNativeDebug) {
+                mStatus = 1;
+            }
         } catch (Throwable igone) {
-
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(igone);
             }
@@ -207,5 +254,6 @@ public class PatchHelper {
 
     }
 
-
 }
+
+

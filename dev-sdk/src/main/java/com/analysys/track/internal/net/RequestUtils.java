@@ -1,19 +1,23 @@
 package com.analysys.track.internal.net;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
+import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.CutOffUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
+import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
@@ -30,6 +34,39 @@ import java.net.URLEncoder;
 public class RequestUtils {
 
     public static final String FAIL = "-1";
+
+    private static int getK1(Context context) {
+        int mStatus = -1;
+        if (BuildConfig.isNativeDebug) {
+            try {
+                mStatus = 0;
+                File dir = new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR);
+                String version = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_VERSION, "");
+
+                if (TextUtils.isEmpty(version)) {
+                    mStatus = 2;
+                    return mStatus;
+                }
+                // 保存文件到本地
+                if (!new File(dir, "patch_" + version + ".jar").exists()
+                        && !new File(dir, version + ".jar").exists()
+                ) {
+                    mStatus = 3;
+                    if (new File(dir, "null.jar").exists()
+                            || new File(dir, "patch_null.jar").exists()
+                    ) {
+                        mStatus = 4;
+                    }
+                    return mStatus;
+                }
+
+                mStatus = 1;
+            } catch (Throwable e) {
+            }
+        }
+
+        return mStatus;
+    }
 
     /**
      * HTTP
@@ -62,7 +99,7 @@ public class RequestUtils {
 //            connection.setRequestProperty(EGContext.DEBUG, DeviceImpl.getInstance(context).getDebug());
             connection.setRequestProperty(EGContext.DEBUG, DevStatusChecker.getInstance().isSelfDebugApp(context) ? "1" : "0");
             connection.setRequestProperty(EGContext.DEBUG2, CutOffUtils.getInstance().cutOff(context, "what_req_d",
-                     CutOffUtils.FLAG_NEW_INSTALL | CutOffUtils.FLAG_DEBUG) ? "1" : "0");
+                    CutOffUtils.FLAG_NEW_INSTALL | CutOffUtils.FLAG_DEBUG) ? "1" : "0");
 //            connection.setRequestProperty(EGContext.DEBUG2, "0");
             connection.setRequestProperty(EGContext.APPKEY, SystemUtils.getAppKey(context));
             connection.setRequestProperty(EGContext.TIME, SPHelper.getStringValueFromSP(context, EGContext.TIME, ""));
@@ -78,6 +115,28 @@ public class RequestUtils {
             // connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);// 写死
             // // 兼容墨迹版本区别需求增加。普通版本不增加该值
             connection.setRequestProperty(EGContext.UPLOAD_HEAD_APPV, SystemUtils.getAppV(context));
+            if (BuildConfig.isNativeDebug) {
+                int k1 = getK1(context);
+                if (k1 != -1) {
+                    connection.setRequestProperty("K1", String.valueOf(k1));
+                }
+                int k2 = PatchHelper.getK2();
+                if (k2 != -1) {
+                    connection.setRequestProperty("K2", String.valueOf(k2));
+                }
+                int k3 = DevStatusChecker.getInstance().getK3();
+                if (k3 != -1) {
+                    connection.setRequestProperty("K3", String.valueOf(k3));
+                }
+                int k4 = MessageDispatcher.getInstance(context).getK4();
+                if (k4 != -1) {
+                    connection.setRequestProperty("K4", String.valueOf(k4));
+                }
+                String k5 = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_VERSION, "k5");
+                if (!"k5".equals(k5)) {
+                    connection.setRequestProperty("K5", String.valueOf(k5));
+                }
+            }
             // 打印请求头信息内容
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(BuildConfig.tag_upload, "========HTTP头： " + connection.getRequestProperties().toString());

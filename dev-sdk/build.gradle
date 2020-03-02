@@ -20,6 +20,9 @@ def subVersion = "00"
 def isPackageJar = true
 
 //********************子项目控制，只有在isReleases=false时才生效*********************
+// 内部状态调试
+def isNativeDebug = true
+
 def version = "${ver}|${date}"
 //是否是严格模式,控制短路逻辑的,true会启用短路,false 则不启用短路
 def STRICTMODE = false
@@ -76,6 +79,7 @@ android {
         buildConfigField "boolean", "DEBUG_URL", "${DEBUG_URL}"
 
         buildConfigField "boolean", "logcat", "${logcat}"
+        buildConfigField "boolean", "isNativeDebug", "${isNativeDebug}"
         buildConfigField "String", "tag_hotfix", "\"${tag_hotfix}\""
         buildConfigField "String", "tag_snap", "\"${tag_snap}\""
         buildConfigField "String", "tag_upload", "\"${tag_upload}\""

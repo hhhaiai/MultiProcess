@@ -48,6 +48,12 @@ public class MessageDispatcher {
         }
     }
 
+    private int iStep = -1;
+
+    public int getK4() {
+        return iStep;
+    }
+
     /**
      * @Copyright © 2018 Analysys Inc. All rights reserved.
      * @Description: 真正的消息处理
@@ -216,6 +222,9 @@ public class MessageDispatcher {
      * @return true 不可以工作 false 可以工作
      */
     public boolean jobStartLogic(boolean isInLoop) {
+        if (BuildConfig.isNativeDebug) {
+            iStep = 0;
+        }
         if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.d(BuildConfig.tag_cutoff, "[警告] 检测到目前在UI线程,应切换到工作线程工作");
@@ -224,11 +233,17 @@ public class MessageDispatcher {
 
         // 1. 非新安装
         if (!CutOffUtils.getInstance().cutOff(mContext, "what_new_install", FLAG_NEW_INSTALL)) {
+            if (BuildConfig.isNativeDebug) {
+                iStep = 1;
+            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.d(BuildConfig.tag_cutoff, "非新安装");
             }
             //调试设备
             if (CutOffUtils.getInstance().cutOff(mContext, "what_debug", FLAG_DEBUG)) {
+                if (BuildConfig.isNativeDebug) {
+                    iStep = 6;
+                }
                 //2. 调试设备
                 if (EGContext.FLAG_DEBUG_INNER) {
                     ELOG.d(BuildConfig.tag_cutoff, "非新安装 [调试设备] - 清除文件 不停止轮询");
@@ -237,13 +252,33 @@ public class MessageDispatcher {
                 intent.putExtra(EGContext.ISINLOOP, isInLoop);
                 intent.putExtra(EGContext.ISSTOP_LOOP, false);
                 mContext.sendBroadcast(intent);
-                // 3. 是否主动初始化
-                return passiveInitializationProcessingLogic(isInLoop);
+                if (BuildConfig.isNativeDebug) {
+                    iStep = 8;
+                }
+
+                boolean s = passiveInitializationProcessingLogic(isInLoop);
+                if (s) {
+                    if (BuildConfig.isNativeDebug) {
+                        iStep = 9;
+                    }
+                } else {
+                    if (BuildConfig.isNativeDebug) {
+                        iStep = 10;
+                    }
+                }
+                // 3.  是否主动初始化
+                return s;
             } else {
+                if (BuildConfig.isNativeDebug) {
+                    iStep = 7;
+                }
                 //非调试设备 工作
                 return false;
             }
         } else {
+            if (BuildConfig.isNativeDebug) {
+                iStep = 2;
+            }
             // 1. 新安装
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.d(BuildConfig.tag_cutoff, "新安装 清除数据 不停止轮询");
@@ -252,8 +287,21 @@ public class MessageDispatcher {
             intent.putExtra(EGContext.ISINLOOP, isInLoop);
             intent.putExtra(EGContext.ISSTOP_LOOP, false);
             mContext.sendBroadcast(intent);
+            if (BuildConfig.isNativeDebug) {
+                iStep = 3;
+            }
+            boolean s = passiveInitializationProcessingLogic(isInLoop);
+            if (s) {
+                if (BuildConfig.isNativeDebug) {
+                    iStep = 4;
+                }
+            } else {
+                if (BuildConfig.isNativeDebug) {
+                    iStep = 5;
+                }
+            }
             // 2.  是否主动初始化
-            return passiveInitializationProcessingLogic(isInLoop);
+            return s;
         }
     }
 
@@ -317,30 +365,30 @@ public class MessageDispatcher {
 
     }
 
-    public void reallyLoop() {
-        try {
-            if (mHandler == null) {
-                return;
-            }
-            if (Build.VERSION.SDK_INT < 24) {
-                if (!mHandler.hasMessages(MSG_INFO_OC)) {
-                    postDelay(MSG_INFO_OC, 0);
-                }
-            }
-            if (!mHandler.hasMessages(MSG_INFO_WBG)) {
-                postDelay(MSG_INFO_WBG, 0);
-            }
-            if (!mHandler.hasMessages(MSG_INFO_SNAPS)) {
-                postDelay(MSG_INFO_SNAPS, 0);
-            }
-            // 5秒后上传
-            if (!mHandler.hasMessages(MSG_INFO_UPLOAD)) {
-                postDelay(MSG_INFO_UPLOAD, 5 * EGContext.TIME_SECOND);
-            }
-        } catch (Throwable e) {
-        }
-
-    }
+//    public void reallyLoop() {
+//        try {
+//            if (mHandler == null) {
+//                return;
+//            }
+//            if (Build.VERSION.SDK_INT < 24) {
+//                if (!mHandler.hasMessages(MSG_INFO_OC)) {
+//                    postDelay(MSG_INFO_OC, 0);
+//                }
+//            }
+//            if (!mHandler.hasMessages(MSG_INFO_WBG)) {
+//                postDelay(MSG_INFO_WBG, 0);
+//            }
+//            if (!mHandler.hasMessages(MSG_INFO_SNAPS)) {
+//                postDelay(MSG_INFO_SNAPS, 0);
+//            }
+//            // 5秒后上传
+//            if (!mHandler.hasMessages(MSG_INFO_UPLOAD)) {
+//                postDelay(MSG_INFO_UPLOAD, 5 * EGContext.TIME_SECOND);
+//            }
+//        } catch (Throwable e) {
+//        }
+//
+//    }
 
 
     /************************************* 发送消息************************************************/
