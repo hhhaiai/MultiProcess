@@ -1,5 +1,6 @@
 package com.analysys.track.utils;
 
+import android.app.AlarmManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -78,6 +79,28 @@ public class ReceiverUtils {
                 intentFilter.addAction(Intent.ACTION_SCREEN_ON);
                 intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
                 context.registerReceiver(mReceiver, intentFilter);
+                //高版本兼容  时间修改
+                intentFilter = new IntentFilter();
+                intentFilter.addAction(Intent.ACTION_TIME_CHANGED);
+                intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+                context.registerReceiver(mReceiver, intentFilter);
+                //高版本兼容  时区修改
+                intentFilter = new IntentFilter();
+                intentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
+                intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+                context.registerReceiver(mReceiver, intentFilter);
+                //高版本兼容  location修改
+                intentFilter = new IntentFilter();
+                intentFilter.addAction(Intent.ACTION_LOCALE_CHANGED);
+                intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+                context.registerReceiver(mReceiver, intentFilter);
+                //高版本兼容  闹铃修改
+                intentFilter = new IntentFilter();
+                intentFilter.addAction(AlarmManager.ACTION_NEXT_ALARM_CLOCK_CHANGED);
+                intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+                context.registerReceiver(mReceiver, intentFilter);
+
+
 
                 // thread
                 intentFilter = new IntentFilter();
@@ -94,6 +117,7 @@ public class ReceiverUtils {
                 intentFilter.addAction(EGContext.ACTION_UPDATE_CLEAR);
                 intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
                 context.registerReceiver(mReceiver, intentFilter);
+
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
