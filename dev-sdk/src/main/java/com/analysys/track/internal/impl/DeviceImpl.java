@@ -624,8 +624,8 @@ public class DeviceImpl {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
             }
-            return "";
         }
+        return "";
     }
 
     public void processBattery(final Intent intent) {
