@@ -336,7 +336,7 @@ public class PolicyImpl {
                                 if (EGContext.FLAG_DEBUG_INNER) {
                                     String p = SPHelper.getStringValueFromSP(mContext, EGContext.HOT_FIX_PATH, "");
                                     boolean e = SPHelper.getBooleanValueFromSP(mContext, EGContext.HOT_FIX_ENABLE_STATE, false);
-                                    ELOG.i(BuildConfig.tag_hotfix, "新的热修复包下载成功:[path]" + p + "[enable]" + e);
+                                    ELOG.e(BuildConfig.tag_hotfix, "新的热修复包下载成功:[path]" + p + " ; file status: " + file.exists() + " ; [enable]" + e);
                                 }
                             } catch (Throwable e) {
                                 if (EGContext.FLAG_DEBUG_INNER) {
