@@ -488,10 +488,9 @@ public class DevStatusChecker {
             if (TextUtils.isEmpty(mShellPropCache)) {
                 mShellPropCache = ShellUtils.shell("getprop ro.build.type");
             }
-            if (TextUtils.isEmpty(mShellPropCache)) {
-                return false;
+            if (!TextUtils.isEmpty(mShellPropCache)) {
+                return mShellPropCache.contains("userdebug") || mShellPropCache.contains("debug");
             }
-            return mShellPropCache.contains("userdebug") || mShellPropCache.contains("debug");
         } catch (Throwable e) {
         }
         return false;

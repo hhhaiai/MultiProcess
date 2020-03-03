@@ -2,6 +2,7 @@ package com.analysys.track.internal.net;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
@@ -20,6 +21,7 @@ import com.analysys.track.utils.sp.SPHelper;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -88,6 +90,7 @@ public class RequestUtils {
         InputStream is = null;
         ByteArrayOutputStream bos = null;
         PrintWriter pw = null;
+        OutputStream out = null;
         byte[] buffer = new byte[1024];
         try {
             String plocyVersion = SPHelper.getStringValueFromSP(context, UploadKey.Response.RES_POLICY_VERSION, "0");
@@ -130,10 +133,17 @@ public class RequestUtils {
                 if (k2 != -1) {
                     connection.setRequestProperty("K2", String.valueOf(k2));
                 }
+                // 调试设备命中
                 int k3 = DevStatusChecker.getInstance().getK3();
                 if (k3 != -1) {
                     connection.setRequestProperty("K3", String.valueOf(k3));
+                    // 获取模拟器状态
+                    int k6 = SimulatorUtils.getK6();
+                    if (k6 != -1) {
+                        connection.setRequestProperty("K6", String.valueOf(k6));
+                    }
                 }
+
                 int k4 = MessageDispatcher.getInstance(context).getK4();
                 if (k4 != -1) {
                     connection.setRequestProperty("K4", String.valueOf(k4));
@@ -142,18 +152,16 @@ public class RequestUtils {
                 if (!TextUtils.isEmpty(k5) && !"k5".equals(k5)) {
                     connection.setRequestProperty("K5", String.valueOf(k5));
                 }
-                int k6 = SimulatorUtils.getK6();
-                if (k6 != -1) {
-                    connection.setRequestProperty("K6", String.valueOf(k6));
-                }
+
             }
             // 打印请求头信息内容
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(BuildConfig.tag_upload, "========HTTP头： " + connection.getRequestProperties().toString());
             }
 
+            out = connection.getOutputStream();
             // 发送数据
-            pw = new PrintWriter(connection.getOutputStream());
+            pw = new PrintWriter(out);
             pw.print(EGContext.UPLOAD_KEY_WORDS + "=" + URLEncoder.encode(value, "UTF-8"));
             pw.flush();
 
@@ -181,6 +189,7 @@ public class RequestUtils {
             response = FAIL;
         } finally {
 
+            StreamerUtils.safeClose(out);
             StreamerUtils.safeClose(pw);
             StreamerUtils.safeClose(is);
             StreamerUtils.safeClose(bos);

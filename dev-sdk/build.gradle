@@ -16,6 +16,8 @@ def ver = "4.3.0.7"
 def date = "20200201"
 //SDK子版本
 def subVersion = "00"
+//当前热修复包的版本,默认是1,需要递增
+def hf_code = 1
 // 宿主包(jar):true , 热修复包(dex):false
 def isPackageJar = true
 
@@ -23,13 +25,12 @@ def isPackageJar = true
 // 内部状态调试
 def isNativeDebug = true
 
+//编译版本内部使用
 def version = "${ver}|${date}"
 //是否是严格模式,控制短路逻辑的,true会启用短路,false 则不启用短路
-def STRICTMODE = false
+def STRICTMODE = true
 // 包含热修复功能:true ， 不包含热修复功能:false
 def enableHotFix = true
-//当前热修复包的版本
-def hf_code = 1
 def ENABLE_BUGLY = true
 def DEBUG_URL = true
 //所有的log开关,true 打印所有的日志,false,关闭所有的日志

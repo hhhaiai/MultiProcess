@@ -261,7 +261,7 @@ public class EGContext {
     public static String HOT_FIX_CHANNEL = "hf_cl_1";
     public static String HOT_FIX_ENABLE_STATE = HOT_FIX_CHANNEL + "_hf";
     //热更版本
-    public static String HOT_FIX_CODE_DEBUG = BuildConfig.hf_code;
+//    public static String HOT_FIX_CODE_DEBUG = BuildConfig.hf_code;
     public static String HOT_FIX_PATH = HOT_FIX_CHANNEL + "hp";
     public static String HOT_FIX_HOST_VERSION = "HF_HOST_VERSION";
     //是否是宿主,打热修复包的时候设置为否
