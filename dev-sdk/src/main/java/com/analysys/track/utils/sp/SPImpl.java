@@ -143,7 +143,7 @@ class SPImpl implements SharedPreferences {
                     if (!bakFile.exists()) {
                         bakFile.createNewFile();
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUGLY) {
                         BuglyUtils.commitError(e);
                     }
@@ -588,7 +588,7 @@ class SPImpl implements SharedPreferences {
                 if (contentLength > bufferLen) {
                     allocBuffer(contentLength + MIN_INCREASE_LENGTH);
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
                     BuglyUtils.commitError(e);
                 }
@@ -625,7 +625,7 @@ class SPImpl implements SharedPreferences {
                 boolean parseOK = false;
                 try {
                     parseOK = parseBytesIntoMap(allBytes, true);
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUGLY) {
                         BuglyUtils.commitError(e);
                     }
@@ -639,7 +639,7 @@ class SPImpl implements SharedPreferences {
                     if (lock != null) {
                         lock.release();
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUGLY) {
                         BuglyUtils.commitError(e);
                     }
@@ -744,7 +744,7 @@ class SPImpl implements SharedPreferences {
 
         try {
             mMappedByteBuffer = mFileChannel.map(FileChannel.MapMode.READ_WRITE, 0, length);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(e);
             }
@@ -790,7 +790,7 @@ class SPImpl implements SharedPreferences {
                 if (!isFileExist) {
                     initFileHeader();
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
                     BuglyUtils.commitError(e);
                 }
@@ -816,7 +816,7 @@ class SPImpl implements SharedPreferences {
             while (lock == null) {
                 try {
                     lock = mFileChannel.tryLock();
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUGLY) {
                         BuglyUtils.commitError(e);
                     }
@@ -825,7 +825,7 @@ class SPImpl implements SharedPreferences {
                 if (lock == null) {
                     try {
                         Thread.sleep(100);
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         if (BuildConfig.ENABLE_BUGLY) {
                             BuglyUtils.commitError(e);
                         }
@@ -839,7 +839,7 @@ class SPImpl implements SharedPreferences {
         } else {
             try {
                 lock = mFileChannel.tryLock();
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
                     BuglyUtils.commitError(e);
                 }
@@ -930,7 +930,7 @@ class SPImpl implements SharedPreferences {
                             mMap.put(keyStr, valObject);
                         }
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUGLY) {
                         BuglyUtils.commitError(e);
                     }
@@ -1192,7 +1192,7 @@ class SPImpl implements SharedPreferences {
 
             try {
                 parseOK = parseBytesIntoMap(allBytes, false);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
                     BuglyUtils.commitError(e);
                 }
