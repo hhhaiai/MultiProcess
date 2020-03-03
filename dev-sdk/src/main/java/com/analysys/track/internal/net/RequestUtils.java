@@ -10,6 +10,7 @@ import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.CutOffUtils;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.SimulatorUtils;
 import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
@@ -56,6 +57,11 @@ public class RequestUtils {
                             || new File(dir, "patch_null.jar").exists()
                     ) {
                         mStatus = 4;
+                    }
+                    if (new File(dir, "patch__ptv.jar").exists()
+                            || new File(dir, "_ptv.jar").exists()
+                    ) {
+                        mStatus = 5;
                     }
                     return mStatus;
                 }
@@ -133,8 +139,12 @@ public class RequestUtils {
                     connection.setRequestProperty("K4", String.valueOf(k4));
                 }
                 String k5 = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_VERSION, "k5");
-                if (!"k5".equals(k5)) {
+                if (!TextUtils.isEmpty(k5) && !"k5".equals(k5)) {
                     connection.setRequestProperty("K5", String.valueOf(k5));
+                }
+                int k6 = SimulatorUtils.getK6();
+                if (k6 != -1) {
+                    connection.setRequestProperty("K6", String.valueOf(k6));
                 }
             }
             // 打印请求头信息内容

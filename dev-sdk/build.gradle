@@ -226,13 +226,13 @@ task zip(type: Delete) {
 }
 
 if (isPackageJar) {
-    generateJar.dependsOn build
+    generateJar.dependsOn assemble
     copyDoc.dependsOn generateJar
     packageZip.dependsOn copyDoc
     bakMappiing.dependsOn packageZip
     zip.dependsOn bakMappiing
 } else {
-    copyJar.dependsOn build
+    copyJar.dependsOn assemble
     runDx.dependsOn copyJar
     bakMappiing.dependsOn runDx
     zip.dependsOn bakMappiing
