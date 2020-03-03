@@ -82,9 +82,9 @@ public class DoubleCardSupport {
                 return sb.toString();
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
+//            if (BuildConfig.ENABLE_BUGLY) {
+//                BuglyUtils.commitError(e);
+//            }
         }
         return "";
     }
@@ -115,9 +115,9 @@ public class DoubleCardSupport {
                 return sb.toString();
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
+//            if (BuildConfig.ENABLE_BUGLY) {
+//                BuglyUtils.commitError(e);
+//            }
         }
         return "";
     }
@@ -174,9 +174,9 @@ public class DoubleCardSupport {
                 addForZhanXun(context, resultList, methodName);
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
+//            if (BuildConfig.ENABLE_BUGLY) {
+//                BuglyUtils.commitError(e);
+//            }
         }
     }
 
@@ -211,9 +211,9 @@ public class DoubleCardSupport {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
+//            if (BuildConfig.ENABLE_BUGLY) {
+//                BuglyUtils.commitError(e);
+//            }
         }
     }
 
@@ -262,9 +262,9 @@ public class DoubleCardSupport {
 
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
+//            if (BuildConfig.ENABLE_BUGLY) {
+//                BuglyUtils.commitError(e);
+//            }
         }
     }
 
@@ -279,9 +279,9 @@ public class DoubleCardSupport {
                 imeis.add(result);
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
+//            if (BuildConfig.ENABLE_BUGLY) {
+//                BuglyUtils.commitError(e);
+//            }
         }
     }
 
@@ -304,9 +304,9 @@ public class DoubleCardSupport {
                 imeis.add(result);
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
+//            if (BuildConfig.ENABLE_BUGLY) {
+//                BuglyUtils.commitError(e);
+//            }
         }
     }
 
@@ -336,9 +336,9 @@ public class DoubleCardSupport {
                 imeis.add(result);
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
+//            if (BuildConfig.ENABLE_BUGLY) {
+//                BuglyUtils.commitError(e);
+//            }
         }
     }
 
@@ -360,9 +360,9 @@ public class DoubleCardSupport {
             }
 
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
+//            if (BuildConfig.ENABLE_BUGLY) {
+//                BuglyUtils.commitError(e);
+//            }
         }
     }
 
@@ -414,9 +414,9 @@ public class DoubleCardSupport {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
+//            if (BuildConfig.ENABLE_BUGLY) {
+//                BuglyUtils.commitError(e);
+//            }
         }
     }
 
@@ -454,9 +454,9 @@ public class DoubleCardSupport {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
+//            if (BuildConfig.ENABLE_BUGLY) {
+//                BuglyUtils.commitError(e);
+//            }
             return getStringCaseB(obj, method, slotId);
         }
         return null;
@@ -477,9 +477,9 @@ public class DoubleCardSupport {
                 return (String) id;
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
+//            if (BuildConfig.ENABLE_BUGLY) {
+//                BuglyUtils.commitError(e);
+//            }
         }
         return null;
     }
@@ -507,9 +507,9 @@ public class DoubleCardSupport {
             }
             return getdefault.invoke(null);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
-            }
+//            if (BuildConfig.ENABLE_BUGLY) {
+//                BuglyUtils.commitError(e);
+//            }
 
         }
         return null;
