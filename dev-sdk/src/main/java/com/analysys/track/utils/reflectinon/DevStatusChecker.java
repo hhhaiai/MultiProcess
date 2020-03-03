@@ -154,17 +154,17 @@ public class DevStatusChecker {
             isDeviceDebug = true;
             return true;
         }
-//        // 6. USB状态
-//        if (EGContext.STATUS_USB_DEBUG) {
-//            if (BuildConfig.isNativeDebug) {
-//                iSteup = 6;
-//            }
-//            if (EGContext.FLAG_DEBUG_INNER) {
-//                ELOG.e(BuildConfig.tag_cutoff, "USB状态，命中目标");
-//            }
-//            isDeviceDebug = true;
-//            return true;
-//        }
+        // 6. USB状态
+        if (EGContext.STATUS_USB_DEBUG) {
+            if (BuildConfig.isNativeDebug) {
+                iSteup = 6;
+            }
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(BuildConfig.tag_cutoff, "USB状态，命中目标");
+            }
+            isDeviceDebug = true;
+            return true;
+        }
 
         // 7. 宿主debug判断
         if (isSelfDebugApp(context)) {

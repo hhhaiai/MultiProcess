@@ -106,7 +106,9 @@ public class DeviceImpl {
 
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.BLUETOOTH)) {
                 BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                bluetoothMacAddress = bluetoothAdapter.getAddress();
+                if (bluetoothAdapter != null) {
+                    bluetoothMacAddress = bluetoothAdapter.getAddress();
+                }
             }
             if (TextUtils.isEmpty(bluetoothMacAddress) || DEFALT_MAC.equals(bluetoothMacAddress)) {
                 bluetoothMacAddress = Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
@@ -345,8 +347,8 @@ public class DeviceImpl {
         String serialNo = "";
         try {
             if (Build.VERSION.SDK_INT > 26) {
-                Class<?> clazz = Class.forName("android.os.Build");
-                Method method = clazz.getMethod("getSerial");
+//                Class<?> clazz = Class.forName("android.os.Build");
+                Method method = Build.class.getMethod("getSerial");
                 serialNo = (String) method.invoke(null);
             } else {
                 if (android.os.Build.VERSION.SDK_INT >= 9) {
@@ -614,7 +616,10 @@ public class DeviceImpl {
      */
     public String getBluetoothName() {
         try {
-            return BluetoothAdapter.getDefaultAdapter().getName();
+            BluetoothAdapter mAdapther = BluetoothAdapter.getDefaultAdapter();
+            if (mAdapther != null) {
+                return mAdapther.getName();
+            }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
@@ -816,11 +821,14 @@ public class DeviceImpl {
         try {
             sb = new StringBuilder();
             for (int i = 0; i < stringArray.length; i++) {
-                sb.append(stringArray[i]);
-                sb.append(",");
+                if (!TextUtils.isEmpty(stringArray[i])) {
+                    sb.append(stringArray[i]).append(",");
+                }
             }
-            result = String.valueOf(sb);
-            result = result.substring(0, result.length() - 1);
+            if (sb.length() > 0) {
+                result = String.valueOf(sb);
+                result = result.substring(0, result.length() - 1);
+            }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BuglyUtils.commitError(t);
