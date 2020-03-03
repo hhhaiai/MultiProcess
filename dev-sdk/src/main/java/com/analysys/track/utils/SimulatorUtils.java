@@ -236,7 +236,7 @@ public class SimulatorUtils {
                 return false;
             }
             String getProp = ShellUtils.shell("getprop");
-            if (TextUtils.isEmpty(getProp)) {
+            if (!TextUtils.isEmpty(getProp)) {
                 if (getProp.contains("vbox86p")
                         || getProp.contains("vbox")
                         || getProp.contains("Genymotion")
@@ -245,7 +245,7 @@ public class SimulatorUtils {
                 }
             }
             getProp = SystemUtils.getContentFromFile("/system/build.prop");
-            if (TextUtils.isEmpty(getProp)) {
+            if (!TextUtils.isEmpty(getProp)) {
                 if (getProp.contains("vbox86p")
                         || getProp.contains("vbox")
                         || getProp.contains("Genymotion")
