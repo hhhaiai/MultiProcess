@@ -37,12 +37,19 @@ public class MultiProcessChecker {
                 return false;
             }
             File dev = new File(cxt.getFilesDir(), fileName);
+            // check parent Dir
+            File parentDir = new File(dev.getParent());
+            if (!parentDir.exists()) {
+                parentDir.mkdirs();
+            }
             if (!dev.exists()) {
-                dev.createNewFile();
-                dev.setExecutable(true);
-                dev.setWritable(true);
-                dev.setReadable(true);
-                dev.setLastModified(System.currentTimeMillis() - (time + 1000));
+                boolean rs = dev.createNewFile();
+                if (rs) {
+                    dev.setExecutable(true);
+                    dev.setWritable(true);
+                    dev.setReadable(true);
+                    dev.setLastModified(System.currentTimeMillis() - (time + 1000));
+                }
             }
             if (dev.exists()) {
                 return true;
@@ -158,6 +165,9 @@ public class MultiProcessChecker {
             if (Math.abs(lastModifyTime - now) > time) {
                 // 文件同步
                 File f = new File(cxt.getFilesDir(), lock);
+                if (!f.exists()) {
+                    f.createNewFile();
+                }
                 RandomAccessFile randomFile = null;
                 FileChannel fileChannel = null;
                 FileLock fl = null;
