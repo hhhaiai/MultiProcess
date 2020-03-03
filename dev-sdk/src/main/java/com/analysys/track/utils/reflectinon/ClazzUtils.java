@@ -52,7 +52,8 @@ public class ClazzUtils {
      */
     public static void unseal() {
         // android  9 10 版本
-        if (SDK_INT > 27 && SDK_INT <= 29) {
+//        if (SDK_INT > 27 && SDK_INT <= 29) {
+        if (SDK_INT > 27) {
             try {
                 Class<?> vmRuntimeClass = (Class<?>) forName.invoke(null, "dalvik.system.VMRuntime");
                 Method getRuntime = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", null);
