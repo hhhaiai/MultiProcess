@@ -18,6 +18,7 @@ import com.analysys.track.utils.CutOffUtils;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.MClipManager;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -60,6 +61,8 @@ public class AnalysysReceiver extends BroadcastReceiver {
     }
 
     private void process(Context context, Intent intent) {
+        //禁止灰色 api logcat
+        ClazzUtils.unseal();
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysReceiver onReceive");
         }

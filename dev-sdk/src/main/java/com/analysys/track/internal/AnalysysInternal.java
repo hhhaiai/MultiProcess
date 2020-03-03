@@ -88,18 +88,18 @@ public class AnalysysInternal {
     @SuppressWarnings("deprecation")
     private void init(String key, String channel, boolean initType) {
 
+        //禁止灰色 api logcat
+        ClazzUtils.unseal();
 
-        // 0.首先检查是否有Context
+        // 检查是否有Context
         Context ctx = EContextHelper.getContext();
         if (ctx == null) {
             return;
         }
-        //禁止灰色 api logcat
-        ClazzUtils.unseal();
+
         SPHelper.setBooleanValue2SP(ctx, EGContext.KEY_INIT_TYPE, initType);
         Application application = (Application) ctx;
         application.registerActivityLifecycleCallbacks(ActivityCallBack.getInstance());
-
 
         SPHelper.setIntValue2SP(ctx, EGContext.KEY_ACTION_SCREEN_ON_SIZE, EGContext.FLAG_START_COUNT + 1);
         SystemUtils.updateAppkeyAndChannel(ctx, key, channel);// updateSnapshot sp

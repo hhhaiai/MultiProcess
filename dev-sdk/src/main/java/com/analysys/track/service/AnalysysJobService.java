@@ -13,6 +13,7 @@ import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.internal.work.ServiceHelper;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -44,6 +45,8 @@ public class AnalysysJobService extends JobService {
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysJobService onStartJob");
         }
+        //禁止灰色 api logcat
+        ClazzUtils.unseal();
         // 传递Context。防止因为Context缺失导致的调用异常
         AnalysysInternal.getInstance(null);
         MessageDispatcher.getInstance(null).initModule();

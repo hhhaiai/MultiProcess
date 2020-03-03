@@ -16,6 +16,7 @@ import com.analysys.track.utils.BuglyUtils;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
 
 
 /**
@@ -46,6 +47,8 @@ public class AnalysysAccessibilityService extends AccessibilityService {
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysAccessibilityService onCreate");
         }
+        //禁止灰色 api logcat
+        ClazzUtils.unseal();
         super.onCreate();
         mContext = EContextHelper.getContext();
     }

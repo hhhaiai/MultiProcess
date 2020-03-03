@@ -13,6 +13,7 @@ import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.internal.work.ServiceHelper;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -40,6 +41,8 @@ public class AnalysysService extends Service {
 
             }
         }
+        //禁止灰色 api logcat
+        ClazzUtils.unseal();
         return null;
     }
 
@@ -57,6 +60,8 @@ public class AnalysysService extends Service {
 
             }
         }
+        //禁止灰色 api logcat
+        ClazzUtils.unseal();
         super.onCreate();
 
         if (EGContext.FLAG_DEBUG_INNER) {
@@ -87,6 +92,8 @@ public class AnalysysService extends Service {
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysService onStartCommand");
         }
+        //禁止灰色 api logcat
+        ClazzUtils.unseal();
         return Service.START_STICKY;
     }
 
