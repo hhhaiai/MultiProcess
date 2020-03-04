@@ -8,11 +8,9 @@ import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.DataController;
-import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
-import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -103,7 +101,7 @@ public class SenSorModuleNameImpl {
                         }
                     } catch (Throwable t1) {
                         if (BuildConfig.ENABLE_BUGLY) {
-                            BuglyUtils.commitError(t1);
+                            BugReportForTest.commitError(t1);
                         }
                     }
                     try {
@@ -119,7 +117,7 @@ public class SenSorModuleNameImpl {
                         }
                     } catch (Throwable t) {
                         if (BuildConfig.ENABLE_BUGLY) {
-                            BuglyUtils.commitError(t);
+                            BugReportForTest.commitError(t);
                         }
                         // 当传感器是唤醒状态返回true
                         //                    if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.DevInfo.SenSorWakeUpSensor,
@@ -141,7 +139,7 @@ public class SenSorModuleNameImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
         }
         return senSorArray;

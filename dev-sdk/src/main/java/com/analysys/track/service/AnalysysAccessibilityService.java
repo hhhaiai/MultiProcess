@@ -12,7 +12,7 @@ import com.analysys.track.impl.HotFixTransform;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.OCImpl;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.SystemUtils;
@@ -40,7 +40,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
                 return;
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
             }
         }
@@ -78,10 +78,10 @@ public class AnalysysAccessibilityService extends AccessibilityService {
             settingAccessibilityInfo();
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
         }
     }
@@ -124,7 +124,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
             });
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
         }
     }

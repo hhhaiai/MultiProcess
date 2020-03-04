@@ -26,15 +26,12 @@ import android.util.DisplayMetrics;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
-import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.OAIDHelper;
 import com.analysys.track.utils.PermissionUtils;
-import com.analysys.track.utils.SystemUtils;
-import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.BufferedInputStream;
@@ -115,7 +112,7 @@ public class DeviceImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return bluetoothMacAddress;
@@ -138,7 +135,7 @@ public class DeviceImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
         }
         try {
@@ -185,7 +182,7 @@ public class DeviceImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
 
@@ -216,7 +213,7 @@ public class DeviceImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
             macAddress = DEFALT_MAC;
         }
@@ -252,7 +249,7 @@ public class DeviceImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
             mac = DEFALT_MAC;
         }
@@ -281,7 +278,7 @@ public class DeviceImpl {
                 }
             } catch (IOException e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
             } finally {
                 if (reader != null) {
@@ -313,7 +310,7 @@ public class DeviceImpl {
             }
         } catch (Exception e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             if (br != null) {
@@ -321,7 +318,7 @@ public class DeviceImpl {
                     br.close();
                 } catch (IOException e) {
                     if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(e);
+                        BugReportForTest.commitError(e);
                     }
                 }
             }
@@ -331,7 +328,7 @@ public class DeviceImpl {
                     in.close();
                 } catch (IOException e) {
                     if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(e);
+                        BugReportForTest.commitError(e);
                     }
                 }
             }
@@ -362,7 +359,7 @@ public class DeviceImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return serialNo;
@@ -374,7 +371,7 @@ public class DeviceImpl {
             displayMetrics = mContext.getApplicationContext().getResources().getDisplayMetrics();
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
             displayMetrics = null;
         }
@@ -390,7 +387,7 @@ public class DeviceImpl {
             res = getDisplayMetrics().widthPixels + "-" + getDisplayMetrics().heightPixels;
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
             res = "";
         }
@@ -405,7 +402,7 @@ public class DeviceImpl {
             dpi = String.valueOf(getDisplayMetrics().densityDpi);
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
             dpi = "";
         }
@@ -432,7 +429,7 @@ public class DeviceImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return operatorName;
@@ -448,7 +445,7 @@ public class DeviceImpl {
             operatorName = tm.getSimOperatorName();
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
             operatorName = "";
         }
@@ -466,7 +463,7 @@ public class DeviceImpl {
 
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
             operatorCode = "";
         }
@@ -486,7 +483,7 @@ public class DeviceImpl {
             operatorCode = tm.getNetworkOperatorName();
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
             operatorCode = "";
         }
@@ -504,7 +501,7 @@ public class DeviceImpl {
             return (String) packageManager.getApplicationLabel(applicationInfo);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return UNKNOW;
@@ -519,7 +516,7 @@ public class DeviceImpl {
             return mContext.getPackageName();
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return UNKNOW;
@@ -538,7 +535,7 @@ public class DeviceImpl {
             return versionName + "|" + versionCode;
         } catch (NameNotFoundException e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return "";
@@ -554,7 +551,7 @@ public class DeviceImpl {
             return md5Fingerprint;
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return "";
@@ -571,7 +568,7 @@ public class DeviceImpl {
             return byteArrayToString(bytes);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return UNKNOW;
@@ -590,7 +587,7 @@ public class DeviceImpl {
             return byteArrayToString(bytes);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return UNKNOW;
@@ -605,7 +602,7 @@ public class DeviceImpl {
             return sig;
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return null;
@@ -622,7 +619,7 @@ public class DeviceImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
         }
         return "";
@@ -671,7 +668,7 @@ public class DeviceImpl {
             info.setBatteryTemperature(String.valueOf(temperature));
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         //MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_BATTERY_BROADCAST, System.currentTimeMillis());
@@ -690,7 +687,7 @@ public class DeviceImpl {
             return mCurConfig.fontScale + "";
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
             return "0";
         }
@@ -737,7 +734,7 @@ public class DeviceImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
         }
         return "";
@@ -750,7 +747,7 @@ public class DeviceImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
         }
         return "";
@@ -763,7 +760,7 @@ public class DeviceImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
         }
         return "";
@@ -790,7 +787,7 @@ public class DeviceImpl {
             });
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
         }
 
@@ -831,7 +828,7 @@ public class DeviceImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
             return null;
         }

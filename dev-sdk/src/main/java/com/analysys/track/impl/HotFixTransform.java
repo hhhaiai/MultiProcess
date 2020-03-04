@@ -7,7 +7,7 @@ import android.util.Log;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.FileUitls;
@@ -227,7 +227,7 @@ public class HotFixTransform {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
     }
@@ -289,7 +289,7 @@ public class HotFixTransform {
             SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
     }
@@ -320,7 +320,7 @@ public class HotFixTransform {
 
         if (classname == null || methodName == null || classname.length() == 0 || methodName.length() == 0) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(new Exception(
+                BugReportForTest.commitError(new Exception(
                         "[HotFixTransform transform error]" + classname + "," + methodName));
             }
             return null;
@@ -350,7 +350,7 @@ public class HotFixTransform {
             return (T) method.invoke(object, pram);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return null;
@@ -417,7 +417,7 @@ public class HotFixTransform {
             return o;
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return null;

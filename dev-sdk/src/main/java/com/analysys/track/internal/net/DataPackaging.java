@@ -10,7 +10,7 @@ import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.impl.SenSorModuleNameImpl;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EguanIdUtils;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.SystemUtils;
@@ -232,7 +232,7 @@ public class DataPackaging {
             deviceInfo.put(EGContext.EXTRA_DATA, batteryJson);
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
         }
         return deviceInfo;

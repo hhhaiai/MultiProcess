@@ -4,7 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -100,7 +100,7 @@ public class ClazzUtils {
             return method;
         } else {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(new Exception(clazz.getName() + methodName + "not found !"));
+                BugReportForTest.commitError(new Exception(clazz.getName() + methodName + "not found !"));
             }
         }
         return method;
@@ -136,7 +136,7 @@ public class ClazzUtils {
             return field;
         } else {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(new Exception(clazz.getName() + fieldName + "not found !"));
+                BugReportForTest.commitError(new Exception(clazz.getName() + fieldName + "not found !"));
             }
         }
         return null;
@@ -267,7 +267,7 @@ public class ClazzUtils {
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
 
@@ -294,7 +294,7 @@ public class ClazzUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return false;

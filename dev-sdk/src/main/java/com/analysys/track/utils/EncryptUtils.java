@@ -59,7 +59,7 @@ public class EncryptUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return false;
@@ -87,7 +87,7 @@ public class EncryptUtils {
             mEncryptKey = null;
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
         }
     }
@@ -112,7 +112,7 @@ public class EncryptUtils {
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
             return "";
         }
@@ -138,7 +138,7 @@ public class EncryptUtils {
             return new String(decrypt(b, mEncryptKey.getBytes()));
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
             return "";
         }
@@ -154,7 +154,7 @@ public class EncryptUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return false;
@@ -187,7 +187,7 @@ public class EncryptUtils {
                             serialNO = (String) method.invoke(null);
                         } catch (Exception e) {
                             if (BuildConfig.ENABLE_BUGLY) {
-                                BuglyUtils.commitError(e);
+                                BugReportForTest.commitError(e);
                             }
                         }
                     }
@@ -226,18 +226,18 @@ public class EncryptUtils {
                     firstKey = ensure(preID.charAt(2));
                 } catch (NumberFormatException e) {
                     if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(e);
+                        BugReportForTest.commitError(e);
                     }
                     try {
                         firstKey = ensure(preID.charAt(2));
                     } catch (NumberFormatException ee) {
                         if (BuildConfig.ENABLE_BUGLY) {
-                            BuglyUtils.commitError(ee);
+                            BugReportForTest.commitError(ee);
                         }
                         firstKey = 3;
                     } catch (Throwable eeee) {
                         if (BuildConfig.ENABLE_BUGLY) {
-                            BuglyUtils.commitError(eeee);
+                            BugReportForTest.commitError(eeee);
                         }
                     }
                 }
@@ -247,13 +247,13 @@ public class EncryptUtils {
                     endKey = ensure(fID.charAt(2));
                 } catch (NumberFormatException e) {
                     if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(e);
+                        BugReportForTest.commitError(e);
                     }
                     try {
                         endKey = ensure(fID.charAt(3));
                     } catch (NumberFormatException ee) {
                         if (BuildConfig.ENABLE_BUGLY) {
-                            BuglyUtils.commitError(ee);
+                            BugReportForTest.commitError(ee);
                         }
                         endKey = 6;
                     }
@@ -276,7 +276,7 @@ public class EncryptUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
     }
@@ -326,7 +326,7 @@ public class EncryptUtils {
             return result.toString();
         } catch (Exception e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return "";
@@ -381,7 +381,7 @@ public class EncryptUtils {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
         }
         return false;

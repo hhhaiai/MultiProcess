@@ -7,11 +7,9 @@ import android.net.wifi.WifiManager;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.DataController;
-import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
-import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.PermissionUtils;
 
@@ -76,7 +74,7 @@ public class WifiImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return jar;
@@ -115,7 +113,7 @@ public class WifiImpl {
                     DataController.SWITCH_OF_FREQUENCY);
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
         }
         return jsonObject;

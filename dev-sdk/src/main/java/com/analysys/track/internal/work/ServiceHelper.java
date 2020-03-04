@@ -15,7 +15,7 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.service.AnalysysJobService;
 import com.analysys.track.service.AnalysysService;
 import com.analysys.track.utils.AndroidManifestHelper;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PermissionUtils;
@@ -57,7 +57,7 @@ public class ServiceHelper {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
             MessageDispatcher.getInstance(mContext).initModule();
         }
@@ -229,7 +229,7 @@ public class ServiceHelper {
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return isWork;

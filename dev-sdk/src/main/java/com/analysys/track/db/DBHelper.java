@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 
@@ -88,7 +88,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 break;
             } catch (SQLiteDatabaseCorruptException e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
                 delDbFile(db);
             }
@@ -105,7 +105,7 @@ public class DBHelper extends SQLiteOpenHelper {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
     }

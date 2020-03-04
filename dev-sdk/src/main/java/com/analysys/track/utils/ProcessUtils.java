@@ -24,7 +24,7 @@ public class ProcessUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return "";
@@ -35,7 +35,7 @@ public class ProcessUtils {
             return ProcessUtils.getCurrentProcessName(context).equals(context.getPackageName());
         } catch (Exception e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return false;

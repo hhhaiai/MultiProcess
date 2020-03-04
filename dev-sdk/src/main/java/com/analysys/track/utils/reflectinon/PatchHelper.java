@@ -1,14 +1,13 @@
 package com.analysys.track.utils.reflectinon;
 
 import android.content.Context;
-import android.os.Build;
 import android.text.TextUtils;
 import android.util.Base64;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.sp.SPHelper;
@@ -139,7 +138,7 @@ public class PatchHelper {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return false;

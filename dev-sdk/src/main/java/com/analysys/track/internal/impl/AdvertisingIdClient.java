@@ -12,7 +12,7 @@ import android.os.Parcel;
 import android.os.RemoteException;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 
 import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -36,7 +36,7 @@ public class AdvertisingIdClient {
             pm.getPackageInfo("com.android.vending", 0);
         } catch (Exception e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
             throw e;
         }
@@ -51,7 +51,7 @@ public class AdvertisingIdClient {
                 return adInfo;
             } catch (Exception exception) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(exception);
+                    BugReportForTest.commitError(exception);
                 }
                 throw exception;
             } finally {
@@ -90,7 +90,7 @@ public class AdvertisingIdClient {
                 this.queue.put(service);
             } catch (InterruptedException localInterruptedException) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(localInterruptedException);
+                    BugReportForTest.commitError(localInterruptedException);
                 }
             }
         }

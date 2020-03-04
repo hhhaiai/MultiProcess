@@ -65,7 +65,7 @@ public class AccessibilityHelper {
         } catch (Throwable e) {
             //部分机器可能这部分会异常
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
             return false;
         }

@@ -1,9 +1,7 @@
 package com.analysys.track.utils.data;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.utils.BuglyUtils;
-import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.BugReportForTest;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -26,7 +24,7 @@ public class AESUtils {
             return result;
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
 
@@ -55,7 +53,7 @@ public class AESUtils {
             return result;
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
 

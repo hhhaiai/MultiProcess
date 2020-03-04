@@ -18,7 +18,7 @@ import java.lang.reflect.Method;
  * @author: miqt
  * @mail: miqingtang@analysys.com.cn
  */
-public class BuglyUtils {
+public class BugReportForTest {
 
     public static void commitError(Throwable throwable) {
         commitError(null, throwable);

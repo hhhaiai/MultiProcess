@@ -3,7 +3,6 @@ package com.analysys.track.utils;
 import android.content.Context;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.internal.content.EGContext;
 
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -56,7 +55,7 @@ public class MultiProcessChecker {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return false;
@@ -83,7 +82,7 @@ public class MultiProcessChecker {
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return -1;
@@ -133,7 +132,7 @@ public class MultiProcessChecker {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return false;
@@ -195,7 +194,7 @@ public class MultiProcessChecker {
                     }
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(e);
+                        BugReportForTest.commitError(e);
                     }
                 }
             } else {
@@ -204,7 +203,7 @@ public class MultiProcessChecker {
 
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
         }
         return false;

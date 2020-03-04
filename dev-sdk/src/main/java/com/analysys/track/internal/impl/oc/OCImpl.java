@@ -12,7 +12,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.db.DBConfig;
@@ -24,7 +23,7 @@ import com.analysys.track.internal.impl.usm.USMImpl;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.utils.AccessibilityHelper;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EncryptUtils;
@@ -92,7 +91,7 @@ public class OCImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_oc,t);
+                BugReportForTest.commitError(BuildConfig.tag_oc,t);
             }
         }
 
@@ -145,7 +144,7 @@ public class OCImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_oc,t);
+                BugReportForTest.commitError(BuildConfig.tag_oc,t);
             }
         }
     }
@@ -425,7 +424,7 @@ public class OCImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_oc,e);
+                BugReportForTest.commitError(BuildConfig.tag_oc,e);
             }
             getAliveAppByProc(aliveList);
         }
@@ -485,7 +484,7 @@ public class OCImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_oc,t);
+                BugReportForTest.commitError(BuildConfig.tag_oc,t);
             }
 
         }
@@ -556,7 +555,7 @@ public class OCImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_oc,t);
+                BugReportForTest.commitError(BuildConfig.tag_oc,t);
             }
         }
         return info;
@@ -615,7 +614,7 @@ public class OCImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_oc,e);
+                BugReportForTest.commitError(BuildConfig.tag_oc,e);
             }
             getAliveAppByProc(aliveList);
         }

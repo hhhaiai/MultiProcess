@@ -36,7 +36,7 @@ public class DataLocalTempUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return defValue;
@@ -56,7 +56,7 @@ public class DataLocalTempUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return defValue;
@@ -75,7 +75,7 @@ public class DataLocalTempUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return defValue;
@@ -94,7 +94,7 @@ public class DataLocalTempUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return defValue;
@@ -144,7 +144,7 @@ public class DataLocalTempUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
     }
@@ -185,7 +185,7 @@ public class DataLocalTempUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return false;
@@ -211,7 +211,7 @@ public class DataLocalTempUtils {
 //            ShellUtils.exec(new String[]{"echo\"\">","/data/local/tmp/kvs"})
 //            ShellUtils.exec(new String[]{"touch","/data/local/tmp/kvs"})
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return false;

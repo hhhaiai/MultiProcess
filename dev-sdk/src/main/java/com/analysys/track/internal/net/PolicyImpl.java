@@ -10,7 +10,7 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.model.PolicyInfo;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.FileUitls;
@@ -147,7 +147,7 @@ public class PolicyImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         // 内存的大容量数据清除
@@ -274,7 +274,7 @@ public class PolicyImpl {
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
 
@@ -356,7 +356,7 @@ public class PolicyImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
     }
@@ -412,7 +412,7 @@ public class PolicyImpl {
             parserHotfix(serverPolicy);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
     }
@@ -442,7 +442,7 @@ public class PolicyImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
     }
@@ -515,7 +515,7 @@ public class PolicyImpl {
             }
         } catch (Throwable igone) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(igone);
+                BugReportForTest.commitError(igone);
             }
         }
     }
@@ -686,7 +686,7 @@ public class PolicyImpl {
                 }
             } catch (Throwable igone) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(igone);
+                    BugReportForTest.commitError(igone);
                 }
             }
         }

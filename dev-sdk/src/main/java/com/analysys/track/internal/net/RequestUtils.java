@@ -2,13 +2,12 @@ package com.analysys.track.internal.net;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.work.MessageDispatcher;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.CutOffUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.SimulatorUtils;
@@ -184,7 +183,7 @@ public class RequestUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
             response = FAIL;
         } finally {

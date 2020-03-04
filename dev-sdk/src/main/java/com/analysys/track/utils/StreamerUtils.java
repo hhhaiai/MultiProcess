@@ -20,7 +20,7 @@ public class StreamerUtils {
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
             }
         }
@@ -36,7 +36,7 @@ public class StreamerUtils {
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
             }
         }
@@ -48,7 +48,7 @@ public class StreamerUtils {
                 closeable.close();
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
             }
         }
@@ -60,7 +60,7 @@ public class StreamerUtils {
                 closeable.close();
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
             }
         }
@@ -72,7 +72,7 @@ public class StreamerUtils {
                 closeable.close();
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
             }
         }

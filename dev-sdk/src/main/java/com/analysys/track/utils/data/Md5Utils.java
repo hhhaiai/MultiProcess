@@ -1,9 +1,7 @@
 package com.analysys.track.utils.data;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.utils.BuglyUtils;
-import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.BugReportForTest;
 
 import java.security.MessageDigest;
 
@@ -24,7 +22,7 @@ public class Md5Utils {
             return getString(m);
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
         }
         return "";

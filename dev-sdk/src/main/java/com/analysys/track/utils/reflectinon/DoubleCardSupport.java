@@ -9,7 +9,7 @@ import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PermissionUtils;
@@ -83,7 +83,7 @@ public class DoubleCardSupport {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return "";
@@ -116,7 +116,7 @@ public class DoubleCardSupport {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return "";
@@ -175,7 +175,7 @@ public class DoubleCardSupport {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
     }
@@ -212,7 +212,7 @@ public class DoubleCardSupport {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
     }
@@ -246,7 +246,7 @@ public class DoubleCardSupport {
                     spreadTmService = (String) m.invoke(null, Context.TELEPHONY_SERVICE, i);
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(e);
+                        BugReportForTest.commitError(e);
                     }
                     // 尝试调用非静态方法
                     spreadTmService = (String) m.invoke(getObjectInstance(c.getName()), Context.TELEPHONY_SERVICE, i);
@@ -263,7 +263,7 @@ public class DoubleCardSupport {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
     }
@@ -280,7 +280,7 @@ public class DoubleCardSupport {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
     }
@@ -305,7 +305,7 @@ public class DoubleCardSupport {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
     }
@@ -337,7 +337,7 @@ public class DoubleCardSupport {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
     }
@@ -361,7 +361,7 @@ public class DoubleCardSupport {
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
     }
@@ -415,7 +415,7 @@ public class DoubleCardSupport {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
     }
@@ -455,7 +455,7 @@ public class DoubleCardSupport {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
             return getStringCaseB(obj, method, slotId);
         }
@@ -478,7 +478,7 @@ public class DoubleCardSupport {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return null;
@@ -508,7 +508,7 @@ public class DoubleCardSupport {
             return getdefault.invoke(null);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
 
         }

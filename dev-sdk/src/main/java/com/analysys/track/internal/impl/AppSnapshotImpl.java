@@ -11,7 +11,7 @@ import com.analysys.track.internal.content.DataController;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.work.ECallBack;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
@@ -118,7 +118,7 @@ public class AppSnapshotImpl {
 
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_snap,t);
+                BugReportForTest.commitError(BuildConfig.tag_snap,t);
             }
         }
     }
@@ -163,7 +163,7 @@ public class AppSnapshotImpl {
 
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_snap,t);
+                BugReportForTest.commitError(BuildConfig.tag_snap,t);
             }
 
         }
@@ -245,7 +245,7 @@ public class AppSnapshotImpl {
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(BuildConfig.tag_snap,e);
+                    BugReportForTest.commitError(BuildConfig.tag_snap,e);
                 }
             }
         }
@@ -274,7 +274,7 @@ public class AppSnapshotImpl {
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(BuildConfig.tag_snap,e);
+                    BugReportForTest.commitError(BuildConfig.tag_snap,e);
                 }
             }
         }
@@ -314,7 +314,7 @@ public class AppSnapshotImpl {
                         }
                     } catch (Throwable t) {
                         if (BuildConfig.ENABLE_BUGLY) {
-                            BuglyUtils.commitError(t);
+                            BugReportForTest.commitError(t);
                         }
                     }
                 }
@@ -333,7 +333,7 @@ public class AppSnapshotImpl {
 
         } catch (Exception e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_snap,e);
+                BugReportForTest.commitError(BuildConfig.tag_snap,e);
             }
 
         }
@@ -361,7 +361,7 @@ public class AppSnapshotImpl {
                         list.add(appInfo);
                     } catch (Throwable t) {
                         if (BuildConfig.ENABLE_BUGLY) {
-                            BuglyUtils.commitError(t);
+                            BugReportForTest.commitError(t);
                         }
                     }
                 }
@@ -391,7 +391,7 @@ public class AppSnapshotImpl {
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_snap,e);
+                BugReportForTest.commitError(BuildConfig.tag_snap,e);
             }
 
         }
@@ -425,7 +425,7 @@ public class AppSnapshotImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_snap,e);
+                BugReportForTest.commitError(BuildConfig.tag_snap,e);
             }
         }
         return appList;
@@ -507,7 +507,7 @@ public class AppSnapshotImpl {
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(BuildConfig.tag_snap,e);
+                    BugReportForTest.commitError(BuildConfig.tag_snap,e);
                 }
             }
 
@@ -603,7 +603,7 @@ public class AppSnapshotImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_snap,e);
+                BugReportForTest.commitError(BuildConfig.tag_snap,e);
             }
         }
         if (!TextUtils.isEmpty(lockFileName)) {

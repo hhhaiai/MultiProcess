@@ -7,7 +7,6 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -20,7 +19,6 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Locale;
 
 /**
@@ -83,7 +81,7 @@ public class FileUitls {
             writer.flush();
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             StreamerUtils.safeClose(outputStream);
@@ -127,7 +125,7 @@ public class FileUitls {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             StreamerUtils.safeClose(reader);

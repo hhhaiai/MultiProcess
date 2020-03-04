@@ -10,7 +10,7 @@ import android.util.Log;
 import android.util.Pair;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 
 import java.io.Closeable;
 import java.io.File;
@@ -145,7 +145,7 @@ class SPImpl implements SharedPreferences {
                     }
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(e);
+                        BugReportForTest.commitError(e);
                     }
                 }
                 mFileMonitor = new FileMonitor(mBackupFilePath, FileObserver.MODIFY);
@@ -177,7 +177,7 @@ class SPImpl implements SharedPreferences {
                 }
             } catch (ClassCastException e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
                 if (mErrorListener != null) {
                     mErrorListener.onError((mFile != null ? mFile.getAbsolutePath() : null) + "#" + key + e,
@@ -207,7 +207,7 @@ class SPImpl implements SharedPreferences {
 
             } catch (ClassCastException e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
                 if (mErrorListener != null) {
                     mErrorListener.onError((mFile != null ? mFile.getAbsolutePath() : null) + "#" + key + e,
@@ -231,7 +231,7 @@ class SPImpl implements SharedPreferences {
                 }
             } catch (ClassCastException e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
                 if (mErrorListener != null) {
                     mErrorListener.onError((mFile != null ? mFile.getAbsolutePath() : null) + "#" + key + e,
@@ -256,7 +256,7 @@ class SPImpl implements SharedPreferences {
 
             } catch (ClassCastException e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
                 if (mErrorListener != null) {
                     mErrorListener.onError((mFile != null ? mFile.getAbsolutePath() : null) + "#" + key + e,
@@ -281,7 +281,7 @@ class SPImpl implements SharedPreferences {
 
             } catch (ClassCastException e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
                 if (mErrorListener != null) {
                     mErrorListener.onError((mFile != null ? mFile.getAbsolutePath() : null) + "#" + key + e,
@@ -426,7 +426,7 @@ class SPImpl implements SharedPreferences {
                     backup();
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(e);
+                        BugReportForTest.commitError(e);
                     }
                     if (mErrorListener != null) {
                         mErrorListener.onError(e.getMessage(), OTHER_EXCEPTION, -1);
@@ -436,7 +436,7 @@ class SPImpl implements SharedPreferences {
                         fileLock.release();
                     } catch (IOException e) {
                         if (BuildConfig.ENABLE_BUGLY) {
-                            BuglyUtils.commitError(e);
+                            BugReportForTest.commitError(e);
                         }
                     }
                     mIsSaving = false;
@@ -590,7 +590,7 @@ class SPImpl implements SharedPreferences {
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
             }
         }
@@ -627,7 +627,7 @@ class SPImpl implements SharedPreferences {
                     parseOK = parseBytesIntoMap(allBytes, true);
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(e);
+                        BugReportForTest.commitError(e);
                     }
                 }
 
@@ -641,7 +641,7 @@ class SPImpl implements SharedPreferences {
                     }
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(e);
+                        BugReportForTest.commitError(e);
                     }
                 }
             }
@@ -713,7 +713,7 @@ class SPImpl implements SharedPreferences {
                     SPImpl.this.wait();
                 } catch (Throwable t) {
                     if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(t);
+                        BugReportForTest.commitError(t);
                     }
                 }
             }
@@ -746,7 +746,7 @@ class SPImpl implements SharedPreferences {
             mMappedByteBuffer = mFileChannel.map(FileChannel.MapMode.READ_WRITE, 0, length);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
 
@@ -792,7 +792,7 @@ class SPImpl implements SharedPreferences {
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
                 isFileExist = false;
 
@@ -818,7 +818,7 @@ class SPImpl implements SharedPreferences {
                     lock = mFileChannel.tryLock();
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(e);
+                        BugReportForTest.commitError(e);
                     }
                 }
 
@@ -827,7 +827,7 @@ class SPImpl implements SharedPreferences {
                         Thread.sleep(100);
                     } catch (Throwable e) {
                         if (BuildConfig.ENABLE_BUGLY) {
-                            BuglyUtils.commitError(e);
+                            BugReportForTest.commitError(e);
                         }
                     }
                 }
@@ -841,7 +841,7 @@ class SPImpl implements SharedPreferences {
                 lock = mFileChannel.tryLock();
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
             }
         }
@@ -932,7 +932,7 @@ class SPImpl implements SharedPreferences {
                     }
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(e);
+                        BugReportForTest.commitError(e);
                     }
                     if (mErrorListener != null) {
                         mErrorListener.onError((mFile != null ? mFile.getAbsolutePath() : null) + "#" + e.getCause(),
@@ -1093,7 +1093,7 @@ class SPImpl implements SharedPreferences {
                 }
             } catch (Throwable t) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(t);
+                    BugReportForTest.commitError(t);
                 }
             }
         }
@@ -1118,7 +1118,7 @@ class SPImpl implements SharedPreferences {
                 }
             } catch (Throwable t) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(t);
+                    BugReportForTest.commitError(t);
                 }
             }
         }
@@ -1139,7 +1139,7 @@ class SPImpl implements SharedPreferences {
             mFileChannel.transferTo(0, mMappedByteBuffer.capacity(), osChannel);
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
         } finally {
             safeClose(os);
@@ -1153,7 +1153,7 @@ class SPImpl implements SharedPreferences {
                 obj.close();
             } catch (IOException e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
             }
         }
@@ -1184,7 +1184,7 @@ class SPImpl implements SharedPreferences {
             is.read(allBytes);
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
             throwable = t;
         } finally {
@@ -1194,7 +1194,7 @@ class SPImpl implements SharedPreferences {
                 parseOK = parseBytesIntoMap(allBytes, false);
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
             }
 

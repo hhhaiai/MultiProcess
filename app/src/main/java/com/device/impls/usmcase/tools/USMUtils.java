@@ -16,7 +16,7 @@ import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.ShellUtils;
 
@@ -116,7 +116,7 @@ public class USMUtils {
 
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(e);
+                        BugReportForTest.commitError(e);
                     }
                 }
             }
@@ -206,7 +206,7 @@ public class USMUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return null;
@@ -294,7 +294,7 @@ public class USMUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return null;
@@ -333,7 +333,7 @@ public class USMUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return appSet;
@@ -345,7 +345,7 @@ public class USMUtils {
             method = clazz.getDeclaredMethod(methodName, parameterTypes);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         if (method == null) {
@@ -353,7 +353,7 @@ public class USMUtils {
                 method = clazz.getMethod(methodName, parameterTypes);
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
             }
         }
@@ -366,7 +366,7 @@ public class USMUtils {
             field = clazz.getDeclaredField(fieldName);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         if (field == null) {
@@ -374,7 +374,7 @@ public class USMUtils {
                 field = clazz.getField(fieldName);
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
             }
         }

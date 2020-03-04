@@ -16,7 +16,7 @@ import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.UploadImpl;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.CutOffUtils;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
@@ -208,7 +208,7 @@ public class MessageDispatcher {
                 }
             } catch (Throwable t) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(t);
+                    BugReportForTest.commitError(t);
                 }
             }
         }
@@ -409,7 +409,7 @@ public class MessageDispatcher {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
 

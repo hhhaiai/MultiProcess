@@ -57,7 +57,7 @@ public class Memory2File {
             return byteBuffer.array();
         } catch (IOException e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
 
@@ -85,7 +85,7 @@ public class Memory2File {
             bos.flush();
         } catch (Exception e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             close(bos);
@@ -181,7 +181,7 @@ public class Memory2File {
                 close.close();
             } catch (IOException e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
             }
         }

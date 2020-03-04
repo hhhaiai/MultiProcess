@@ -12,7 +12,7 @@ import com.analysys.track.internal.work.CrashHandler;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.internal.work.ServiceHelper;
 import com.analysys.track.utils.ActivityCallBack;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
@@ -40,7 +40,7 @@ public class AnalysysInternal {
             ELOG.init(EContextHelper.getContext());
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return Holder.instance;
@@ -71,7 +71,7 @@ public class AnalysysInternal {
                     init(key, channel, initType);
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(e);
+                        BugReportForTest.commitError(e);
                     }
                 }
 
@@ -156,7 +156,7 @@ public class AnalysysInternal {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
 
         }
@@ -194,7 +194,7 @@ public class AnalysysInternal {
             MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_NET, EGContext.TIME_SECOND * 5);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
     }

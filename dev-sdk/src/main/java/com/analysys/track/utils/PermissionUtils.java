@@ -34,7 +34,7 @@ public class PermissionUtils {
                 result = rest == PackageManager.PERMISSION_GRANTED;
             } catch (Exception e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
                 result = false;
             }

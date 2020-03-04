@@ -67,7 +67,7 @@ public class SystemUtils {
             return true;
         } catch (IllegalArgumentException e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return false;
@@ -95,7 +95,7 @@ public class SystemUtils {
             }
         } catch (Exception e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
 
         }
@@ -214,7 +214,7 @@ public class SystemUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         isRoot = false;
@@ -297,7 +297,7 @@ public class SystemUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return false;
@@ -340,7 +340,7 @@ public class SystemUtils {
             is.read(data);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             StreamerUtils.safeClose(is);
@@ -380,7 +380,7 @@ public class SystemUtils {
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
             }
             if (!TextUtils.isEmpty(channel)) {
@@ -425,7 +425,7 @@ public class SystemUtils {
             }
         } catch (IOException e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             StreamerUtils.safeClose(apkZip);
@@ -462,7 +462,7 @@ public class SystemUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return appkey;
@@ -489,7 +489,7 @@ public class SystemUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         if (!TextUtils.isEmpty(EGContext.VALUE_APP_CHANNEL)) {
@@ -572,7 +572,7 @@ public class SystemUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return "";
@@ -589,7 +589,7 @@ public class SystemUtils {
             return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
             return "0";
         }

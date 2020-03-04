@@ -1,7 +1,7 @@
 package com.analysys.track.internal.impl.usm;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 
 import org.json.JSONObject;
 
@@ -38,7 +38,7 @@ public class USMInfo {
             jsonObject.putOpt("ETDM", extendedMap.toJson());
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
             //JSONException
         }
@@ -58,7 +58,7 @@ public class USMInfo {
             jsonObject.putOpt("ETDM", extendedMap.toJson());
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
             //JSONException
         }
@@ -83,7 +83,7 @@ public class USMInfo {
                 jsonObject.putOpt("ST", switchType);
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
                 //JSONException
             }

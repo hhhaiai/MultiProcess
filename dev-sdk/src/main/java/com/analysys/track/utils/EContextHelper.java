@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.Context;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 
 public class EContextHelper {
@@ -41,7 +40,7 @@ public class EContextHelper {
 
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
             }
         }
@@ -55,7 +54,7 @@ public class EContextHelper {
             } catch (Throwable e) {
                 //热修包调用的时候，这里会有兼容性错误，保护
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
             }
         }

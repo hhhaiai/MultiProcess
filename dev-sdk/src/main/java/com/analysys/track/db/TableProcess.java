@@ -14,7 +14,7 @@ import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.net.NetInfo;
 import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.net.UploadImpl;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EncryptUtils;
@@ -61,7 +61,7 @@ public class TableProcess {
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -241,7 +241,7 @@ public class TableProcess {
             db.delete(DBConfig.XXXInfo.TABLE_NAME, null, null);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -275,7 +275,7 @@ public class TableProcess {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -346,7 +346,7 @@ public class TableProcess {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
             array = null;
         } finally {
@@ -382,7 +382,7 @@ public class TableProcess {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         try {
@@ -521,7 +521,7 @@ public class TableProcess {
             }
         } catch (Exception e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(BuildConfig.tag_oc, e);
+                BugReportForTest.commitError(BuildConfig.tag_oc, e);
             }
         } finally {
             StreamerUtils.safeClose(cursor);
@@ -547,7 +547,7 @@ public class TableProcess {
 //            ELOG.e("删除的行数：：：  "+count);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -566,7 +566,7 @@ public class TableProcess {
             db.delete(DBConfig.OC.TABLE_NAME, null, null);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -615,7 +615,7 @@ public class TableProcess {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -689,7 +689,7 @@ public class TableProcess {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             if (cursor != null) {
@@ -719,7 +719,7 @@ public class TableProcess {
                     new String[]{EGContext.DEFAULT_ONE});
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -742,7 +742,7 @@ public class TableProcess {
             db.delete(DBConfig.Location.TABLE_NAME, null, null);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
 
         } finally {
@@ -772,7 +772,7 @@ public class TableProcess {
             db.insert(DBConfig.IDStorage.TABLE_NAME, null, cv);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -815,7 +815,7 @@ public class TableProcess {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             StreamerUtils.safeClose(cursor);
@@ -836,7 +836,7 @@ public class TableProcess {
             db.delete(DBConfig.IDStorage.TABLE_NAME, null, null);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -873,7 +873,7 @@ public class TableProcess {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -914,7 +914,7 @@ public class TableProcess {
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -954,7 +954,7 @@ public class TableProcess {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -1029,7 +1029,7 @@ public class TableProcess {
                     DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return jsonObj;
@@ -1086,7 +1086,7 @@ public class TableProcess {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             StreamerUtils.safeClose(cursor);
@@ -1131,7 +1131,7 @@ public class TableProcess {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -1151,7 +1151,7 @@ public class TableProcess {
             db.delete(DBConfig.AppSnapshot.TABLE_NAME, null, null);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -1183,7 +1183,7 @@ public class TableProcess {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -1228,7 +1228,7 @@ public class TableProcess {
             return scanningInfos;
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             StreamerUtils.safeClose(cursor);
@@ -1261,7 +1261,7 @@ public class TableProcess {
             waitRemoveScanningInfoIds.clear();
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -1306,7 +1306,7 @@ public class TableProcess {
             return scanningInfos;
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             StreamerUtils.safeClose(cursor);

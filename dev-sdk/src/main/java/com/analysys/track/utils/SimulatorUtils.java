@@ -71,7 +71,7 @@ public class SimulatorUtils {
             return true;
         } catch (Throwable exception) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(exception);
+                BugReportForTest.commitError(exception);
             }
             return false;
         }
@@ -296,7 +296,7 @@ public class SimulatorUtils {
                         }
                     } catch (Throwable e) {
                         if (BuildConfig.ENABLE_BUGLY) {
-                            BuglyUtils.commitError(e);
+                            BugReportForTest.commitError(e);
                         }
                     } finally {
                         StreamerUtils.safeClose(fis);
@@ -356,7 +356,7 @@ public class SimulatorUtils {
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
 
         }
@@ -393,7 +393,7 @@ public class SimulatorUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return false;
@@ -432,7 +432,7 @@ public class SimulatorUtils {
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             StreamerUtils.safeClose(fis);

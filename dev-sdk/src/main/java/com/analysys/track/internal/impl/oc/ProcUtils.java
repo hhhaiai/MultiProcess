@@ -1,12 +1,11 @@
 package com.analysys.track.internal.impl.oc;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.ShellUtils;
@@ -94,7 +93,7 @@ public class ProcUtils {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
         }
         return uploadInfo;
@@ -153,7 +152,7 @@ public class ProcUtils {
 
                 } catch (Throwable ttt) {
                     if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(ttt);
+                        BugReportForTest.commitError(ttt);
                     }
                 }
 
@@ -163,7 +162,7 @@ public class ProcUtils {
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
             // L.e(e);
         }
@@ -204,7 +203,7 @@ public class ProcUtils {
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
             }
         } else {
@@ -244,7 +243,7 @@ public class ProcUtils {
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
-                    BuglyUtils.commitError(e);
+                    BugReportForTest.commitError(e);
                 }
                 // L.e(e);
             }
@@ -332,7 +331,7 @@ public class ProcUtils {
             return Integer.parseInt(oom_score.trim());
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
         return DEF_VALUE;
@@ -390,13 +389,13 @@ public class ProcUtils {
 
                             } catch (NumberFormatException e) {
                                 if (BuildConfig.ENABLE_BUGLY) {
-                                    BuglyUtils.commitError(e);
+                                    BugReportForTest.commitError(e);
                                 }
                             }
                         }
                     } catch (Throwable e) {
                         if (BuildConfig.ENABLE_BUGLY) {
-                            BuglyUtils.commitError(e);
+                            BugReportForTest.commitError(e);
                         }
                     }
                 }
@@ -422,7 +421,7 @@ public class ProcUtils {
                     pid = Integer.parseInt(file.getName());
                 } catch (NumberFormatException e) {
                     if (BuildConfig.ENABLE_BUGLY) {
-                        BuglyUtils.commitError(e);
+                        BugReportForTest.commitError(e);
                     }
                     continue;
                 }

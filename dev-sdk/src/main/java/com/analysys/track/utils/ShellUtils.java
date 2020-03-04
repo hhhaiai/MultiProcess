@@ -100,7 +100,7 @@ public class ShellUtils {
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
 
@@ -143,7 +143,7 @@ public class ShellUtils {
             result = String.valueOf(sb);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             StreamerUtils.safeClose(br);
@@ -173,7 +173,7 @@ public class ShellUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             StreamerUtils.safeClose(is);

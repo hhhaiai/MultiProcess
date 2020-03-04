@@ -46,7 +46,7 @@ public class EguanIdUtils {
             tmpId = getContrastId(file, setting, shard, database);
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
             tmpId = "";
         }
@@ -72,7 +72,7 @@ public class EguanIdUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
     }
@@ -146,7 +146,7 @@ public class EguanIdUtils {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(t);
+                BugReportForTest.commitError(t);
             }
         }
     }
@@ -234,7 +234,7 @@ public class EguanIdUtils {
             out.write(st.getBytes());
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             StreamerUtils.safeClose(out);
@@ -265,7 +265,7 @@ public class EguanIdUtils {
             return String.valueOf(sb);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             StreamerUtils.safeClose(br);

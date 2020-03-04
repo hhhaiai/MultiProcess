@@ -9,14 +9,13 @@ import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Build;
-import android.os.Debug;
 import android.provider.Settings;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.ShellUtils;
@@ -31,7 +30,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.lang.reflect.Field;
 import java.net.NetworkInterface;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -315,7 +313,7 @@ public class DevStatusChecker {
 
         } catch (Exception e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         } finally {
             StreamerUtils.safeClose(fr);
@@ -469,7 +467,7 @@ public class DevStatusChecker {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
 
@@ -521,7 +519,7 @@ public class DevStatusChecker {
             }
         } catch (Exception ex) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(ex);
+                BugReportForTest.commitError(ex);
             }
         }
         return false;

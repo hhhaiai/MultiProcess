@@ -6,7 +6,7 @@ import android.content.SharedPreferences.Editor;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.utils.BuglyUtils;
+import com.analysys.track.utils.BugReportForTest;
 
 import java.io.File;
 import java.io.IOException;
@@ -89,7 +89,7 @@ public class SPHelper {
                         f.createNewFile();
                     } catch (IOException e) {
                         if (BuildConfig.ENABLE_BUGLY) {
-                            BuglyUtils.commitError(e);
+                            BugReportForTest.commitError(e);
                         }
                     }
                 }
@@ -213,7 +213,7 @@ public class SPHelper {
             returnValue = method.invoke(o, args);
         } catch (Exception e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BuglyUtils.commitError(e);
+                BugReportForTest.commitError(e);
             }
         }
 
