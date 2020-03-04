@@ -1,5 +1,6 @@
 package com.analysys.track.internal.impl.usm;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -10,11 +11,14 @@ import android.provider.Settings;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.BugReportForTest;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 
 import java.util.HashSet;
+import java.util.IllegalFormatCodePointException;
 import java.util.List;
 import java.util.Set;
 
@@ -64,21 +68,24 @@ public class USMUtils {
     }
 
 
-    public static Object getUsageEvents(long beginTime, long endTime, Context context) {
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    static Object getUsageEvents(long beginTime, long endTime, Context context) {
         try {
 //            if (context.getApplicationInfo().targetSdkVersion > 27 || Build.VERSION.SDK_INT > 27) {
 //                return null;
 //            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Object usageEvents;
-                usageEvents = getUsageEventsByApi(beginTime, endTime, context);
-                boolean b = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
-                if (usageEvents != null && b) {
+            boolean hasNextEvent = false;
+            Object usageEvents = getUsageEventsByApi(beginTime, endTime, context);
+            if (usageEvents != null) {
+                hasNextEvent = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
+                if (hasNextEvent) {
                     return usageEvents;
                 }
-                usageEvents = getUsageEventsByInvoke(beginTime, endTime, context);
-                b = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
-                if (usageEvents != null && b) {
+            }
+            usageEvents = getUsageEventsByInvoke(beginTime, endTime, context);
+            if (usageEvents != null) {
+                hasNextEvent = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
+                if (hasNextEvent) {
                     return usageEvents;
                 }
             }
@@ -100,46 +107,50 @@ public class USMUtils {
         return null;
     }
 
-    public static Object getUsageEventsByInvoke(long beginTime, long endTime, Context context) {
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private static Object getUsageEventsByInvoke(long beginTime, long endTime, Context context) {
         try {
 //            if (context.getApplicationInfo().targetSdkVersion > 27 || Build.VERSION.SDK_INT > 27) {
 //                return null;
 //            }
-            if (endTime <= beginTime || context == null) {
-                return null;
-            }
 //            if (Build.VERSION.SDK_INT > 29) {
 //                //未来 android 11 防止
 //                return null;
 //            }
-//            if (!ClazzUtils.rawReflex && (context.getApplicationInfo().targetSdkVersion >= 28 || Build.VERSION.SDK_INT >= 28)) {
-//                return null;
-//            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Object mService = ClazzUtils.getObjectFieldObject(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
-                if (mService == null) {
-                    return null;
-                }
-                Set<String> pkgs = getAppPackageList(context);
-                if (pkgs == null) {
-                    return null;
-                }
-                Object usageEvents = null;
-                for (String opname : pkgs) {
-                    try {
-                        usageEvents = ClazzUtils.invokeObjectMethod(mService, "queryEvents", new Class[]{long.class, long.class, String.class}, new Object[]{beginTime, endTime, opname});
-                        if (usageEvents == null) {
-                            continue;
-                        }
-                        boolean b = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
-                        if (b) {
-                            break;
-                        }
-                    } catch (Throwable e) {
+            context = EContextHelper.getContext(context);
+            if (context == null) {
+                return null;
+            }
+            if (endTime <= beginTime) {
+                beginTime = endTime - EGContext.TIME_HOUR * 24 * 2;
+            }
+
+            Object mService = ClazzUtils.getObjectFieldObject(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
+            if (mService == null) {
+                return null;
+            }
+            Set<String> pkgs = getAppPackageList(context);
+            if (pkgs.size() == 0) {
+                return null;
+            }
+            Object usageEvents = null;
+            for (String opname : pkgs) {
+                try {
+                    usageEvents = ClazzUtils.invokeObjectMethod(mService, "queryEvents", new Class[]{long.class, long.class, String.class}, new Object[]{beginTime, endTime, opname});
+                    if (usageEvents == null) {
+                        continue;
+                    }
+                    boolean b = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
+                    if (b) {
+                        return usageEvents;
+                    }
+                } catch (Throwable e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BugReportForTest.commitError(e);
                     }
                 }
-                return usageEvents;
             }
+            return usageEvents;
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BugReportForTest.commitError(e);
@@ -149,17 +160,16 @@ public class USMUtils {
     }
 
 
-    public static Set<String> getAppPackageList(Context context) {
+    private static Set<String> getAppPackageList(Context context) {
         Set<String> appSet = new HashSet<>();
         try {
             PackageManager packageManager = context.getPackageManager();
             List<PackageInfo> packageInfo = packageManager.getInstalledPackages(0);
-            if (packageInfo != null) {
+            if (packageInfo.size() > 0) {
                 for (int i = 0; i < packageInfo.size(); i++) {
                     appSet.add(packageInfo.get(i).packageName);
                 }
             }
-
             String result = ShellUtils.shell("pm list packages");
             if (!TextUtils.isEmpty(result) && result.contains("\n")) {
                 String[] lines = result.split("\n");
@@ -171,7 +181,7 @@ public class USMUtils {
                         if (!TextUtils.isEmpty(line) && line.contains(".") && line.contains(":")) {
                             // 分割. 样例数据:<code>package:com.android.launcher3</code>
                             String[] split = line.split(":");
-                            if (split != null && split.length > 1) {
+                            if (split.length > 1) {
                                 String packageName = split[1];
                                 appSet.add(packageName);
                             }
@@ -183,6 +193,9 @@ public class USMUtils {
             if (BuildConfig.ENABLE_BUGLY) {
                 BugReportForTest.commitError(e);
             }
+        }
+        if (appSet.size() == 0) {
+            appSet.add(context.getPackageName());
         }
         return appSet;
     }

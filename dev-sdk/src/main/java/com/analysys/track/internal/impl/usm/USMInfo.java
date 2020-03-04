@@ -6,6 +6,7 @@ import com.analysys.track.utils.BugReportForTest;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class USMInfo {
     private long closeTime;
@@ -48,7 +49,7 @@ public class USMInfo {
     public JSONObject toJsonForMatTime() {
         JSONObject jsonObject = new JSONObject();
         try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault());
             jsonObject.putOpt("AOT", dateFormat.format(openTime));
             jsonObject.putOpt("ACT", dateFormat.format(closeTime));
             jsonObject.putOpt("APN", pkgName);

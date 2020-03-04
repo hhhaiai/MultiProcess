@@ -306,8 +306,9 @@ public class UploadImpl {
                 TableProcess.getInstance(mContext).deleteAllSnapshot();
             }
             //USM 可用,允许上传
-            if (USMImpl.isUSMAvailable(mContext)
-                    && SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM, true)) {
+            if (
+//                    USMImpl.isUSMAvailable(mContext) &&
+                    SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM, true)) {
                 JSONArray usmJson = USMImpl.getUSMInfo(mContext);
                 if (usmJson != null && usmJson.length() > 0) {
                     object.put(UploadKey.USMInfo.NAME, usmJson);
@@ -316,7 +317,9 @@ public class UploadImpl {
             //  组装OC数据
 //            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_OC, true)) {
             if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_OC, true)) {
-                if (USMImpl.isUSMAvailable(mContext) && SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_OC, false)) {
+                if (
+//                        USMImpl.isUSMAvailable(mContext) &&
+                        SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_OC, false)) {
                     //可用且短路,不传
                 } else {
                     long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
@@ -332,7 +335,8 @@ public class UploadImpl {
             }
             //组装net数据
             if (EGContext.ENABLE_NET_INFO) {
-                if (USMImpl.isUSMAvailable(mContext) &&
+                if (
+//                        USMImpl.isUSMAvailable(mContext) &&
                         SPHelper.getBooleanValueFromSP(mContext,
                                 UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_NET, false)) {
                     //USM 可用且net控制短路不上传
@@ -358,7 +362,8 @@ public class UploadImpl {
 //            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true)) {
             if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true)) {
 
-                if (USMImpl.isUSMAvailable(mContext) &&
+                if (
+//                        USMImpl.isUSMAvailable(mContext) &&
                         SPHelper.getBooleanValueFromSP(mContext,
                                 UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_XXX, false)) {
                     //USM 可用并且控制短路打开,不上传

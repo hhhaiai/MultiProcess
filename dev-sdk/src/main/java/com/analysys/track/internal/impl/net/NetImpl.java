@@ -148,7 +148,8 @@ public class NetImpl {
 
     public HashMap<String, NetInfo> getNetInfo() {
         try {
-            if (USMImpl.isUSMAvailable(context) &&
+            if (
+//                    USMImpl.isUSMAvailable(context) &&
                     SPHelper.getBooleanValueFromSP(context,
                             UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_NET, false)) {
                 //USM可用&&控制短路 不工作

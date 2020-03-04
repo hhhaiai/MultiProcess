@@ -123,7 +123,8 @@ public class OCImpl {
                         }
                         return;
                     }
-                    if (USMImpl.isUSMAvailable(mContext) &&
+                    if (
+//                            USMImpl.isUSMAvailable(mContext) &&
                             SPHelper.getBooleanValueFromSP(mContext,
                                     UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_OC, false)) {
                         if (EGContext.FLAG_DEBUG_INNER) {

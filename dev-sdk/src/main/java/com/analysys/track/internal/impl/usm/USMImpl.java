@@ -12,6 +12,7 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.utils.BugReportForTest;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
@@ -22,52 +23,26 @@ import org.json.JSONArray;
 import static com.analysys.track.internal.content.UploadKey.Response.RES_POLICY_MODULE_CL_USM;
 
 public class USMImpl {
-
-    /**
-     * 一次启动判断一次,能获取就认为一直能获取
-     */
-    public static Boolean USMAvailable;
     public static final String LAST_UPLOAD_TIME = "USMImpl_ST";
-
-    public static boolean isUSMAvailable(Context context) {
-        try {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                return false;
-            }
-            boolean usmCl = SPHelper.getBooleanValueFromSP(context, RES_POLICY_MODULE_CL_USM, true);
-            if (!usmCl) {
-                //不采集
-                return false;
-            }
-            // 采集 能获取短路 不能获取不短路
-            if (USMAvailable != null) {
-                return USMAvailable;
-            }
-            // 采集 能获取短路 不能获取不短路
-            Object usageStats = USMUtils.getUsageEvents(0, System.currentTimeMillis(), context);
-            USMAvailable = usageStats != null;
-            return USMAvailable;
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BugReportForTest.commitError(e);
-            }
-
-        }
-        return false;
-    }
 
     public static JSONArray getUSMInfo(Context context) {
         try {
+            // 低版本不采集
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                 return null;
             }
-            long pre_time = SPHelper.getLongValueFromSP(context, LAST_UPLOAD_TIME, -1);
+            //不采集
+            boolean usmCl = SPHelper.getBooleanValueFromSP(context, RES_POLICY_MODULE_CL_USM, true);
+            if (!usmCl) {
+                return null;
+            }
+            long lastUploadTime = SPHelper.getLongValueFromSP(context, LAST_UPLOAD_TIME, -1);
             long end = System.currentTimeMillis();
-            if (pre_time == -1) {
-                pre_time = end - (EGContext.TIME_HOUR * 6);
+            if (lastUploadTime == -1) {
+                lastUploadTime = end - (EGContext.TIME_HOUR * 48);
             }
             //SPHelper.setLongValue2SP(context, LAST_UPLOAD_TIME, end);
-            return getUSMInfo(context, pre_time, end);
+            return getUSMInfo(context, lastUploadTime, end);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BugReportForTest.commitError(e);
@@ -81,36 +56,40 @@ public class USMImpl {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                 return null;
             }
+            // 时间校验.
             if (end - start <= 0) {
-                return null;
+                end = start - 12 * EGContext.TIME_HOUR;
             }
             if (end - start >= EGContext.TIME_HOUR * 24 * 2) {
                 start = end - EGContext.TIME_HOUR * 24 * 2;
             }
 
-            PackageManager packageManager = context.getPackageManager();
-            Object usageStats = USMUtils.getUsageEvents(start, end, context);
-            if (usageStats != null) {
+            PackageManager packageManager = EContextHelper.getContext().getPackageManager();
+            if (packageManager == null) {
+                return null;
+            }
+            Object usageEvents = USMUtils.getUsageEvents(start, end, context);
+            if (usageEvents != null) {
                 JSONArray jsonArray = new JSONArray();
                 USMInfo openEvent = null;
                 Object lastEvent = null;
-                boolean hasNext = false;
+                boolean hasNextEvent = false;
                 while (true) {
-                    boolean b = (boolean) ClazzUtils.invokeObjectMethod(usageStats, "hasNextEvent");
-                    if (!b) {
+                    hasNextEvent = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
+                    if (!hasNextEvent) {
                         break;
                     }
                     Object event = ClazzUtils.newInstance("android.app.usage.UsageEvents$Event");
 
-                    ClazzUtils.invokeObjectMethod(usageStats, "getNextEvent", new String[]{"android.app.usage.UsageEvents$Event"}
+                    ClazzUtils.invokeObjectMethod(usageEvents, "getNextEvent", new String[]{"android.app.usage.UsageEvents$Event"}
                             , new Object[]{event});
 
-                    if (!SystemUtils.hasLaunchIntentForPackage(packageManager,getPackageName(event))) {
+                    if (event == null || !SystemUtils.hasLaunchIntentForPackage(packageManager, getPackageName(event))) {
                         continue;
                     }
                     if (openEvent == null) {
-
-                        if (getEventType(event) == UsageEvents.Event.MOVE_TO_FOREGROUND) {
+                        if (getEventType(event) == UsageEvents.Event.MOVE_TO_FOREGROUND
+                                || getEventType(event) == UsageEvents.Event.ACTIVITY_RESUMED) {
                             openEvent = openUsm(context, packageManager, event);
                         }
                     } else {
@@ -122,7 +101,9 @@ public class USMImpl {
                                 jsonArray.put(openEvent.toJson());
                             }
 
-                            if (getEventType(event) == UsageEvents.Event.MOVE_TO_FOREGROUND) {
+                            if (getEventType(event) == UsageEvents.Event.MOVE_TO_FOREGROUND
+                                    || getEventType(event) == UsageEvents.Event.ACTIVITY_RESUMED
+                            ) {
                                 openEvent = openUsm(context, packageManager, event);
                             }
                         }
@@ -130,6 +111,9 @@ public class USMImpl {
                     lastEvent = event;
                 }
                 return jsonArray;
+            } else {
+                //US
+
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
