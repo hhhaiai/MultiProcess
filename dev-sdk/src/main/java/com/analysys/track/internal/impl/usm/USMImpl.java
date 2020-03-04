@@ -110,7 +110,7 @@ public class USMImpl {
                 try {
                     long lastUsedTime = us.getLastTimeUsed();
                     long durTime = us.getTotalTimeInForeground();
-                    if (lastUsedTime > 0 && durTime > 0) {
+                    if (lastUsedTime > 0 && durTime > 3 * EGContext.TIME_SECOND) {
                         String pkgName = us.getPackageName();
                         long openTime = lastUsedTime - durTime;
 
@@ -125,6 +125,7 @@ public class USMImpl {
                         openEvent.setVersionCode(packageInfo.versionName + "|" + packageInfo.versionCode);
                         openEvent.setCloseTime(lastUsedTime);
                         arr.put(openEvent.toJson());
+//                        arr.put(openEvent.toJsonForMatTime());
                     }
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUGLY) {
