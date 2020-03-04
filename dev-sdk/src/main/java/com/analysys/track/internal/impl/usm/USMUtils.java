@@ -1,24 +1,28 @@
 package com.analysys.track.internal.impl.usm;
 
 import android.annotation.TargetApi;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Build;
+import android.os.IBinder;
 import android.provider.Settings;
-import android.text.TextUtils;
+import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
-import com.analysys.track.utils.ShellUtils;
+import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.PkgList;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 
-import java.util.HashSet;
-import java.util.IllegalFormatCodePointException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -68,12 +72,23 @@ public class USMUtils {
     }
 
 
+    /**
+     * 获取UsageEvents对象
+     *
+     * @param beginTime
+     * @param endTime
+     * @param context
+     * @return
+     */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    static Object getUsageEvents(long beginTime, long endTime, Context context) {
+    public static Object getUsageEvents(long beginTime, long endTime, Context context) {
         try {
 //            if (context.getApplicationInfo().targetSdkVersion > 27 || Build.VERSION.SDK_INT > 27) {
 //                return null;
 //            }
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                return null;
+            }
             boolean hasNextEvent = false;
             Object usageEvents = getUsageEventsByApi(beginTime, endTime, context);
             if (usageEvents != null) {
@@ -90,23 +105,46 @@ public class USMUtils {
                 }
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BugReportForTest.commitError(BuildConfig.tag_snap, e);
+            }
         }
         return null;
-
     }
 
+    /**
+     * 系统API获取UsageEvents
+     *
+     * @param beginTime
+     * @param endTime
+     * @param context
+     * @return
+     */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static Object getUsageEventsByApi(long beginTime, long endTime, Context context) {
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                return ClazzUtils.invokeObjectMethod(context.getApplicationContext()
-                                .getSystemService(Context.USAGE_STATS_SERVICE), "queryEvents",
-                        new Class[]{long.class, long.class}, new Object[]{beginTime, endTime});
-            }
+//            UsageStatsManager usm = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
+//            UsageEvents usageEvents = usm.queryEvents(beginTime, endTime);
+
+            return ClazzUtils.invokeObjectMethod(context.getApplicationContext()
+                            .getSystemService(Context.USAGE_STATS_SERVICE), "queryEvents",
+                    new Class[]{long.class, long.class}, new Object[]{beginTime, endTime});
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BugReportForTest.commitError(BuildConfig.tag_snap, e);
+            }
         }
         return null;
     }
 
+    /**
+     * 系统API获取UsageEvents
+     *
+     * @param beginTime
+     * @param endTime
+     * @param context
+     * @return
+     */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static Object getUsageEventsByInvoke(long beginTime, long endTime, Context context) {
         try {
@@ -124,18 +162,24 @@ public class USMUtils {
             if (endTime <= beginTime) {
                 beginTime = endTime - EGContext.TIME_HOUR * 24 * 2;
             }
-
+            //android.app.usage.IUsageStatsManager$Stub$Proxy
             Object mService = ClazzUtils.getObjectFieldObject(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
+            if (mService == null) {
+                Object iBinder = ClazzUtils.invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{"usagestats"});
+                mService = ClazzUtils.invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{iBinder});
+            }
+            if (BuildConfig.logcat) {
+                ELOG.i(BuildConfig.tag_usm, "mService: " + mService);
+            }
             if (mService == null) {
                 return null;
             }
-            Set<String> pkgs = getAppPackageList(context);
-            if (pkgs.size() == 0) {
-                return null;
-            }
+            Set<String> pkgs = PkgList.getAppPackageList(context);
+
             Object usageEvents = null;
             for (String opname : pkgs) {
                 try {
+                    //UsageEvents
                     usageEvents = ClazzUtils.invokeObjectMethod(mService, "queryEvents", new Class[]{long.class, long.class, String.class}, new Object[]{beginTime, endTime, opname});
                     if (usageEvents == null) {
                         continue;
@@ -160,45 +204,119 @@ public class USMUtils {
     }
 
 
-    private static Set<String> getAppPackageList(Context context) {
-        Set<String> appSet = new HashSet<>();
+    /**
+     * 获取UsageStats列表
+     *
+     * @param context
+     * @param beginTime
+     * @param endTime
+     * @return
+     */
+    public static List<UsageStats> getUsageStats(Context context, long beginTime, long endTime) {
+        List<UsageStats> usageStatsList = new ArrayList<UsageStats>();
         try {
-            PackageManager packageManager = context.getPackageManager();
-            List<PackageInfo> packageInfo = packageManager.getInstalledPackages(0);
-            if (packageInfo.size() > 0) {
-                for (int i = 0; i < packageInfo.size(); i++) {
-                    appSet.add(packageInfo.get(i).packageName);
+//            if (context.getApplicationInfo().targetSdkVersion > 27 || Build.VERSION.SDK_INT > 27) {
+//                return null;
+//            }
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                return usageStatsList;
+            }
+            List<UsageStats> temp = getUsageStatsListByApi(context, beginTime, endTime);
+            if (temp != null && temp.size() > 0) {
+                usageStatsList.addAll(temp);
+            } else {
+                List<UsageStats> temp1 = getUsageStatsListByInvoke(context, beginTime, endTime);
+                if (temp1 != null && temp1.size() > 0) {
+                    usageStatsList.addAll(temp1);
                 }
             }
-            String result = ShellUtils.shell("pm list packages");
-            if (!TextUtils.isEmpty(result) && result.contains("\n")) {
-                String[] lines = result.split("\n");
-                if (lines.length > 0) {
-                    String line = null;
-                    for (int i = 0; i < lines.length; i++) {
-                        line = lines[i];
-                        // 单行条件: 非空&&有点&&有冒号
-                        if (!TextUtils.isEmpty(line) && line.contains(".") && line.contains(":")) {
-                            // 分割. 样例数据:<code>package:com.android.launcher3</code>
-                            String[] split = line.split(":");
-                            if (split.length > 1) {
-                                String packageName = split[1];
-                                appSet.add(packageName);
-                            }
-                        }
-                    }
-                }
-            }
+
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
-                BugReportForTest.commitError(e);
+                BugReportForTest.commitError(BuildConfig.tag_snap, e);
             }
         }
-        if (appSet.size() == 0) {
-            appSet.add(context.getPackageName());
-        }
-        return appSet;
+        return usageStatsList;
     }
 
+
+    /**
+     * API 获取UsageStatsList
+     *
+     * @param context
+     * @param beginTime
+     * @param endTime
+     * @return
+     */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private static List<UsageStats> getUsageStatsListByApi(Context context, long beginTime, long endTime) {
+//        /**
+//         * 系统API获取
+//         */
+//        UsageStatsManager usm = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
+//        List<UsageStats> uss = usm.queryUsageStats( UsageStatsManager.INTERVAL_BEST, beginTime, endTime);
+        try {
+            return (List<UsageStats>) ClazzUtils.invokeObjectMethod(context.getApplicationContext()
+                            .getSystemService(Context.USAGE_STATS_SERVICE), "queryUsageStats",
+                    new Class[]{int.class, long.class, long.class}, new Object[]{UsageStatsManager.INTERVAL_BEST, beginTime, endTime});
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BugReportForTest.commitError(BuildConfig.tag_snap, e);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 反射获取UsageStatsList
+     *
+     * @param context
+     * @param beginTime
+     * @param endTime
+     * @return
+     */
+    private static List<UsageStats> getUsageStatsListByInvoke(Context context, long beginTime, long endTime) {
+        try {
+            UsageStatsManager a;
+            //android.app.usage.IUsageStatsManager$Stub$Proxy
+            Object mService = ClazzUtils.getObjectFieldObject(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
+            if (mService == null) {
+                Object iBinder = ClazzUtils.invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{"usagestats"});
+                mService = ClazzUtils.invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{iBinder});
+            }
+            if (BuildConfig.logcat) {
+                ELOG.i(BuildConfig.tag_usm, "mService: " + mService);
+            }
+            if (mService == null) {
+                return null;
+            }
+
+            Set<String> pkgs = PkgList.getAppPackageList(EContextHelper.getContext(context));
+
+            for (String pkg : pkgs) {
+                try {
+                    // 返回值android.content.pm.ParceledListSlice
+                    Object parceledListSlice = ClazzUtils.invokeObjectMethod(mService, "queryUsageStats",
+                            new Class[]{int.class, long.class, long.class, String.class},
+                            new Object[]{UsageStatsManager.INTERVAL_BEST, beginTime, endTime, pkg}
+                    );
+                    if (parceledListSlice != null) {
+                        return (List<UsageStats>) ClazzUtils.invokeObjectMethod(parceledListSlice, "getList");
+                    }
+                } catch (Throwable e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BugReportForTest.commitError(BuildConfig.tag_snap, e);
+                    }
+                }
+
+            }
+
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BugReportForTest.commitError(BuildConfig.tag_snap, e);
+            }
+        }
+        return null;
+    }
 
 }

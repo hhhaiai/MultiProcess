@@ -1,7 +1,9 @@
 package com.analysys.track.internal.impl.usm;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.usage.UsageEvents;
+import android.app.usage.UsageStats;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
@@ -19,6 +21,9 @@ import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.analysys.track.internal.content.UploadKey.Response.RES_POLICY_MODULE_CL_USM;
 
@@ -52,9 +57,10 @@ public class USMImpl {
     }
 
     public static JSONArray getUSMInfo(Context context, long start, long end) {
+        JSONArray arr = new JSONArray();
         try {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                return null;
+                return arr;
             }
             // 时间校验.
             if (end - start <= 0) {
@@ -63,57 +69,22 @@ public class USMImpl {
             if (end - start >= EGContext.TIME_HOUR * 24 * 2) {
                 start = end - EGContext.TIME_HOUR * 24 * 2;
             }
+            context = EContextHelper.getContext(context);
 
-            PackageManager packageManager = EContextHelper.getContext().getPackageManager();
-            if (packageManager == null) {
-                return null;
-            }
+            // 1. ue方式获取
             Object usageEvents = USMUtils.getUsageEvents(start, end, context);
+
             if (usageEvents != null) {
-                JSONArray jsonArray = new JSONArray();
-                USMInfo openEvent = null;
-                Object lastEvent = null;
-                boolean hasNextEvent = false;
-                while (true) {
-                    hasNextEvent = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
-                    if (!hasNextEvent) {
-                        break;
-                    }
-                    Object event = ClazzUtils.newInstance("android.app.usage.UsageEvents$Event");
-
-                    ClazzUtils.invokeObjectMethod(usageEvents, "getNextEvent", new String[]{"android.app.usage.UsageEvents$Event"}
-                            , new Object[]{event});
-
-                    if (event == null || !SystemUtils.hasLaunchIntentForPackage(packageManager, getPackageName(event))) {
-                        continue;
-                    }
-                    if (openEvent == null) {
-                        if (getEventType(event) == UsageEvents.Event.MOVE_TO_FOREGROUND
-                                || getEventType(event) == UsageEvents.Event.ACTIVITY_RESUMED) {
-                            openEvent = openUsm(context, packageManager, event);
-                        }
-                    } else {
-                        if (!openEvent.getPkgName().equals(getPackageName(event))) {
-                            openEvent.setCloseTime(getTimeStamp(lastEvent));
-
-                            //大于3秒的才算做oc,一闪而过的不算
-                            if (openEvent.getCloseTime() - openEvent.getOpenTime() >= EGContext.MINDISTANCE * 3) {
-                                jsonArray.put(openEvent.toJson());
-                            }
-
-                            if (getEventType(event) == UsageEvents.Event.MOVE_TO_FOREGROUND
-                                    || getEventType(event) == UsageEvents.Event.ACTIVITY_RESUMED
-                            ) {
-                                openEvent = openUsm(context, packageManager, event);
-                            }
-                        }
-                    }
-                    lastEvent = event;
+                getArrayFromUsageEvents(context, usageEvents, arr);
+            }
+            if (arr.length() == 0) {
+                // 2. us方式获取
+                //  List<UsageStats> usList = new ArrayList<UsageStats>();
+                //  后续如数据量增加，可考虑更细力度的取时间，更精确，暂时一次获取
+                List<UsageStats> usageStatsList = USMUtils.getUsageStats(context, start, end);
+                if (usageStatsList.size() > 0) {
+                    parserUsageStatsList(context, usageStatsList, arr);
                 }
-                return jsonArray;
-            } else {
-                //US
-
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
@@ -121,6 +92,109 @@ public class USMImpl {
             }
         }
         return null;
+    }
+
+    /**
+     * 解析 dao
+     *
+     * @param context
+     * @param usageStatsList
+     * @param arr
+     */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public static void parserUsageStatsList(Context context, List<UsageStats> usageStatsList, JSONArray arr) {
+        if (usageStatsList != null && usageStatsList.size() > 0) {
+            PackageManager packageManager = context.getPackageManager();
+
+            for (UsageStats us : usageStatsList) {
+                try {
+                    long lastUsedTime = us.getLastTimeUsed();
+                    long durTime = us.getTotalTimeInForeground();
+                    if (lastUsedTime > 0 && durTime > 0) {
+                        String pkgName = us.getPackageName();
+                        long openTime = lastUsedTime - durTime;
+
+                        USMInfo openEvent = new USMInfo(openTime, pkgName);
+                        openEvent.setCollectionType("5");
+                        openEvent.setNetType(NetworkUtils.getNetworkType(context));
+                        openEvent.setApplicationType(AppSnapshotImpl.getInstance(context).getAppType(pkgName));
+                        openEvent.setSwitchType("1");
+                        PackageInfo packageInfo = packageManager.getPackageInfo(pkgName, 0);
+                        ApplicationInfo applicationInfo = packageInfo.applicationInfo;
+                        openEvent.setAppName((String) applicationInfo.loadLabel(packageManager));
+                        openEvent.setVersionCode(packageInfo.versionName + "|" + packageInfo.versionCode);
+                        openEvent.setCloseTime(lastUsedTime);
+                        arr.put(openEvent.toJson());
+                    }
+                } catch (Throwable e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BugReportForTest.commitError(e);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 通过UE 解析json arrsy
+     *
+     * @param context
+     * @param usageEvents
+     * @param jsonArray
+     * @return
+     */
+    private static JSONArray getArrayFromUsageEvents(Context context, Object usageEvents, JSONArray jsonArray) {
+        PackageManager packageManager = context.getPackageManager();
+        if (packageManager == null) {
+            return jsonArray;
+        }
+        USMInfo openEvent = null;
+        Object lastEvent = null;
+        boolean hasNextEvent = false;
+        while (true) {
+            hasNextEvent = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
+            if (!hasNextEvent) {
+                break;
+            }
+            /**
+             * 获取Event
+             */
+            Object event = ClazzUtils.newInstance("android.app.usage.UsageEvents$Event");
+            ClazzUtils.invokeObjectMethod(usageEvents, "getNextEvent", new String[]{"android.app.usage.UsageEvents$Event"}
+                    , new Object[]{event});
+
+            if (event == null || !SystemUtils.hasLaunchIntentForPackage(packageManager, getPackageName(event))) {
+                continue;
+            }
+            /**
+             * 闭合数据
+             */
+            if (openEvent == null) {
+                // 首个
+                if (getEventType(event) == UsageEvents.Event.MOVE_TO_FOREGROUND
+                        || getEventType(event) == UsageEvents.Event.ACTIVITY_RESUMED) {
+                    openEvent = openUsm(context, packageManager, event);
+                }
+            } else {
+                // 闭合非连续
+                if (!openEvent.getPkgName().equals(getPackageName(event))) {
+                    openEvent.setCloseTime(getTimeStamp(lastEvent));
+
+                    //大于3秒的才算做oc,一闪而过的不算
+                    if (openEvent.getCloseTime() - openEvent.getOpenTime() >= EGContext.MINDISTANCE * 3) {
+                        jsonArray.put(openEvent.toJson());
+                    }
+
+                    if (getEventType(event) == UsageEvents.Event.MOVE_TO_FOREGROUND
+                            || getEventType(event) == UsageEvents.Event.ACTIVITY_RESUMED
+                    ) {
+                        openEvent = openUsm(context, packageManager, event);
+                    }
+                }
+            }
+            lastEvent = event;
+        }
+        return jsonArray;
     }
 
     public static String getPackageName(Object object) {
