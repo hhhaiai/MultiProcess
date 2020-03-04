@@ -1,6 +1,7 @@
 package com.device.impls;
 
 import android.Manifest;
+import android.app.usage.UsageStats;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.Ringtone;
@@ -22,6 +23,7 @@ import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.impl.oc.ProcUtils;
+import com.analysys.track.internal.impl.usm.USMImpl;
 import com.analysys.track.internal.impl.usm.USMUtils;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.net.UploadImpl;
@@ -332,11 +334,11 @@ public class MainFunCaseDispatcher {
             e.printStackTrace();
         }
 
-        try {
-            USMUtils.getUsageEventsByInvoke(0, System.currentTimeMillis(), mContext);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            USMUtils.getUsageEventsByInvoke(0, System.currentTimeMillis(), mContext);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         try {
             EContextHelper.getContext(null);
@@ -528,7 +530,15 @@ public class MainFunCaseDispatcher {
 
 
     private static void runCaseP29(final Context context) {
-        USMCase.run(context);
+        JSONArray arr = new JSONArray();
+
+        List<UsageStats> usageStatsList = USMUtils.getUsageStats(context, 0, System.currentTimeMillis());
+        if (usageStatsList.size() > 0) {
+            USMImpl.parserUsageStatsList(context, usageStatsList, arr);
+        }
+        EL.i("=====>" + arr.toString());
+
+//        USMCase.run(context);
     }
     private static void runCaseP30(final Context context) {
         USMCase.simple(context);

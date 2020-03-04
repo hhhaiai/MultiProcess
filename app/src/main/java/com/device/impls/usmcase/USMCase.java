@@ -31,10 +31,10 @@ public class USMCase {
 
     public static void simple(Context context) {
 
-        getDataByUsageEvents(context);
+//        getDataByUsageEvents(context);
         getDataByUsageStats(context);
-        getDataByConfigurationStats(context);
-        getDataByA(context);
+//        getDataByConfigurationStats(context);
+//        getDataByA(context);
     }
 
     private static void getDataByA(Context context) {
@@ -112,7 +112,15 @@ public class USMCase {
             }
             for (UsageStats us : uss) {
                 if (packageManager.getLaunchIntentForPackage(us.getPackageName()) != null) {
-                    EL.i("【US API获取】(" + us.getPackageName() + ")  LastTimeStamp：" + us.getLastTimeStamp() + "  LastTimeUsed：" + us.getLastTimeUsed());
+//                    EL.i("【US API获取】(" + us.getPackageName() + ")  LastTimeStamp：" + us.getLastTimeStamp() + "  LastTimeUsed：" + us.getLastTimeUsed());
+                    EL.i("US [" + us.getPackageName() + "]  " + us.getLastTimeUsed()
+//                            +" ; " + us.getTotalTimeVisible()
+                                    + " ; " + us.getLastTimeStamp()
+//                                    + " ; " + us.getLastTimeForegroundServiceUsed()
+                                    + " ; " + us.getFirstTimeStamp()
+//                                    + " ; " + us.getTotalTimeForegroundServiceUsed()
+                                    + " ; " + us.getTotalTimeInForeground()
+                    );
                 } else {
                     EL.v("【US API获取】(" + us.getPackageName() + ")  LastTimeStamp：" + us.getLastTimeStamp() + "  LastTimeUsed：" + us.getLastTimeUsed());
                 }
