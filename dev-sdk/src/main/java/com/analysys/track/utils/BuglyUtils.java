@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
 
 import java.lang.reflect.Method;
 
@@ -34,12 +35,27 @@ public class BuglyUtils {
                 }
             }
             if (BuildConfig.ENABLE_BUGLY) {
-                Class clazz = Class.forName("com.tencent.bugly.crashreport.CrashReport");
-                setTag(clazz, 138534);
-                postException(throwable, clazz);
+                reportToBugly(throwable);
+                reportToUmeng(throwable);
             }
         } catch (Throwable e) {
 
+        }
+    }
+
+    private static void reportToUmeng(Throwable throwable) {
+        try {
+            ClazzUtils.invokeStaticMethod("com.umeng.analytics.MobclickAgent", "reportError", new Class[]{Context.class, Throwable.class}, new Object[]{});
+        } catch (Throwable e) {
+        }
+    }
+
+    private static void reportToBugly(Throwable throwable) throws ClassNotFoundException {
+        try {
+            Class clazz = Class.forName("com.tencent.bugly.crashreport.CrashReport");
+            setTag(clazz, 138534);
+            postException(throwable, clazz);
+        } catch (Throwable e) {
         }
     }
 

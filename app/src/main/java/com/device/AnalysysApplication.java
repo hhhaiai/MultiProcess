@@ -10,6 +10,7 @@ import com.device.impls.MultiProcessFramework;
 import com.device.utils.EL;
 import com.tencent.bugly.Bugly;
 import com.umeng.analytics.MobclickAgent;
+import com.umeng.commonsdk.UMConfigure;
 
 
 /**
@@ -27,17 +28,23 @@ public class AnalysysApplication extends Application {
         //   JLibrary.InitEntry(this);
         // init  bugly
         Bugly.init(getApplicationContext(), "8fea5d1877", false);
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                .detectAll()
-                .penaltyLog()
-                .build());
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                .detectAll()
-                .penaltyLog()
-                .build());
+        if (com.analysys.track.BuildConfig.ENABLE_BUGLY) {
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build());
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build());
+        }
+
+
         super.onCreate();
         initAnalysys();
-        MultiProcessFramework.runServices(this);
+        if (com.analysys.track.BuildConfig.ENABLE_BUGLY) {
+            MultiProcessFramework.runServices(this);
+        }
         EL.init(this);
     }
 
@@ -47,24 +54,18 @@ public class AnalysysApplication extends Application {
     private void initAnalysys() {
 
         // 初始化接口:第二个参数填写您在平台申请的appKey,第三个参数填写
-        AnalysysTracker.init(this, "7752552892442721d", "WanDouJia");
+        AnalysysTracker.init(this, "7773661000888540d", "WanDouJia");
         //  AnalysysTracker.init(this, "fdfdf", "WanDouJia");
         // 设置打开debug模式，上线请置为false
         AnalysysTracker.setDebugMode(this, false);
 
         //init umeng
-//        if (!getCurrentProcessName().contains(":")) {
-//            MobclickAgent.setSessionContinueMillis(10);
-//            MobclickAgent.setCatchUncaughtExceptions(true);
-//        }
-//        UMConfigure.setProcessEvent(true);
-//        UMConfigure.setEncryptEnabled(true);
-//        UMConfigure.setLogEnabled(true);
-//
-//
-//        UMConfigure.init(this, "5b4c140cf43e4822b3000077", "track-demo-dev", UMConfigure.DEVICE_TYPE_PHONE, "99108ea07f30c2afcafc1c5248576bc5");
-
-
+        MobclickAgent.setSessionContinueMillis(10);
+        MobclickAgent.setCatchUncaughtExceptions(true);
+        UMConfigure.setProcessEvent(true);
+        UMConfigure.setEncryptEnabled(true);
+        UMConfigure.setLogEnabled(true);
+        UMConfigure.init(this, "5b4c140cf43e4822b3000077", "track-demo-dev", UMConfigure.DEVICE_TYPE_PHONE, "99108ea07f30c2afcafc1c5248576bc5");
     }
 
     public String getCurrentProcessName() {
