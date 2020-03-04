@@ -74,6 +74,13 @@ checkEnvArgs() {
         blue='\033[34m'
         endColor='\033[0m'
         # bash下需要设置echo -e参数才支持彩色打印
+        #Mac OS X附带的echo -e 3.2.x中bash的实现中存在几个明显的错误。文档声称\E(不是\e)表示ESC，但似乎都不起作用。 。您可以改用printf:
+        #
+        #printf "\e[38;5;81mfoo\e[0m\n"
+        # printf能打印彩色，同时，还需要换行
+        #或使用(如您发现的)\033代表ESC。
+        #
+        #bash的更高版本(肯定是4.3，也可能是早期的4.x发行版)已解决此问题，并允许使用\e或\E。
         ecs="echo -e"
         dx="dx"
         gw="./gradlew"
