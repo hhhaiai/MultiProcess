@@ -77,9 +77,9 @@ public class OAIDHelper {
             }
         } catch (Throwable e) {
             //没有这个类代表宿主没集成 OAID 相关 SDK,不处理
-//            if (EGContext.FLAG_DEBUG_INNER) {
-//                ELOG.d("宿主没集成 OAID 相关 SDK,不处理");
-//            }
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.d("宿主没集成 OAID 相关 SDK,不处理");
+            }
         }
 
         return false;
