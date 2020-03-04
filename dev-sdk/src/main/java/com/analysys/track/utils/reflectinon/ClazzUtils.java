@@ -111,10 +111,6 @@ public class ClazzUtils {
             return null;
         }
 
-        if (!hasField(clazz, fieldName)) {
-            return null;
-        }
-
         Field field = (Field) invokeMethod(invoke, getDeclaredField, clazz, fieldName);
         if (field == null) {
             field = (Field) invokeMethod(invoke, getField, clazz, fieldName);
@@ -142,27 +138,10 @@ public class ClazzUtils {
         return null;
     }
 
-    /**
-     * 是否有变量
-     *
-     * @param clazz
-     * @param fieldName
-     * @return
-     */
-    private static boolean hasField(Class clazz, String fieldName) {
-        Field[] fs = clazz.getFields();
-        for (Field f : fs) {
-            if (f.getName().equals(fieldName)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
 
     public static Object invokeObjectMethod(Object o, String methodName) {
-        return invokeObjectMethod(o, methodName, (Class<?>[]) null, null);
+        return invokeObjectMethod(o, methodName, (Class<?>[]) null, (Object[]) null);
     }
 
     public static Object invokeObjectMethod(Object o, String methodName, Class<?>[] argsClass, Object[] args) {
