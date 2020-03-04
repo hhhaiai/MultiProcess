@@ -25,9 +25,8 @@ public class AnalysysApplication extends Application {
 
     @Override
     public void onCreate() {
-        //   JLibrary.InitEntry(this);
-        // init  bugly
-        Bugly.init(getApplicationContext(), "8fea5d1877", false);
+        // init  bugly。  track-sdk-demo
+        Bugly.init(getApplicationContext(), "8b5379e3bc", false);
         if (com.analysys.track.BuildConfig.ENABLE_BUGLY) {
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                     .detectAll()
