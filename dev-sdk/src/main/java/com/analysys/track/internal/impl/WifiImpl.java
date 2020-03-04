@@ -55,8 +55,8 @@ public class WifiImpl {
             }
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_WIFI_STATE)
                     && PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                WifiManager wm = (WifiManager) mContext.getSystemService(WIFI_SERVICE);
-                if (wm.getWifiState() == WifiManager.WIFI_STATE_ENABLED) {
+                WifiManager wm = (WifiManager) mContext.getApplicationContext().getSystemService(WIFI_SERVICE);
+                if (wm != null && wm.getWifiState() == WifiManager.WIFI_STATE_ENABLED) {
                     List<ScanResult> list = wm.getScanResults();
                     wifiSort(list);
                     ScanResult s = null;
