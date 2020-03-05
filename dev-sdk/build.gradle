@@ -31,9 +31,6 @@ def ENABLE_BUGLY = true
 def DEBUG_URL = true
 //所有的log开关,true 打印所有的日志,false,关闭所有的日志
 def logcat = true
-// 内部加密字符串试用的密钥，StringFog_G生成时用，
-// 在StringFogTransform.groovy之前生成加密串放置于com.analysys.plugin.StringFog bs
-def STRING_FOG_KEY = "4.3.0.7|aaa"
 
 //********************日志tag相关*********************
 //region 内部日志相关
@@ -66,7 +63,7 @@ android {
             STRICTMODE = true
         }
         buildConfigField "String", "SDK_VERSION", "\"${sdkv}\""
-        buildConfigField "String", "STRING_FOG_KEY", "\"${STRING_FOG_KEY}\""
+        buildConfigField "String", "STRING_FOG_KEY", "\"${version}\""
         buildConfigField "boolean", "IS_HOST", "${isPackageJar}"
         buildConfigField "boolean", "enableHotFix", "${enableHotFix}"
 

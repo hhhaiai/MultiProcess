@@ -10,20 +10,34 @@ class GenerateKeyUtil {
         FileInputStream inputStream = new FileInputStream(file)
         InputStreamReader isr = new InputStreamReader(inputStream)
         BufferedReader reader = new BufferedReader(isr)
-        String key = "aaaa";
+        String key = "";
+        String ver=null;
+        String data=null;
         while (true) {
             String line = reader.readLine()
             if (line == null) {
-                println("error: STRING_FOG_KEY not found !")
+                println("error: ver or data not found !")
                 break
             }
-            if (line.startsWith("def STRING_FOG_KEY")) {
+            if (line.startsWith("def ver")) {
                 String[] keys = line.split("\"")
                 if (keys.length < 2) {
-                    println("error: STRING_FOG_KEY not found !")
+                    println("error: ver not found !")
                 }
-                key = keys[keys.length - 1]
-                println("STRING_FOG_KEY = [" + key + "]")
+                ver = keys[keys.length - 1]
+                println("ver = [" + ver + "]")
+            }
+            if (line.startsWith("def date")) {
+                String[] keys = line.split("\"")
+                if (keys.length < 2) {
+                    println("error: date not found !")
+                }
+                data = keys[keys.length - 1]
+                println("data = [" + data + "]")
+            }
+
+            if(data!=null&&ver!=null){
+                key = ver+"|"+data
                 break
             }
         }
