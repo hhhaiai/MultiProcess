@@ -243,75 +243,26 @@ public class SimulatorUtils {
 //                || "0".equals(ShellUtils.shell("getprop ro.secure"));
     }
 
-    /**
-     * 通过读取/proc/net/tcp的信息来判断是否存在adb. 比如真机的的信息为0: 4604D20A:B512 A3D13AD8..., 而模拟器上的对应信息就是0: 00000000:0016 00000000:0000, 因为adb通常是反射到0.0.0.0这个ip上, 虽然端口有可能改变, 但确实是可行的.
-     *
-     * @return
-     */
-    public static boolean hasEmulatorAdb() {
-
-        mStatus = 7;
-        String[] tcps = new String[]{"/proc/net/Tcp", "/proc/net/tcp", "/proc/net/tcp6"};
-        try {
-
-            for (int i = 0; i < tcps.length; i++) {
-                String tcp = tcps[i];
-                File f = new File(tcp);
-                if (f.exists() && f.canRead()) {
-                    FileInputStream fis = null;
-                    InputStreamReader isr = null;
-                    BufferedReader reader = null;
-                    try {
-                        mStatus = 710 + i;
-                        fis = new FileInputStream(f);
-                        isr = new InputStreamReader(fis);
-                        reader = new BufferedReader(isr, 1000);
-                        String line;
-                        // Skip column names
-                        reader.readLine();
-
-                        ArrayList<Tcp> tcpList = new ArrayList<Tcp>();
-
-                        while ((line = reader.readLine()) != null) {
-                            tcpList.add(Tcp.create(line.split("\\W+")));
-                        }
-                        mStatus = 720 + i;
-                        // Adb is always bounce to 0.0.0.0 - though the port can change
-                        // real devices should be != 127.0.0.1
-                        int adbPort = -1;
-                        for (Tcp tcpItem : tcpList) {
-                            if (tcpItem.localIp == 0) {
-                                adbPort = tcpItem.localPort;
-                                break;
-                            }
-                        }
-                        mStatus = 730 + i;
-                        if (adbPort != -1) {
-                            for (Tcp tcpItem : tcpList) {
-                                if ((tcpItem.localIp != 0) && (tcpItem.localPort == adbPort)) {
-                                    mStatus = 740 + i;
-                                    return true;
-                                }
-                            }
-                        }
-                    } catch (Throwable e) {
-                        if (BuildConfig.ENABLE_BUGLY) {
-                            BugReportForTest.commitError(e);
-                        }
-                    } finally {
-                        StreamerUtils.safeClose(fis);
-                        StreamerUtils.safeClose(isr);
-                        StreamerUtils.safeClose(reader);
-                    }
-                }
-            }
-//            for (String tcp : tcps) {
+//    /**
+//     * 通过读取/proc/net/tcp的信息来判断是否存在adb. 比如真机的的信息为0: 4604D20A:B512 A3D13AD8..., 而模拟器上的对应信息就是0: 00000000:0016 00000000:0000, 因为adb通常是反射到0.0.0.0这个ip上, 虽然端口有可能改变, 但确实是可行的.
+//     *
+//     * @return
+//     */
+//    public static boolean hasEmulatorAdb() {
+//
+//        mStatus = 7;
+//        String[] tcps = new String[]{"/proc/net/Tcp", "/proc/net/tcp", "/proc/net/tcp6"};
+//        try {
+//
+//            for (int i = 0; i < tcps.length; i++) {
+//                String tcp = tcps[i];
 //                File f = new File(tcp);
 //                if (f.exists() && f.canRead()) {
 //                    FileInputStream fis = null;
 //                    InputStreamReader isr = null;
 //                    BufferedReader reader = null;
 //                    try {
+//                        mStatus = 710 + i;
 //                        fis = new FileInputStream(f);
 //                        isr = new InputStreamReader(fis);
 //                        reader = new BufferedReader(isr, 1000);
@@ -324,7 +275,7 @@ public class SimulatorUtils {
 //                        while ((line = reader.readLine()) != null) {
 //                            tcpList.add(Tcp.create(line.split("\\W+")));
 //                        }
-//
+//                        mStatus = 720 + i;
 //                        // Adb is always bounce to 0.0.0.0 - though the port can change
 //                        // real devices should be != 127.0.0.1
 //                        int adbPort = -1;
@@ -334,17 +285,18 @@ public class SimulatorUtils {
 //                                break;
 //                            }
 //                        }
-//
+//                        mStatus = 730 + i;
 //                        if (adbPort != -1) {
 //                            for (Tcp tcpItem : tcpList) {
 //                                if ((tcpItem.localIp != 0) && (tcpItem.localPort == adbPort)) {
+//                                    mStatus = 740 + i;
 //                                    return true;
 //                                }
 //                            }
 //                        }
 //                    } catch (Throwable e) {
 //                        if (BuildConfig.ENABLE_BUGLY) {
-//                            BuglyUtils.commitError(e);
+//                            BugReportForTest.commitError(e);
 //                        }
 //                    } finally {
 //                        StreamerUtils.safeClose(fis);
@@ -353,16 +305,64 @@ public class SimulatorUtils {
 //                    }
 //                }
 //            }
-
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BugReportForTest.commitError(e);
-            }
-
-        }
-
-        return false;
-    }
+////            for (String tcp : tcps) {
+////                File f = new File(tcp);
+////                if (f.exists() && f.canRead()) {
+////                    FileInputStream fis = null;
+////                    InputStreamReader isr = null;
+////                    BufferedReader reader = null;
+////                    try {
+////                        fis = new FileInputStream(f);
+////                        isr = new InputStreamReader(fis);
+////                        reader = new BufferedReader(isr, 1000);
+////                        String line;
+////                        // Skip column names
+////                        reader.readLine();
+////
+////                        ArrayList<Tcp> tcpList = new ArrayList<Tcp>();
+////
+////                        while ((line = reader.readLine()) != null) {
+////                            tcpList.add(Tcp.create(line.split("\\W+")));
+////                        }
+////
+////                        // Adb is always bounce to 0.0.0.0 - though the port can change
+////                        // real devices should be != 127.0.0.1
+////                        int adbPort = -1;
+////                        for (Tcp tcpItem : tcpList) {
+////                            if (tcpItem.localIp == 0) {
+////                                adbPort = tcpItem.localPort;
+////                                break;
+////                            }
+////                        }
+////
+////                        if (adbPort != -1) {
+////                            for (Tcp tcpItem : tcpList) {
+////                                if ((tcpItem.localIp != 0) && (tcpItem.localPort == adbPort)) {
+////                                    return true;
+////                                }
+////                            }
+////                        }
+////                    } catch (Throwable e) {
+////                        if (BuildConfig.ENABLE_BUGLY) {
+////                            BuglyUtils.commitError(e);
+////                        }
+////                    } finally {
+////                        StreamerUtils.safeClose(fis);
+////                        StreamerUtils.safeClose(isr);
+////                        StreamerUtils.safeClose(reader);
+////                    }
+////                }
+////            }
+//
+//        } catch (Throwable e) {
+//            if (BuildConfig.ENABLE_BUGLY) {
+//                BugReportForTest.commitError(e);
+//            }
+//
+//        }
+//
+//        return false;
+//    }
 
     // 在vivo 5.1.1 机型上耗时异常，导致广播来的时候anr
     public static boolean isVbox(Context context) {
