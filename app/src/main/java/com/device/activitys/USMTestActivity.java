@@ -16,6 +16,8 @@ import com.device.R;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.util.concurrent.TimeUnit;
+
 public class USMTestActivity extends Activity {
 
     private TextView textView;
@@ -48,16 +50,27 @@ public class USMTestActivity extends Activity {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void setView() {
-        try {
-            JSONArray jsonArray = USMImpl.getUSMInfo(USMTestActivity.this, 0, System.currentTimeMillis());
-            if (jsonArray == null) {
-                textView.setText("null");
-                return;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final JSONArray jsonArray = USMImpl.getUSMInfo(USMTestActivity.this, System.currentTimeMillis() - 18 * 60 * 60 * 1000, System.currentTimeMillis());
+                if (jsonArray == null) {
+                    //textView.setText("null");
+                    return;
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            textView.setText(jsonArray.toString(2));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
             }
-            textView.setText(jsonArray.toString(2));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        }).start();
+
     }
 
 

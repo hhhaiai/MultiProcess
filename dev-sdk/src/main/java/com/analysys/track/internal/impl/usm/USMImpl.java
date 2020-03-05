@@ -69,20 +69,28 @@ public class USMImpl {
                 start = end - EGContext.TIME_HOUR * 24 * 2;
             }
             context = EContextHelper.getContext(context);
-
+//            Log.i("sanbo", "--------获取USM-------");
             // 1. ue方式获取
             Object usageEvents = USMUtils.getUsageEvents(start, end, context);
+//            Log.i("sanbo", "--------usageEvents----" + usageEvents);
 
             if (usageEvents != null) {
                 arr = getArrayFromUsageEvents(context, usageEvents);
             }
+//            Log.i("sanbo", "--------getArrayFromUsageEvents----" + arr);
+
             if (arr == null || arr.length() == 0) {
+//                Log.i("sanbo", "--------arr isnull----");
+
                 // 2. us方式获取
                 //  List<UsageStats> usList = new ArrayList<UsageStats>();
                 //  后续如数据量增加，可考虑更细力度的取时间，更精确，暂时一次获取
                 List<UsageStats> usageStatsList = USMUtils.getUsageStats(context, start, end);
+//                Log.i("sanbo", "--------usageStatsList----" + usageStatsList);
+
                 if (usageStatsList.size() > 0) {
                     arr = parserUsageStatsList(context, usageStatsList);
+//                    Log.i("sanbo", "--------arr----" + arr);
                 }
             }
         } catch (Throwable e) {

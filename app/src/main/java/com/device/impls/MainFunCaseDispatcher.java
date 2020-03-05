@@ -9,12 +9,14 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.FileObserver;
+import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.telephony.NeighboringCellInfo;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
@@ -27,6 +29,7 @@ import com.analysys.track.internal.impl.usm.USMImpl;
 import com.analysys.track.internal.impl.usm.USMUtils;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.net.UploadImpl;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
@@ -50,6 +53,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -523,11 +527,102 @@ public class MainFunCaseDispatcher {
 
     }
 
+
     private static void runCaseP28(final Context context) {
-        JSONObject p = ProcUtils.getInstance(context).getRunningInfo();
-        EL.i("xxx:" +p.toString());
+//        JSONArray arr = new JSONArray();
+//
+//        List<UsageStats> usageStatsList = USMUtils.getUsageStats(context, 0, System.currentTimeMillis());
+//        if (usageStatsList.size() > 0) {
+//            USMImpl.parserUsageStatsList(context, usageStatsList, arr);
+//        }
+//        EL.i("=====>" + arr.toString());
+
+//        Object s1 = getIUsageStatsManagerStub(context);
+//        EL.i("s1=========+> " + s1);
+//        try {
+//            testGetService(context);
+//        } catch (Throwable e) {
+//            EL.e(e);
+//        }
+        long now = System.currentTimeMillis();
+//        JSONArray arr = USMImpl.getUSMInfo(context, now-48*60*60*1000, now);
+        JSONArray arr = USMImpl.getUSMInfo(context, now - 6 * 60 * 60 * 1000, now);
+        EL.i("arr: " + arr);
+
+//        USMCase.run(context);
     }
 
+
+    /**
+     * 获取 IUsageStatsManager$Stub$Proxy
+     *
+     * @param context
+     * @return
+     */
+    public static Object getIUsageStatsManagerStub(Context context) {
+        //android.app.usage.IUsageStatsManager$Stub$Proxy
+        Object mService = ClazzUtils.getObjectFieldObject(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
+        if (mService == null) {
+            IBinder ibinder = null;
+            try {
+                Class<?> serviceManager = Class.forName("android.os.ServiceManager");
+                Method getService = ClazzUtils.getMethod(serviceManager, "getService", String.class);
+                ibinder = (IBinder) getService.invoke(null, Context.USAGE_STATS_SERVICE);
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BugReportForTest.commitError(BuildConfig.tag_snap, e);
+                }
+            }
+            if (ibinder == null) {
+                ibinder = (IBinder) ClazzUtils.invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{Context.USAGE_STATS_SERVICE});
+            }
+            if (ibinder != null) {
+                try {
+                    Method asInterface = ClazzUtils.getMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", IBinder.class);
+                    if (asInterface != null) {
+                        mService = asInterface.invoke(null, ibinder);
+                    }
+                } catch (Throwable e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BugReportForTest.commitError(BuildConfig.tag_snap, e);
+                    }
+                }
+
+                if (mService == null) {
+                    mService = ClazzUtils.invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{ibinder});
+                }
+            }
+        }
+        return mService;
+    }
+
+    private static void testGetService(final Context context) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        try {
+            Class<?> serviceManager = Class.forName("android.os.ServiceManager");
+            Method getService = ClazzUtils.getMethod(serviceManager, "getService", String.class);
+            IBinder rawBinder = (IBinder) getService.invoke(null, Context.USAGE_STATS_SERVICE);
+            EL.i("rawBinder: " + rawBinder);
+            IBinder binder = (IBinder) ClazzUtils.invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{Context.USAGE_STATS_SERVICE});
+            EL.i("binder: " + binder);
+            Object mService = Class.forName("android.app.usage.IUsageStatsManager$Stub").getMethod("asInterface", IBinder.class).invoke(null, rawBinder);
+            EL.i("getMethod mService: " + mService);
+            Object mService1 = Class.forName("android.app.usage.IUsageStatsManager$Stub").getDeclaredMethod("asInterface", IBinder.class).invoke(null, binder);
+            EL.i("getDeclaredMethod mService1: " + mService1);
+            Object mService2 = ClazzUtils.invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{binder});
+            EL.i("invokeStaticMethod mService2: " + mService2);
+
+
+            EL.e("反射获取=====>" + USMUtils.getIUsageStatsManagerStub(context));
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
 
     private static void runCaseP29(final Context context) {
         JSONArray arr = USMImpl.getUSMInfo(context, 0, System.currentTimeMillis());

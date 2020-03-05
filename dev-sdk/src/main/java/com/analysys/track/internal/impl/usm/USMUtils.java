@@ -8,10 +8,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Build;
-import android.os.Environment;
 import android.os.IBinder;
 import android.provider.Settings;
-import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
@@ -21,13 +19,9 @@ import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PkgList;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 
-import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -95,6 +89,7 @@ public class USMUtils {
             }
             boolean hasNextEvent = false;
             Object usageEvents = getUsageEventsByApi(beginTime, endTime, context);
+//            Log.e("sanbo", "getUsageEventsByApi usageEvents: " + usageEvents);
             if (usageEvents != null) {
                 hasNextEvent = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
                 if (hasNextEvent) {
@@ -102,6 +97,8 @@ public class USMUtils {
                 }
             }
             usageEvents = getUsageEventsByInvoke(beginTime, endTime, context);
+//            Log.e("sanbo", "usageEvents usageEvents: " + usageEvents);
+
             if (usageEvents != null) {
                 hasNextEvent = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
                 if (hasNextEvent) {
@@ -166,12 +163,9 @@ public class USMUtils {
             if (endTime <= beginTime) {
                 beginTime = endTime - EGContext.TIME_HOUR * 24 * 2;
             }
-            //android.app.usage.IUsageStatsManager$Stub$Proxy
-            Object mService = ClazzUtils.getObjectFieldObject(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
-            if (mService == null) {
-                Object iBinder = ClazzUtils.invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{"usagestats"});
-                mService = ClazzUtils.invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{iBinder});
-            }
+            Object mService = getIUsageStatsManagerStub(context);
+//            Log.i("sanbo", "getUsageEventsByInvoke mService-------: " + mService);
+
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_usm, "mService: " + mService);
             }
@@ -185,6 +179,8 @@ public class USMUtils {
                 try {
                     //UsageEvents
                     usageEvents = ClazzUtils.invokeObjectMethod(mService, "queryEvents", new Class[]{long.class, long.class, String.class}, new Object[]{beginTime, endTime, opname});
+//                    Log.d("sanbo", "getUsageEventsByInvoke [" + opname + "]  usageEvents: " + usageEvents);
+
                     if (usageEvents == null) {
                         continue;
                     }
@@ -222,21 +218,21 @@ public class USMUtils {
 //            if (context.getApplicationInfo().targetSdkVersion > 27 || Build.VERSION.SDK_INT > 27) {
 //                return null;
 //            }
+//            Log.i("sanbo", "getUsageStats  ");
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                 return usageStatsList;
             }
             List<UsageStats> temp = getUsageStatsListByApi(context, beginTime, endTime);
+//            Log.e("sanbo", "getUsageStatsListByApi temp: " + temp);
+
             if (temp != null && temp.size() > 0) {
                 usageStatsList.addAll(temp);
             } else {
                 List<UsageStats> temp1 = getUsageStatsListByInvoke(context, beginTime, endTime);
+//                Log.e("sanbo", "getUsageStatsListByApi temp: " + temp1);
+
                 if (temp1 != null && temp1.size() > 0) {
                     usageStatsList.addAll(temp1);
-                } else {
-                    List<UsageStats> temp2 = getUsageStatsByDataBase(context, beginTime, endTime);
-                    if (temp2 != null && temp2.size() > 0) {
-                        usageStatsList.addAll(temp2);
-                    }
                 }
             }
 
@@ -248,45 +244,6 @@ public class USMUtils {
         return usageStatsList;
     }
 
-    private static List<UsageStats> getUsageStatsByDataBase(Context context, long beginTime, long endTime) {
-        try {
-            File systemDataDir = new File(Environment.getDataDirectory(), "system");
-            File mUsageStatsDir = new File(systemDataDir, "usagestats");
-            if (mUsageStatsDir.exists() && mUsageStatsDir.isDirectory()) {
-                //  UserUsageStatsService(Context context, int userId, File usageStatsDir,StatsUpdatedListener listener)
-                try {
-                    Class clazz = Class.forName("com.android.server.usage.UserUsageStatsService");
-                    Constructor constructor = clazz.getConstructor(Context.class, int.class, File.class, Class.forName("com.android.server.usage.UserUsageStatsService$StatsUpdatedListener"));
-                    if (constructor == null) {
-                        constructor = clazz.getDeclaredConstructor(Context.class, int.class, File.class, Class.forName("com.android.server.usage.UserUsageStatsService$StatsUpdatedListener"));
-                    }
-                    if (constructor != null) {
-                        constructor.setAccessible(true);
-                        Object userUsageStatsService = constructor.newInstance(context, 0, mUsageStatsDir, null);
-                        if (userUsageStatsService != null) {
-                            Method queryUsageStats = clazz.getMethod("queryUsageStats", int.class, long.class, long.class);
-                            if (queryUsageStats == null) {
-                                queryUsageStats = clazz.getDeclaredMethod("queryUsageStats", int.class, long.class, long.class);
-                            }
-                            if (queryUsageStats != null) {
-                                Object o = queryUsageStats.invoke(userUsageStatsService, UsageStatsManager.INTERVAL_BEST, beginTime, endTime);
-                                if (o != null) {
-                                    return (List<UsageStats>) o;
-                                }
-                            }
-                        }
-                    }
-
-                } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUGLY) {
-                        BugReportForTest.commitError(e);
-                    }
-                }
-            }
-        } catch (Throwable e) {
-        }
-        return null;
-    }
 
     /**
      * API 获取UsageStatsList
@@ -325,13 +282,11 @@ public class USMUtils {
      */
     private static List<UsageStats> getUsageStatsListByInvoke(Context context, long beginTime, long endTime) {
         try {
-            UsageStatsManager a;
-            //android.app.usage.IUsageStatsManager$Stub$Proxy
-            Object mService = ClazzUtils.getObjectFieldObject(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
-            if (mService == null) {
-                Object iBinder = ClazzUtils.invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{"usagestats"});
-                mService = ClazzUtils.invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{iBinder});
-            }
+
+
+            Object mService = getIUsageStatsManagerStub(context);
+//            Log.i("sanbo", "getUsageStatsListByInvoke --------mService---------:" + mService);
+
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_usm, "mService: " + mService);
             }
@@ -348,6 +303,8 @@ public class USMUtils {
                             new Class[]{int.class, long.class, long.class, String.class},
                             new Object[]{UsageStatsManager.INTERVAL_BEST, beginTime, endTime, pkg}
                     );
+//                    Log.d("sanbo", "getUsageStatsListByInvoke [" + pkg + "]---:" + parceledListSlice);
+
                     if (parceledListSlice != null) {
                         return (List<UsageStats>) ClazzUtils.invokeObjectMethod(parceledListSlice, "getList");
                     }
@@ -367,56 +324,51 @@ public class USMUtils {
         return null;
     }
 
+
     /**
-     * 反射获取UsageStatsList
+     * 获取 IUsageStatsManager$Stub$Proxy
      *
      * @param context
-     * @param beginTime
-     * @param endTime
      * @return
      */
-    private static List<UsageStats> getUsageStatsListPlanBByInvoke(Context context, long beginTime, long endTime) {
-        try {
-            //相当于：IBinder oRemoteService = ServiceManager.getService("usagestats");
-            Class<?> cServiceManager = Class.forName("android.os.ServiceManager");
-            Method mGetService = cServiceManager.getMethod("getService", java.lang.String.class);
-            Object oRemoteService = mGetService.invoke(null, "usagestats");
+    public static Object getIUsageStatsManagerStub(Context context) {
+//        IBinder binder = (IBinder) ClazzUtils.invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{Context.USAGE_STATS_SERVICE});
+//       return ClazzUtils.invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{binder});
 
-            // 相当于:IUsageStats mUsageStatsService = IUsageStats.Stub.asInterface(oRemoteService)
-            Class<?> cStub = Class.forName("com.android.internal.app.IUsageStats$Stub");
-            Method mUsageStatsService = cStub.getMethod("asInterface", android.os.IBinder.class);
-            Object oIUsageStats = mUsageStatsService.invoke(null, oRemoteService);
-
-            // 相当于:PkgUsageStats[] oPkgUsageStatsArray =mUsageStatsService.getAllPkgUsageStats();
-            Class<?> cIUsageStatus = Class.forName("com.android.internal.app.IUsageStats");
-            Method mGetAllPkgUsageStats = cIUsageStatus.getMethod("getAllPkgUsageStats", (Class[]) null);
-            Object[] oPkgUsageStatsArray = (Object[]) mGetAllPkgUsageStats.invoke(oIUsageStats, (Object[]) null);
-
-            //相当于
-            //for (PkgUsageStats pkgUsageStats: oPkgUsageStatsArray)
-            //{
-            //  当前APP的包名：
-            //  packageName = pkgUsageStats.packageName
-            //  当前APP的启动次数
-            //  launchCount = pkgUsageStats.launchCount
-            //  当前APP的累计使用时间：
-            //  usageTime = pkgUsageStats.usageTime
-            //  当前APP的每个Activity的最后启动时间
-            //  componentResumeTimes = pkgUsageStats.componentResumeTimes
-            //}
-            Class<?> cPkgUsageStats = Class.forName("com.android.internal.os.PkgUsageStats");
-            for (Object pkgUsageStats : oPkgUsageStatsArray) {
-                String packageName = (String) cPkgUsageStats.getDeclaredField("packageName").get(pkgUsageStats);
-                int launchCount = cPkgUsageStats.getDeclaredField("launchCount").getInt(pkgUsageStats);
-                long usageTime = cPkgUsageStats.getDeclaredField("usageTime").getLong(pkgUsageStats);
-                Map<String, Long> componentResumeMap = (Map<String, Long>) cPkgUsageStats.getDeclaredField("componentResumeTimes").get(pkgUsageStats);
+        //android.app.usage.IUsageStatsManager$Stub$Proxy
+        Object mService = ClazzUtils.getObjectFieldObject(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
+        if (mService == null) {
+            IBinder ibinder = null;
+            try {
+                Class<?> serviceManager = Class.forName("android.os.ServiceManager");
+                Method getService = ClazzUtils.getMethod(serviceManager, "getService", String.class);
+                ibinder = (IBinder) getService.invoke(null, Context.USAGE_STATS_SERVICE);
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUGLY) {
+                    BugReportForTest.commitError(BuildConfig.tag_snap, e);
+                }
             }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
-                BugReportForTest.commitError(BuildConfig.tag_snap, e);
+            if (ibinder == null) {
+                ibinder = (IBinder) ClazzUtils.invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{Context.USAGE_STATS_SERVICE});
+            }
+            if (ibinder != null) {
+                try {
+                    Method asInterface = ClazzUtils.getMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", IBinder.class);
+                    if (asInterface != null) {
+                        mService = asInterface.invoke(null, ibinder);
+                    }
+                } catch (Throwable e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BugReportForTest.commitError(BuildConfig.tag_snap, e);
+                    }
+                }
+
+                if (mService == null) {
+                    mService = ClazzUtils.invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{ibinder});
+                }
             }
         }
-        return null;
+        return mService;
     }
 
 }
