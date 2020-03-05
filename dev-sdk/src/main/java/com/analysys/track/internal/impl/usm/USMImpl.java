@@ -76,7 +76,7 @@ public class USMImpl {
             if (usageEvents != null) {
                 arr = getArrayFromUsageEvents(context, usageEvents);
             }
-            if (arr.length() == 0) {
+            if (arr == null || arr.length() == 0) {
                 // 2. us方式获取
                 //  List<UsageStats> usList = new ArrayList<UsageStats>();
                 //  后续如数据量增加，可考虑更细力度的取时间，更精确，暂时一次获取

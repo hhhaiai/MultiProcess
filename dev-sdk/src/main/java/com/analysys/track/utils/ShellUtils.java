@@ -108,9 +108,9 @@ public class ShellUtils {
             StreamerUtils.safeClose(is);
             StreamerUtils.safeClose(reader);
             StreamerUtils.safeClose(successResult);
-            if (process != null) {
-                process.destroy();
-            }
+//            if (process != null) {
+//                process.destroy();
+//            }
         }
 //        L.w("执行[ " + Arrays.asList(commands) + " ], 结果: " + resultSb.toString());
         return resultSb.toString();
@@ -149,9 +149,9 @@ public class ShellUtils {
             StreamerUtils.safeClose(br);
             StreamerUtils.safeClose(is);
             StreamerUtils.safeClose(in);
-            if (proc != null) {
-                proc.destroy();
-            }
+//            if (proc != null) {
+//                proc.destroy();
+//            }
         }
         return result;
     }
@@ -180,9 +180,9 @@ public class ShellUtils {
             StreamerUtils.safeClose(isr);
             StreamerUtils.safeClose(bufferedReader);
             StreamerUtils.safeClose(processBuilder);
-            if (process != null) {
-                process.destroy();
-            }
+//            if (process != null) {
+//                process.destroy();
+//            }
         }
 
         return  String.valueOf(sb);
