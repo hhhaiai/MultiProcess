@@ -22,7 +22,6 @@ import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.analysys.track.internal.content.UploadKey.Response.RES_POLICY_MODULE_CL_USM;
@@ -75,7 +74,7 @@ public class USMImpl {
             Object usageEvents = USMUtils.getUsageEvents(start, end, context);
 
             if (usageEvents != null) {
-                getArrayFromUsageEvents(context, usageEvents, arr);
+                arr = getArrayFromUsageEvents(context, usageEvents);
             }
             if (arr.length() == 0) {
                 // 2. us方式获取
@@ -83,7 +82,7 @@ public class USMImpl {
                 //  后续如数据量增加，可考虑更细力度的取时间，更精确，暂时一次获取
                 List<UsageStats> usageStatsList = USMUtils.getUsageStats(context, start, end);
                 if (usageStatsList.size() > 0) {
-                    parserUsageStatsList(context, usageStatsList, arr);
+                    arr = parserUsageStatsList(context, usageStatsList);
                 }
             }
         } catch (Throwable e) {
@@ -91,18 +90,19 @@ public class USMImpl {
                 BugReportForTest.commitError(e);
             }
         }
-        return null;
+        return arr;
     }
+
 
     /**
      * 解析 dao
-     *
      * @param context
      * @param usageStatsList
-     * @param arr
+     * @return
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public static void parserUsageStatsList(Context context, List<UsageStats> usageStatsList, JSONArray arr) {
+    public static JSONArray parserUsageStatsList(Context context, List<UsageStats> usageStatsList) {
+        JSONArray arr = new JSONArray();
         if (usageStatsList != null && usageStatsList.size() > 0) {
             PackageManager packageManager = context.getPackageManager();
 
@@ -134,6 +134,7 @@ public class USMImpl {
                 }
             }
         }
+        return arr;
     }
 
     /**
@@ -141,10 +142,10 @@ public class USMImpl {
      *
      * @param context
      * @param usageEvents
-     * @param jsonArray
      * @return
      */
-    private static JSONArray getArrayFromUsageEvents(Context context, Object usageEvents, JSONArray jsonArray) {
+    private static JSONArray getArrayFromUsageEvents(Context context, Object usageEvents) {
+        JSONArray jsonArray = new JSONArray();
         PackageManager packageManager = context.getPackageManager();
         if (packageManager == null) {
             return jsonArray;
@@ -171,6 +172,7 @@ public class USMImpl {
              * 闭合数据
              */
             if (openEvent == null) {
+
                 // 首个
                 if (getEventType(event) == UsageEvents.Event.MOVE_TO_FOREGROUND
                         || getEventType(event) == UsageEvents.Event.ACTIVITY_RESUMED) {
@@ -179,16 +181,15 @@ public class USMImpl {
             } else {
                 // 闭合非连续
                 if (!openEvent.getPkgName().equals(getPackageName(event))) {
+
                     openEvent.setCloseTime(getTimeStamp(lastEvent));
 
                     //大于3秒的才算做oc,一闪而过的不算
-                    if (openEvent.getCloseTime() - openEvent.getOpenTime() >= EGContext.MINDISTANCE * 3) {
+                    if (openEvent.getCloseTime() - openEvent.getOpenTime() >= EGContext.TIME_SECOND * 3) {
                         jsonArray.put(openEvent.toJson());
                     }
-
                     if (getEventType(event) == UsageEvents.Event.MOVE_TO_FOREGROUND
-                            || getEventType(event) == UsageEvents.Event.ACTIVITY_RESUMED
-                    ) {
+                            || getEventType(event) == UsageEvents.Event.ACTIVITY_RESUMED) {
                         openEvent = openUsm(context, packageManager, event);
                     }
                 }
