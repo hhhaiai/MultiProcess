@@ -19,7 +19,7 @@ import org.json.JSONArray;
 
 import static com.analysys.track.internal.content.UploadKey.Response.RES_POLICY_MODULE_CL_USM;
 
-public class USMImpl {
+public class IUSMImpl {
 
     /**
      * 一次启动判断一次,能获取就认为一直能获取
@@ -42,7 +42,7 @@ public class USMImpl {
                 return USMAvailable;
             }
             // 采集 能获取短路 不能获取不短路
-            UsageEvents usageStats = (UsageEvents) USMUtils.getUsageEvents(0, System.currentTimeMillis(), context);
+            UsageEvents usageStats = (UsageEvents) IUSMUtils.getUsageEvents(0, System.currentTimeMillis(), context);
             USMAvailable = usageStats != null;
             return USMAvailable;
         } catch (Throwable e) {
@@ -87,10 +87,10 @@ public class USMImpl {
             }
 
             PackageManager packageManager = context.getPackageManager();
-            UsageEvents usageStats = (UsageEvents) USMUtils.getUsageEvents(start, end, context);
+            UsageEvents usageStats = (UsageEvents) IUSMUtils.getUsageEvents(start, end, context);
             if (usageStats != null) {
                 JSONArray jsonArray = new JSONArray();
-                USMInfo openEvent = null;
+                IUSMInfo openEvent = null;
                 UsageEvents.Event lastEvent = null;
                 while (usageStats.hasNextEvent()) {
                     UsageEvents.Event event = new UsageEvents.Event();
@@ -130,9 +130,9 @@ public class USMImpl {
     }
 
     @SuppressLint("NewApi")
-    private static USMInfo openUsm(Context context, PackageManager packageManager, UsageEvents.Event event) {
+    private static IUSMInfo openUsm(Context context, PackageManager packageManager, UsageEvents.Event event) {
         try {
-            USMInfo openEvent = new USMInfo(event.getTimeStamp(), event.getPackageName());
+            IUSMInfo openEvent = new IUSMInfo(event.getTimeStamp(), event.getPackageName());
             openEvent.setCollectionType("5");
             openEvent.setNetType(NetworkUtils.getNetworkType(context));
             openEvent.setApplicationType(AppSnapshotImpl.getInstance(context).getAppType(event.getPackageName()));

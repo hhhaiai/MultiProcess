@@ -38,7 +38,7 @@ import java.util.Set;
  * @author: miqt
  * @mail: miqingtang@analysys.com.cn
  */
-public class USMUtils {
+public class IUSMUtils {
     /**
      * 是否有打开辅助功能的设置页面
      *

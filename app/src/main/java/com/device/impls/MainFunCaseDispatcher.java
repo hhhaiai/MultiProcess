@@ -530,15 +530,8 @@ public class MainFunCaseDispatcher {
 
 
     private static void runCaseP29(final Context context) {
-        JSONArray arr = new JSONArray();
-
-        List<UsageStats> usageStatsList = USMUtils.getUsageStats(context, 0, System.currentTimeMillis());
-        if (usageStatsList.size() > 0) {
-            USMImpl.parserUsageStatsList(context, usageStatsList, arr);
-        }
-        EL.i("=====>" + arr.toString());
-
-//        USMCase.run(context);
+        JSONArray arr = USMImpl.getUSMInfo(context, 0, System.currentTimeMillis());
+        EL.i("arr: " + arr);
     }
     private static void runCaseP30(final Context context) {
         USMCase.simple(context);

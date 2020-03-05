@@ -7,7 +7,7 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 
-public class USMInfo {
+public class IUSMInfo {
     private long closeTime;
     private long openTime;
     private String pkgName;
@@ -16,7 +16,7 @@ public class USMInfo {
     private String netType;
     private final ExtendedMap extendedMap = new ExtendedMap();
 
-    public USMInfo(long openTime, String pkgName) {
+    public IUSMInfo(long openTime, String pkgName) {
         this.openTime = openTime;
         this.pkgName = pkgName;
     }

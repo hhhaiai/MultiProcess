@@ -7,15 +7,10 @@ import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
 
-import com.analysys.track.internal.content.UploadKey;
-import com.analysys.track.utils.sp.SPHelper;
-import com.device.impls.usmcase.tools.USMImpl;
-import com.device.impls.usmcase.tools.USMUtils;
+import com.device.impls.usmcase.tools.IUSMImpl;
 import com.device.utils.EL;
 
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -26,7 +21,7 @@ import java.util.Map;
  */
 public class USMCase {
     public static void run(Context context) {
-        EL.i("===>" + USMImpl.getUSMInfo(context));
+        EL.i("===>" + IUSMImpl.getUSMInfo(context));
     }
 
     public static void simple(Context context) {

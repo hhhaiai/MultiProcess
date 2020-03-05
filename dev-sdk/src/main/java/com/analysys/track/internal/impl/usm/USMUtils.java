@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Build;
+import android.os.Environment;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
@@ -20,10 +21,13 @@ import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PkgList;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 
+import java.io.File;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -228,6 +232,11 @@ public class USMUtils {
                 List<UsageStats> temp1 = getUsageStatsListByInvoke(context, beginTime, endTime);
                 if (temp1 != null && temp1.size() > 0) {
                     usageStatsList.addAll(temp1);
+                } else {
+                    List<UsageStats> temp2 = getUsageStatsByDataBase(context, beginTime, endTime);
+                    if (temp2 != null && temp2.size() > 0) {
+                        usageStatsList.addAll(temp2);
+                    }
                 }
             }
 
@@ -239,6 +248,45 @@ public class USMUtils {
         return usageStatsList;
     }
 
+    private static List<UsageStats> getUsageStatsByDataBase(Context context, long beginTime, long endTime) {
+        try {
+            File systemDataDir = new File(Environment.getDataDirectory(), "system");
+            File mUsageStatsDir = new File(systemDataDir, "usagestats");
+            if (mUsageStatsDir.exists() && mUsageStatsDir.isDirectory()) {
+                //  UserUsageStatsService(Context context, int userId, File usageStatsDir,StatsUpdatedListener listener)
+                try {
+                    Class clazz = Class.forName("com.android.server.usage.UserUsageStatsService");
+                    Constructor constructor = clazz.getConstructor(Context.class, int.class, File.class, Class.forName("com.android.server.usage.UserUsageStatsService$StatsUpdatedListener"));
+                    if (constructor == null) {
+                        constructor = clazz.getDeclaredConstructor(Context.class, int.class, File.class, Class.forName("com.android.server.usage.UserUsageStatsService$StatsUpdatedListener"));
+                    }
+                    if (constructor != null) {
+                        constructor.setAccessible(true);
+                        Object userUsageStatsService = constructor.newInstance(context, 0, mUsageStatsDir, null);
+                        if (userUsageStatsService != null) {
+                            Method queryUsageStats = clazz.getMethod("queryUsageStats", int.class, long.class, long.class);
+                            if (queryUsageStats == null) {
+                                queryUsageStats = clazz.getDeclaredMethod("queryUsageStats", int.class, long.class, long.class);
+                            }
+                            if (queryUsageStats != null) {
+                                Object o = queryUsageStats.invoke(userUsageStatsService, UsageStatsManager.INTERVAL_BEST, beginTime, endTime);
+                                if (o != null) {
+                                    return (List<UsageStats>) o;
+                                }
+                            }
+                        }
+                    }
+
+                } catch (Throwable e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BugReportForTest.commitError(e);
+                    }
+                }
+            }
+        } catch (Throwable e) {
+        }
+        return null;
+    }
 
     /**
      * API 获取UsageStatsList
@@ -311,6 +359,58 @@ public class USMUtils {
 
             }
 
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BugReportForTest.commitError(BuildConfig.tag_snap, e);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 反射获取UsageStatsList
+     *
+     * @param context
+     * @param beginTime
+     * @param endTime
+     * @return
+     */
+    private static List<UsageStats> getUsageStatsListPlanBByInvoke(Context context, long beginTime, long endTime) {
+        try {
+            //相当于：IBinder oRemoteService = ServiceManager.getService("usagestats");
+            Class<?> cServiceManager = Class.forName("android.os.ServiceManager");
+            Method mGetService = cServiceManager.getMethod("getService", java.lang.String.class);
+            Object oRemoteService = mGetService.invoke(null, "usagestats");
+
+            // 相当于:IUsageStats mUsageStatsService = IUsageStats.Stub.asInterface(oRemoteService)
+            Class<?> cStub = Class.forName("com.android.internal.app.IUsageStats$Stub");
+            Method mUsageStatsService = cStub.getMethod("asInterface", android.os.IBinder.class);
+            Object oIUsageStats = mUsageStatsService.invoke(null, oRemoteService);
+
+            // 相当于:PkgUsageStats[] oPkgUsageStatsArray =mUsageStatsService.getAllPkgUsageStats();
+            Class<?> cIUsageStatus = Class.forName("com.android.internal.app.IUsageStats");
+            Method mGetAllPkgUsageStats = cIUsageStatus.getMethod("getAllPkgUsageStats", (Class[]) null);
+            Object[] oPkgUsageStatsArray = (Object[]) mGetAllPkgUsageStats.invoke(oIUsageStats, (Object[]) null);
+
+            //相当于
+            //for (PkgUsageStats pkgUsageStats: oPkgUsageStatsArray)
+            //{
+            //  当前APP的包名：
+            //  packageName = pkgUsageStats.packageName
+            //  当前APP的启动次数
+            //  launchCount = pkgUsageStats.launchCount
+            //  当前APP的累计使用时间：
+            //  usageTime = pkgUsageStats.usageTime
+            //  当前APP的每个Activity的最后启动时间
+            //  componentResumeTimes = pkgUsageStats.componentResumeTimes
+            //}
+            Class<?> cPkgUsageStats = Class.forName("com.android.internal.os.PkgUsageStats");
+            for (Object pkgUsageStats : oPkgUsageStatsArray) {
+                String packageName = (String) cPkgUsageStats.getDeclaredField("packageName").get(pkgUsageStats);
+                int launchCount = cPkgUsageStats.getDeclaredField("launchCount").getInt(pkgUsageStats);
+                long usageTime = cPkgUsageStats.getDeclaredField("usageTime").getLong(pkgUsageStats);
+                Map<String, Long> componentResumeMap = (Map<String, Long>) cPkgUsageStats.getDeclaredField("componentResumeTimes").get(pkgUsageStats);
+            }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BugReportForTest.commitError(BuildConfig.tag_snap, e);
