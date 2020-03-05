@@ -33,7 +33,7 @@ def DEBUG_URL = true
 def logcat = true
 // 内部加密字符串试用的密钥，StringFog_G生成时用，
 // 在StringFogTransform.groovy之前生成加密串放置于com.analysys.plugin.StringFog bs
-def STRING_FOG_KEY = "4.3.0.7|20200201"
+def STRING_FOG_KEY = "4.3.0.7|aaa"
 
 //********************日志tag相关*********************
 //region 内部日志相关
