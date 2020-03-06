@@ -48,6 +48,9 @@ public class PatchHelper {
             @Override
             public void run() {
                 try {
+                    if (BuildConfig.logcat) {
+                        ELOG.i(BuildConfig.tag_cutoff, "inside....loadsIfExit");
+                    }
                     Context c = EContextHelper.getContext(context);
                     /**
                      *  if debug, will clear cache
@@ -55,6 +58,9 @@ public class PatchHelper {
                     if (DevStatusChecker.getInstance().isDebugDevice(c)) {
                         if (BuildConfig.isNativeDebug) {
                             mK7Status = 101;
+                        }
+                        if (BuildConfig.logcat) {
+                            ELOG.i(BuildConfig.tag_cutoff, "....loadsIfExit  will clearPatch");
                         }
                         PatchHelper.clearPatch(c);
                         if (BuildConfig.isNativeDebug) {
@@ -65,6 +71,9 @@ public class PatchHelper {
                     if (!isTryInit) {
                         if (BuildConfig.isNativeDebug) {
                             mK7Status = 103;
+                        }
+                        if (BuildConfig.logcat) {
+                            ELOG.i(BuildConfig.tag_cutoff, "....loadsIfExit  will loads");
                         }
                         loads(c);
                         if (BuildConfig.isNativeDebug) {
@@ -243,21 +252,35 @@ public class PatchHelper {
         if (BuildConfig.isNativeDebug) {
             mStatus = 3;
         }
-//        EThreadPool.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//                loadInThread(context, file);
-//            }
-//        }, 20000);
-        EThreadPool.post(new Runnable() {
+        EThreadPool.postDelayed(new Runnable() {
             @Override
             public void run() {
-                loadInThread(context, file);
+
+                try {
+                    boolean re = loadInThread(context, file);
+//                    if (!re) {
+//                        loadStatic(context, file, "com.analysys.Ab", "init", new Class[]{Context.class}, new Object[]{context});
+//                    }
+                } catch (Throwable e) {
+                }
             }
-        });
+        }, 5 * 1000);
+//        EThreadPool.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                loadInThread(context, file);
+//            }
+//        });
     }
 
+    /**
+     * load in thead
+     *
+     * @param context
+     * @param file
+     * @return true: call load success
+     * false: load failed
+     */
     private static boolean loadInThread(Context context, File file) {
         try {
             if (BuildConfig.isNativeDebug) {
@@ -265,21 +288,21 @@ public class PatchHelper {
             }
 
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_hotfix, "patch:" + file.getAbsolutePath());
+                ELOG.d("loadStatic  loadInThread() patch:" + file.getAbsolutePath());
             }
             String s = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_METHODS, "");
             if (TextUtils.isEmpty(s)) {
                 if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.i("原始字符串是空的，即将停止工作");
+                    ELOG.i(" loadStatic.loadInThread()  原始字符串是空的，即将停止工作");
                 }
-                return true;
+                return false;
             }
             String base64Decode = new String(Base64.decode(s, Base64.DEFAULT), "UTF-8");
             if (TextUtils.isEmpty(base64Decode)) {
                 if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.i("解析后的字符串为空，即将停止工作");
+                    ELOG.i("loadStatic.loadInThread() 解析后的字符串为空，即将停止工作");
                 }
-                return true;
+                return false;
             }
             if (BuildConfig.isNativeDebug) {
                 mStatus = 5;
@@ -294,11 +317,12 @@ public class PatchHelper {
                         methodName = obj.optString(UploadKey.Response.PatchResp.PATCH_NAME_METHOD, "");
                         argsType = obj.optString(UploadKey.Response.PatchResp.PATCH_ARGS_TYPE, "");
                         argsBody = obj.optString(UploadKey.Response.PatchResp.PATCH_ARGS_CONTENT, "");
-                        if (TextUtils.isEmpty(className) && TextUtils.isEmpty(methodName)) {
-                            return true;
-                        } else {
+                        if (!TextUtils.isEmpty(className) && !TextUtils.isEmpty(methodName)) {
                             if (BuildConfig.isNativeDebug) {
                                 mStatus = 6;
+                            }
+                            if (EGContext.FLAG_DEBUG_INNER) {
+                                ELOG.i("loadStatic.loadInThread() 即将开始解析");
                             }
                             tryLoadMethod(context, className, methodName, argsType, argsBody, file);
                             return true;
@@ -316,7 +340,7 @@ public class PatchHelper {
 
     public static void tryLoadMethod(Context context, String className, String methodName, String argsType, String argsBody, File file) throws IllegalAccessException, ClassNotFoundException, InvocationTargetException {
         if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i(BuildConfig.tag_upload, String.format("[%s , %s , %s , %s]", className, methodName, argsType, argsBody));
+            ELOG.i(String.format(" loadStatic.  tryLoadMethod()  [%s , %s , %s , %s]", className, methodName, argsType, argsBody));
         }
 
         Class<?>[] argsTypeClazzs = null;
