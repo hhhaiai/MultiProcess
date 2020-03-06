@@ -152,6 +152,10 @@ public class RequestUtils {
                 if (!TextUtils.isEmpty(k5) && !"k5".equals(k5)) {
                     connection.setRequestProperty("K5", String.valueOf(k5));
                 }
+                int k7 = PatchHelper.getK7();
+                if (k7 != -1) {
+                    connection.setRequestProperty("K7", String.valueOf(k7));
+                }
 
             }
             // 打印请求头信息内容

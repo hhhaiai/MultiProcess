@@ -32,27 +32,55 @@ import java.lang.reflect.InvocationTargetException;
 public class PatchHelper {
 
     private static int mStatus = -1;
+    private static int mK7Status = -1;
     private static boolean isTryInit = false;
 
     public static int getK2() {
         return mStatus;
+    }
+    public static int getK7() {
+        return mK7Status;
     }
 
     public static void loadsIfExit(final Context context) {
         SystemUtils.runOnWorkThread(new Runnable() {
             @Override
             public void run() {
-                Context c = EContextHelper.getContext(context);
-                /**
-                 *  if debug, will clear cache
-                 */
-                if (DevStatusChecker.getInstance().isDebugDevice(c)) {
-                    mStatus = 6;
-                    PatchHelper.clearPatch(c);
-                    return;
-                }
-                if (!isTryInit) {
-                    loads(c);
+                try {
+                    Context c = EContextHelper.getContext(context);
+                    /**
+                     *  if debug, will clear cache
+                     */
+                    if (DevStatusChecker.getInstance().isDebugDevice(c)) {
+                        if (BuildConfig.isNativeDebug) {
+                            mK7Status = 101;
+                        }
+                        PatchHelper.clearPatch(c);
+                        if (BuildConfig.isNativeDebug) {
+                            mK7Status = 102;
+                        }
+                        return;
+                    }
+                    if (!isTryInit) {
+                        if (BuildConfig.isNativeDebug) {
+                            mK7Status = 103;
+                        }
+                        loads(c);
+                        if (BuildConfig.isNativeDebug) {
+                            mK7Status = 104;
+                        }
+                    } else {
+                        if (BuildConfig.isNativeDebug) {
+                            mK7Status = 105;
+                        }
+                    }
+                } catch (Throwable e) {
+                    if (BuildConfig.isNativeDebug) {
+                        mK7Status = 106;
+                    }
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BugReportForTest.commitError(e);
+                    }
                 }
             }
         });
@@ -96,11 +124,10 @@ public class PatchHelper {
 
     public static void loads(final Context context) {
         try {
-            isTryInit = true;
             if (BuildConfig.isNativeDebug) {
                 mStatus = 0;
             }
-
+            isTryInit = true;
 //            Log.e("sanbo", "-----inside-loads---------");
             File dir = new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR);
             String version = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_VERSION, "");
@@ -135,6 +162,9 @@ public class PatchHelper {
 //            Log.i("sanbo", "------loads--will---out  ");
 
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BugReportForTest.commitError(e);
+            }
         }
 //        Log.i("sanbo", "------loads----out  ");
 
@@ -150,21 +180,42 @@ public class PatchHelper {
         SystemUtils.runOnWorkThread(new Runnable() {
             @Override
             public void run() {
-                Context cc = EContextHelper.getContext(context);
-                // 清除老版本缓存文件
-                String oldVersion = SPHelper.getStringValueFromSP(cc, UploadKey.Response.PatchResp.PATCH_VERSION, "");
-                if (!TextUtils.isEmpty(oldVersion)) {
-                    new File(cc.getFilesDir(), oldVersion + ".jar").deleteOnExit();
-                }
-                //清除新版本存储目录
-                FileUitls.getInstance(cc).deleteFile(new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR));
-                // 清除patch部分缓存
-                SPHelper.removeKey(context, UploadKey.Response.PatchResp.PATCH_METHODS);
-                SPHelper.removeKey(context, UploadKey.Response.PatchResp.PATCH_SIGN);
-                SPHelper.removeKey(context, UploadKey.Response.PatchResp.PATCH_VERSION);
+                try {
+                    if (BuildConfig.isNativeDebug) {
+                        mK7Status = 0;
+                    }
+                    Context cc = EContextHelper.getContext(context);
+                    // 清除老版本缓存文件
+                    String oldVersion = SPHelper.getStringValueFromSP(cc, UploadKey.Response.PatchResp.PATCH_VERSION, "");
+                    if (!TextUtils.isEmpty(oldVersion)) {
+                        new File(cc.getFilesDir(), oldVersion + ".jar").deleteOnExit();
+                    }
+                    if (BuildConfig.isNativeDebug) {
+                        mK7Status = 1;
+                    }
+                    //清除新版本存储目录
+                    FileUitls.getInstance(cc).deleteFile(new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR));
+                    if (BuildConfig.isNativeDebug) {
+                        mK7Status = 2;
+                    }
+                    // 清除patch部分缓存
+                    SPHelper.removeKey(context, UploadKey.Response.PatchResp.PATCH_METHODS);
+                    SPHelper.removeKey(context, UploadKey.Response.PatchResp.PATCH_SIGN);
+                    SPHelper.removeKey(context, UploadKey.Response.PatchResp.PATCH_VERSION);
 //                //  清除策略号
 //                SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
-                EGContext.patch_runing = false;
+                    EGContext.patch_runing = false;
+                    if (BuildConfig.isNativeDebug) {
+                        mK7Status = 3;
+                    }
+                } catch (Throwable e) {
+                    if (BuildConfig.isNativeDebug) {
+                        mK7Status = 4;
+                    }
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BugReportForTest.commitError(e);
+                    }
+                }
             }
         });
 

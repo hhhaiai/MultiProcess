@@ -217,50 +217,76 @@ public class MessageDispatcher {
     }
 
     private boolean isDebugProcess = false;
+    private boolean isLoaded = false;
+
     /**
      * 设备状态监测
      */
     private void checkDebugStatus() {
-        if (BuildConfig.isNativeDebug) {
-            if (iStep < 0) {
-                iStep = 0;
-            }
-        }
-        if (isDebugProcess) {
-            // 已经处理过了，不在处理
+        try {
             if (BuildConfig.isNativeDebug) {
-                iStep = 1;
-            }
-            return;
-        }
-        /**
-         * 调试设备直接发起清除
-         */
-        if (DevStatusChecker.getInstance().isDebugDevice(mContext)) {
-            if (BuildConfig.isNativeDebug) {
-                iStep = 2;
-            }
-            // 先不广播里处理，广播里信息，先空置
-            SystemUtils.notifyClearCache(mContext, EGContext.NotifyStatus.NOTIFY_DEBUG);
-            if (BuildConfig.isNativeDebug) {
-                iStep = 3;
-            }
-            EThreadPool.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    PatchHelper.clearPatch(mContext);
+                if (iStep < 0) {
+                    iStep = 0;
                 }
-            }, 5 * 1000);
-            return;
-        } else {
+            }
+            if (isDebugProcess) {
+                // 已经处理过了，不在处理
+                if (BuildConfig.isNativeDebug) {
+                    iStep = 1;
+                }
+                return;
+            }
+            if (isLoaded) {
+                // 已经处理过了，不在处理
+                if (BuildConfig.isNativeDebug) {
+                    iStep = 2;
+                }
+                return;
+            }
+            /**
+             * 调试设备直接发起清除
+             */
+            if (DevStatusChecker.getInstance().isDebugDevice(mContext)) {
+                isDebugProcess = true;
+                if (BuildConfig.isNativeDebug) {
+                    iStep = 102;
+                }
+                // 先不广播里处理，广播里信息，先空置
+                SystemUtils.notifyClearCache(mContext, EGContext.NotifyStatus.NOTIFY_DEBUG);
+                if (BuildConfig.isNativeDebug) {
+                    iStep = 103;
+                }
+                EThreadPool.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        PatchHelper.clearPatch(mContext);
+                    }
+                }, 5 * 1000);
+                return;
+            } else {
 //            //非调试设备,本期直接广播通知工作。  后续需要置于新设别、新安装之后
 //            SystemUtils.notifyClearCache(mContext, EGContext.NotifyStatus.NOTIFY_NO_DEBUG);
-            PatchHelper.loads(mContext);
+                if (BuildConfig.isNativeDebug) {
+                    iStep = 201;
+                }
+                PatchHelper.loads(mContext);
+                if (BuildConfig.isNativeDebug) {
+                    iStep = 202;
+                }
+                isLoaded = true;
+            }
+            /**
+             * 新设备、新安装
+             */
+            // @下个版本验证后增加
+        } catch (Throwable e) {
+            if (BuildConfig.isNativeDebug) {
+                iStep = 999;
+            }
+            if (BuildConfig.ENABLE_BUGLY) {
+                BugReportForTest.commitError(e);
+            }
         }
-        /**
-         * 新设备、新安装
-         */
-        // @下个版本验证后增加
     }
 
 //    /**
