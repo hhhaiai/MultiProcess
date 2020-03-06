@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
@@ -445,8 +446,8 @@ public class UploadImpl {
                 JSONObject object = new JSONObject(json);
                 String code = String.valueOf(object.opt(UploadKey.Response.RES_CODE));
                 if (code != null) {
-                    if (EGContext.FLAG_DEBUG_INNER) {
-                        ELOG.i(BuildConfig.tag_upload, "========收到code-----" + code);
+                    if (BuildConfig.logcat) {
+                        ELOG.i(BuildConfig.tag_cutoff, "========收到code-----" + code);
                     }
                     if (EGContext.HTTP_STATUS_200.equals(code)) {
                         EguanIdUtils.getInstance(mContext).setId(json);
@@ -454,32 +455,35 @@ public class UploadImpl {
                         uploadSuccess(EGContext.SHORT_TIME);
                     } else if (EGContext.HTTP_STATUS_500.equals(code)) {
 
-                        if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i(BuildConfig.tag_upload, "========收到500策略-----");
+                        if (BuildConfig.logcat) {
+                            ELOG.i(BuildConfig.tag_cutoff, "========收到500策略-----");
                         }
                         isChunkUpload = false;
                         int numb = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);
-//                        if (numb == 0 || EGContext.DEBUG_POLICY) {
-                        if (numb == 0) {
-
-                            String intentJson = object.optString(UploadKey.Response.RES_POLICY);
-                            JSONObject jsonObject;
-                            try {
-                                //没加密
-                                jsonObject = new JSONObject(intentJson);
-                            } catch (JSONException e) {
-                                //加密
-                                intentJson = PolicyEncrypt.getInstance().decode(
-                                        intentJson,
-                                        SystemUtils.getAppKey(mContext),
-                                        EGContext.SDK_VERSION, "-1", null);
-                                jsonObject = new JSONObject(intentJson);
-                            }
-
-                            PolicyImpl.getInstance(mContext).saveRespParams(jsonObject);
-
+                        if (BuildConfig.logcat) {
+                            ELOG.e(BuildConfig.tag_cutoff, " failed number: " + numb);
                         }
-                        uploadFailure(mContext);
+//                        if (numb == 0 || EGContext.DEBUG_POLICY) {
+//                        if (numb == 0) {
+
+                        String intentJson = object.optString(UploadKey.Response.RES_POLICY);
+                        JSONObject jsonObject;
+                        try {
+                            //没加密
+                            jsonObject = new JSONObject(intentJson);
+                        } catch (JSONException e) {
+                            //加密
+                            intentJson = PolicyEncrypt.getInstance().decode(
+                                    intentJson,
+                                    SystemUtils.getAppKey(mContext),
+                                    EGContext.SDK_VERSION, "-1", null);
+                            jsonObject = new JSONObject(intentJson);
+                        }
+
+                        PolicyImpl.getInstance(mContext).saveRespParams(jsonObject);
+
+//                        }
+//                        uploadFailure(mContext);
                     } else {
                         uploadFailure(mContext);
                     }
@@ -580,6 +584,9 @@ public class UploadImpl {
      */
     private void uploadFailure(Context mContext) {
         try {
+            if (BuildConfig.logcat) {
+                ELOG.i(BuildConfig.tag_cutoff, Log.getStackTraceString(new Exception("-----uploadFailure-----")));
+            }
             isUploading = false;
 //            SPHelper.setIntValue2SP(mContext, EGContext.REQUEST_STATE, EGContext.sPrepare);
             // 上传失败记录上传次数

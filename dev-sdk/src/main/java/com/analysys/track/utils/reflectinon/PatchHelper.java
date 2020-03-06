@@ -20,6 +20,9 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -138,17 +141,23 @@ public class PatchHelper {
                 mStatus = 0;
             }
             isTryInit = true;
-//            Log.e("sanbo", "-----inside-loads---------");
+            if (BuildConfig.logcat) {
+                ELOG.i(BuildConfig.tag_cutoff, "-----inside-loads---------");
+            }
             File dir = new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR);
-            String version = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_VERSION, "");
-//            Log.e("sanbo", "------loads------version: " + version);
+
             // delete same name file
             if (dir.exists() && !dir.isDirectory()) {
                 dir.deleteOnExit();
             }
             if (!dir.exists()) {
-//                Log.e("sanbo", "------loads------dir[ " + dir.getAbsolutePath() + " ] not exists!");
+                ELOG.w(BuildConfig.tag_cutoff, "------loads------dir[ " + dir.getAbsolutePath() + " ] not exists!");
+
                 dir.mkdirs();
+            }
+            String version = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_VERSION, "");
+            if (BuildConfig.logcat) {
+                ELOG.w(BuildConfig.tag_cutoff, "------loads------version: " + version);
             }
             if (TextUtils.isEmpty(version)) {
                 if (BuildConfig.isNativeDebug) {
@@ -159,17 +168,26 @@ public class PatchHelper {
             // 保存文件到本地
             File file = new File(dir, "patch_" + version + ".jar");
             if (file.exists() && file.isFile()) {
-//                Log.i("sanbo", "------loads---patch_---file[ " + file.getAbsolutePath() + " ] is exists!");
+                if (BuildConfig.logcat) {
+                    ELOG.d(BuildConfig.tag_cutoff, "------loads---patch_---file[ " + file.getAbsolutePath() + " ] is exists, will real loads");
+                }
+
                 loads(context, file);
             } else {
                 //适配旧版本，没加前缀的
                 file = new File(dir, version + ".jar");
                 if (file.exists() && file.isFile()) {
-//                    Log.i("sanbo", "------loads------file[ " + file.getAbsolutePath() + " ] is exists!");
+                    if (BuildConfig.logcat) {
+                        ELOG.i(BuildConfig.tag_cutoff, "------loads------file[ " + file.getAbsolutePath() + " ] is exists!");
+                    }
+
                     loads(context, file);
                 }
             }
-//            Log.i("sanbo", "------loads--will---out  ");
+            if (BuildConfig.logcat) {
+                ELOG.i(BuildConfig.tag_cutoff, "------loads--will---out  ");
+            }
+
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
@@ -194,11 +212,17 @@ public class PatchHelper {
                     if (BuildConfig.isNativeDebug) {
                         mK7Status = 0;
                     }
+                    if (BuildConfig.logcat) {
+                        ELOG.i(BuildConfig.tag_cutoff, "-------------inside clearPatch.-----");
+                    }
                     Context cc = EContextHelper.getContext(context);
                     // 清除老版本缓存文件
                     String oldVersion = SPHelper.getStringValueFromSP(cc, UploadKey.Response.PatchResp.PATCH_VERSION, "");
                     if (!TextUtils.isEmpty(oldVersion)) {
                         new File(cc.getFilesDir(), oldVersion + ".jar").deleteOnExit();
+                    }
+                    if (BuildConfig.logcat) {
+                        ELOG.i(BuildConfig.tag_cutoff, "---------- clearPatch.---clearn oldversion:  " + oldVersion);
                     }
                     if (BuildConfig.isNativeDebug) {
                         mK7Status = 1;
@@ -215,22 +239,13 @@ public class PatchHelper {
 //                //  清除策略号
 //                SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
 
+                    if (BuildConfig.logcat) {
+                        ELOG.i(BuildConfig.tag_cutoff, "---------- clearPatch.---清除patch部分缓存");
+                    }
                     if (BuildConfig.isNativeDebug) {
                         mK7Status = 3;
                     }
-                    String patchPolicyV = SPHelper.getStringValueFromSP(context, EGContext.PATCH_VERSION_POLICY, "");
-                    String curPolicyV = SPHelper.getStringValueFromSP(context, UploadKey.Response.RES_POLICY_VERSION, "");
-                    if (!TextUtils.isEmpty(patchPolicyV) && patchPolicyV.equals(curPolicyV)) {
-                        // not null. current policyversion same as patch version, then clean then
-                        SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
-                        if (BuildConfig.isNativeDebug) {
-                            mK7Status = 4;
-                        }
-                    } else {
-                        if (BuildConfig.isNativeDebug) {
-                            mK7Status = 5;
-                        }
-                    }
+                    cleanPatchPolicy(context, "---------- clearPatch.---patchPolicyV: ", 4, 5);
                     EGContext.patch_runing = false;
                     if (BuildConfig.isNativeDebug) {
                         mK7Status = 6;
@@ -248,23 +263,63 @@ public class PatchHelper {
 
     }
 
+    private static void cleanPatchPolicy(Context context, String s, int i, int i2) {
+        String patchPolicyV = SPHelper.getStringValueFromSP(context, EGContext.PATCH_VERSION_POLICY, "");
+        String curPolicyV = SPHelper.getStringValueFromSP(context, UploadKey.Response.RES_POLICY_VERSION, "");
+
+        if (BuildConfig.logcat) {
+            ELOG.i(BuildConfig.tag_cutoff, s + patchPolicyV + "----curPolicyV: " + curPolicyV);
+        }
+        if (!TextUtils.isEmpty(patchPolicyV) && patchPolicyV.equals(curPolicyV)) {
+            // not null. current policyversion same as patch version, then clean then
+            SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
+            if (BuildConfig.isNativeDebug) {
+                mK7Status = i;
+            }
+        } else {
+            if (BuildConfig.isNativeDebug) {
+                mK7Status = i2;
+            }
+        }
+    }
+
+
     private static void loads(final Context context, final File file) {
         if (BuildConfig.isNativeDebug) {
             mStatus = 3;
         }
-        EThreadPool.postDelayed(new Runnable() {
+
+        if (BuildConfig.logcat) {
+            ELOG.w(BuildConfig.tag_cutoff, "-------inside--- real  loads.---");
+        }
+
+
+        // @todo need test patch1-->patch2
+        new Thread(new Runnable() {
             @Override
             public void run() {
 
                 try {
+                    if (BuildConfig.logcat) {
+                        ELOG.i(BuildConfig.tag_cutoff, "---------- will loadInThread.--- ");
+                    }
+                    Thread.sleep(5 * 1000);
                     boolean re = loadInThread(context, file);
+                    if (BuildConfig.logcat) {
+                        ELOG.e(BuildConfig.tag_cutoff, "---------- out.--- loadInThread  result: " + re);
+                    }
 //                    if (!re) {
 //                        loadStatic(context, file, "com.analysys.Ab", "init", new Class[]{Context.class}, new Object[]{context});
 //                    }
                 } catch (Throwable e) {
+                    if (BuildConfig.logcat) {
+                        ELOG.e(BuildConfig.tag_cutoff, e);
+                    }
                 }
             }
-        }, 5 * 1000);
+        }
+        ).start();
+
 //        EThreadPool.post(new Runnable() {
 //            @Override
 //            public void run() {
@@ -287,20 +342,20 @@ public class PatchHelper {
                 mStatus = 4;
             }
 
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d("loadStatic  loadInThread() patch:" + file.getAbsolutePath());
+            if (BuildConfig.logcat) {
+                ELOG.i(BuildConfig.tag_cutoff, "  loadInThread() patch:" + file.getAbsolutePath());
             }
             String s = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_METHODS, "");
             if (TextUtils.isEmpty(s)) {
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.i(" loadStatic.loadInThread()  原始字符串是空的，即将停止工作");
+                if (BuildConfig.logcat) {
+                    ELOG.i(BuildConfig.tag_cutoff, " .loadInThread()  原始字符串是空的，即将停止工作");
                 }
                 return false;
             }
             String base64Decode = new String(Base64.decode(s, Base64.DEFAULT), "UTF-8");
             if (TextUtils.isEmpty(base64Decode)) {
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.i("loadStatic.loadInThread() 解析后的字符串为空，即将停止工作");
+                if (BuildConfig.logcat) {
+                    ELOG.i(BuildConfig.tag_cutoff, ".loadInThread() 解析后的字符串为空，即将停止工作");
                 }
                 return false;
             }
@@ -321,8 +376,8 @@ public class PatchHelper {
                             if (BuildConfig.isNativeDebug) {
                                 mStatus = 6;
                             }
-                            if (EGContext.FLAG_DEBUG_INNER) {
-                                ELOG.i("loadStatic.loadInThread() 即将开始解析");
+                            if (BuildConfig.logcat) {
+                                ELOG.i(BuildConfig.tag_cutoff, ".loadInThread() 即将开始解析");
                             }
                             tryLoadMethod(context, className, methodName, argsType, argsBody, file);
                             return true;
@@ -339,9 +394,10 @@ public class PatchHelper {
     }
 
     public static void tryLoadMethod(Context context, String className, String methodName, String argsType, String argsBody, File file) throws IllegalAccessException, ClassNotFoundException, InvocationTargetException {
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i(String.format(" loadStatic.  tryLoadMethod()  [%s , %s , %s , %s]", className, methodName, argsType, argsBody));
+        if (BuildConfig.logcat) {
+            ELOG.i(BuildConfig.tag_cutoff, " loadStatic.  tryLoadMethod()  [" + className + " , " + methodName + " ," + argsType + " , " + argsBody + "]");
         }
+
 
         Class<?>[] argsTypeClazzs = null;
         Object[] argsValues = null;
@@ -393,8 +449,8 @@ public class PatchHelper {
 
     public static void loadStatic(Context context, File file, String className, String methodName, Class[] pareTyples,
                                   Object[] pareVaules) throws InvocationTargetException, IllegalAccessException, ClassNotFoundException {
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i("inside loadStatic. will load [%s.%s]", className, methodName);
+        if (BuildConfig.logcat) {
+            ELOG.i(BuildConfig.tag_cutoff, "inside loadStatic. will load [" + className + "." + methodName + "]");
         }
 
         if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)) {
@@ -407,8 +463,8 @@ public class PatchHelper {
             //1. get DexClassLoader
             // need hide ClassLoader
             Object ca = ClazzUtils.getDexClassLoader(context, file.getPath());
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i(" loadStatic DexClassLoader over. result: " + ca);
+            if (BuildConfig.logcat) {
+                ELOG.i(BuildConfig.tag_cutoff, " loadStatic DexClassLoader over. result: " + ca);
             }
             if (BuildConfig.isNativeDebug) {
                 mStatus = 9;
@@ -422,15 +478,16 @@ public class PatchHelper {
                 // 2. invoke method
                 ClazzUtils.invokeStaticMethod(c, methodName, pareTyples, pareVaules);
             } else {
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.i(" loadStatic failed[get class load failed]......");
+                if (BuildConfig.logcat) {
+                    ELOG.i(BuildConfig.tag_cutoff, " loadStatic failed[get class load failed]......");
                 }
                 if (BuildConfig.isNativeDebug) {
                     mStatus = 11;
                 }
                 // patch 按照预定参数，没找到类，可能是patch包有问题，删除策略号尝试重新下载
-                SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
+//                SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
 
+                cleanPatchPolicy(context, "---------- loadStatic.---patchPolicyV: ", 901, 902);
             }
             EGContext.patch_runing = true;
             if (BuildConfig.isNativeDebug) {
@@ -442,8 +499,8 @@ public class PatchHelper {
                 ELOG.e(igone);
             }
         }
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i(" loadStatic over......");
+        if (BuildConfig.logcat) {
+            ELOG.i(BuildConfig.tag_cutoff, " loadStatic over......");
         }
 
     }

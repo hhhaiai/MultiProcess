@@ -217,7 +217,8 @@ public class HotFixTransform {
             if (EGContext.FLAG_DEBUG_INNER) {
                 Log.i(BuildConfig.tag_hotfix, "dex path 存在 文件实际不存在【清除策略号】下次重新获取" + path);
             }
-            SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
+//            SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
+            clearHotFixPolicyVersion(context);
             return false;
         }
     }
@@ -255,11 +256,21 @@ public class HotFixTransform {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_hotfix, "dexError[损坏][重置策略版本号]");
             }
-            SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
+            clearHotFixPolicyVersion(context);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BugReportForTest.commitError(e);
             }
+        }
+    }
+
+    private static void clearHotFixPolicyVersion(Context context) {
+        String patchPolicyV = SPHelper.getStringValueFromSP(context, EGContext.PATCH_VERSION_POLICY, "");
+        String curPolicyV = SPHelper.getStringValueFromSP(context, UploadKey.Response.RES_POLICY_VERSION, "");
+
+        if (!TextUtils.isEmpty(curPolicyV) && !patchPolicyV.equals(curPolicyV)) {
+            // not null. current policyversion same as patch version, then clean then
+            SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
         }
     }
 
