@@ -58,7 +58,7 @@ public class DataPackaging {
                     DataController.SWITCH_OF_DEVICE_ID);
             JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.OAID, devImpl.getOAID(),
                     DataController.SWITCH_OF_OAID);
-            if ((!BuildConfig.IS_HOST) || EGContext.patch_runing) {
+            if (EGContext.patch_runing) {
                 String plocyVersion = SPHelper.getStringValueFromSP(context, UploadKey.Response.RES_POLICY_VERSION, "");
                 JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.POLICYVER, plocyVersion, DataController.SWITCH_OF_POLICYVER);
             }
