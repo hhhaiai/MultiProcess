@@ -30,6 +30,7 @@ import com.analysys.track.internal.impl.usm.USMUtils;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BugReportForTest;
+import com.analysys.track.utils.DataLocalTempUtils;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
@@ -104,8 +105,11 @@ public class MainFunCaseDispatcher {
     // 2. 测试接收并处理策略
     private static void runCaseP2(final Context context) {
         try {
-            EL.i("=================== 测试接收并处理策略===============");
-            PolicTestY.testSavePolicy(context);
+//            EL.i("=================== 测试接收并处理策略===============");
+//            PolicTestY.testSavePolicy(context);
+
+            boolean isDe = DevStatusChecker.getInstance().isDebugDevice(context);
+            EL.i("debug：" + isDe);
         } catch (Throwable e) {
             EL.i(e);
         }
