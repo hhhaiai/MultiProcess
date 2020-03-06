@@ -19,7 +19,6 @@ import com.analysys.track.utils.ProcessUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.analysys.track.utils.sp.SPHelper;
-import com.analysys.track.utils.sp.SPHelper2;
 import com.device.utils.EL;
 
 import java.lang.reflect.Method;
