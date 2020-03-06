@@ -8,7 +8,6 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.CutOffUtils;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.SimulatorUtils;
 import com.analysys.track.utils.StreamerUtils;
