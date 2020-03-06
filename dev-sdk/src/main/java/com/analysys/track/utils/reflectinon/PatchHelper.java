@@ -32,6 +32,7 @@ import java.lang.reflect.InvocationTargetException;
 public class PatchHelper {
 
     private static int mStatus = -1;
+    private static boolean isTryInit = false;
 
     public static int getK2() {
         return mStatus;
@@ -41,21 +42,61 @@ public class PatchHelper {
         SystemUtils.runOnWorkThread(new Runnable() {
             @Override
             public void run() {
+                Context c = EContextHelper.getContext(context);
                 /**
                  *  if debug, will clear cache
                  */
-                if (DevStatusChecker.getInstance().isDebugDevice(context)) {
+                if (DevStatusChecker.getInstance().isDebugDevice(c)) {
                     mStatus = 6;
-                    clearPatch(context);
+                    PatchHelper.clearPatch(c);
                     return;
                 }
-                loads(context);
+                if (!isTryInit) {
+                    loads(c);
+                }
             }
         });
     }
+
+//
+//    /**
+//     * 确保3秒内执行执行一次
+//     */
+//    private static void makesureRunOnce(Context context) {
+//
+//        if (mHandler == null) {
+//            mHandler = new MyHandler(context);
+//        }
+//        if (!mHandler.hasMessages(99)) {
+//            mHandler.removeMessages(99);
+//        }
+//        Message msg = mHandler.obtainMessage();
+//        msg.what = 99;
+//        mHandler.sendEmptyMessageDelayed(99, 3 * 1000);
+//    }
+//
+//    private static Handler mHandler = null;
+//
+//    static class MyHandler extends Handler {
+//        private Context mContext;
+//
+//        MyHandler(Context context) {
+//            mContext = EContextHelper.getContext(context);
+//        }
+//
+//        @Override
+//        public void handleMessage(Message msg) {
+//            if (msg.what == 99) {
+//                if (!isTryInit) {
+//                    loads(mContext);
+//                }
+//            }
+//        }
+//    }
+
     public static void loads(final Context context) {
         try {
-
+            isTryInit = true;
             if (BuildConfig.isNativeDebug) {
                 mStatus = 0;
             }

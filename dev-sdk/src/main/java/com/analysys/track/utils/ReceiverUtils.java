@@ -114,7 +114,7 @@ public class ReceiverUtils {
                 context.registerReceiver(mReceiver, intentFilter);
                 // 清数据的
                 intentFilter = new IntentFilter();
-                intentFilter.addAction(EGContext.ACTION_UPDATE_CLEAR);
+                intentFilter.addAction(EGContext.ACTION_NOTIFY_CLEAR);
                 intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
                 context.registerReceiver(mReceiver, intentFilter);
 

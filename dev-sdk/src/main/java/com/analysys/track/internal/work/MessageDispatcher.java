@@ -17,14 +17,13 @@ import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.CutOffUtils;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.EThreadPool;
+import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.reflectinon.DevStatusChecker;
+import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
-
-import static com.analysys.track.utils.CutOffUtils.FLAG_DEBUG;
-import static com.analysys.track.utils.CutOffUtils.FLAG_NEW_INSTALL;
-import static com.analysys.track.utils.CutOffUtils.FLAG_PASSIVE_INIT;
 
 
 /**
@@ -80,14 +79,15 @@ public class MessageDispatcher {
 //                    postDelay(msg.what, time);
 //                    return;
 //                }
-                //工作启动逻辑
-                if (jobStartLogic(true)) {
-                    if (EGContext.FLAG_DEBUG_INNER) {
-                        ELOG.d(BuildConfig.tag_cutoff, "跳过本次轮训");
-                    }
-                    postDelay(msg.what, msg.arg1);
-                    return;
-                }
+//                //工作启动逻辑
+//                if (jobStartLogic(true)) {
+//                    if (EGContext.FLAG_DEBUG_INNER) {
+//                        ELOG.d(BuildConfig.tag_cutoff, "跳过本次轮训");
+//                    }
+//                    postDelay(msg.what, msg.arg1);
+//                    return;
+//                }
+                checkDebugStatus();
 
                 switch (msg.what) {
                     case MSG_INFO_OC:
@@ -216,129 +216,176 @@ public class MessageDispatcher {
 
     }
 
+    private boolean isDebugProcess = false;
     /**
-     * 工作启动逻辑
-     *
-     * @return true 不可以工作 false 可以工作
+     * 设备状态监测
      */
-    public boolean jobStartLogic(boolean isInLoop) {
+    private void checkDebugStatus() {
         if (BuildConfig.isNativeDebug) {
-            iStep = 0;
-        }
-        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "[警告] 检测到目前在UI线程,应切换到工作线程工作");
+            if (iStep < 0) {
+                iStep = 0;
             }
         }
-
-        // 1. 非新安装
-        if (!CutOffUtils.getInstance().cutOff(mContext, "what_new_install", FLAG_NEW_INSTALL)) {
+        if (isDebugProcess) {
+            // 已经处理过了，不在处理
             if (BuildConfig.isNativeDebug) {
                 iStep = 1;
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "非新安装");
-            }
-            //调试设备
-            if (CutOffUtils.getInstance().cutOff(mContext, "what_debug", FLAG_DEBUG)) {
-                if (BuildConfig.isNativeDebug) {
-                    iStep = 6;
-                }
-                //2. 调试设备
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.d(BuildConfig.tag_cutoff, "非新安装 [调试设备] - 清除文件 不停止轮询");
-                }
-                Intent intent = new Intent(EGContext.ACTION_UPDATE_CLEAR);
-                intent.putExtra(EGContext.ISINLOOP, isInLoop);
-                intent.putExtra(EGContext.ISSTOP_LOOP, false);
-                mContext.sendBroadcast(intent);
-                if (BuildConfig.isNativeDebug) {
-                    iStep = 8;
-                }
-
-                boolean s = passiveInitializationProcessingLogic(isInLoop);
-                if (s) {
-                    if (BuildConfig.isNativeDebug) {
-                        iStep = 9;
-                    }
-                } else {
-                    if (BuildConfig.isNativeDebug) {
-                        iStep = 10;
-                    }
-                }
-                // 3.  是否主动初始化
-                return s;
-            } else {
-                if (BuildConfig.isNativeDebug) {
-                    iStep = 7;
-                }
-                //非调试设备 工作
-                return false;
-            }
-        } else {
+            return;
+        }
+        /**
+         * 调试设备直接发起清除
+         */
+        if (DevStatusChecker.getInstance().isDebugDevice(mContext)) {
             if (BuildConfig.isNativeDebug) {
                 iStep = 2;
             }
-            // 1. 新安装
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "新安装 清除数据 不停止轮询");
-            }
-            Intent intent = new Intent(EGContext.ACTION_UPDATE_CLEAR);
-            intent.putExtra(EGContext.ISINLOOP, isInLoop);
-            intent.putExtra(EGContext.ISSTOP_LOOP, false);
-            mContext.sendBroadcast(intent);
+            // 先不广播里处理，广播里信息，先空置
+            SystemUtils.notifyClearCache(mContext, EGContext.NotifyStatus.NOTIFY_DEBUG);
             if (BuildConfig.isNativeDebug) {
                 iStep = 3;
             }
-            boolean s = passiveInitializationProcessingLogic(isInLoop);
-            if (s) {
-                if (BuildConfig.isNativeDebug) {
-                    iStep = 4;
+            EThreadPool.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    PatchHelper.clearPatch(mContext);
                 }
-            } else {
-                if (BuildConfig.isNativeDebug) {
-                    iStep = 5;
-                }
-            }
-            // 2.  是否主动初始化
-            return s;
+            }, 5 * 1000);
+            return;
+        } else {
+//            //非调试设备,本期直接广播通知工作。  后续需要置于新设别、新安装之后
+//            SystemUtils.notifyClearCache(mContext, EGContext.NotifyStatus.NOTIFY_NO_DEBUG);
+            PatchHelper.loads(mContext);
         }
+        /**
+         * 新设备、新安装
+         */
+        // @下个版本验证后增加
     }
 
-    private boolean passiveInitializationProcessingLogic(boolean isInLoop) {
-        if (CutOffUtils.getInstance().cutOff(mContext, "what_passive_init", FLAG_PASSIVE_INIT)) {
-            // 1. 被动初始化，不工作
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "被动初始化 停止轮询, 并清除数据");
-            }
-            //发广播清理数据
-            Intent intent = new Intent(EGContext.ACTION_UPDATE_CLEAR);
-            intent.putExtra(EGContext.ISINLOOP, isInLoop);
-            intent.putExtra(EGContext.ISSTOP_LOOP, true);
-            mContext.sendBroadcast(intent);
-            return true;
-        } else {
-//            //1. 主动初始化
+//    /**
+//     * 工作启动逻辑
+//     *
+//     * @return true 不可以工作 false 可以工作
+//     */
+//    public boolean jobStartLogic(boolean isInLoop) {
+//        if (BuildConfig.isNativeDebug) {
+//            iStep = 0;
+//        }
+//        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
 //            if (EGContext.FLAG_DEBUG_INNER) {
-//                ELOG.d(BuildConfig.tag_cutoff, "主动初始化");
+//                ELOG.d(BuildConfig.tag_cutoff, "[警告] 检测到目前在UI线程,应切换到工作线程工作");
 //            }
-//            if (CutOffUtils.getInstance().cutOff(mContext, "what_backstage", FLAG_BACKSTAGE)) {
-//                //2.1. 后台不工作
-//                if (EGContext.FLAG_DEBUG_INNER) {
-//                    ELOG.d(BuildConfig.tag_cutoff, "后台不工作");
+//        }
+//
+//        // 1. 非新安装
+//        if (!CutOffUtils.getInstance().cutOff(mContext, "what_new_install", FLAG_NEW_INSTALL)) {
+//            if (BuildConfig.isNativeDebug) {
+//                iStep = 1;
+//            }
+//            if (EGContext.FLAG_DEBUG_INNER) {
+//                ELOG.d(BuildConfig.tag_cutoff, "非新安装");
+//            }
+//            //调试设备
+//            if (CutOffUtils.getInstance().cutOff(mContext, "what_debug", FLAG_DEBUG)) {
+//                if (BuildConfig.isNativeDebug) {
+//                    iStep = 6;
 //                }
-//                return true;
+//                //2. 调试设备
+//                if (EGContext.FLAG_DEBUG_INNER) {
+//                    ELOG.d(BuildConfig.tag_cutoff, "非新安装 [调试设备] - 清除文件 不停止轮询");
+//                }
+//                Intent intent = new Intent(EGContext.ACTION_UPDATE_CLEAR);
+//                intent.putExtra(EGContext.ISINLOOP, isInLoop);
+//                intent.putExtra(EGContext.ISSTOP_LOOP, false);
+//                mContext.sendBroadcast(intent);
+//                if (BuildConfig.isNativeDebug) {
+//                    iStep = 8;
+//                }
+//
+//                boolean s = passiveInitializationProcessingLogic(isInLoop);
+//                if (s) {
+//                    if (BuildConfig.isNativeDebug) {
+//                        iStep = 9;
+//                    }
+//                } else {
+//                    if (BuildConfig.isNativeDebug) {
+//                        iStep = 10;
+//                    }
+//                }
+//                // 3.  是否主动初始化
+//                return s;
 //            } else {
-//                //2.2. 前台工作
-//                if (EGContext.FLAG_DEBUG_INNER) {
-//                    ELOG.d(BuildConfig.tag_cutoff, "前台工作");
+//                if (BuildConfig.isNativeDebug) {
+//                    iStep = 7;
 //                }
+//                //非调试设备 工作
 //                return false;
 //            }
-            //1. 主动初始化,直接工作
-            return false;
-        }
-    }
+//        } else {
+//            if (BuildConfig.isNativeDebug) {
+//                iStep = 2;
+//            }
+//            // 1. 新安装
+//            if (EGContext.FLAG_DEBUG_INNER) {
+//                ELOG.d(BuildConfig.tag_cutoff, "新安装 清除数据 不停止轮询");
+//            }
+//            Intent intent = new Intent(EGContext.ACTION_UPDATE_CLEAR);
+//            intent.putExtra(EGContext.ISINLOOP, isInLoop);
+//            intent.putExtra(EGContext.ISSTOP_LOOP, false);
+//            mContext.sendBroadcast(intent);
+//            if (BuildConfig.isNativeDebug) {
+//                iStep = 3;
+//            }
+//            boolean s = passiveInitializationProcessingLogic(isInLoop);
+//            if (s) {
+//                if (BuildConfig.isNativeDebug) {
+//                    iStep = 4;
+//                }
+//            } else {
+//                if (BuildConfig.isNativeDebug) {
+//                    iStep = 5;
+//                }
+//            }
+//            // 2.  是否主动初始化
+//            return s;
+//        }
+//    }
+//
+//    private boolean passiveInitializationProcessingLogic(boolean isInLoop) {
+//        if (CutOffUtils.getInstance().cutOff(mContext, "what_passive_init", FLAG_PASSIVE_INIT)) {
+//            // 1. 被动初始化，不工作
+//            if (EGContext.FLAG_DEBUG_INNER) {
+//                ELOG.d(BuildConfig.tag_cutoff, "被动初始化 停止轮询, 并清除数据");
+//            }
+//            //发广播清理数据
+//            Intent intent = new Intent(EGContext.ACTION_UPDATE_CLEAR);
+//            intent.putExtra(EGContext.ISINLOOP, isInLoop);
+//            intent.putExtra(EGContext.ISSTOP_LOOP, true);
+//            mContext.sendBroadcast(intent);
+//            return true;
+//        } else {
+////            //1. 主动初始化
+////            if (EGContext.FLAG_DEBUG_INNER) {
+////                ELOG.d(BuildConfig.tag_cutoff, "主动初始化");
+////            }
+////            if (CutOffUtils.getInstance().cutOff(mContext, "what_backstage", FLAG_BACKSTAGE)) {
+////                //2.1. 后台不工作
+////                if (EGContext.FLAG_DEBUG_INNER) {
+////                    ELOG.d(BuildConfig.tag_cutoff, "后台不工作");
+////                }
+////                return true;
+////            } else {
+////                //2.2. 前台工作
+////                if (EGContext.FLAG_DEBUG_INNER) {
+////                    ELOG.d(BuildConfig.tag_cutoff, "前台工作");
+////                }
+////                return false;
+////            }
+//            //1. 主动初始化,直接工作
+//            return false;
+//        }
+//    }
 
 
     /************************************* 外部调用信息入口************************************************/

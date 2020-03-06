@@ -38,13 +38,23 @@ public class EGContext {
     /**
      * 广播相关
      */
+    // 获取到安装列表
     public static final String ACTION_MTC_LOCK = "com.analysys.sdk.action_snap";
+    // 收到策略进程同步
     public static final String ACTION_UPDATE_POLICY = "com.analysys.sdk.action_policy";
-    public static final String ACTION_UPDATE_CLEAR = "com.analysys.sdk.action_clear";
-    public static final String POLICY = "POLICY";
-    public static final String ISINLOOP = "isInLoop";
-    public static final String ISSTOP_LOOP = "ISSTOP_LOOP";
-    public static final String PNAME = "PNAME";
+    // 测试设备，通知方式传递信息。 http://con.analysys.cn/pages/viewpage.action?pageId=24183993
+    public static final String ACTION_NOTIFY_CLEAR = "com.analysys.notify";
+    public static final String NOTIFY_PKG = "pkg";
+    public static final String NOTIFY_TYPE = "type";
+
+    public static class NotifyStatus {
+        public static final int NOTIFY_NO_DEBUG = 0;
+        public static final int NOTIFY_DEBUG = 1;
+        public static final int NOTIFY_NEW_INSTALL = 2;
+        public static final int NOTIFY_UNKNOW_DEVICE = 3;
+    }
+
+    // 开屏次数
     public static final String KEY_ACTION_SCREEN_ON_SIZE = "SCREEN_ON_SIZE";
 
 
@@ -279,6 +289,19 @@ public class EGContext {
      */
     public static String PATCH_VERSION = "_ptv";
     public static final String PATCH_CACHE_DIR = FILE_DIR + ".patch/";
+
+
+    /**
+     * 调试使用/data/local/tmp/kvs文件使用
+     */
+    // 忽略调试状态。大于等于0即表示忽略
+    public static final String KVS_KEY_DEBUG = "i_debug";
+    // 忽略新安装状态。大于等于0即表示忽略
+    public static final String KVS_KEY_NEW_INSTALL = "i_new_install";
+    // 忽略新设备状态。大于等于0即表示忽略
+    public static final String KVS_KEY_NEW_DEVICE = "i_new_device";
+
+
     /********************************************日志控制************************************************/
     /**
      * EGuan 内部调试系列tag.主要用于控制堆栈打印、错误打印、内部提示信息打印

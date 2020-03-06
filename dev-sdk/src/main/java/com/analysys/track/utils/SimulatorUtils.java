@@ -14,7 +14,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -214,7 +213,6 @@ public class SimulatorUtils {
 
     public static boolean hasQemuBuildProps(Context context) {
         mStatus = 8;
-
         if ("goldfish".equals(ShellUtils.shell("getprop ro.hardware"))) {
             mStatus = 81;
             return true;
@@ -408,21 +406,34 @@ public class SimulatorUtils {
      * @throws IOException
      */
     public static boolean hasTracerPid() {
-        mStatus = 6;
+        if (BuildConfig.isNativeDebug) {
+            mStatus = 6;
+        }
         BufferedReader reader = null;
         InputStreamReader isr = null;
         FileInputStream fis = null;
         try {
-            fis = new FileInputStream("/proc/self/status");
+            File f = new File("/proc/self/status");
+            if (!f.exists() || !f.canRead()) {
+                if (BuildConfig.isNativeDebug) {
+                    mStatus = 63;
+                }
+                return false;
+            }
+            fis = new FileInputStream(f);
             isr = new InputStreamReader(fis);
             reader = new BufferedReader(isr, 1000);
             String line;
-            mStatus = 61;
+            if (BuildConfig.isNativeDebug) {
+                mStatus = 61;
+            }
             while ((line = reader.readLine()) != null) {
                 if (line.length() > tracerpid.length()) {
                     if (line.substring(0, tracerpid.length()).equalsIgnoreCase(tracerpid)) {
                         if (Integer.decode(line.substring(tracerpid.length() + 1).trim()) > 0) {
-                            mStatus = 62;
+                            if (BuildConfig.isNativeDebug) {
+                                mStatus = 62;
+                            }
                             return true;
                         }
                         break;
@@ -442,26 +453,26 @@ public class SimulatorUtils {
         return false;
     }
 
-    public static class Tcp {
-
-        public int id;
-        public long localIp;
-        public int localPort;
-        public int remoteIp;
-        public int remotePort;
-
-        public Tcp(String id, String localIp, String localPort, String remoteIp, String remotePort, String state,
-                   String tx_queue, String rx_queue, String tr, String tm_when, String retrnsmt, String uid, String timeout,
-                   String inode) {
-            this.id = Integer.parseInt(id, 16);
-            this.localIp = Long.parseLong(localIp, 16);
-            this.localPort = Integer.parseInt(localPort, 16);
-        }
-
-        static Tcp create(String[] params) {
-            return new Tcp(params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8],
-                    params[9], params[10], params[11], params[12], params[13], params[14]);
-        }
-    }
+//    public static class Tcp {
+//
+//        public int id;
+//        public long localIp;
+//        public int localPort;
+//        public int remoteIp;
+//        public int remotePort;
+//
+//        public Tcp(String id, String localIp, String localPort, String remoteIp, String remotePort, String state,
+//                   String tx_queue, String rx_queue, String tr, String tm_when, String retrnsmt, String uid, String timeout,
+//                   String inode) {
+//            this.id = Integer.parseInt(id, 16);
+//            this.localIp = Long.parseLong(localIp, 16);
+//            this.localPort = Integer.parseInt(localPort, 16);
+//        }
+//
+//        static Tcp create(String[] params) {
+//            return new Tcp(params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8],
+//                    params[9], params[10], params[11], params[12], params[13], params[14]);
+//        }
+//    }
 }
 

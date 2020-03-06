@@ -6,6 +6,7 @@ import android.app.ActivityManager;
 import android.app.AppOpsManager;
 import android.app.KeyguardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -612,5 +613,27 @@ public class SystemUtils {
             }
             return "0";
         }
+    }
+
+    /**
+     * nodify clear cache
+     *
+     * @param context
+     * @param type
+     */
+    public static void notifyClearCache(final Context context, final int type) {
+        runOnWorkThread(new Runnable() {
+            @Override
+            public void run() {
+                // make sure receiver msg , send 4 times
+                for (int i = 0; i < 4; i++) {
+                    Intent intent = new Intent(EGContext.ACTION_NOTIFY_CLEAR);
+                    intent.putExtra(EGContext.NOTIFY_PKG, context.getPackageName());
+                    intent.putExtra(EGContext.NOTIFY_TYPE, type);
+                    context.sendBroadcast(intent);
+                }
+            }
+        });
+
     }
 }

@@ -1,8 +1,11 @@
 package com.analysys.track.internal.impl;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
@@ -12,6 +15,7 @@ import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.PatchHelper;
@@ -27,6 +31,7 @@ import com.analysys.track.utils.reflectinon.PatchHelper;
 public class ReceiverImpl {
 
 
+    private Context mContext = null;
     /**
      * 处理接收到的广播
      *
@@ -34,7 +39,7 @@ public class ReceiverImpl {
      * @param intent
      */
     public void process(final Context context, final Intent intent) {
-
+        mContext = EContextHelper.getContext(context);
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.d(BuildConfig.tag_recerver + intent);
         }
@@ -113,11 +118,6 @@ public class ReceiverImpl {
             }
 
         } else if (Intent.ACTION_SCREEN_ON.equals(intent.getAction())) {
-//            //  7.x以上版本保持心跳
-//            if (Build.VERSION.SDK_INT >= 24) {
-//                return;
-//            }
-
             OCImpl.getInstance(context).processOCWhenScreenChange(true);
 
         } else if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
@@ -139,42 +139,58 @@ public class ReceiverImpl {
             EGContext.snap_complete = true;
         } else if (EGContext.ACTION_UPDATE_POLICY.equals(intent.getAction())) {
             PolicyImpl.getInstance(EContextHelper.getContext(context)).updatePolicyForReceiver(intent);
-        } else if (EGContext.ACTION_UPDATE_CLEAR.equals(intent.getAction())) {
-            boolean isStopLoop = intent.getBooleanExtra(EGContext.ISSTOP_LOOP, false);
-            boolean isInLoop = intent.getBooleanExtra(EGContext.ISINLOOP, true);
-            stopAndClearData(EContextHelper.getContext(context), isInLoop, isStopLoop);
+        } else if (EGContext.ACTION_NOTIFY_CLEAR.equals(intent.getAction())) {
+//            makesureRunOnce(context, intent);
         }
     }
 
-    private void stopAndClearData(Context context, boolean isInLoop, boolean isStopLoop) {
-        try {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.d(BuildConfig.tag_cutoff, "[清除数据]");
-            }
-
-            PatchHelper.clearPatch(context);
-//            if (isStopLoop) {
-//                if (EGContext.FLAG_DEBUG_INNER) {
-//                    ELOG.d(BuildConfig.tag_cutoff, "[停止轮训]");
+//    /**
+//     * 确保3秒内执行执行一次
+//     */
+//    private void makesureRunOnce(Context context, Intent intent) {
+//
+//        if (mHandler == null) {
+//            mHandler = new MyHandler(mContext);
+//        }
+//        if (!mHandler.hasMessages(1)) {
+//            mHandler.removeMessages(1);
+//        }
+//        String pkg = intent.getStringExtra(EGContext.NOTIFY_PKG);
+//        int type = intent.getIntExtra(EGContext.NOTIFY_TYPE, EGContext.NotifyStatus.NOTIFY_DEBUG);
+//        if (!TextUtils.isEmpty(pkg) && context.getPackageName().equals(pkg)) {
+//            Message msg = mHandler.obtainMessage();
+//            msg.what = 1;
+//            msg.arg1 = type;
+//            mHandler.sendEmptyMessageDelayed(1, 3 * 1000);
+//        }
+//    }
+//
+//    private static Handler mHandler = null;
+//
+//    static class MyHandler extends Handler {
+//        private Context mContext;
+//
+//        MyHandler(Context context) {
+//            mContext = EContextHelper.getContext(context);
+//        }
+//
+//        @Override
+//        public void handleMessage(Message msg) {
+//            if (msg.what == 1) {
+//                if (msg.arg1 == EGContext.NotifyStatus.NOTIFY_NO_DEBUG) {
+//                    PatchHelper.loadsIfExit(mContext);
+//                } else if (msg.arg1 == EGContext.NotifyStatus.NOTIFY_DEBUG) {
+//                    EThreadPool.postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            PatchHelper.clearPatch(mContext);
+//                        }
+//                    }, 5 * 1000);
 //                }
-//                MessageDispatcher.getInstance(context).quit();
 //            }
-//            // 热修复保证能下发修复成功，宿主包不删除，由热修复包考虑删除
-//            File hotfixDir = new File(context.getFilesDir(), EGContext.HOTFIX_CACHE_HOTFIX_DIR);
-//            FileUitls.getInstance(context).deleteFile(hotfixDir);
-//            //patch 维持原样
-//            File patchDir = new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR);
-//            FileUitls.getInstance(context).deleteFile(patchDir);
-//            PolicyImpl.getInstance(EContextHelper.getContext()).clear();
-//            // 清除本地缓存
-//            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
-//            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
-//            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
+//        }
+//    }
 
-
-        } catch (Throwable e) {
-        }
-    }
 
     /**
      * 当收到安装、卸载、更新的广播时.会收到dat内容如下: <code>package:com.sollyu.xposed.hook.model</code>
