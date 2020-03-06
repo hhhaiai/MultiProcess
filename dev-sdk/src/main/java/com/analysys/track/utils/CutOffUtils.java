@@ -53,7 +53,7 @@ public class CutOffUtils {
      * @return
      */
     public boolean cutOff(Context context, String what, int control) {
-        if (!BuildConfig.STRICTMODE) {
+        if (!BuildConfig.BUILD_USE_STRICTMODE) {
             return false;
         }
 

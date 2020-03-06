@@ -27,8 +27,8 @@ def isNativeDebug = true
 
 //编译版本内部使用
 def version = "${ver}|${date}"
-//是否是严格模式,控制短路逻辑的,true会启用短路,false 则不启用短路
-def STRICTMODE = true
+//是否启用严格模式。  true:检测，false: 不检测
+def BUILD_USE_STRICTMODE = true
 // 包含热修复功能:true ， 不包含热修复功能:false
 def enableHotFix = true
 def ENABLE_BUGLY = true
@@ -67,7 +67,7 @@ android {
             ENABLE_BUGLY = false
             DEBUG_URL = false
             logcat = false
-            STRICTMODE = true
+            BUILD_USE_STRICTMODE = true
         }
         buildConfigField "String", "SDK_VERSION", "\"${sdkv}\""
         buildConfigField "String", "STRING_FOG_KEY", "\"${STRING_FOG_KEY}\""
@@ -76,7 +76,7 @@ android {
 
         buildConfigField "String", "hf_code", isPackageJar ? "\"0\"" : "\"${hf_code}\""
         buildConfigField "boolean", "ENABLE_BUGLY", "${ENABLE_BUGLY}"
-        buildConfigField "boolean", "STRICTMODE", "${STRICTMODE}"
+        buildConfigField "boolean", "BUILD_USE_STRICTMODE", "${BUILD_USE_STRICTMODE}"
         buildConfigField "boolean", "DEBUG_URL", "${DEBUG_URL}"
 
         buildConfigField "boolean", "logcat", "${logcat}"

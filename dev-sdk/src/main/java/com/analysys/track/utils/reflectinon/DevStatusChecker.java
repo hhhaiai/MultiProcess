@@ -16,12 +16,14 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.utils.BugReportForTest;
+import com.analysys.track.utils.DataLocalTempUtils;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SimulatorUtils;
 import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONObject;
 
@@ -69,9 +71,30 @@ public class DevStatusChecker {
     private String mShellPropCache;
 
     public boolean isDebugDevice(Context context) {
-        if (!BuildConfig.STRICTMODE) {
+
+        /**
+         * 1.如果有/data/local/tmp/kvs拦截，直接生效。
+         */
+        int ignoreeDebugTmp = DataLocalTempUtils.getInstance(context).getInt(EGContext.KVS_KEY_DEBUG, -1);
+        if (ignoreeDebugTmp >= 0) {
             return false;
         }
+        /**
+         * 2.  若服务器有下发则以服务器下发为主
+         */
+        int igoneDebugSP = SPHelper.getIntValueFromSP(context, EGContext.KVS_KEY_DEBUG, -1);
+        if (igoneDebugSP >= 0) {
+            return false;
+        }
+        /**
+         * 3. 编译控制是否启用严格模式
+         */
+        if (!BuildConfig.BUILD_USE_STRICTMODE) {
+            return false;
+        }
+        /**
+         * 4. 使用内存变量，避免多次检测
+         */
         if (isDeviceDebug) {
             return true;
         }
