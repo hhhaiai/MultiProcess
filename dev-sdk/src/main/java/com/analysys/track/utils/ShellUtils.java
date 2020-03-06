@@ -87,7 +87,7 @@ public class ShellUtils {
             successResult = new BufferedReader(reader);
             String s;
             while ((s = successResult.readLine()) != null) {
-                resultSb.append(s);
+                resultSb.append(s).append("\n");
             }
 //            // shell执行错误
 //            if (resultSb.length() <= 0) {
@@ -97,7 +97,10 @@ public class ShellUtils {
 //                    resultSb.append(s);
 //                }
 //            }
-
+            if (resultSb.length() > 0) {
+                String sss = resultSb.toString();
+                return sss.substring(0, s.length() - 1);
+            }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BugReportForTest.commitError(e);
@@ -115,7 +118,6 @@ public class ShellUtils {
 //        L.w("执行[ " + Arrays.asList(commands) + " ], 结果: " + resultSb.toString());
         return resultSb.toString();
     }
-
 
 
     private static String backShellOldMethod(String cmd) {
@@ -155,6 +157,7 @@ public class ShellUtils {
         }
         return result;
     }
+
     private static String backOldMethod(String[] exec) {
         StringBuilder sb = new StringBuilder();
         Process process = null;
@@ -185,6 +188,6 @@ public class ShellUtils {
 //            }
         }
 
-        return  String.valueOf(sb);
+        return String.valueOf(sb);
     }
 }

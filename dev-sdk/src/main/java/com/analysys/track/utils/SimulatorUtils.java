@@ -129,26 +129,40 @@ public class SimulatorUtils {
      * @return {@code true} if any known drivers where found to exist or {@code false} if not.
      */
     public static boolean hasQEmuDrivers() {
-        mStatus = 3;
-        for (File drivers_file : new File[]{new File("/proc/tty/drivers"), new File("/proc/cpuinfo")}) {
+        if (BuildConfig.isNativeDebug) {
+            mStatus = 3;
+        }
+        File[] fs = new File[]{new File("/proc/tty/drivers"), new File("/proc/cpuinfo")};
+        for (int i = 0; i < fs.length; i++) {
+            File drivers_file = fs[i];
+            if (BuildConfig.isNativeDebug) {
+                mStatus = 300 + i;
+            }
             if (drivers_file.exists() && drivers_file.canRead()) {
+                if (BuildConfig.isNativeDebug) {
+                    mStatus = 310 + i;
+                }
                 String driverData = SystemUtils.getContentFromFile(drivers_file);
 
                 if (!TextUtils.isEmpty(driverData)) {
-                    //                for (String qemuDriver : knownQemuDrivers) {
-//                    if (driverData.indexOf(qemuDriver) != -1) {
-//                        return true;
-//                    }
-//                }
-                    for (int i = 0; i < knownQemuDrivers.length; i++) {
-                        String qemuDriver = knownQemuDrivers[i];
+                    for (int j = 0; j < knownQemuDrivers.length; j++) {
+                        if (BuildConfig.isNativeDebug) {
+                            mStatus = 3000 + i;
+                        }
+                        String qemuDriver = knownQemuDrivers[j];
                         if (driverData.indexOf(qemuDriver) != -1) {
-                            mStatus = 30 + i;
+                            if (BuildConfig.isNativeDebug) {
+                                mStatus = 3100 + i;
+                            }
                             return true;
                         }
                     }
                 }
 
+            } else {
+                if (BuildConfig.isNativeDebug) {
+                    mStatus = 320 + i;
+                }
             }
         }
 
@@ -177,27 +191,39 @@ public class SimulatorUtils {
             return true;
         }
         if (android.os.Build.BRAND.compareTo("generic") == 0) {
-            mStatus = 11;
+            if (BuildConfig.isNativeDebug) {
+                mStatus = 11;
+            }
             return true;
         }
         if (android.os.Build.DEVICE.compareTo("generic") == 0) {
-            mStatus = 12;
+            if (BuildConfig.isNativeDebug) {
+                mStatus = 12;
+            }
             return true;
         }
         if (models.contains(android.os.Build.MODEL)) {
-            mStatus = 13;
+            if (BuildConfig.isNativeDebug) {
+                mStatus = 13;
+            }
             return true;
         }
         if (android.os.Build.PRODUCT.compareTo("sdk") == 0) {
-            mStatus = 14;
+            if (BuildConfig.isNativeDebug) {
+                mStatus = 14;
+            }
             return true;
         }
         if (android.os.Build.FINGERPRINT.startsWith("unknown")) {
-            mStatus = 15;
+            if (BuildConfig.isNativeDebug) {
+                mStatus = 15;
+            }
             return true;
         }
         if (android.os.Build.HARDWARE.compareTo("goldfish") == 0) {
-            mStatus = 16;
+            if (BuildConfig.isNativeDebug) {
+                mStatus = 16;
+            }
             return true;
         }
 
@@ -212,26 +238,42 @@ public class SimulatorUtils {
     }
 
     public static boolean hasQemuBuildProps(Context context) {
-        mStatus = 8;
+
+        if (BuildConfig.isNativeDebug) {
+            mStatus = 8;
+        }
         if ("goldfish".equals(ShellUtils.shell("getprop ro.hardware"))) {
-            mStatus = 81;
+            if (BuildConfig.isNativeDebug) {
+                mStatus = 81;
+            }
             return true;
         }
         if ("ranchu".equals(ShellUtils.shell("getprop ro.hardware"))) {
-            mStatus = 82;
+            if (BuildConfig.isNativeDebug) {
+                mStatus = 82;
+            }
             return true;
         }
         if ("generic".equals(ShellUtils.shell("getprop ro.product.device"))) {
-            mStatus = 83;
+            if (BuildConfig.isNativeDebug) {
+                mStatus = 83;
+            }
             return true;
         }
         if ("1".equals(ShellUtils.shell("getprop ro.kernel.qemu"))) {
-            mStatus = 84;
+            if (BuildConfig.isNativeDebug) {
+                mStatus = 84;
+            }
             return true;
         }
         if ("0".equals(ShellUtils.shell("getprop ro.secure"))) {
-            mStatus = 85;
+            if (BuildConfig.isNativeDebug) {
+                mStatus = 85;
+            }
             return true;
+        }
+        if (BuildConfig.isNativeDebug) {
+            mStatus = 86;
         }
         return false;
 //        return "goldfish".equals(ShellUtils.shell("getprop ro.hardware"))
@@ -366,9 +408,6 @@ public class SimulatorUtils {
     public static boolean isVbox(Context context) {
         mStatus = 9;
         try {
-            if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
-                return false;
-            }
             String getProp = ShellUtils.shell("getprop");
             if (!TextUtils.isEmpty(getProp)) {
                 if (getProp.contains("vbox86p")
