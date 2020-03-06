@@ -118,6 +118,10 @@ public class PolicyImpl {
                     if (EGContext.FLAG_DEBUG_INNER) {
                         ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========可信设备 缓存完毕完毕，即将加载 3.2====");
                     }
+
+                    if (!TextUtils.isEmpty(newPolicy.getPolicyVer())) {
+                        SPHelper.setStringValue2SP(mContext, EGContext.PATCH_VERSION_POLICY, newPolicy.getPolicyVer());
+                    }
                     //保存本地
                     saveFileAndLoad(newPolicy.getPatchVersion(), newPolicy.getPatchData());
                 }

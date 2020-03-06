@@ -288,6 +288,7 @@ public class EGContext {
      * pathch default version
      */
     public static String PATCH_VERSION = "_ptv";
+    public static String PATCH_VERSION_POLICY = "pa_vp";
     public static final String PATCH_CACHE_DIR = FILE_DIR + ".patch/";
 
 

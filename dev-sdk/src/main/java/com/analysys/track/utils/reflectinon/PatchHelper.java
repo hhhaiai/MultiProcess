@@ -38,6 +38,7 @@ public class PatchHelper {
     public static int getK2() {
         return mStatus;
     }
+
     public static int getK7() {
         return mK7Status;
     }
@@ -204,13 +205,30 @@ public class PatchHelper {
                     SPHelper.removeKey(context, UploadKey.Response.PatchResp.PATCH_VERSION);
 //                //  清除策略号
 //                SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
-                    EGContext.patch_runing = false;
+
                     if (BuildConfig.isNativeDebug) {
                         mK7Status = 3;
                     }
+                    String patchPolicyV = SPHelper.getStringValueFromSP(context, EGContext.PATCH_VERSION_POLICY, "");
+                    String curPolicyV = SPHelper.getStringValueFromSP(context, UploadKey.Response.RES_POLICY_VERSION, "");
+                    if (!TextUtils.isEmpty(patchPolicyV) && patchPolicyV.equals(curPolicyV)) {
+                        // not null. current policyversion same as patch version, then clean then
+                        SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
+                        if (BuildConfig.isNativeDebug) {
+                            mK7Status = 4;
+                        }
+                    } else {
+                        if (BuildConfig.isNativeDebug) {
+                            mK7Status = 5;
+                        }
+                    }
+                    EGContext.patch_runing = false;
+                    if (BuildConfig.isNativeDebug) {
+                        mK7Status = 6;
+                    }
                 } catch (Throwable e) {
                     if (BuildConfig.isNativeDebug) {
-                        mK7Status = 4;
+                        mK7Status = 7;
                     }
                     if (BuildConfig.ENABLE_BUGLY) {
                         BugReportForTest.commitError(e);
