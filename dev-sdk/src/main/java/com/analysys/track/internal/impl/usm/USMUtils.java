@@ -304,7 +304,6 @@ public class USMUtils {
                             new Object[]{UsageStatsManager.INTERVAL_BEST, beginTime, endTime, pkg}
                     );
 //                    Log.d("sanbo", "getUsageStatsListByInvoke [" + pkg + "]---:" + parceledListSlice);
-
                     if (parceledListSlice != null) {
                         return (List<UsageStats>) ClazzUtils.invokeObjectMethod(parceledListSlice, "getList");
                     }

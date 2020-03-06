@@ -39,7 +39,10 @@ public class AnalysysReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, final Intent intent) {
         try {
-            AnalysysTracker.setContext(context);
+            //禁止灰色 api logcat
+            ClazzUtils.unseal();
+            Context c = EContextHelper.getContext(context);
+            AnalysysTracker.setContext(c);
             if (EGContext.FLAG_DEBUG_INNER) {
                 Log.d(BuildConfig.tag_recerver, " analysys 广播 " + intent.getAction());
                 TimePrint.start(BuildConfig.tag_recerver + " 广播 " + intent.getAction() + " process");
@@ -49,20 +52,19 @@ public class AnalysysReceiver extends BroadcastReceiver {
                     HotFixTransform.transform(
                             HotFixTransform.make(AnalysysReceiver.class.getName())
                             , AnalysysReceiver.class.getName()
-                            , "onReceive", EContextHelper.getContext(), intent);
+                            , "onReceive", c, intent);
                     return;
                 } catch (Throwable e) {
 
                 }
             }
-            process(EContextHelper.getContext(), intent);
+            process(c, intent);
+
         } catch (Throwable e) {
         }
     }
 
     private void process(Context context, Intent intent) {
-        //禁止灰色 api logcat
-        ClazzUtils.unseal();
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysReceiver onReceive");
         }
@@ -77,7 +79,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
             //没初始化并且开屏了10次,就初始化,否则+1返回不处理
             parExtra(context);
             if (!AnalysysInternal.isInit()) {
-                if (CutOffUtils.getInstance().cutOff(context, "what_recerver", CutOffUtils.FLAG_DEBUG)) {
+//                if (CutOffUtils.getInstance().cutOff(context, "what_recerver", CutOffUtils.FLAG_DEBUG)) {
                     //调试设备清零
                     SPHelper.setIntValue2SP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, 0);
                     if (EGContext.FLAG_DEBUG_INNER) {
@@ -96,10 +98,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
                     return;
                 }
             }
-
-        }
-
-
+//        }
         ReceiverImpl.getInstance().process(context, intent);
 
         if (EGContext.FLAG_DEBUG_INNER) {

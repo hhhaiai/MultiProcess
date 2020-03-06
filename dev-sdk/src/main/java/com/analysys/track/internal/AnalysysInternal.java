@@ -139,12 +139,11 @@ public class AnalysysInternal {
             OAIDHelper.tryGetOaidAndSave(ctx);
         }
 
-        PatchHelper.loads(ctx);
+        PatchHelper.loadsIfExit(ctx);
 
         try {
             // 9. 清除以前的SP和DB
             SPHelper.removeSPFiles(EContextHelper.getContext(), EGContext.SP_NAME);
-
             File file = SPHelper.getNewSharedPrefsFile(EContextHelper.getContext(), "ana_sp_xml");
             if (file.exists() && file.isFile()) {
                 file.delete();

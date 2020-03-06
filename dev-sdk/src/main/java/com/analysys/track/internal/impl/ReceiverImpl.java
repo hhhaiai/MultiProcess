@@ -7,18 +7,14 @@ import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.EThreadPool;
-import com.analysys.track.utils.FileUitls;
 import com.analysys.track.utils.MultiProcessChecker;
-import com.analysys.track.utils.sp.SPHelper;
-
-import java.io.File;
+import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.reflectinon.PatchHelper;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -37,13 +33,15 @@ public class ReceiverImpl {
      * @param context
      * @param intent
      */
-    public void process(Context context, final Intent intent) {
+    public void process(final Context context, final Intent intent) {
 
         if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.d(BuildConfig.tag_recerver + intent.toString());
+            ELOG.d(BuildConfig.tag_recerver + intent);
+        }
+        if (intent == null) {
+            return;
         }
 
-        context = context.getApplicationContext();
         long currentTime = System.currentTimeMillis();
 
         if (Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction())) {
@@ -129,29 +127,22 @@ public class ReceiverImpl {
             }
             OCImpl.getInstance(context).processOCWhenScreenChange(false);
         } else if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
-            DeviceImpl.getInstance(context).processBattery(intent);
+            SystemUtils.runOnWorkThread(new Runnable() {
+                @Override
+                public void run() {
+                    DeviceImpl.getInstance(context).processBattery(intent);
+                }
+            });
         } else if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
             MessageDispatcher.getInstance(context).initModule();
         } else if (EGContext.ACTION_MTC_LOCK.equals(intent.getAction())) {
             EGContext.snap_complete = true;
         } else if (EGContext.ACTION_UPDATE_POLICY.equals(intent.getAction())) {
-            final Context finalContext = context;
-            EThreadPool.post(new Runnable() {
-                @Override
-                public void run() {
-                    PolicyImpl.getInstance(finalContext).updatePolicyForReceiver(intent);
-                }
-            });
+            PolicyImpl.getInstance(EContextHelper.getContext(context)).updatePolicyForReceiver(intent);
         } else if (EGContext.ACTION_UPDATE_CLEAR.equals(intent.getAction())) {
-            final Context finalContext = context;
-            EThreadPool.post(new Runnable() {
-                @Override
-                public void run() {
-                    boolean isStopLoop = intent.getBooleanExtra(EGContext.ISSTOP_LOOP, false);
-                    boolean isInLoop = intent.getBooleanExtra(EGContext.ISINLOOP, true);
-                    stopAndClearData(finalContext, isInLoop, isStopLoop);
-                }
-            });
+            boolean isStopLoop = intent.getBooleanExtra(EGContext.ISSTOP_LOOP, false);
+            boolean isInLoop = intent.getBooleanExtra(EGContext.ISINLOOP, true);
+            stopAndClearData(EContextHelper.getContext(context), isInLoop, isStopLoop);
         }
     }
 
@@ -161,24 +152,24 @@ public class ReceiverImpl {
                 ELOG.d(BuildConfig.tag_cutoff, "[清除数据]");
             }
 
-            if (isStopLoop) {
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.d(BuildConfig.tag_cutoff, "[停止轮训]");
-                }
-                MessageDispatcher.getInstance(context).quit();
-            }
-
-            // 热修复保证能下发修复成功，宿主包不删除，由热修复包考虑删除
+            PatchHelper.clearPatch(context);
+//            if (isStopLoop) {
+//                if (EGContext.FLAG_DEBUG_INNER) {
+//                    ELOG.d(BuildConfig.tag_cutoff, "[停止轮训]");
+//                }
+//                MessageDispatcher.getInstance(context).quit();
+//            }
+//            // 热修复保证能下发修复成功，宿主包不删除，由热修复包考虑删除
 //            File hotfixDir = new File(context.getFilesDir(), EGContext.HOTFIX_CACHE_HOTFIX_DIR);
 //            FileUitls.getInstance(context).deleteFile(hotfixDir);
-            //patch 维持原样
-            File patchDir = new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR);
-            FileUitls.getInstance(context).deleteFile(patchDir);
-            PolicyImpl.getInstance(EContextHelper.getContext()).clear();
-            // 清除本地缓存
-            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
-            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
-            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
+//            //patch 维持原样
+//            File patchDir = new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR);
+//            FileUitls.getInstance(context).deleteFile(patchDir);
+//            PolicyImpl.getInstance(EContextHelper.getContext()).clear();
+//            // 清除本地缓存
+//            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
+//            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
+//            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
 
 
         } catch (Throwable e) {

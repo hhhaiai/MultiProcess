@@ -8,8 +8,11 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.utils.BugReportForTest;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
+import com.analysys.track.utils.FileUitls;
+import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -34,18 +37,39 @@ public class PatchHelper {
         return mStatus;
     }
 
+    public static void loadsIfExit(final Context context) {
+        SystemUtils.runOnWorkThread(new Runnable() {
+            @Override
+            public void run() {
+                /**
+                 *  if debug, will clear cache
+                 */
+                if (DevStatusChecker.getInstance().isDebugDevice(context)) {
+                    mStatus = 6;
+                    clearPatch(context);
+                    return;
+                }
+                loads(context);
+            }
+        });
+    }
     public static void loads(final Context context) {
         try {
+
             if (BuildConfig.isNativeDebug) {
                 mStatus = 0;
             }
+
+//            Log.e("sanbo", "-----inside-loads---------");
             File dir = new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR);
             String version = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_VERSION, "");
-
+//            Log.e("sanbo", "------loads------version: " + version);
+            // delete same name file
             if (dir.exists() && !dir.isDirectory()) {
                 dir.deleteOnExit();
             }
             if (!dir.exists()) {
+//                Log.e("sanbo", "------loads------dir[ " + dir.getAbsolutePath() + " ] not exists!");
                 dir.mkdirs();
             }
             if (TextUtils.isEmpty(version)) {
@@ -57,16 +81,52 @@ public class PatchHelper {
             // 保存文件到本地
             File file = new File(dir, "patch_" + version + ".jar");
             if (file.exists() && file.isFile()) {
+//                Log.i("sanbo", "------loads---patch_---file[ " + file.getAbsolutePath() + " ] is exists!");
                 loads(context, file);
             } else {
                 //适配旧版本，没加前缀的
                 file = new File(dir, version + ".jar");
                 if (file.exists() && file.isFile()) {
+//                    Log.i("sanbo", "------loads------file[ " + file.getAbsolutePath() + " ] is exists!");
                     loads(context, file);
                 }
             }
+//            Log.i("sanbo", "------loads--will---out  ");
+
         } catch (Throwable e) {
         }
+//        Log.i("sanbo", "------loads----out  ");
+
+    }
+
+    /**
+     * 清除缓存
+     *
+     * @param context
+     */
+    public static void clearPatch(final Context context) {
+
+        SystemUtils.runOnWorkThread(new Runnable() {
+            @Override
+            public void run() {
+                Context cc = EContextHelper.getContext(context);
+                // 清除老版本缓存文件
+                String oldVersion = SPHelper.getStringValueFromSP(cc, UploadKey.Response.PatchResp.PATCH_VERSION, "");
+                if (!TextUtils.isEmpty(oldVersion)) {
+                    new File(cc.getFilesDir(), oldVersion + ".jar").deleteOnExit();
+                }
+                //清除新版本存储目录
+                FileUitls.getInstance(cc).deleteFile(new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR));
+                // 清除patch部分缓存
+                SPHelper.removeKey(context, UploadKey.Response.PatchResp.PATCH_METHODS);
+                SPHelper.removeKey(context, UploadKey.Response.PatchResp.PATCH_SIGN);
+                SPHelper.removeKey(context, UploadKey.Response.PatchResp.PATCH_VERSION);
+//                //  清除策略号
+//                SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
+                EGContext.patch_runing = false;
+            }
+        });
+
     }
 
     private static void loads(final Context context, final File file) {
@@ -243,6 +303,7 @@ public class PatchHelper {
                 mStatus = 1;
             }
         } catch (Throwable igone) {
+            EGContext.patch_runing = false;
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(igone);
             }
@@ -252,6 +313,7 @@ public class PatchHelper {
         }
 
     }
+
 
 }
 

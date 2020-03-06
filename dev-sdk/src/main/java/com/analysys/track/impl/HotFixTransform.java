@@ -69,20 +69,20 @@ public class HotFixTransform {
                         }
                         //热修之前宿主判断
                         if (isSdkUpdateInHost(context)) {
-                            //清除patch
-                            File patchDir = new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR);
-                            FileUitls.getInstance(context).deleteFile(patchDir);
-                            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
-                            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
-                            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
+//                            //清除patch
+//                            File patchDir = new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR);
+//                            FileUitls.getInstance(context).deleteFile(patchDir);
+//                            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
+//                            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
+//                            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
                             //清除短路控制变量
                             SPHelper.removeKey(context, "case1");
                             SPHelper.removeKey(context, "case2");
                             SPHelper.removeKey(context, "case3");
                             SPHelper.removeKey(context, "case4");
                             SPHelper.removeKey(context, "case_d");
-                            SPHelper.removeKey(context, "what_recerver");
                             SPHelper.removeKey(context, "what_dev");
+//                            SPHelper.removeKey(context, "what_recerver");
                         }
                         //清除热修相关的（如果未激活或文件不存在或宿主变动）
                         //激活，热修文件存在，宿主一致
@@ -151,40 +151,9 @@ public class HotFixTransform {
         if (clazzLoader != null) {
             loader = ClazzUtils.newInstance(analysysThisClazz,
                     new Class[]{String.class, String.class, String.class, clazzLoader
-//                            , LoadCallback.class
                     },
                     new Object[]{path, context.getCacheDir().getAbsolutePath(), null, ClazzUtils.
                             invokeObjectMethod(context, "getClassLoader")
-
-//                            , new LoadCallback() {
-//                        @Override
-//                        public void onSelfNotFound(String name) {
-//                            //入口类一定能自己找到,如果找不到,则一定是这个dex损坏了
-//                            if (MYCLASS_NAME.contains(name)) {
-//                                dexError(context);
-//                                if (EGContext.FLAG_DEBUG_INNER) {
-//                                    Log.i(BuildConfig.tag_hotfix, "[DEX损坏]:" + name + "[not found]");
-//                                }
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onLoadBySelf(String name) {
-//                        }
-//
-//                        @Override
-//                        public void onLoadByCache(String name) {
-//                        }
-//
-//                        @Override
-//                        public void onLoadByParent(String name) {
-//                        }
-//
-//                        @Override
-//                        public void onNotFound(String name) {
-//                        }
-//                    }
-
                     });
         }
 
