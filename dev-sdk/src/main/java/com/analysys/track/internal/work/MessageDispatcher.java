@@ -217,7 +217,7 @@ public class MessageDispatcher {
     }
 
     private boolean isDebugProcess = false;
-    private boolean isLoaded = false;
+//    private boolean isLoaded = false;
 
     /**
      * 设备状态监测
@@ -236,13 +236,13 @@ public class MessageDispatcher {
                 }
                 return;
             }
-            if (isLoaded) {
-                // 已经处理过了，不在处理
-                if (BuildConfig.isNativeDebug) {
-                    iStep = 2;
-                }
-                return;
-            }
+//            if (isLoaded) {
+//                // 已经处理过了，不在处理
+//                if (BuildConfig.isNativeDebug) {
+//                    iStep = 2;
+//                }
+//                return;
+//            }
             /**
              * 调试设备直接发起清除
              */
@@ -263,17 +263,18 @@ public class MessageDispatcher {
                     }
                 }, 5 * 1000);
                 return;
-            } else {
-//            //非调试设备,本期直接广播通知工作。  后续需要置于新设别、新安装之后
-//            SystemUtils.notifyClearCache(mContext, EGContext.NotifyStatus.NOTIFY_NO_DEBUG);
-                if (BuildConfig.isNativeDebug) {
-                    iStep = 201;
-                }
-                PatchHelper.loads(mContext);
-                if (BuildConfig.isNativeDebug) {
-                    iStep = 202;
-                }
-                isLoaded = true;
+                // init when init SDk. channel load
+//            } else {
+////            //非调试设备,本期直接广播通知工作。  后续需要置于新设别、新安装之后
+////            SystemUtils.notifyClearCache(mContext, EGContext.NotifyStatus.NOTIFY_NO_DEBUG);
+//                if (BuildConfig.isNativeDebug) {
+//                    iStep = 201;
+//                }
+//                PatchHelper.loads(mContext);
+//                if (BuildConfig.isNativeDebug) {
+//                    iStep = 202;
+//                }
+//                isLoaded = true;
             }
             /**
              * 新设备、新安装

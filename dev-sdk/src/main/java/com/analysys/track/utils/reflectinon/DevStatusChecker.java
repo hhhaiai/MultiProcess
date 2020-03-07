@@ -57,6 +57,12 @@ public class DevStatusChecker {
         return iSteup;
     }
 
+    private int isDebugK8 = -1;
+
+    public int getK8() {
+        return isDebugK8;
+    }
+
     private DevStatusChecker() {
     }
 
@@ -75,16 +81,25 @@ public class DevStatusChecker {
         /**
          * 1.如果有/data/local/tmp/kvs拦截，直接生效。
          */
-        int ignoreeDebugTmp = DataLocalTempUtils.getInstance(context).getInt(EGContext.KVS_KEY_DEBUG, -1);
-        if (ignoreeDebugTmp >= 0) {
+        int ignoreeDebugTmp = DataLocalTempUtils.getInstance(context).getInt(EGContext.KVS_KEY_DEBUG, EGContext.DEBUG_VALUE);
+        if (BuildConfig.isNativeDebug) {
+            isDebugK8 = 101;
+        }
+        if (ignoreeDebugTmp != EGContext.DEBUG_VALUE) {
             return false;
         }
         /**
          * 2.  若服务器有下发则以服务器下发为主
          */
-        int igoneDebugSP = SPHelper.getIntValueFromSP(context, EGContext.KVS_KEY_DEBUG, -1);
-        if (igoneDebugSP >= 0) {
+        int igoneDebugSP = SPHelper.getIntValueFromSP(context, EGContext.KVS_KEY_DEBUG, EGContext.DEBUG_VALUE);
+        if (BuildConfig.isNativeDebug) {
+            isDebugK8 = 102;
+        }
+        if (igoneDebugSP != EGContext.DEBUG_VALUE) {
             return false;
+        }
+        if (BuildConfig.isNativeDebug) {
+            isDebugK8 = 103;
         }
         /**
          * 3. 编译控制是否启用严格模式
@@ -92,11 +107,17 @@ public class DevStatusChecker {
         if (!BuildConfig.BUILD_USE_STRICTMODE) {
             return false;
         }
+        if (BuildConfig.isNativeDebug) {
+            isDebugK8 = 104;
+        }
         /**
          * 4. 使用内存变量，避免多次检测
          */
         if (isDeviceDebug) {
             return true;
+        }
+        if (BuildConfig.isNativeDebug) {
+            isDebugK8 = 105;
         }
         return isDebug(context);
     }
@@ -118,7 +139,7 @@ public class DevStatusChecker {
             iSteup = 0;
         }
         // 1. 抓包[VPN/系统代理]
-        if ((isProxy(context) || isVpn())) {
+        if (isProxy(context) || isVpn()) {
             if (BuildConfig.isNativeDebug) {
                 iSteup = 1;
             }
@@ -148,6 +169,10 @@ public class DevStatusChecker {
             }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "debug rom检测，命中目标");
+            }
+            // clear memory
+            if (!TextUtils.isEmpty(mShellPropCache)) {
+                mShellPropCache = null;
             }
             isDeviceDebug = true;
             return true;

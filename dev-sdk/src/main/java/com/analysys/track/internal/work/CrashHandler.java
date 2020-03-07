@@ -14,11 +14,14 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
     private CrashCallBack handler = null;
 
     private CrashHandler() {
-        if (Thread.getDefaultUncaughtExceptionHandler() == this) {
-            return;
+        try {
+            if (Thread.getDefaultUncaughtExceptionHandler() == this) {
+                return;
+            }
+            mDefaultHandler = Thread.getDefaultUncaughtExceptionHandler();
+            Thread.setDefaultUncaughtExceptionHandler(this);
+        } catch (Throwable e) {
         }
-        mDefaultHandler = Thread.getDefaultUncaughtExceptionHandler();
-        Thread.setDefaultUncaughtExceptionHandler(this);
     }
 
     public static CrashHandler getInstance() {

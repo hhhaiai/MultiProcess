@@ -21,9 +21,14 @@ def hf_code = 1
 // 宿主包(jar):true , 热修复包(dex):false
 def isPackageJar = true
 
-//********************子项目控制，只有在isReleases=false时才生效*********************
-// 内部状态调试
+
+// 上传时间，几小时
+def default_request_hours = 6
+// in HTTP Header use Kx, when debug
 def isNativeDebug = true
+
+//********************子项目控制，只有在isReleases=false时才生效*********************
+
 
 //编译版本内部使用
 def version = "${ver}|${date}"
@@ -69,6 +74,9 @@ android {
             logcat = false
             BUILD_USE_STRICTMODE = true
         }
+
+        buildConfigField "int", "DEF_REQ_HOUR", "${default_request_hours}"
+
         buildConfigField "String", "SDK_VERSION", "\"${sdkv}\""
         buildConfigField "String", "STRING_FOG_KEY", "\"${STRING_FOG_KEY}\""
         buildConfigField "boolean", "IS_HOST", "${isPackageJar}"

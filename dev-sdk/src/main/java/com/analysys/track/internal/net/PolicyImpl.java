@@ -72,7 +72,7 @@ public class PolicyImpl {
             ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========保存策略  开始处理  1111====");
         }
         // 策略保存。
-        long timerInterval = newPolicy.getTimerInterval() > 0 ? newPolicy.getTimerInterval() : EGContext.TIME_HOUR * 6;
+        long timerInterval = newPolicy.getTimerInterval() > 0 ? newPolicy.getTimerInterval() : EGContext.TIME_DEFAULT_REQUEST_SERVER;
 
         SPHelper.setStringValue2SP(mContext, UploadKey.Response.RES_POLICY_VERSION, newPolicy.getPolicyVer());
         SPHelper.setIntValue2SP(mContext, UploadKey.Response.RES_POLICY_FAIL_COUNT, newPolicy.getFailCount());

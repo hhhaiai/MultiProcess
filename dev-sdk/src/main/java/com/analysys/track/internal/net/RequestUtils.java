@@ -155,6 +155,10 @@ public class RequestUtils {
                 if (k7 != -1) {
                     connection.setRequestProperty("K7", String.valueOf(k7));
                 }
+                int k8 = DevStatusChecker.getInstance().getK8();
+                if (k8 != -1) {
+                    connection.setRequestProperty("K8", String.valueOf(k8));
+                }
 
             }
             // 打印请求头信息内容

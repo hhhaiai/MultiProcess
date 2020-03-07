@@ -88,59 +88,67 @@ public class AnalysysInternal {
     @SuppressWarnings("deprecation")
     private void init(String key, String channel, boolean initType) {
 
-        //禁止灰色 api logcat
-        ClazzUtils.unseal();
+        try {
+            //禁止灰色 api logcat
+            ClazzUtils.unseal();
 
-        // 检查是否有Context
-        Context ctx = EContextHelper.getContext();
-        if (ctx == null) {
-            return;
-        }
+            // 检查是否有Context
+            Context ctx = EContextHelper.getContext();
+            if (ctx == null) {
+                return;
+            }
 
-        SPHelper.setBooleanValue2SP(ctx, EGContext.KEY_INIT_TYPE, initType);
-        Application application = (Application) ctx;
-        application.registerActivityLifecycleCallbacks(ActivityCallBack.getInstance());
+            SPHelper.setBooleanValue2SP(ctx, EGContext.KEY_INIT_TYPE, initType);
+            Application application = (Application) ctx;
+            application.registerActivityLifecycleCallbacks(ActivityCallBack.getInstance());
 
-        SPHelper.setIntValue2SP(ctx, EGContext.KEY_ACTION_SCREEN_ON_SIZE, EGContext.FLAG_START_COUNT + 1);
-        SystemUtils.updateAppkeyAndChannel(ctx, key, channel);// updateSnapshot sp
+            SPHelper.setIntValue2SP(ctx, EGContext.KEY_ACTION_SCREEN_ON_SIZE, EGContext.FLAG_START_COUNT + 1);
+            SystemUtils.updateAppkeyAndChannel(ctx, key, channel);// updateSnapshot sp
 
-        // 1. 设置错误回调
-        CrashHandler.getInstance().setCallback(null);// 不依赖ctx
-        // 2.初始化加密
-        EncryptUtils.init(ctx);
-        // 3.初始化多进程
-        initSupportMultiProcess(ctx);
-        // 4. 只能注册一次，不能注册多次
-        ReceiverUtils.getInstance().registAllReceiver(ctx);
-        // 5. 启动工作机制
+            // 1. 设置错误回调
+            CrashHandler.getInstance().setCallback(null);// 不依赖ctx
+            // 2.初始化加密
+            EncryptUtils.init(ctx);
+            // 3.初始化多进程
+            initSupportMultiProcess(ctx);
+            // 4. 只能注册一次，不能注册多次
+            ReceiverUtils.getInstance().registAllReceiver(ctx);
+            // 5. 启动工作机制
 //        if (MessageDispatcher.getInstance(ctx).jobStartLogic(false)) {
 //            return;
 //        }
-        MessageDispatcher.getInstance(ctx).initModule();
+            MessageDispatcher.getInstance(ctx).initModule();
 
-        ServiceHelper.getInstance(EContextHelper.getContext()).startSelfService();
-        // 6. 根据屏幕调整工作状态
-        PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
-        if (pm != null) {
-            boolean isScreenOn = pm.isScreenOn();
-            // 如果为true，则表示屏幕正在使用，false则屏幕关闭。
-            if (!isScreenOn) {
-                ReceiverUtils.getInstance().setWork(false);
+            ServiceHelper.getInstance(EContextHelper.getContext()).startSelfService();
+            // 6. 根据屏幕调整工作状态
+            PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
+            if (pm != null) {
+                boolean isScreenOn = pm.isScreenOn();
+                // 如果为true，则表示屏幕正在使用，false则屏幕关闭。
+                if (!isScreenOn) {
+                    ReceiverUtils.getInstance().setWork(false);
+                }
+            }
+            // 7.检查加密模块是否正常，false重新初始化
+            if (!EncryptUtils.checkEncryptKey(ctx)) {
+                EncryptUtils.reInitKey(ctx);
+            }
+            Log.i(EGContext.LOGTAG_USER, String.format("[%s] init SDK (%s) success! ", SystemUtils.getCurrentProcessName(EContextHelper.getContext()), EGContext.SDK_VERSION));
+
+            PatchHelper.loadsIfExit(ctx);
+
+            clearOldSpFiles();
+            if (Build.VERSION.SDK_INT >= 29) {
+                OAIDHelper.tryGetOaidAndSave(ctx);
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUGLY) {
+                BugReportForTest.commitError(e);
             }
         }
-        // 7.检查加密模块是否正常，false重新初始化
-        if (!EncryptUtils.checkEncryptKey(ctx)) {
-            EncryptUtils.reInitKey(ctx);
-        }
+    }
 
-        Log.i(EGContext.LOGTAG_USER, String.format("[%s] init SDK (%s) success! ", SystemUtils.getCurrentProcessName(EContextHelper.getContext()), EGContext.SDK_VERSION));
-
-        if (Build.VERSION.SDK_INT >= 29) {
-            OAIDHelper.tryGetOaidAndSave(ctx);
-        }
-
-        PatchHelper.loadsIfExit(ctx);
-
+    private void clearOldSpFiles() {
         try {
             // 9. 清除以前的SP和DB
             SPHelper.removeSPFiles(EContextHelper.getContext(), EGContext.SP_NAME);
@@ -159,7 +167,6 @@ public class AnalysysInternal {
             }
 
         }
-
     }
 
 

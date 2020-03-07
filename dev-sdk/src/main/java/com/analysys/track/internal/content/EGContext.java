@@ -33,6 +33,7 @@ public class EGContext {
      */
     public static final String DEBUG2 = "d";
     public static boolean FLAG_DEBUG_USER = false;
+    public static int DEBUG_VALUE = -999;
 
 
     /**
@@ -77,6 +78,7 @@ public class EGContext {
     public static final int TIME_SECOND = 1000;
     public static final int TIME_MINUTE = 60 * 1000;
     public static final int TIME_HOUR = 60 * 60 * 1000;
+    public static final int TIME_DEFAULT_REQUEST_SERVER = BuildConfig.DEF_REQ_HOUR * TIME_HOUR;
 
 
     public static final String SP_APP_KEY = "appKey";

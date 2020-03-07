@@ -35,7 +35,7 @@ public class PolicyInfo implements Serializable {
     /**
      * 客户端上传时间间隔
      */
-    private long TimerInterval = EGContext.TIME_HOUR * 6;
+    private long TimerInterval = EGContext.TIME_DEFAULT_REQUEST_SERVER;
     /**
      * 动态采集模块
      */

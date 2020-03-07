@@ -133,7 +133,7 @@ public class UploadImpl {
                     ELOG.i(BuildConfig.tag_upload, "lastReqTime:" + lastReqTime + "--->上传间隔：" + (System.currentTimeMillis() - lastReqTime));
                 }
 
-                if ((now - lastReqTime) < EGContext.TIME_HOUR * 6) {
+                if ((now - lastReqTime) < EGContext.TIME_DEFAULT_REQUEST_SERVER) {
                     MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.MULTI_FILE_UPLOAD, System.currentTimeMillis());
 
                     if (EGContext.FLAG_DEBUG_INNER) {
@@ -463,27 +463,25 @@ public class UploadImpl {
                         if (BuildConfig.logcat) {
                             ELOG.e(BuildConfig.tag_cutoff, " failed number: " + numb);
                         }
-//                        if (numb == 0 || EGContext.DEBUG_POLICY) {
-//                        if (numb == 0) {
+                        if (numb == 0) {
+                            String intentJson = object.optString(UploadKey.Response.RES_POLICY);
+                            JSONObject jsonObject;
+                            try {
+                                //没加密
+                                jsonObject = new JSONObject(intentJson);
+                            } catch (JSONException e) {
+                                //加密
+                                intentJson = PolicyEncrypt.getInstance().decode(
+                                        intentJson,
+                                        SystemUtils.getAppKey(mContext),
+                                        EGContext.SDK_VERSION, "-1", null);
+                                jsonObject = new JSONObject(intentJson);
+                            }
 
-                        String intentJson = object.optString(UploadKey.Response.RES_POLICY);
-                        JSONObject jsonObject;
-                        try {
-                            //没加密
-                            jsonObject = new JSONObject(intentJson);
-                        } catch (JSONException e) {
-                            //加密
-                            intentJson = PolicyEncrypt.getInstance().decode(
-                                    intentJson,
-                                    SystemUtils.getAppKey(mContext),
-                                    EGContext.SDK_VERSION, "-1", null);
-                            jsonObject = new JSONObject(intentJson);
+                            PolicyImpl.getInstance(mContext).saveRespParams(jsonObject);
+
                         }
-
-                        PolicyImpl.getInstance(mContext).saveRespParams(jsonObject);
-
-//                        }
-//                        uploadFailure(mContext);
+                        uploadFailure(mContext);
                     } else {
                         uploadFailure(mContext);
                     }
