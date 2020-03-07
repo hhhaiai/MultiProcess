@@ -271,6 +271,7 @@ public class HotFixTransform {
         if (!TextUtils.isEmpty(curPolicyV) && !patchPolicyV.equals(curPolicyV)) {
             // not null. current policyversion same as patch version, then clean then
             SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
+            SPHelper.removeKey(context, EGContext.PATCH_VERSION_POLICY);
         }
     }
 

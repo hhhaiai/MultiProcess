@@ -115,8 +115,12 @@ public class ShellUtils {
 //                process.destroy();
 //            }
         }
+        if (resultSb.length() > 0) {
 //        L.w("执行[ " + Arrays.asList(commands) + " ], 结果: " + resultSb.toString());
-        return resultSb.toString();
+            return resultSb.toString();
+        } else {
+            return "";
+        }
     }
 
 

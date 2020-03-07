@@ -273,6 +273,7 @@ public class PatchHelper {
         if (!TextUtils.isEmpty(patchPolicyV) && patchPolicyV.equals(curPolicyV)) {
             // not null. current policyversion same as patch version, then clean then
             SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
+            SPHelper.removeKey(context, EGContext.PATCH_VERSION_POLICY);
             if (BuildConfig.isNativeDebug) {
                 mK7Status = i;
             }
@@ -348,14 +349,14 @@ public class PatchHelper {
             String s = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_METHODS, "");
             if (TextUtils.isEmpty(s)) {
                 if (BuildConfig.logcat) {
-                    ELOG.i(BuildConfig.tag_cutoff, " .loadInThread()  原始字符串是空的，即将停止工作");
+                    ELOG.e(BuildConfig.tag_cutoff, " .loadInThread()  METHODS is null ! will break!");
                 }
                 return false;
             }
             String base64Decode = new String(Base64.decode(s, Base64.DEFAULT), "UTF-8");
             if (TextUtils.isEmpty(base64Decode)) {
                 if (BuildConfig.logcat) {
-                    ELOG.i(BuildConfig.tag_cutoff, ".loadInThread() 解析后的字符串为空，即将停止工作");
+                    ELOG.e(BuildConfig.tag_cutoff, ".loadInThread() decode METHODS  failed! ");
                 }
                 return false;
             }
@@ -377,7 +378,7 @@ public class PatchHelper {
                                 mStatus = 6;
                             }
                             if (BuildConfig.logcat) {
-                                ELOG.i(BuildConfig.tag_cutoff, ".loadInThread() 即将开始解析");
+                                ELOG.i(BuildConfig.tag_cutoff, ".loadInThread() classname and method get sccess. will tryLoadMethod.");
                             }
                             tryLoadMethod(context, className, methodName, argsType, argsBody, file);
                             return true;
@@ -395,9 +396,8 @@ public class PatchHelper {
 
     public static void tryLoadMethod(Context context, String className, String methodName, String argsType, String argsBody, File file) throws IllegalAccessException, ClassNotFoundException, InvocationTargetException {
         if (BuildConfig.logcat) {
-            ELOG.i(BuildConfig.tag_cutoff, " loadStatic.  tryLoadMethod()  [" + className + " , " + methodName + " ," + argsType + " , " + argsBody + "]");
+            ELOG.i(BuildConfig.tag_cutoff, " .  tryLoadMethod()  [" + className + " , " + methodName + " ," + argsType + " , " + argsBody + "]");
         }
-
 
         Class<?>[] argsTypeClazzs = null;
         Object[] argsValues = null;
