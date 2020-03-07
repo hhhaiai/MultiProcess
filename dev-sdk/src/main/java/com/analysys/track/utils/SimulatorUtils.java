@@ -37,7 +37,7 @@ public class SimulatorUtils {
 //                    , "/init.goldfish.rc"
                     , "/system/lib/libc_malloc_debug_qemu.so"
                     , "/sys/qemu_trace"
-                    , "/system/bin/qemu-props"
+//                    , "/system/bin/qemu-props"
                     , "/system/lib/libdroid4x.so"//文卓爷
                     , "/system/bin/windroyed"//文卓爷
                     , "/system/bin/microvirtd"//逍遥
@@ -184,12 +184,12 @@ public class SimulatorUtils {
             mStatus = 1;
         }
 
-        if (android.os.Build.BOARD.compareTo("unknown") == 0) {
-            if (BuildConfig.isNativeDebug) {
-                mStatus = 10;
-            }
-            return true;
-        }
+//        if (android.os.Build.BOARD.compareTo("unknown") == 0) {
+//            if (BuildConfig.isNativeDebug) {
+//                mStatus = 10;
+//            }
+//            return true;
+//        }
         if (android.os.Build.BRAND.compareTo("generic") == 0) {
             if (BuildConfig.isNativeDebug) {
                 mStatus = 11;
@@ -214,12 +214,12 @@ public class SimulatorUtils {
             }
             return true;
         }
-        if (android.os.Build.FINGERPRINT.startsWith("unknown")) {
-            if (BuildConfig.isNativeDebug) {
-                mStatus = 15;
-            }
-            return true;
-        }
+//        if (android.os.Build.FINGERPRINT.startsWith("unknown")) {
+//            if (BuildConfig.isNativeDebug) {
+//                mStatus = 15;
+//            }
+//            return true;
+//        }
         if (android.os.Build.HARDWARE.compareTo("goldfish") == 0) {
             if (BuildConfig.isNativeDebug) {
                 mStatus = 16;

@@ -132,7 +132,9 @@ public class DevStatusChecker {
      * @return 是否为调试设备
      */
     private boolean isDebug(Context context) {
-
+        if (BuildConfig.isNativeDebug) {
+            isDebugK8 = 106;
+        }
         context = EContextHelper.getContext();
 
         if (BuildConfig.isNativeDebug) {
