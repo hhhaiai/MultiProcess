@@ -181,7 +181,7 @@ public class SystemUtils {
                 "/su/bin/su", "/system/sd/xbin/su", "/system/bin/failsafe/su", "/system/bin/failsafe/su",
                 "/data/local/xbin/su", "/data/local/bin/su", "/system/sd/xbin/su", "/system/bin/failsafe/su",
                 "/data/local/su", "/system/app/Superuser.apk", "/system/priv-app/Superuser.apk"};
-        String[] gg = {"which", "type"};
+//        String[] gg = {"which", "type"};
         try {
             // 1. 文件判断, 文件存在则权限判断
             for (String path : paths) {
@@ -205,14 +205,15 @@ public class SystemUtils {
                     return isRoot;
                 }
             }
-            // 2.命令行获取
-            for (String g : gg) {
-                String execResult = ShellUtils.execCommand(new String[]{g+ " su"});
-                if (!TextUtils.isEmpty(execResult) && !"su not found".equals(execResult)) {
-                    isRoot = true;
-                    return isRoot;
-                }
-            }
+//            // 2.命令行获取
+//            for (String g : gg) {
+//                String execResult = ShellUtils.execCommand(new String[]{g+ " su"});
+//                //!"su not found".equals(execResult)
+//                if (!TextUtils.isEmpty(execResult) && !execResult.contains("su not found")) {
+//                    isRoot = true;
+//                    return isRoot;
+//                }
+//            }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BugReportForTest.commitError(e);
