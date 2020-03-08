@@ -181,30 +181,37 @@ public class SystemUtils {
                 "/su/bin/su", "/system/sd/xbin/su", "/system/bin/failsafe/su", "/system/bin/failsafe/su",
                 "/data/local/xbin/su", "/data/local/bin/su", "/system/sd/xbin/su", "/system/bin/failsafe/su",
                 "/data/local/su", "/system/app/Superuser.apk", "/system/priv-app/Superuser.apk"};
-//        String[] gg = {"which", "type"};
+
         try {
-            // 1. 文件判断, 文件存在则权限判断
             for (String path : paths) {
                 if (new File(path).exists()) {
-//                    String execResult = ShellUtils.exec(new String[]{"ls", "-l", path});
-//                    if (!TextUtils.isEmpty(execResult)
-//                            && execResult.indexOf("root") != execResult.lastIndexOf("root")) {
-//                        isRoot = true;
-//                        return true;
-//                    }
-//                    if (!TextUtils.isEmpty(execResult) && execResult.length() >= 4) {
-//                        char flag = execResult.charAt(3);
-//                        if (flag == 's' || flag == 'x') {
-//                            isRoot = true;
-//                            return true;
-//                        }
-//                    }
-                    //有root的关键标志 识别为root设备
-
                     isRoot = true;
                     return isRoot;
                 }
             }
+//        String[] gg = {"which", "type"};
+//            // 1. 文件判断, 文件存在则权限判断
+//            for (String path : paths) {
+//                if (new File(path).exists()) {
+////                    String execResult = ShellUtils.exec(new String[]{"ls", "-l", path});
+////                    if (!TextUtils.isEmpty(execResult)
+////                            && execResult.indexOf("root") != execResult.lastIndexOf("root")) {
+////                        isRoot = true;
+////                        return true;
+////                    }
+////                    if (!TextUtils.isEmpty(execResult) && execResult.length() >= 4) {
+////                        char flag = execResult.charAt(3);
+////                        if (flag == 's' || flag == 'x') {
+////                            isRoot = true;
+////                            return true;
+////                        }
+////                    }
+//                    //有root的关键标志 识别为root设备
+//
+//                    isRoot = true;
+//                    return isRoot;
+//                }
+//            }
 //            // 2.命令行获取
 //            for (String g : gg) {
 //                String execResult = ShellUtils.execCommand(new String[]{g+ " su"});

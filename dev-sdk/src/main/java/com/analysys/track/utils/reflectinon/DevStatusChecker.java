@@ -491,26 +491,26 @@ public class DevStatusChecker {
     }
 
     public boolean isSelfDebugApp(Context context) {
-        //1.通过pkg.BuildConfig 的DEBUG判断
-        try {
-            String packageName = context.getPackageName();
-            Class<?> buildConfig = ClazzUtils.getClass(packageName + ".BuildConfig");
-            Field debugField = buildConfig.getField("DEBUG");
-            debugField.setAccessible(true);
-            if (debugField.getBoolean(null)) {
-                return true;
-            }
-        } catch (Throwable e) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(e);
-            }
-        }
+//        //1.通过pkg.BuildConfig 的DEBUG判断
+//        try {
+//            String packageName = context.getPackageName();
+//            Class<?> buildConfig = ClazzUtils.getClass(packageName + ".BuildConfig");
+//            Field debugField = buildConfig.getField("DEBUG");
+//            debugField.setAccessible(true);
+//            if (debugField.getBoolean(null)) {
+//                return true;
+//            }
+//        } catch (Throwable e) {
+//            if (EGContext.FLAG_DEBUG_INNER) {
+//                ELOG.e(e);
+//            }
+//        }
 
         try {
-            // 2. 系统判断是否debug
-            if ("1".equals(ShellUtils.shell("getprop ro.debuggable"))) {
-                return true;
-            }
+//            // 2. 系统判断是否debug
+//            if ("1".equals(ShellUtils.shell("getprop ro.debuggable"))) {
+//                return true;
+//            }
             // 3.通过ApplicationInfo的flag判断
             if ((context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
                 return true;
