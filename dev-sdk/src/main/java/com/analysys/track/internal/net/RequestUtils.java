@@ -68,6 +68,7 @@ public class RequestUtils {
 
                 mStatus = 1;
             } catch (Throwable e) {
+                mStatus = 6;
             }
         }
 

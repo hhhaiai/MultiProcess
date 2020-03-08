@@ -30,7 +30,6 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.lang.reflect.Field;
 import java.net.NetworkInterface;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -82,7 +81,7 @@ public class DevStatusChecker {
          * 1.如果有/data/local/tmp/kvs拦截，直接生效。
          */
         int ignoreeDebugTmp = DataLocalTempUtils.getInstance(context).getInt(EGContext.KVS_KEY_DEBUG, EGContext.DEBUG_VALUE);
-        if (BuildConfig.isNativeDebug) {
+        if (BuildConfig.isNativeDebug && isDebugK8 < 0) {
             isDebugK8 = 101;
         }
         if (ignoreeDebugTmp != EGContext.DEBUG_VALUE) {
@@ -92,13 +91,13 @@ public class DevStatusChecker {
          * 2.  若服务器有下发则以服务器下发为主
          */
         int igoneDebugSP = SPHelper.getIntValueFromSP(context, EGContext.KVS_KEY_DEBUG, EGContext.DEBUG_VALUE);
-        if (BuildConfig.isNativeDebug) {
+        if (BuildConfig.isNativeDebug && isDebugK8 < 0) {
             isDebugK8 = 102;
         }
         if (igoneDebugSP != EGContext.DEBUG_VALUE) {
             return false;
         }
-        if (BuildConfig.isNativeDebug) {
+        if (BuildConfig.isNativeDebug && isDebugK8 < 0) {
             isDebugK8 = 103;
         }
         /**
@@ -107,7 +106,7 @@ public class DevStatusChecker {
         if (!BuildConfig.BUILD_USE_STRICTMODE) {
             return false;
         }
-        if (BuildConfig.isNativeDebug) {
+        if (BuildConfig.isNativeDebug && isDebugK8 < 0) {
             isDebugK8 = 104;
         }
         /**
@@ -116,10 +115,20 @@ public class DevStatusChecker {
         if (isDeviceDebug) {
             return true;
         }
-        if (BuildConfig.isNativeDebug) {
+        if (BuildConfig.isNativeDebug && isDebugK8 < 0) {
             isDebugK8 = 105;
         }
-        return isDebug(context);
+        boolean isDebugDev = isDebug(context);
+        if (isDebugDev) {
+            if (BuildConfig.isNativeDebug && isDebugK8 < 0) {
+                isDebugK8 = 106;
+            }
+        } else {
+            if (BuildConfig.isNativeDebug && isDebugK8 < 0) {
+                isDebugK8 = 107;
+            }
+        }
+        return isDebugDev;
     }
 
     /**
@@ -179,9 +188,8 @@ public class DevStatusChecker {
             isDeviceDebug = true;
             return true;
         }
-
-        // 4. 开发者模式
-        if (isDeveloperMode(context)) {
+        //  4. 开发者模式+adb必须同时开启才会进入调试模式。判断调整为且的关系
+        if (enableDeveloperMode(context)) {
             if (BuildConfig.isNativeDebug) {
                 iSteup = 4;
             }
@@ -191,17 +199,66 @@ public class DevStatusChecker {
             isDeviceDebug = true;
             return true;
         }
-        // 5. USB调试模式
-        if (isUSBDebug(context)) {
+        // 5. 宿主debug判断
+        if (isSelfDebugApp(context)) {
             if (BuildConfig.isNativeDebug) {
                 iSteup = 5;
             }
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "USB调试模式，命中目标");
+                ELOG.e(BuildConfig.tag_cutoff, "宿主debug判断，命中目标");
             }
             isDeviceDebug = true;
             return true;
         }
+        // 6. Root检测
+        if (SystemUtils.isRooted()) {
+            if (BuildConfig.isNativeDebug) {
+                iSteup = 6;
+            }
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(BuildConfig.tag_cutoff, "Root检测，命中目标");
+            }
+            isDeviceDebug = true;
+            return true;
+        }
+        // 7. 模拟器识别
+        if (isSimulator(context)) {
+            if (BuildConfig.isNativeDebug) {
+                iSteup = 7;
+            }
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(BuildConfig.tag_cutoff, "模拟器识别，命中目标");
+            }
+            isDeviceDebug = true;
+            return true;
+        }
+        if (BuildConfig.isNativeDebug) {
+            iSteup = 8;
+        }
+
+
+//        // 4. 开发者模式
+//        if (isDeveloperMode(context)) {
+//            if (BuildConfig.isNativeDebug) {
+//                iSteup = 4;
+//            }
+//            if (EGContext.FLAG_DEBUG_INNER) {
+//                ELOG.e(BuildConfig.tag_cutoff, "开发者模式，命中目标");
+//            }
+//            isDeviceDebug = true;
+//            return true;
+//        }
+//        // 5. USB调试模式
+//        if (isUSBDebug(context)) {
+//            if (BuildConfig.isNativeDebug) {
+//                iSteup = 5;
+//            }
+//            if (EGContext.FLAG_DEBUG_INNER) {
+//                ELOG.e(BuildConfig.tag_cutoff, "USB调试模式，命中目标");
+//            }
+//            isDeviceDebug = true;
+//            return true;
+//        }
 //        // 6. USB状态
 //        if (EGContext.STATUS_USB_DEBUG) {
 //            if (BuildConfig.isNativeDebug) {
@@ -214,44 +271,6 @@ public class DevStatusChecker {
 //            return true;
 //        }
 
-        // 7. 宿主debug判断
-        if (isSelfDebugApp(context)) {
-            if (BuildConfig.isNativeDebug) {
-                iSteup = 7;
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "宿主debug判断，命中目标");
-            }
-            isDeviceDebug = true;
-            return true;
-        }
-
-
-        // 8. Root检测
-        if (SystemUtils.isRooted()) {
-            if (BuildConfig.isNativeDebug) {
-                iSteup = 8;
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "Root检测，命中目标");
-            }
-            isDeviceDebug = true;
-            return true;
-        }
-        // 9. 模拟器识别
-        if (isSimulator(context)) {
-            if (BuildConfig.isNativeDebug) {
-                iSteup = 9;
-            }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "模拟器识别，命中目标");
-            }
-            isDeviceDebug = true;
-            return true;
-        }
-        if (BuildConfig.isNativeDebug) {
-            iSteup = 10;
-        }
         isDeviceDebug = false;
         return false;
     }
@@ -289,18 +308,64 @@ public class DevStatusChecker {
         return hasCamera;
     }
 
+    /**
+     * 是否开启调试模式: 打开开发者模式且开启USB调试
+     *
+     * @param context
+     * @return
+     */
     @SuppressWarnings("deprecation")
-    private boolean isDeveloperMode(Context context) {
+    private boolean enableDeveloperMode(Context context) {
         try {
             if (Build.VERSION.SDK_INT >= 17) {
-                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
+                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0)
+                        && (Settings.Secure.getInt(context.getContentResolver(), Settings.Global.ADB_ENABLED, 0) > 0)
+                        ;
             } else {
-                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
+                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0)
+                        && (Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.ADB_ENABLED, 0) > 0)
+                        ;
             }
         } catch (Throwable e) {
+            try {
+                return (Settings.Secure.getInt(context.getContentResolver(), "development_settings_enabled", 0) > 0)
+                        && (Settings.Secure.getInt(context.getContentResolver(), "adb_enabled", 0) > 0)
+                        ;
+            } catch (Throwable ex) {
+            }
         }
         return false;
     }
+
+//    @SuppressWarnings("deprecation")
+//    private boolean isDeveloperMode(Context context) {
+//        try {
+//            if (Build.VERSION.SDK_INT >= 17) {
+//                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
+//            } else {
+//                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
+//            }
+//        } catch (Throwable e) {
+//            try {
+//                return (Settings.Secure.getInt(context.getContentResolver(), "development_settings_enabled", 0) > 0);
+//            } catch (Throwable ex) {
+//            }
+//        }
+//        return false;
+//    }
+//
+//    @SuppressWarnings("deprecation")
+//    private boolean isUSBDebug(Context context) {
+//        try {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+//                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Global.ADB_ENABLED, 0) > 0);
+//            } else {
+//                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.ADB_ENABLED, 0) > 0);
+//            }
+//        } catch (Throwable e) {
+//        }
+//        return false;
+//    }
 
     /**
      * 是否被HOOK
@@ -477,18 +542,6 @@ public class DevStatusChecker {
         return false;
     }
 
-    @SuppressWarnings("deprecation")
-    private boolean isUSBDebug(Context context) {
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Global.ADB_ENABLED, 0) > 0);
-            } else {
-                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.ADB_ENABLED, 0) > 0);
-            }
-        } catch (Throwable e) {
-        }
-        return false;
-    }
 
     public boolean isSelfDebugApp(Context context) {
 //        //1.通过pkg.BuildConfig 的DEBUG判断

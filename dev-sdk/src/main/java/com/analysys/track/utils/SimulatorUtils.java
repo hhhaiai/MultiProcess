@@ -266,14 +266,14 @@ public class SimulatorUtils {
             }
             return true;
         }
-        if ("0".equals(ShellUtils.shell("getprop ro.secure"))) {
-            if (BuildConfig.isNativeDebug) {
-                mStatus = 85;
-            }
-            return true;
-        }
+//        if ("0".equals(ShellUtils.shell("getprop ro.secure"))) {
+//            if (BuildConfig.isNativeDebug) {
+//                mStatus = 85;
+//            }
+//            return true;
+//        }
         if (BuildConfig.isNativeDebug) {
-            mStatus = 86;
+            mStatus = 85;
         }
         return false;
 //        return "goldfish".equals(ShellUtils.shell("getprop ro.hardware"))

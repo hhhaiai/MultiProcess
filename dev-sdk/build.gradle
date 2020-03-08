@@ -17,18 +17,15 @@ def date = "20200201"
 //SDK子版本
 def subVersion = "00"
 //当前热修复包的版本,默认是1,需要递增
-def hf_code = 1
+def hf_code = 2020020100
 // 宿主包(jar):true , 热修复包(dex):false
 def isPackageJar = true
-
-
 // 上传时间，几小时
 def default_request_hours = 6
 // in HTTP Header use Kx, when debug
 def isNativeDebug = true
 
 //********************子项目控制，只有在isReleases=false时才生效*********************
-
 
 //编译版本内部使用
 def version = "${ver}|${date}"
