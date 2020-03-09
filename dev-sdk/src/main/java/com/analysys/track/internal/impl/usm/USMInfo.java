@@ -61,7 +61,6 @@ public class USMInfo {
             if (BuildConfig.ENABLE_BUGLY) {
                 BugReportForTest.commitError(e);
             }
-            //JSONException
         }
         return jsonObject;
     }
@@ -86,7 +85,6 @@ public class USMInfo {
                 if (BuildConfig.ENABLE_BUGLY) {
                     BugReportForTest.commitError(e);
                 }
-                //JSONException
             }
             return jsonObject;
         }

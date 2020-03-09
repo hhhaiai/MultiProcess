@@ -84,6 +84,8 @@ public class EGContext {
     public static final String SP_APP_KEY = "appKey";
     public static final String SP_APP_CHANNEL = "appChannel";
 
+    public static final String SP_INIT_TIME = "t_init";
+
     public static final String SP_MAC_ADDRESS = "MACAddress";
     public static final String SP_APP_IDFA = "appIDFA";
     // 蓝牙

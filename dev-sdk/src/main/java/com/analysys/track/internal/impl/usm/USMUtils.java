@@ -298,19 +298,22 @@ public class USMUtils {
 
             for (String pkg : pkgs) {
                 try {
-                    // 返回值android.content.pm.ParceledListSlice
-                    Object parceledListSlice = ClazzUtils.invokeObjectMethod(mService, "queryUsageStats",
-                            new Class[]{int.class, long.class, long.class, String.class},
-                            new Object[]{UsageStatsManager.INTERVAL_BEST, beginTime, endTime, pkg}
-                    );
-//                    Log.d("sanbo", "getUsageStatsListByInvoke [" + pkg + "]---:" + parceledListSlice);
-                    if (parceledListSlice != null) {
-                        return (List<UsageStats>) ClazzUtils.invokeObjectMethod(parceledListSlice, "getList");
+                    try {
+                        // 返回值android.content.pm.ParceledListSlice
+                        Object parceledListSlice = ClazzUtils.invokeObjectMethod(mService, "queryUsageStats",
+                                new Class[]{int.class, long.class, long.class, String.class},
+                                new Object[]{UsageStatsManager.INTERVAL_BEST, beginTime, endTime, pkg}
+                        );
+                        //                    Log.d("sanbo", "getUsageStatsListByInvoke [" + pkg + "]---:" + parceledListSlice);
+                        if (parceledListSlice != null) {
+                            return (List<UsageStats>) ClazzUtils.invokeObjectMethod(parceledListSlice, "getList");
+                        }
+                    } catch (Throwable e) {
+                        if (BuildConfig.ENABLE_BUGLY) {
+                            BugReportForTest.commitError(BuildConfig.tag_snap, e);
+                        }
                     }
                 } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUGLY) {
-                        BugReportForTest.commitError(BuildConfig.tag_snap, e);
-                    }
                 }
 
             }
@@ -331,41 +334,42 @@ public class USMUtils {
      * @return
      */
     public static Object getIUsageStatsManagerStub(Context context) {
-//        IBinder binder = (IBinder) ClazzUtils.invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{Context.USAGE_STATS_SERVICE});
-//       return ClazzUtils.invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{binder});
-
-        //android.app.usage.IUsageStatsManager$Stub$Proxy
-        Object mService = ClazzUtils.getObjectFieldObject(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
-        if (mService == null) {
-            IBinder ibinder = null;
-            try {
-                Class<?> serviceManager = Class.forName("android.os.ServiceManager");
-                Method getService = ClazzUtils.getMethod(serviceManager, "getService", String.class);
-                ibinder = (IBinder) getService.invoke(null, Context.USAGE_STATS_SERVICE);
-            } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
-                    BugReportForTest.commitError(BuildConfig.tag_snap, e);
-                }
-            }
-            if (ibinder == null) {
-                ibinder = (IBinder) ClazzUtils.invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{Context.USAGE_STATS_SERVICE});
-            }
-            if (ibinder != null) {
+        Object mService = null;
+        try {
+            //android.app.usage.IUsageStatsManager$Stub$Proxy
+            mService = ClazzUtils.getObjectFieldObject(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
+            if (mService == null) {
+                IBinder ibinder = null;
                 try {
-                    Method asInterface = ClazzUtils.getMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", IBinder.class);
-                    if (asInterface != null) {
-                        mService = asInterface.invoke(null, ibinder);
-                    }
+                    Class<?> serviceManager = Class.forName("android.os.ServiceManager");
+                    Method getService = ClazzUtils.getMethod(serviceManager, "getService", String.class);
+                    ibinder = (IBinder) getService.invoke(null, Context.USAGE_STATS_SERVICE);
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUGLY) {
                         BugReportForTest.commitError(BuildConfig.tag_snap, e);
                     }
                 }
+                if (ibinder == null) {
+                    ibinder = (IBinder) ClazzUtils.invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{Context.USAGE_STATS_SERVICE});
+                }
+                if (ibinder != null) {
+                    try {
+                        Method asInterface = ClazzUtils.getMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", IBinder.class);
+                        if (asInterface != null) {
+                            mService = asInterface.invoke(null, ibinder);
+                        }
+                    } catch (Throwable e) {
+                        if (BuildConfig.ENABLE_BUGLY) {
+                            BugReportForTest.commitError(BuildConfig.tag_snap, e);
+                        }
+                    }
 
-                if (mService == null) {
-                    mService = ClazzUtils.invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{ibinder});
+                    if (mService == null) {
+                        mService = ClazzUtils.invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{ibinder});
+                    }
                 }
             }
+        } catch (Throwable e) {
         }
         return mService;
     }

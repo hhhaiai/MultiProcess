@@ -114,10 +114,12 @@ public class AnalysysInternal {
             // 4. 只能注册一次，不能注册多次
             ReceiverUtils.getInstance().registAllReceiver(ctx);
             // 5. 启动工作机制
-//        if (MessageDispatcher.getInstance(ctx).jobStartLogic(false)) {
-//            return;
-//        }
             MessageDispatcher.getInstance(ctx).initModule();
+            // if has no init time, init
+            long initTime = SPHelper.getLongValueFromSP(ctx, EGContext.SP_INIT_TIME, 0);
+            if (initTime <= 0) {
+                SPHelper.setLongValue2SP(ctx, EGContext.SP_INIT_TIME, System.currentTimeMillis());
+            }
 
             ServiceHelper.getInstance(EContextHelper.getContext()).startSelfService();
             // 6. 根据屏幕调整工作状态

@@ -9,6 +9,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.widget.TabHost;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
@@ -111,36 +112,39 @@ public class USMImpl {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public static JSONArray parserUsageStatsList(Context context, List<UsageStats> usageStatsList) {
         JSONArray arr = new JSONArray();
-        if (usageStatsList != null && usageStatsList.size() > 0) {
-            PackageManager packageManager = context.getPackageManager();
+        try {
+            if (usageStatsList != null && usageStatsList.size() > 0) {
+                PackageManager packageManager = context.getPackageManager();
 
-            for (UsageStats us : usageStatsList) {
-                try {
-                    long lastUsedTime = us.getLastTimeUsed();
-                    long durTime = us.getTotalTimeInForeground();
-                    if (lastUsedTime > 0 && durTime > 3 * EGContext.TIME_SECOND) {
-                        String pkgName = us.getPackageName();
-                        long openTime = lastUsedTime - durTime;
+                for (UsageStats us : usageStatsList) {
+                    try {
+                        long lastUsedTime = us.getLastTimeUsed();
+                        long durTime = us.getTotalTimeInForeground();
+                        if (lastUsedTime > 0 && durTime > 3 * EGContext.TIME_SECOND) {
+                            String pkgName = us.getPackageName();
+                            long openTime = lastUsedTime - durTime;
 
-                        USMInfo openEvent = new USMInfo(openTime, pkgName);
-                        openEvent.setCollectionType("5");
-                        openEvent.setNetType(NetworkUtils.getNetworkType(context));
-                        openEvent.setApplicationType(AppSnapshotImpl.getInstance(context).getAppType(pkgName));
-                        openEvent.setSwitchType("1");
-                        PackageInfo packageInfo = packageManager.getPackageInfo(pkgName, 0);
-                        ApplicationInfo applicationInfo = packageInfo.applicationInfo;
-                        openEvent.setAppName((String) applicationInfo.loadLabel(packageManager));
-                        openEvent.setVersionCode(packageInfo.versionName + "|" + packageInfo.versionCode);
-                        openEvent.setCloseTime(lastUsedTime);
-                        arr.put(openEvent.toJson());
-//                        arr.put(openEvent.toJsonForMatTime());
-                    }
-                } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUGLY) {
-                        BugReportForTest.commitError(e);
+                            USMInfo openEvent = new USMInfo(openTime, pkgName);
+                            openEvent.setCollectionType("5");
+                            openEvent.setNetType(NetworkUtils.getNetworkType(context));
+                            openEvent.setApplicationType(AppSnapshotImpl.getInstance(context).getAppType(pkgName));
+                            openEvent.setSwitchType("1");
+                            PackageInfo packageInfo = packageManager.getPackageInfo(pkgName, 0);
+                            ApplicationInfo applicationInfo = packageInfo.applicationInfo;
+                            openEvent.setAppName((String) applicationInfo.loadLabel(packageManager));
+                            openEvent.setVersionCode(packageInfo.versionName + "|" + packageInfo.versionCode);
+                            openEvent.setCloseTime(lastUsedTime);
+                            arr.put(openEvent.toJson());
+                            //                        arr.put(openEvent.toJsonForMatTime());
+                        }
+                    } catch (Throwable e) {
+                        if (BuildConfig.ENABLE_BUGLY) {
+                            BugReportForTest.commitError(e);
+                        }
                     }
                 }
             }
+        } catch (Throwable e) {
         }
         return arr;
     }
@@ -154,55 +158,61 @@ public class USMImpl {
      */
     private static JSONArray getArrayFromUsageEvents(Context context, Object usageEvents) {
         JSONArray jsonArray = new JSONArray();
-        PackageManager packageManager = context.getPackageManager();
-        if (packageManager == null) {
-            return jsonArray;
-        }
-        USMInfo openEvent = null;
-        Object lastEvent = null;
-        boolean hasNextEvent = false;
-        while (true) {
-            hasNextEvent = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
-            if (!hasNextEvent) {
-                break;
+        try {
+            PackageManager packageManager = context.getPackageManager();
+            if (packageManager == null) {
+                return jsonArray;
             }
-            /**
-             * 获取Event
-             */
-            Object event = ClazzUtils.newInstance("android.app.usage.UsageEvents$Event");
-            ClazzUtils.invokeObjectMethod(usageEvents, "getNextEvent", new String[]{"android.app.usage.UsageEvents$Event"}
-                    , new Object[]{event});
-
-            if (event == null || !SystemUtils.hasLaunchIntentForPackage(packageManager, getPackageName(event))) {
-                continue;
-            }
-            /**
-             * 闭合数据
-             */
-            if (openEvent == null) {
-
-                // 首个
-                if (getEventType(event) == UsageEvents.Event.MOVE_TO_FOREGROUND
-                        || getEventType(event) == UsageEvents.Event.ACTIVITY_RESUMED) {
-                    openEvent = openUsm(context, packageManager, event);
-                }
-            } else {
-                // 闭合非连续
-                if (!openEvent.getPkgName().equals(getPackageName(event))) {
-
-                    openEvent.setCloseTime(getTimeStamp(lastEvent));
-
-                    //大于3秒的才算做oc,一闪而过的不算
-                    if (openEvent.getCloseTime() - openEvent.getOpenTime() >= EGContext.TIME_SECOND * 3) {
-                        jsonArray.put(openEvent.toJson());
+            USMInfo openEvent = null;
+            Object lastEvent = null;
+            boolean hasNextEvent = false;
+            while (true) {
+                try {
+                    hasNextEvent = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
+                    if (!hasNextEvent) {
+                        break;
                     }
-                    if (getEventType(event) == UsageEvents.Event.MOVE_TO_FOREGROUND
-                            || getEventType(event) == UsageEvents.Event.ACTIVITY_RESUMED) {
-                        openEvent = openUsm(context, packageManager, event);
+                    /**
+                     * 获取Event
+                     */
+                    Object event = ClazzUtils.newInstance("android.app.usage.UsageEvents$Event");
+                    ClazzUtils.invokeObjectMethod(usageEvents, "getNextEvent", new String[]{"android.app.usage.UsageEvents$Event"}
+                            , new Object[]{event});
+
+                    if (event == null || !SystemUtils.hasLaunchIntentForPackage(packageManager, getPackageName(event))) {
+                        continue;
                     }
+                    /**
+                     * 闭合数据
+                     */
+                    if (openEvent == null) {
+
+                        // 首个
+                        if (getEventType(event) == UsageEvents.Event.MOVE_TO_FOREGROUND
+                                || getEventType(event) == UsageEvents.Event.ACTIVITY_RESUMED) {
+                            openEvent = openUsm(context, packageManager, event);
+                        }
+                    } else {
+                        // 闭合非连续
+                        if (!openEvent.getPkgName().equals(getPackageName(event))) {
+
+                            openEvent.setCloseTime(getTimeStamp(lastEvent));
+
+                            //大于3秒的才算做oc,一闪而过的不算
+                            if (openEvent.getCloseTime() - openEvent.getOpenTime() >= EGContext.TIME_SECOND * 3) {
+                                jsonArray.put(openEvent.toJson());
+                            }
+                            if (getEventType(event) == UsageEvents.Event.MOVE_TO_FOREGROUND
+                                    || getEventType(event) == UsageEvents.Event.ACTIVITY_RESUMED) {
+                                openEvent = openUsm(context, packageManager, event);
+                            }
+                        }
+                    }
+                    lastEvent = event;
+                } catch (Throwable e) {
                 }
             }
-            lastEvent = event;
+        } catch (Throwable e) {
         }
         return jsonArray;
     }
