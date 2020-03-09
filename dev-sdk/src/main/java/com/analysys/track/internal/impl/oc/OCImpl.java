@@ -164,60 +164,63 @@ public class OCImpl {
     @SuppressWarnings("deprecation")
     public void getInfoByVersion(boolean isAllowOC, boolean isAllowXXX) {
 
-        // 1. 声明xxx
-        JSONObject xxx = null;
+        try {
+            // 1. 声明xxx
+            JSONObject xxx = null;
 
-        // xxx demo数据
-        //{"time":1563676428130,"ocr":["com.alipay.hulu","com.device"],"result":[{"pid":4815,"oomScore":41,"pkg":"com.device","cpuset":"\/foreground","cgroup":"3:cpuset:\/foreground\n2:cpu:\/\n1:cpuacct:\/uid_10219\/pid_4815","oomAdj":"0"},{"pid":3644,"oomScore":95,"pkg":"com.alipay.hulu","cpuset":"\/foreground","cgroup":"3:cpuset:\/foreground\n2:cpu:\/\n1:cpuacct:\/uid_10131\/pid_3644","oomAdj":"1"}]}
+            // xxx demo数据
+            //{"time":1563676428130,"ocr":["com.alipay.hulu","com.device"],"result":[{"pid":4815,"oomScore":41,"pkg":"com.device","cpuset":"\/foreground","cgroup":"3:cpuset:\/foreground\n2:cpu:\/\n1:cpuacct:\/uid_10219\/pid_4815","oomAdj":"0"},{"pid":3644,"oomScore":95,"pkg":"com.alipay.hulu","cpuset":"\/foreground","cgroup":"3:cpuset:\/foreground\n2:cpu:\/\n1:cpuacct:\/uid_10131\/pid_3644","oomAdj":"1"}]}
 
-        // oc 允许采集
-        if (isAllowOC) {
-            // 有辅助功能停止其他方式处理
-            if (!AccessibilityHelper.isAccessibilitySettingsOn(mContext, AnalysysAccessibilityService.class)) {
-                // 获取XXX
-                xxx = ProcUtils.getInstance(mContext).getRunningInfo();
-                // 最新的列表
-                JSONArray aliveList = null;
-                if (xxx != null && xxx.has(ProcUtils.RUNNING_OC_RESULT)) {
-                    aliveList = xxx.optJSONArray(ProcUtils.RUNNING_OC_RESULT);
-                }
-
-                if (Build.VERSION.SDK_INT < 21) {
-                    if (PermissionUtils.checkPermission(mContext, Manifest.permission.GET_TASKS)) {
-                        if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i(BuildConfig.tag_oc, " 4.x版本  有GET_TASKS权限。。。");
-                        }
-                        getRunningTasksByapiWhen4x(aliveList);
-                    } else {
-                        // 没权限，用xxxinfo方式收集
-                        if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.e(BuildConfig.tag_oc, " 4.x版本  没有GET_TASKS权限。。。");
-                        }
-                        getAliveAppByProc(aliveList);
+            // oc 允许采集
+            if (isAllowOC) {
+                // 有辅助功能停止其他方式处理
+                if (!AccessibilityHelper.isAccessibilitySettingsOn(mContext, AnalysysAccessibilityService.class)) {
+                    // 获取XXX
+                    xxx = ProcUtils.getInstance(mContext).getRunningInfo();
+                    // 最新的列表
+                    JSONArray aliveList = null;
+                    if (xxx != null && xxx.has(ProcUtils.RUNNING_OC_RESULT)) {
+                        aliveList = xxx.optJSONArray(ProcUtils.RUNNING_OC_RESULT);
                     }
-                } else if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {// 5 6
 
-                    // 如果开了USM则使用USM
-                    if (SystemUtils.canUseUsageStatsManager(mContext)) {
-                        processOCByUsageStatsManager(aliveList);
-                    } else {
-                        getAliveAppByProc(aliveList);
+                    if (Build.VERSION.SDK_INT < 21) {
+                        if (PermissionUtils.checkPermission(mContext, Manifest.permission.GET_TASKS)) {
+                            if (EGContext.FLAG_DEBUG_INNER) {
+                                ELOG.i(BuildConfig.tag_oc, " 4.x版本  有GET_TASKS权限。。。");
+                            }
+                            getRunningTasksByapiWhen4x(aliveList);
+                        } else {
+                            // 没权限，用xxxinfo方式收集
+                            if (EGContext.FLAG_DEBUG_INNER) {
+                                ELOG.e(BuildConfig.tag_oc, " 4.x版本  没有GET_TASKS权限。。。");
+                            }
+                            getAliveAppByProc(aliveList);
+                        }
+                    } else if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {// 5 6
+
+                        // 如果开了USM则使用USM
+                        if (SystemUtils.canUseUsageStatsManager(mContext)) {
+                            processOCByUsageStatsManager(aliveList);
+                        } else {
+                            getAliveAppByProc(aliveList);
+                        }
+                    } else if (Build.VERSION.SDK_INT < 26) { // 7
+                        //                    // 如果开了USM则使用USM
+                        //                    if (SystemUtils.canUseUsageStatsManager(mContext)) {
+                        //                        processOCByUsageStatsManager(aliveList);
+                        //                    } else {
+                        //                        getRuningService();
+                        //                    }
                     }
-                } else if (Build.VERSION.SDK_INT < 26) { // 7
-//                    // 如果开了USM则使用USM
-//                    if (SystemUtils.canUseUsageStatsManager(mContext)) {
-//                        processOCByUsageStatsManager(aliveList);
-//                    } else {
-//                        getRuningService();
-//                    }
+
                 }
 
             }
-
-        }
-        // xxx允许采集进行处理
-        if (isAllowXXX) {
-            parserXXXAndSave(xxx);
+            // xxx允许采集进行处理
+            if (isAllowXXX) {
+                parserXXXAndSave(xxx);
+            }
+        } catch (Throwable e) {
         }
     }
 
@@ -263,109 +266,112 @@ public class OCImpl {
      */
     public void getAliveAppByProc(JSONArray aliveList) {
 
-        // 1. 若无有效数据，停止处理
+        try {
+            // 1. 若无有效数据，停止处理
 
-        if (aliveList == null || aliveList.length() < 1) {
-            return;
-        }
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i(BuildConfig.tag_oc, "\n内存里的列表数据[" + mOpenedPkgNameList.size() + "]");
-            ELOG.i(BuildConfig.tag_oc, "\n内存里的MAP数据[" + mOpenedPkgNameAndInfoMap.size() + "]");
-            ELOG.i(BuildConfig.tag_oc, "\n本次处理的数据[" + aliveList.length() + "]");
-        }
-
-        /**
-         *  2. 双列表对比，生成需要处理的列表
-         */
-
-        //新增加列表: 新的有，老的没有
-        List<String> needOpenList = new ArrayList<String>();
-        // 需要闭合列表: 老的有.新的没有
-        List<String> needCloseList = new ArrayList<String>();
-
-        // 以新的列表为主遍历，老列表中不包含为条件，生成新增列表
-        // 如内存列表: 1,2,3, 本次，3，4，5,应该生成==》needOpenList[4,5]
-        for (int i = 0; i < aliveList.length(); i++) {
-            String pkgName = aliveList.optString(i);
-            if (!TextUtils.isEmpty(pkgName) && !mOpenedPkgNameList.contains(pkgName)) {
-                if (!needOpenList.contains(pkgName)) {
-                    needOpenList.add(pkgName);
-                }
+            if (aliveList == null || aliveList.length() < 1) {
+                return;
             }
-        }
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i(BuildConfig.tag_oc, "\n内存里的列表数据[" + mOpenedPkgNameList.size() + "]");
+                ELOG.i(BuildConfig.tag_oc, "\n内存里的MAP数据[" + mOpenedPkgNameAndInfoMap.size() + "]");
+                ELOG.i(BuildConfig.tag_oc, "\n本次处理的数据[" + aliveList.length() + "]");
+            }
 
-        // 以老列表为主遍历，新列表中不包含为条件，生成需要闭合列表
-        // 如内存列表: 1,2,3, 本次，3，4，5,应该生成==》needCloseList[1,2]
-        if (mOpenedPkgNameList.size() > 0) {
-            List<String> converyList = JsonUtils.converyJSONArrayToList(aliveList);
-            for (int i = 0; i < mOpenedPkgNameList.size(); i++) {
-                String pkgName = mOpenedPkgNameList.get(i);
-                if (!TextUtils.isEmpty(pkgName) && !converyList.contains(pkgName)) {
-                    if (!needCloseList.contains(pkgName)) {
-                        needCloseList.add(pkgName);
+            /**
+             *  2. 双列表对比，生成需要处理的列表
+             */
+
+            //新增加列表: 新的有，老的没有
+            List<String> needOpenList = new ArrayList<String>();
+            // 需要闭合列表: 老的有.新的没有
+            List<String> needCloseList = new ArrayList<String>();
+
+            // 以新的列表为主遍历，老列表中不包含为条件，生成新增列表
+            // 如内存列表: 1,2,3, 本次，3，4，5,应该生成==》needOpenList[4,5]
+            for (int i = 0; i < aliveList.length(); i++) {
+                String pkgName = aliveList.optString(i);
+                if (!TextUtils.isEmpty(pkgName) && !mOpenedPkgNameList.contains(pkgName)) {
+                    if (!needOpenList.contains(pkgName)) {
+                        needOpenList.add(pkgName);
                     }
                 }
             }
-        }
 
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i(BuildConfig.tag_oc, "-----needOpenList:" + needOpenList.toString());
-            ELOG.i(BuildConfig.tag_oc, "-----needCloseList:" + needCloseList.toString());
-        }
-
-
-        /**
-         * 3. 根据新增、保存列表进行处理
-         */
-        // 处理闭合列表
-        if (needCloseList.size() > 0) {
-            ContentValues info = null;
-            // 先闭合数据
-            for (String closePkg : needCloseList) {
-                if (!TextUtils.isEmpty(closePkg)) {
-                    info = null;
-                    // 获取内存里的数据
-                    info = mOpenedPkgNameAndInfoMap.get(closePkg);
-                    if (info != null && info.size() > 0) {
-                        // 补充上闭合时间 ACT不加密
-                        info.put(DBConfig.OC.Column.ACT, String.valueOf(System.currentTimeMillis()));
-                        info.put(DBConfig.OC.Column.RS, "1");
-                        // 保存上一个打开关闭记录信息
-                        TableProcess.getInstance(mContext).insertOC(info);
+            // 以老列表为主遍历，新列表中不包含为条件，生成需要闭合列表
+            // 如内存列表: 1,2,3, 本次，3，4，5,应该生成==》needCloseList[1,2]
+            if (mOpenedPkgNameList.size() > 0) {
+                List<String> converyList = JsonUtils.converyJSONArrayToList(aliveList);
+                for (int i = 0; i < mOpenedPkgNameList.size(); i++) {
+                    String pkgName = mOpenedPkgNameList.get(i);
+                    if (!TextUtils.isEmpty(pkgName) && !converyList.contains(pkgName)) {
+                        if (!needCloseList.contains(pkgName)) {
+                            needCloseList.add(pkgName);
+                        }
                     }
                 }
+            }
 
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i(BuildConfig.tag_oc, "-----needOpenList:" + needOpenList.toString());
+                ELOG.i(BuildConfig.tag_oc, "-----needCloseList:" + needCloseList.toString());
             }
-            // 再删除数据，直接删除会导致不可预知的问题。
-            for (String closePkg : needCloseList) {
-                if (!TextUtils.isEmpty(closePkg)) {
-                    mOpenedPkgNameList.remove(closePkg);
-                    mOpenedPkgNameAndInfoMap.remove(closePkg);
-                }
-            }
-            // 清除缓存变量
-            info = null;
-            needCloseList.clear();
-            needCloseList = null;
-        }
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i(BuildConfig.tag_oc, "\n 闭合数据后，列表[" + mOpenedPkgNameList.size() + "]");
-            ELOG.i(BuildConfig.tag_oc, "\n 闭合数据后，MAP[" + mOpenedPkgNameAndInfoMap.size() + "]");
-        }
 
-        // 增加新增加的数据
-        if (needOpenList.size() > 0) {
-            for (String openPkg : needOpenList) {
-                if (!TextUtils.isEmpty(openPkg)) {
-                    cacheDataToMemory(openPkg, UploadKey.OCInfo.COLLECTIONTYPE_PROC);
+
+            /**
+             * 3. 根据新增、保存列表进行处理
+             */
+            // 处理闭合列表
+            if (needCloseList.size() > 0) {
+                ContentValues info = null;
+                // 先闭合数据
+                for (String closePkg : needCloseList) {
+                    if (!TextUtils.isEmpty(closePkg)) {
+                        info = null;
+                        // 获取内存里的数据
+                        info = mOpenedPkgNameAndInfoMap.get(closePkg);
+                        if (info != null && info.size() > 0) {
+                            // 补充上闭合时间 ACT不加密
+                            info.put(DBConfig.OC.Column.ACT, String.valueOf(System.currentTimeMillis()));
+                            info.put(DBConfig.OC.Column.RS, "1");
+                            // 保存上一个打开关闭记录信息
+                            TableProcess.getInstance(mContext).insertOC(info);
+                        }
+                    }
+
                 }
+                // 再删除数据，直接删除会导致不可预知的问题。
+                for (String closePkg : needCloseList) {
+                    if (!TextUtils.isEmpty(closePkg)) {
+                        mOpenedPkgNameList.remove(closePkg);
+                        mOpenedPkgNameAndInfoMap.remove(closePkg);
+                    }
+                }
+                // 清除缓存变量
+                info = null;
+                needCloseList.clear();
+                needCloseList = null;
             }
-            needOpenList.clear();
-            needOpenList = null;
-        }
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i(BuildConfig.tag_oc, "\n 新增数据完毕，列表[" + mOpenedPkgNameList.size() + "]");
-            ELOG.i(BuildConfig.tag_oc, "\n 新增数据完毕，MAP[" + mOpenedPkgNameAndInfoMap.size() + "]");
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i(BuildConfig.tag_oc, "\n 闭合数据后，列表[" + mOpenedPkgNameList.size() + "]");
+                ELOG.i(BuildConfig.tag_oc, "\n 闭合数据后，MAP[" + mOpenedPkgNameAndInfoMap.size() + "]");
+            }
+
+            // 增加新增加的数据
+            if (needOpenList.size() > 0) {
+                for (String openPkg : needOpenList) {
+                    if (!TextUtils.isEmpty(openPkg)) {
+                        cacheDataToMemory(openPkg, UploadKey.OCInfo.COLLECTIONTYPE_PROC);
+                    }
+                }
+                needOpenList.clear();
+                needOpenList = null;
+            }
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i(BuildConfig.tag_oc, "\n 新增数据完毕，列表[" + mOpenedPkgNameList.size() + "]");
+                ELOG.i(BuildConfig.tag_oc, "\n 新增数据完毕，MAP[" + mOpenedPkgNameAndInfoMap.size() + "]");
+            }
+        } catch (Throwable e) {
         }
     }
 
@@ -376,15 +382,18 @@ public class OCImpl {
      * @param xxx
      */
     private void parserXXXAndSave(JSONObject xxx) {
-        // 且5.x以后版本，去除OCR数据，存储到数据库
-        if (Build.VERSION.SDK_INT > 20) {
-            if (xxx == null) {
-                xxx = ProcUtils.getInstance(mContext).getRunningInfo();
+        try {
+            // 且5.x以后版本，去除OCR数据，存储到数据库
+            if (Build.VERSION.SDK_INT > 20) {
+                if (xxx == null) {
+                    xxx = ProcUtils.getInstance(mContext).getRunningInfo();
+                }
+                if (xxx != null && xxx.has(ProcUtils.RUNNING_OC_RESULT)) {
+                    xxx.remove(ProcUtils.RUNNING_OC_RESULT);
+                    TableProcess.getInstance(mContext).insertXXX(xxx);
+                }
             }
-            if (xxx != null && xxx.has(ProcUtils.RUNNING_OC_RESULT)) {
-                xxx.remove(ProcUtils.RUNNING_OC_RESULT);
-                TableProcess.getInstance(mContext).insertXXX(xxx);
-            }
+        } catch (Throwable e) {
         }
     }
 

@@ -206,7 +206,7 @@ public class ProcUtils {
                     BugReportForTest.commitError(e);
                 }
             }
-        } else {
+            //  } else {
             // sb.append("不符合规则");
             // Log.w("PROC", "=====>: " + sb.toString());
 
