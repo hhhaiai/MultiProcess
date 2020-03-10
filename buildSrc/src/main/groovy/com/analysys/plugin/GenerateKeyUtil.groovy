@@ -12,7 +12,7 @@ class GenerateKeyUtil {
         BufferedReader reader = new BufferedReader(isr)
         String key = "";
         String ver=null;
-        String data=null;
+//        String data=null;
         while (true) {
             String line = reader.readLine()
             if (line == null) {
@@ -27,17 +27,21 @@ class GenerateKeyUtil {
                 ver = keys[keys.length - 1]
                 println("ver = [" + ver + "]")
             }
-            if (line.startsWith("def date")) {
-                String[] keys = line.split("\"")
-                if (keys.length < 2) {
-                    println("error: date not found !")
-                }
-                data = keys[keys.length - 1]
-                println("data = [" + data + "]")
-            }
-
-            if(data!=null&&ver!=null){
-                key = ver+"|"+data
+//            if (line.startsWith("def date")) {
+//                String[] keys = line.split("\"")
+//                if (keys.length < 2) {
+//                    println("error: date not found !")
+//                }
+//                data = keys[keys.length - 1]
+//                println("data = [" + data + "]")
+//            }
+//
+//            if(data!=null&&ver!=null){
+//                key = ver+"|"+data
+//                break
+//            }
+            if (ver != null && ver.length() > 0) {
+                key = ver
                 break
             }
         }
@@ -48,14 +52,19 @@ class GenerateKeyUtil {
         StringFog.StringFogImpl sfi = new StringFog.StringFogImpl()
         // 生成 ps
         String ps = generatePs(key, sfi.hset)
-        println("ps = " + ps);
+        println("generatePs success");
+//        println("ps = " + ps);
         // 替换 ps
 
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(project.projectDir, ".\\src\\main\\java\\com\\analysys\\plugin\\Key.java"))))
+//        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(project.projectDir, ".\\src\\main\\java\\com\\analysys\\plugin\\Key.java"))))
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(project.projectDir, "src/main/java/com/analysys/plugin/Key.java"))))
 
-        writer.write("package com.analysys.plugin;\n" +
-                "\n" +
-                "public class Key {" + ps + "}")
+        writer.write(
+                "package com.analysys.plugin;\r\n"
+                        + "\r\n// 该类自动生成，勿手动改"
+                        + "\r\npublic class Key {\r\n"
+                        + "\t" + ps
+                        + "\r\n}")
         writer.flush()
         writer.close()
     }

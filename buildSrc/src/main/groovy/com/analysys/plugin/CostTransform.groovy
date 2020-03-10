@@ -66,7 +66,7 @@ public class CostTransform extends Transform {
                         if (name.endsWith(".class") && !name.startsWith("R\$") &&
                                 !"R.class".equals(name) && !"BuildConfig.class".equals(name) && !name.contains("TimePrint")) {
 
-                            println name + ' is changing...'
+//                            println name + ' is changing...'
 
                             ClassReader cr = new ClassReader(file.bytes)
                             ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS)

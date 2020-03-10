@@ -72,7 +72,7 @@ android {
         buildConfigField "int", "DEF_REQ_HOUR", "${default_request_hours}"
 
         buildConfigField "String", "SDK_VERSION", "\"${sdkv}\""
-        buildConfigField "String", "STRING_FOG_KEY", "\"${version}\""
+        buildConfigField "String", "STRING_FOG_KEY", "\"${ver}\""
         buildConfigField "boolean", "IS_HOST", "${isPackageJar}"
         buildConfigField "boolean", "enableHotFix", "${enableHotFix}"
 
