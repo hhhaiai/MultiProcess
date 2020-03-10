@@ -45,7 +45,7 @@ import java.util.Vector;
  * @author: cqs
  * @EMail: sanbo.xyz@gmail.com
  */
-class SPImpl implements SharedPreferences {
+class DexSpImpl implements SharedPreferences {
     // temp bak
     private static final String BACKUP_FILE_SUFFIX = ".tmk";
     private static final int ID_LENGTH = Integer.SIZE / Byte.SIZE;
@@ -114,15 +114,15 @@ class SPImpl implements SharedPreferences {
         }
     };
 
-    public SPImpl(File file) {
+    public DexSpImpl(File file) {
         this(file, 0, null);
     }
 
-    public SPImpl(File file, OnSharedPreferenceErrorListener lis) {
+    public DexSpImpl(File file, OnSharedPreferenceErrorListener lis) {
         this(file, 0, lis);
     }
 
-    public SPImpl(File file, int var, OnSharedPreferenceErrorListener lis) {
+    public DexSpImpl(File file, int var, OnSharedPreferenceErrorListener lis) {
         mErrorListener = lis;
         mThread = new HandlerThread(file.getName());
         mThread.start();
@@ -622,14 +622,14 @@ class SPImpl implements SharedPreferences {
     }
 
     private void startLoadFromDisk() {
-        synchronized (SPImpl.this) {
+        synchronized (DexSpImpl.this) {
             mLoaded = false;
         }
 
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                synchronized (SPImpl.this) {
+                synchronized (DexSpImpl.this) {
                     loadFromDiskLocked();
                 }
             }
@@ -644,14 +644,14 @@ class SPImpl implements SharedPreferences {
         load(false);
 
         mLoaded = true;
-        SPImpl.this.notifyAll();
+        DexSpImpl.this.notifyAll();
     }
 
     private void awaitLoadedLocked() {
-        synchronized (SPImpl.this) {
+        synchronized (DexSpImpl.this) {
             while (!mLoaded) {
                 try {
-                    SPImpl.this.wait();
+                    DexSpImpl.this.wait();
                 } catch (Throwable t) {
                 }
             }
@@ -1267,13 +1267,13 @@ class SPImpl implements SharedPreferences {
 
         @Override
         public boolean commit() {
-            SPImpl.this.save(this, false, true, false);
+            DexSpImpl.this.save(this, false, true, false);
             return true;
         }
 
         @Override
         public void apply() {
-            SPImpl.this.save(this, false, false, true);
+            DexSpImpl.this.save(this, false, false, true);
         }
 
         boolean doClear() {

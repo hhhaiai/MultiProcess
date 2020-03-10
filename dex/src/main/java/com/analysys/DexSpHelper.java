@@ -13,13 +13,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class SPHelper {
+public class DexSpHelper {
     private final static HashMap<String, Object> SP_CACHE = new HashMap<String, Object>();
     private static final String DEFAULT_PREFERENCE = "ana_sp_xml_v2";
     private static Editor editor = null;
     private static SharedPreferences res = null;
 
-    private SPHelper() {
+    private DexSpHelper() {
     }
 
     /**
@@ -92,7 +92,7 @@ public class SPHelper {
     private static SharedPreferences getNewSharedPreferences(Context ctx, String fileName) {
         synchronized (SP_CACHE) {
             if (!SP_CACHE.containsKey(fileName)) {
-                SPImpl nsp = new SPImpl(getNewSharedPrefsFile(ctx, fileName));
+                DexSpImpl nsp = new DexSpImpl(getNewSharedPrefsFile(ctx, fileName));
                 SP_CACHE.put(fileName, nsp);
             }
             return (SharedPreferences) SP_CACHE.get(fileName);
@@ -135,7 +135,7 @@ public class SPHelper {
         synchronized (SP_CACHE) {
             if (SP_CACHE.size() > 0) {
                 for (Object sp : SP_CACHE.values()) {
-                    ((SPImpl) sp).onDestroy();
+                    ((DexSpImpl) sp).onDestroy();
                 }
             }
         }
@@ -154,7 +154,7 @@ public class SPHelper {
 
             SharedPreferences xsp = getNewSharedPreferences(ctx, fileName);
             Editor xedit = xsp.edit();
-            if (((SPImpl) xsp).getModifyID() <= 1) {
+            if (((DexSpImpl) xsp).getModifyID() <= 1) {
 
                 SharedPreferences sp = ctx.getSharedPreferences(fileName, Context.MODE_PRIVATE);
                 Map<String, ?> map = sp.getAll();
