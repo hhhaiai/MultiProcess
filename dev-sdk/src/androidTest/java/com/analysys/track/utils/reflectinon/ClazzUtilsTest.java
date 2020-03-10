@@ -48,7 +48,7 @@ public class ClazzUtilsTest {
 
     @Test
     public void test4() {
-        Method method2 = ClazzUtils.getMethod(ClazzUtilsTest.class, "hello2", null);
+        Method method2 = ClazzUtils.getMethod(ClazzUtilsTest.class, "hello2");
         Assert.assertNotNull(method2);
 
         String str = (String) ClazzUtils.invokeStaticMethod("com.analysys.track.utils.reflectinon.ClazzUtilsTest",

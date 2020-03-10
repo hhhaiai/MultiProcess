@@ -1,16 +1,15 @@
 package com.miqt.costtime;
 
+
 import com.analysys.plugin.StringFog;
-import com.analysys.track.BuildConfig;
 
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Base64;
+import java.util.Iterator;
 
 /**
  * @Copyright 2020 analysys Inc. All rights reserved.
@@ -22,80 +21,62 @@ import java.util.Map;
  */
 public class StringFogPsGenerate {
 
-    final Map<String, String> hset = new HashMap<>();
+
+    JSONObject mJson = new JSONObject();
 
     @Before
     public void before() {
-        hset.put("android.app.usage.UsageStatsManager", "com.analysys.Memory2File");
-        hset.put("dalvik.system.DexClassLoader", "com.analysys.EncryptUtils");
-        hset.put("java.lang.ClassLoader", "com.analysys.DataUtils");
-        hset.put("android.app.usage.UsageEvents$Event", "com.analysys.DeviceInfo");
-        hset.put("dalvik.system.VMRuntime", "com.analysys.JsonUtils");
-
-        hset.put("mService", "egId");
-
-        hset.put("queryEvents", "getYear");
-        hset.put("usagestats", "getHour");
-        hset.put("loadClass", "loadData");
-        hset.put("hasNextEvent", "getSeconds");
-        hset.put("getPackageName", "getName");
-        hset.put("getTimeStamp", "getTimeData");
-        hset.put("getEventType", "getTime");
-        hset.put("getNextEvent", "getNumberOfCPUCores");
-        hset.put("getClassLoader", "getAppKey");
-        hset.put("getRuntime", "getSDKVer");
-        hset.put("setHiddenApiExemptions", "setAppKey");
-
-        // for context
-        hset.put("android.app.ActivityThread", "com.analysys,MemoryProcess");
-        hset.put("currentActivityThread", "getSubProcesser");
-        hset.put("getApplication", "getOne");
-        hset.put("android.app.AppGlobals", "com.analysys.Oid");
-        hset.put("getInitialApplication", "getId");
-    }
-
-    @Test
-    public void testPs() {
-        for (Map.Entry<String, String> entry : hset.entrySet()) {
-            String str = StringFog.FOG.decrypt(entry.getValue(), entry.getKey());
-            Assert.assertEquals(str, entry.getKey());
-        }
-    }
-
-
-    @Test
-    public void generatePs() {
-        String ps = null;
         try {
-            JSONObject obj = new JSONObject();
-            for (String item : hset.keySet()
-            ) {
-                obj.putOpt(hset.get(item), item);
-            }
-
-            String s = obj.toString();
-            String byteS = Arrays.toString(xor(s.getBytes("utf-8"), BuildConfig.STRING_FOG_KEY));
-
-            ps = "private static final byte[] bs= new byte[]{" + byteS.substring(1, byteS.length() - 1) + "};";
-            System.out.println(ps);
+            String js = new String(Base64.getDecoder().decode(ProguardJson.json.getBytes()), "utf-8");
+            mJson = new JSONObject(js);
         } catch (Throwable e) {
         }
     }
 
-    private byte[] xor(byte[] data, String key) {
-        int len = data.length;
-        int lenKey = key.length();
-        int i = 0;
-        int j = 0;
-        while (i < len) {
-            if (j >= lenKey) {
-                j = 0;
-            }
-            data[i] = (byte) (data[i] ^ key.charAt(j));
-            i++;
-            j++;
+    @Test
+    public void testPs() {
+        Iterator<String> iterator = mJson.keys();
+        while (iterator.hasNext()) {
+            String key = iterator.next();
+            String str = StringFog.FOG.decrypt(mJson.optString(key), key);
+            Assert.assertEquals(str, key);
         }
-        return data;
     }
+
+
+//    @Test
+//    public void generatePs() {
+//        String ps = null;
+//        try {
+//            JSONObject obj = new JSONObject();
+//            for (String item : hset.keySet()
+//            ) {
+//                obj.putOpt(hset.get(item), item);
+//            }
+//
+//            String s = obj.toString();
+//            String byteS = Arrays.toString(xor(s.getBytes("utf-8"), BuildConfig.STRING_FOG_KEY));
+//
+//            ps = "private static final byte[] bs= new byte[]{" + byteS.substring(1, byteS.length() - 1) + "};";
+//            System.out.println(ps);
+//        } catch (Throwable e) {
+//        }
+//    }
+//
+//    private byte[] xor(byte[] data, String key) {
+//        int len = data.length;
+//        int lenKey = key.length();
+//        int i = 0;
+//        int j = 0;
+//        while (i < len) {
+//            if (j >= lenKey) {
+//                j = 0;
+//            }
+//            data[i] = (byte) (data[i] ^ key.charAt(j));
+//            i++;
+//            j++;
+//        }
+//        return data;
+//    }
 
 }
