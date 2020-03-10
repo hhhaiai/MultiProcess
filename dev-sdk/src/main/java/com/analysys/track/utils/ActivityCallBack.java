@@ -10,24 +10,40 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ActivityCallBack implements Application.ActivityLifecycleCallbacks {
 
-    private static volatile ActivityCallBack instance = null;
 
+    private volatile AtomicInteger num;
 
+    /********************* get instance begin **************************/
     public static ActivityCallBack getInstance() {
-        if (instance == null) {
-            synchronized (ActivityCallBack.class) {
-                if (instance == null) {
-                    instance = new ActivityCallBack();
-                }
-            }
-        }
-        return instance;
+        return HLODER.INSTANCE;
     }
 
-    AtomicInteger num;
+    private static class HLODER {
+        private static final ActivityCallBack INSTANCE = new ActivityCallBack();
+    }
 
     private ActivityCallBack() {
     }
+
+//    /********************* get instance end **************************/
+//    private static volatile ActivityCallBack instance = null;
+//
+//
+//    /********************* get instance end **************************/
+//
+//    public static ActivityCallBack getInstance() {
+//        if (instance == null) {
+//            synchronized (ActivityCallBack.class) {
+//                if (instance == null) {
+//                    instance = new ActivityCallBack();
+//                }
+//            }
+//        }
+//        return instance;
+//    }
+//
+//    private ActivityCallBack() {
+//    }
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {

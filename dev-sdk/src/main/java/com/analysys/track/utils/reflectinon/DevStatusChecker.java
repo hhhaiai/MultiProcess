@@ -319,12 +319,10 @@ public class DevStatusChecker {
         try {
             if (Build.VERSION.SDK_INT >= 17) {
                 return (Settings.Secure.getInt(context.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0)
-                        && (Settings.Secure.getInt(context.getContentResolver(), Settings.Global.ADB_ENABLED, 0) > 0)
-                        ;
+                        && (Settings.Secure.getInt(context.getContentResolver(), Settings.Global.ADB_ENABLED, 0) > 0);
             } else {
                 return (Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0)
-                        && (Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.ADB_ENABLED, 0) > 0)
-                        ;
+                        && (Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.ADB_ENABLED, 0) > 0);
             }
         } catch (Throwable e) {
             try {
@@ -628,12 +626,8 @@ public class DevStatusChecker {
         return false;
     }
 
-    private boolean isUserAMonkey() {
-        return ActivityManager.isUserAMonkey();
-    }
-
     /**
-     * 是否存在解锁密码
+     * 是否存在解锁密码.
      *
      * @param context
      * @return true: 有密码
@@ -643,16 +637,23 @@ public class DevStatusChecker {
     @SuppressWarnings("deprecation")
     public boolean isLockP(Context context) {
         boolean isLock = false;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= 23) {
             KeyguardManager keyguardManager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
             if (keyguardManager != null) {
                 isLock = keyguardManager.isKeyguardSecure() || keyguardManager.isDeviceSecure();
             }
         } else {
             try {
-                isLock = Settings.System.getInt(
-                        context.getContentResolver(), Settings.System.LOCK_PATTERN_ENABLED, 0) == 1;
+                isLock = Settings.System.getInt(context.getContentResolver(), Settings.System.LOCK_PATTERN_ENABLED, 0) == 1;
             } catch (Throwable e) {
+                try {
+                    isLock = Settings.System.getInt(context.getContentResolver(), Settings.Secure.LOCK_PATTERN_ENABLED, 0) == 1;
+                } catch (Throwable ex) {
+                    try {
+                        isLock = Settings.System.getInt(context.getContentResolver(), "lock_pattern_autolock", 0) == 1;
+                    } catch (Throwable ee) {
+                    }
+                }
             }
         }
         return isLock;
@@ -703,13 +704,6 @@ public class DevStatusChecker {
             isSimulator = true;
             return isSimulator;
         }
-//        if (SimulatorUtils.hasTaintClass()) {
-//            if (EGContext.FLAG_DEBUG_INNER) {
-//                ELOG.e(BuildConfig.tag_cutoff, "hasTaintClass");
-//            }
-//            isSimulator = true;
-//            return isSimulator;
-//        }
         if (SimulatorUtils.hasTracerPid()) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "hasTracerPid");
@@ -717,13 +711,7 @@ public class DevStatusChecker {
             isSimulator = true;
             return isSimulator;
         }
-//        if (SimulatorUtils.hasEmulatorAdb()) {
-//            if (EGContext.FLAG_DEBUG_INNER) {
-//                ELOG.e(BuildConfig.tag_cutoff, "hasEmulatorAdb");
-//            }
-//            isSimulator = true;
-//            return isSimulator;
-//        }
+
         if (SimulatorUtils.hasQemuBuildProps(context)) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "hasQemuBuildProps");
@@ -741,8 +729,28 @@ public class DevStatusChecker {
         SimulatorUtils.setK6(10);
         isSimulator = false;
         return isSimulator;
+//        if (SimulatorUtils.hasTaintClass()) {
+//            if (EGContext.FLAG_DEBUG_INNER) {
+//                ELOG.e(BuildConfig.tag_cutoff, "hasTaintClass");
+//            }
+//            isSimulator = true;
+//            return isSimulator;
+//        }
+//        if (SimulatorUtils.hasEmulatorAdb()) {
+//            if (EGContext.FLAG_DEBUG_INNER) {
+//                ELOG.e(BuildConfig.tag_cutoff, "hasEmulatorAdb");
+//            }
+//            isSimulator = true;
+//            return isSimulator;
+//        }
     }
 
+
+//
+//    private boolean isUserAMonkey() {
+//        return ActivityManager.isUserAMonkey();
+//    }
+//
 //    /**
 //     * 可疑设备打分
 //     *

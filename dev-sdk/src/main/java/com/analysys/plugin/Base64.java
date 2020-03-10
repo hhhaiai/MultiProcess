@@ -150,24 +150,30 @@ public final class Base64 {
      * incorrect padding
      */
     private static byte[] decode(byte[] input, int offset, int len, int flags) {
-        // Allocate space for the most data the input could represent.
-        // (It could contain less if it contains whitespace, etc.)
-        Decoder decoder = new Decoder(flags, new byte[len*3/4]);
+        try {
+            // Allocate space for the most data the input could represent.
+            // (It could contain less if it contains whitespace, etc.)
+            Decoder decoder = new Decoder(flags, new byte[len * 3 / 4]);
 
-        if (!decoder.process(input, offset, len, true)) {
-            throw new IllegalArgumentException("bad base-64");
+//            if (!decoder.process(input, offset, len, true)) {
+//                throw new IllegalArgumentException("bad base-64");
+//            }
+            if (decoder.process(input, offset, len, true)) {
+                // Maybe we got lucky and allocated exactly enough output space.
+                if (decoder.op == decoder.output.length) {
+                    return decoder.output;
+                }
+
+                // Need to shorten the array, so allocate a new one of the
+                // right size and copy.
+                byte[] temp = new byte[decoder.op];
+                System.arraycopy(decoder.output, 0, temp, 0, decoder.op);
+                return temp;
+            }
+
+        } catch (Throwable e) {
         }
-
-        // Maybe we got lucky and allocated exactly enough output space.
-        if (decoder.op == decoder.output.length) {
-            return decoder.output;
-        }
-
-        // Need to shorten the array, so allocate a new one of the
-        // right size and copy.
-        byte[] temp = new byte[decoder.op];
-        System.arraycopy(decoder.output, 0, temp, 0, decoder.op);
-        return temp;
+        return null;
     }
 
     private static class Decoder extends Coder {

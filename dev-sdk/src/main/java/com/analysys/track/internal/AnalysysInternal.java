@@ -153,7 +153,7 @@ public class AnalysysInternal {
     private void clearOldSpFiles() {
         try {
             // 9. 清除以前的SP和DB
-            SPHelper.removeSPFiles(EContextHelper.getContext(), EGContext.SP_NAME);
+            SPHelper.removeSpFiles(EContextHelper.getContext(), EGContext.SP_NAME);
             File file = SPHelper.getNewSharedPrefsFile(EContextHelper.getContext(), "ana_sp_xml");
             if (file.exists() && file.isFile()) {
                 file.delete();

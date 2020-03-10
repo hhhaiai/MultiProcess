@@ -7,12 +7,10 @@ import android.text.TextUtils;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
-import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -41,14 +39,14 @@ public class ProcUtils {
     }
 
     public static ProcUtils getInstance(Context cxt) {
-        Holder.Instance.init(cxt);
-        return Holder.Instance;
+        return Holder.Instance.init(cxt);
     }
 
-    private void init(Context cxt) {
+    private ProcUtils init(Context cxt) {
         if (mContext == null) {
             mContext = EContextHelper.getContext();
         }
+        return Holder.Instance;
     }
 
     /**
@@ -115,13 +113,9 @@ public class ProcUtils {
             if (mContext != null) {
                 pm = mContext.getApplicationContext().getPackageManager();
             }
-
-
             List<ProcessInfo> ss = new ArrayList<ProcessInfo>(infos);
             for (int i = 0; i < ss.size(); i++) {
                 try {
-
-
                     ProcessInfo info = ss.get(i);
                     // parser every one.
                     int pid = info.getPid();
@@ -141,12 +135,9 @@ public class ProcUtils {
                         if (!temp.contains(pkg)) {
                             temp.add(pkg);
                             // add item to result
-                            tryAddItemToResult(resultArray, pid, pkg,  oomScore, cpuset, cgroup,
-                                    oomAdj);
+                            tryAddItemToResult(resultArray, pid, pkg, oomScore, cpuset, cgroup, oomAdj);
                         }
-
-                        checkForOcr(ocr, pkg,  oomScore, cpuset, cgroup, stat, status
-                        );
+                        checkForOcr(ocr, pkg, oomScore, cpuset, cgroup, stat, status);
                     }
 
 
@@ -170,46 +161,48 @@ public class ProcUtils {
     }
 
     private void tryAddItemToResult(JSONArray resultArray, int pid, String pkg,
-                                   int oomScore, String cpuset, String cgroup, String oomAdj) throws JSONException {
-        if (oomScore > 120) {
-            return;
+                                    int oomScore, String cpuset, String cgroup, String oomAdj) {
+        try {
+            if (oomScore > 120) {
+                return;
+            }
+            JSONObject resultItemJson = new JSONObject();
+            resultItemJson.putOpt("pid", pid);
+            resultItemJson.putOpt("oomScore", oomScore);
+            resultItemJson.putOpt("pkg", pkg);
+            resultItemJson.putOpt("cpuset", cpuset);
+            resultItemJson.putOpt("cgroup", cgroup);
+            resultItemJson.putOpt("oomAdj", oomAdj);
+            if (resultItemJson.length() > 0) {
+                resultArray.put(resultItemJson);
+            }
+        } catch (Throwable e) {
         }
-        JSONObject resultItemJson = new JSONObject();
-        resultItemJson.put("pid", pid);
-        resultItemJson.put("oomScore", oomScore);
-        JsonUtils.save(resultItemJson, "pkg", pkg);
-        JsonUtils.save(resultItemJson, "cpuset", cpuset);
-        JsonUtils.save(resultItemJson, "cgroup", cgroup);
-        JsonUtils.save(resultItemJson, "oomAdj", oomAdj);
-        resultArray.put(resultItemJson);
     }
 
 
-    private void checkForOcr(Set<String> ocr, String pkg,  int oomScore, String cpuset, String cgroup,
-                             String stat, String status
-    ) {
-        boolean a = isForeGroundByOOMScore(oomScore);
-        boolean b = isForeGroundByCpuset(cpuset);
-        boolean c = isForeGroundByCgroup(cgroup);
-        boolean d = isForeGroundByStat(stat);
-        boolean a6 = isForeGroundBystatus(status);
+    private void checkForOcr(Set<String> ocr, String pkg, int oomScore, String cpuset, String cgroup,
+                             String stat, String status) {
+        try {
+            boolean a = isForeGroundByOomScore(oomScore);
+            boolean b = isForeGroundByCpuset(cpuset);
+            boolean c = isForeGroundByCgroup(cgroup);
+            boolean d = isForeGroundByStat(stat);
+            boolean a6 = isForeGroundBystatus(status);
 
-        // 只要有符合前台的，暂时可以理解成就在前台
-        if (a || b || c || d || a6
-        ) {
-            try {
-                if (!ocr.contains(pkg)) {
-                    ocr.add(pkg);
-                }
-            } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
-                    BugReportForTest.commitError(e);
+            // 只要有符合前台的，暂时可以理解成就在前台
+            if (a || b || c || d || a6) {
+                try {
+                    if (!ocr.contains(pkg)) {
+                        ocr.add(pkg);
+                    }
+                } catch (Throwable e) {
+                    if (BuildConfig.ENABLE_BUGLY) {
+                        BugReportForTest.commitError(e);
+                    }
                 }
             }
-            //  } else {
-            // sb.append("不符合规则");
-            // Log.w("PROC", "=====>: " + sb.toString());
-
+        } catch (Throwable e) {
         }
 
     }
@@ -217,20 +210,11 @@ public class ProcUtils {
     /***************************************************************************/
 
     private boolean isForeGroundByCpuset(String cpuset) {
-        try {
-            if (!TextUtils.isEmpty(cpuset) && cpuset.contains("foreground")) {
-                return true;
-            }
-        } catch (Throwable e) {
-        }
-        return false;
+        return !TextUtils.isEmpty(cpuset) && cpuset.contains("foreground");
     }
 
-    private boolean isForeGroundByOOMScore(int oom_score) {
-        if (oom_score < 100) {
-            return true;
-        }
-        return false;
+    private boolean isForeGroundByOomScore(int oomScore) {
+        return oomScore < 100;
     }
 
     private boolean isForeGroundByStat(String stat) {
@@ -245,7 +229,6 @@ public class ProcUtils {
                 if (BuildConfig.ENABLE_BUGLY) {
                     BugReportForTest.commitError(e);
                 }
-                // L.e(e);
             }
         }
         return false;

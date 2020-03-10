@@ -26,14 +26,17 @@ public class SPHelper {
     }
 
     public static void reInit() {
-        if (editor != null) {
-            editor = null;
-        }
-        if (res != null) {
-            res = null;
-        }
-        if (SP_CACHE.size() > 0) {
-            SP_CACHE.clear();
+        try {
+            if (editor != null) {
+                editor = null;
+            }
+            if (res != null) {
+                res = null;
+            }
+            if (SP_CACHE.size() > 0) {
+                SP_CACHE.clear();
+            }
+        } catch (Throwable e) {
         }
     }
 
@@ -43,10 +46,14 @@ public class SPHelper {
      * @param context
      * @param spName
      */
-    public static void removeSPFiles(Context context, String spName) {
-        File f = getSystemSharedPrefsFile(context, spName);
-        if (f.exists()) {
-            f.delete();
+    public static void removeSpFiles(Context context, String spName) {
+        // some time the file is null.
+        try {
+            File f = getSystemSharedPrefsFile(context, spName);
+            if (f != null && f.exists()) {
+                f.deleteOnExit();
+            }
+        } catch (Throwable e) {
         }
     }
 
@@ -139,8 +146,7 @@ public class SPHelper {
             if (!dir.exists() || !dir.isDirectory()) {
                 dir.mkdirs();
             }
-            File systemFile = new File(dir, name + ".xml");
-            return systemFile;
+            return new File(dir, name + ".xml");
         } catch (Throwable e) {
         }
         return null;
@@ -228,7 +234,10 @@ public class SPHelper {
      * @param value
      */
     public static void setIntValue2SP(Context ctx, String key, int value) {
-        getEditor(ctx).putInt(key, value).commit();
+        try {
+            getEditor(ctx).putInt(key, value).commit();
+        } catch (Throwable e) {
+        }
     }
 
     /**
@@ -240,7 +249,11 @@ public class SPHelper {
      * @return
      */
     public static int getIntValueFromSP(Context ctx, String key, int defaultValue) {
-        return getDefault(ctx).getInt(key, defaultValue);
+        try {
+            return getDefault(ctx).getInt(key, defaultValue);
+        } catch (Throwable e) {
+        }
+        return defaultValue;
     }
 
     /**
@@ -249,21 +262,30 @@ public class SPHelper {
      * @param value
      */
     public static void setStringValue2SP(Context ctx, String key, String value) {
-        if (TextUtils.isEmpty(key)) {
-            return;
+        try {
+            if (TextUtils.isEmpty(key)) {
+                return;
+            }
+            getEditor(ctx).putString(key, value).commit();
+        } catch (Throwable e) {
         }
-        getEditor(ctx).putString(key, value).commit();
     }
 
     public static void setStringValue2SPCommit(Context ctx, String key, String value) {
-        if (TextUtils.isEmpty(key)) {
-            return;
+        try {
+            if (TextUtils.isEmpty(key)) {
+                return;
+            }
+            getEditor(ctx).putString(key, value).commit();
+        } catch (Throwable e) {
         }
-        getEditor(ctx).putString(key, value).commit();
     }
 
     public static void setBooleanValue2SPCommit(Context ctx, String key, boolean value) {
-        getEditor(ctx).putBoolean(key, value).commit();
+        try {
+            getEditor(ctx).putBoolean(key, value).commit();
+        } catch (Throwable e) {
+        }
     }
 
     /**
@@ -273,7 +295,11 @@ public class SPHelper {
      * @return
      */
     public static String getStringValueFromSP(Context ctx, String key, String defaultValue) {
-        return getDefault(ctx).getString(key, defaultValue);
+        try {
+            return getDefault(ctx).getString(key, defaultValue);
+        } catch (Throwable e) {
+        }
+        return defaultValue;
     }
 
     /**
@@ -282,7 +308,10 @@ public class SPHelper {
      * @param value
      */
     public static void setBooleanValue2SP(Context ctx, String key, boolean value) {
-        getEditor(ctx).putBoolean(key, value).commit();
+        try {
+            getEditor(ctx).putBoolean(key, value).commit();
+        } catch (Throwable e) {
+        }
     }
 
     /**
@@ -292,7 +321,11 @@ public class SPHelper {
      * @return
      */
     public static boolean getBooleanValueFromSP(Context ctx, String key, boolean defaultValue) {
-        return getDefault(ctx).getBoolean(key, defaultValue);
+        try {
+            return getDefault(ctx).getBoolean(key, defaultValue);
+        } catch (Throwable e) {
+        }
+        return defaultValue;
     }
 
     /**
@@ -301,11 +334,17 @@ public class SPHelper {
      * @param value
      */
     public static void setLongValue2SP(Context ctx, String key, long value) {
-        getEditor(ctx).putLong(key, value).commit();
+        try {
+            getEditor(ctx).putLong(key, value).commit();
+        } catch (Throwable e) {
+        }
     }
 
     public static void removeKey(Context ctx, String key) {
-        getEditor(ctx).remove(key).commit();
+        try {
+            getEditor(ctx).remove(key).commit();
+        } catch (Throwable e) {
+        }
     }
 
     /**
@@ -315,7 +354,11 @@ public class SPHelper {
      * @return
      */
     public static long getLongValueFromSP(Context ctx, String key, long defaultValue) {
-        return getDefault(ctx).getLong(key, defaultValue);
+        try {
+            return getDefault(ctx).getLong(key, defaultValue);
+        } catch (Throwable e) {
+        }
+        return defaultValue;
     }
 
 

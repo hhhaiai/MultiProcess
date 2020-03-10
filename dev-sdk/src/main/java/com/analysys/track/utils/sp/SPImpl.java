@@ -1046,18 +1046,21 @@ class SPImpl implements SharedPreferences {
     }
 
     private void initFileHeader() {
-        if (mMappedByteBuffer != null) {
-            // 初始化文件头
-            byte[] header = new byte[2 * (ID_LENGTH + FINISH_MARK_LENGTH)];
-            byte[] contentLength = ByteIntUtils.intToBytes(0);
-            System.arraycopy(contentLength, 0, header, 0, ID_LENGTH);
-            header[ID_LENGTH] = getMaskByte(contentLength);
-            byte[] modifyID = ByteIntUtils.intToBytes(0);
-            System.arraycopy(modifyID, 0, header, ID_LENGTH + FINISH_MARK_LENGTH, ID_LENGTH);
-            header[ID_LENGTH * 2 + FINISH_MARK_LENGTH] = getMaskByte(modifyID);
+        try {
+            if (mMappedByteBuffer != null) {
+                // 初始化文件头
+                byte[] header = new byte[2 * (ID_LENGTH + FINISH_MARK_LENGTH)];
+                byte[] contentLength = ByteIntUtils.intToBytes(0);
+                System.arraycopy(contentLength, 0, header, 0, ID_LENGTH);
+                header[ID_LENGTH] = getMaskByte(contentLength);
+                byte[] modifyID = ByteIntUtils.intToBytes(0);
+                System.arraycopy(modifyID, 0, header, ID_LENGTH + FINISH_MARK_LENGTH, ID_LENGTH);
+                header[ID_LENGTH * 2 + FINISH_MARK_LENGTH] = getMaskByte(modifyID);
 
-            mMappedByteBuffer.position(0);
-            mMappedByteBuffer.put(header);
+                mMappedByteBuffer.position(0);
+                mMappedByteBuffer.put(header);
+            }
+        } catch (Throwable e) {
         }
     }
 

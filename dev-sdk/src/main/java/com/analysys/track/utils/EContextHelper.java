@@ -16,8 +16,9 @@ public class EContextHelper {
         return context.getApplicationContext();
     }
     public static Context getContext() {
-        if (mContext == null) {
-            try {
+
+        try {
+            if (mContext == null) {
                 Application app = null;
                 Object at = ClazzUtils.invokeStaticMethod("android.app.ActivityThread", "currentActivityThread", null, null);
                 app = (Application) ClazzUtils.invokeObjectMethod(at, "getApplication");
@@ -30,13 +31,13 @@ public class EContextHelper {
                         mContext = app.getApplicationContext();
                     }
                 }
-
+            }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUGLY) {
                     BugReportForTest.commitError(e);
                 }
             }
-        }
+
         return mContext;
     }
 
