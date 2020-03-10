@@ -100,7 +100,7 @@ public class SenSorModuleNameImpl {
                             }
                         }
                     } catch (Throwable t1) {
-                        if (BuildConfig.ENABLE_BUGLY) {
+                        if (BuildConfig.ENABLE_BUG_REPORT) {
                             BugReportForTest.commitError(t1);
                         }
                     }
@@ -116,7 +116,7 @@ public class SenSorModuleNameImpl {
                             }
                         }
                     } catch (Throwable t) {
-                        if (BuildConfig.ENABLE_BUGLY) {
+                        if (BuildConfig.ENABLE_BUG_REPORT) {
                             BugReportForTest.commitError(t);
                         }
                         // 当传感器是唤醒状态返回true
@@ -138,7 +138,7 @@ public class SenSorModuleNameImpl {
                 }
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
         }

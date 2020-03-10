@@ -35,7 +35,7 @@ public class JsonUtils {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -47,7 +47,7 @@ public class JsonUtils {
                 json.put(key, value.trim());
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }

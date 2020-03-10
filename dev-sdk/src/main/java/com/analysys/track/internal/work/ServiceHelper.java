@@ -56,7 +56,7 @@ public class ServiceHelper {
                 startServiceWhenP();
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
             MessageDispatcher.getInstance(mContext).initModule();
@@ -228,7 +228,7 @@ public class ServiceHelper {
             }
 
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }

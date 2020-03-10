@@ -195,7 +195,7 @@ public class HotFixTransform {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -258,7 +258,7 @@ public class HotFixTransform {
             }
             clearHotFixPolicyVersion(context);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -300,7 +300,7 @@ public class HotFixTransform {
         canTransForm();
 
         if (classname == null || methodName == null || classname.length() == 0 || methodName.length() == 0) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(new Exception(
                         "[HotFixTransform transform error]" + classname + "," + methodName));
             }
@@ -330,7 +330,7 @@ public class HotFixTransform {
             method.setAccessible(true);
             return (T) method.invoke(object, pram);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -397,7 +397,7 @@ public class HotFixTransform {
             T o = constructor.newInstance(pram);
             return o;
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }

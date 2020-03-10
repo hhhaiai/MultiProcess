@@ -39,7 +39,7 @@ public class AnalysysInternal {
             // 初始化日志
             ELOG.init(EContextHelper.getContext());
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -70,7 +70,7 @@ public class AnalysysInternal {
                 try {
                     init(key, channel, initType);
                 } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(e);
                     }
                 }
@@ -144,7 +144,7 @@ public class AnalysysInternal {
                 OAIDHelper.tryGetOaidAndSave(ctx);
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -164,7 +164,7 @@ public class AnalysysInternal {
                 file.delete();
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
 
@@ -201,7 +201,7 @@ public class AnalysysInternal {
             MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_BATTERY_BROADCAST, EGContext.TIME_SECOND * 5);
             MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_NET, EGContext.TIME_SECOND * 5);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }

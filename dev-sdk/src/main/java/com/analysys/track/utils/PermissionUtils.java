@@ -33,7 +33,7 @@ public class PermissionUtils {
                 int rest = (Integer) method.invoke(context, permission);
                 result = rest == PackageManager.PERMISSION_GRANTED;
             } catch (Exception e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
                 result = false;

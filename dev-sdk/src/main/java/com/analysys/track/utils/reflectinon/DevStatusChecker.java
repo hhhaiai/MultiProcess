@@ -1,6 +1,5 @@
 package com.analysys.track.utils.reflectinon;
 
-import android.app.ActivityManager;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -425,7 +424,7 @@ public class DevStatusChecker {
             }
 
         } catch (Exception e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -567,7 +566,7 @@ public class DevStatusChecker {
                 return true;
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -619,7 +618,7 @@ public class DevStatusChecker {
                 }
             }
         } catch (Exception ex) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(ex);
             }
         }

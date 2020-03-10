@@ -1,7 +1,6 @@
 package com.device.impls;
 
 import android.Manifest;
-import android.app.usage.UsageStats;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.Ringtone;
@@ -24,13 +23,11 @@ import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
-import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.impl.usm.USMImpl;
 import com.analysys.track.internal.impl.usm.USMUtils;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.DataLocalTempUtils;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
@@ -40,7 +37,6 @@ import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 import com.device.impls.case2.RefModelA;
 import com.device.impls.cases.CaseImpls;
-import com.device.impls.cases.PolicTestY;
 import com.device.impls.usmcase.USMCase;
 import com.device.utils.AssetsHelper;
 import com.device.utils.EContextHelper;
@@ -573,7 +569,7 @@ public class MainFunCaseDispatcher {
                 Method getService = ClazzUtils.getMethod(serviceManager, "getService", String.class);
                 ibinder = (IBinder) getService.invoke(null, Context.USAGE_STATS_SERVICE);
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(BuildConfig.tag_snap, e);
                 }
             }
@@ -587,7 +583,7 @@ public class MainFunCaseDispatcher {
                         mService = asInterface.invoke(null, ibinder);
                     }
                 } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(BuildConfig.tag_snap, e);
                     }
                 }

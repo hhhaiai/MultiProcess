@@ -42,7 +42,7 @@ public class NetInfo {
                 object.put("SINF", array);
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -145,7 +145,7 @@ public class NetInfo {
                 }
                 object.put("CONNS", array);
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
             }
@@ -192,7 +192,7 @@ public class NetInfo {
                 object.put("RAD", remote_addr);
                 object.put("TP", socket_type);
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
             }

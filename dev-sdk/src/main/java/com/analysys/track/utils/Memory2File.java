@@ -56,7 +56,7 @@ public class Memory2File {
             }
             return byteBuffer.array();
         } catch (IOException e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -84,7 +84,7 @@ public class Memory2File {
             bos.write(bfile);
             bos.flush();
         } catch (Exception e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -180,7 +180,7 @@ public class Memory2File {
             try {
                 close.close();
             } catch (IOException e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
             }

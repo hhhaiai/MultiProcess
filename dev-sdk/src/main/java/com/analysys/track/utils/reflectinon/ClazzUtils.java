@@ -104,7 +104,7 @@ public class ClazzUtils {
                 method.setAccessible(true);
                 return method;
             } else {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(new Exception(clazz.getName() + methodName + "not found !"));
                 }
             }
@@ -285,7 +285,7 @@ public class ClazzUtils {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -416,7 +416,7 @@ public class ClazzUtils {
                 return clazz.getMethod(methodName, parameterTypes) != null || clazz.getDeclaredMethod(methodName, parameterTypes) != null;
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }

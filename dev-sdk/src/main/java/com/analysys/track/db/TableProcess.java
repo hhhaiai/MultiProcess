@@ -60,7 +60,7 @@ public class TableProcess {
             }
 
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -240,7 +240,7 @@ public class TableProcess {
             }
             db.delete(DBConfig.XXXInfo.TABLE_NAME, null, null);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -274,7 +274,7 @@ public class TableProcess {
                 db.delete(DBConfig.XXXInfo.TABLE_NAME, DBConfig.XXXInfo.Column.ID + "=?", new String[]{id});
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -345,7 +345,7 @@ public class TableProcess {
 
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
             array = null;
@@ -381,7 +381,7 @@ public class TableProcess {
                 return;
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -520,7 +520,7 @@ public class TableProcess {
 //                ELOG.e(" size值：："+size+" maxLength = "+maxLength);
             }
         } catch (Exception e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_oc, e);
             }
         } finally {
@@ -546,7 +546,7 @@ public class TableProcess {
             db.delete(DBConfig.OC.TABLE_NAME, DBConfig.OC.Column.ST + "=?", new String[]{EGContext.DEFAULT_ONE});
 //            ELOG.e("删除的行数：：：  "+count);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -565,7 +565,7 @@ public class TableProcess {
             }
             db.delete(DBConfig.OC.TABLE_NAME, null, null);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -614,7 +614,7 @@ public class TableProcess {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -688,7 +688,7 @@ public class TableProcess {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -718,7 +718,7 @@ public class TableProcess {
             db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?",
                     new String[]{EGContext.DEFAULT_ONE});
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -741,7 +741,7 @@ public class TableProcess {
             }
             db.delete(DBConfig.Location.TABLE_NAME, null, null);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
 
@@ -771,7 +771,7 @@ public class TableProcess {
             cv.put(DBConfig.IDStorage.Column.TEMPID, EncryptUtils.encrypt(mContext, tmpId));
             db.insert(DBConfig.IDStorage.TABLE_NAME, null, cv);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -814,7 +814,7 @@ public class TableProcess {
 
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -835,7 +835,7 @@ public class TableProcess {
             }
             db.delete(DBConfig.IDStorage.TABLE_NAME, null, null);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -872,7 +872,7 @@ public class TableProcess {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -913,7 +913,7 @@ public class TableProcess {
             }
 
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -953,7 +953,7 @@ public class TableProcess {
                 ELOG.i(BuildConfig.tag_snap, " 更新信息-----> " + appTag);
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -1028,7 +1028,7 @@ public class TableProcess {
                     cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AHT)),
                     DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -1085,7 +1085,7 @@ public class TableProcess {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -1130,7 +1130,7 @@ public class TableProcess {
                 ELOG.i(BuildConfig.tag_snap, " 重置状态-----> " + result);
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -1150,7 +1150,7 @@ public class TableProcess {
             }
             db.delete(DBConfig.AppSnapshot.TABLE_NAME, null, null);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -1182,7 +1182,7 @@ public class TableProcess {
                 db.insertOrThrow(DBConfig.ScanningInfo.TABLE_NAME, null, cv);
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -1227,7 +1227,7 @@ public class TableProcess {
             }
             return scanningInfos;
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -1260,7 +1260,7 @@ public class TableProcess {
             }
             waitRemoveScanningInfoIds.clear();
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -1305,7 +1305,7 @@ public class TableProcess {
             }
             return scanningInfos;
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {

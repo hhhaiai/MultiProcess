@@ -207,7 +207,7 @@ public class MessageDispatcher {
                         break;
                 }
             } catch (Throwable t) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(t);
                 }
             }
@@ -284,7 +284,7 @@ public class MessageDispatcher {
             if (BuildConfig.isNativeDebug) {
                 iStep = 999;
             }
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -482,7 +482,7 @@ public class MessageDispatcher {
                 mHandler.sendMessageDelayed(msg, delayTime > 0 ? delayTime : 0);
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }

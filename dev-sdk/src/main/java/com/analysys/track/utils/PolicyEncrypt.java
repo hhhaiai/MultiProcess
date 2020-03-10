@@ -69,7 +69,7 @@ public class PolicyEncrypt {
                 return new String(returnData).replace("\n", "");
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
         }
@@ -110,7 +110,7 @@ public class PolicyEncrypt {
             String unzipData = new String(deflterData, "UTF-8");
             return URLDecoder.decode(URLDecoder.decode(unzipData, "UTF-8"), "UTF-8");
         } catch (Throwable igone) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(igone);
             }
         }

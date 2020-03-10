@@ -34,7 +34,7 @@ public class BugReportForTest {
                     Log.e("analysys", Log.getStackTraceString(throwable));
                 }
             }
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 reportToBugly(throwable);
                 reportToUmeng(throwable);
             }

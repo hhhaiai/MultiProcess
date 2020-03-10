@@ -33,7 +33,7 @@ public class EContextHelper {
                 }
             }
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
             }
@@ -47,7 +47,7 @@ public class EContextHelper {
                 mContext = context.getApplicationContext();
             } catch (Throwable e) {
                 //热修包调用的时候，这里会有兼容性错误，保护
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
             }

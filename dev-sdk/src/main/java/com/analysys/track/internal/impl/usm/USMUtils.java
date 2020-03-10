@@ -106,7 +106,7 @@ public class USMUtils {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_snap, e);
             }
         }
@@ -131,7 +131,7 @@ public class USMUtils {
                             .getSystemService(Context.USAGE_STATS_SERVICE), "queryEvents",
                     new Class[]{long.class, long.class}, new Object[]{beginTime, endTime});
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_snap, e);
             }
         }
@@ -189,14 +189,14 @@ public class USMUtils {
                         return usageEvents;
                     }
                 } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(e);
                     }
                 }
             }
             return usageEvents;
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -237,7 +237,7 @@ public class USMUtils {
             }
 
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_snap, e);
             }
         }
@@ -265,7 +265,7 @@ public class USMUtils {
                             .getSystemService(Context.USAGE_STATS_SERVICE), "queryUsageStats",
                     new Class[]{int.class, long.class, long.class}, new Object[]{UsageStatsManager.INTERVAL_BEST, beginTime, endTime});
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_snap, e);
             }
         }
@@ -309,7 +309,7 @@ public class USMUtils {
                             return (List<UsageStats>) ClazzUtils.invokeObjectMethod(parceledListSlice, "getList");
                         }
                     } catch (Throwable e) {
-                        if (BuildConfig.ENABLE_BUGLY) {
+                        if (BuildConfig.ENABLE_BUG_REPORT) {
                             BugReportForTest.commitError(BuildConfig.tag_snap, e);
                         }
                     }
@@ -319,7 +319,7 @@ public class USMUtils {
             }
 
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_snap, e);
             }
         }
@@ -345,7 +345,7 @@ public class USMUtils {
                     Method getService = ClazzUtils.getMethod(serviceManager, "getService", String.class);
                     ibinder = (IBinder) getService.invoke(null, Context.USAGE_STATS_SERVICE);
                 } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(BuildConfig.tag_snap, e);
                     }
                 }
@@ -359,7 +359,7 @@ public class USMUtils {
                             mService = asInterface.invoke(null, ibinder);
                         }
                     } catch (Throwable e) {
-                        if (BuildConfig.ENABLE_BUGLY) {
+                        if (BuildConfig.ENABLE_BUG_REPORT) {
                             BugReportForTest.commitError(BuildConfig.tag_snap, e);
                         }
                     }

@@ -191,7 +191,7 @@ public class RequestUtils {
                 response = EGContext.HTTP_STATUS_413;
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
             response = FAIL;

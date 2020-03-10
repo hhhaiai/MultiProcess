@@ -115,7 +115,7 @@ public class IUSMUtils {
                     Object userUsageStatsService = constructor.newInstance(context, 0, mUsageStatsDir, null);
 
                 } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(e);
                     }
                 }
@@ -205,7 +205,7 @@ public class IUSMUtils {
                 method.setAccessible(override);
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -293,7 +293,7 @@ public class IUSMUtils {
                 return usageEvents;
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -332,7 +332,7 @@ public class IUSMUtils {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -344,7 +344,7 @@ public class IUSMUtils {
         try {
             method = clazz.getDeclaredMethod(methodName, parameterTypes);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -352,7 +352,7 @@ public class IUSMUtils {
             try {
                 method = clazz.getMethod(methodName, parameterTypes);
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
             }
@@ -365,7 +365,7 @@ public class IUSMUtils {
         try {
             field = clazz.getDeclaredField(fieldName);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -373,7 +373,7 @@ public class IUSMUtils {
             try {
                 field = clazz.getField(fieldName);
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
             }

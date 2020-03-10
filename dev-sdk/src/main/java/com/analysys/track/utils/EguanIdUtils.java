@@ -45,7 +45,7 @@ public class EguanIdUtils {
             // 四个文件作对比
             tmpId = getContrastId(file, setting, shard, database);
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
             tmpId = "";
@@ -71,7 +71,7 @@ public class EguanIdUtils {
                 writeDatabase(tmpId);
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -145,7 +145,7 @@ public class EguanIdUtils {
                 }
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
         }
@@ -233,7 +233,7 @@ public class EguanIdUtils {
             out = new FileOutputStream(file, false);
             out.write(st.getBytes());
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -264,7 +264,7 @@ public class EguanIdUtils {
             }
             return String.valueOf(sb);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {

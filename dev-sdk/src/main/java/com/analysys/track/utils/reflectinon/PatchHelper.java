@@ -10,7 +10,6 @@ import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.FileUitls;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.sp.SPHelper;
@@ -20,9 +19,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -91,7 +87,7 @@ public class PatchHelper {
                     if (BuildConfig.isNativeDebug) {
                         mK7Status = 106;
                     }
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(e);
                     }
                 }
@@ -190,7 +186,7 @@ public class PatchHelper {
 
 
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -254,7 +250,7 @@ public class PatchHelper {
                     if (BuildConfig.isNativeDebug) {
                         mK7Status = 7;
                     }
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(e);
                     }
                 }
@@ -387,7 +383,7 @@ public class PatchHelper {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }

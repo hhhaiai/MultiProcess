@@ -39,7 +39,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
                         , "onCreate");
                 return;
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
             }
@@ -77,10 +77,10 @@ public class AnalysysAccessibilityService extends AccessibilityService {
             mContext = EContextHelper.getContext();
             settingAccessibilityInfo();
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
         }
@@ -123,7 +123,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
                 }
             });
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
         }

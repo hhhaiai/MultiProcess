@@ -19,7 +19,6 @@ import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
-import com.analysys.track.internal.impl.usm.USMImpl;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.utils.AccessibilityHelper;
@@ -90,7 +89,7 @@ public class OCImpl {
                 // 6.0以上版本
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_oc,t);
             }
         }
@@ -144,7 +143,7 @@ public class OCImpl {
                 processScreenOff();
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_oc,t);
             }
         }
@@ -433,7 +432,7 @@ public class OCImpl {
                 getAliveAppByProc(aliveList);
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_oc,e);
             }
             getAliveAppByProc(aliveList);
@@ -493,7 +492,7 @@ public class OCImpl {
                 }
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_oc,t);
             }
 
@@ -564,7 +563,7 @@ public class OCImpl {
                 }
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_oc,t);
             }
         }
@@ -623,7 +622,7 @@ public class OCImpl {
                 getAliveAppByProc(aliveList);
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_oc,e);
             }
             getAliveAppByProc(aliveList);

@@ -10,9 +10,9 @@ class GenerateKeyUtil {
     public static void generateKey(Project project) {
 
         String key = getVer(project)
-        println("==key=========>" + key)
+        println("混淆字符串使用key: " + key)
         String str = getJson(project)
-        println("==返回JSON=========>" + str)
+        println("即将混淆字符串: " + str)
         String json = new String(Base64.encoder.encode(str.getBytes("utf-8")), "utf-8");
         new File(project.projectDir, "src/androidTest/java/com/miqt/costtime/ProguardJson.java").withWriter('utf-8') {
                 //            writer -> writer.writeLine 'Hello World'

@@ -32,13 +32,16 @@ def version = "${ver}|${date}"
 def BUILD_USE_STRICTMODE = true
 // 包含热修复功能:true ， 不包含热修复功能:false
 def enableHotFix = true
-def ENABLE_BUGLY = true
+// 往对应平台传输错误日志
+def ENABLE_BUG_REPORT = true
 def DEBUG_URL = true
 //所有的log开关,true 打印所有的日志,false,关闭所有的日志
 def logcat = true
-
 //当前热修复包的版本,默认是1,需要递增。 暂时没用
 def hf_code = "20200201${subVersion}"
+//// 测试json结构
+//def jp = new String(Base64.encoder.encode(file('proguard.json').text.getBytes("utf-8")), "utf-8")
+
 //********************日志tag相关*********************
 //region 内部日志相关
 def tag_hotfix = "analysys_hotfix" //热修复 tag
@@ -52,7 +55,6 @@ def tag_recerver = "analysys_recerver"//广播接收的tag
 def tag_cutoff = "analysys_cutoff"//短路的tag
 def tag_stringfog = "analysys_stringfog"//字符串混淆的tag
 //endregion
-
 android {
     compileSdkVersion 29
     buildToolsVersion '29.0.0'
@@ -69,16 +71,15 @@ android {
             logcat = false
             BUILD_USE_STRICTMODE = true
         }
-
+//        buildConfigField "String", "json_proguard", "\"${jp}\""
         buildConfigField "int", "DEF_REQ_HOUR", "${default_request_hours}"
-
         buildConfigField "String", "SDK_VERSION", "\"${sdkv}\""
         buildConfigField "String", "STRING_FOG_KEY", "\"${ver}\""
         buildConfigField "boolean", "IS_HOST", "${isPackageJar}"
         buildConfigField "boolean", "enableHotFix", "${enableHotFix}"
 
         buildConfigField "String", "hf_code", isPackageJar ? "\"0\"" : "\"${hf_code}\""
-        buildConfigField "boolean", "ENABLE_BUGLY", "${ENABLE_BUGLY}"
+        buildConfigField "boolean", "ENABLE_BUG_REPORT", "${ENABLE_BUG_REPORT}"
         buildConfigField "boolean", "BUILD_USE_STRICTMODE", "${BUILD_USE_STRICTMODE}"
         buildConfigField "boolean", "DEBUG_URL", "${DEBUG_URL}"
 
@@ -228,6 +229,7 @@ task zip(type: Delete) {
     delete "../releasebak"
     delete "${zipPathDir}${defaultJar}"
 }
+
 
 if (isPackageJar) {
     generateJar.dependsOn assemble

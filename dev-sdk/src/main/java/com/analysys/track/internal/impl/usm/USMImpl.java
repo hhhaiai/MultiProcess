@@ -9,7 +9,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.widget.TabHost;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
@@ -49,7 +48,7 @@ public class USMImpl {
             //SPHelper.setLongValue2SP(context, LAST_UPLOAD_TIME, end);
             return getUSMInfo(context, lastUploadTime, end);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -95,7 +94,7 @@ public class USMImpl {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -138,7 +137,7 @@ public class USMImpl {
                             //                        arr.put(openEvent.toJsonForMatTime());
                         }
                     } catch (Throwable e) {
-                        if (BuildConfig.ENABLE_BUGLY) {
+                        if (BuildConfig.ENABLE_BUG_REPORT) {
                             BugReportForTest.commitError(e);
                         }
                     }
@@ -243,7 +242,7 @@ public class USMImpl {
             openEvent.setVersionCode(packageInfo.versionName + "|" + packageInfo.versionCode);
             return openEvent;
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }

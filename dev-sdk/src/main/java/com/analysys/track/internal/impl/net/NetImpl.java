@@ -16,7 +16,6 @@ import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.ProcUtils;
-import com.analysys.track.internal.impl.usm.USMImpl;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
@@ -136,7 +135,7 @@ public class NetImpl {
                 map.put(info.pkgname, info);
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_netinfo,e);
             }
         }
@@ -181,7 +180,7 @@ public class NetImpl {
                     //解析原始信息存到pkgs里面
                     resolve(cmd, result, time);
                 } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(BuildConfig.tag_netinfo,e);
                     }
                 }
@@ -229,7 +228,7 @@ public class NetImpl {
             saveScanningInfos(pkgs);
 
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_netinfo,e);
             }
         }
@@ -286,7 +285,7 @@ public class NetImpl {
                     return usmPkg;
                 }
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(BuildConfig.tag_netinfo,e);
                 }
             }
@@ -311,7 +310,7 @@ public class NetImpl {
             try {
                 ELOG.i(BuildConfig.tag_netinfo,"[存App列表]" + array.toString(2));
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(BuildConfig.tag_netinfo,e);
                 }
             }
@@ -435,7 +434,7 @@ public class NetImpl {
 
 
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_netinfo,e);
             }
         }
@@ -465,7 +464,7 @@ public class NetImpl {
             }
             return builder.toString();
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_netinfo,e);
             }
         } finally {
@@ -480,7 +479,7 @@ public class NetImpl {
                     fileInputStream.close();
                 }
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(BuildConfig.tag_netinfo,e);
                 }
             }

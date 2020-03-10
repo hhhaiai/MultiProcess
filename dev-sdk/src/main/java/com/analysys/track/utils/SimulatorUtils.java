@@ -1,7 +1,6 @@
 package com.analysys.track.utils;
 
 import android.content.Context;
-import android.os.Looper;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
@@ -69,7 +68,7 @@ public class SimulatorUtils {
             mStatus = 51;
             return true;
         } catch (Throwable exception) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(exception);
             }
             return false;
@@ -429,7 +428,7 @@ public class SimulatorUtils {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -481,7 +480,7 @@ public class SimulatorUtils {
             }
 
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {

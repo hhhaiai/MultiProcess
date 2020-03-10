@@ -111,7 +111,7 @@ public class DeviceImpl {
                 bluetoothMacAddress = Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -134,7 +134,7 @@ public class DeviceImpl {
                 }
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
         }
@@ -181,7 +181,7 @@ public class DeviceImpl {
                 mac = getMacByShell();
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -212,7 +212,7 @@ public class DeviceImpl {
                 macAddress = DEFALT_MAC;
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
             macAddress = DEFALT_MAC;
@@ -248,7 +248,7 @@ public class DeviceImpl {
                 }
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
             mac = DEFALT_MAC;
@@ -277,7 +277,7 @@ public class DeviceImpl {
                     }
                 }
             } catch (IOException e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
             } finally {
@@ -309,7 +309,7 @@ public class DeviceImpl {
                 }
             }
         } catch (Exception e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
@@ -317,7 +317,7 @@ public class DeviceImpl {
                 try {
                     br.close();
                 } catch (IOException e) {
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(e);
                     }
                 }
@@ -327,7 +327,7 @@ public class DeviceImpl {
                 try {
                     in.close();
                 } catch (IOException e) {
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(e);
                     }
                 }
@@ -358,7 +358,7 @@ public class DeviceImpl {
                 serialNo = (String) get.invoke(c, "ro.serialnocustom");
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -370,7 +370,7 @@ public class DeviceImpl {
         try {
             displayMetrics = mContext.getApplicationContext().getResources().getDisplayMetrics();
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
             displayMetrics = null;
@@ -386,7 +386,7 @@ public class DeviceImpl {
         try {
             res = getDisplayMetrics().widthPixels + "-" + getDisplayMetrics().heightPixels;
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
             res = "";
@@ -401,7 +401,7 @@ public class DeviceImpl {
         try {
             dpi = String.valueOf(getDisplayMetrics().densityDpi);
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
             dpi = "";
@@ -428,7 +428,7 @@ public class DeviceImpl {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -444,7 +444,7 @@ public class DeviceImpl {
             TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
             operatorName = tm.getSimOperatorName();
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
             operatorName = "";
@@ -462,7 +462,7 @@ public class DeviceImpl {
             operatorCode = tm.getNetworkOperator();
 
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
             operatorCode = "";
@@ -482,7 +482,7 @@ public class DeviceImpl {
             TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
             operatorCode = tm.getNetworkOperatorName();
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
             operatorCode = "";
@@ -500,7 +500,7 @@ public class DeviceImpl {
             ApplicationInfo applicationInfo = packageManager.getApplicationInfo(mContext.getPackageName(), 0);
             return (String) packageManager.getApplicationLabel(applicationInfo);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -515,7 +515,7 @@ public class DeviceImpl {
         try {
             return mContext.getPackageName();
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -534,7 +534,7 @@ public class DeviceImpl {
             String versionName = pInfo.versionName;
             return versionName + "|" + versionCode;
         } catch (NameNotFoundException e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -550,7 +550,7 @@ public class DeviceImpl {
             String md5Fingerprint = doFingerprint(sig.toByteArray());
             return md5Fingerprint;
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -567,7 +567,7 @@ public class DeviceImpl {
             byte[] bytes = md.digest();
             return byteArrayToString(bytes);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -586,7 +586,7 @@ public class DeviceImpl {
             byte[] bytes = md.digest(cert);
             return byteArrayToString(bytes);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -601,7 +601,7 @@ public class DeviceImpl {
             Signature sig = packageInfo.signatures[0];
             return sig;
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -618,7 +618,7 @@ public class DeviceImpl {
                 return mAdapther.getName();
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
         }
@@ -667,7 +667,7 @@ public class DeviceImpl {
             // 电池温度
             info.setBatteryTemperature(String.valueOf(temperature));
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -686,7 +686,7 @@ public class DeviceImpl {
             Configuration mCurConfig = mContext.getResources().getConfiguration();
             return mCurConfig.fontScale + "";
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
             return "0";
@@ -733,7 +733,7 @@ public class DeviceImpl {
                 return stringArrayToString(Build.SUPPORTED_ABIS);
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
         }
@@ -746,7 +746,7 @@ public class DeviceImpl {
                 return stringArrayToString(Build.SUPPORTED_32_BIT_ABIS);
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
         }
@@ -759,7 +759,7 @@ public class DeviceImpl {
                 return stringArrayToString(Build.SUPPORTED_64_BIT_ABIS);
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
         }
@@ -786,7 +786,7 @@ public class DeviceImpl {
                 }
             });
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
         }
@@ -827,7 +827,7 @@ public class DeviceImpl {
                 result = result.substring(0, result.length() - 1);
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
             return null;

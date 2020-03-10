@@ -21,7 +21,7 @@ public class Md5Utils {
             byte[] m = md5.digest();// 加密
             return getString(m);
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
         }

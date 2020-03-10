@@ -35,7 +35,7 @@ public class AdvertisingIdClient {
             PackageManager pm = context.getPackageManager();
             pm.getPackageInfo("com.android.vending", 0);
         } catch (Exception e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
             throw e;
@@ -50,7 +50,7 @@ public class AdvertisingIdClient {
                 AdInfo adInfo = new AdInfo(adInterface.getId(), adInterface.isLimitAdTrackingEnabled(true));
                 return adInfo;
             } catch (Exception exception) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(exception);
                 }
                 throw exception;
@@ -89,7 +89,7 @@ public class AdvertisingIdClient {
             try {
                 this.queue.put(service);
             } catch (InterruptedException localInterruptedException) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(localInterruptedException);
                 }
             }

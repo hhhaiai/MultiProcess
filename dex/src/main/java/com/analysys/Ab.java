@@ -36,6 +36,7 @@ public class Ab {
                 Log.i("sanbo", String.format("[%s]======{%d/%d}======Test.init(context,%s,%s)==call over===[%s]==", getCurrentProcessName(context), i, count, key, channel, version));
             }
         }
+
     }
 
     /**

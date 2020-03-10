@@ -51,14 +51,17 @@ public class StringFog {
             try {
                 String result = FileUitls.getInstance(null).getString(data, bs);
                 if (EGContext.FLAG_DEBUG_INNER) {
-                    Log.d(BuildConfig.tag_stringfog + "1", "[key=" + EGContext.STRING_FOG_KEY + "][" + data + "]-->[" + result + "]");
+                    Log.d(BuildConfig.tag_stringfog, "[key=" + EGContext.STRING_FOG_KEY + "][" + data + "]-->[" + result + "]");
                 }
                 return result;
             } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
+                    Log.e(BuildConfig.tag_stringfog, Log.getStackTraceString(e));
+                }
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
-                Log.d(BuildConfig.tag_stringfog + "1", "[key=" + key + "][" + data + "]-->[" + null + "]");
-            }
+//            if (EGContext.FLAG_DEBUG_INNER) {
+//                Log.d(BuildConfig.tag_stringfog + "1", "[key=" + key + "][" + data + "]-->[" + null + "]");
+//            }
             return "";
         }
 

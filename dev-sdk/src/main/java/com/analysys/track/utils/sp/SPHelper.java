@@ -95,7 +95,7 @@ public class SPHelper {
                     try {
                         f.createNewFile();
                     } catch (IOException e) {
-                        if (BuildConfig.ENABLE_BUGLY) {
+                        if (BuildConfig.ENABLE_BUG_REPORT) {
                             BugReportForTest.commitError(e);
                         }
                     }
@@ -218,7 +218,7 @@ public class SPHelper {
             method.setAccessible(true);
             returnValue = method.invoke(o, args);
         } catch (Exception e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }

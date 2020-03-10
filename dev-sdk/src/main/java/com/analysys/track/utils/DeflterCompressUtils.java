@@ -44,7 +44,7 @@ public class DeflterCompressUtils {
             }
             output = bos.toByteArray();
         } catch (Exception e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
             output = data;
@@ -55,7 +55,7 @@ public class DeflterCompressUtils {
             try {
                 bos.close();
             } catch (IOException e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
             }

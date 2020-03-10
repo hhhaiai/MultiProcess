@@ -23,7 +23,7 @@ public class AESUtils {
             byte[] result = cipher.doFinal(content);
             return result;
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -52,7 +52,7 @@ public class AESUtils {
             byte[] result = cipher.doFinal(content);
             return result;
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }

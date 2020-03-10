@@ -46,7 +46,7 @@ public class IUSMImpl {
             USMAvailable = usageStats != null;
             return USMAvailable;
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
 
@@ -67,7 +67,7 @@ public class IUSMImpl {
             //SPHelper.setLongValue2SP(context, LAST_UPLOAD_TIME, end);
             return getUSMInfo(context, pre_time, end);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -122,7 +122,7 @@ public class IUSMImpl {
                 return jsonArray;
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -143,7 +143,7 @@ public class IUSMImpl {
             openEvent.setVersionCode(packageInfo.versionName + "|" + packageInfo.versionCode);
             return openEvent;
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }

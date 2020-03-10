@@ -118,7 +118,7 @@ public class LocationImpl {
             }
 
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_loc,t);
             }
         }
@@ -169,7 +169,7 @@ public class LocationImpl {
                 TableProcess.getInstance(mContext).insertLocation(location);
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_loc,t);
             }
         }
@@ -239,7 +239,7 @@ public class LocationImpl {
                 return false;
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_loc,t);
             }
         }
@@ -278,7 +278,7 @@ public class LocationImpl {
             }
             return true;
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_loc,t);
             }
         }
@@ -361,7 +361,7 @@ public class LocationImpl {
                 return true;
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_loc,e);
             }
         }
@@ -375,7 +375,7 @@ public class LocationImpl {
                 JsonUtils.pushToJSON(mContext, locationJson, UploadKey.LocationInfo.CollectionTime,
                         String.valueOf(System.currentTimeMillis()), DataController.SWITCH_OF_COLLECTION_TIME);
             } catch (Throwable t) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(BuildConfig.tag_loc,t);
                 }
             }
@@ -384,7 +384,7 @@ public class LocationImpl {
                 JsonUtils.pushToJSON(mContext, locationJson, UploadKey.LocationInfo.GeographyLocation,
                         locationInfo, DataController.SWITCH_OF_GEOGRAPHY_LOCATION);
             } catch (Throwable t) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(BuildConfig.tag_loc,t);
                 }
             }
@@ -399,7 +399,7 @@ public class LocationImpl {
                                 wifiInfo, DataController.SWITCH_OF_WIFI_NAME);
                     }
                 } catch (Throwable t) {
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(BuildConfig.tag_loc,t);
                     }
                 }
@@ -417,14 +417,14 @@ public class LocationImpl {
                                 DataController.SWITCH_OF_BS_NAME);
                     }
                 } catch (Throwable t) {
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(BuildConfig.tag_loc,t);
                     }
                 }
 
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_loc,e);
             }
         }
@@ -553,7 +553,7 @@ public class LocationImpl {
                         }
                     }
                 } catch (Throwable t) {
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(BuildConfig.tag_loc,t);
                     }
                 }
@@ -566,7 +566,7 @@ public class LocationImpl {
                 return jsonArray;
             }
         } catch (Exception e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_loc,e);
             }
         }
@@ -594,7 +594,7 @@ public class LocationImpl {
                 }
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_loc,t);
             }
         }
@@ -663,7 +663,7 @@ public class LocationImpl {
                         DataController.SWITCH_OF_BS_RSRQ);
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_loc,t);
             }
         }

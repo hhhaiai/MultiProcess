@@ -37,7 +37,7 @@ public class IUSMInfo {
             jsonObject.putOpt("NT", netType);
             jsonObject.putOpt("ETDM", extendedMap.toJson());
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
             //JSONException
@@ -57,7 +57,7 @@ public class IUSMInfo {
             jsonObject.putOpt("NT", netType);
             jsonObject.putOpt("ETDM", extendedMap.toJson());
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
             //JSONException
@@ -82,7 +82,7 @@ public class IUSMInfo {
                 jsonObject.putOpt("AT", applicationType);
                 jsonObject.putOpt("ST", switchType);
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
                 //JSONException

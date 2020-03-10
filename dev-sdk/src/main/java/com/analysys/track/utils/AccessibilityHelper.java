@@ -64,7 +64,7 @@ public class AccessibilityHelper {
                     android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
         } catch (Throwable e) {
             //部分机器可能这部分会异常
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
             return false;

@@ -154,7 +154,7 @@ public class PolicyImpl {
                 printInfo();
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -280,7 +280,7 @@ public class PolicyImpl {
             saveNewPolicyToLocal(PolicyInfo.getInstance());
 
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -362,7 +362,7 @@ public class PolicyImpl {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -418,7 +418,7 @@ public class PolicyImpl {
             parserPatchPolicy(serverPolicy, policyInfo);
             parserHotfix(serverPolicy);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -448,7 +448,7 @@ public class PolicyImpl {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -521,7 +521,7 @@ public class PolicyImpl {
                 }
             }
         } catch (Throwable igone) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(igone);
             }
         }
@@ -692,7 +692,7 @@ public class PolicyImpl {
                     list.put(responseCtrlInfo);
                 }
             } catch (Throwable igone) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(igone);
                 }
             }

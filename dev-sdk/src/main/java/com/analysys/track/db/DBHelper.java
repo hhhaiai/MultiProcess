@@ -87,7 +87,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 }
                 break;
             } catch (SQLiteDatabaseCorruptException e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
                 delDbFile(db);
@@ -104,7 +104,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }

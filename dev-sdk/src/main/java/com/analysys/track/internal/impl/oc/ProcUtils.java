@@ -90,7 +90,7 @@ public class ProcUtils {
                 }
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
         }
@@ -142,7 +142,7 @@ public class ProcUtils {
 
 
                 } catch (Throwable ttt) {
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(ttt);
                     }
                 }
@@ -152,7 +152,7 @@ public class ProcUtils {
             object.put(RUNNING_RESULT, resultArray);
 
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
             // L.e(e);
@@ -197,7 +197,7 @@ public class ProcUtils {
                         ocr.add(pkg);
                     }
                 } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(e);
                     }
                 }
@@ -226,7 +226,7 @@ public class ProcUtils {
                     return true;
                 }
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
             }
@@ -313,7 +313,7 @@ public class ProcUtils {
         try {
             return Integer.parseInt(oom_score.trim());
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -371,13 +371,13 @@ public class ProcUtils {
                                 }
 
                             } catch (NumberFormatException e) {
-                                if (BuildConfig.ENABLE_BUGLY) {
+                                if (BuildConfig.ENABLE_BUG_REPORT) {
                                     BugReportForTest.commitError(e);
                                 }
                             }
                         }
                     } catch (Throwable e) {
-                        if (BuildConfig.ENABLE_BUGLY) {
+                        if (BuildConfig.ENABLE_BUG_REPORT) {
                             BugReportForTest.commitError(e);
                         }
                     }
@@ -403,7 +403,7 @@ public class ProcUtils {
                 try {
                     pid = Integer.parseInt(file.getName());
                 } catch (NumberFormatException e) {
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(e);
                     }
                     continue;

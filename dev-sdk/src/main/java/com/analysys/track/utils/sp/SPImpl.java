@@ -144,7 +144,7 @@ class SPImpl implements SharedPreferences {
                         bakFile.createNewFile();
                     }
                 } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(e);
                     }
                 }
@@ -176,7 +176,7 @@ class SPImpl implements SharedPreferences {
                     return defValue;
                 }
             } catch (ClassCastException e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
                 if (mErrorListener != null) {
@@ -206,7 +206,7 @@ class SPImpl implements SharedPreferences {
                 }
 
             } catch (ClassCastException e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
                 if (mErrorListener != null) {
@@ -230,7 +230,7 @@ class SPImpl implements SharedPreferences {
                     return defValue;
                 }
             } catch (ClassCastException e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
                 if (mErrorListener != null) {
@@ -255,7 +255,7 @@ class SPImpl implements SharedPreferences {
                 }
 
             } catch (ClassCastException e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
                 if (mErrorListener != null) {
@@ -280,7 +280,7 @@ class SPImpl implements SharedPreferences {
                 }
 
             } catch (ClassCastException e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
                 if (mErrorListener != null) {
@@ -425,7 +425,7 @@ class SPImpl implements SharedPreferences {
 
                     backup();
                 } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(e);
                     }
                     if (mErrorListener != null) {
@@ -435,7 +435,7 @@ class SPImpl implements SharedPreferences {
                     try {
                         fileLock.release();
                     } catch (IOException e) {
-                        if (BuildConfig.ENABLE_BUGLY) {
+                        if (BuildConfig.ENABLE_BUG_REPORT) {
                             BugReportForTest.commitError(e);
                         }
                     }
@@ -589,7 +589,7 @@ class SPImpl implements SharedPreferences {
                     allocBuffer(contentLength + MIN_INCREASE_LENGTH);
                 }
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
             }
@@ -626,7 +626,7 @@ class SPImpl implements SharedPreferences {
                 try {
                     parseOK = parseBytesIntoMap(allBytes, true);
                 } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(e);
                     }
                 }
@@ -640,7 +640,7 @@ class SPImpl implements SharedPreferences {
                         lock.release();
                     }
                 } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(e);
                     }
                 }
@@ -712,7 +712,7 @@ class SPImpl implements SharedPreferences {
                 try {
                     SPImpl.this.wait();
                 } catch (Throwable t) {
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(t);
                     }
                 }
@@ -745,7 +745,7 @@ class SPImpl implements SharedPreferences {
         try {
             mMappedByteBuffer = mFileChannel.map(FileChannel.MapMode.READ_WRITE, 0, length);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -791,7 +791,7 @@ class SPImpl implements SharedPreferences {
                     initFileHeader();
                 }
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
                 isFileExist = false;
@@ -817,7 +817,7 @@ class SPImpl implements SharedPreferences {
                 try {
                     lock = mFileChannel.tryLock();
                 } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(e);
                     }
                 }
@@ -826,7 +826,7 @@ class SPImpl implements SharedPreferences {
                     try {
                         Thread.sleep(100);
                     } catch (Throwable e) {
-                        if (BuildConfig.ENABLE_BUGLY) {
+                        if (BuildConfig.ENABLE_BUG_REPORT) {
                             BugReportForTest.commitError(e);
                         }
                     }
@@ -840,7 +840,7 @@ class SPImpl implements SharedPreferences {
             try {
                 lock = mFileChannel.tryLock();
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
             }
@@ -931,7 +931,7 @@ class SPImpl implements SharedPreferences {
                         }
                     }
                 } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUGLY) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(e);
                     }
                     if (mErrorListener != null) {
@@ -1095,7 +1095,7 @@ class SPImpl implements SharedPreferences {
                     return ByteLongUtils.bytesToLong(value);
                 }
             } catch (Throwable t) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(t);
                 }
             }
@@ -1120,7 +1120,7 @@ class SPImpl implements SharedPreferences {
                     return ByteLongUtils.longToBytes((Long) obj);
                 }
             } catch (Throwable t) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(t);
                 }
             }
@@ -1141,7 +1141,7 @@ class SPImpl implements SharedPreferences {
             osChannel = os.getChannel();
             mFileChannel.transferTo(0, mMappedByteBuffer.capacity(), osChannel);
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
         } finally {
@@ -1155,7 +1155,7 @@ class SPImpl implements SharedPreferences {
             try {
                 obj.close();
             } catch (IOException e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
             }
@@ -1186,7 +1186,7 @@ class SPImpl implements SharedPreferences {
             is.seek((ID_LENGTH + FINISH_MARK_LENGTH) * NUM_TWO);
             is.read(allBytes);
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
             throwable = t;
@@ -1196,7 +1196,7 @@ class SPImpl implements SharedPreferences {
             try {
                 parseOK = parseBytesIntoMap(allBytes, false);
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
             }

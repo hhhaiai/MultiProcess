@@ -73,7 +73,7 @@ public class WifiImpl {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -112,7 +112,7 @@ public class WifiImpl {
             JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.Frequency, frequency,
                     DataController.SWITCH_OF_FREQUENCY);
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
         }

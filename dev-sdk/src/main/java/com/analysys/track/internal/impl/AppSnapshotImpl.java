@@ -117,7 +117,7 @@ public class AppSnapshotImpl {
             }
 
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_snap,t);
             }
         }
@@ -162,7 +162,7 @@ public class AppSnapshotImpl {
             memoryData = null;
 
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_snap,t);
             }
 
@@ -244,7 +244,7 @@ public class AppSnapshotImpl {
                     TableProcess.getInstance(mContext).updateSnapshot(apn, EGContext.SNAP_SHOT_UNINSTALL, avc);
                 }
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(BuildConfig.tag_snap,e);
                 }
             }
@@ -273,7 +273,7 @@ public class AppSnapshotImpl {
                     }
                 }
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(BuildConfig.tag_snap,e);
                 }
             }
@@ -313,7 +313,7 @@ public class AppSnapshotImpl {
                             }
                         }
                     } catch (Throwable t) {
-                        if (BuildConfig.ENABLE_BUGLY) {
+                        if (BuildConfig.ENABLE_BUG_REPORT) {
                             BugReportForTest.commitError(t);
                         }
                     }
@@ -332,7 +332,7 @@ public class AppSnapshotImpl {
             }
 
         } catch (Exception e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_snap,e);
             }
 
@@ -360,7 +360,7 @@ public class AppSnapshotImpl {
                         appInfo.put(EGContext.TEXT_DEBUG_STATUS, SystemUtils.isApkDebugable(mContext, packageName));
                         list.add(appInfo);
                     } catch (Throwable t) {
-                        if (BuildConfig.ENABLE_BUGLY) {
+                        if (BuildConfig.ENABLE_BUG_REPORT) {
                             BugReportForTest.commitError(t);
                         }
                     }
@@ -390,7 +390,7 @@ public class AppSnapshotImpl {
             }
 
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_snap,e);
             }
 
@@ -424,7 +424,7 @@ public class AppSnapshotImpl {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_snap,e);
             }
         }
@@ -506,7 +506,7 @@ public class AppSnapshotImpl {
                     return true;
                 }
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(BuildConfig.tag_snap,e);
                 }
             }
@@ -602,7 +602,7 @@ public class AppSnapshotImpl {
                 // SNAP_SHOT_UPDATE 解锁
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_snap,e);
             }
         }

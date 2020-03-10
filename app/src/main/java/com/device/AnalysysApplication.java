@@ -27,7 +27,7 @@ public class AnalysysApplication extends Application {
     public void onCreate() {
         // init  bugly。  track-sdk-demo
         Bugly.init(getApplicationContext(), "8b5379e3bc", false);
-        if (com.analysys.track.BuildConfig.ENABLE_BUGLY) {
+        if (com.analysys.track.BuildConfig.ENABLE_BUG_REPORT) {
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                     .detectAll()
                     .penaltyLog()
@@ -41,7 +41,7 @@ public class AnalysysApplication extends Application {
 
         super.onCreate();
         initAnalysys();
-        if (com.analysys.track.BuildConfig.ENABLE_BUGLY) {
+        if (com.analysys.track.BuildConfig.ENABLE_BUG_REPORT) {
             MultiProcessFramework.runServices(this);
         }
         EL.init(this);

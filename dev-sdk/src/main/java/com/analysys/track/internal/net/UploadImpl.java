@@ -167,7 +167,7 @@ public class UploadImpl {
                 return;
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_upload, t);
             }
 
@@ -234,7 +234,7 @@ public class UploadImpl {
             }
             isUploading = false;
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_upload, t);
             }
 
@@ -252,7 +252,7 @@ public class UploadImpl {
             try {
                 devJson = DataPackaging.getInstance().getDevInfo(mContext);
             } catch (Throwable t) {
-                if (BuildConfig.ENABLE_BUGLY) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(BuildConfig.tag_upload, t);
                 }
             }
@@ -386,7 +386,7 @@ public class UploadImpl {
 
 
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_upload, e);
             }
         }
@@ -420,7 +420,7 @@ public class UploadImpl {
                 return new String(returnData).replace("\n", "");
             }
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_upload, t);
             }
         }
@@ -501,7 +501,7 @@ public class UploadImpl {
             Intent intent = new Intent(EGContext.ACTION_UPDATE_POLICY);
             EContextHelper.getContext().sendBroadcast(intent);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_upload, e);
             }
         }
@@ -571,7 +571,7 @@ public class UploadImpl {
 
             SPHelper.setLongValue2SP(mContext, USMImpl.LAST_UPLOAD_TIME, System.currentTimeMillis());
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_upload, t);
             }
         }
@@ -595,7 +595,7 @@ public class UploadImpl {
             // 多久重试
             SPHelper.setLongValue2SP(mContext, EGContext.RETRYTIME, SystemUtils.intervalTime(mContext));
         } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_upload, t);
             }
         }
@@ -664,7 +664,7 @@ public class UploadImpl {
                 return arr;
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUGLY) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_upload, e);
             }
         }
