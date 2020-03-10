@@ -34,7 +34,7 @@ public class StringFogPsGenerate {
     }
 
     @Test
-    public void testPs() {
+    public void checkProguardText() {
         Iterator<String> iterator = mJson.keys();
         while (iterator.hasNext()) {
             String key = iterator.next();

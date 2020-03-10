@@ -16,8 +16,7 @@ def ver = "4.3.0.7"
 def date = "20200201"
 //SDK子版本
 def subVersion = "00"
-//当前热修复包的版本,默认是1,需要递增
-def hf_code = 2020020100
+
 // 宿主包(jar):true , 热修复包(dex):false
 def isPackageJar = true
 // 上传时间，几小时
@@ -38,6 +37,8 @@ def DEBUG_URL = true
 //所有的log开关,true 打印所有的日志,false,关闭所有的日志
 def logcat = true
 
+//当前热修复包的版本,默认是1,需要递增。 暂时没用
+def hf_code = "20200201${subVersion}"
 //********************日志tag相关*********************
 //region 内部日志相关
 def tag_hotfix = "analysys_hotfix" //热修复 tag

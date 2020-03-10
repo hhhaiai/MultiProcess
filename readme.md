@@ -4,13 +4,15 @@
 
 ## 编译方法
 
-* 确定版本信息: 现阶段需要手动保持一致.
-    * `./dev-sdk/src/com/analysys/track/internal/Content/EGContext.java` 中`SDK_VERSION`调整SDK的版本号
-    * `./dev-sdk/build.gradle`中的`version`和`date`调整打包版本号和日期
+* 确认隐藏字符串: `dev-sdk/proguard.json`
+* 确定是否`release`版本: `dev-sdk/build.gradle` 中，`isRelease`，`true`会关闭日志上传正式地址，`false`可自己配置
+* 确定打包类型: `dev-sdk/build.gradle `中`isPackageJar`，`true`打jar包，`false`则打dex包
+* 确定版本号: `dev-sdk/build.gradle` 中，`ver`、`date`、`subVersion`
+    * 规则: jar包的`subVersion`必须为`00`，`dex`的包必须从`01`开始
 * 编译: 根目录下执行`sh build.sh`即可
+* 编译完成后，需要测试混淆字符串是否正确，需要手动调用对应测试case脚本`dev-sdk/src/androidTest/java/com/miqt/costtime/StringFogPsGenerate.java`， 跑**case**: `checkProguardText`
 
 ## release 包 验证步骤
-
 1. 最后打了release 包之后,需要验证的事项, 防止操作人打包失误.
 2. 验证jar包混淆了 ,  (开发自己来)
 3. 验证 hide api ,三个维度 ,
@@ -22,21 +24,7 @@
 6. 验证版本没有填错(开发测试都验证)
 7. 验证bugly上报,方法耗时上报关掉了(开发自己来)
 
-## 字符串混淆相关
 
-### 新增混淆关键字步骤
-
-1. 把想增加的关键字kv对增加到 '.\buildSrc\src\main\java\com\analysys\plugin\StringFog.java'
-2. 复制 hset 全部内容，到 '.\dev-sdk\src\androidTest\java\com\miqt\costtime\StringFogPsGenerate.java'
-3. 运行 'StringFogPsGenerate' 的 generatePs 方法，获得ps的代码字符串
-4. 打开 '.\dev-sdk\src\main\java\com\analysys\plugin\StringFog.java'
-5. 用第4步获得的字符串，替换ps参数。
-6. 同步代码，运行 'StringFogPsGenerate' testPs方法，测试结果。完成。
-
-### 修改混淆加密key步骤
-
-1. 在 '.\analysys-dev-sdk\dev-sdk\build.gradle' 中修改 STRING_FOG_KEY。
-2. 新增混淆关键字步骤，2-6，执行操作即可。
 
 ## 更新日志
 
