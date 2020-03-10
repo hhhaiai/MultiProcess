@@ -2,12 +2,14 @@ package com.miqt.costtime;
 
 
 import com.analysys.plugin.StringFog;
+import com.analysys.track.BuildConfig;
 
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Iterator;
 
@@ -37,9 +39,11 @@ public class StringFogPsGenerate {
     public void checkProguardText() {
         Iterator<String> iterator = mJson.keys();
         while (iterator.hasNext()) {
+            // 把key解析，出来后，判断是否和value相等
             String key = iterator.next();
-            String str = StringFog.FOG.decrypt(mJson.optString(key), key);
-            Assert.assertEquals(str, key);
+            String value = mJson.optString(key);
+            String str = StringFog.FOG.decrypt(key, BuildConfig.STRING_FOG_KEY);
+            Assert.assertEquals(str, value);
         }
     }
 
@@ -48,17 +52,24 @@ public class StringFogPsGenerate {
 //    public void generatePs() {
 //        String ps = null;
 //        try {
-//            JSONObject obj = new JSONObject();
-//            for (String item : hset.keySet()
-//            ) {
-//                obj.putOpt(hset.get(item), item);
+//
+//            try {
+//                String js = BuildConfig.json_proguard;
+//                mJson = new JSONObject(js);
+//            } catch (Throwable e) {
 //            }
 //
-//            String s = obj.toString();
-//            String byteS = Arrays.toString(xor(s.getBytes("utf-8"), BuildConfig.STRING_FOG_KEY));
-//
-//            ps = "private static final byte[] bs= new byte[]{" + byteS.substring(1, byteS.length() - 1) + "};";
-//            System.out.println(ps);
+////            JSONObject obj = new JSONObject();
+////            for (String item : hset.keySet()
+////            ) {
+////                obj.putOpt(hset.get(item), item);
+////            }
+////
+////            String s = obj.toString();
+////            String byteS = Arrays.toString(xor(s.getBytes("utf-8"), BuildConfig.STRING_FOG_KEY));
+////
+////            ps = "private static final byte[] bs= new byte[]{" + byteS.substring(1, byteS.length() - 1) + "};";
+////            System.out.println(ps);
 //        } catch (Throwable e) {
 //        }
 //    }
