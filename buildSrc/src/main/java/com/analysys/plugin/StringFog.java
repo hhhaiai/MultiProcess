@@ -27,7 +27,7 @@ public class StringFog {
     }
 
     public final static class StringFogImpl implements IStringFog {
-        private final Map<String, String> hset = new HashMap<>();
+        public final Map<String, String> hset = new HashMap<>();
 
         public StringFogImpl() {
             hset.put("android.app.usage.UsageStatsManager", "com.analysys.Memory2File");
