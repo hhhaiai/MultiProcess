@@ -399,8 +399,7 @@ public class TableProcess {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(BuildConfig.tag_oc, "写入  结果：[" + result + "]。。。。");
             }
-        } catch (
-                Throwable e) {
+        } catch (Throwable e) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(BuildConfig.tag_oc, e);
             }
@@ -415,12 +414,12 @@ public class TableProcess {
      */
     public JSONArray selectOC(long maxLength) {
         JSONArray ocJar = new JSONArray();
-        SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
         Cursor cursor = null;
         int blankCount = 0, countNum = 0;
         String pkgName = "", act = "";
         JSONObject jsonObject, etdm;
         try {
+            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if (db == null) {
                 return ocJar;
             }
@@ -516,10 +515,9 @@ public class TableProcess {
                     db.update(DBConfig.OC.TABLE_NAME, cv, DBConfig.OC.Column.ID + "=?",
                             new String[]{String.valueOf(id)});
                 }
-
 //                ELOG.e(" size值：："+size+" maxLength = "+maxLength);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_oc, e);
             }

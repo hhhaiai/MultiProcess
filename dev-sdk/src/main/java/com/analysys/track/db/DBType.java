@@ -1,5 +1,12 @@
 package com.analysys.track.db;
 
+/**
+ * @Copyright © 2020 sanbo Inc. All rights reserved.
+ * @Description:
+ * @Version: 1.0
+ * @Create: 2020/3/11 10:59
+ * @author: sanbo
+ */
 public class DBType {
     public static final String AUTOINCREMENT = " Integer Primary Key Autoincrement ";
     public static final String VARCHAR_TEN = " varchar(10) not null ";

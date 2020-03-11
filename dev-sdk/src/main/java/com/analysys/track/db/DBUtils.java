@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.BugReportForTest;
+import com.analysys.track.utils.StreamerUtils;
 
 public class DBUtils {
 
@@ -29,9 +30,7 @@ public class DBUtils {
                 BugReportForTest.commitError(e);
             }
         } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
+            StreamerUtils.safeClose(cursor);
         }
         return result;
     }

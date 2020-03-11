@@ -29,7 +29,8 @@ public class JsonUtils {
         try {
             if (value != null
                     && SPHelper.getBooleanValueFromSP(mContext, key, SPDefaultValue)
-                    && !TextUtils.isEmpty(value.toString()) && !"unknown".equalsIgnoreCase(value.toString())) {
+                    && !TextUtils.isEmpty(value.toString())
+                    && !"unknown".equalsIgnoreCase(value.toString())) {
                 if (!json.has(key)) {
                     json.put(key, value);
                 }
@@ -41,22 +42,13 @@ public class JsonUtils {
         }
     }
 
-    public static void save(JSONObject json, String key, String value) {
-        try {
-            if (json != null && !TextUtils.isEmpty(key) && !TextUtils.isEmpty(value)) {
-                json.put(key, value.trim());
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-    }
+
 
     public static Set<String> transferStringArray2Set(String data) {
         String[] strArray = null;
         Set<String> nameSet = new HashSet<String>();
-        data = data.replace("[", "").replace("]", "");
+        data = data.replace("[", "")
+                .replace("]", "");
         strArray = data.split(",");
         if (strArray != null && strArray.length > 0) {
             String key = null;
@@ -88,7 +80,19 @@ public class JsonUtils {
         return result;
 
     }
-
+//
+//    public static void save(JSONObject json, String key, String value) {
+//        try {
+//            if (json != null && !TextUtils.isEmpty(key) && !TextUtils.isEmpty(value)) {
+//                json.put(key, value.trim());
+//            }
+//        } catch (Throwable e) {
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(e);
+//            }
+//        }
+//    }
+//
 //    public static List<JSONObject> jsonArray2JsonObjList(JSONArray array) {
 //        List<JSONObject> list = null;
 //        try {

@@ -10,6 +10,13 @@ import java.net.HttpURLConnection;
 import java.nio.channels.FileLock;
 import java.util.zip.ZipFile;
 
+/**
+ * @Copyright © 2020 sanbo Inc. All rights reserved.
+ * @Description: 流关闭
+ * @Version: 1.0
+ * @Create: 2020/3/11 11:00
+ * @author: sanbo
+ */
 public class StreamerUtils {
 
     public static void safeClose(AutoCloseable closeable) {
@@ -86,6 +93,7 @@ public class StreamerUtils {
 
     }
 
+
 //    public static void safeClose(Process proc) {
 //        if (proc != null) {
 //            try {
@@ -102,12 +110,5 @@ public class StreamerUtils {
 //
 //    }
 
-    public static void safeClose(ProcessBuilder pb) {
-        if (pb != null) {
-            pb.directory();
-            pb = null;
-        }
-
-    }
 
 }

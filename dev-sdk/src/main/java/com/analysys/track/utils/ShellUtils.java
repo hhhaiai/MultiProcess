@@ -186,7 +186,7 @@ public class ShellUtils {
             StreamerUtils.safeClose(is);
             StreamerUtils.safeClose(isr);
             StreamerUtils.safeClose(bufferedReader);
-            StreamerUtils.safeClose(processBuilder);
+//            StreamerUtils.safeClose(processBuilder);
 //            if (process != null) {
 //                process.destroy();
 //            }

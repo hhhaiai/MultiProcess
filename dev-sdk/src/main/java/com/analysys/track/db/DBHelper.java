@@ -20,7 +20,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static Context mContext = null;
 
     private DBHelper(Context context) {
-        super(EContextHelper.getContext(), DB_NAME, null, DB_VERSION);
+        super(EContextHelper.getContext(context), DB_NAME, null, DB_VERSION);
     }
 
     private static volatile DBHelper instance;
@@ -30,9 +30,9 @@ public class DBHelper extends SQLiteOpenHelper {
             synchronized (DBHelper.class) {
                 if (instance == null) {
                     if (mContext == null) {
-                        mContext = EContextHelper.getContext();
+                        mContext = EContextHelper.getContext(mContext);
                     }
-                    instance = new DBHelper(context);
+                    instance = new DBHelper(mContext);
                 }
             }
         }
@@ -85,7 +85,6 @@ public class DBHelper extends SQLiteOpenHelper {
                 if (!DBUtils.isTableExist(db, DBConfig.IDStorage.CREATE_TABLE)) {
                     db.execSQL(DBConfig.IDStorage.CREATE_TABLE);
                 }
-                break;
             } catch (SQLiteDatabaseCorruptException e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
@@ -97,6 +96,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public void delDbFile(SQLiteDatabase db) {
         try {
+            mContext=EContextHelper.getContext(mContext);
             if (mContext != null) {
                 File f = mContext.getDatabasePath(DB_NAME);
                 if (f.exists()) {
