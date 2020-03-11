@@ -21,6 +21,7 @@ checkEnvArgs() {
     local msys_nt="MSYS_NT"
     local macos="Darwin"
     local linux="Linux"
+    is_mac=""
     if [[ ${unames} =~ $cygwin ]]; then
         echo "[$filename]your platform is win . cygwin"
         red='\e[0;31m'
@@ -89,6 +90,7 @@ checkEnvArgs() {
         else
             iadb="$ANDROID_HOME/platform-tools/adb"
         fi
+        is_mac="macos"
     elif [[ ${unames} =~ $linux ]]; then
         echo "[$filename]your platform is $linux"
         red='\033[31m'
@@ -129,26 +131,34 @@ makesureEnv() {
 }
 logd() {
     makesureEnv
-    if [ "$1" ]; then
+    if [ "$1" ] && [ ! "$is_mac" ]; then
         $ecs "${blue}$1${endColor}"
+    else
+        printf "${blue}$1${endColor}\n"
     fi
 }
 logi() {
     makesureEnv
-    if [ "$1" ]; then
+    if [ "$1" ] && [ ! "$is_mac" ]; then
         $ecs "${green}$1${endColor}"
+    else
+        printf "${green}$1${endColor}\n"
     fi
 }
 loge() {
     makesureEnv
-    if [ "$1" ]; then
+    if [ "$1" ] && [ ! "$is_mac" ]; then
         $ecs "${red}$1${endColor}"
+    else
+        printf "${red}$1${endColor}\n"
     fi
 }
 logw() {
     makesureEnv
-    if [ "$1" ]; then
+    if [ "$1" ] && [ ! "$is_mac" ]; then
         $ecs "${yellow}$1${endColor}"
+    else
+        printf "${yellow}$1${endColor}\n"
     fi
 }
 
@@ -164,6 +174,6 @@ main() {
 #    loge "打印一下调试信息"
 #    logw "打印一下调试信息"
 #}
-# call method
-main
+## call method
+#main
 #test
