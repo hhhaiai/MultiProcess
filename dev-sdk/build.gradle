@@ -66,7 +66,7 @@ android {
         }
         // 勿动，调试修改isRelease为false即可
         if (isRelease) {
-            ENABLE_BUGLY = false
+            ENABLE_BUG_REPORT = false
             DEBUG_URL = false
             logcat = false
             BUILD_USE_STRICTMODE = true
