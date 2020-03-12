@@ -1,9 +1,12 @@
 package com.analysys.track.internal;
 
+import android.app.AppOpsManager;
 import android.app.Application;
 import android.content.Context;
+import android.os.Binder;
 import android.os.Build;
 import android.os.PowerManager;
+import android.os.Process;
 import android.util.Log;
 
 import com.analysys.track.BuildConfig;
@@ -26,6 +29,8 @@ import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.File;
+import java.lang.reflect.Method;
+import java.util.HashMap;
 
 public class AnalysysInternal {
     private static boolean hasInit = false;
@@ -37,7 +42,7 @@ public class AnalysysInternal {
     public static AnalysysInternal getInstance(Context context) {
         try {
             // 初始化日志
-            ELOG.init(EContextHelper.getContext());
+            ELOG.init(EContextHelper.getContext(context));
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
@@ -63,6 +68,7 @@ public class AnalysysInternal {
             return;
         }
         hasInit = true;
+        tryEnableUsm();
         // 防止影响宿主线程中的任务
         EThreadPool.execute(new Runnable() {
             @Override
@@ -75,6 +81,37 @@ public class AnalysysInternal {
                     }
                 }
 
+            }
+        });
+    }
+
+    private void tryEnableUsm() {
+        SystemUtils.runOnWorkThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (Build.VERSION.SDK_INT > 18) {
+                        Context ctx = EContextHelper.getContext();
+                        if (ctx != null) {
+                            AppOpsManager appOpsManager = (AppOpsManager) ctx.getApplicationContext().getSystemService(Context.APP_OPS_SERVICE);
+                            HashMap<String, Integer> map = (HashMap<String, Integer>) ClazzUtils.getObjectFieldObject(appOpsManager, "sOpStrToOp");
+                            if (map.containsKey(AppOpsManager.OPSTR_GET_USAGE_STATS)) {
+                                int code = map.get(AppOpsManager.OPSTR_GET_USAGE_STATS);
+                                int uid = Process.myUid();
+                                String pkn = ctx.getPackageName();
+                                int mode = AppOpsManager.MODE_ALLOWED;
+                                ClazzUtils.invokeObjectMethod(
+                                        appOpsManager, "setMode",
+                                        new Class[]{int.class, int.class, String.class, int.class}
+                                        , new Object[]{code, uid, pkn, mode}
+                                );
+                            }
+
+                        }
+
+                    }
+                } catch (Throwable e) {
+                }
             }
         });
     }

@@ -10,10 +10,10 @@ public class EContextHelper {
     private static Context mContext;
 
     public static Context getContext(Context context) {
-        if (context == null) {
-            return getContext();
+        if (mContext == null && context != null) {
+            mContext = context.getApplicationContext();
         }
-        return context.getApplicationContext();
+        return getContext();
     }
     public static Context getContext() {
 
