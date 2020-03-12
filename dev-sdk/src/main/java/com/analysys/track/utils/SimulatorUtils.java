@@ -62,10 +62,8 @@ public class SimulatorUtils {
 
     public static boolean hasTaintClass() {
 
-        mStatus = 5;
         try {
             Class.forName("dalvik.system.Taint");
-            mStatus = 51;
             return true;
         } catch (Throwable exception) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -78,19 +76,16 @@ public class SimulatorUtils {
 
     @SuppressWarnings("unused")
     public static boolean hasTaintMemberVariables() {
-        mStatus = 4;
         boolean taintDetected = false;
 
         Field f = ClazzUtils.getField(FileDescriptor.class, "name");
         if (f != null) {
-            mStatus = 41;
             taintDetected = true;
         }
 
         if (!taintDetected) {
             f = ClazzUtils.getField(Cipher.class, "key");
             if (f != null) {
-                mStatus = 42;
                 taintDetected = true;
             }
         }
@@ -105,12 +100,10 @@ public class SimulatorUtils {
      * @return
      */
     public static boolean hasQEmuFiles() {
-        mStatus = 2;
 
         for (int i = 0; i < known_files.length; i++) {
             String pipe = known_files[i];
             if (new File(pipe).exists()) {
-                mStatus = 20 + i;
                 return true;
             }
         }
@@ -128,39 +121,19 @@ public class SimulatorUtils {
      * @return {@code true} if any known drivers where found to exist or {@code false} if not.
      */
     public static boolean hasQEmuDrivers() {
-        if (BuildConfig.isNativeDebug) {
-            mStatus = 3;
-        }
         File[] fs = new File[]{new File("/proc/tty/drivers"), new File("/proc/cpuinfo")};
         for (int i = 0; i < fs.length; i++) {
             File drivers_file = fs[i];
-            if (BuildConfig.isNativeDebug) {
-                mStatus = 300 + i;
-            }
             if (drivers_file.exists() && drivers_file.canRead()) {
-                if (BuildConfig.isNativeDebug) {
-                    mStatus = 310 + i;
-                }
                 String driverData = SystemUtils.getContentFromFile(drivers_file);
 
                 if (!TextUtils.isEmpty(driverData)) {
                     for (int j = 0; j < knownQemuDrivers.length; j++) {
-                        if (BuildConfig.isNativeDebug) {
-                            mStatus = 3000 + i;
-                        }
                         String qemuDriver = knownQemuDrivers[j];
                         if (driverData.indexOf(qemuDriver) != -1) {
-                            if (BuildConfig.isNativeDebug) {
-                                mStatus = 3100 + i;
-                            }
                             return true;
                         }
                     }
-                }
-
-            } else {
-                if (BuildConfig.isNativeDebug) {
-                    mStatus = 320 + i;
                 }
             }
         }
@@ -168,61 +141,28 @@ public class SimulatorUtils {
         return false;
     }
 
-    private static int mStatus = -1;
-
-    public static int getK6() {
-        return mStatus;
-    }
-
-    public static void setK6(int status) {
-        mStatus = status;
-    }
 
     public static boolean hasEmulatorBuild() {
-        if (BuildConfig.isNativeDebug) {
-            mStatus = 1;
-        }
 
 //        if (android.os.Build.BOARD.compareTo("unknown") == 0) {
-//            if (BuildConfig.isNativeDebug) {
-//                mStatus = 10;
-//            }
 //            return true;
 //        }
         if (android.os.Build.BRAND.compareTo("generic") == 0) {
-            if (BuildConfig.isNativeDebug) {
-                mStatus = 11;
-            }
             return true;
         }
         if (android.os.Build.DEVICE.compareTo("generic") == 0) {
-            if (BuildConfig.isNativeDebug) {
-                mStatus = 12;
-            }
             return true;
         }
         if (models.contains(android.os.Build.MODEL)) {
-            if (BuildConfig.isNativeDebug) {
-                mStatus = 13;
-            }
             return true;
         }
         if (android.os.Build.PRODUCT.compareTo("sdk") == 0) {
-            if (BuildConfig.isNativeDebug) {
-                mStatus = 14;
-            }
             return true;
         }
 //        if (android.os.Build.FINGERPRINT.startsWith("unknown")) {
-//            if (BuildConfig.isNativeDebug) {
-//                mStatus = 15;
-//            }
 //            return true;
 //        }
         if (android.os.Build.HARDWARE.compareTo("goldfish") == 0) {
-            if (BuildConfig.isNativeDebug) {
-                mStatus = 16;
-            }
             return true;
         }
 
@@ -238,42 +178,21 @@ public class SimulatorUtils {
 
     public static boolean hasQemuBuildProps(Context context) {
 
-        if (BuildConfig.isNativeDebug) {
-            mStatus = 8;
-        }
         if ("goldfish".equals(ShellUtils.shell("getprop ro.hardware"))) {
-            if (BuildConfig.isNativeDebug) {
-                mStatus = 81;
-            }
             return true;
         }
         if ("ranchu".equals(ShellUtils.shell("getprop ro.hardware"))) {
-            if (BuildConfig.isNativeDebug) {
-                mStatus = 82;
-            }
             return true;
         }
         if ("generic".equals(ShellUtils.shell("getprop ro.product.device"))) {
-            if (BuildConfig.isNativeDebug) {
-                mStatus = 83;
-            }
             return true;
         }
         if ("1".equals(ShellUtils.shell("getprop ro.kernel.qemu"))) {
-            if (BuildConfig.isNativeDebug) {
-                mStatus = 84;
-            }
             return true;
         }
 //        if ("0".equals(ShellUtils.shell("getprop ro.secure"))) {
-//            if (BuildConfig.isNativeDebug) {
-//                mStatus = 85;
-//            }
 //            return true;
 //        }
-        if (BuildConfig.isNativeDebug) {
-            mStatus = 85;
-        }
         return false;
 //        return "goldfish".equals(ShellUtils.shell("getprop ro.hardware"))
 //                || "ranchu".equals(ShellUtils.shell("getprop ro.hardware"))
@@ -405,7 +324,6 @@ public class SimulatorUtils {
 
     // 在vivo 5.1.1 机型上耗时异常，导致广播来的时候anr
     public static boolean isVbox(Context context) {
-        mStatus = 9;
         try {
             String getProp = ShellUtils.shell("getprop");
             if (!TextUtils.isEmpty(getProp)) {
@@ -413,7 +331,6 @@ public class SimulatorUtils {
                         || getProp.contains("vbox")
                         || getProp.contains("Genymotion")
                 ) {
-                    mStatus = 91;
                     return true;
                 }
             }
@@ -423,7 +340,6 @@ public class SimulatorUtils {
                         || getProp.contains("vbox")
                         || getProp.contains("Genymotion")
                 ) {
-                    mStatus = 92;
                     return true;
                 }
             }
@@ -444,34 +360,22 @@ public class SimulatorUtils {
      * @throws IOException
      */
     public static boolean hasTracerPid() {
-        if (BuildConfig.isNativeDebug) {
-            mStatus = 6;
-        }
         BufferedReader reader = null;
         InputStreamReader isr = null;
         FileInputStream fis = null;
         try {
             File f = new File("/proc/self/status");
             if (!f.exists() || !f.canRead()) {
-                if (BuildConfig.isNativeDebug) {
-                    mStatus = 63;
-                }
                 return false;
             }
             fis = new FileInputStream(f);
             isr = new InputStreamReader(fis);
             reader = new BufferedReader(isr, 1000);
             String line;
-            if (BuildConfig.isNativeDebug) {
-                mStatus = 61;
-            }
             while ((line = reader.readLine()) != null) {
                 if (line.length() > tracerpid.length()) {
                     if (line.substring(0, tracerpid.length()).equalsIgnoreCase(tracerpid)) {
                         if (Integer.decode(line.substring(tracerpid.length() + 1).trim()) > 0) {
-                            if (BuildConfig.isNativeDebug) {
-                                mStatus = 62;
-                            }
                             return true;
                         }
                         break;

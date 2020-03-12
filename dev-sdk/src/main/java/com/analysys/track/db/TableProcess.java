@@ -17,7 +17,7 @@ import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.EncryptUtils;
+import com.analysys.track.utils.data.EncryptUtils;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.data.Base64Utils;

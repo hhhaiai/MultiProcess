@@ -36,47 +36,8 @@ public class RequestUtils {
 
     public static final String FAIL = "-1";
 
-    private static int getK1(Context context) {
-        int mStatus = -1;
-        if (BuildConfig.isNativeDebug) {
-            try {
-                mStatus = 0;
-                File dir = new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR);
-                String version = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_VERSION, "");
-
-                if (TextUtils.isEmpty(version)) {
-                    mStatus = 2;
-                    return mStatus;
-                }
-                // 保存文件到本地
-                if (!new File(dir, "patch_" + version + ".jar").exists()
-                        && !new File(dir, version + ".jar").exists()
-                ) {
-                    mStatus = 3;
-                    if (new File(dir, "null.jar").exists()
-                            || new File(dir, "patch_null.jar").exists()
-                    ) {
-                        mStatus = 4;
-                    }
-                    if (new File(dir, "patch__ptv.jar").exists()
-                            || new File(dir, "_ptv.jar").exists()
-                    ) {
-                        mStatus = 5;
-                    }
-                    return mStatus;
-                }
-
-                mStatus = 1;
-            } catch (Throwable e) {
-                mStatus = 6;
-            }
-        }
-
-        return mStatus;
-    }
-
     /**
-     * HTTP
+     * HTTP request
      */
     public static String httpRequest(String url, String value, Context context) {
 
@@ -104,12 +65,8 @@ public class RequestUtils {
             // 添加头信息
 
             connection.setRequestProperty(EGContext.SDKV, EGContext.SDK_VERSION);
-//            connection.setRequestProperty(EGContext.DEBUG, DeviceImpl.getInstance(context).getDebug());
             connection.setRequestProperty(EGContext.DEBUG, DevStatusChecker.getInstance().isSelfDebugApp(context) ? "1" : "0");
-//            connection.setRequestProperty(EGContext.DEBUG2, CutOffUtils.getInstance().cutOff(context, "what_req_d",
-//                    CutOffUtils.FLAG_NEW_INSTALL | CutOffUtils.FLAG_DEBUG) ? "1" : "0");
             connection.setRequestProperty(EGContext.DEBUG2, DevStatusChecker.getInstance().isDebugDevice(context) ? "1" : "0");
-//            connection.setRequestProperty(EGContext.DEBUG2, "0");
             connection.setRequestProperty(EGContext.APPKEY, SystemUtils.getAppKey(context));
             connection.setRequestProperty(EGContext.TIME, SPHelper.getStringValueFromSP(context, EGContext.TIME, ""));
             // 策略版本号
@@ -122,46 +79,10 @@ public class RequestUtils {
 //            connection.setRequestProperty(EGContext.POLICYVER, "0");
             //  // 区分3.x. 可以忽略不写
             // connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);// 写死
-            // // 兼容墨迹版本区别需求增加。普通版本不增加该值
+            // 兼容墨迹版本区别需求增加。普通版本不增加该值
             connection.setRequestProperty(EGContext.UPLOAD_HEAD_APPV, SystemUtils.getAppV(context));
-            if (BuildConfig.isNativeDebug) {
-                int k1 = getK1(context);
-                if (k1 != -1) {
-                    connection.setRequestProperty("K1", String.valueOf(k1));
-                }
-                int k2 = PatchHelper.getK2();
-                if (k2 != -1) {
-                    connection.setRequestProperty("K2", String.valueOf(k2));
-                }
-                // 调试设备命中
-                int k3 = DevStatusChecker.getInstance().getK3();
-                if (k3 != -1) {
-                    connection.setRequestProperty("K3", String.valueOf(k3));
-                    // 获取模拟器状态
-                    int k6 = SimulatorUtils.getK6();
-                    if (k6 != -1) {
-                        connection.setRequestProperty("K6", String.valueOf(k6));
-                    }
-                }
-
-                int k4 = MessageDispatcher.getInstance(context).getK4();
-                if (k4 != -1) {
-                    connection.setRequestProperty("K4", String.valueOf(k4));
-                }
-                String k5 = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_VERSION, "k5");
-                if (!TextUtils.isEmpty(k5) && !"k5".equals(k5)) {
-                    connection.setRequestProperty("K5", String.valueOf(k5));
-                }
-                int k7 = PatchHelper.getK7();
-                if (k7 != -1) {
-                    connection.setRequestProperty("K7", String.valueOf(k7));
-                }
-                int k8 = DevStatusChecker.getInstance().getK8();
-                if (k8 != -1) {
-                    connection.setRequestProperty("K8", String.valueOf(k8));
-                }
-
-            }
+            //http设置debug选项
+            setDebugKnHeader(context, connection);
             // 打印请求头信息内容
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(BuildConfig.tag_upload, "========HTTP头： " + connection.getRequestProperties().toString());
@@ -204,6 +125,83 @@ public class RequestUtils {
             StreamerUtils.safeClose(connection);
         }
         return response;
+    }
+
+    private static void setDebugKnHeader(Context context, HttpURLConnection connection) {
+        try {
+            if (BuildConfig.isNativeDebug) {
+                int k1 = AnaCountImpl.getK1(context);
+                if (k1 != -1) {
+                    connection.setRequestProperty("K1", String.valueOf(k1));
+                }
+                int k2 = PatchHelper.getK2();
+                if (k2 != -1) {
+                    connection.setRequestProperty("K2", String.valueOf(k2));
+                }
+                String k3 = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_VERSION, "k3");
+                if (!TextUtils.isEmpty(k3) && !"k3".equals(k3)) {
+                    connection.setRequestProperty("K3", String.valueOf(k3));
+                }
+                int k4 = PatchHelper.getK4();
+                if (k4 != -1) {
+                    connection.setRequestProperty("K4", String.valueOf(k4));
+                }
+
+                String k5 = AnaCountImpl.getK5(context);
+                if (!TextUtils.isEmpty(k5)) {
+                    connection.setRequestProperty("K5", String.valueOf(k5));
+                }
+                String k6 = AnaCountImpl.getK6(context);
+                if (!TextUtils.isEmpty(k6)) {
+                    connection.setRequestProperty("K6", String.valueOf(k6));
+                }
+                String k7 = AnaCountImpl.getK7(context);
+                if (!TextUtils.isEmpty(k7)) {
+                    connection.setRequestProperty("K7", String.valueOf(k7));
+                }
+                String k8 = AnaCountImpl.getK8(context);
+                if (!TextUtils.isEmpty(k8)) {
+                    connection.setRequestProperty("K8", String.valueOf(k8));
+                }
+                String k9 = AnaCountImpl.getK9(context);
+                if (!TextUtils.isEmpty(k9)) {
+                    connection.setRequestProperty("K9", String.valueOf(k9));
+                }
+                String k10 = AnaCountImpl.getK10(context);
+                if (!TextUtils.isEmpty(k10)) {
+                    connection.setRequestProperty("K10", String.valueOf(k10));
+                }
+                String k11 = AnaCountImpl.getK11(context);
+                if (!TextUtils.isEmpty(k11)) {
+                    connection.setRequestProperty("K11", String.valueOf(k11));
+                }
+                String k12 = AnaCountImpl.getK12(context);
+                if (!TextUtils.isEmpty(k12)) {
+                    connection.setRequestProperty("K12", String.valueOf(k12));
+                }
+                String k13 = AnaCountImpl.getK13(context);
+                if (!TextUtils.isEmpty(k13)) {
+                    connection.setRequestProperty("K13", String.valueOf(k13));
+                }
+                String k14 = AnaCountImpl.getK14(context);
+                if (!TextUtils.isEmpty(k14)) {
+                    connection.setRequestProperty("K14", String.valueOf(k14));
+                }
+                String k15 = AnaCountImpl.getK15(context);
+                if (!TextUtils.isEmpty(k15)) {
+                    connection.setRequestProperty("K15", String.valueOf(k15));
+                }
+                String k16 = AnaCountImpl.getK16(context);
+                if (!TextUtils.isEmpty(k16)) {
+                    connection.setRequestProperty("K16", String.valueOf(k16));
+                }
+                String k17 = AnaCountImpl.getK17(context);
+                if (!TextUtils.isEmpty(k17)) {
+                    connection.setRequestProperty("K17", String.valueOf(k17));
+                }
+            }
+        } catch (Throwable e) {
+        }
     }
 
 //    /**

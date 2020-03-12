@@ -30,16 +30,16 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class PatchHelper {
 
-    private static int mStatus = -1;
-    private static int mK7Status = -1;
+    private static int mK2Status = -1;
+    private static int mK4Status = -1;
     private static boolean isTryInit = false;
 
     public static int getK2() {
-        return mStatus;
+        return mK2Status;
     }
 
-    public static int getK7() {
-        return mK7Status;
+    public static int getK4() {
+        return mK4Status;
     }
 
     public static void loadsIfExit(final Context context) {
@@ -56,36 +56,36 @@ public class PatchHelper {
                      */
                     if (DevStatusChecker.getInstance().isDebugDevice(c)) {
                         if (BuildConfig.isNativeDebug) {
-                            mK7Status = 101;
+                            mK4Status = 101;
                         }
                         if (BuildConfig.logcat) {
                             ELOG.i(BuildConfig.tag_cutoff, "....loadsIfExit  will clearPatch");
                         }
                         PatchHelper.clearPatch(c);
                         if (BuildConfig.isNativeDebug) {
-                            mK7Status = 102;
+                            mK4Status = 102;
                         }
                         return;
                     }
                     if (!isTryInit) {
                         if (BuildConfig.isNativeDebug) {
-                            mK7Status = 103;
+                            mK4Status = 103;
                         }
                         if (BuildConfig.logcat) {
                             ELOG.i(BuildConfig.tag_cutoff, "....loadsIfExit  will loads");
                         }
                         loads(c);
                         if (BuildConfig.isNativeDebug) {
-                            mK7Status = 104;
+                            mK4Status = 104;
                         }
                     } else {
                         if (BuildConfig.isNativeDebug) {
-                            mK7Status = 105;
+                            mK4Status = 105;
                         }
                     }
                 } catch (Throwable e) {
                     if (BuildConfig.isNativeDebug) {
-                        mK7Status = 106;
+                        mK4Status = 106;
                     }
                     if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(e);
@@ -134,7 +134,9 @@ public class PatchHelper {
     public static void loads(final Context context) {
         try {
             if (BuildConfig.isNativeDebug) {
-                mStatus = 0;
+                if (mK2Status != 1 && mK2Status <= 0) {
+                    mK2Status = 0;
+                }
             }
             isTryInit = true;
             if (BuildConfig.logcat) {
@@ -157,7 +159,7 @@ public class PatchHelper {
             }
             if (TextUtils.isEmpty(version)) {
                 if (BuildConfig.isNativeDebug) {
-                    mStatus = 2;
+                    mK2Status = 2;
                 }
                 return;
             }
@@ -206,7 +208,7 @@ public class PatchHelper {
             public void run() {
                 try {
                     if (BuildConfig.isNativeDebug) {
-                        mK7Status = 0;
+                        mK4Status = 0;
                     }
                     if (BuildConfig.logcat) {
                         ELOG.i(BuildConfig.tag_cutoff, "-------------inside clearPatch.-----");
@@ -221,12 +223,12 @@ public class PatchHelper {
                         ELOG.i(BuildConfig.tag_cutoff, "---------- clearPatch.---clearn oldversion:  " + oldVersion);
                     }
                     if (BuildConfig.isNativeDebug) {
-                        mK7Status = 1;
+                        mK4Status = 1;
                     }
                     //清除新版本存储目录
                     FileUitls.getInstance(cc).deleteFile(new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR));
                     if (BuildConfig.isNativeDebug) {
-                        mK7Status = 2;
+                        mK4Status = 2;
                     }
                     // 清除patch部分缓存
                     SPHelper.removeKey(context, UploadKey.Response.PatchResp.PATCH_METHODS);
@@ -239,16 +241,16 @@ public class PatchHelper {
                         ELOG.i(BuildConfig.tag_cutoff, "---------- clearPatch.---清除patch部分缓存");
                     }
                     if (BuildConfig.isNativeDebug) {
-                        mK7Status = 3;
+                        mK4Status = 3;
                     }
                     cleanPatchPolicy(context, "---------- clearPatch.---patchPolicyV: ", 4, 5);
                     EGContext.patch_runing = false;
                     if (BuildConfig.isNativeDebug) {
-                        mK7Status = 6;
+                        mK4Status = 6;
                     }
                 } catch (Throwable e) {
                     if (BuildConfig.isNativeDebug) {
-                        mK7Status = 7;
+                        mK4Status = 7;
                     }
                     if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(e);
@@ -271,11 +273,11 @@ public class PatchHelper {
             SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
             SPHelper.removeKey(context, EGContext.PATCH_VERSION_POLICY);
             if (BuildConfig.isNativeDebug) {
-                mK7Status = i;
+                mK4Status = i;
             }
         } else {
             if (BuildConfig.isNativeDebug) {
-                mK7Status = i2;
+                mK4Status = i2;
             }
         }
     }
@@ -283,7 +285,7 @@ public class PatchHelper {
 
     private static void loads(final Context context, final File file) {
         if (BuildConfig.isNativeDebug) {
-            mStatus = 3;
+            mK2Status = 3;
         }
 
         if (BuildConfig.logcat) {
@@ -336,7 +338,7 @@ public class PatchHelper {
     private static boolean loadInThread(Context context, File file) {
         try {
             if (BuildConfig.isNativeDebug) {
-                mStatus = 4;
+                mK2Status = 4;
             }
 
             if (BuildConfig.logcat) {
@@ -357,7 +359,7 @@ public class PatchHelper {
                 return false;
             }
             if (BuildConfig.isNativeDebug) {
-                mStatus = 5;
+                mK2Status = 5;
             }
             JSONArray arr = new JSONArray(base64Decode);
             if (arr.length() > 0) {
@@ -371,7 +373,7 @@ public class PatchHelper {
                         argsBody = obj.optString(UploadKey.Response.PatchResp.PATCH_ARGS_CONTENT, "");
                         if (!TextUtils.isEmpty(className) && !TextUtils.isEmpty(methodName)) {
                             if (BuildConfig.isNativeDebug) {
-                                mStatus = 6;
+                                mK2Status = 6;
                             }
                             if (BuildConfig.logcat) {
                                 ELOG.i(BuildConfig.tag_cutoff, ".loadInThread() classname and method get sccess. will tryLoadMethod.");
@@ -437,7 +439,7 @@ public class PatchHelper {
             }
         }
         if (BuildConfig.isNativeDebug) {
-            mStatus = 7;
+            mK2Status = 7;
         }
         loadStatic(context, file, className, methodName, argsTypeClazzs, argsValues);
     }
@@ -451,7 +453,7 @@ public class PatchHelper {
 
         if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName)) {
             if (BuildConfig.isNativeDebug) {
-                mStatus = 8;
+                mK2Status = 8;
             }
             return;
         }
@@ -463,13 +465,13 @@ public class PatchHelper {
                 ELOG.i(BuildConfig.tag_cutoff, " loadStatic DexClassLoader over. result: " + ca);
             }
             if (BuildConfig.isNativeDebug) {
-                mStatus = 9;
+                mK2Status = 9;
             }
             // 2. load class
             Class<?> c = (Class<?>) ClazzUtils.invokeObjectMethod(ca, "loadClass", new Class[]{String.class}, new Object[]{className});
             if (c != null) {
                 if (BuildConfig.isNativeDebug) {
-                    mStatus = 10;
+                    mK2Status = 10;
                 }
                 // 2. invoke method
                 ClazzUtils.invokeStaticMethod(c, methodName, pareTyples, pareVaules);
@@ -478,7 +480,7 @@ public class PatchHelper {
                     ELOG.i(BuildConfig.tag_cutoff, " loadStatic failed[get class load failed]......");
                 }
                 if (BuildConfig.isNativeDebug) {
-                    mStatus = 11;
+                    mK2Status = 11;
                 }
                 // patch 按照预定参数，没找到类，可能是patch包有问题，删除策略号尝试重新下载
 //                SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
@@ -487,7 +489,7 @@ public class PatchHelper {
             }
             EGContext.patch_runing = true;
             if (BuildConfig.isNativeDebug) {
-                mStatus = 1;
+                mK2Status = 1;
             }
         } catch (Throwable igone) {
             EGContext.patch_runing = false;

@@ -1,4 +1,4 @@
-package com.analysys.track.utils;
+package com.analysys.track.utils.data;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -12,6 +12,8 @@ import android.util.Base64;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.BugReportForTest;
+import com.analysys.track.utils.PermissionUtils;
 
 import java.lang.reflect.Method;
 import java.security.MessageDigest;
@@ -25,10 +27,11 @@ import static android.provider.Settings.System.AIRPLANE_MODE_ON;
 
 /**
  * @Copyright © 2018 EGuan Inc. All rights reserved.
- * @Description: 加解密工具类。用法: 数据库初始化时,调用checkEncryptKey(Context
- * context)确认之前加解密部分是否正常工作,正常工作可以测试下DB之前数据是否正常解密,根据结果进行相关操作
- * 加密调用接口:encrypt(Context context, String str) 解密调用接口:decrypt(Context context,
- * String str)
+ * @Description: 加解密工具类。
+ *      用法:
+ *          数据库初始化时,调用checkEncryptKey(Context context)确认之前加解密部分是否正常工作, 正常工作可以测试下DB之前数据是否正常解密,根据结果进行相关操作
+ *          加密调用接口:encrypt(Context context, String str)
+ *          解密调用接口:decrypt(Context context, String str)
  * @Version: 1.0
  * @Create: 2018年2月2日 上午11:50:40
  * @Author: sanbo

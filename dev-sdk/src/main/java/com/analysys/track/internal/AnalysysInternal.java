@@ -3,7 +3,6 @@ package com.analysys.track.internal;
 import android.app.AppOpsManager;
 import android.app.Application;
 import android.content.Context;
-import android.os.Binder;
 import android.os.Build;
 import android.os.PowerManager;
 import android.os.Process;
@@ -19,7 +18,7 @@ import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
-import com.analysys.track.utils.EncryptUtils;
+import com.analysys.track.utils.data.EncryptUtils;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.OAIDHelper;
 import com.analysys.track.utils.ReceiverUtils;
@@ -29,7 +28,6 @@ import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 
 public class AnalysysInternal {

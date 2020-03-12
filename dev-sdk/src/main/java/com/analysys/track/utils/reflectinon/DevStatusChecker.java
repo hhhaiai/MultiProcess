@@ -49,18 +49,6 @@ public class DevStatusChecker {
     private boolean isDeviceDebug = false;
     private boolean isSimulator = false;
 
-    private int iSteup = -1;
-
-    public int getK3() {
-        return iSteup;
-    }
-
-    private int isDebugK8 = -1;
-
-    public int getK8() {
-        return isDebugK8;
-    }
-
     private DevStatusChecker() {
     }
 
@@ -80,9 +68,6 @@ public class DevStatusChecker {
          * 1.如果有/data/local/tmp/kvs拦截，直接生效。
          */
         int ignoreeDebugTmp = DataLocalTempUtils.getInstance(context).getInt(EGContext.KVS_KEY_DEBUG, EGContext.DEBUG_VALUE);
-        if (BuildConfig.isNativeDebug && isDebugK8 < 0) {
-            isDebugK8 = 101;
-        }
         if (ignoreeDebugTmp != EGContext.DEBUG_VALUE) {
             return false;
         }
@@ -90,14 +75,8 @@ public class DevStatusChecker {
          * 2.  若服务器有下发则以服务器下发为主
          */
         int igoneDebugSP = SPHelper.getIntValueFromSP(context, EGContext.KVS_KEY_DEBUG, EGContext.DEBUG_VALUE);
-        if (BuildConfig.isNativeDebug && isDebugK8 < 0) {
-            isDebugK8 = 102;
-        }
         if (igoneDebugSP != EGContext.DEBUG_VALUE) {
             return false;
-        }
-        if (BuildConfig.isNativeDebug && isDebugK8 < 0) {
-            isDebugK8 = 103;
         }
         /**
          * 3. 编译控制是否启用严格模式
@@ -105,29 +84,13 @@ public class DevStatusChecker {
         if (!BuildConfig.BUILD_USE_STRICTMODE) {
             return false;
         }
-        if (BuildConfig.isNativeDebug && isDebugK8 < 0) {
-            isDebugK8 = 104;
-        }
         /**
          * 4. 使用内存变量，避免多次检测
          */
         if (isDeviceDebug) {
             return true;
         }
-        if (BuildConfig.isNativeDebug && isDebugK8 < 0) {
-            isDebugK8 = 105;
-        }
-        boolean isDebugDev = isDebug(context);
-        if (isDebugDev) {
-            if (BuildConfig.isNativeDebug && isDebugK8 < 0) {
-                isDebugK8 = 106;
-            }
-        } else {
-            if (BuildConfig.isNativeDebug && isDebugK8 < 0) {
-                isDebugK8 = 107;
-            }
-        }
-        return isDebugDev;
+        return isDebug(context);
     }
 
     /**
@@ -140,19 +103,10 @@ public class DevStatusChecker {
      * @return 是否为调试设备
      */
     private boolean isDebug(Context context) {
-        if (BuildConfig.isNativeDebug) {
-            isDebugK8 = 106;
-        }
         context = EContextHelper.getContext();
 
-        if (BuildConfig.isNativeDebug) {
-            iSteup = 0;
-        }
         // 1. 抓包[VPN/系统代理]
         if (isProxy(context) || isVpn()) {
-            if (BuildConfig.isNativeDebug) {
-                iSteup = 1;
-            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "抓包判断，命中目标");
             }
@@ -162,9 +116,6 @@ public class DevStatusChecker {
 
         // 2. hook检测
         if (isHook(context)) {
-            if (BuildConfig.isNativeDebug) {
-                iSteup = 2;
-            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "HOOK检测，命中目标");
             }
@@ -174,9 +125,6 @@ public class DevStatusChecker {
 
         // 3. debug rom检测
         if (isDebugRom()) {
-            if (BuildConfig.isNativeDebug) {
-                iSteup = 3;
-            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "debug rom检测，命中目标");
             }
@@ -189,9 +137,6 @@ public class DevStatusChecker {
         }
         //  4. 开发者模式+adb必须同时开启才会进入调试模式。判断调整为且的关系
         if (enableDeveloperMode(context)) {
-            if (BuildConfig.isNativeDebug) {
-                iSteup = 4;
-            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "开发者模式，命中目标");
             }
@@ -200,9 +145,6 @@ public class DevStatusChecker {
         }
         // 5. 宿主debug判断
         if (isSelfDebugApp(context)) {
-            if (BuildConfig.isNativeDebug) {
-                iSteup = 5;
-            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "宿主debug判断，命中目标");
             }
@@ -211,9 +153,6 @@ public class DevStatusChecker {
         }
         // 6. Root检测
         if (SystemUtils.isRooted()) {
-            if (BuildConfig.isNativeDebug) {
-                iSteup = 6;
-            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "Root检测，命中目标");
             }
@@ -222,17 +161,11 @@ public class DevStatusChecker {
         }
         // 7. 模拟器识别
         if (isSimulator(context)) {
-            if (BuildConfig.isNativeDebug) {
-                iSteup = 7;
-            }
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "模拟器识别，命中目标");
             }
             isDeviceDebug = true;
             return true;
-        }
-        if (BuildConfig.isNativeDebug) {
-            iSteup = 8;
         }
 
 
@@ -672,9 +605,6 @@ public class DevStatusChecker {
         if (isSimulator) {
             return true;
         }
-        if (BuildConfig.isNativeDebug) {
-            SimulatorUtils.setK6(0);
-        }
         if (SimulatorUtils.hasEmulatorBuild()) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "hasEmulatorBuild");
@@ -725,7 +655,6 @@ public class DevStatusChecker {
             isSimulator = true;
             return isSimulator;
         }
-        SimulatorUtils.setK6(10);
         isSimulator = false;
         return isSimulator;
 //        if (SimulatorUtils.hasTaintClass()) {
