@@ -1,8 +1,5 @@
 package com.device.impls.usmcase.tools;
 
-import com.analysys.track.BuildConfig;
-import com.analysys.track.utils.BugReportForTest;
-
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
@@ -37,10 +34,6 @@ public class IUSMInfo {
             jsonObject.putOpt("NT", netType);
             jsonObject.putOpt("ETDM", extendedMap.toJson());
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-            //JSONException
         }
         return jsonObject;
     }
@@ -57,10 +50,6 @@ public class IUSMInfo {
             jsonObject.putOpt("NT", netType);
             jsonObject.putOpt("ETDM", extendedMap.toJson());
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-            //JSONException
         }
         return jsonObject;
     }
@@ -82,10 +71,6 @@ public class IUSMInfo {
                 jsonObject.putOpt("AT", applicationType);
                 jsonObject.putOpt("ST", switchType);
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(e);
-                }
-                //JSONException
             }
             return jsonObject;
         }

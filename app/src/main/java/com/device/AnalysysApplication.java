@@ -7,6 +7,7 @@ import android.os.StrictMode;
 
 import com.analysys.track.AnalysysTracker;
 import com.device.impls.MultiProcessFramework;
+import com.device.tripartite.Abu;
 import com.device.utils.EL;
 import com.tencent.bugly.Bugly;
 import com.umeng.analytics.MobclickAgent;
@@ -25,66 +26,12 @@ public class AnalysysApplication extends Application {
 
     @Override
     public void onCreate() {
-        // init  bugly。  track-sdk-demo
-        Bugly.init(getApplicationContext(), "8b5379e3bc", false);
-        if (com.analysys.track.BuildConfig.ENABLE_BUG_REPORT) {
-            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog()
-                    .build());
-            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog()
-                    .build());
-        }
-
-
         super.onCreate();
-        initAnalysys();
-        if (com.analysys.track.BuildConfig.ENABLE_BUG_REPORT) {
-            MultiProcessFramework.runServices(this);
-        }
-        EL.init(this);
-    }
 
-    /**
-     * 初始化统计功能
-     */
-    private void initAnalysys() {
+        Abu.initMultiProcessIfDebug(this.getApplicationContext());
+        Abu.initBugly(this.getApplicationContext());
+        Abu.initAnalysys(this.getApplicationContext());
 
-        // 初始化接口:第二个参数填写您在平台申请的appKey,第三个参数填写
-        AnalysysTracker.init(this, "7773661000888540d", "WanDouJia");
-        //  AnalysysTracker.init(this, "fdfdf", "WanDouJia");
-        // 设置打开debug模式，上线请置为false
-        AnalysysTracker.setDebugMode(this, false);
-
-        //init umeng
-        MobclickAgent.setSessionContinueMillis(10);
-        MobclickAgent.setCatchUncaughtExceptions(true);
-        UMConfigure.setProcessEvent(true);
-        UMConfigure.setEncryptEnabled(true);
-        UMConfigure.setLogEnabled(true);
-        UMConfigure.init(this, "5b4c140cf43e4822b3000077", "track-demo-dev", UMConfigure.DEVICE_TYPE_PHONE, "99108ea07f30c2afcafc1c5248576bc5");
-    }
-
-    public String getCurrentProcessName() {
-        try {
-            int pid = android.os.Process.myPid();
-            ActivityManager am = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
-            for (ActivityManager.RunningAppProcessInfo info : am.getRunningAppProcesses()) {
-                if (info.pid == pid) {
-                    return info.processName;
-                }
-            }
-        } catch (Throwable e) {
-            MobclickAgent.reportError(this, e);
-        }
-        return "";
-    }
-
-    @Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(base);
-        // MultiDex.install(this);
+        EL.init(this.getApplicationContext());
     }
 }

@@ -1,4 +1,4 @@
-package com.device.impls;
+package com.device.tripartite;
 
 
 import android.content.Context;

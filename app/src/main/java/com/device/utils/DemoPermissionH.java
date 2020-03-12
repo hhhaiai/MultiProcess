@@ -17,7 +17,7 @@ import java.util.List;
  * @author: sanbo
  * @mail: xueyongfu@analysys.com.cn
  */
-public class PermissionH {
+public class DemoPermissionH {
 
     /**
      * 判断权限是否已经授权

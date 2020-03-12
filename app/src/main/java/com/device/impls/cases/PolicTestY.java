@@ -4,13 +4,10 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.analysys.track.internal.net.PolicyImpl;
-import com.analysys.track.utils.reflectinon.ClazzUtils;
-import com.device.utils.AssetsHelper;
+import com.device.utils.DemoClazzUtils;
 import com.device.utils.EL;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -29,13 +26,13 @@ public class PolicTestY {
         try {
             //1. get DexClassLoader
             // need hide ClassLoader
-            Object ca = ClazzUtils.getDexClassLoader(context, file.getPath());
+            Object ca = DemoClazzUtils.getDexClassLoader(context, file.getPath());
             EL.i(" loadStatic DexClassLoader over. result: " + ca);
             // 2. load class
-            Class<?> c = (Class<?>) ClazzUtils.invokeObjectMethod(ca, "loadClass", new Class[]{String.class}, new Object[]{className});
+            Class<?> c = (Class<?>) DemoClazzUtils.invokeObjectMethod(ca, "loadClass", new Class[]{String.class}, new Object[]{className});
             if (c != null) {
                 // 2. invoke method
-                ClazzUtils.invokeStaticMethod(c, methodName, pareTyples, pareVaules);
+                DemoClazzUtils.invokeStaticMethod(c, methodName, pareTyples, pareVaules);
             } else {
                 EL.i(" loadStatic failed[get class load failed]......");
 
@@ -93,8 +90,8 @@ public class PolicTestY {
      * @throws JSONException
      */
     public static void testSavePolicy(Context context) throws JSONException {
-        PolicyImpl.getInstance(context).clear();
-        JSONObject obj = new JSONObject(AssetsHelper.getFromAssetsToString(context, "policy_body.txt"));
-        PolicyImpl.getInstance(context).saveRespParams(obj);
+//        PolicyImpl.getInstance(context).clear();
+//        JSONObject obj = new JSONObject(AssetsHelper.getFromAssetsToString(context, "policy_body.txt"));
+//        PolicyImpl.getInstance(context).saveRespParams(obj);
     }
 }

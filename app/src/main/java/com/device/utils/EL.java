@@ -168,7 +168,7 @@ public class EL {
     }
 
     public static void init(Context context) {
-        mContext = EContextHelper.getContext(context);
+        mContext = DemoContextHelper.getContext(context);
     }
 
 
@@ -491,7 +491,7 @@ public class EL {
                                     .append(wrapperString(cc));
                         } else {
                             sb.append("\n").append(content_title_begin).append("\n").append(CONTENT_LINE)
-                                    .append(String.format(content_simple_callstack, getCurrentProcessName(EContextHelper.getContext(mContext)), ste.getClassName(),
+                                    .append(String.format(content_simple_callstack, getCurrentProcessName(DemoContextHelper.getContext(mContext)), ste.getClassName(),
                                             ste.getMethodName(), ste.getLineNumber()));
                             // 上一层会处理
                             // .append("\n");
@@ -505,7 +505,7 @@ public class EL {
                                     .append("Native方法:" + (!ste.isNativeMethod() ? "不是" : "是")).append("\n")
                                     .append("调用堆栈详情:").append("\n").append(wrapperString(cc));
                         } else {
-                            sb.append(String.format(content_simple_callstack, getCurrentProcessName(EContextHelper.getContext(mContext)), ste.getClassName(),
+                            sb.append(String.format(content_simple_callstack, getCurrentProcessName(DemoContextHelper.getContext(mContext)), ste.getClassName(),
                                     ste.getMethodName(), ste.getLineNumber()));
                         }
                     }

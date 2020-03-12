@@ -7,12 +7,13 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.device.R;
-import com.device.impls.MainFunCaseDispatcher;
 import com.device.impls.MultiProcessFramework;
+import com.device.tripartite.Abu;
+import com.device.utils.DemoProcessUtils;
 import com.device.utils.EL;
-import com.analysys.track.utils.ProcessUtils;
 import com.device.utils.MyLooper;
-import com.umeng.analytics.MobclickAgent;
+
+import java.lang.reflect.Method;
 
 
 /**
@@ -37,15 +38,13 @@ public class TestCase1Activity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        MobclickAgent.onResume(this);
-        MobclickAgent.onPageStart("测试");
+        Abu.onResume(this, "测试");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        MobclickAgent.onPause(this);
-        MobclickAgent.onPageEnd("测试");
+        Abu.onPause(this, "测试");
     }
 
     // 多进程系统调用。简化
@@ -53,7 +52,7 @@ public class TestCase1Activity extends Activity {
         TextView tv = findViewById(view.getId());
         String s = tv.getText().toString().trim().replace("case", "");
         EL.i("您点击了多进程测试case:" + s);
-        MobclickAgent.onEvent(this, "[" + ProcessUtils.getCurrentProcessName(this) + "]测试-caseP" + s);
+        Abu.onEvent(this, "[" + DemoProcessUtils.getCurrentProcessName(this) + "]测试-caseP" + s);
 
         int x = Integer.parseInt(s);
         MultiProcessFramework.postMultiMessages(this, x);
@@ -63,11 +62,19 @@ public class TestCase1Activity extends Activity {
         TextView tv = findViewById(view.getId());
         final String s = tv.getText().toString().trim().replace("caseP", "");
         EL.i("您点击了测试case:" + s);
-        MobclickAgent.onEvent(this, "[" + ProcessUtils.getCurrentProcessName(this) + "]测试-case" + s);
+        Abu.onEvent(this, "[" + DemoProcessUtils.getCurrentProcessName(this) + "]测试-case" + s);
+
         MyLooper.execute(new Runnable() {
             @Override
             public void run() {
-                MainFunCaseDispatcher.runCase(mContext, s);
+//                MainFunCaseDispatcher.runCase(mContext, s);
+                try {
+                    EL.d("--- you click  btnCase" + s);
+                    Method runCaseA = Abu.class.getDeclaredMethod("runCaseP" + s, Context.class);
+                    runCaseA.invoke(null, mContext);
+                } catch (Throwable e) {
+                    EL.e(e);
+                }
             }
         });
     }

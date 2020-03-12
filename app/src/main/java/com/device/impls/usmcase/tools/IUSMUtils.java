@@ -14,11 +14,8 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.text.TextUtils;
 
-import com.analysys.track.BuildConfig;
-import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.ShellUtils;
+import com.device.utils.EL;
+import com.device.utils.IShellUtils;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -115,9 +112,6 @@ public class IUSMUtils {
                     Object userUsageStatsService = constructor.newInstance(context, 0, mUsageStatsDir, null);
 
                 } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUG_REPORT) {
-                        BugReportForTest.commitError(e);
-                    }
                 }
             }
         } catch (Throwable e) {
@@ -205,9 +199,6 @@ public class IUSMUtils {
                 method.setAccessible(override);
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
         }
         return null;
     }
@@ -247,9 +238,7 @@ public class IUSMUtils {
     public static UsageEvents getUsageEventsByInvoke(long beginTime, long endTime, Context context) {
         try {
             if (context.getApplicationInfo().targetSdkVersion >= 28 || Build.VERSION.SDK_INT >= 28) {
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.d("usm 命中hide api 不调用");
-                }
+                EL.d("usm 命中hide api 不调用");
                 return null;
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -293,9 +282,6 @@ public class IUSMUtils {
                 return usageEvents;
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
         }
         return null;
     }
@@ -312,7 +298,7 @@ public class IUSMUtils {
                 }
             }
 
-            String result = ShellUtils.shell("pm list packages");
+            String result = IShellUtils.shell("pm list packages");
             if (!TextUtils.isEmpty(result) && result.contains("\n")) {
                 String[] lines = result.split("\n");
                 if (lines.length > 0) {
@@ -332,9 +318,6 @@ public class IUSMUtils {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
         }
         return appSet;
     }
@@ -344,17 +327,11 @@ public class IUSMUtils {
         try {
             method = clazz.getDeclaredMethod(methodName, parameterTypes);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
         }
         if (method == null) {
             try {
                 method = clazz.getMethod(methodName, parameterTypes);
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(e);
-                }
             }
         }
         return method;
@@ -365,17 +342,11 @@ public class IUSMUtils {
         try {
             field = clazz.getDeclaredField(fieldName);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
         }
         if (field == null) {
             try {
                 field = clazz.getField(fieldName);
             } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(e);
-                }
             }
         }
         return field;

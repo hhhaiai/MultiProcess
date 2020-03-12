@@ -13,7 +13,7 @@ android {
         versionCode 3
         versionName "${ver}"
         multiDexEnabled true
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+//        buildConfigField "boolean", "DEBUG", "false"
     }
     signingConfigs {
         myConfig {
@@ -24,7 +24,6 @@ android {
 
             v1SigningEnabled true
             v2SigningEnabled true
-
         }
     }
     buildTypes {
@@ -89,14 +88,12 @@ tasks.withType(Javadoc) {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation project(':dev-sdk')
     //  DB查看
     implementation 'com.amitshekhar.android:debug-db:1.0.6'
-    implementation 'com.android.support:multidex:1.0.3'
 
+
+//    implementation 'com.android.support:multidex:1.0.3'
 //     // 网络不好时下载失败
 //    //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
 //    implementation 'com.tencent.bugly:crashreport:latest.release'

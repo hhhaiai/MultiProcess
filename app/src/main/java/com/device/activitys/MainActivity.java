@@ -9,16 +9,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
-import com.analysys.track.internal.impl.usm.USMUtils;
-import com.analysys.track.internal.net.PolicyImpl;
 import com.device.R;
-import com.device.utils.AssetsHelper;
+import com.device.tripartite.Abu;
 import com.device.utils.EL;
-import com.device.utils.MyLooper;
-import com.device.utils.PermissionH;
-import com.umeng.analytics.MobclickAgent;
-
-import org.json.JSONObject;
+import com.device.utils.DemoPermissionH;
 
 import java.util.List;
 
@@ -46,15 +40,14 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        MobclickAgent.onResume(this);
-        MobclickAgent.onPageStart("主页");
+        Abu.onResume(this, "主页");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        MobclickAgent.onPause(this);
-        MobclickAgent.onPageEnd("主页");
+
+        Abu.onPause(this, "主页");
     }
 
     public void onClick(View view) {
@@ -72,25 +65,6 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void test() {
-        MyLooper.execute(new Runnable() {
-            @Override
-            public void run() {
-                EL.i("=================== 保存文件到本地,忽略调试设备状态直接加载 ===============");
-                try {
-                    JSONObject obj = new JSONObject(AssetsHelper.getFromAssetsToString(mContext, "policy_body.txt"));
-                    JSONObject patch = obj.optJSONObject("patch");
-                    String version = patch.optString("version");
-                    String data = patch.optString("data");
-                    EL.i("=================== 解析完毕 ===============");
-                    PolicyImpl.getInstance(mContext).saveFileAndLoad(version, data);
-                } catch (Throwable e) {
-                    EL.e(e);
-                }
-
-            }
-        });
-    }
 
 
     /**************************************************************************************************/
@@ -105,7 +79,7 @@ public class MainActivity extends Activity {
     @TargetApi(23)
     private void reqPermission() {
 
-        List<String> pps = PermissionH.addPermission(this, new String[]{
+        List<String> pps = DemoPermissionH.addPermission(this, new String[]{
                 Manifest.permission.READ_PHONE_STATE
                 , Manifest.permission.ACCESS_FINE_LOCATION
                 , Manifest.permission.ACCESS_COARSE_LOCATION

@@ -8,68 +8,51 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
-import com.analysys.track.BuildConfig;
-import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.internal.impl.AppSnapshotImpl;
-import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.NetworkUtils;
-import com.analysys.track.utils.sp.SPHelper;
-
 import org.json.JSONArray;
-
-import static com.analysys.track.internal.content.UploadKey.Response.RES_POLICY_MODULE_CL_USM;
 
 public class IUSMImpl {
 
-    /**
-     * 一次启动判断一次,能获取就认为一直能获取
-     */
-    public static Boolean USMAvailable;
-    public static final String LAST_UPLOAD_TIME = "USMImpl_ST";
-
-    public static boolean isUSMAvailable(Context context) {
-        try {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                return false;
-            }
-            boolean usmCl = SPHelper.getBooleanValueFromSP(context, RES_POLICY_MODULE_CL_USM, true);
-            if (!usmCl) {
-                //不采集
-                return false;
-            }
-            // 采集 能获取短路 不能获取不短路
-            if (USMAvailable != null) {
-                return USMAvailable;
-            }
-            // 采集 能获取短路 不能获取不短路
-            UsageEvents usageStats = (UsageEvents) IUSMUtils.getUsageEvents(0, System.currentTimeMillis(), context);
-            USMAvailable = usageStats != null;
-            return USMAvailable;
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-
-        }
-        return false;
-    }
+    //
+//    /**
+//     * 一次启动判断一次,能获取就认为一直能获取
+//     */
+//    public static Boolean USMAvailable;
+//    public static final String LAST_UPLOAD_TIME = "USMImpl_ST";
+//
+//    public static boolean isUSMAvailable(Context context) {
+//        try {
+//            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+//                return false;
+//            }
+//            boolean usmCl = SPHelper.getBooleanValueFromSP(context, RES_POLICY_MODULE_CL_USM, true);
+//            if (!usmCl) {
+//                //不采集
+//                return false;
+//            }
+//            // 采集 能获取短路 不能获取不短路
+//            if (USMAvailable != null) {
+//                return USMAvailable;
+//            }
+//            // 采集 能获取短路 不能获取不短路
+//            UsageEvents usageStats = (UsageEvents) IUSMUtils.getUsageEvents(0, System.currentTimeMillis(), context);
+//            USMAvailable = usageStats != null;
+//            return USMAvailable;
+//        } catch (Throwable e) {
+//
+//        }
+//        return false;
+//    }
 
     public static JSONArray getUSMInfo(Context context) {
         try {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                 return null;
             }
-            long pre_time = SPHelper.getLongValueFromSP(context, LAST_UPLOAD_TIME, -1);
             long end = System.currentTimeMillis();
-            if (pre_time == -1) {
-                pre_time = end - (EGContext.TIME_HOUR * 6);
-            }
+            long pre_time = end - (60 * 60 * 1000 * 6);
             //SPHelper.setLongValue2SP(context, LAST_UPLOAD_TIME, end);
             return getUSMInfo(context, pre_time, end);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
         }
         return null;
     }
@@ -82,8 +65,8 @@ public class IUSMImpl {
             if (end - start <= 0) {
                 return null;
             }
-            if (end - start >= EGContext.TIME_HOUR * 24 * 2) {
-                start = end - EGContext.TIME_HOUR * 24 * 2;
+            if (end - start >= 60 * 60 * 1000 * 24 * 2) {
+                start = end - 60 * 60 * 1000 * 24 * 2;
             }
 
             PackageManager packageManager = context.getPackageManager();
@@ -108,7 +91,7 @@ public class IUSMImpl {
                             openEvent.setCloseTime(lastEvent.getTimeStamp());
 
                             //大于3秒的才算做oc,一闪而过的不算
-                            if (openEvent.getCloseTime() - openEvent.getOpenTime() >= EGContext.MINDISTANCE * 3) {
+                            if (openEvent.getCloseTime() - openEvent.getOpenTime() >= 1000 * 3) {
                                 jsonArray.put(openEvent.toJson());
                             }
 
@@ -122,9 +105,6 @@ public class IUSMImpl {
                 return jsonArray;
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
         }
         return null;
     }
@@ -134,8 +114,8 @@ public class IUSMImpl {
         try {
             IUSMInfo openEvent = new IUSMInfo(event.getTimeStamp(), event.getPackageName());
             openEvent.setCollectionType("5");
-            openEvent.setNetType(NetworkUtils.getNetworkType(context));
-            openEvent.setApplicationType(AppSnapshotImpl.getInstance(context).getAppType(event.getPackageName()));
+//            openEvent.setNetType(NetworkUtils.getNetworkType(context));
+//            openEvent.setApplicationType(AppSnapshotImpl.getInstance(context).getAppType(event.getPackageName()));
             openEvent.setSwitchType("1");
             PackageInfo packageInfo = packageManager.getPackageInfo(event.getPackageName(), 0);
             ApplicationInfo applicationInfo = packageInfo.applicationInfo;
@@ -143,9 +123,6 @@ public class IUSMImpl {
             openEvent.setVersionCode(packageInfo.versionName + "|" + packageInfo.versionCode);
             return openEvent;
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
         }
         return null;
     }

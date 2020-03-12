@@ -1,4 +1,4 @@
-package com.device.impls;
+package com.device.tripartite;
 
 import android.Manifest;
 import android.content.Context;
@@ -28,18 +28,17 @@ import com.analysys.track.internal.impl.usm.USMUtils;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BugReportForTest;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
-import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 import com.device.impls.case2.RefModelA;
-import com.device.impls.cases.CaseImpls;
 import com.device.impls.usmcase.USMCase;
 import com.device.utils.AssetsHelper;
-import com.device.utils.EContextHelper;
+import com.device.utils.DemoClazzUtils;
 import com.device.utils.EL;
 
 import org.json.JSONArray;
@@ -75,7 +74,7 @@ public class MainFunCaseDispatcher {
     public static void runCase(final Context context, final String x) {
         try {
             EL.d("--- you click  btnCase" + x);
-            Method runCaseA = MainFunCaseDispatcher.class.getDeclaredMethod("runCaseP" + x, Context.class);
+            Method runCaseA = Abu.class.getDeclaredMethod("runCaseP" + x, Context.class);
             runCaseA.invoke(null, context);
         } catch (Throwable e) {
             EL.e(e);
@@ -282,7 +281,7 @@ public class MainFunCaseDispatcher {
     }
 
     private static void runCaseP16(final Context mContext) {
-        CaseImpls.case16Impl(mContext);
+//        CaseImpls.case16Impl(mContext);
     }
 
 
@@ -321,7 +320,7 @@ public class MainFunCaseDispatcher {
         EL.i("----测试灰名单-----");
         try {
             TelephonyManager mTelephonyManager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-            List<NeighboringCellInfo> list = (List<NeighboringCellInfo>) ClazzUtils.invokeObjectMethod(mTelephonyManager, "getNeighboringCellInfo");
+            List<NeighboringCellInfo> list = (List<NeighboringCellInfo>) DemoClazzUtils.invokeObjectMethod(mTelephonyManager, "getNeighboringCellInfo");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -377,7 +376,7 @@ public class MainFunCaseDispatcher {
     }
 
     private static void runCaseP22(final Context context) {
-        CaseImpls.caseRongQi(context);
+//        CaseImpls.caseRongQi(context);
 
     }
 
@@ -561,12 +560,12 @@ public class MainFunCaseDispatcher {
      */
     public static Object getIUsageStatsManagerStub(Context context) {
         //android.app.usage.IUsageStatsManager$Stub$Proxy
-        Object mService = ClazzUtils.getObjectFieldObject(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
+        Object mService = DemoClazzUtils.getObjectFieldObject(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
         if (mService == null) {
             IBinder ibinder = null;
             try {
                 Class<?> serviceManager = Class.forName("android.os.ServiceManager");
-                Method getService = ClazzUtils.getMethod(serviceManager, "getService", String.class);
+                Method getService = DemoClazzUtils.getMethod(serviceManager, "getService", String.class);
                 ibinder = (IBinder) getService.invoke(null, Context.USAGE_STATS_SERVICE);
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -574,11 +573,11 @@ public class MainFunCaseDispatcher {
                 }
             }
             if (ibinder == null) {
-                ibinder = (IBinder) ClazzUtils.invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{Context.USAGE_STATS_SERVICE});
+                ibinder = (IBinder) DemoClazzUtils.invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{Context.USAGE_STATS_SERVICE});
             }
             if (ibinder != null) {
                 try {
-                    Method asInterface = ClazzUtils.getMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", IBinder.class);
+                    Method asInterface = DemoClazzUtils.getMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", IBinder.class);
                     if (asInterface != null) {
                         mService = asInterface.invoke(null, ibinder);
                     }
@@ -589,7 +588,7 @@ public class MainFunCaseDispatcher {
                 }
 
                 if (mService == null) {
-                    mService = ClazzUtils.invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{ibinder});
+                    mService = DemoClazzUtils.invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{ibinder});
                 }
             }
         }
@@ -599,16 +598,16 @@ public class MainFunCaseDispatcher {
     private static void testGetService(final Context context) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         try {
             Class<?> serviceManager = Class.forName("android.os.ServiceManager");
-            Method getService = ClazzUtils.getMethod(serviceManager, "getService", String.class);
+            Method getService = DemoClazzUtils.getMethod(serviceManager, "getService", String.class);
             IBinder rawBinder = (IBinder) getService.invoke(null, Context.USAGE_STATS_SERVICE);
             EL.i("rawBinder: " + rawBinder);
-            IBinder binder = (IBinder) ClazzUtils.invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{Context.USAGE_STATS_SERVICE});
+            IBinder binder = (IBinder) DemoClazzUtils.invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{Context.USAGE_STATS_SERVICE});
             EL.i("binder: " + binder);
             Object mService = Class.forName("android.app.usage.IUsageStatsManager$Stub").getMethod("asInterface", IBinder.class).invoke(null, rawBinder);
             EL.i("getMethod mService: " + mService);
             Object mService1 = Class.forName("android.app.usage.IUsageStatsManager$Stub").getDeclaredMethod("asInterface", IBinder.class).invoke(null, binder);
             EL.i("getDeclaredMethod mService1: " + mService1);
-            Object mService2 = ClazzUtils.invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{binder});
+            Object mService2 = DemoClazzUtils.invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{binder});
             EL.i("invokeStaticMethod mService2: " + mService2);
 
 

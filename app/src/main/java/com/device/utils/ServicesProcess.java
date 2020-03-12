@@ -20,7 +20,7 @@ public class ServicesProcess {
         try {
 
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
-                if (PermissionH.checkPermission(service, "android.permission.FOREGROUND_SERVICE")) {
+                if (DemoPermissionH.checkPermission(service, "android.permission.FOREGROUND_SERVICE")) {
                     NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME,
                             NotificationManager.IMPORTANCE_HIGH);
                     NotificationManager manager = (NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE);

@@ -3,7 +3,7 @@ package com.device.utils;
 import android.app.Application;
 import android.content.Context;
 
-public class EContextHelper {
+public class DemoContextHelper {
 
     public static Context getContext(Context context) {
         try {

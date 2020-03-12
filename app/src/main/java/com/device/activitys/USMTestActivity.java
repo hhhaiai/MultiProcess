@@ -1,22 +1,22 @@
 package com.device.activitys;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.analysys.track.internal.impl.usm.USMImpl;
-import com.analysys.track.internal.impl.usm.USMUtils;
 import com.device.R;
+import com.device.tripartite.Abu;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-
-import java.util.concurrent.TimeUnit;
 
 public class USMTestActivity extends Activity {
 
@@ -34,7 +34,7 @@ public class USMTestActivity extends Activity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                USMUtils.openUSMSetting(USMTestActivity.this);
+                openUSMSetting(USMTestActivity.this);
             }
         });
         button2.setOnClickListener(new View.OnClickListener() {
@@ -47,13 +47,27 @@ public class USMTestActivity extends Activity {
 
     }
 
+    /**
+     * 打开辅助功能设置界面
+     *
+     * @param context
+     */
+    public static void openUSMSetting(Context context) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                context.startActivity(intent);
+            }
+        } catch (Throwable e) {
+        }
+    }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @TargetApi(21)
     private void setView() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                final JSONArray jsonArray = USMImpl.getUSMInfo(USMTestActivity.this, System.currentTimeMillis() - 18 * 60 * 60 * 1000, System.currentTimeMillis());
+                final JSONArray jsonArray = Abu.getUSMInfo(USMTestActivity.this, System.currentTimeMillis() - 18 * 60 * 60 * 1000, System.currentTimeMillis());
                 if (jsonArray == null) {
                     //textView.setText("null");
                     return;

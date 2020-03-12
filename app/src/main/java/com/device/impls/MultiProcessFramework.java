@@ -19,8 +19,12 @@ import com.device.services.MyServiceK;
 import com.device.services.MyServiceL;
 import com.device.services.MyServiceM;
 import com.device.services.MyServiceN;
+import com.device.tripartite.MultiProcessCaseDispatcher;
+import com.device.utils.EL;
 import com.device.utils.MyLooper;
 import com.umeng.analytics.MobclickAgent;
+
+import java.lang.reflect.Method;
 
 
 /**
@@ -112,7 +116,14 @@ public class MultiProcessFramework {
             final Bundle bundle = intent.getExtras();
             if (bundle != null && bundle.size() > 0) {
                 if (bundle.containsKey(TYPE_MSG)) {
-                    MultiProcessCaseDispatcher.runCase(context, bundle.getInt(TYPE_MSG, -1));
+//                    MultiProcessCaseDispatcher.runCase(context, bundle.getInt(TYPE_MSG, -1));
+                    try {
+                        Class<?> testCase = MultiProcessCaseDispatcher.class;
+                        Method runCaseA = testCase.getDeclaredMethod("runCase" +  bundle.getInt(TYPE_MSG, -1), Context.class);
+                        runCaseA.invoke(null, context);
+                    } catch (Throwable e) {
+                        EL.v(e);
+                    }
                 }
             }
         } catch (Throwable e) {
