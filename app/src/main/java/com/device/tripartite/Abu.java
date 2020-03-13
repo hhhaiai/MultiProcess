@@ -59,24 +59,6 @@ public class Abu {
         initUmeng(context);
     }
 
-    /**
-     * 调试打开多进程和严格模式
-     *
-     * @param context
-     */
-    public static void initMultiProcessIfDebug(Context context) {
-        if (BuildConfig.DEBUG) {
-            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog()
-                    .build());
-            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog()
-                    .build());
-            MultiProcessFramework.runServices(context);
-        }
-    }
 
     public static void onResume(Context ctx, String pn) {
         MobclickAgent.onResume(ctx);

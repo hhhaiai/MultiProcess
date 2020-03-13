@@ -13,7 +13,7 @@ android {
         versionCode 3
         versionName "${ver}"
         multiDexEnabled true
-//        buildConfigField "boolean", "DEBUG", "false"
+        buildConfigField "boolean", "USE_MULTI_TEST", "false"
     }
     signingConfigs {
         myConfig {

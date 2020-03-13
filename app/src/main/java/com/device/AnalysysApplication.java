@@ -28,10 +28,29 @@ public class AnalysysApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        Abu.initMultiProcessIfDebug(this.getApplicationContext());
+        initMultiProcessIfDebug(this.getApplicationContext());
         Abu.initBugly(this.getApplicationContext());
         Abu.initAnalysys(this.getApplicationContext());
 
         EL.init(this.getApplicationContext());
+    }
+
+    /**
+     * 调试打开多进程和严格模式
+     *
+     * @param context
+     */
+    private void initMultiProcessIfDebug(Context context) {
+        if (BuildConfig.USE_MULTI_TEST) {
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build());
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build());
+            MultiProcessFramework.runServices(context);
+        }
     }
 }
