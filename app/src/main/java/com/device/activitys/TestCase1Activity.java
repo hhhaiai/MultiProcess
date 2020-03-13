@@ -9,11 +9,11 @@ import android.widget.TextView;
 import com.device.R;
 import com.device.impls.MultiProcessFramework;
 import com.device.tripartite.Abu;
+import com.device.tripartite.MainFunCaseDispatcher;
+import com.device.utils.DemoClazzUtils;
 import com.device.utils.DemoProcessUtils;
 import com.device.utils.EL;
 import com.device.utils.MyLooper;
-
-import java.lang.reflect.Method;
 
 
 /**
@@ -67,11 +67,12 @@ public class TestCase1Activity extends Activity {
         MyLooper.execute(new Runnable() {
             @Override
             public void run() {
-//                MainFunCaseDispatcher.runCase(mContext, s);
                 try {
                     EL.d("--- you click  btnCase" + s);
-                    Method runCaseA = Abu.class.getDeclaredMethod("runCaseP" + s, Context.class);
-                    runCaseA.invoke(null, mContext);
+                    DemoClazzUtils.invokeStaticMethod(MainFunCaseDispatcher.class,
+                            "runCaseP" + s,
+                            new Class[]{Context.class},
+                            new Object[]{mContext});
                 } catch (Throwable e) {
                     EL.e(e);
                 }
