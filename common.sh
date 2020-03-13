@@ -23,7 +23,8 @@ checkEnvArgs() {
     local macos="Darwin"
     local linux="Linux"
     support_printf_os=""
-    if [ "${unames}" = "$cygwin" ]; then
+#    if [ "${unames}" = "$cygwin" ]; then
+    if [[ ${unames} =~ $cygwin  ]]; then
         echo "[$filename]your platform is win . cygwin"
         red='\e[0;31m'
         green='\e[0;32m'
@@ -41,7 +42,8 @@ checkEnvArgs() {
         else
             iadb="$ANDROID_HOME\\platform-tools\\adb.exe"
         fi
-    elif [ "${unames}" = "$mingw" ]; then
+#    elif [ "${unames}" = "$mingw" ]; then
+    elif [[ ${unames} =~ $mingw  ]]; then
         echo "[$filename]your platform is win . mingw"
         red='\033[31m'
         green='\033[32m'
@@ -59,7 +61,8 @@ checkEnvArgs() {
         else
             iadb="$ANDROID_HOME\\platform-tools\\adb.exe"
         fi
-    elif [ "${unames}" = "$msys_nt" ]; then
+#    elif [ "${unames}" = "$msys_nt" ]; then
+    elif [[ ${unames} =~ $msys_nt  ]]; then
         echo "[$filename]your platform is win10 . mingw"
         red='\e[0;31m'
         green='\e[0;32m'
@@ -77,7 +80,8 @@ checkEnvArgs() {
         else
             iadb="$ANDROID_HOME\\platform-tools\\adb.exe"
         fi
-    elif [ "${unames}" = "$macos" ]; then
+#    elif [ "${unames}" = "$macos" ]; then
+    elif [[ ${unames} =~ $macos  ]]; then
         echo "[$filename]your platform is macos"
         red='\033[31m'
         green='\033[32m'
@@ -104,7 +108,8 @@ checkEnvArgs() {
         else
             iadb="$ANDROID_HOME/platform-tools/adb"
         fi
-    elif [ "${unames}" = "$linux" ]; then
+#    elif [ "${unames}" = "$linux" ]; then
+    elif [[ ${unames} =~ $linux  ]]; then
         echo "[$filename]your platform is $linux"
         red='\033[31m'
         green='\033[32m'
@@ -169,7 +174,6 @@ logi() {
     #    if [ $1 ] && [ ! $support_printf_os ]; then
     if [ "$1" ] && [ ! "$support_printf_os" ]; then
         $ecs "${green}$1${endColor}"
-        printf "${green}$1${endColor}\n"
     else
         printf "${green}$1${endColor}\n"
     fi

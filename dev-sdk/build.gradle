@@ -209,6 +209,10 @@ def isWindows() {
     //return System.properties['os.name'].contains('windows');
 }
 
+def isMacOsX() {
+    return org.gradle.internal.os.OperatingSystem.current().isMacOsX()
+}
+
 // 执行shell命令.如果是打dex 包，则
 task runDx(type: Exec) {
     if (isWindows()) {
@@ -219,8 +223,13 @@ task runDx(type: Exec) {
 }
 
 task docGeneral(type: Exec) {
-    commandLine "../general_doc.sh", "${version}"
+    if (isMacOsX()) {
+        commandLine "../general_doc.sh", "${version}"
+    } else {
+        commandLine "pwd"
+    }
 }
+
 
 task bakMappiing(type: Copy) {
     from("build/outputs/mapping/release")
