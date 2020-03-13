@@ -66,6 +66,19 @@ public class PolicyInfo implements Serializable {
     private String mPatchVersion;
     private String mPatchMethons;
 
+    /**
+     * hotfix version
+     */
+    private String mHotfixVer = "";
+
+    public void setHotfixVersion(String version) {
+        mHotfixVer = version;
+    }
+
+    public String getHotfixVersion() {
+        return mHotfixVer;
+    }
+
 
     private PolicyInfo() {
     }

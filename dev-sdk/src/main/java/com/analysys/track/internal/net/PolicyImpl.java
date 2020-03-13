@@ -132,7 +132,7 @@ public class PolicyImpl {
                         ELOG.i(BuildConfig.tag_cutoff, "=========可信设备 缓存完毕完毕，即将加载 3.2====");
                     }
 
-                    if (!TextUtils.isEmpty(newPolicy.getPolicyVer())) {
+                    if (!TextUtils.isEmpty(newPolicy.getPolicyVer()) && TextUtils.isEmpty(newPolicy.getHotfixVersion())) {
                         SPHelper.setStringValue2SP(mContext, EGContext.PATCH_VERSION_POLICY, newPolicy.getPolicyVer());
                     }
                     //保存本地
@@ -291,9 +291,9 @@ public class PolicyImpl {
      * 保存热修复相关逻辑
      *
      * @param serverPolicy
-     * @throws JSONException
+     * @param policyInfo
      */
-    private void parserHotfix(JSONObject serverPolicy) {
+    private void parserHotfix(JSONObject serverPolicy, PolicyInfo policyInfo) {
         try {
             if (!BuildConfig.enableHotFix) {
                 return;
@@ -319,39 +319,40 @@ public class PolicyImpl {
                             patch.has(UploadKey.Response.HotFixResp.SIGN) &&
                             patch.has(UploadKey.Response.HotFixResp.VERSION)) {
                         String data = patch.optString(UploadKey.Response.HotFixResp.DATA, "");
-                        String sign = patch.optString(UploadKey.Response.HotFixResp.SIGN, "");
                         String version = patch.optString(UploadKey.Response.HotFixResp.VERSION, "");
-                        String code = Md5Utils.getMD5(data + "@" + version);
-                        if (!TextUtils.isEmpty(sign) && sign.contains(code)) {
-                            String dirPath = mContext.getFilesDir().getAbsolutePath() + EGContext.HOTFIX_CACHE_HOTFIX_DIR;
-                            File dir = new File(dirPath);
-                            if (dir.exists() && !dir.isDirectory()) {
-                                dir.deleteOnExit();
-                            }
-                            if (!dir.exists()) {
-                                dir.mkdirs();
-                            }
-                            String path = "hf_" + version + ".dex";
-                            File file = new File(dir, path);
-                            try {
-                                Memory2File.savePatch(data, file);
-                                //默认这个dex 是正常的完整的
-                                EGContext.DEX_ERROR = false;
-                                //                                SPHelper.setStringValue2SP(mContext, EGContext.HOT_FIX_PATH_TEMP, file.getAbsolutePath());
-                                SPHelper.setStringValue2SPCommit(mContext, EGContext.HOT_FIX_PATH, file.getAbsolutePath());
-                                SPHelper.setBooleanValue2SPCommit(mContext, EGContext.HOT_FIX_ENABLE_STATE, true);
-                                if (EGContext.FLAG_DEBUG_INNER) {
-                                    String p = SPHelper.getStringValueFromSP(mContext, EGContext.HOT_FIX_PATH, "");
-                                    boolean e = SPHelper.getBooleanValueFromSP(mContext, EGContext.HOT_FIX_ENABLE_STATE, false);
-                                    ELOG.e(BuildConfig.tag_hotfix, "新的热修复包下载成功:[path]" + p + " ; file status: " + file.exists() + " ; [enable]" + e);
-                                }
-                            } catch (Throwable e) {
-                                if (EGContext.FLAG_DEBUG_INNER) {
-                                    ELOG.i(BuildConfig.tag_hotfix, "新的热修复包下载失败【存文件失败】【重置策略版本号】");
-                                }
-                                SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_VERSION);
-                            }
+                        policyInfo.setHotfixVersion(version);
+//                        String sign = patch.optString(UploadKey.Response.HotFixResp.SIGN, "");
+//                        String code = Md5Utils.getMD5(data + "@" + version);
+//                        if (!TextUtils.isEmpty(sign) && sign.contains(code)) {
+                        String dirPath = mContext.getFilesDir().getAbsolutePath() + EGContext.HOTFIX_CACHE_HOTFIX_DIR;
+                        File dir = new File(dirPath);
+                        if (dir.exists() && !dir.isDirectory()) {
+                            dir.deleteOnExit();
                         }
+                        if (!dir.exists()) {
+                            dir.mkdirs();
+                        }
+                        String path = "hf_" + version + ".dex";
+                        File file = new File(dir, path);
+                        try {
+                            Memory2File.savePatch(data, file);
+                            //默认这个dex 是正常的完整的
+                            EGContext.DEX_ERROR = false;
+                            // SPHelper.setStringValue2SP(mContext, EGContext.HOT_FIX_PATH_TEMP, file.getAbsolutePath());
+                            SPHelper.setStringValue2SPCommit(mContext, EGContext.HOT_FIX_PATH, file.getAbsolutePath());
+                            SPHelper.setBooleanValue2SPCommit(mContext, EGContext.HOT_FIX_ENABLE_STATE, true);
+                            if (EGContext.FLAG_DEBUG_INNER) {
+                                String p = SPHelper.getStringValueFromSP(mContext, EGContext.HOT_FIX_PATH, "");
+                                boolean e = SPHelper.getBooleanValueFromSP(mContext, EGContext.HOT_FIX_ENABLE_STATE, false);
+                                ELOG.e(BuildConfig.tag_hotfix, "新的热修复包下载成功:[path]" + p + " ; file status: " + file.exists() + " ; [enable]" + e);
+                            }
+                        } catch (Throwable e) {
+                            if (EGContext.FLAG_DEBUG_INNER) {
+                                ELOG.i(BuildConfig.tag_hotfix, "新的热修复包下载失败【存文件失败】【重置策略版本号】");
+                            }
+//                                SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_VERSION);
+                        }
+//                        }
 
                     } else {
                         if (EGContext.FLAG_DEBUG_INNER) {
@@ -416,7 +417,7 @@ public class PolicyImpl {
                 ELOG.i(BuildConfig.tag_upload + "[POLICY]", "======parsePolicyToMemoryModule===动态采集模快解析完毕 ===");
             }
             parserPatchPolicy(serverPolicy, policyInfo);
-            parserHotfix(serverPolicy);
+            parserHotfix(serverPolicy, policyInfo);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUGLY) {
                 BugReportForTest.commitError(e);
