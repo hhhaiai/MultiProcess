@@ -13,7 +13,7 @@ costtime {
 def isRelease = true
 //SDK版本号, 混淆字符串也依赖改行，切勿改动变量名字
 def ver = "4.3.0.7"
-def date = "20200201"
+def date = "20200214"
 //SDK子版本
 def subVersion = "00"
 
@@ -204,36 +204,41 @@ def isWindows() {
     //return org.gradle.internal.os.OperatingSystem.current().isWindows()
     //return System.properties['os.name'].contains('windows');
 }
+
 // 执行shell命令.如果是打dex 包，则
 task runDx(type: Exec) {
-//    commandLine 'pwd'
-//    commandLine '../dx.sh'
-//    commandLine "dx", "--dex", "--output" ,"001.dex","../release/4.3.0.7_20200201/classes.jar"
-
     if (isWindows()) {
         commandLine "cmd", "/c", "dx", "--dex", "--output", "${zipPathDir}${name}.dex", "${zipPathDir}${defaultJar}"
     } else {
         commandLine "dx", "--dex", "--output", "${zipPathDir}${name}.dex", "${zipPathDir}${defaultJar}"
     }
+}
 
-
+task docGeneral(type: Exec) {
+    commandLine "../general_doc.sh", "${version}"
 }
 
 task bakMappiing(type: Copy) {
     from("build/outputs/mapping/release")
     into "${zipPathDir}"
     include("mapping.txt")
-    rename("mapping.txt", "${ver}_${date}${subVersion}-mapping.txt")
+    if (isPackageJar) {
+        rename("mapping.txt", "${ver}_${date}${subVersion}-jar-mapping.txt")
+    } else {
+        rename("mapping.txt", "${ver}_${date}${subVersion}-dex-mapping.txt")
+    }
 }
 task zip(type: Delete) {
     delete "../releasebak"
+    delete "../doc/流量审核SDK.pdf"
     delete "${zipPathDir}${defaultJar}"
 }
 
 
 if (isPackageJar) {
     generateJar.dependsOn assemble
-    copyDoc.dependsOn generateJar
+    docGeneral.dependsOn generateJar
+    copyDoc.dependsOn docGeneral
     packageZip.dependsOn copyDoc
     bakMappiing.dependsOn packageZip
     zip.dependsOn bakMappiing

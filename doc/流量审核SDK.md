@@ -2,9 +2,8 @@
 
 ## 版本变动
 
-* **版本号**: `4.3.0.7|20200201`
+* **版本号**: `默认版本号`
 * **版本变动**:
-
     1. 解决已知问题
     2. 优化性能
 
@@ -51,7 +50,7 @@
 |  android.permission.RECEIVE_BOOT_COMPLETED  |  允许程序开机自动运行  |
 |  android.permission.ACCESS_NETWORK_STATE  |  访问网络连接情况  |
 |  android.permission.BLUETOOTH       |  允许应用程序读取蓝牙MAC  |
-|  android.permission.WRITE_SETTINGS      |  允许应用程序读取或写入系统设置    
+|  android.permission.WRITE_SETTINGS      |  允许应用程序读取或写入系统设置
 
 #### 2.2. 组件声明
 
@@ -179,7 +178,7 @@ android P之后版本默认不支持HTTP通讯,为保证正常使用，建议在
 如果您使用了谷歌的混淆, 请进行如下设置, 将sdk的代码都生成到主dex。 示例如下:
 
 * build.gradle
-    
+
 ``` groovy
 android {
     buildTypes {
@@ -194,5 +193,5 @@ android {
 * multidex-config.pro
 
 ``` groovy
--keep class com.analysys.track.** { *; } 
+-keep class com.analysys.track.** { *; }
 ```
