@@ -1,22 +1,17 @@
 #!/usr/bin/env bash
 
-
-: '
- 清除程序入口
-'
-
-source_common()
-{
-    pwd=$(cd `dirname $0`; pwd)
+source_common() {
+    pwd=$(
+        cd $(dirname $0)
+        pwd
+    )
     source $pwd/common.sh
 }
 
-clean_task()
-{
+clean_task() {
     logw "[$filename]>>>>clean project<<<<"
     dir=("app" "dev-sdk" "buildSrc" "dex")
-    for element in ${dir[@]}
-    do
+    for element in ${dir[@]}; do
         #clean task
         rm -rf $element/build/
         rm -rf $element/bin/
@@ -31,7 +26,7 @@ clean_task()
     rm -rf sh.exe.stackdump
     rm -rf classes.dex
 
-    if  [ $# == 0 ]; then
+    if [ $# == 0 ]; then
         logi "[$filename]clean project success. "
     else
         loge "[$filename]clean project Failed!"
@@ -39,11 +34,9 @@ clean_task()
 
 }
 
-main()
-{
+main() {
     source_common
     clean_task
 }
 
 main
-
