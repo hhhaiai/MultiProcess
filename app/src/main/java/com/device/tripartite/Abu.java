@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.StrictMode;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
@@ -16,7 +17,6 @@ import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.analysys.track.utils.sp.SPHelper;
-import com.device.BuildConfig;
 import com.device.impls.MultiProcessFramework;
 import com.device.utils.AssetsHelper;
 import com.device.utils.DemoClazzUtils;
@@ -83,8 +83,11 @@ public class Abu {
     // 初始化接口:第二个参数填写您在平台申请的appKey,第三个参数填写
     private static void initEg(Context context) {
 
+
+//        DemoClazzUtils.invokeStaticMethod("com.analysys.track.AnalysysTracker", "init",
+//                new Class[]{Context.class, String.class, String.class}, new Object[]{context, "7773661000888540d", "WanDouJia"});
         DemoClazzUtils.invokeStaticMethod("com.analysys.track.AnalysysTracker", "init",
-                new Class[]{Context.class, String.class, String.class}, new Object[]{context, "7773661000888540d", "WanDouJia"});
+                new Class[]{Context.class, String.class, String.class}, new Object[]{context, BuildConfig.DEMO_APPKEY, "WanDouJia"});
     }
 
     //init umeng

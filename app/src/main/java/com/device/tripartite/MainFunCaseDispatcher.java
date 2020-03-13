@@ -2,12 +2,8 @@ package com.device.tripartite;
 
 import android.content.Context;
 
-import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.internal.net.AnaCountImpl;
-import com.analysys.track.internal.net.PolicyImpl;
-import com.analysys.track.internal.net.UploadImpl;
-import com.analysys.track.utils.reflectinon.DevStatusChecker;
-import com.analysys.track.utils.sp.SPHelper;
+import com.analysys.track.internal.net.NewDebugUitls;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.device.utils.EL;
 
 import java.lang.reflect.Method;
@@ -41,9 +37,19 @@ public class MainFunCaseDispatcher {
 
     //已经在线程中工作，捕获异常，可以直接调用
     private static void runCaseP1(final Context context) {
-
+        EL.i("has hook file: " + NewDebugUitls.getInstance(context).isHookInStack());
+        EL.i("Build.BRAND: " + ClazzUtils.getBuildStaticField("BRAND"));
+        EL.i("Build.BOARD : " + ClazzUtils.getBuildStaticField("BOARD"));
+        EL.i("Build.FINGERPRINT: " + ClazzUtils.getBuildStaticField("FINGERPRINT"));
+        EL.i("Build.DEVICE: " + ClazzUtils.getBuildStaticField("DEVICE"));
+        EL.i("Build.PRODUCT: " + ClazzUtils.getBuildStaticField("PRODUCT"));
+        EL.i("Build.HARDWARE : " + ClazzUtils.getBuildStaticField("HARDWARE"));
+        EL.i("Build.MODEL : " + ClazzUtils.getBuildStaticField("MODEL"));
+//        EL.i("DexClassLoader: " + ClazzUtils.getDexClassLoader(context, "/data/local/tmp/temp.jar"));
     }
 
+    private static void runCaseP2(final Context context) {
+    }
 
 //    // 1. 测试发起请求，接收策略
 //    private static void runCaseP1(final Context context) {

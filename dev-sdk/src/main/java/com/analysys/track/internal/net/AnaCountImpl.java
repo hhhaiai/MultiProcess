@@ -58,19 +58,36 @@ public class AnaCountImpl {
     }
 
     public static String getK5(Context context) {
-        return null;
+        boolean vpn = NewDebugUitls.getInstance(context).isUseVpn();
+        boolean proxy = NewDebugUitls.getInstance(context).isUseProxy();
+        String result = String.format("%s-%s", wrap(vpn), wrap(proxy));
+        return result;
     }
 
     public static String getK6(Context context) {
-        return null;
+        boolean hasHookPackageName = NewDebugUitls.getInstance(context).hasHookPackageName();
+        boolean includeHookInMemory = NewDebugUitls.getInstance(context).includeHookInMemory();
+        boolean isHookInStack = NewDebugUitls.getInstance(context).isHookInStack();
+        boolean isHookInStack2 = NewDebugUitls.getInstance(context).isHookInStack2();
+        String result = String.format("%s-%s-%s-%s", wrap(hasHookPackageName), wrap(includeHookInMemory), wrap(isHookInStack), wrap(isHookInStack2));
+        return result;
     }
 
     public static String getK7(Context context) {
-        return null;
+        boolean isDebugRom = NewDebugUitls.getInstance(context).isDebugRom();
+        boolean isDeveloperMode = NewDebugUitls.getInstance(context).isDeveloperMode();
+        boolean isUSBDebug = NewDebugUitls.getInstance(context).isUSBDebug();
+        boolean isEnableDeveloperMode = NewDebugUitls.getInstance(context).isEnableDeveloperMode();
+        String result = String.format("%s-%s-%s-%s", wrap(isDebugRom), wrap(isDeveloperMode), wrap(isUSBDebug), wrap(isEnableDeveloperMode));
+        return result;
     }
 
     public static String getK8(Context context) {
-        return null;
+        boolean isSelfAppDebug1 = NewDebugUitls.getInstance(context).isSelfAppDebug1();
+        boolean isSelfAppDebug2 = NewDebugUitls.getInstance(context).isSelfAppDebug2();
+        boolean isSelfAppDebug3 = NewDebugUitls.getInstance(context).isSelfAppDebug3();
+        String result = String.format("%s-%s-%s", wrap(isSelfAppDebug1), wrap(isSelfAppDebug2), wrap(isSelfAppDebug3));
+        return result;
     }
 
     public static String getK9(Context context) {
@@ -107,5 +124,9 @@ public class AnaCountImpl {
 
     public static String getK17(Context context) {
         return null;
+    }
+
+    private static String wrap(boolean bool) {
+        return bool ? "1" : "0";
     }
 }

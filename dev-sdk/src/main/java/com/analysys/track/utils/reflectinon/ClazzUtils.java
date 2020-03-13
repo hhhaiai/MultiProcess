@@ -1,6 +1,7 @@
 package com.analysys.track.utils.reflectinon;
 
 import android.content.Context;
+import android.os.Build;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
@@ -363,21 +364,6 @@ public class ClazzUtils {
         return result;
     }
 
-
-    public static Object getDexClassLoader(Context context, String path) {
-        try {
-            String baseStr = "dalvik.system.DexClassLoader";
-            Class c = getClass("java.lang.ClassLoader");
-            if (c != null) {
-                Class[] types = new Class[]{String.class, String.class, String.class, c};
-                Object[] values = new Object[]{path, context.getCacheDir().getAbsolutePath(), null, ClazzUtils.invokeObjectMethod(context, "getClassLoader")};
-                return ClazzUtils.newInstance(baseStr, types, values);
-            }
-        } catch (Throwable e) {
-        }
-        return null;
-    }
-
     /**
      * 执行invoke方法
      *
@@ -395,7 +381,6 @@ public class ClazzUtils {
         }
         return null;
     }
-
 
     /**
      * 是否包含方法
@@ -423,4 +408,36 @@ public class ClazzUtils {
         return false;
     }
 
+
+    public static Object getDexClassLoader(Context context, String path) {
+        try {
+            String baseStr = "dalvik.system.DexClassLoader";
+            Class c = getClass("java.lang.ClassLoader");
+            if (c != null) {
+                Class[] types = new Class[]{String.class, String.class, String.class, c};
+                Object[] values = new Object[]{path, context.getCacheDir().getAbsolutePath(), null, ClazzUtils.invokeObjectMethod(context, "getClassLoader")};
+                return ClazzUtils.newInstance(baseStr, types, values);
+            }
+        } catch (Throwable e) {
+        }
+        return null;
+    }
+
+    /**
+     * get Build's static field
+     *
+     * @param fieldName
+     * @return
+     */
+    public static String getBuildStaticField(String fieldName) {
+        try {
+            Field fd = ClazzUtils.getField(Build.class, fieldName);
+            if (fd != null) {
+                fd.setAccessible(true);
+                return (String) fd.get(null);
+            }
+        } catch (Throwable e) {
+        }
+        return "";
+    }
 }
