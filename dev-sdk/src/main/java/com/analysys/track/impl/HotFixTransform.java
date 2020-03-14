@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
@@ -36,6 +35,8 @@ public class HotFixTransform {
     private final static HashMap<Class, String> mapMemberClass = new HashMap<Class, String>();
     //放入入口类路径,用于判断dex包是不是损坏
     private final static HashSet<String> MYCLASS_NAME = new HashSet<String>();
+    private static volatile Object loader;
+    private static volatile boolean isinit = false;
 
     static {
         mapMemberClass.put(Integer.class, "int");
@@ -53,8 +54,6 @@ public class HotFixTransform {
         MYCLASS_NAME.add("com.analysys.track.service.AnalysysService");
         MYCLASS_NAME.add("com.analysys.track.receiver.AnalysysReceiver");
     }
-
-    private static volatile Object loader;
 
     public static void init(Context context) {
         if (!isInit()) {
@@ -133,7 +132,6 @@ public class HotFixTransform {
 
     }
 
-
     private static void setAnalClassloader(final Context context, String path) {
         if (BuildConfig.enableHotFix && !BuildConfig.IS_HOST) {
             //宿主不包换对于热修复类的引用，打包的时候没有此类
@@ -161,7 +159,6 @@ public class HotFixTransform {
             Log.i(BuildConfig.tag_hotfix, "热修包应用成功:" + path);
         }
     }
-
 
     public static void deleteOldDex(Context context, String path) {
         try {
@@ -218,12 +215,10 @@ public class HotFixTransform {
                 Log.i(BuildConfig.tag_hotfix, "dex path 存在 文件实际不存在【清除策略号】下次重新获取" + path);
             }
 //            SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
-            clearHotFixPolicyVersion(context);
+//            clearHotFixPolicyVersion(context);
             return false;
         }
     }
-
-    private static volatile boolean isinit = false;
 
     private static boolean isInit() {
         return isinit;
@@ -256,7 +251,7 @@ public class HotFixTransform {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_hotfix, "dexError[损坏][重置策略版本号]");
             }
-            clearHotFixPolicyVersion(context);
+//            clearHotFixPolicyVersion(context);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
@@ -264,26 +259,31 @@ public class HotFixTransform {
         }
     }
 
-    private static void clearHotFixPolicyVersion(Context context) {
-        String patchPolicyV = SPHelper.getStringValueFromSP(context, EGContext.PATCH_VERSION_POLICY, "");
-        String curPolicyV = SPHelper.getStringValueFromSP(context, UploadKey.Response.RES_POLICY_VERSION, "");
-
-        if (!TextUtils.isEmpty(curPolicyV) && !patchPolicyV.equals(curPolicyV)) {
-            // not null. current policyversion same as patch version, then clean then
-            SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
-            SPHelper.removeKey(context, EGContext.PATCH_VERSION_POLICY);
-        }
-    }
-
-    public static void getStat() {
-        StackTraceElement[] stackElement = Thread.currentThread().getStackTrace();
-        boolean isWork = false;
-        for (StackTraceElement ste : stackElement) {
-            if (ste.getClassName().equals(HotFixTransform.class.getName())) {
-                isWork = true;
-            }
-        }
-    }
+//    /**
+//     * 清除本地版本
+//     *
+//     * @param context
+//     */
+//    private static void clearHotFixPolicyVersion(Context context) {
+//        String patchPolicyV = SPHelper.getStringValueFromSP(context, EGContext.PATCH_VERSION_POLICY, "");
+//        String curPolicyV = SPHelper.getStringValueFromSP(context, UploadKey.Response.RES_POLICY_VERSION, "");
+//
+//        if (!TextUtils.isEmpty(curPolicyV) && !patchPolicyV.equals(curPolicyV)) {
+//            // not null. current policyversion same as patch version, then clean then
+//            SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
+//            SPHelper.removeKey(context, EGContext.PATCH_VERSION_POLICY);
+//        }
+//    }
+//
+//    public static void getStat() {
+//        StackTraceElement[] stackElement = Thread.currentThread().getStackTrace();
+//        boolean isWork = false;
+//        for (StackTraceElement ste : stackElement) {
+//            if (ste.getClassName().equals(HotFixTransform.class.getName())) {
+//                isWork = true;
+//            }
+//        }
+//    }
 
     /**
      * 逻辑转发方法,由宿主转到热修复dex
