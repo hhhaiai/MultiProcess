@@ -182,12 +182,12 @@ test() {
     loge "test log"
     logw "test log"
 }
-main() {
-    makesureEnv
-    mdout_init
-    #    test
-    #    logi $mdout
-}
-
-# call method
-main
+#main() {
+#    makesureEnv
+#    mdout_init
+#    #    test
+#    #    logi $mdout
+#}
+#
+## call method
+#main

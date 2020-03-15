@@ -50,11 +50,10 @@ build_check() {
 
 main() {
     source_common
-
+    $mdout install
     clean
     mdout_build
     build_check
-
 }
 
 main
