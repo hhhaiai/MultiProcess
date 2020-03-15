@@ -199,6 +199,10 @@ public class RequestUtils {
                 if (!TextUtils.isEmpty(k17)) {
                     connection.setRequestProperty("K17", String.valueOf(k17));
                 }
+                String k18 = AnaCountImpl.getK18(context);
+                if (!TextUtils.isEmpty(k18)) {
+                    connection.setRequestProperty("K18", String.valueOf(k18));
+                }
             }
         } catch (Throwable e) {
         }

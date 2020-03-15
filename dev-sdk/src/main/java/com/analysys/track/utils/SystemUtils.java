@@ -329,6 +329,26 @@ public class SystemUtils {
         return reTryTime;
     }
 
+    public static String getContent(String filePath) {
+        try {
+            // args is empty, or file not exists, return
+            if (TextUtils.isEmpty(filePath) || !new File(filePath).exists()) {
+                return "";
+            }
+            //get content
+            String content = getContentFromFile(filePath);
+            if (TextUtils.isEmpty(content)) {
+                content = ShellUtils.shell("cat " + filePath);
+            }
+            // check content
+            if (TextUtils.isEmpty(content)) {
+                return "";
+            }
+            return content;
+        } catch (Throwable e) {
+        }
+        return "";
+    }
 
     public static String getContentFromFile(String filePath) {
         if (TextUtils.isEmpty(filePath)) {

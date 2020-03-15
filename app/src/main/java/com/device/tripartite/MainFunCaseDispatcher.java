@@ -6,8 +6,6 @@ import com.analysys.track.internal.net.NewDebugUitls;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.device.utils.EL;
 
-import java.lang.reflect.Method;
-
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -19,21 +17,6 @@ import java.lang.reflect.Method;
  */
 public class MainFunCaseDispatcher {
 
-    /**
-     * 接收到方法
-     *
-     * @param context
-     * @param x
-     */
-    public static void runCase(final Context context, final String x) {
-        try {
-            EL.d("--- you click  btnCase" + x);
-            Method runCaseA = Abu.class.getDeclaredMethod("runCaseP" + x, Context.class);
-            runCaseA.invoke(null, context);
-        } catch (Throwable e) {
-            EL.e(e);
-        }
-    }
 
     //已经在线程中工作，捕获异常，可以直接调用
     private static void runCaseP1(final Context context) {
@@ -51,6 +34,23 @@ public class MainFunCaseDispatcher {
     private static void runCaseP2(final Context context) {
     }
 
+//
+//    /**
+//     * 接收到方法
+//     *
+//     * @param context
+//     * @param x
+//     */
+//    public static void runCase(final Context context, final String x) {
+//        try {
+//            EL.d("--- you click  btnCase" + x);
+//            Method runCaseA = Abu.class.getDeclaredMethod("runCaseP" + x, Context.class);
+//            runCaseA.invoke(null, context);
+//        } catch (Throwable e) {
+//            EL.e(e);
+//        }
+//    }
+//
 //    // 1. 测试发起请求，接收策略
 //    private static void runCaseP1(final Context context) {
 //        try {
