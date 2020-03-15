@@ -1,6 +1,6 @@
-# PAAS 流量审核SDK
+# **PAAS 流量审核SDK**
 
-## 版本变动
+## **版本变动**
 
 * **版本号**: `默认版本号`
 * **版本变动**:
@@ -8,18 +8,18 @@
     2. 优化性能
 
 
-### 1. 拷贝jar到对应项目中.
+### **1. 拷贝jar到对应项目中**
 
-#### Eclipse SDK 集成
-将需要的 jar 包拷贝到本地工程 libs 子目录下；在Eclipse中右键工程根目录，选择 property —> Java Build Path —> Libraries ，然后点击 Add External JARs... 选择指向 jar 的路径，点击 OK，即导入成功。（ADT17 及以上不需要手动导入）
+#### **Eclipse SDK 集成**
+将需要的`jar`包拷贝到本地工程`libs`子目录下；在`Eclipse`中右键工程根目录，选择 `property`—> `Java Build Path` —> `Libraries` ，然后点击 `Add External JARs...` 选择指向 `jar` 的路径，点击 `OK`，即导入成功。（`ADT17` 及以上不需要手动导入）
 
-#### AndroidStudio SDK 集成
-选择 SDK 功能组件并下载，解压.zip 文件得到相应 jar 包（例如：x.x.x.jar等），在 Android Studio 的项目工程 libs 目录中拷入相关组件 jar 包。
-右键 Android Studio 的项目工程; 选择 Open Module Settings → 在 Project Structure 弹出框中 → 选择 Dependencies 选项卡 → 点击左下"＋" → 选择 jar 包类型 → 引入相应的 jar 包。
+#### **AndroidStudio SDK 集成**
+选择`SDK`功能组件并下载，解压`*.zip` 文件得到相应`jar` 包（例如：`x.x.x.jar`等），在 `Android Studio` 的项目工程 `libs` 目录中拷入相关组件 `jar` 包。
+右键 `Android Studio` 的项目工程; 选择 `Open Module Settings` → 在 `Project Structure` 弹出框中 → 选择 `Dependencies` 选项卡 → 点击左下"＋" → 选择 `jar`包类型 → 引入相应的 `jar` 包。
 
-### 2. 配置Manifest
+### **2. 配置Manifest**
 
-#### 2.1. 权限配置
+#### **2.1. 权限配置**
 
 
 ``` xml
@@ -52,7 +52,7 @@
 |  android.permission.BLUETOOTH       |  允许应用程序读取蓝牙MAC  |
 |  android.permission.WRITE_SETTINGS      |  允许应用程序读取或写入系统设置
 
-#### 2.2. 组件声明
+#### **2.2. 组件声明**
 
 ``` xml
  <!-- 必须集成 -->
@@ -88,7 +88,7 @@
    </intent-filter>
 </service>
 ```
-#### 2.3. 声明APPKEY/CHANNEL（可选）
+#### **2.3. 声明APPKEY/CHANNEL**
 
 多渠道打包，可以参考使用该方案声明
 
@@ -102,7 +102,7 @@
     android:value="WanDouJia" />
 ```
 
-### 3. 初始化接口
+### **3. 初始化接口**
 
 ``` java
 AnalysysTracker.init(Context context, String appkey,  String channel);
@@ -125,7 +125,7 @@ AnalysysTracker.init(context,"appkey","channel");
 需要在应用的自定义的Application类的onCreate函数里面调用。appkey允许xml设置和代码设置两种方式，当两种都设置时，优先级`代码设置appkey`优先级高于`XML设置appkey`
 
 
-### 4. 混淆保护
+### **4. 混淆保护**
 
 如果您启用了混淆，请在你的proguard-rules.pro中加入防止混淆的配置.示例如下：
 
@@ -137,12 +137,13 @@ AnalysysTracker.init(context,"appkey","channel");
 -dontwarn com.analysys.track.**
 ```
 
-android 10可以获取的有效ID减少，为解决该问题可以集成了[MSA SDK](http://www.msa-alliance.cn)。 如您已经集成，需要添加以下防混淆配置:
-```
+`android 10`可以获取的有效ID减少，为解决该问题可以集成了[MSA SDK](http://www.msa-alliance.cn)。 如您已经集成，需要添加以下防混淆配置:
+
+``` proguard
 -keep class com.bun.miitmdid.core.** {*;}
 ```
 
-### 5. 适配Android P及以上版本网络
+### **5. 适配Android P及以上版本网络**
 
 android P之后版本默认不支持HTTP通讯,为保证正常使用，建议在AndroidMainfest.xml中增加`usesCleartextTraffic`配置。 示例如下:
 
@@ -173,11 +174,11 @@ android P之后版本默认不支持HTTP通讯,为保证正常使用，建议在
   />
 ```
 
-### 6. 分包支持
+### **6. 分包支持**
 
 如果您使用了谷歌的混淆, 请进行如下设置, 将sdk的代码都生成到主dex。 示例如下:
 
-* build.gradle
+* **`build.gradle`**
 
 ``` groovy
 android {
@@ -190,7 +191,7 @@ android {
 }
 ```
 
-* multidex-config.pro
+* **`multidex-config.pro`**
 
 ``` groovy
 -keep class com.analysys.track.** { *; }
