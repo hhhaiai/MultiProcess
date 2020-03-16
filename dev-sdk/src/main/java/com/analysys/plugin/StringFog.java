@@ -59,9 +59,6 @@ public class StringFog {
                     Log.e(BuildConfig.tag_stringfog, Log.getStackTraceString(e));
                 }
             }
-//            if (EGContext.FLAG_DEBUG_INNER) {
-//                Log.d(BuildConfig.tag_stringfog + "1", "[key=" + key + "][" + data + "]-->[" + null + "]");
-//            }
             return "";
         }
 

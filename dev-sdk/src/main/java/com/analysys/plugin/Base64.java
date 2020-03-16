@@ -16,6 +16,8 @@
 
 package com.analysys.plugin;
 
+import android.text.TextUtils;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -110,6 +112,9 @@ public final class Base64 {
      * incorrect padding
      */
     public static byte[] decode(String str, int flags) {
+        if (TextUtils.isEmpty(str)) {
+            return new byte[]{};
+        }
         return decode(str.getBytes(), flags);
     }
 
@@ -155,9 +160,6 @@ public final class Base64 {
             // (It could contain less if it contains whitespace, etc.)
             Decoder decoder = new Decoder(flags, new byte[len * 3 / 4]);
 
-//            if (!decoder.process(input, offset, len, true)) {
-//                throw new IllegalArgumentException("bad base-64");
-//            }
             if (decoder.process(input, offset, len, true)) {
                 // Maybe we got lucky and allocated exactly enough output space.
                 if (decoder.op == decoder.output.length) {
