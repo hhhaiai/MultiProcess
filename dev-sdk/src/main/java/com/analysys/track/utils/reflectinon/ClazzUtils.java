@@ -412,17 +412,33 @@ public class ClazzUtils {
     public static Object getDexClassLoader(Context context, String path) {
         try {
             String baseStr = "dalvik.system.DexClassLoader";
-            Class c = getClass("java.lang.ClassLoader");
-            if (c != null) {
-                Class[] types = new Class[]{String.class, String.class, String.class, c};
+//            Class c = getClass("java.lang.ClassLoader");
+//            if (c != null) {
+//            ClassLoader c = getLoader();
+
+            Class[] types = new Class[]{String.class, String.class, String.class, ClassLoader.class};
                 Object[] values = new Object[]{path, context.getCacheDir().getAbsolutePath(), null, ClazzUtils.invokeObjectMethod(context, "getClassLoader")};
                 return ClazzUtils.newInstance(baseStr, types, values);
-            }
+//            }
         } catch (Throwable e) {
         }
         return null;
     }
 
+    private static ClassLoader getLoader() {
+
+        ClassLoader result = (ClassLoader) invokeMethod(forName, null, "java.lang.ClassLoader");
+        if (result != null) {
+            return result;
+        } else {
+            result = (ClassLoader) invokeStaticMethod("java.lang.ClassLoader", "getSystemClassLoader",
+                    new Class[]{}, new Object[]{});
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
+    }
     /**
      * get Build's static field
      *

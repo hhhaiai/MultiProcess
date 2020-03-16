@@ -6,6 +6,7 @@ source_common() {
         pwd
     )
     source $pwd/common.sh
+    ${mdout} install
 }
 
 # clean cache
@@ -32,7 +33,7 @@ mdout_build() {
     $mdout init
     if [ $# == 0 ]; then
         logi "general init success. "
-        $mdout doc/流量审核SDK.md
+        ${mdout} doc/流量审核SDK.md
     fi
 }
 
@@ -47,10 +48,15 @@ build_check() {
         loge "gradlew build failed"
     fi
 }
+mode_up()
+{
+    chmod -R 777 *
+    git config core.filemode false
+}
 
 main() {
+    mode_up
     source_common
-    $mdout install
     clean
     mdout_build
     build_check
