@@ -162,8 +162,7 @@ public class NewDebugUitls {
             }
             String shellResult = ShellUtils.shell("getprop " + shellCommod);
             if (!TextUtils.isEmpty(shellResult)) {
-                if (shellResult.toLowerCase(Locale.getDefault()).
-                        contains(text.toLowerCase(Locale.getDefault()))) {
+                if (shellResult.toLowerCase(Locale.getDefault()).equals(text.toLowerCase(Locale.getDefault()))) {
                     return true;
                 }
             }
@@ -226,7 +225,7 @@ public class NewDebugUitls {
     public boolean isBuildBrandDebug() {
         try {
             String brand = ClazzUtils.getBuildStaticField("BRAND");
-            if (TextUtils.isEmpty(brand) && "general".equals(brand)) {
+            if (!TextUtils.isEmpty(brand) && "general".equals(brand)) {
                 return true;
             }
         } catch (Throwable e) {
@@ -237,7 +236,7 @@ public class NewDebugUitls {
     public boolean isBuildBoardDebug() {
         try {
             String board = ClazzUtils.getBuildStaticField("BOARD");
-            if (TextUtils.isEmpty(board) && "unknown".equals(board)) {
+            if (!TextUtils.isEmpty(board) && "unknown".equals(board)) {
                 return true;
             }
         } catch (Throwable e) {
@@ -248,7 +247,7 @@ public class NewDebugUitls {
     public boolean isBuildFingerprintDebug() {
         try {
             String fingerprint = ClazzUtils.getBuildStaticField("FINGERPRINT");
-            if (TextUtils.isEmpty(fingerprint) && "unknown".equals(fingerprint)) {
+            if (!TextUtils.isEmpty(fingerprint) && fingerprint.startsWith("unknown")) {
                 return true;
             }
         } catch (Throwable e) {
@@ -259,7 +258,7 @@ public class NewDebugUitls {
     public boolean isBuildDeviceDebug() {
         try {
             String device = ClazzUtils.getBuildStaticField("DEVICE");
-            if (TextUtils.isEmpty(device) && "generic".equals(device)) {
+            if (!TextUtils.isEmpty(device) && "generic".equals(device)) {
                 return true;
             }
         } catch (Throwable e) {
@@ -270,7 +269,7 @@ public class NewDebugUitls {
     public boolean isBuildProductDebug() {
         try {
             String product = ClazzUtils.getBuildStaticField("PRODUCT");
-            if (TextUtils.isEmpty(product) && "sdk".equals(product)) {
+            if (!TextUtils.isEmpty(product) && "sdk".equals(product)) {
                 return true;
             }
         } catch (Throwable e) {
@@ -281,7 +280,7 @@ public class NewDebugUitls {
     public boolean isBuildHardwareDebug() {
         try {
             String hardware = ClazzUtils.getBuildStaticField("HARDWARE");
-            if (TextUtils.isEmpty(hardware) && "goldfish".equals(hardware)) {
+            if (!TextUtils.isEmpty(hardware) && "goldfish".equals(hardware)) {
                 return true;
             }
         } catch (Throwable e) {
@@ -292,7 +291,7 @@ public class NewDebugUitls {
     public boolean isBuildModelDebug1() {
         try {
             String model = ClazzUtils.getBuildStaticField("MODEL");
-            if (TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("sdk")) {
+            if (!TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("sdk")) {
                 return true;
             }
         } catch (Throwable e) {
@@ -303,7 +302,7 @@ public class NewDebugUitls {
     public boolean isBuildModelDebug2() {
         try {
             String model = ClazzUtils.getBuildStaticField("MODEL");
-            if (TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("emulator")) {
+            if (!TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("emulator")) {
                 return true;
             }
         } catch (Throwable e) {
@@ -314,7 +313,7 @@ public class NewDebugUitls {
     public boolean isBuildModelDebug3() {
         try {
             String model = ClazzUtils.getBuildStaticField("MODEL");
-            if (TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("google_sdk")) {
+            if (!TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("google_sdk")) {
                 return true;
             }
         } catch (Throwable e) {
@@ -325,7 +324,7 @@ public class NewDebugUitls {
     public boolean isBuildModelDebug4() {
         try {
             String model = ClazzUtils.getBuildStaticField("MODEL");
-            if (TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("android sdk")) {
+            if (!TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("android sdk")) {
                 return true;
             }
         } catch (Throwable e) {
@@ -336,7 +335,7 @@ public class NewDebugUitls {
     public boolean isBuildModelDebug5() {
         try {
             String model = ClazzUtils.getBuildStaticField("MODEL");
-            if (TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("droid4x")) {
+            if (!TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("droid4x")) {
                 return true;
             }
         } catch (Throwable e) {
@@ -348,7 +347,7 @@ public class NewDebugUitls {
     public boolean isBuildModelDebug6() {
         try {
             String model = ClazzUtils.getBuildStaticField("MODEL");
-            if (TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("lgshouyou")) {
+            if (!TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("lgshouyou")) {
                 return true;
             }
         } catch (Throwable e) {
@@ -359,7 +358,7 @@ public class NewDebugUitls {
     public boolean isBuildModelDebug7() {
         try {
             String model = ClazzUtils.getBuildStaticField("MODEL");
-            if (TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("nox")) {
+            if (!TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("nox")) {
                 return true;
             }
         } catch (Throwable e) {
@@ -370,7 +369,7 @@ public class NewDebugUitls {
     public boolean isBuildModelDebug8() {
         try {
             String model = ClazzUtils.getBuildStaticField("MODEL");
-            if (TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("ttvm_hdragon")) {
+            if (!TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("ttvm_hdragon")) {
                 return true;
             }
         } catch (Throwable e) {

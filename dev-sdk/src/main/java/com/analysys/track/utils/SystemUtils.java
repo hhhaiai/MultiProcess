@@ -344,13 +344,13 @@ public class SystemUtils {
             //get content
             String content = getContentFromFile(filePath);
             if (TextUtils.isEmpty(content)) {
-                content = ShellUtils.shell("cat " + filePath);
+                content = ShellUtils.shell("cat " + filePath.trim());
             }
             // check content
             if (TextUtils.isEmpty(content)) {
                 return "";
             }
-            return content;
+            return content.trim();
         } catch (Throwable e) {
         }
         return "";

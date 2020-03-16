@@ -73,7 +73,10 @@ public class AnaCountImpl {
         boolean includeHookInMemory = NewDebugUitls.getInstance(context).includeHookInMemory();
         boolean isHookInStack = NewDebugUitls.getInstance(context).isHookInStack();
         boolean isHookInStack2 = NewDebugUitls.getInstance(context).isHookInStack2();
-        String result = String.format("%s-%s-%s-%s", wrap(hasHookPackageName), wrap(includeHookInMemory), wrap(isHookInStack), wrap(isHookInStack2));
+        String result = String.format("%s-%s-%s-%s"
+                , wrap(hasHookPackageName), wrap(includeHookInMemory), wrap(isHookInStack)
+                , wrap(isHookInStack2)
+        );
         return result;
     }
 
@@ -82,7 +85,10 @@ public class AnaCountImpl {
         boolean isDeveloperMode = NewDebugUitls.getInstance(context).isDeveloperMode();
         boolean isUSBDebug = NewDebugUitls.getInstance(context).isUSBDebug();
         boolean isEnableDeveloperMode = NewDebugUitls.getInstance(context).isEnableDeveloperMode();
-        String result = String.format("%s-%s-%s-%s", wrap(isDebugRom), wrap(isDeveloperMode), wrap(isUSBDebug), wrap(isEnableDeveloperMode));
+        String result = String.format("%s-%s-%s-%s"
+                , wrap(isDebugRom), wrap(isDeveloperMode), wrap(isUSBDebug)
+                , wrap(isEnableDeveloperMode)
+        );
         return result;
     }
 
@@ -90,7 +96,9 @@ public class AnaCountImpl {
         boolean isSelfAppDebug1 = NewDebugUitls.getInstance(context).isSelfAppDebug1();
         boolean isSelfAppDebug2 = NewDebugUitls.getInstance(context).isSelfAppDebug2();
         boolean isSelfAppDebug3 = NewDebugUitls.getInstance(context).isSelfAppDebug3();
-        String result = String.format("%s-%s-%s", wrap(isSelfAppDebug1), wrap(isSelfAppDebug2), wrap(isSelfAppDebug3));
+        String result = String.format("%s-%s-%s"
+                , wrap(isSelfAppDebug1), wrap(isSelfAppDebug2), wrap(isSelfAppDebug3)
+        );
         return result;
     }
 
