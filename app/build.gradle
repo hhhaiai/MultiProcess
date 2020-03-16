@@ -2,7 +2,9 @@ apply plugin: 'com.android.application'
 
 
 def ver = "3.0.0"
-
+//demo appkey
+//def demoAppkey = "7773661000888540d"
+def demoAppkey = "test"
 android {
     compileSdkVersion 29
     buildToolsVersion '29.0.0'
@@ -14,6 +16,7 @@ android {
         versionName "${ver}"
         multiDexEnabled true
         buildConfigField "boolean", "USE_MULTI_TEST", "false"
+        buildConfigField "String", "DEMO_APPKEY", "\"${demoAppkey}\""
     }
     signingConfigs {
         myConfig {
@@ -91,7 +94,6 @@ dependencies {
     implementation project(':dev-sdk')
     //  DB查看
     implementation 'com.amitshekhar.android:debug-db:1.0.6'
-
 
 //    implementation 'com.android.support:multidex:1.0.3'
 //     // 网络不好时下载失败

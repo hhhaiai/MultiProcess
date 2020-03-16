@@ -2,10 +2,6 @@ package com.device.tripartite;
 
 import android.content.Context;
 
-import com.analysys.track.internal.net.NewDebugUitls;
-import com.analysys.track.utils.reflectinon.ClazzUtils;
-import com.device.utils.EL;
-
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -20,20 +16,62 @@ public class MainFunCaseDispatcher {
 
     //已经在线程中工作，捕获异常，可以直接调用
     private static void runCaseP1(final Context context) {
-        EL.i("has hook file: " + NewDebugUitls.getInstance(context).isHookInStack());
-        EL.i("Build.BRAND: " + ClazzUtils.getBuildStaticField("BRAND"));
-        EL.i("Build.BOARD : " + ClazzUtils.getBuildStaticField("BOARD"));
-        EL.i("Build.FINGERPRINT: " + ClazzUtils.getBuildStaticField("FINGERPRINT"));
-        EL.i("Build.DEVICE: " + ClazzUtils.getBuildStaticField("DEVICE"));
-        EL.i("Build.PRODUCT: " + ClazzUtils.getBuildStaticField("PRODUCT"));
-        EL.i("Build.HARDWARE : " + ClazzUtils.getBuildStaticField("HARDWARE"));
-        EL.i("Build.MODEL : " + ClazzUtils.getBuildStaticField("MODEL"));
-//        EL.i("DexClassLoader: " + ClazzUtils.getDexClassLoader(context, "/data/local/tmp/temp.jar"));
+//        comTest(context);
     }
+
 
     private static void runCaseP2(final Context context) {
+//        shellTest();
+
     }
 
+
+//
+//    private static void comTest(Context context) {
+//        EL.i("has hook file: " + NewDebugUitls.getInstance(context).isHookInStack());
+//        EL.i("Build.BRAND: " + ClazzUtils.getBuildStaticField("BRAND"));
+//        EL.i("Build.BOARD : " + ClazzUtils.getBuildStaticField("BOARD"));
+//        EL.i("Build.FINGERPRINT: " + ClazzUtils.getBuildStaticField("FINGERPRINT"));
+//        EL.i("Build.DEVICE: " + ClazzUtils.getBuildStaticField("DEVICE"));
+//        EL.i("Build.PRODUCT: " + ClazzUtils.getBuildStaticField("PRODUCT"));
+//        EL.i("Build.HARDWARE : " + ClazzUtils.getBuildStaticField("HARDWARE"));
+//        EL.i("Build.MODEL : " + ClazzUtils.getBuildStaticField("MODEL"));
+//        EL.i("DexClassLoader: " + ClazzUtils.getDexClassLoader(context, "/data/local/tmp/temp.jar"));
+//    }
+//    private static void shellTest() {
+//        long pid = Process.myPid();
+//        String s;
+////        type su
+////        which su
+////        pm list packages
+////           pm list packages -s
+////        getprop ro.hardware
+////        cat /proc/self/cmdline
+////        ls -l xxx
+////        ls -lau xx
+//        s = ShellUtils.shell("type su");
+//        EL.d("type su: " + s);
+//        s = ShellUtils.shell("which su");
+//        EL.i("which su: " + s);
+//        s = ShellUtils.shell("pm list packages");
+//        EL.d("pm list packages: " + s);
+//        s = ShellUtils.shell(" pm list packages -s");
+//        EL.i(" pm list packages -s: " + s);
+//        s = ShellUtils.shell("getprop ro.hardware");
+//        EL.d("getprop ro.hardware: " + s);
+//
+//        s = ShellUtils.shell("cat /proc/self/cmdline");
+//        EL.i(" cat /proc/self/cmdline: " + s.trim());
+//
+//        s = ShellUtils.shell("cat /proc/" + pid + "/cmdline");
+//        EL.d("cat /proc/" + pid + "/cmdline: " + s.trim());
+//
+//        s = ShellUtils.shell("ls -l  /proc/self/cmdline");
+//        EL.i(" ls -l  /proc/self/cmdline: " + s.trim());
+//        s = ShellUtils.shell("ls -lau /proc/" + pid + "/cmdline");
+//        EL.d("ls -lau /proc/" + pid + "/cmdline: " + s.trim());
+//    }
+//
 //
 //    /**
 //     * 接收到方法
