@@ -6,7 +6,6 @@ import com.analysys.track.BuildConfig;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
@@ -26,6 +25,15 @@ public class ShellUtils {
      * @return
      */
     public static String shell(String cmd) {
+//          pm list packages
+//           pm list packages -s
+//        getprop
+//        type su
+//        which su
+//        getprop ro.hardware
+//        cat /xxx/
+//
+
 
         return backShellOldMethod(cmd);
 //        return execCommand(new String[]{cmd});
@@ -33,95 +41,100 @@ public class ShellUtils {
 
 
     public static String exec(String[] exec) {
+//        cat /proc/xx/status
+//        cat /proc/xx/cmdline
+//        cat /proc/self/cmdline
+//        ls -l xxx
+//        ls -lau xx
 
-        return backOldMethod(exec);
+//        return backOldMethod(exec);
 
-//        StringBuffer sb = new StringBuffer();
-//        for (String s : exec) {
-//            sb.append(s).append(" ");
+        StringBuffer sb = new StringBuffer();
+        for (String s : exec) {
+            sb.append(s).append(" ");
+        }
+        return backShellOldMethod(sb.toString());
+    }
+
+
+//    /**
+//     * 支持多个语句的shell
+//     *
+//     * @param commands 每一个元素都是语句shell.示例 new String[]{"type su"}.
+//     * @return
+//     */
+//    public static String execCommand(String[] commands) {
+//        if (commands == null || commands.length == 0) {
+//            return "";
 //        }
-//        return execCommand(new String[]{sb.toString()});
-    }
-
-
-    /**
-     * 支持多个语句的shell
-     *
-     * @param commands 每一个元素都是语句shell.示例 new String[]{"type su"}.
-     * @return
-     */
-    public static String execCommand(String[] commands) {
-        if (commands == null || commands.length == 0) {
-            return "";
-        }
-
-        Process process = null;
-        BufferedReader successResult = null;
-        InputStreamReader reader = null;
-        InputStream is = null;
-        DataOutputStream os = null;
-//        BufferedReader errorResult = null;
-        StringBuilder resultSb = new StringBuilder();
-        try {
-            process = Runtime.getRuntime().exec("sh");
-            os = new DataOutputStream(process.getOutputStream());
-            for (String command : commands) {
-                if (command == null) {
-                    continue;
-                }
-
-                // donnot use os.writeBytes(commmand), avoid chinese charset
-                // error
-                os.write(command.getBytes());
-                os.writeBytes("\n");
-                os.flush();
-            }
-            os.writeBytes("exit\n");
-            os.flush();
-
-//            // top等循环打印指令，可能导致死等
-//            process.waitFor();
-
-            is = process.getInputStream();
-            reader = new InputStreamReader(is);
-            successResult = new BufferedReader(reader);
-            String s;
-            while ((s = successResult.readLine()) != null) {
-                resultSb.append(s).append("\n");
-            }
-//            // shell执行错误
-//            if (resultSb.length() <= 0) {
-//                // failed
-//                errorResult = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-//                while ((s = errorResult.readLine()) != null) {
-//                    resultSb.append(s);
+//
+//        Process process = null;
+//        BufferedReader successResult = null;
+//        InputStreamReader reader = null;
+//        InputStream is = null;
+//        DataOutputStream os = null;
+////        BufferedReader errorResult = null;
+//        StringBuilder resultSb = new StringBuilder();
+//        try {
+//            process = Runtime.getRuntime().exec("sh");
+//            os = new DataOutputStream(process.getOutputStream());
+//            for (String command : commands) {
+//                if (command == null) {
+//                    continue;
 //                }
+//
+//                // donnot use os.writeBytes(commmand), avoid chinese charset
+//                // error
+//                os.write(command.getBytes());
+//                os.writeBytes("\n");
+//                os.flush();
 //            }
-            if (resultSb.length() > 0) {
-                String sss = resultSb.toString();
-                return sss.substring(0, s.length() - 1);
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        } finally {
-
-            StreamerUtils.safeClose(os);
-            StreamerUtils.safeClose(is);
-            StreamerUtils.safeClose(reader);
-            StreamerUtils.safeClose(successResult);
-//            if (process != null) {
-//                process.destroy();
+//            os.writeBytes("exit\n");
+//            os.flush();
+//
+////            // top等循环打印指令，可能导致死等
+////            process.waitFor();
+//
+//            is = process.getInputStream();
+//            reader = new InputStreamReader(is);
+//            successResult = new BufferedReader(reader);
+//            String s;
+//            while ((s = successResult.readLine()) != null) {
+//                resultSb.append(s).append("\n");
 //            }
-        }
-        if (resultSb.length() > 0) {
-//        L.w("执行[ " + Arrays.asList(commands) + " ], 结果: " + resultSb.toString());
-            return resultSb.toString();
-        } else {
-            return "";
-        }
-    }
+////            // shell执行错误
+////            if (resultSb.length() <= 0) {
+////                // failed
+////                errorResult = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+////                while ((s = errorResult.readLine()) != null) {
+////                    resultSb.append(s);
+////                }
+////            }
+//            if (resultSb.length() > 0) {
+//                String sss = resultSb.toString();
+//                return sss.substring(0, s.length() - 1);
+//            }
+//        } catch (Throwable e) {
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(e);
+//            }
+//        } finally {
+//
+//            StreamerUtils.safeClose(os);
+//            StreamerUtils.safeClose(is);
+//            StreamerUtils.safeClose(reader);
+//            StreamerUtils.safeClose(successResult);
+////            if (process != null) {
+////                process.destroy();
+////            }
+//        }
+//        if (resultSb.length() > 0) {
+////        L.w("执行[ " + Arrays.asList(commands) + " ], 结果: " + resultSb.toString());
+//            return resultSb.toString();
+//        } else {
+//            return "";
+//        }
+//    }
 
 
     private static String backShellOldMethod(String cmd) {
@@ -133,10 +146,12 @@ public class ShellUtils {
         BufferedInputStream in = null;
         BufferedReader br = null;
         InputStreamReader is = null;
+        InputStream ii = null;
         StringBuilder sb = new StringBuilder();
         try {
             proc = Runtime.getRuntime().exec(cmd);
-            in = new BufferedInputStream(proc.getInputStream());
+            ii = proc.getInputStream();
+            in = new BufferedInputStream(ii);
             is = new InputStreamReader(in);
             br = new BufferedReader(is);
             String line = "";
@@ -152,46 +167,44 @@ public class ShellUtils {
                 BugReportForTest.commitError(e);
             }
         } finally {
+            StreamerUtils.safeClose(ii);
             StreamerUtils.safeClose(br);
             StreamerUtils.safeClose(is);
             StreamerUtils.safeClose(in);
-//            if (proc != null) {
-//                proc.destroy();
-//            }
         }
         return result;
     }
 
-    private static String backOldMethod(String[] exec) {
-        StringBuilder sb = new StringBuilder();
-        Process process = null;
-        ProcessBuilder processBuilder = new ProcessBuilder(exec);
-        BufferedReader bufferedReader = null;
-        InputStreamReader isr = null;
-        InputStream is = null;
-        try {
-            process = processBuilder.start();
-            is = process.getInputStream();
-            isr = new InputStreamReader(is);
-            bufferedReader = new BufferedReader(isr);
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                sb.append(line).append("\n");
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        } finally {
-            StreamerUtils.safeClose(is);
-            StreamerUtils.safeClose(isr);
-            StreamerUtils.safeClose(bufferedReader);
-//            StreamerUtils.safeClose(processBuilder);
-//            if (process != null) {
-//                process.destroy();
+//    private static String backOldMethod(String[] exec) {
+//        StringBuilder sb = new StringBuilder();
+//        Process process = null;
+//        ProcessBuilder processBuilder = new ProcessBuilder(exec);
+//        BufferedReader bufferedReader = null;
+//        InputStreamReader isr = null;
+//        InputStream is = null;
+//        try {
+//            process = processBuilder.start();
+//            is = process.getInputStream();
+//            isr = new InputStreamReader(is);
+//            bufferedReader = new BufferedReader(isr);
+//            String line;
+//            while ((line = bufferedReader.readLine()) != null) {
+//                sb.append(line).append("\n");
 //            }
-        }
-
-        return String.valueOf(sb);
-    }
+//        } catch (Throwable e) {
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(e);
+//            }
+//        } finally {
+//            StreamerUtils.safeClose(is);
+//            StreamerUtils.safeClose(isr);
+//            StreamerUtils.safeClose(bufferedReader);
+////            StreamerUtils.safeClose(processBuilder);
+////            if (process != null) {
+////                process.destroy();
+////            }
+//        }
+//
+//        return String.valueOf(sb);
+//    }
 }

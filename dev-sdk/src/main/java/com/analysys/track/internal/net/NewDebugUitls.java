@@ -160,7 +160,7 @@ public class NewDebugUitls {
             if (TextUtils.isEmpty(shellCommod) || TextUtils.isEmpty(text)) {
                 return false;
             }
-            String shellResult = ShellUtils.shell(shellCommod);
+            String shellResult = ShellUtils.shell("getprop " + shellCommod);
             if (!TextUtils.isEmpty(shellResult)) {
                 if (shellResult.toLowerCase(Locale.getDefault()).
                         contains(text.toLowerCase(Locale.getDefault()))) {
