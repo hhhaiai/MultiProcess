@@ -6,8 +6,11 @@ import com.analysys.track.BuildConfig;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -18,6 +21,15 @@ import java.io.InputStreamReader;
  * @author: sanbo
  */
 public class ShellUtils {
+
+    public static String exec(String[] exec) {
+        StringBuffer sb = new StringBuffer();
+        for (String s : exec) {
+            sb.append(s).append(" ");
+        }
+        return shell(sb.toString());
+    }
+
     /**
      * 执行shell指令
      *
@@ -25,37 +37,107 @@ public class ShellUtils {
      * @return
      */
     public static String shell(String cmd) {
-//          pm list packages
-//           pm list packages -s
-//        getprop
-//        type su
-//        which su
-//        getprop ro.hardware
-//        cat /xxx/
-//
-
-
-        return backShellOldMethod(cmd);
-//        return execCommand(new String[]{cmd});
-    }
-
-
-    public static String exec(String[] exec) {
-//        cat /proc/xx/status
-//        cat /proc/xx/cmdline
-//        cat /proc/self/cmdline
-//        ls -l xxx
-//        ls -lau xx
-
-//        return backOldMethod(exec);
-
-        StringBuffer sb = new StringBuffer();
-        for (String s : exec) {
-            sb.append(s).append(" ");
+        if (TextUtils.isEmpty(cmd)) {
+            return "";
         }
-        return backShellOldMethod(sb.toString());
+        return getResultString(cmd);
     }
 
+    private static String getResultString(String cmd) {
+        String result = "";
+        Process proc = null;
+        BufferedInputStream in = null;
+        BufferedReader br = null;
+        InputStreamReader is = null;
+        InputStream ii = null;
+        StringBuilder sb = new StringBuilder();
+        DataOutputStream os = null;
+        try {
+            proc = Runtime.getRuntime().exec("sh");
+
+            os = new DataOutputStream(proc.getOutputStream());
+
+            // donnot use os.writeBytes(commmand), avoid chinese charset error
+            os.write(cmd.getBytes());
+            os.writeBytes("\n");
+            os.flush();
+            os.writeBytes("exit\n");
+            os.flush();
+            ii = proc.getInputStream();
+            in = new BufferedInputStream(ii);
+            is = new InputStreamReader(in);
+            br = new BufferedReader(is);
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+            if (sb.length() > 0) {
+                return sb.substring(0, sb.length() - 1);
+            }
+            result = String.valueOf(sb);
+            if (!TextUtils.isEmpty(result)) {
+                result = result.trim();
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
+        } finally {
+            StreamerUtils.safeClose(ii);
+            StreamerUtils.safeClose(br);
+            StreamerUtils.safeClose(is);
+            StreamerUtils.safeClose(in);
+            StreamerUtils.safeClose(os);
+        }
+
+        return result;
+    }
+
+
+    public static List<String> getResultArrays(String cmd) {
+        if (TextUtils.isEmpty(cmd)) {
+            return null;
+        }
+        List<String> result = new ArrayList<String>();
+        Process proc = null;
+        BufferedInputStream in = null;
+        BufferedReader br = null;
+        InputStreamReader is = null;
+        InputStream ii = null;
+        StringBuilder sb = new StringBuilder();
+        DataOutputStream os = null;
+        try {
+            proc = Runtime.getRuntime().exec("sh");
+            os = new DataOutputStream(proc.getOutputStream());
+            // donnot use os.writeBytes(commmand), avoid chinese charset error
+            os.write(cmd.getBytes());
+            os.writeBytes("\n");
+            os.flush();
+            os.writeBytes("exit\n");
+            os.flush();
+            ii = proc.getInputStream();
+            in = new BufferedInputStream(ii);
+            is = new InputStreamReader(in);
+            br = new BufferedReader(is);
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                if (!TextUtils.isEmpty(line) && !result.contains(line.trim())) {
+                    result.add(line.trim());
+                }
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
+        } finally {
+            StreamerUtils.safeClose(ii);
+            StreamerUtils.safeClose(br);
+            StreamerUtils.safeClose(is);
+            StreamerUtils.safeClose(in);
+            StreamerUtils.safeClose(os);
+        }
+        return result;
+    }
 
 //    /**
 //     * 支持多个语句的shell
@@ -135,46 +217,8 @@ public class ShellUtils {
 //            return "";
 //        }
 //    }
-
-
-    private static String backShellOldMethod(String cmd) {
-        String result = "";
-        if (TextUtils.isEmpty(cmd)) {
-            return result;
-        }
-        Process proc = null;
-        BufferedInputStream in = null;
-        BufferedReader br = null;
-        InputStreamReader is = null;
-        InputStream ii = null;
-        StringBuilder sb = new StringBuilder();
-        try {
-            proc = Runtime.getRuntime().exec(cmd);
-            ii = proc.getInputStream();
-            in = new BufferedInputStream(ii);
-            is = new InputStreamReader(in);
-            br = new BufferedReader(is);
-            String line = "";
-            while ((line = br.readLine()) != null) {
-                sb.append(line).append("\n");
-            }
-            if (sb.length() > 0) {
-                return sb.substring(0, sb.length() - 1);
-            }
-            result = String.valueOf(sb);
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        } finally {
-            StreamerUtils.safeClose(ii);
-            StreamerUtils.safeClose(br);
-            StreamerUtils.safeClose(is);
-            StreamerUtils.safeClose(in);
-        }
-        return result;
-    }
-
+//
+//
 //    private static String backOldMethod(String[] exec) {
 //        StringBuilder sb = new StringBuilder();
 //        Process process = null;
