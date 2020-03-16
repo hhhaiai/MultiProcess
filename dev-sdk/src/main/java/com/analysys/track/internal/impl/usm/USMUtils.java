@@ -260,13 +260,18 @@ public class USMUtils {
 //         */
 //        UsageStatsManager usm = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
 //        List<UsageStats> uss = usm.queryUsageStats( UsageStatsManager.INTERVAL_BEST, beginTime, endTime);
-        try {
-            return (List<UsageStats>) ClazzUtils.invokeObjectMethod(context.getApplicationContext()
-                            .getSystemService(Context.USAGE_STATS_SERVICE), "queryUsageStats",
-                    new Class[]{int.class, long.class, long.class}, new Object[]{UsageStatsManager.INTERVAL_BEST, beginTime, endTime});
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_snap, e);
+        for (int i = UsageStatsManager.INTERVAL_BEST; i == 0; i--) {
+            try {
+                List<UsageStats> lus = (List<UsageStats>) ClazzUtils.invokeObjectMethod(context.getApplicationContext()
+                                .getSystemService(Context.USAGE_STATS_SERVICE), "queryUsageStats",
+                        new Class[]{int.class, long.class, long.class}, new Object[]{i, beginTime, endTime});
+                if (lus != null && lus.size() > 0) {
+                    return lus;
+                }
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
+                    BugReportForTest.commitError(BuildConfig.tag_snap, e);
+                }
             }
         }
         return null;
@@ -298,19 +303,24 @@ public class USMUtils {
 
             for (String pkg : pkgs) {
                 try {
-                    try {
-                        // 返回值android.content.pm.ParceledListSlice
-                        Object parceledListSlice = ClazzUtils.invokeObjectMethod(mService, "queryUsageStats",
-                                new Class[]{int.class, long.class, long.class, String.class},
-                                new Object[]{UsageStatsManager.INTERVAL_BEST, beginTime, endTime, pkg}
-                        );
-                        //                    Log.d("sanbo", "getUsageStatsListByInvoke [" + pkg + "]---:" + parceledListSlice);
-                        if (parceledListSlice != null) {
-                            return (List<UsageStats>) ClazzUtils.invokeObjectMethod(parceledListSlice, "getList");
-                        }
-                    } catch (Throwable e) {
-                        if (BuildConfig.ENABLE_BUG_REPORT) {
-                            BugReportForTest.commitError(BuildConfig.tag_snap, e);
+                    for (int i = UsageStatsManager.INTERVAL_BEST; i == 0; i--) {
+                        try {
+                            // 返回值android.content.pm.ParceledListSlice
+                            Object parceledListSlice = ClazzUtils.invokeObjectMethod(mService, "queryUsageStats",
+                                    new Class[]{int.class, long.class, long.class, String.class},
+                                    new Object[]{i, beginTime, endTime, pkg}
+                            );
+                            // Log.d("sanbo", "getUsageStatsListByInvoke [" + pkg + "]---:" + parceledListSlice);
+                            if (parceledListSlice != null) {
+                                List<UsageStats> lus = (List<UsageStats>) ClazzUtils.invokeObjectMethod(parceledListSlice, "getList");
+                                if (lus != null && lus.size() > 0) {
+                                    return lus;
+                                }
+                            }
+                        } catch (Throwable e) {
+                            if (BuildConfig.ENABLE_BUG_REPORT) {
+                                BugReportForTest.commitError(BuildConfig.tag_snap, e);
+                            }
                         }
                     }
                 } catch (Throwable e) {
