@@ -25,16 +25,19 @@ public class AnalysysTracker {
      * @param channel
      */
     public static void init(Context context, String appKey, String channel) {
-        AnalysysTracker.setContext(context);
-        if (BuildConfig.enableHotFix) {
-            try {
-                HotFixTransform.transform(null, AnalysysTracker.class.getName(), "init", context, appKey, channel);
-                return;
-            } catch (Throwable e) {
+        try {
+            AnalysysTracker.setContext(context);
+            if (BuildConfig.enableHotFix) {
+                try {
+                    HotFixTransform.transform(null, AnalysysTracker.class.getName(), "init", context, appKey, channel);
+                    return;
+                } catch (Throwable e) {
 
+                }
             }
+            AnalysysInternal.getInstance(context).initEguan(appKey, channel, true);
+        } catch (Throwable e) {
         }
-        AnalysysInternal.getInstance(context).initEguan(appKey, channel, true);
     }
 
 
@@ -43,17 +46,20 @@ public class AnalysysTracker {
      *
      * @param isDebug
      */
+    @Deprecated
     public static void setDebugMode(Context context, boolean isDebug) {
-        AnalysysTracker.setContext(context);
-        if (BuildConfig.enableHotFix) {
-            try {
-                HotFixTransform.transform(null, AnalysysTracker.class.getName(), "setDebugMode", context, isDebug);
-                return;
-            } catch (Throwable e) {
-
+        try {
+            AnalysysTracker.setContext(context);
+            if (BuildConfig.enableHotFix) {
+                try {
+                    HotFixTransform.transform(null, AnalysysTracker.class.getName(), "setDebugMode", context, isDebug);
+                    return;
+                } catch (Throwable e) {
+                }
             }
+            EGContext.FLAG_DEBUG_USER = isDebug;
+        } catch (Throwable e) {
         }
-        EGContext.FLAG_DEBUG_USER = isDebug;
     }
 
     public static void setContext(Context context) {

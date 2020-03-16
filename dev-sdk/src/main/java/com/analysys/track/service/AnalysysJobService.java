@@ -28,51 +28,59 @@ public class AnalysysJobService extends JobService {
 
     @Override
     public boolean onStartJob(final JobParameters params) {
-        AnalysysTracker.setContext(this);
-        if (BuildConfig.enableHotFix) {
-            try {
-                Boolean aBoolean = HotFixTransform.transform(
-                        HotFixTransform.make(AnalysysJobService.class.getName())
-                        , AnalysysJobService.class.getName()
-                        , "onStartJob", params);
-                if (aBoolean != null) {
-                    return aBoolean;
-                }
-            } catch (Throwable e) {
+        try {
+            //禁止灰色 api logcat
+            ClazzUtils.unseal();
+            AnalysysTracker.setContext(this);
+            if (BuildConfig.enableHotFix) {
+                try {
+                    Boolean aBoolean = HotFixTransform.transform(
+                            HotFixTransform.make(AnalysysJobService.class.getName())
+                            , AnalysysJobService.class.getName()
+                            , "onStartJob", params);
+                    if (aBoolean != null) {
+                        return aBoolean;
+                    }
+                } catch (Throwable e) {
 
+                }
             }
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i("AnalysysJobService onStartJob");
+            }
+            // 传递Context。防止因为Context缺失导致的调用异常
+            AnalysysInternal.getInstance(null);
+            MessageDispatcher.getInstance(null).initModule();
+        } catch (Throwable e) {
         }
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i("AnalysysJobService onStartJob");
-        }
-        //禁止灰色 api logcat
-        ClazzUtils.unseal();
-        // 传递Context。防止因为Context缺失导致的调用异常
-        AnalysysInternal.getInstance(null);
-        MessageDispatcher.getInstance(null).initModule();
         return false;
     }
 
     @Override
     public boolean onStopJob(JobParameters params) {
-        AnalysysTracker.setContext(this);
-        if (BuildConfig.enableHotFix) {
-            try {
-                Boolean aBoolean = HotFixTransform.transform(
-                        HotFixTransform.make(AnalysysJobService.class.getName())
-                        , AnalysysJobService.class.getName()
-                        , "onStopJob", params);
-                if (aBoolean != null) {
-                    return aBoolean;
-                }
-            } catch (Throwable e) {
+        try {
+            //禁止灰色 api logcat
+            ClazzUtils.unseal();
+            AnalysysTracker.setContext(this);
+            if (BuildConfig.enableHotFix) {
+                try {
+                    Boolean aBoolean = HotFixTransform.transform(
+                            HotFixTransform.make(AnalysysJobService.class.getName())
+                            , AnalysysJobService.class.getName()
+                            , "onStopJob", params);
+                    if (aBoolean != null) {
+                        return aBoolean;
+                    }
+                } catch (Throwable e) {
 
+                }
             }
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i("AnalysysJobService onStopJob");
+            }
+            ServiceHelper.getInstance(EContextHelper.getContext()).startSelfService();
+        } catch (Throwable e) {
         }
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i("AnalysysJobService onStopJob");
-        }
-        ServiceHelper.getInstance(EContextHelper.getContext()).startSelfService();
         return false;
     }
 

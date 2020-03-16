@@ -27,94 +27,107 @@ public class AnalysysService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        AnalysysTracker.setContext(this);
-        if (BuildConfig.enableHotFix) {
-            try {
-                IBinder iBinder = HotFixTransform.transform(
-                        HotFixTransform.make(AnalysysService.class.getName())
-                        , AnalysysService.class.getName()
-                        , "onBind", intent);
-                if (iBinder != null) {
-                    return iBinder;
-                }
-            } catch (Throwable e) {
+        try {
+            //禁止灰色 api logcat
+            ClazzUtils.unseal();
+            AnalysysTracker.setContext(this);
+            if (BuildConfig.enableHotFix) {
+                try {
+                    IBinder iBinder = HotFixTransform.transform(
+                            HotFixTransform.make(AnalysysService.class.getName())
+                            , AnalysysService.class.getName()
+                            , "onBind", intent);
+                    if (iBinder != null) {
+                        return iBinder;
+                    }
+                } catch (Throwable e) {
 
+                }
             }
+        } catch (Throwable e) {
         }
-        //禁止灰色 api logcat
-        ClazzUtils.unseal();
         return null;
     }
 
     @Override
     public void onCreate() {
-        AnalysysTracker.setContext(this);
-        if (BuildConfig.enableHotFix) {
-            try {
-                HotFixTransform.transform(
-                        HotFixTransform.make(AnalysysService.class.getName())
-                        , AnalysysService.class.getName()
-                        , "onCreate");
-                return;
-            } catch (Throwable e) {
+        try {
+            //禁止灰色 api logcat
+            ClazzUtils.unseal();
+            AnalysysTracker.setContext(this);
+            if (BuildConfig.enableHotFix) {
+                try {
+                    HotFixTransform.transform(
+                            HotFixTransform.make(AnalysysService.class.getName())
+                            , AnalysysService.class.getName()
+                            , "onCreate");
+                    return;
+                } catch (Throwable e) {
 
+                }
             }
-        }
-        //禁止灰色 api logcat
-        ClazzUtils.unseal();
-        super.onCreate();
+            super.onCreate();
 
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i("AnalysysService onCreate");
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i("AnalysysService onCreate");
+            }
+            AnalysysInternal.getInstance(EContextHelper.getContext());
+            MessageDispatcher.getInstance(EContextHelper.getContext()).initModule();
+        } catch (Throwable e) {
         }
-        AnalysysInternal.getInstance(EContextHelper.getContext());
-        MessageDispatcher.getInstance(EContextHelper.getContext()).initModule();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        AnalysysTracker.setContext(this);
+        try {
+            //禁止灰色 api logcat
+            ClazzUtils.unseal();
+            AnalysysTracker.setContext(this);
+            if (BuildConfig.enableHotFix) {
+                try {
+                    Integer o = HotFixTransform.transform(
+                            HotFixTransform.make(AnalysysService.class.getName())
+                            , AnalysysService.class.getName()
+                            , "onStartCommand", intent, flags, startId);
+                    if (o != null) {
+                        return o;
+                    }
+                    return Service.START_STICKY;
+                } catch (Throwable e) {
 
-        if (BuildConfig.enableHotFix) {
-            try {
-                Integer o = HotFixTransform.transform(
-                        HotFixTransform.make(AnalysysService.class.getName())
-                        , AnalysysService.class.getName()
-                        , "onStartCommand", intent, flags, startId);
-                if (o != null) {
-                    return o;
                 }
-                return Service.START_STICKY;
-            } catch (Throwable e) {
-
             }
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i("AnalysysService onStartCommand");
+            }
+        } catch (Throwable e) {
         }
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i("AnalysysService onStartCommand");
-        }
-        //禁止灰色 api logcat
-        ClazzUtils.unseal();
         return Service.START_STICKY;
     }
 
     @Override
     public void onDestroy() {
-        AnalysysTracker.setContext(this);
-        if (BuildConfig.enableHotFix) {
-            try {
-                HotFixTransform.transform(
-                        HotFixTransform.make(AnalysysService.class.getName())
-                        , AnalysysService.class.getName()
-                        , "onDestroy");
-                return;
-            } catch (Throwable e) {
+        try {
+            //禁止灰色 api logcat
+            ClazzUtils.unseal();
+            AnalysysTracker.setContext(this);
+            if (BuildConfig.enableHotFix) {
+                try {
+                    HotFixTransform.transform(
+                            HotFixTransform.make(AnalysysService.class.getName())
+                            , AnalysysService.class.getName()
+                            , "onDestroy");
+                    return;
+                } catch (Throwable e) {
 
+                }
             }
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i("AnalysysService onDestroy");
+            }
+            ServiceHelper.getInstance(EContextHelper.getContext()).startSelfService();
+        } catch (Throwable e) {
         }
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i("AnalysysService onDestroy");
-        }
-        ServiceHelper.getInstance(EContextHelper.getContext()).startSelfService();
         super.onDestroy();
     }
 }

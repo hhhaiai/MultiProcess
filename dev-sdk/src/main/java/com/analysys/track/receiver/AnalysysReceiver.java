@@ -37,6 +37,10 @@ public class AnalysysReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
+        processReceiver(context, intent);
+    }
+
+    private void processReceiver(Context context, Intent intent) {
         try {
             //禁止灰色 api logcat
             ClazzUtils.unseal();
@@ -57,13 +61,12 @@ public class AnalysysReceiver extends BroadcastReceiver {
 
                 }
             }
-            process(c, intent);
-
+            parserIntent(c, intent);
         } catch (Throwable e) {
         }
     }
 
-    private void process(Context context, Intent intent) {
+    private void parserIntent(Context context, Intent intent) {
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("AnalysysReceiver onReceive");
         }
