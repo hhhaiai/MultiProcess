@@ -114,7 +114,13 @@ public class SystemUtils {
      */
     public static boolean hasLaunchIntentForPackage(PackageManager manager, String packageName) {
         try {
-            if (manager == null || packageName == null) {
+            if (manager == null) {
+                Context c = EContextHelper.getContext();
+                if (c != null) {
+                    manager = c.getPackageManager();
+                }
+            }
+            if (manager == null || TextUtils.isEmpty(packageName)) {
                 return false;
             }
             if (catchPackage.contains(packageName)) {

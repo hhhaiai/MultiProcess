@@ -98,7 +98,7 @@ public class MultiProcessChecker {
      */
     public synchronized boolean setLockLastModifyTime(Context cxt, String fileName, long time) {
         try {
-            cxt = EContextHelper.getContext();
+            cxt = EContextHelper.getContext(cxt);
             if (cxt != null) {
                 File dev = new File(cxt.getFilesDir(), fileName);
                 if (!dev.exists()) {
@@ -152,7 +152,7 @@ public class MultiProcessChecker {
      */
     public synchronized boolean isNeedWorkByLockFile(Context cxt, String lock, long time, long now) {
         try {
-            cxt = EContextHelper.getContext();
+            cxt = EContextHelper.getContext(cxt);
             if (cxt == null) {
                 return false;
             }
