@@ -2,6 +2,12 @@ package com.device.tripartite;
 
 import android.content.Context;
 
+import com.analysys.track.utils.reflectinon.ClazzUtils;
+import com.device.utils.EL;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -17,6 +23,35 @@ public class MainFunCaseDispatcher {
     //已经在线程中工作，捕获异常，可以直接调用
     private static void runCaseP1(final Context context) {
 //        comTest(context);
+//        EL.i("----------runCaseP1-----------");
+//        Object obj = ClazzUtils.newInstance("com.android.internal.os.PowerProfile", new Class[]{Context.class}, new Object[]{context});
+//        EL.i("----------runCaseP1-----------obj:" + obj);
+//        int batteryCapacity = (String) ClazzUtils.invokeObjectMethod(obj, "getBatteryCapacity");
+//        EL.i("batteryCapacity: " + batteryCapacity);
+
+        EL.i("----------runCaseP1-----------");
+        try {
+            int bv = 2000;
+            String ppcstr = "com.android.internal.os.PowerProfile";
+            Class<?> classClz = Class.forName(ppcstr);
+            Constructor<?> constructor = classClz.getConstructor(Context.class);
+
+            Object newInstance = constructor.newInstance(context);
+            EL.i("----------runCaseP1----------newInstance：" + newInstance);
+            bv = (int) Double.parseDouble(classClz.getMethod("getBatteryCapacity").invoke(newInstance).toString());
+            EL.i("----------runCaseP1----------bv：" + bv);
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
     }
 
 

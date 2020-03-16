@@ -1,8 +1,11 @@
 package com.analysys.track.internal.net;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Process;
 import android.provider.Settings;
@@ -20,8 +23,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.net.NetworkInterface;
 import java.util.Arrays;
@@ -29,7 +32,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
+
+import static com.bun.miitmdid.core.JLibrary.context;
 
 /**
  * @Copyright © 2020 sanbo Inc. All rights reserved.
@@ -39,6 +43,129 @@ import java.util.Set;
  * @author: sanbo
  */
 public class NewDebugUitls {
+
+    public boolean isBluestacks() {
+        try {
+            List<String> known_bluestacks = Arrays.asList(
+                    "/data/app/com.bluestacks.appmart-1.apk", "/data/app/com.bluestacks.BstCommandProcessor-1.apk",
+                    "/data/app/com.bluestacks.help-1.apk", "/data/app/com.bluestacks.home-1.apk", "/data/app/com.bluestacks.s2p-1.apk",
+                    "/data/app/com.bluestacks.searchapp-1.apk", "/data/bluestacks.prop", "/data/data/com.androVM.vmconfig",
+                    "/data/data/com.bluestacks.accelerometerui", "/data/data/com.bluestacks.appfinder",
+                    "/data/data/com.bluestacks.appmart", "/data/data/com.bluestacks.appsettings",
+                    "/data/data/com.bluestacks.BstCommandProcessor", "/data/data/com.bluestacks.bstfolder",
+                    "/data/data/com.bluestacks.help", "/data/data/com.bluestacks.home",
+                    "/data/data/com.bluestacks.s2p", "/data/data/com.bluestacks.searchapp",
+                    "/data/data/com.bluestacks.settings", "/data/data/com.bluestacks.setup",
+                    "/data/data/com.bluestacks.spotlight", "/mnt/prebundledapps/bluestacks.prop.orig");
+
+            for (String blueStacks : known_bluestacks) {
+                if (new File(blueStacks).exists()) {
+                    return true;
+                }
+            }
+        } catch (Throwable e) {
+        }
+
+        return false;
+    }
+
+    /**
+     * 距离传感器
+     *
+     * @return
+     */
+    public boolean isHasNoProximitySensor() {
+        try {
+            SensorManager sm = (SensorManager) mContext.getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
+            if (sm != null) {
+                Sensor sensor = sm.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+                if (sensor == null) {
+                    return true;
+                }
+            }
+
+        } catch (Throwable e) {
+        }
+
+        return false;
+    }
+
+
+    /**
+     * 电池容量
+     *
+     * @return
+     */
+    public boolean isBatteryCapacity() {
+
+        try {
+            String ppcstr = "com.android.internal.os.PowerProfile";
+            Class<?> classClz = Class.forName(ppcstr);
+            Constructor<?> constructor = classClz.getConstructor(Context.class);
+
+            Object newInstance = constructor.newInstance(context);
+            int batteryCapacity = (int) Double.parseDouble(classClz.getMethod("getBatteryCapacity").invoke(newInstance).toString());
+            if (batteryCapacity > 1000) {
+                return true;
+            }
+        } catch (Throwable e) {
+        }
+        return false;
+    }
+
+    public boolean isHasNoLightSensor() {
+        try {
+            SensorManager sm = (SensorManager) mContext.getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
+            if (sm != null) {
+                Sensor sensor = sm.getDefaultSensor(Sensor.TYPE_LIGHT);
+                if (sensor == null) {
+                    return true;
+                }
+            }
+        } catch (Throwable e) {
+        }
+
+        return false;
+    }
+
+    public boolean isHasNoBluetooth() {
+        try {
+            if (BluetoothAdapter.getDefaultAdapter() == null) {
+                return true;
+            }
+        } catch (Throwable e) {
+        }
+        return false;
+    }
+
+    /**
+     * 基带检测
+     *
+     * @return true: 有基带
+     */
+    public boolean isHasNoBaseband() {
+
+        String gsm = ShellUtils.shell("getprop gsm.version.baseband");
+        if (TextUtils.isEmpty(gsm)) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isCpuMonitor() {
+
+        try {
+            String cpuinfo = SystemUtils.getContent("/proc/cpuinfo");
+            if (!TextUtils.isEmpty(cpuinfo)) {
+                if (isContains(cpuinfo, "intel") || isContains(cpuinfo, "amd")) {
+                    return true;
+                }
+            }
+        } catch (Throwable e) {
+        }
+        return false;
+    }
+
 
     /**
      * 容器判断1
@@ -288,6 +415,17 @@ public class NewDebugUitls {
         return false;
     }
 
+    public boolean isBuildTagDebug() {
+        try {
+            String tags = ClazzUtils.getBuildStaticField("TAGS");
+            if (!TextUtils.isEmpty(tags) && tags.contains("test-keys")) {
+                return true;
+            }
+        } catch (Throwable e) {
+        }
+        return false;
+    }
+
     public boolean isBuildModelDebug1() {
         try {
             String model = ClazzUtils.getBuildStaticField("MODEL");
@@ -393,7 +531,9 @@ public class NewDebugUitls {
 
     public boolean isSelfAppDebug2() {
         try {
-            if ("1".equals(ShellUtils.shell("getprop ro.debuggable"))) {
+            if (
+                    !"0".equals(ShellUtils.shell("getprop ro.debuggable "))
+                            || !"0".equals(ShellUtils.shell("getprop ro.debuggle "))) {
                 return true;
             }
         } catch (Throwable e) {

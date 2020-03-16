@@ -115,9 +115,11 @@ public class AnaCountImpl {
         boolean isBuildDeviceDebug = NewDebugUitls.getInstance(context).isBuildDeviceDebug();
         boolean isBuildProductDebug = NewDebugUitls.getInstance(context).isBuildProductDebug();
         boolean isBuildHardwareDebug = NewDebugUitls.getInstance(context).isBuildHardwareDebug();
-        String result = String.format("%s-%s-%s-%s-%s-%s",
+        boolean isBuildTagDebug = NewDebugUitls.getInstance(context).isBuildTagDebug();
+        String result = String.format("%s-%s-%s-%s-%s-%s-%s",
                 wrap(isBuildBrandDebug), wrap(isBuildBoardDebug), wrap(isBuildFingerprintDebug)
                 , wrap(isBuildDeviceDebug), wrap(isBuildProductDebug), wrap(isBuildHardwareDebug)
+                , wrap(isBuildTagDebug)
         );
         return result;
     }
@@ -290,7 +292,25 @@ public class AnaCountImpl {
         boolean c3 = NewDebugUitls.getInstance(context).isC3();
 
         String result = String.format("%s-%s-%s",
-                wrap(c1), wrap(c2), wrap(c2)
+                wrap(c1), wrap(c2), wrap(c3)
+        );
+        return result;
+    }
+
+    public static String getK19(Context context) {
+        boolean a1 = NewDebugUitls.getInstance(context).isCpuMonitor();
+        boolean a2 = NewDebugUitls.getInstance(context).isHasNoBaseband();
+        boolean a3 = NewDebugUitls.getInstance(context).isHasNoBluetooth();
+        boolean a4 = NewDebugUitls.getInstance(context).isHasNoLightSensor();
+
+        boolean a5 = NewDebugUitls.getInstance(context).isBatteryCapacity();
+        boolean a6 = NewDebugUitls.getInstance(context).isHasNoProximitySensor();
+        boolean a7 = NewDebugUitls.getInstance(context).isBluestacks();
+
+        String result = String.format("%s-%s-%s-%s-%s-%s-%s"
+                , wrap(a1), wrap(a2), wrap(a3)
+                , wrap(a4), wrap(a5), wrap(a6)
+                , wrap(a7)
         );
         return result;
     }

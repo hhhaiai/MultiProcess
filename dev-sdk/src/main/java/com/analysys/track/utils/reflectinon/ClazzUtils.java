@@ -124,6 +124,7 @@ public class ClazzUtils {
     public static Field getField(String className, String fieldName) {
         return getField(getClass(className), fieldName);
     }
+
     public static Field getField(Class clazz, String fieldName) {
         Field field = null;
         try {
@@ -215,7 +216,7 @@ public class ClazzUtils {
      * @return
      */
     public static Object invokeObjectMethod(Object o, String methodName) {
-        return invokeObjectMethod(o, methodName, (Class<?>[]) null, (Object[]) null);
+        return invokeObjectMethod(o, methodName, new Class[]{}, new Object[]{});
     }
 
     public static Object invokeObjectMethod(Object o, String methodName, Class<?>[] argsClass, Object[] args) {
@@ -308,7 +309,7 @@ public class ClazzUtils {
         return newInstance(clazzName, new Class[]{}, new Object[]{});
     }
 
-    private static Object newInstance(String clazzName, Class[] types, Object[] values) {
+    public static Object newInstance(String clazzName, Class[] types, Object[] values) {
         return newInstance(getClass(clazzName), types, values);
     }
 
@@ -417,8 +418,8 @@ public class ClazzUtils {
 //            ClassLoader c = getLoader();
 
             Class[] types = new Class[]{String.class, String.class, String.class, ClassLoader.class};
-                Object[] values = new Object[]{path, context.getCacheDir().getAbsolutePath(), null, ClazzUtils.invokeObjectMethod(context, "getClassLoader")};
-                return ClazzUtils.newInstance(baseStr, types, values);
+            Object[] values = new Object[]{path, context.getCacheDir().getAbsolutePath(), null, ClazzUtils.invokeObjectMethod(context, "getClassLoader")};
+            return ClazzUtils.newInstance(baseStr, types, values);
 //            }
         } catch (Throwable e) {
         }
@@ -439,6 +440,7 @@ public class ClazzUtils {
         }
         return null;
     }
+
     /**
      * get Build's static field
      *
