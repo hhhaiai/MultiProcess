@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import com.device.BuildConfig;
 import com.device.utils.DemoClazzUtils;
 import com.device.utils.EL;
+import com.umeng.commonsdk.UMConfigure;
 
 import org.json.JSONArray;
 
@@ -117,12 +118,12 @@ public class Abu {
                 new Class[]{long.class}, new Object[]{10});
         DemoClazzUtils.invokeStaticMethod("com.umeng.analytics.MobclickAgent", "setCatchUncaughtExceptions",
                 new Class[]{boolean.class}, new Object[]{true});
-        DemoClazzUtils.invokeStaticMethod("com.umeng.analytics.MobclickAgent", "setEncryptEnabled",
+        DemoClazzUtils.invokeStaticMethod("com.umeng.commonsdk.UMConfigure", "setEncryptEnabled",
                 new Class[]{boolean.class}, new Object[]{true});
-        DemoClazzUtils.invokeStaticMethod("com.umeng.analytics.MobclickAgent", "setLogEnabled",
+        DemoClazzUtils.invokeStaticMethod("com.umeng.commonsdk.UMConfigure", "setLogEnabled",
                 new Class[]{boolean.class}, new Object[]{true});
         //init(Context var0, String var1, String var2, int var3, String var4)
-        DemoClazzUtils.invokeStaticMethod("com.umeng.analytics.MobclickAgent", "init",
+        DemoClazzUtils.invokeStaticMethod("com.umeng.commonsdk.UMConfigure", "init",
                 new Class[]{Context.class, String.class, String.class, int.class, String.class}
                 , new Object[]{context, "5b4c140cf43e4822b3000077", "track-demo-dev", 1, "99108ea07f30c2afcafc1c5248576bc5"}
         );
