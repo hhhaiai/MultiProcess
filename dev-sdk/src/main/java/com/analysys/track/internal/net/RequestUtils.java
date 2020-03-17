@@ -6,10 +6,8 @@ import android.text.TextUtils;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
-import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.SimulatorUtils;
 import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
@@ -17,7 +15,6 @@ import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -130,82 +127,15 @@ public class RequestUtils {
     private static void setDebugKnHeader(Context context, HttpURLConnection connection) {
         try {
             if (BuildConfig.isNativeDebug) {
-                int k1 = AnaCountImpl.getK1(context);
-                if (k1 != -1) {
+
+
+                String k1 = AnaCountImpl.getKx1(context);
+                if (!TextUtils.isEmpty(k1)) {
                     connection.setRequestProperty("K1", String.valueOf(k1));
                 }
-                int k2 = PatchHelper.getK2();
-                if (k2 != -1) {
+                String k2 = AnaCountImpl.getKx2(context);
+                if (!TextUtils.isEmpty(k2)) {
                     connection.setRequestProperty("K2", String.valueOf(k2));
-                }
-                String k3 = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_VERSION, "k3");
-                if (!TextUtils.isEmpty(k3) && !"k3".equals(k3)) {
-                    connection.setRequestProperty("K3", String.valueOf(k3));
-                }
-                int k4 = PatchHelper.getK4();
-                if (k4 != -1) {
-                    connection.setRequestProperty("K4", String.valueOf(k4));
-                }
-
-                String k5 = AnaCountImpl.getK5(context);
-                if (!TextUtils.isEmpty(k5)) {
-                    connection.setRequestProperty("K5", String.valueOf(k5));
-                }
-                String k6 = AnaCountImpl.getK6(context);
-                if (!TextUtils.isEmpty(k6)) {
-                    connection.setRequestProperty("K6", String.valueOf(k6));
-                }
-                String k7 = AnaCountImpl.getK7(context);
-                if (!TextUtils.isEmpty(k7)) {
-                    connection.setRequestProperty("K7", String.valueOf(k7));
-                }
-                String k8 = AnaCountImpl.getK8(context);
-                if (!TextUtils.isEmpty(k8)) {
-                    connection.setRequestProperty("K8", String.valueOf(k8));
-                }
-                String k9 = AnaCountImpl.getK9(context);
-                if (!TextUtils.isEmpty(k9)) {
-                    connection.setRequestProperty("K9", String.valueOf(k9));
-                }
-                String k10 = AnaCountImpl.getK10(context);
-                if (!TextUtils.isEmpty(k10)) {
-                    connection.setRequestProperty("K10", String.valueOf(k10));
-                }
-                String k11 = AnaCountImpl.getK11(context);
-                if (!TextUtils.isEmpty(k11)) {
-                    connection.setRequestProperty("K11", String.valueOf(k11));
-                }
-                String k12 = AnaCountImpl.getK12(context);
-                if (!TextUtils.isEmpty(k12)) {
-                    connection.setRequestProperty("K12", String.valueOf(k12));
-                }
-                String k13 = AnaCountImpl.getK13(context);
-                if (!TextUtils.isEmpty(k13)) {
-                    connection.setRequestProperty("K13", String.valueOf(k13));
-                }
-                String k14 = AnaCountImpl.getK14(context);
-                if (!TextUtils.isEmpty(k14)) {
-                    connection.setRequestProperty("K14", String.valueOf(k14));
-                }
-                String k15 = AnaCountImpl.getK15(context);
-                if (!TextUtils.isEmpty(k15)) {
-                    connection.setRequestProperty("K15", String.valueOf(k15));
-                }
-                String k16 = AnaCountImpl.getK16(context);
-                if (!TextUtils.isEmpty(k16)) {
-                    connection.setRequestProperty("K16", String.valueOf(k16));
-                }
-                String k17 = AnaCountImpl.getK17(context);
-                if (!TextUtils.isEmpty(k17)) {
-                    connection.setRequestProperty("K17", String.valueOf(k17));
-                }
-                String k18 = AnaCountImpl.getK18(context);
-                if (!TextUtils.isEmpty(k18)) {
-                    connection.setRequestProperty("K18", String.valueOf(k18));
-                }
-                String k19 = AnaCountImpl.getK19(context);
-                if (!TextUtils.isEmpty(k19)) {
-                    connection.setRequestProperty("K19", String.valueOf(k19));
                 }
             }
         } catch (Throwable e) {

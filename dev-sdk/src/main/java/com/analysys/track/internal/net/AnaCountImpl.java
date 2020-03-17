@@ -3,12 +3,14 @@ package com.analysys.track.internal.net;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
+import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.File;
@@ -26,7 +28,30 @@ import javax.crypto.Cipher;
  * @author: sanbo
  */
 public class AnaCountImpl {
-    static int getK1(Context context) {
+    public static String getKx1(Context context) {
+        String k3 = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_VERSION, "");
+        String result = String.format("%s|%s|%s|%s"
+                , wrap(AnaCountImpl.getK1(context)), wrap(PatchHelper.getK2()), wrap(k3)
+                , wrap(PatchHelper.getK4())
+        );
+        Log.i("sanbo", "k1:" + result.length());
+        return result;
+    }
+
+    public static String getKx2(Context context) {
+
+        String result = String.format("%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s"
+                , wrap(getK5(context)), wrap(getK6(context)), wrap(getK7(context))
+                , wrap(getK8(context)), wrap(getK9(context)), wrap(getK10(context))
+                , wrap(getK11(context)), wrap(getK12(context)), wrap(getK13(context))
+                , wrap(getK14(context)), wrap(getK15(context)), wrap(getK16(context))
+                , wrap(getK17(context)), wrap(getK18(context)), wrap(getK19(context))
+        );
+        Log.i("sanbo", "k2:" + result.length());
+        return result;
+    }
+
+    private static int getK1(Context context) {
         try {
             File dir = new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR);
             String version = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_VERSION, "");
@@ -61,14 +86,16 @@ public class AnaCountImpl {
         return -1;
     }
 
-    public static String getK5(Context context) {
+
+    private static String getK5(Context context) {
         boolean vpn = NewDebugUitls.getInstance(context).isUseVpn();
         boolean proxy = NewDebugUitls.getInstance(context).isUseProxy();
         String result = String.format("%s-%s", wrap(vpn), wrap(proxy));
         return result;
     }
 
-    public static String getK6(Context context) {
+
+    private static String getK6(Context context) {
         boolean hasHookPackageName = NewDebugUitls.getInstance(context).hasHookPackageName();
         boolean includeHookInMemory = NewDebugUitls.getInstance(context).includeHookInMemory();
         boolean isHookInStack = NewDebugUitls.getInstance(context).isHookInStack();
@@ -80,7 +107,7 @@ public class AnaCountImpl {
         return result;
     }
 
-    public static String getK7(Context context) {
+    private static String getK7(Context context) {
         boolean isDebugRom = NewDebugUitls.getInstance(context).isDebugRom();
         boolean isDeveloperMode = NewDebugUitls.getInstance(context).isDeveloperMode();
         boolean isUSBDebug = NewDebugUitls.getInstance(context).isUSBDebug();
@@ -92,7 +119,7 @@ public class AnaCountImpl {
         return result;
     }
 
-    public static String getK8(Context context) {
+    private static String getK8(Context context) {
         boolean isSelfAppDebug1 = NewDebugUitls.getInstance(context).isSelfAppDebug1();
         boolean isSelfAppDebug2 = NewDebugUitls.getInstance(context).isSelfAppDebug2();
         boolean isSelfAppDebug3 = NewDebugUitls.getInstance(context).isSelfAppDebug3();
@@ -108,7 +135,7 @@ public class AnaCountImpl {
      * @param context
      * @return
      */
-    public static String getK9(Context context) {
+    private static String getK9(Context context) {
         boolean isBuildBrandDebug = NewDebugUitls.getInstance(context).isBuildBrandDebug();
         boolean isBuildBoardDebug = NewDebugUitls.getInstance(context).isBuildBoardDebug();
         boolean isBuildFingerprintDebug = NewDebugUitls.getInstance(context).isBuildFingerprintDebug();
@@ -124,7 +151,7 @@ public class AnaCountImpl {
         return result;
     }
 
-    public static String getK10(Context context) {
+    private static String getK10(Context context) {
         boolean isBuildModelDebug1 = NewDebugUitls.getInstance(context).isBuildModelDebug1();
         boolean isBuildModelDebug2 = NewDebugUitls.getInstance(context).isBuildModelDebug2();
         boolean isBuildModelDebug3 = NewDebugUitls.getInstance(context).isBuildModelDebug3();
@@ -142,7 +169,7 @@ public class AnaCountImpl {
         return result;
     }
 
-    public static String getK11(Context context) {
+    private static String getK11(Context context) {
         boolean isExistsF1 = NewDebugUitls.getInstance(context).isFileExists("/dev/socket/qemud");
         boolean isExistsF2 = NewDebugUitls.getInstance(context).isFileExists("/dev/qemu_pipe");
         boolean isExistsF3 = NewDebugUitls.getInstance(context).isFileExists("/system/lib/libc_malloc_debug_qemu.so");
@@ -164,7 +191,7 @@ public class AnaCountImpl {
         return result;
     }
 
-    public static String getK12(Context context) {
+    private static String getK12(Context context) {
         String content1 = SystemUtils.getContent("/proc/tty/drivers");
         boolean isContains1 = NewDebugUitls.getInstance(context).isContains(content1, "goldfish");
         boolean isContains2 = NewDebugUitls.getInstance(context).isContains(content1, "SDK");
@@ -186,7 +213,7 @@ public class AnaCountImpl {
         return result;
     }
 
-    public static String getK13(Context context) {
+    private static String getK13(Context context) {
         try {
             boolean hasFiled1 = ClazzUtils.getField(FileDescriptor.class, "name") == null;
             boolean hasFiled2 = ClazzUtils.getField(Cipher.class, "key") == null;
@@ -203,7 +230,7 @@ public class AnaCountImpl {
         return null;
     }
 
-    public static String getK14(Context context) {
+    private static String getK14(Context context) {
         boolean is1 = NewDebugUitls.getInstance(context).isSameByShell("ro.hardware", "goldfish");
         boolean is2 = NewDebugUitls.getInstance(context).isSameByShell("ro.hardware", "ranchu");
         boolean is3 = NewDebugUitls.getInstance(context).isSameByShell("ro.product.device", "generic");
@@ -216,7 +243,7 @@ public class AnaCountImpl {
         return result;
     }
 
-    public static String getK15(Context context) {
+    private static String getK15(Context context) {
         try {
             String f = SystemUtils.getContent("/system/build.prop");
             if (TextUtils.isEmpty(f)) {
@@ -236,7 +263,7 @@ public class AnaCountImpl {
         return null;
     }
 
-    public static String getK16(Context context) {
+    private static String getK16(Context context) {
         try {
             boolean isDebugUsb = EGContext.STATUS_USB_DEBUG;
 
@@ -260,7 +287,7 @@ public class AnaCountImpl {
         return null;
     }
 
-    public static String getK17(Context context) {
+    private static String getK17(Context context) {
 
         try {
             List<String> rootFiles = Arrays.asList("/sbin/su", "/system/bin/su", "/system/xbin/su", "/system/sbin/su", "/vendor/bin/su",
@@ -286,7 +313,7 @@ public class AnaCountImpl {
         return null;
     }
 
-    public static String getK18(Context context) {
+    private static String getK18(Context context) {
         boolean c1 = NewDebugUitls.getInstance(context).isC1();
         boolean c2 = NewDebugUitls.getInstance(context).isC2();
         boolean c3 = NewDebugUitls.getInstance(context).isC3();
@@ -297,7 +324,7 @@ public class AnaCountImpl {
         return result;
     }
 
-    public static String getK19(Context context) {
+    private static String getK19(Context context) {
         boolean a1 = NewDebugUitls.getInstance(context).isCpuMonitor();
         boolean a2 = NewDebugUitls.getInstance(context).isHasNoBaseband();
         boolean a3 = NewDebugUitls.getInstance(context).isHasNoBluetooth();
@@ -315,6 +342,19 @@ public class AnaCountImpl {
         return result;
     }
 
+    private static String wrap(int def) {
+        if (def == -1) {
+            return "";
+        }
+        return String.valueOf(def);
+    }
+
+    private static String wrap(String kVaue) {
+        if (TextUtils.isEmpty(kVaue)) {
+            return "";
+        }
+        return kVaue;
+    }
     private static String wrap(boolean bool) {
         return bool ? "1" : "0";
     }
