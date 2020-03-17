@@ -30,7 +30,7 @@ mdout_build() {
     logw "======================================="
     logw "========  will general doc ============"
     logw "======================================="
-    $mdout init
+#    $mdout init
     if [ $# == 0 ]; then
         logi "general init success. "
         ${mdout} doc/流量审核SDK.md
