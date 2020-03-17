@@ -779,8 +779,10 @@ public class DeviceImpl {
                 public void run() {
                     try {
                         AdvertisingIdClient.AdInfo adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);// 阻塞调用，需放在子线程处理
-                        String advertisingId = adInfo.getId();
-                        SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_IDFA, advertisingId);
+                        if (adInfo != null) {
+                            SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_IDFA, adInfo.getId());
+                        }
+
                     } catch (Throwable e) {
                     }
                 }

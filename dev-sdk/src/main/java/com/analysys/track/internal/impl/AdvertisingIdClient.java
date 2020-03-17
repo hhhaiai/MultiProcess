@@ -14,7 +14,6 @@ import android.os.RemoteException;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.BugReportForTest;
 
-import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -28,37 +27,33 @@ public class AdvertisingIdClient {
 
     public static AdInfo getAdvertisingIdInfo(Context context) throws Exception {
 
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            throw new IllegalStateException("Cannot be called from the main thread");
-        }
         try {
-            PackageManager pm = context.getPackageManager();
-            pm.getPackageInfo("com.android.vending", 0);
-        } catch (Exception e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
+            if (Looper.myLooper() == Looper.getMainLooper()) {
+                return null;
             }
-            throw e;
-        }
-
-        AdvertisingConnection connection = new AdvertisingConnection();
-        Intent intent = new Intent("com.google.android.gms.ads.identifier.service.START");
-        intent.setPackage("com.google.android.gms");
-        if (context.bindService(intent, connection, Context.BIND_AUTO_CREATE)) {
             try {
-                AdvertisingInterface adInterface = new AdvertisingInterface(connection.getBinder());
-                AdInfo adInfo = new AdInfo(adInterface.getId(), adInterface.isLimitAdTrackingEnabled(true));
-                return adInfo;
-            } catch (Exception exception) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(exception);
-                }
-                throw exception;
-            } finally {
-                context.unbindService(connection);
+                PackageManager pm = context.getPackageManager();
+                pm.getPackageInfo("com.android.vending", 0);
+            } catch (Throwable e) {
+                return null;
             }
+
+            AdvertisingConnection connection = new AdvertisingConnection();
+            Intent intent = new Intent("com.google.android.gms.ads.identifier.service.START");
+            intent.setPackage("com.google.android.gms");
+            if (context.bindService(intent, connection, Context.BIND_AUTO_CREATE)) {
+                try {
+                    AdvertisingInterface adInterface = new AdvertisingInterface(connection.getBinder());
+                    AdInfo adInfo = new AdInfo(adInterface.getId(), adInterface.isLimitAdTrackingEnabled(true));
+                    return adInfo;
+                } catch (Exception exception) {
+                } finally {
+                    context.unbindService(connection);
+                }
+            }
+        } catch (Throwable e) {
         }
-        throw new IOException("Google Play connection failed");
+        return null;
     }
 
     public static final class AdInfo {
