@@ -417,31 +417,16 @@ public class ClazzUtils {
 
     public static Object getDexClassLoader(Context context, String path) {
         try {
-            String baseStr = "dalvik.system.DexClassLoader";
-//            Class c = getClass("java.lang.ClassLoader");
-//            if (c != null) {
-//            ClassLoader c = getLoader();
-
-            Class[] types = new Class[]{String.class, String.class, String.class, ClassLoader.class};
-            Object[] values = new Object[]{path, context.getCacheDir().getAbsolutePath(), null, ClazzUtils.invokeObjectMethod(context, "getClassLoader")};
-            return ClazzUtils.newInstance(baseStr, types, values);
-//            }
-        } catch (Throwable e) {
-        }
-        return null;
-    }
-
-    private static ClassLoader getLoader() {
-
-        ClassLoader result = (ClassLoader) invokeMethod(forName, null, "java.lang.ClassLoader");
-        if (result != null) {
-            return result;
-        } else {
-            result = (ClassLoader) invokeStaticMethod("java.lang.ClassLoader", "getSystemClassLoader",
-                    new Class[]{}, new Object[]{});
-            if (result != null) {
-                return result;
+            String dc = "dalvik.system.DexClassLoader";
+            Class c = getClass("java.lang.ClassLoader");
+            if (c != null) {
+//            Object c = getLoader();
+//            Class[] types = new Class[]{String.class, String.class, String.class, ClassLoader.class};
+                Class[] types = new Class[]{String.class, String.class, String.class, c};
+                Object[] values = new Object[]{path, context.getCacheDir().getAbsolutePath(), null, invokeObjectMethod(context, "getClassLoader")};
+                return ClazzUtils.newInstance(dc, types, values);
             }
+        } catch (Throwable e) {
         }
         return null;
     }
@@ -463,4 +448,19 @@ public class ClazzUtils {
         }
         return "";
     }
+
+//
+//    public static Class<?> getLoader(Context ctx) {
+//
+//        Object result = ClazzUtils.invokeObjectMethod(ctx, "getClassLoader");
+//        if (result == null) {
+//            result = invokeStaticMethod("java.lang.ClassLoader", "getSystemClassLoader",
+//                    new Class[]{}, new Object[]{});
+//        }
+//        if (result != null) {
+//            return result.getClass();
+//        } else {
+//            return invokeMethod(forName, null, "java.lang.ClassLoader").getClass();
+//        }
+//    }
 }

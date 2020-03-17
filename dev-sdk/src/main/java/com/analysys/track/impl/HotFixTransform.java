@@ -133,30 +133,33 @@ public class HotFixTransform {
     }
 
     private static void setAnalClassloader(final Context context, String path) {
-        if (BuildConfig.enableHotFix && !BuildConfig.IS_HOST) {
-            //宿主不包换对于热修复类的引用，打包的时候没有此类
-            abeg0.class.getName();
-        }
-        Object dexClassLoader = ClazzUtils.getDexClassLoader(context, path);
-        Class analysysThisClazz = (Class) ClazzUtils.invokeObjectMethod(dexClassLoader,
-                "loadClass",
-                new Class[]{String.class}, new Object[]{"com.analysys.track.impl.abeg0"});
-        if (analysysThisClazz == null) {
-            dexError(context);
-            return;
-        }
-        Class<?> clazzLoader = ClazzUtils.getClass("java.lang.ClassLoader");
-        if (clazzLoader != null) {
-            loader = ClazzUtils.newInstance(analysysThisClazz,
-                    new Class[]{String.class, String.class, String.class, clazzLoader
-                    },
-                    new Object[]{path, context.getCacheDir().getAbsolutePath(), null, ClazzUtils.
-                            invokeObjectMethod(context, "getClassLoader")
-                    });
-        }
+        try {
+            if (BuildConfig.enableHotFix && !BuildConfig.IS_HOST) {
+                //宿主不包换对于热修复类的引用，打包的时候没有此类
+                abeg0.class.getName();
+            }
+            Object dexClassLoader = ClazzUtils.getDexClassLoader(context, path);
+            Class analysysThisClazz = (Class) ClazzUtils.invokeObjectMethod(dexClassLoader,
+                    "loadClass",
+                    new Class[]{String.class}, new Object[]{"com.analysys.track.impl.abeg0"});
+            if (analysysThisClazz == null) {
+                dexError(context);
+                return;
+            }
+            Class<?> clazzLoader = ClazzUtils.getClass("java.lang.ClassLoader");
+            if (clazzLoader != null) {
+                loader = ClazzUtils.newInstance(analysysThisClazz,
+                        new Class[]{String.class, String.class, String.class, clazzLoader
+                        },
+                        new Object[]{path, context.getCacheDir().getAbsolutePath(), null, ClazzUtils.
+                                invokeObjectMethod(context, "getClassLoader")
+                        });
+            }
 
-        if (EGContext.FLAG_DEBUG_INNER) {
-            Log.i(BuildConfig.tag_hotfix, "热修包应用成功:" + path);
+            if (EGContext.FLAG_DEBUG_INNER) {
+                Log.i(BuildConfig.tag_hotfix, "热修包应用成功:" + path);
+            }
+        } catch (Throwable e) {
         }
     }
 
