@@ -5,8 +5,7 @@ source_common() {
         cd $(dirname $0)
         pwd
     )
-    source $pwd/common.sh
-    ${mdout} install
+    sh $pwd/common.sh mdout
 }
 
 # clean cache

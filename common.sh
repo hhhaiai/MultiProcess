@@ -189,5 +189,16 @@ test() {
 #    #    logi $mdout
 #}
 #
-## call method
+### call method
 #main
+
+
+#logd $0
+#logd $1
+if [ -n "$1" ]; then
+    # loge "not null"
+    chmod -R 777 tools/
+    # git config core.filemode false
+    $mdout install
+fi
+
