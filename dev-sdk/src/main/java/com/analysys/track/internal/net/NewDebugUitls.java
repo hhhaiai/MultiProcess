@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.InputStreamReader;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.net.NetworkInterface;
 import java.util.Arrays;
@@ -99,12 +98,9 @@ public class NewDebugUitls {
     public boolean isBatteryCapacity() {
 
         try {
-            String ppcstr = "com.android.internal.os.PowerProfile";
-            Class<?> classClz = Class.forName(ppcstr);
-            Constructor<?> constructor = classClz.getConstructor(Context.class);
-
-            Object newInstance = constructor.newInstance(context);
-            int batteryCapacity = (int) Double.parseDouble(classClz.getMethod("getBatteryCapacity").invoke(newInstance).toString());
+            Object c = ClazzUtils.newInstance("com.android.internal.os.PowerProfile",
+                    new Class[]{Context.class}, new Object[]{context});
+            int batteryCapacity = (int) Double.parseDouble(ClazzUtils.invokeObjectMethod(c, "getBatteryCapacity").toString());
             if (batteryCapacity > 1000) {
                 return true;
             }

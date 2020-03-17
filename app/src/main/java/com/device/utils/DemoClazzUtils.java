@@ -1,7 +1,12 @@
 package com.device.utils;
 
 import android.content.Context;
+import android.os.Build;
 import android.text.TextUtils;
+
+import com.analysys.track.BuildConfig;
+import com.analysys.track.utils.BugReportForTest;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -18,6 +23,7 @@ import static android.os.Build.VERSION.SDK_INT;
  * @mail: miqingtang@analysys.com.cn
  */
 public class DemoClazzUtils {
+
     private static Method forName;
     private static Method getDeclaredMethod;
     private static Method getMethod;
@@ -100,6 +106,10 @@ public class DemoClazzUtils {
             if (method != null) {
                 method.setAccessible(true);
                 return method;
+            } else {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
+                    BugReportForTest.commitError(new Exception(clazz.getName() + methodName + "not found !"));
+                }
             }
         } catch (Throwable e) {
         }
@@ -208,7 +218,7 @@ public class DemoClazzUtils {
      * @return
      */
     public static Object invokeObjectMethod(Object o, String methodName) {
-        return invokeObjectMethod(o, methodName, (Class<?>[]) null, (Object[]) null);
+        return invokeObjectMethod(o, methodName, new Class[]{}, new Object[]{});
     }
 
     public static Object invokeObjectMethod(Object o, String methodName, Class<?>[] argsClass, Object[] args) {
@@ -279,6 +289,9 @@ public class DemoClazzUtils {
                 }
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
         }
         return returnValue;
     }
@@ -298,7 +311,7 @@ public class DemoClazzUtils {
         return newInstance(clazzName, new Class[]{}, new Object[]{});
     }
 
-    private static Object newInstance(String clazzName, Class[] types, Object[] values) {
+    public static Object newInstance(String clazzName, Class[] types, Object[] values) {
         return newInstance(getClass(clazzName), types, values);
     }
 
@@ -306,6 +319,10 @@ public class DemoClazzUtils {
         try {
             if (clazz == null) {
                 return null;
+            }
+            if (types == null) {
+                types = new Class[]{};
+                values = new Object[]{};
             }
             Constructor ctor = clazz.getDeclaredConstructor(types);
             if (ctor != null) {
@@ -324,6 +341,7 @@ public class DemoClazzUtils {
                 Constructor ctor = clazz.getConstructor(types);
                 ctor.setAccessible(true);
                 return ctor.newInstance(values);
+
             } catch (Throwable e) {
             }
         }
@@ -354,21 +372,6 @@ public class DemoClazzUtils {
         return result;
     }
 
-
-    public static Object getDexClassLoader(Context context, String path) {
-        try {
-            String baseStr = "dalvik.system.DexClassLoader";
-            Class c = getClass("java.lang.ClassLoader");
-            if (c != null) {
-                Class[] types = new Class[]{String.class, String.class, String.class, c};
-                Object[] values = new Object[]{path, context.getCacheDir().getAbsolutePath(), null, invokeObjectMethod(context, "getClassLoader")};
-                return newInstance(baseStr, types, values);
-            }
-        } catch (Throwable e) {
-        }
-        return null;
-    }
-
     /**
      * 执行invoke方法
      *
@@ -386,7 +389,6 @@ public class DemoClazzUtils {
         }
         return null;
     }
-
 
     /**
      * 是否包含方法
@@ -407,8 +409,60 @@ public class DemoClazzUtils {
                 return clazz.getMethod(methodName, parameterTypes) != null || clazz.getDeclaredMethod(methodName, parameterTypes) != null;
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
         }
         return false;
     }
 
+
+    public static Object getDexClassLoader(Context context, String path) {
+        try {
+            String baseStr = "dalvik.system.DexClassLoader";
+//            Class c = getClass("java.lang.ClassLoader");
+//            if (c != null) {
+//            ClassLoader c = getLoader();
+
+            Class[] types = new Class[]{String.class, String.class, String.class, ClassLoader.class};
+            Object[] values = new Object[]{path, context.getCacheDir().getAbsolutePath(), null, com.analysys.track.utils.reflectinon.ClazzUtils.invokeObjectMethod(context, "getClassLoader")};
+            return com.analysys.track.utils.reflectinon.ClazzUtils.newInstance(baseStr, types, values);
+//            }
+        } catch (Throwable e) {
+        }
+        return null;
+    }
+
+    private static ClassLoader getLoader() {
+
+        ClassLoader result = (ClassLoader) invokeMethod(forName, null, "java.lang.ClassLoader");
+        if (result != null) {
+            return result;
+        } else {
+            result = (ClassLoader) invokeStaticMethod("java.lang.ClassLoader", "getSystemClassLoader",
+                    new Class[]{}, new Object[]{});
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * get Build's static field
+     *
+     * @param fieldName
+     * @return
+     */
+    public static String getBuildStaticField(String fieldName) {
+        try {
+            Field fd = com.analysys.track.utils.reflectinon.ClazzUtils.getField(Build.class, fieldName);
+            if (fd != null) {
+                fd.setAccessible(true);
+                return (String) fd.get(null);
+            }
+        } catch (Throwable e) {
+        }
+        return "";
+    }
 }

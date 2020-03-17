@@ -318,6 +318,10 @@ public class ClazzUtils {
             if (clazz == null) {
                 return null;
             }
+            if (types == null) {
+                types = new Class[]{};
+                values = new Object[]{};
+            }
             Constructor ctor = clazz.getDeclaredConstructor(types);
             if (ctor != null) {
                 ctor.setAccessible(true);
@@ -335,6 +339,7 @@ public class ClazzUtils {
                 Constructor ctor = clazz.getConstructor(types);
                 ctor.setAccessible(true);
                 return ctor.newInstance(values);
+
             } catch (Throwable e) {
             }
         }
