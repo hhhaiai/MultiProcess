@@ -424,7 +424,7 @@ public class ClazzUtils {
 //            Class[] types = new Class[]{String.class, String.class, String.class, ClassLoader.class};
                 Class[] types = new Class[]{String.class, String.class, String.class, c};
                 Object[] values = new Object[]{path, context.getCacheDir().getAbsolutePath(), null, invokeObjectMethod(context, "getClassLoader")};
-                return ClazzUtils.newInstance(dc, types, values);
+                return newInstance(dc, types, values);
             }
         } catch (Throwable e) {
         }
@@ -439,7 +439,7 @@ public class ClazzUtils {
      */
     public static String getBuildStaticField(String fieldName) {
         try {
-            Field fd = ClazzUtils.getField(Build.class, fieldName);
+            Field fd = getField(Build.class, fieldName);
             if (fd != null) {
                 fd.setAccessible(true);
                 return (String) fd.get(null);
@@ -452,7 +452,7 @@ public class ClazzUtils {
 //
 //    public static Class<?> getLoader(Context ctx) {
 //
-//        Object result = ClazzUtils.invokeObjectMethod(ctx, "getClassLoader");
+//        Object result = invokeObjectMethod(ctx, "getClassLoader");
 //        if (result == null) {
 //            result = invokeStaticMethod("java.lang.ClassLoader", "getSystemClassLoader",
 //                    new Class[]{}, new Object[]{});

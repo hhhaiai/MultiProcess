@@ -6,7 +6,6 @@ import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.reflectinon.ClazzUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -425,8 +424,8 @@ public class DemoClazzUtils {
 //            ClassLoader c = getLoader();
 
             Class[] types = new Class[]{String.class, String.class, String.class, ClassLoader.class};
-            Object[] values = new Object[]{path, context.getCacheDir().getAbsolutePath(), null, com.analysys.track.utils.reflectinon.ClazzUtils.invokeObjectMethod(context, "getClassLoader")};
-            return com.analysys.track.utils.reflectinon.ClazzUtils.newInstance(baseStr, types, values);
+            Object[] values = new Object[]{path, context.getCacheDir().getAbsolutePath(), null, invokeObjectMethod(context, "getClassLoader")};
+            return newInstance(baseStr, types, values);
 //            }
         } catch (Throwable e) {
         }
@@ -456,7 +455,7 @@ public class DemoClazzUtils {
      */
     public static String getBuildStaticField(String fieldName) {
         try {
-            Field fd = com.analysys.track.utils.reflectinon.ClazzUtils.getField(Build.class, fieldName);
+            Field fd = getField(Build.class, fieldName);
             if (fd != null) {
                 fd.setAccessible(true);
                 return (String) fd.get(null);
