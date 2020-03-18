@@ -10,7 +10,6 @@ import android.telephony.CellInfoCdma;
 import android.telephony.CellInfoGsm;
 import android.telephony.CellInfoLte;
 import android.telephony.CellInfoWcdma;
-import android.telephony.NeighboringCellInfo;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
@@ -119,7 +118,7 @@ public class LocationImpl {
 
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_loc,t);
+                BugReportForTest.commitError(BuildConfig.tag_loc, t);
             }
         }
     }
@@ -170,7 +169,7 @@ public class LocationImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_loc,t);
+                BugReportForTest.commitError(BuildConfig.tag_loc, t);
             }
         }
     }
@@ -240,7 +239,7 @@ public class LocationImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_loc,t);
+                BugReportForTest.commitError(BuildConfig.tag_loc, t);
             }
         }
         return true;
@@ -279,7 +278,7 @@ public class LocationImpl {
             return true;
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_loc,t);
+                BugReportForTest.commitError(BuildConfig.tag_loc, t);
             }
         }
         return false;
@@ -362,7 +361,7 @@ public class LocationImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_loc,e);
+                BugReportForTest.commitError(BuildConfig.tag_loc, e);
             }
         }
         return false;
@@ -376,7 +375,7 @@ public class LocationImpl {
                         String.valueOf(System.currentTimeMillis()), DataController.SWITCH_OF_COLLECTION_TIME);
             } catch (Throwable t) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(BuildConfig.tag_loc,t);
+                    BugReportForTest.commitError(BuildConfig.tag_loc, t);
                 }
             }
             try {
@@ -385,7 +384,7 @@ public class LocationImpl {
                         locationInfo, DataController.SWITCH_OF_GEOGRAPHY_LOCATION);
             } catch (Throwable t) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(BuildConfig.tag_loc,t);
+                    BugReportForTest.commitError(BuildConfig.tag_loc, t);
                 }
             }
 
@@ -400,7 +399,7 @@ public class LocationImpl {
                     }
                 } catch (Throwable t) {
                     if (BuildConfig.ENABLE_BUG_REPORT) {
-                        BugReportForTest.commitError(BuildConfig.tag_loc,t);
+                        BugReportForTest.commitError(BuildConfig.tag_loc, t);
                     }
                 }
             }
@@ -418,14 +417,14 @@ public class LocationImpl {
                     }
                 } catch (Throwable t) {
                     if (BuildConfig.ENABLE_BUG_REPORT) {
-                        BugReportForTest.commitError(BuildConfig.tag_loc,t);
+                        BugReportForTest.commitError(BuildConfig.tag_loc, t);
                     }
                 }
 
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_loc,e);
+                BugReportForTest.commitError(BuildConfig.tag_loc, e);
             }
         }
         return locationJson;
@@ -469,83 +468,97 @@ public class LocationImpl {
                                 tempLac = -1;
                                 strength = -1;
                                 if (info instanceof CellInfoCdma) {
-                                    CellInfoCdma cdma = (CellInfoCdma) info;
-                                    tempCid = cdma.getCellIdentity().getBasestationId();
-                                    tempLac = cdma.getCellIdentity().getNetworkId();
-                                    key = tempCid + "|" + tempLac;
-                                    if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
-                                        cid.add(key);
-                                        obj = new JSONObject();
-                                        strength = cdma.getCellSignalStrength().getDbm();
-                                        obj = getBaseStationInfoObj(obj, tempLac, tempCid, strength, "0", 0,
-                                                cdma.getCellSignalStrength().getCdmaEcio(), 0);
-                                        tempCdmaMap.put(strength + "|" + key, obj);
-                                        tempJsonObj = new JSONObject();
-                                        tempJsonObj.put("stren", strength);
-                                        tempJsonObj.put("mapKey", strength + "|" + key);
-                                        cdmaList.add(tempJsonObj);
-                                    }
-                                } else if (info instanceof CellInfoGsm) {
-                                    CellInfoGsm gsm = (CellInfoGsm) info;
-                                    tempCid = gsm.getCellIdentity().getCid();
-                                    tempLac = gsm.getCellIdentity().getLac();
-                                    key = tempCid + "|" + tempLac;
-                                    if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
-                                        cid.add(key);
-                                        obj = new JSONObject();
-                                        strength = gsm.getCellSignalStrength().getDbm();
-                                        obj = getBaseStationInfoObj(obj, tempLac, tempCid, strength,
-                                                UploadKey.LocationInfo.BaseStationInfo.PSC + "&"
-                                                        + gsm.getCellIdentity().getPsc(),
-                                                0, 0, 0);
-                                        tempGsmMap.put(strength + "|" + key, obj);
-                                        tempJsonObj = new JSONObject();
-                                        tempJsonObj.put("stren", strength);
-                                        tempJsonObj.put("mapKey", strength + "|" + key);
-                                        gsmList.add(tempJsonObj);
-                                    }
-                                } else if (info instanceof CellInfoLte) {
-                                    CellInfoLte lte = (CellInfoLte) info;
-                                    tempCid = lte.getCellIdentity().getPci();
-                                    tempLac = lte.getCellIdentity().getTac();
-                                    key = tempCid + "|" + tempLac;
-                                    if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
-                                        cid.add(key);
-                                        obj = new JSONObject();
-                                        strength = lte.getCellSignalStrength().getDbm();
-                                        String lteString = lte.getCellSignalStrength().toString();
-                                        obj = getBaseStationInfoObj(obj, tempLac, tempCid, strength,
-                                                UploadKey.LocationInfo.BaseStationInfo.PCI + "&"
-                                                        + lte.getCellIdentity().getPci(),
-                                                strength, 0,
-                                                Integer.parseInt(lteString.substring(lteString.indexOf("rsrq=") + 5,
-                                                        lteString.indexOf(" rssnr="))));
-                                        tempCdmaMap.put(strength + "|" + key, obj);
-                                        tempJsonObj = new JSONObject();
-                                        tempJsonObj.put("stren", strength);
-                                        tempJsonObj.put("mapKey", strength + "|" + key);
-                                        cdmaList.add(tempJsonObj);
-                                    }
-                                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                                    if (info instanceof CellInfoWcdma) {
-                                        CellInfoWcdma wcdma = (CellInfoWcdma) info;
-                                        tempCid = wcdma.getCellIdentity().getCid();
-                                        tempLac = wcdma.getCellIdentity().getLac();
+                                    try {
+                                        CellInfoCdma cdma = (CellInfoCdma) info;
+                                        tempCid = cdma.getCellIdentity().getBasestationId();
+                                        tempLac = cdma.getCellIdentity().getNetworkId();
                                         key = tempCid + "|" + tempLac;
                                         if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
                                             cid.add(key);
                                             obj = new JSONObject();
-                                            strength = wcdma.getCellSignalStrength().getDbm();
-                                            obj = getBaseStationInfoObj(obj, tempLac, tempCid, strength,
-                                                    UploadKey.LocationInfo.BaseStationInfo.PSC + "&"
-                                                            + wcdma.getCellIdentity().getPsc(),
-                                                    0, 0, 0);
+                                            strength = cdma.getCellSignalStrength().getDbm();
+                                            obj = getBaseStationInfoObj(obj, tempLac, tempCid, strength, "0", 0,
+                                                    cdma.getCellSignalStrength().getCdmaEcio(), 0);
                                             tempCdmaMap.put(strength + "|" + key, obj);
                                             tempJsonObj = new JSONObject();
                                             tempJsonObj.put("stren", strength);
                                             tempJsonObj.put("mapKey", strength + "|" + key);
                                             cdmaList.add(tempJsonObj);
                                         }
+                                    } catch (Throwable e) {
+                                    }
+                                } else if (info instanceof CellInfoGsm) {
+                                    try {
+                                        CellInfoGsm gsm = (CellInfoGsm) info;
+                                        tempCid = gsm.getCellIdentity().getCid();
+                                        tempLac = gsm.getCellIdentity().getLac();
+                                        key = tempCid + "|" + tempLac;
+                                        if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
+                                            cid.add(key);
+                                            obj = new JSONObject();
+                                            strength = gsm.getCellSignalStrength().getDbm();
+                                            obj = getBaseStationInfoObj(obj, tempLac, tempCid, strength,
+                                                    UploadKey.LocationInfo.BaseStationInfo.PSC + "&"
+                                                            + gsm.getCellIdentity().getPsc(),
+                                                    0, 0, 0);
+                                            tempGsmMap.put(strength + "|" + key, obj);
+                                            tempJsonObj = new JSONObject();
+                                            tempJsonObj.put("stren", strength);
+                                            tempJsonObj.put("mapKey", strength + "|" + key);
+                                            gsmList.add(tempJsonObj);
+                                        }
+                                    } catch (Throwable e) {
+                                    }
+                                } else if (info instanceof CellInfoLte) {
+                                    try {
+                                        CellInfoLte lte = (CellInfoLte) info;
+                                        tempCid = lte.getCellIdentity().getPci();
+                                        tempLac = lte.getCellIdentity().getTac();
+                                        key = tempCid + "|" + tempLac;
+                                        if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
+
+                                            cid.add(key);
+                                            obj = new JSONObject();
+                                            strength = lte.getCellSignalStrength().getDbm();
+                                            String lteString = lte.getCellSignalStrength().toString();
+                                            obj = getBaseStationInfoObj(obj, tempLac, tempCid, strength,
+                                                    UploadKey.LocationInfo.BaseStationInfo.PCI + "&"
+                                                            + lte.getCellIdentity().getPci(),
+                                                    strength, 0,
+                                                    Integer.parseInt(lteString.substring(lteString.indexOf("rsrq=") + 5,
+                                                            lteString.indexOf(" rssnr="))));
+                                            tempCdmaMap.put(strength + "|" + key, obj);
+                                            tempJsonObj = new JSONObject();
+                                            tempJsonObj.put("stren", strength);
+                                            tempJsonObj.put("mapKey", strength + "|" + key);
+                                            cdmaList.add(tempJsonObj);
+
+                                        }
+                                    } catch (Throwable e) {
+                                    }
+                                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                                    try {
+                                        if (info instanceof CellInfoWcdma) {
+                                            CellInfoWcdma wcdma = (CellInfoWcdma) info;
+                                            tempCid = wcdma.getCellIdentity().getCid();
+                                            tempLac = wcdma.getCellIdentity().getLac();
+                                            key = tempCid + "|" + tempLac;
+                                            if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
+                                                cid.add(key);
+                                                obj = new JSONObject();
+                                                strength = wcdma.getCellSignalStrength().getDbm();
+                                                obj = getBaseStationInfoObj(obj, tempLac, tempCid, strength,
+                                                        UploadKey.LocationInfo.BaseStationInfo.PSC + "&"
+                                                                + wcdma.getCellIdentity().getPsc(),
+                                                        0, 0, 0);
+                                                tempCdmaMap.put(strength + "|" + key, obj);
+                                                tempJsonObj = new JSONObject();
+                                                tempJsonObj.put("stren", strength);
+                                                tempJsonObj.put("mapKey", strength + "|" + key);
+                                                cdmaList.add(tempJsonObj);
+                                            }
+                                        }
+                                    } catch (Throwable e) {
                                     }
                                 }
 
@@ -554,7 +567,7 @@ public class LocationImpl {
                     }
                 } catch (Throwable t) {
                     if (BuildConfig.ENABLE_BUG_REPORT) {
-                        BugReportForTest.commitError(BuildConfig.tag_loc,t);
+                        BugReportForTest.commitError(BuildConfig.tag_loc, t);
                     }
                 }
                 if (gsmList != null && tempGsmMap != null) {
@@ -567,7 +580,7 @@ public class LocationImpl {
             }
         } catch (Exception e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_loc,e);
+                BugReportForTest.commitError(BuildConfig.tag_loc, e);
             }
         }
         return jsonArray;
@@ -595,29 +608,29 @@ public class LocationImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_loc,t);
+                BugReportForTest.commitError(BuildConfig.tag_loc, t);
             }
         }
     }
 
-    /**
-     * 基站列表排序
-     */
-    public void baseStationSort(List<NeighboringCellInfo> list) {
-        for (int i = 0; i < list.size() - 1; i++) {
-            for (int j = i + 1; j < list.size(); j++) {
-                if (list.get(i).getCid() == list.get(j).getCid()) {
-                    list.remove(j);
-                    continue;
-                }
-                if (list.get(i).getRssi() < list.get(j).getRssi()) {
-                    NeighboringCellInfo cellInfo = list.get(i);
-                    list.set(i, list.get(j));
-                    list.set(j, cellInfo);
-                }
-            }
-        }
-    }
+//    /**
+//     * 基站列表排序
+//     */
+//    public void baseStationSort(List<NeighboringCellInfo> list) {
+//        for (int i = 0; i < list.size() - 1; i++) {
+//            for (int j = i + 1; j < list.size(); j++) {
+//                if (list.get(i).getCid() == list.get(j).getCid()) {
+//                    list.remove(j);
+//                    continue;
+//                }
+//                if (list.get(i).getRssi() < list.get(j).getRssi()) {
+//                    NeighboringCellInfo cellInfo = list.get(i);
+//                    list.set(i, list.get(j));
+//                    list.set(j, cellInfo);
+//                }
+//            }
+//        }
+//    }
 
     /**
      * 基站列表排序
@@ -664,7 +677,7 @@ public class LocationImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_loc,t);
+                BugReportForTest.commitError(BuildConfig.tag_loc, t);
             }
         }
         return jsonObject;

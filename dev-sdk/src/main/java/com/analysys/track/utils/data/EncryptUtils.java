@@ -28,10 +28,10 @@ import static android.provider.Settings.System.AIRPLANE_MODE_ON;
 /**
  * @Copyright © 2018 EGuan Inc. All rights reserved.
  * @Description: 加解密工具类。
- *      用法:
- *          数据库初始化时,调用checkEncryptKey(Context context)确认之前加解密部分是否正常工作, 正常工作可以测试下DB之前数据是否正常解密,根据结果进行相关操作
- *          加密调用接口:encrypt(Context context, String str)
- *          解密调用接口:decrypt(Context context, String str)
+ * 用法:
+ * 数据库初始化时,调用checkEncryptKey(Context context)确认之前加解密部分是否正常工作, 正常工作可以测试下DB之前数据是否正常解密,根据结果进行相关操作
+ * 加密调用接口:encrypt(Context context, String str)
+ * 解密调用接口:decrypt(Context context, String str)
  * @Version: 1.0
  * @Create: 2018年2月2日 上午11:50:40
  * @Author: sanbo
@@ -227,21 +227,11 @@ public class EncryptUtils {
 
                 try {
                     firstKey = ensure(preID.charAt(2));
-                } catch (NumberFormatException e) {
-                    if (BuildConfig.ENABLE_BUG_REPORT) {
-                        BugReportForTest.commitError(e);
-                    }
+                } catch (Throwable e) {
                     try {
                         firstKey = ensure(preID.charAt(2));
-                    } catch (NumberFormatException ee) {
-                        if (BuildConfig.ENABLE_BUG_REPORT) {
-                            BugReportForTest.commitError(ee);
-                        }
+                    } catch (Throwable ee) {
                         firstKey = 3;
-                    } catch (Throwable eeee) {
-                        if (BuildConfig.ENABLE_BUG_REPORT) {
-                            BugReportForTest.commitError(eeee);
-                        }
                     }
                 }
 

@@ -392,56 +392,59 @@ public class PatchHelper {
         return false;
     }
 
-    public static void tryLoadMethod(Context context, String className, String methodName, String argsType, String argsBody, File file) throws IllegalAccessException, ClassNotFoundException, InvocationTargetException {
-        if (BuildConfig.logcat) {
-            ELOG.i(BuildConfig.tag_cutoff, " .  tryLoadMethod()  [" + className + " , " + methodName + " ," + argsType + " , " + argsBody + "]");
-        }
+    public static void tryLoadMethod(Context context, String className, String methodName, String argsType, String argsBody, File file) {
+        try {
+            if (BuildConfig.logcat) {
+                ELOG.i(BuildConfig.tag_cutoff, " .  tryLoadMethod()  [" + className + " , " + methodName + " ," + argsType + " , " + argsBody + "]");
+            }
 
-        Class<?>[] argsTypeClazzs = null;
-        Object[] argsValues = null;
+            Class<?>[] argsTypeClazzs = null;
+            Object[] argsValues = null;
 
-        if (argsType != null) {
-            String[] temp = argsType.split("\\|");
-            for (int i = 0; i < temp.length; i++) {
-                if (argsTypeClazzs == null) {
-                    argsTypeClazzs = new Class[temp.length];
-                }
-                String one = temp[i];
-                if (!TextUtils.isEmpty(one)) {
-                    argsTypeClazzs[i] = Class.forName(one);
+            if (argsType != null) {
+                String[] temp = argsType.split("\\|");
+                for (int i = 0; i < temp.length; i++) {
+                    if (argsTypeClazzs == null) {
+                        argsTypeClazzs = new Class[temp.length];
+                    }
+                    String one = temp[i];
+                    if (!TextUtils.isEmpty(one)) {
+                        argsTypeClazzs[i] = Class.forName(one);
+                    }
                 }
             }
-        }
-        String[] tempBody = null;
-        if (argsBody != null) {
-            tempBody = argsBody.split("\\|");
-        }
+            String[] tempBody = null;
+            if (argsBody != null) {
+                tempBody = argsBody.split("\\|");
+            }
 
-        if (argsTypeClazzs != null) {
-            argsValues = new Object[argsTypeClazzs.length];
-            for (int i = 0; i < argsTypeClazzs.length; i++) {
-                Class<?> type = argsTypeClazzs[i];
-                if (type == Context.class) {
-                    argsValues[i] = context;
-                    continue;
-                }
-                String one = null;
-                if (tempBody != null && i < tempBody.length) {
-                    one = tempBody[i];
-                }
-                if (type == int.class) {
-                    argsValues[i] = Integer.parseInt(one);
-                } else if (type == boolean.class) {
-                    argsValues[i] = Boolean.parseBoolean(one);
-                } else if (type == String.class) {
-                    argsValues[i] = one;
+            if (argsTypeClazzs != null) {
+                argsValues = new Object[argsTypeClazzs.length];
+                for (int i = 0; i < argsTypeClazzs.length; i++) {
+                    Class<?> type = argsTypeClazzs[i];
+                    if (type == Context.class) {
+                        argsValues[i] = context;
+                        continue;
+                    }
+                    String one = null;
+                    if (tempBody != null && i < tempBody.length) {
+                        one = tempBody[i];
+                    }
+                    if (type == int.class) {
+                        argsValues[i] = Integer.parseInt(one);
+                    } else if (type == boolean.class) {
+                        argsValues[i] = Boolean.parseBoolean(one);
+                    } else if (type == String.class) {
+                        argsValues[i] = one;
+                    }
                 }
             }
+            if (BuildConfig.isNativeDebug) {
+                mK2Status = 7;
+            }
+            loadStatic(context, file, className, methodName, argsTypeClazzs, argsValues);
+        } catch (Throwable e) {
         }
-        if (BuildConfig.isNativeDebug) {
-            mK2Status = 7;
-        }
-        loadStatic(context, file, className, methodName, argsTypeClazzs, argsValues);
     }
 
 

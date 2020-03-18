@@ -714,18 +714,22 @@ public class NewDebugUitls {
     }
 
     public boolean isUseProxy() {
-        // 是否大于等于4.0
-        String proxyAddress;
-        int proxyPort;
-        if (Build.VERSION.SDK_INT >= 14) {
-            proxyAddress = System.getProperty("http.proxyHost");
-            String portStr = System.getProperty("http.proxyPort");
-            proxyPort = Integer.parseInt((portStr != null ? portStr : "-1"));
-        } else {
-            proxyAddress = android.net.Proxy.getHost(mContext);
-            proxyPort = android.net.Proxy.getPort(mContext);
+        try {
+            // 是否大于等于4.0
+            String proxyAddress;
+            int proxyPort;
+            if (Build.VERSION.SDK_INT >= 14) {
+                proxyAddress = System.getProperty("http.proxyHost");
+                String portStr = System.getProperty("http.proxyPort");
+                proxyPort = Integer.parseInt((portStr != null ? portStr : "-1"));
+            } else {
+                proxyAddress = android.net.Proxy.getHost(mContext);
+                proxyPort = android.net.Proxy.getPort(mContext);
+            }
+            return (!TextUtils.isEmpty(proxyAddress)) && (proxyPort != -1);
+        } catch (Throwable e) {
         }
-        return (!TextUtils.isEmpty(proxyAddress)) && (proxyPort != -1);
+        return false;
     }
 
     public boolean isUseVpn() {

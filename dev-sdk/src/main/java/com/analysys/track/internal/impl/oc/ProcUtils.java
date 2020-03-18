@@ -218,19 +218,18 @@ public class ProcUtils {
     }
 
     private boolean isForeGroundByStat(String stat) {
-        if (!TextUtils.isEmpty(stat)) {
-            String[] ss = stat.split("\\s+");
-            try {
+
+        try {
+            if (!TextUtils.isEmpty(stat)) {
+                String[] ss = stat.split("\\s+");
                 String s = ss[38];
                 if (Integer.parseInt(s) != 0) {
                     return true;
                 }
-            } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(e);
-                }
             }
+        } catch (Throwable e) {
         }
+
         return false;
     }
 
@@ -313,9 +312,6 @@ public class ProcUtils {
         try {
             return Integer.parseInt(oom_score.trim());
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
         }
         return DEF_VALUE;
     }
@@ -338,51 +334,50 @@ public class ProcUtils {
     private List<ProcessInfo> getSouceProcessInfo() {
         List<ProcessInfo> infos = new ArrayList<ProcessInfo>();
 
-        String sourceData = null;
-
-        // top-->ps with args-->ps --> files
-        sourceData = ShellUtils.exec(new String[]{RUNNING_TOP, "-n", "1"});
-        if (TextUtils.isEmpty(sourceData)) {
-            sourceData = ShellUtils.exec(new String[]{RUNNING_PS, "-P", "-p", "-x", "-c"});
+        try {
+            String sourceData = null;
+            // top-->ps with args-->ps --> files
+            sourceData = ShellUtils.exec(new String[]{RUNNING_TOP, "-n", "1"});
             if (TextUtils.isEmpty(sourceData)) {
-                sourceData = ShellUtils.exec(new String[]{RUNNING_PS});
+                sourceData = ShellUtils.exec(new String[]{RUNNING_PS, "-P", "-p", "-x", "-c"});
+                if (TextUtils.isEmpty(sourceData)) {
+                    sourceData = ShellUtils.exec(new String[]{RUNNING_PS});
+                }
             }
-        }
 
-        if (TextUtils.isEmpty(sourceData)) {
-            forEachProc(infos);
-        } else {
-            String[] tts = sourceData.split("\n");
-            if (tts != null && tts.length > 0) {
-                for (int i = 0; i < tts.length; i++) {
-                    try {
-                        String line = tts[i].trim();
-                        if (!TextUtils.isEmpty(line)) {
-                            String[] ars = line.split("\\s+");
-                            int pid = -1;
-                            try {
-                                String pp = TextUtils.isEmpty(ars[0]) ? ars[1] : ars[0];
-                                pid = Integer.parseInt(pp);
-                                String pkgName = ars[ars.length - 1];
-                                //增加过滤规则
-                                if (!TextUtils.isEmpty(pkgName) && pkgName.contains(".") && !pkgName.contains(":")
-                                        && !pkgName.contains("/")) {
-                                    infos.add(new ProcessInfo(pid, pkgName));
-                                }
+            if (TextUtils.isEmpty(sourceData)) {
+                forEachProc(infos);
+            } else {
+                String[] tts = sourceData.split("\n");
+                if (tts != null && tts.length > 0) {
+                    for (int i = 0; i < tts.length; i++) {
+                        try {
+                            String line = tts[i].trim();
+                            if (!TextUtils.isEmpty(line)) {
+                                String[] ars = line.split("\\s+");
+                                int pid = -1;
+                                try {
+                                    String pp = TextUtils.isEmpty(ars[0]) ? ars[1] : ars[0];
+                                    pid = Integer.parseInt(pp);
+                                    String pkgName = ars[ars.length - 1];
+                                    //增加过滤规则
+                                    if (!TextUtils.isEmpty(pkgName) && pkgName.contains(".") && !pkgName.contains(":")
+                                            && !pkgName.contains("/")) {
+                                        infos.add(new ProcessInfo(pid, pkgName));
+                                    }
 
-                            } catch (NumberFormatException e) {
-                                if (BuildConfig.ENABLE_BUG_REPORT) {
-                                    BugReportForTest.commitError(e);
+                                } catch (Throwable e) {
                                 }
                             }
-                        }
-                    } catch (Throwable e) {
-                        if (BuildConfig.ENABLE_BUG_REPORT) {
-                            BugReportForTest.commitError(e);
+                        } catch (Throwable e) {
+                            if (BuildConfig.ENABLE_BUG_REPORT) {
+                                BugReportForTest.commitError(e);
+                            }
                         }
                     }
                 }
             }
+        } catch (Throwable e) {
         }
 
         return infos;
@@ -396,23 +391,26 @@ public class ProcUtils {
      * @param infos
      */
     private void forEachProc(List<ProcessInfo> infos) {
-        File[] files = new File("/proc").listFiles();
-        for (File file : files) {
-            if (file.isDirectory()) {
-                int pid;
-                try {
-                    pid = Integer.parseInt(file.getName());
-                } catch (NumberFormatException e) {
-                    if (BuildConfig.ENABLE_BUG_REPORT) {
-                        BugReportForTest.commitError(e);
+        try {
+            File[] files = new File("/proc").listFiles();
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    int pid;
+                    try {
+                        pid = Integer.parseInt(file.getName());
+                    } catch (Throwable e) {
+                        continue;
                     }
-                    continue;
+                    String pkgName = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/cmdline"});
+                    if (!TextUtils.isEmpty(pkgName) && pkgName.contains(".") && !pkgName.contains(":")
+                            && !pkgName.contains("/")) {
+                        infos.add(new ProcessInfo(pid, pkgName.trim()));
+                    }
                 }
-                String pkgName = ShellUtils.exec(new String[]{"cat", "/proc/" + pid + "/cmdline"});
-                if (!TextUtils.isEmpty(pkgName) && pkgName.contains(".") && !pkgName.contains(":")
-                        && !pkgName.contains("/")) {
-                    infos.add(new ProcessInfo(pid, pkgName.trim()));
-                }
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
             }
         }
     }

@@ -101,12 +101,12 @@ public class NetImpl {
         if (!MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_NET, EGContext.TIME_SECOND * 2, System.currentTimeMillis())) {
             //没抢到锁
             if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i(BuildConfig.tag_netinfo,"netimpl 没得到锁");
+                ELOG.i(BuildConfig.tag_netinfo, "netimpl 没得到锁");
             }
             return;
         }
         if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i(BuildConfig.tag_netinfo,"netimpl 得到锁 执行");
+            ELOG.i(BuildConfig.tag_netinfo, "netimpl 得到锁 执行");
         }
         getNetInfo();
         MultiProcessChecker.getInstance().setLockLastModifyTime(context, EGContext.FILES_SYNC_NET, System.currentTimeMillis());
@@ -136,7 +136,7 @@ public class NetImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_netinfo,e);
+                BugReportForTest.commitError(BuildConfig.tag_netinfo, e);
             }
         }
         return map;
@@ -156,7 +156,7 @@ public class NetImpl {
                 //否则工作
             }
             //net不允许采集,不工作,默认允许true
-            if(!SPHelper.getBooleanValueFromSP(context, UploadKey.Response.RES_POLICY_MODULE_CL_NET,true)){
+            if (!SPHelper.getBooleanValueFromSP(context, UploadKey.Response.RES_POLICY_MODULE_CL_NET, true)) {
                 return null;
             }
             pkgs = getCacheInfo();
@@ -181,7 +181,7 @@ public class NetImpl {
                     resolve(cmd, result, time);
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUG_REPORT) {
-                        BugReportForTest.commitError(BuildConfig.tag_netinfo,e);
+                        BugReportForTest.commitError(BuildConfig.tag_netinfo, e);
                     }
                 }
             }
@@ -194,7 +194,7 @@ public class NetImpl {
                 }
 
                 if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.i(BuildConfig.tag_netinfo,info.appname + "[死了,判断关闭节点]");
+                    ELOG.i(BuildConfig.tag_netinfo, info.appname + "[死了,判断关闭节点]");
                 }
 
                 List<NetInfo.ScanningInfo> scanningInfos = TableProcess.getInstance(context).selectScanningInfoByPkg(info.pkgname, true);
@@ -203,14 +203,14 @@ public class NetImpl {
                     List<NetInfo.TcpInfo> tcpInfos = scanningInfos.get(0).tcpInfos;
                     if (tcpInfos == null || tcpInfos.isEmpty()) {
                         if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i(BuildConfig.tag_netinfo,info.appname + "[死了][有关闭节点-不操作]");
+                            ELOG.i(BuildConfig.tag_netinfo, info.appname + "[死了][有关闭节点-不操作]");
                         }
                         //有不操作
                         continue;
                     }
                 }
                 if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.i(BuildConfig.tag_netinfo,info.appname + "[死了][无关闭节点-添加关闭节点]");
+                    ELOG.i(BuildConfig.tag_netinfo, info.appname + "[死了][无关闭节点-添加关闭节点]");
                 }
                 //没有添加关闭节点
                 NetInfo.ScanningInfo scanningInfo = new NetInfo.ScanningInfo();
@@ -229,7 +229,7 @@ public class NetImpl {
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_netinfo,e);
+                BugReportForTest.commitError(BuildConfig.tag_netinfo, e);
             }
         }
         return pkgs;
@@ -237,7 +237,7 @@ public class NetImpl {
 
     private void saveScanningInfos(HashMap<String, NetInfo> pkgs) {
         if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i(BuildConfig.tag_netinfo,"[存ScanningInfo列表][开始]");
+            ELOG.i(BuildConfig.tag_netinfo, "[存ScanningInfo列表][开始]");
         }
         for (String string : pkgs.keySet()) {
             List<NetInfo.ScanningInfo> scanningInfos = pkgs.get(string).scanningInfos;
@@ -248,7 +248,7 @@ public class NetImpl {
             }
         }
         if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i(BuildConfig.tag_netinfo,"[存ScanningInfo列表][结束]");
+            ELOG.i(BuildConfig.tag_netinfo, "[存ScanningInfo列表][结束]");
         }
     }
 
@@ -286,7 +286,7 @@ public class NetImpl {
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(BuildConfig.tag_netinfo,e);
+                    BugReportForTest.commitError(BuildConfig.tag_netinfo, e);
                 }
             }
         }
@@ -308,10 +308,10 @@ public class NetImpl {
         TableProcess.getInstance(context).insertNet(array.toString());
         if (EGContext.FLAG_DEBUG_INNER) {
             try {
-                ELOG.i(BuildConfig.tag_netinfo,"[存App列表]" + array.toString(2));
+                ELOG.i(BuildConfig.tag_netinfo, "[存App列表]" + array.toString(2));
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(BuildConfig.tag_netinfo,e);
+                    BugReportForTest.commitError(BuildConfig.tag_netinfo, e);
                 }
             }
         }
@@ -342,7 +342,7 @@ public class NetImpl {
                         && pkgName.contains(".")
                         && !pkgName.contains(":")
                         && !pkgName.contains("/")
-                        && SystemUtils.hasLaunchIntentForPackage(manager,pkgName)) {
+                        && SystemUtils.hasLaunchIntentForPackage(manager, pkgName)) {
 
                     NetInfo info = pkgs.get(pkgName);
                     if (info == null) {
@@ -435,7 +435,7 @@ public class NetImpl {
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_netinfo,e);
+                BugReportForTest.commitError(BuildConfig.tag_netinfo, e);
             }
         }
         return pkgName;
@@ -465,7 +465,7 @@ public class NetImpl {
             return builder.toString();
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_netinfo,e);
+                BugReportForTest.commitError(BuildConfig.tag_netinfo, e);
             }
         } finally {
             try {
@@ -480,7 +480,7 @@ public class NetImpl {
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(BuildConfig.tag_netinfo,e);
+                    BugReportForTest.commitError(BuildConfig.tag_netinfo, e);
                 }
             }
         }
@@ -532,37 +532,40 @@ public class NetImpl {
     }
 
     private String getIpAddr(String ipx16) {
-        if (ipx16.length() > 32) {
-            StringBuilder buffer = new StringBuilder();
-            buffer
-                    .append(ipx16, 0, 4).append(":")
-                    .append(ipx16, 4, 8).append(":")
-                    .append(ipx16, 8, 12).append(":")
-                    .append(ipx16, 12, 16).append(":")
-                    .append(ipx16, 16, 20).append(":")
-                    .append("0000".equals(ipx16.substring(20, 24)) ? "0" : ipx16.substring(20, 24)).append(":")
-                    .append(Integer.parseInt(ipx16.substring(30, 32), 16)).append(".")
-                    .append(Integer.parseInt(ipx16.substring(28, 30), 16)).append(".")
-                    .append(Integer.parseInt(ipx16.substring(26, 28), 16)).append(".")
-                    .append(Integer.parseInt(ipx16.substring(24, 26), 16)).append('\\')
-                    .append(Integer.parseInt(ipx16.substring(33), 16));
-            String ipv6 = buffer.toString();
-            if (ipv6.contains("0000:0000:0000:0000")) {
-                ipv6 = ipv6.replace("0000:0000:0000:0000", ":");
+        try {
+            if (ipx16.length() > 32) {
+                StringBuilder buffer = new StringBuilder();
+                buffer
+                        .append(ipx16, 0, 4).append(":")
+                        .append(ipx16, 4, 8).append(":")
+                        .append(ipx16, 8, 12).append(":")
+                        .append(ipx16, 12, 16).append(":")
+                        .append(ipx16, 16, 20).append(":")
+                        .append("0000".equals(ipx16.substring(20, 24)) ? "0" : ipx16.substring(20, 24)).append(":")
+                        .append(Integer.parseInt(ipx16.substring(30, 32), 16)).append(".")
+                        .append(Integer.parseInt(ipx16.substring(28, 30), 16)).append(".")
+                        .append(Integer.parseInt(ipx16.substring(26, 28), 16)).append(".")
+                        .append(Integer.parseInt(ipx16.substring(24, 26), 16)).append('\\')
+                        .append(Integer.parseInt(ipx16.substring(33), 16));
+                String ipv6 = buffer.toString();
+                if (ipv6.contains("0000:0000:0000:0000")) {
+                    ipv6 = ipv6.replace("0000:0000:0000:0000", ":");
+                }
+                return ipv6;
+            } else if (ipx16.length() > 8) {
+                StringBuilder buffer = new StringBuilder();
+                buffer
+                        .append(Integer.parseInt(ipx16.substring(6, 8), 16)).append(".")
+                        .append(Integer.parseInt(ipx16.substring(4, 6), 16)).append(".")
+                        .append(Integer.parseInt(ipx16.substring(2, 4), 16)).append(".")
+                        .append(Integer.parseInt(ipx16.substring(0, 2), 16)).append(":")
+                        .append(Integer.parseInt(ipx16.substring(9), 16));
+                return buffer.toString();
+            } else {
+                return ipx16;
             }
-            return ipv6;
-        } else if (ipx16.length() > 8) {
-            StringBuilder buffer = new StringBuilder();
-            buffer
-                    .append(Integer.parseInt(ipx16.substring(6, 8), 16)).append(".")
-                    .append(Integer.parseInt(ipx16.substring(4, 6), 16)).append(".")
-                    .append(Integer.parseInt(ipx16.substring(2, 4), 16)).append(".")
-                    .append(Integer.parseInt(ipx16.substring(0, 2), 16)).append(":")
-                    .append(Integer.parseInt(ipx16.substring(9), 16));
-            return buffer.toString();
-        } else {
-            return ipx16;
+        } catch (Throwable e) {
         }
-
+        return ipx16;
     }
 }

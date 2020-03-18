@@ -35,12 +35,15 @@ public class AppSnapshotImplTest extends AnalsysTest {
 
     @Test(timeout = 5000)
     public void processAppModifyMsg() {
-        for (int i = 0; i < 200; i++) {
-            appSnapshot.processAppModifyMsg("com.aaa.bbb" + i, Integer.parseInt(EGContext.SNAP_SHOT_INSTALL),
-                    null);
+        try {
+            for (int i = 0; i < 200; i++) {
+                appSnapshot.processAppModifyMsg("com.aaa.bbb" + i, Integer.parseInt(EGContext.SNAP_SHOT_INSTALL),
+                        null);
+            }
+            //这里只测试耗时，不测试数据库操作，这一块的测试放到TableProcessTest进行
+            //TableProcess.getInstance(mContext).selectSnapshot()
+        } catch (Throwable e) {
         }
-        //这里只测试耗时，不测试数据库操作，这一块的测试放到TableProcessTest进行
-        //TableProcess.getInstance(mContext).selectSnapshot()
     }
 
     AppSnapshotImpl appSnapshot;
@@ -137,7 +140,7 @@ public class AppSnapshotImplTest extends AnalsysTest {
     @Test
     public void getCurrentSnapshots() {
         //私有方法
-      //  Debug.startMethodTracing("getCurrentSnapshots/");
+        //  Debug.startMethodTracing("getCurrentSnapshots/");
         List<JSONObject> objs = invokeMethod(appSnapshot, AppSnapshotImpl.class.getName(),
                 "getCurrentSnapshots");
         //Debug.stopMethodTracing();
