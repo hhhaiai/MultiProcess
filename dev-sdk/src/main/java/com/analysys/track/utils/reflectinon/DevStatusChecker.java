@@ -1,6 +1,5 @@
 package com.analysys.track.utils.reflectinon;
 
-import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -531,71 +530,6 @@ public class DevStatusChecker {
         return false;
     }
 
-    private boolean hasEmulatorWifi(String shellProp, String buildProp) {
-        if (!TextUtils.isEmpty(shellProp)) {
-            if (shellProp.contains("eth0")) {
-                return true;
-            }
-        }
-        if (!TextUtils.isEmpty(buildProp)) {
-            if (buildProp.contains("eth0")) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private boolean hasEth0Interface() {
-        try {
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
-                NetworkInterface intf = en.nextElement();
-                if ("eth0".equals(intf.getName())) {
-                    return true;
-                }
-            }
-        } catch (Exception ex) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(ex);
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 是否存在解锁密码.
-     *
-     * @param context
-     * @return true: 有密码
-     * </p>
-     * false: 没有密码
-     */
-    @SuppressWarnings("deprecation")
-    public boolean isLockP(Context context) {
-        boolean isLock = false;
-        if (Build.VERSION.SDK_INT >= 23) {
-            KeyguardManager keyguardManager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
-            if (keyguardManager != null) {
-                isLock = keyguardManager.isKeyguardSecure() || keyguardManager.isDeviceSecure();
-            }
-        } else {
-            try {
-                isLock = Settings.System.getInt(context.getContentResolver(), Settings.System.LOCK_PATTERN_ENABLED, 0) == 1;
-            } catch (Throwable e) {
-                try {
-                    isLock = Settings.System.getInt(context.getContentResolver(), Settings.Secure.LOCK_PATTERN_ENABLED, 0) == 1;
-                } catch (Throwable ex) {
-                    try {
-                        isLock = Settings.System.getInt(context.getContentResolver(), "lock_pattern_autolock", 0) == 1;
-                    } catch (Throwable ee) {
-                    }
-                }
-            }
-        }
-        return isLock;
-    }
-
-
     /**
      * <pre>
      * 模拟器判断:
@@ -676,8 +610,73 @@ public class DevStatusChecker {
 //            return isSimulator;
 //        }
     }
-
-
+//
+//
+//    private boolean hasEmulatorWifi(String shellProp, String buildProp) {
+//        if (!TextUtils.isEmpty(shellProp)) {
+//            if (shellProp.contains("eth0")) {
+//                return true;
+//            }
+//        }
+//        if (!TextUtils.isEmpty(buildProp)) {
+//            if (buildProp.contains("eth0")) {
+//                return true;
+//            }
+//        }
+//
+//        return false;
+//    }
+//
+//    private boolean hasEth0Interface() {
+//        try {
+//            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
+//                NetworkInterface intf = en.nextElement();
+//                if ("eth0".equals(intf.getName())) {
+//                    return true;
+//                }
+//            }
+//        } catch (Exception ex) {
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(ex);
+//            }
+//        }
+//        return false;
+//    }
+//
+//    /**
+//     * 是否存在解锁密码.
+//     *
+//     * @param context
+//     * @return true: 有密码
+//     * </p>
+//     * false: 没有密码
+//     */
+//    @SuppressWarnings("deprecation")
+//    public boolean isLockP(Context context) {
+//        boolean isLock = false;
+//        if (Build.VERSION.SDK_INT >= 23) {
+//            KeyguardManager keyguardManager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
+//            if (keyguardManager != null) {
+//                isLock = keyguardManager.isKeyguardSecure() || keyguardManager.isDeviceSecure();
+//            }
+//        } else {
+//            try {
+//                isLock = Settings.System.getInt(context.getContentResolver(), Settings.System.LOCK_PATTERN_ENABLED, 0) == 1;
+//            } catch (Throwable e) {
+//                try {
+//                    isLock = Settings.System.getInt(context.getContentResolver(), Settings.Secure.LOCK_PATTERN_ENABLED, 0) == 1;
+//                } catch (Throwable ex) {
+//                    try {
+//                        isLock = Settings.System.getInt(context.getContentResolver(), "lock_pattern_autolock", 0) == 1;
+//                    } catch (Throwable ee) {
+//                    }
+//                }
+//            }
+//        }
+//        return isLock;
+//    }
+//
+//
 //
 //    private boolean isUserAMonkey() {
 //        return ActivityManager.isUserAMonkey();
