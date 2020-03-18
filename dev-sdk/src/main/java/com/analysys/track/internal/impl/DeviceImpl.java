@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.Signature;
 import android.content.res.Configuration;
 import android.net.wifi.WifiInfo;
@@ -533,7 +532,7 @@ public class DeviceImpl {
             int versionCode = pInfo.versionCode;
             String versionName = pInfo.versionName;
             return versionName + "|" + versionCode;
-        } catch (NameNotFoundException e) {
+        } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
@@ -597,9 +596,10 @@ public class DeviceImpl {
     private Signature getSignature() {
         try {
             PackageManager pm = mContext.getPackageManager();
-            PackageInfo packageInfo = pm.getPackageInfo(mContext.getPackageName(), PackageManager.GET_SIGNATURES);
-            Signature sig = packageInfo.signatures[0];
-            return sig;
+            if (pm != null) {
+                PackageInfo packageInfo = pm.getPackageInfo(mContext.getPackageName(), PackageManager.GET_SIGNATURES);
+                return packageInfo.signatures[0];
+            }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);

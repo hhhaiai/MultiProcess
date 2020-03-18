@@ -84,7 +84,7 @@ public class SystemUtils {
      */
     public static boolean isApkDebugable(Context context, String packageName) {
         try {
-            context = EContextHelper.getContext();
+            context = EContextHelper.getContext(context);
             if (context == null) {
                 return false;
             }
@@ -94,7 +94,7 @@ public class SystemUtils {
             if (pkginfo != null) {
                 return (pkginfo.applicationInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }

@@ -239,9 +239,12 @@ public class AppSnapshotImpl {
 
                 // 内存没有。DB有 -->删除列表
                 if (!memMap.containsKey(apn)) {
-                    PackageInfo pi = pm.getPackageInfo(apn, 0);
-                    String avc = pi.versionName + "|" + pi.versionCode;
-                    TableProcess.getInstance(mContext).updateSnapshot(apn, EGContext.SNAP_SHOT_UNINSTALL, avc);
+                    try {
+                        PackageInfo pi = pm.getPackageInfo(apn, 0);
+                        String avc = pi.versionName + "|" + pi.versionCode;
+                        TableProcess.getInstance(mContext).updateSnapshot(apn, EGContext.SNAP_SHOT_UNINSTALL, avc);
+                    } catch (Throwable e) {
+                    }
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -259,9 +262,12 @@ public class AppSnapshotImpl {
                 String memApn = memJson.optString(UploadKey.AppSnapshotInfo.ApplicationPackageName);
                 // 内存有，DB没有--> 插入
                 if (!dbMap.containsKey(memApn)) {
-                    PackageInfo pi = pm.getPackageInfo(memApn, 0);
-                    if (SystemUtils.hasLaunchIntentForPackage(pm, memApn)) {
-                        TableProcess.getInstance(mContext).insertSnapshot(getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL));
+                    try {
+                        PackageInfo pi = pm.getPackageInfo(memApn, 0);
+                        if (SystemUtils.hasLaunchIntentForPackage(pm, memApn)) {
+                            TableProcess.getInstance(mContext).insertSnapshot(getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL));
+                        }
+                    } catch (Throwable e) {
                     }
                 } else {
                     String memAvc = memJson.optString(UploadKey.AppSnapshotInfo.ApplicationVersionCode);
