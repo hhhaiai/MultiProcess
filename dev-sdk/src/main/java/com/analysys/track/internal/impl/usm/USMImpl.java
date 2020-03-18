@@ -9,6 +9,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
@@ -104,6 +105,7 @@ public class USMImpl {
 
     /**
      * 解析 dao
+     *
      * @param context
      * @param usageStatsList
      * @return
@@ -130,11 +132,17 @@ public class USMImpl {
                             openEvent.setSwitchType("1");
                             PackageInfo packageInfo = packageManager.getPackageInfo(pkgName, 0);
                             ApplicationInfo applicationInfo = packageInfo.applicationInfo;
-                            openEvent.setAppName((String) applicationInfo.loadLabel(packageManager));
+
                             openEvent.setVersionCode(packageInfo.versionName + "|" + packageInfo.versionCode);
                             openEvent.setCloseTime(lastUsedTime);
+                            try {
+                                CharSequence lb = applicationInfo.loadLabel(packageManager);
+                                if (!TextUtils.isEmpty(lb)) {
+                                    openEvent.setAppName(String.valueOf(lb));
+                                }
+                            } catch (Throwable e) {
+                            }
                             arr.put(openEvent.toJson());
-                            //                        arr.put(openEvent.toJsonForMatTime());
                         }
                     } catch (Throwable e) {
                         if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -238,8 +246,15 @@ public class USMImpl {
             openEvent.setSwitchType("1");
             PackageInfo packageInfo = packageManager.getPackageInfo(getPackageName(event), 0);
             ApplicationInfo applicationInfo = packageInfo.applicationInfo;
-            openEvent.setAppName((String) applicationInfo.loadLabel(packageManager));
             openEvent.setVersionCode(packageInfo.versionName + "|" + packageInfo.versionCode);
+//            openEvent.setAppName((String) applicationInfo.loadLabel(packageManager));
+            try {
+                CharSequence lb = applicationInfo.loadLabel(packageManager);
+                if (!TextUtils.isEmpty(lb)) {
+                    openEvent.setAppName(String.valueOf(lb));
+                }
+            } catch (Throwable e) {
+            }
             return openEvent;
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {

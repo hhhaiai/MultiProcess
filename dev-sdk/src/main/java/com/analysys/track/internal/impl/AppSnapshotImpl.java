@@ -542,9 +542,12 @@ public class AppSnapshotImpl {
                 appInfo = new JSONObject();
                 JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationPackageName,
                         pkgInfo.packageName, DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
-                JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationName,
-                        String.valueOf(pkgInfo.applicationInfo.loadLabel(packageManager)),
-                        DataController.SWITCH_OF_APPLICATION_NAME);
+                try {
+                    JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationName,
+                            String.valueOf(pkgInfo.applicationInfo.loadLabel(packageManager)),
+                            DataController.SWITCH_OF_APPLICATION_NAME);
+                } catch (Throwable e) {
+                }
                 JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationVersionCode,
                         pkgInfo.versionName + "|" + pkgInfo.versionCode, DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
                 JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ActionType, tag,

@@ -351,9 +351,12 @@ public class NetImpl {
                         pkgs.put(pkgName, info);
                     }
                     if (info.appname == null) {
-                        ApplicationInfo info1 = manager.getApplicationInfo(pkgName, 0);
-                        if (info1 != null) {
-                            info.appname = (String) info1.loadLabel(manager);
+                        try {
+                            ApplicationInfo info1 = manager.getApplicationInfo(pkgName, 0);
+                            if (info1 != null) {
+                                info.appname = (String) info1.loadLabel(manager);
+                            }
+                        } catch (Throwable e) {
                         }
                     }
                     info.isOpen = true;
