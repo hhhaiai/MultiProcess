@@ -118,7 +118,7 @@ public class AppSnapshotImpl {
 
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_snap,t);
+                BugReportForTest.commitError(BuildConfig.tag_snap, t);
             }
         }
     }
@@ -163,7 +163,7 @@ public class AppSnapshotImpl {
 
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_snap,t);
+                BugReportForTest.commitError(BuildConfig.tag_snap, t);
             }
 
         }
@@ -245,7 +245,7 @@ public class AppSnapshotImpl {
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(BuildConfig.tag_snap,e);
+                    BugReportForTest.commitError(BuildConfig.tag_snap, e);
                 }
             }
         }
@@ -260,7 +260,7 @@ public class AppSnapshotImpl {
                 // 内存有，DB没有--> 插入
                 if (!dbMap.containsKey(memApn)) {
                     PackageInfo pi = pm.getPackageInfo(memApn, 0);
-                    if ( SystemUtils.hasLaunchIntentForPackage(pm,memApn)) {
+                    if (SystemUtils.hasLaunchIntentForPackage(pm, memApn)) {
                         TableProcess.getInstance(mContext).insertSnapshot(getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL));
                     }
                 } else {
@@ -274,7 +274,7 @@ public class AppSnapshotImpl {
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(BuildConfig.tag_snap,e);
+                    BugReportForTest.commitError(BuildConfig.tag_snap, e);
                 }
             }
         }
@@ -296,46 +296,39 @@ public class AppSnapshotImpl {
     private List<JSONObject> getCurrentSnapshots() {
         List<JSONObject> list = new ArrayList<JSONObject>();
         try {
-            PackageManager packageManager = mContext.getPackageManager();
-            List<PackageInfo> packageInfo = packageManager.getInstalledPackages(0);
-            if (packageInfo != null && packageInfo.size() > 0) {
-                JSONObject jsonObject = null;
-                PackageInfo pi = null;
-                for (int i = 0; i < packageInfo.size(); i++) {
-                    try {
-                        pi = packageInfo.get(i);
-                        if (pi != null) {
-                            jsonObject = null;
-                            //获取更详细的一些信息，封装成jsonobject
-                            jsonObject = getAppInfo(pi, mContext.getPackageManager(), EGContext.SNAP_SHOT_DEFAULT);
-                            if (jsonObject != null) {
-                                list.add(jsonObject);
+            PackageManager packageManager = mContext.getApplicationContext().getPackageManager();
+            if (packageManager != null) {
+                List<PackageInfo> packageInfo = packageManager.getInstalledPackages(0);
+                if (packageInfo != null && packageInfo.size() > 0) {
+                    JSONObject jsonObject = null;
+                    PackageInfo pi = null;
+                    for (int i = 0; i < packageInfo.size(); i++) {
+                        try {
+                            pi = packageInfo.get(i);
+                            if (pi != null) {
+                                jsonObject = null;
+                                //获取更详细的一些信息，封装成jsonobject
+                                jsonObject = getAppInfo(pi, mContext.getPackageManager(), EGContext.SNAP_SHOT_DEFAULT);
+                                if (jsonObject != null) {
+                                    list.add(jsonObject);
+                                }
+                            }
+                        } catch (Throwable t) {
+                            if (BuildConfig.ENABLE_BUG_REPORT) {
+                                BugReportForTest.commitError(t);
                             }
                         }
-                    } catch (Throwable t) {
-                        if (BuildConfig.ENABLE_BUG_REPORT) {
-                            BugReportForTest.commitError(t);
-                        }
-                    }
-                }
-                if (list.size() < 5) {
-                    list = getAppInfosFromShell(mContext, EGContext.SNAP_SHOT_DEFAULT, list);
-                }
-            } else {
-                // 如果上面的方法不能获取，改用shell命令
-                if (list == null) {
-                    list = new ArrayList<JSONObject>();
-                    if (list.size() < 5) {
-                        list = getAppInfosFromShell(mContext, EGContext.SNAP_SHOT_DEFAULT, list);
                     }
                 }
             }
 
         } catch (Exception e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_snap,e);
+                BugReportForTest.commitError(BuildConfig.tag_snap, e);
             }
-
+        }
+        if (list.size() < 5) {
+            list = getAppInfosFromShell(mContext, EGContext.SNAP_SHOT_DEFAULT, list);
         }
         return list;
     }
@@ -391,7 +384,7 @@ public class AppSnapshotImpl {
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_snap,e);
+                BugReportForTest.commitError(BuildConfig.tag_snap, e);
             }
 
         }
@@ -409,23 +402,29 @@ public class AppSnapshotImpl {
     private List<JSONObject> getAppInfosFromShell(Context mContext, String tag, List<JSONObject> appList) {
         try {
             JSONObject appInfo;
+            if (appList == null) {
+                appList = new ArrayList<JSONObject>();
+            }
             Set<String> result = new HashSet<>();
             PackageManager pm = mContext.getPackageManager();
             result = getPkgNamesByShell(result, SHELL_PM_LIST_PACKAGES);
             PackageInfo pi = null;
             for (String pkgName : result) {
-                if (!TextUtils.isEmpty(pkgName) && SystemUtils.hasLaunchIntentForPackage(pm,pkgName)) {
-                    pi = mContext.getPackageManager().getPackageInfo(pkgName, 0);
-                    appInfo = AppSnapshotImpl.getInstance(mContext).getAppInfo(pi, pm, tag);
-                    if (!appList.contains(appInfo)) {
-                        appList.add(appInfo);
-                    }
+                try {
+                    if (!TextUtils.isEmpty(pkgName) && SystemUtils.hasLaunchIntentForPackage(pm, pkgName)) {
+                        pi = mContext.getPackageManager().getPackageInfo(pkgName, 0);
+                        appInfo = AppSnapshotImpl.getInstance(mContext).getAppInfo(pi, pm, tag);
+                        if (!appList.contains(appInfo)) {
+                            appList.add(appInfo);
+                        }
 
+                    }
+                } catch (Throwable e) {
                 }
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_snap,e);
+                BugReportForTest.commitError(BuildConfig.tag_snap, e);
             }
         }
         return appList;
@@ -446,15 +445,18 @@ public class AppSnapshotImpl {
             if (lines.length > 0) {
                 String line = null;
                 for (int i = 0; i < lines.length; i++) {
-                    line = lines[i];
-                    // 单行条件: 非空&&有点&&有冒号
-                    if (!TextUtils.isEmpty(line) && line.contains(".") && line.contains(":")) {
-                        // 分割. 样例数据:<code>package:com.android.launcher3</code>
-                        String[] split = line.split(":");
-                        if (split != null && split.length > 1) {
-                            String packageName = split[1];
-                            appSet.add(packageName);
+                    try {
+                        line = lines[i];
+                        // 单行条件: 非空&&有点&&有冒号
+                        if (!TextUtils.isEmpty(line) && line.contains(".") && line.contains(":")) {
+                            // 分割. 样例数据:<code>package:com.android.launcher3</code>
+                            String[] split = line.split(":");
+                            if (split != null && split.length > 1) {
+                                String packageName = split[1];
+                                appSet.add(packageName);
+                            }
                         }
+                    } catch (Throwable e) {
                     }
                 }
             }
@@ -507,7 +509,7 @@ public class AppSnapshotImpl {
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(BuildConfig.tag_snap,e);
+                    BugReportForTest.commitError(BuildConfig.tag_snap, e);
                 }
             }
 
@@ -530,7 +532,7 @@ public class AppSnapshotImpl {
 
         try {
             String pkg = pkgInfo.packageName;
-            if (!TextUtils.isEmpty(pkg) && pkg.contains(".") && SystemUtils.hasLaunchIntentForPackage(packageManager,pkg)) {
+            if (!TextUtils.isEmpty(pkg) && pkg.contains(".") && SystemUtils.hasLaunchIntentForPackage(packageManager, pkg)) {
                 appInfo = new JSONObject();
                 JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationPackageName,
                         pkgInfo.packageName, DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
@@ -581,7 +583,7 @@ public class AppSnapshotImpl {
             if (type == 0) {
                 PackageInfo pi = pm.getPackageInfo(pkgName, 0);
                 // SNAP_SHOT_INSTALL 解锁
-                if (pi != null && SystemUtils.hasLaunchIntentForPackage(pm,pkgName)) {
+                if (pi != null && SystemUtils.hasLaunchIntentForPackage(pm, pkgName)) {
                     TableProcess.getInstance(mContext).insertSnapshot(getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL));
                 }
             } else if (type == 1) {
@@ -603,7 +605,7 @@ public class AppSnapshotImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_snap,e);
+                BugReportForTest.commitError(BuildConfig.tag_snap, e);
             }
         }
         if (!TextUtils.isEmpty(lockFileName)) {
@@ -624,7 +626,7 @@ public class AppSnapshotImpl {
 
     public static AppSnapshotImpl getInstance(Context context) {
         if (Holder.INSTANCE.mContext == null) {
-            Holder.INSTANCE.mContext = EContextHelper.getContext();
+            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
         }
         return Holder.INSTANCE;
     }

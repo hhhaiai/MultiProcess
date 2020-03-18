@@ -22,7 +22,6 @@ import com.analysys.track.utils.reflectinon.ClazzUtils;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @Copyright 2019 analysys Inc. All rights reserved.
@@ -172,7 +171,7 @@ public class USMUtils {
             if (mService == null) {
                 return null;
             }
-            Set<String> pkgs = PkgList.getAppPackageList(context);
+            List<String> pkgs = PkgList.getAppPackageList(context);
 
             Object usageEvents = null;
             for (String opname : pkgs) {
@@ -299,7 +298,7 @@ public class USMUtils {
                 return null;
             }
 
-            Set<String> pkgs = PkgList.getAppPackageList(EContextHelper.getContext(context));
+            List<String> pkgs = PkgList.getAppPackageList(EContextHelper.getContext(context));
 
             for (String pkg : pkgs) {
                 try {
