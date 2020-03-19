@@ -33,6 +33,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -318,21 +319,23 @@ public class SystemUtils {
     }
 
     /**
-     * 获取上传间隔时间
+     * 获取上传间隔时间，调整为5分-30分钟，如服务器下发则按照服务器下发时间执行
      *
      * @return
      */
     public static long intervalTime(Context ctx) {
-//        long reTryTime = PolicyImpl.getInstance(ctx).getSP() .getLong(UploadKey.Response.RES_POLICY_FAIL_TRY_DELAY, 0);
         long reTryTime = SPHelper.getLongValueFromSP(ctx, UploadKey.Response.RES_POLICY_FAIL_TRY_DELAY, 0);
         if (reTryTime == 0) {
-            reTryTime = EGContext.TIME_MINUTE;
-            // 10s间隔
-            reTryTime = ((int) (Math.random() * 10) * 1000) + reTryTime;
+            reTryTime = randomLong(5 * EGContext.TIME_MINUTE, 30 * EGContext.TIME_MINUTE);
         }
-
         return reTryTime;
     }
+
+    public static long randomLong(long min, long max) {
+        Random random = new Random(System.nanoTime());
+        return min + (((long) (random.nextDouble() * (max - min))));
+    }
+
 
     public static String getContent(String filePath) {
         try {
