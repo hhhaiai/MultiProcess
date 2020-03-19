@@ -96,6 +96,16 @@ public class StreamerUtils {
         }
     }
 
+
+
+    public static void safeClose(HttpURLConnection connection) {
+        if (connection != null) {
+            connection.disconnect();
+            connection = null;
+        }
+
+    }
+
 //    public static void safeClose(ZipFile closeable) {
 //        if (closeable != null) {
 //            try {
@@ -107,16 +117,6 @@ public class StreamerUtils {
 //            }
 //        }
 //    }
-
-    public static void safeClose(HttpURLConnection connection) {
-        if (connection != null) {
-            connection.disconnect();
-            connection = null;
-        }
-
-    }
-
-
 //    public static void safeClose(Process proc) {
 //        if (proc != null) {
 //            try {
@@ -130,8 +130,6 @@ public class StreamerUtils {
 //            proc = null;
 //
 //        }
-//
 //    }
-
 
 }

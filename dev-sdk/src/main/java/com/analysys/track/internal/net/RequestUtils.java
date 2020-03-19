@@ -88,7 +88,11 @@ public class RequestUtils {
             out = connection.getOutputStream();
             // 发送数据
             pw = new PrintWriter(out);
-            pw.print(EGContext.UPLOAD_KEY_WORDS + "=" + URLEncoder.encode(value, "UTF-8"));
+            if (TextUtils.isEmpty(value)) {
+                pw.print(EGContext.UPLOAD_KEY_WORDS + "=");
+            } else {
+                pw.print(EGContext.UPLOAD_KEY_WORDS + "=" + URLEncoder.encode(value, "UTF-8"));
+            }
             pw.flush();
 
             int status = connection.getResponseCode();

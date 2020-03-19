@@ -9,7 +9,6 @@ import android.os.Looper;
 import android.os.Message;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.impl.HotFixImpl;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.LocationImpl;
@@ -150,14 +149,14 @@ public class MessageDispatcher {
                         break;
 
                     case MSG_INFO_HOTFIX:
-                        if (BuildConfig.enableHotFix) {
-                            HotFixImpl.reqHotFix(mContext, new ECallBack() {
-                                @Override
-                                public void onProcessed() {
-                                    postDelay(MSG_INFO_HOTFIX, EGContext.TIME_SECOND * 10);
-                                }
-                            });
-                        }
+//                        if (BuildConfig.enableHotFix) {
+//                            HotFixImpl.reqHotFix(mContext, new ECallBack() {
+//                                @Override
+//                                public void onProcessed() {
+//                                    postDelay(MSG_INFO_HOTFIX, EGContext.TIME_SECOND * 10);
+//                                }
+//                            });
+//                        }
                         break;
                     case MSG_INFO_SNAPS:
                         if (EGContext.FLAG_DEBUG_INNER) {
