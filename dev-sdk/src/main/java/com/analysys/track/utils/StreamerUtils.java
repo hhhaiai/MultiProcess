@@ -96,17 +96,17 @@ public class StreamerUtils {
         }
     }
 
-    public static void safeClose(ZipFile closeable) {
-        if (closeable != null) {
-            try {
-                closeable.close();
-            } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(e);
-                }
-            }
-        }
-    }
+//    public static void safeClose(ZipFile closeable) {
+//        if (closeable != null) {
+//            try {
+//                closeable.close();
+//            } catch (Throwable e) {
+//                if (BuildConfig.ENABLE_BUG_REPORT) {
+//                    BugReportForTest.commitError(e);
+//                }
+//            }
+//        }
+//    }
 
     public static void safeClose(HttpURLConnection connection) {
         if (connection != null) {

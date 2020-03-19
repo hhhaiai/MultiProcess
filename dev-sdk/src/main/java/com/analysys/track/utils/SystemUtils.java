@@ -399,9 +399,9 @@ public class SystemUtils {
             EGContext.VALUE_APPKEY = key;
             SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_KEY, key);
         }
-        // 此处需要进行channel优先级处理,优先处理多渠道打包过来的channel,配置文件次之,接口传入的channel优先级最低
-        String channelFromApk = getChannelFromApk(mContext);
-        if (TextUtils.isEmpty(channelFromApk)) {
+//        // 此处需要进行channel优先级处理,优先处理多渠道打包过来的channel,配置文件次之,接口传入的channel优先级最低
+//        String channelFromApk = getChannelFromApk(mContext);
+//        if (TextUtils.isEmpty(channelFromApk)) {
             try {
                 ApplicationInfo appInfo = mContext.getApplicationContext().getPackageManager()
                         .getApplicationInfo(mContext.getPackageName(), PackageManager.GET_META_DATA);
@@ -422,51 +422,51 @@ public class SystemUtils {
                 EGContext.VALUE_APP_CHANNEL = channel;
                 SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_CHANNEL, channel);
             }
-        } else {
-            // 赋值多渠道打包的channel
-            EGContext.VALUE_APP_CHANNEL = channelFromApk;
-            SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_CHANNEL, channelFromApk);
-        }
+//        } else {
+//            // 赋值多渠道打包的channel
+//            EGContext.VALUE_APP_CHANNEL = channelFromApk;
+//            SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_CHANNEL, channelFromApk);
+//        }
     }
 
-    /**
-     * 仅用作多渠道打包,获取apk文件中的渠道信息
-     *
-     * @param context
-     * @return
-     */
-    public static String getChannelFromApk(Context context) {
-        ApplicationInfo appinfo = context.getApplicationInfo();
-        String sourceDir = appinfo.sourceDir;
-        // 注意这里：默认放在meta-inf/里， 所以需要再拼接一下
-        String channel_pre = "META-INF/" + EGContext.EGUAN_CHANNEL_PREFIX;
-        String channelName = "";
-        ZipFile apkZip = null;
-        try {
-            apkZip = new ZipFile(sourceDir);
-            Enumeration<?> entries = apkZip.entries();
-            while (entries.hasMoreElements()) {
-                ZipEntry entry = ((ZipEntry) entries.nextElement());
-                String entryName = entry.getName();
-                if (entryName.startsWith(channel_pre)) {
-                    channelName = entryName;
-                    break;
-                }
-            }
-            // 假如没有在apk文件中找到相关渠道信息,则返回空串,表示没有调用易观多渠道打包方式
-            if (TextUtils.isEmpty(channelName)) {
-                return "";
-            }
-        } catch (IOException e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        } finally {
-            StreamerUtils.safeClose(apkZip);
-        }
-        // Eg的渠道文件以EGUAN_CHANNEL_XXX为例,其XXX为最终的渠道信息
-        return channelName.substring(23);
-    }
+//    /**
+//     * 仅用作多渠道打包,获取apk文件中的渠道信息
+//     *
+//     * @param context
+//     * @return
+//     */
+//    public static String getChannelFromApk(Context context) {
+//        ApplicationInfo appinfo = context.getApplicationInfo();
+//        String sourceDir = appinfo.sourceDir;
+//        // 注意这里：默认放在meta-inf/里， 所以需要再拼接一下
+//        String channel_pre = "META-INF/" + EGContext.EGUAN_CHANNEL_PREFIX;
+//        String channelName = "";
+//        ZipFile apkZip = null;
+//        try {
+//            apkZip = new ZipFile(sourceDir);
+//            Enumeration<?> entries = apkZip.entries();
+//            while (entries.hasMoreElements()) {
+//                ZipEntry entry = ((ZipEntry) entries.nextElement());
+//                String entryName = entry.getName();
+//                if (entryName.startsWith(channel_pre)) {
+//                    channelName = entryName;
+//                    break;
+//                }
+//            }
+//            // 假如没有在apk文件中找到相关渠道信息,则返回空串,表示没有调用易观多渠道打包方式
+//            if (TextUtils.isEmpty(channelName)) {
+//                return "";
+//            }
+//        } catch (IOException e) {
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(e);
+//            }
+//        } finally {
+//            StreamerUtils.safeClose(apkZip);
+//        }
+//        // Eg的渠道文件以EGUAN_CHANNEL_XXX为例,其XXX为最终的渠道信息
+//        return channelName.substring(23);
+//    }
 
     /**
      * 获取Appkey. 优先级：内存==>SP==>XML
