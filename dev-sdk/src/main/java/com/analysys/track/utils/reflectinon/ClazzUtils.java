@@ -420,7 +420,6 @@ public class ClazzUtils {
             String dc = "dalvik.system.DexClassLoader";
             Class c = getClass("java.lang.ClassLoader");
             if (c != null) {
-//            Object c = getLoader();
 //            Class[] types = new Class[]{String.class, String.class, String.class, ClassLoader.class};
                 Class[] types = new Class[]{String.class, String.class, String.class, c};
                 Object[] values = new Object[]{path, context.getCacheDir().getAbsolutePath(), null, invokeObjectMethod(context, "getClassLoader")};

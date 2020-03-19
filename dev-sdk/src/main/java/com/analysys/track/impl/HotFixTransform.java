@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
@@ -68,12 +69,6 @@ public class HotFixTransform {
                         }
                         //热修之前宿主判断
                         if (isSdkUpdateInHost(context)) {
-//                            //清除patch
-//                            File patchDir = new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR);
-//                            FileUitls.getInstance(context).deleteFile(patchDir);
-//                            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_VERSION, "");
-//                            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_SIGN, "");
-//                            SPHelper.setStringValue2SP(EContextHelper.getContext(), UploadKey.Response.PatchResp.PATCH_METHODS, "");
                             //清除短路控制变量
                             SPHelper.removeKey(context, "case1");
                             SPHelper.removeKey(context, "case2");
@@ -81,7 +76,6 @@ public class HotFixTransform {
                             SPHelper.removeKey(context, "case4");
                             SPHelper.removeKey(context, "case_d");
                             SPHelper.removeKey(context, "what_dev");
-//                            SPHelper.removeKey(context, "what_recerver");
                         }
                         //清除热修相关的（如果未激活或文件不存在或宿主变动）
                         //激活，热修文件存在，宿主一致
@@ -139,9 +133,9 @@ public class HotFixTransform {
                 abeg0.class.getName();
             }
             Object dexClassLoader = ClazzUtils.getDexClassLoader(context, path);
-            Class analysysThisClazz = (Class) ClazzUtils.invokeObjectMethod(dexClassLoader,
-                    "loadClass",
+            Class analysysThisClazz = (Class) ClazzUtils.invokeObjectMethod(dexClassLoader, "loadClass",
                     new Class[]{String.class}, new Object[]{"com.analysys.track.impl.abeg0"});
+            // 下发的dex不包含这个类
             if (analysysThisClazz == null) {
                 dexError(context);
                 return;
@@ -217,6 +211,7 @@ public class HotFixTransform {
             if (EGContext.FLAG_DEBUG_INNER) {
                 Log.i(BuildConfig.tag_hotfix, "dex path 存在 文件实际不存在【清除策略号】下次重新获取" + path);
             }
+            //需要考虑文件被删除，sp有文件名
 //            SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
 //            clearHotFixPolicyVersion(context);
             return false;
