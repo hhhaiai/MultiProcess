@@ -5,7 +5,8 @@ source_common() {
         cd $(dirname $0)
         pwd
     )
-    sh $pwd/common.sh mdout
+    source $pwd/common.sh md
+#    bash $pwd/common.sh mdout
 }
 
 # clean cache
