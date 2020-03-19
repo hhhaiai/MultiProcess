@@ -1016,16 +1016,13 @@ public class ELOG {
                     return xml;
                 } catch (Throwable e3) {
                     // 不是XML
-                    return src;
                 } finally {
-                    if (reader != null) {
-                        reader.close();
-                    }
+                    StreamerUtils.safeClose(reader);
                 }
             }
         } catch (Throwable e) {
-            return src;
         }
+        return src;
     }
 
     /**
@@ -1066,15 +1063,8 @@ public class ELOG {
             }
         } catch (Throwable error) {
         } finally {
-            if (sw != null) {
-                try {
-                    sw.close();
-                } catch (Throwable e1) {
-                }
-            }
-            if (pw != null) {
-                pw.close();
-            }
+            StreamerUtils.safeClose(sw);
+            StreamerUtils.safeClose(pw);
         }
         return String.valueOf(sb);
     }

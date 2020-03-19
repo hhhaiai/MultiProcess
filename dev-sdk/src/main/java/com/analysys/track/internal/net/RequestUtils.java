@@ -201,7 +201,7 @@ public class RequestUtils {
 //        while ((line = reader.readLine()) != null) {
 //            sb.append(line);
 //        }
-//        reader.close();
+//        StreamerUtils.safeClose(reader);
 //        return String.valueOf(sb);
 //    }
 //    private static TrustManager[] tm = null;

@@ -11,6 +11,7 @@ import android.util.Pair;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.BugReportForTest;
+import com.analysys.track.utils.StreamerUtils;
 
 import java.io.Closeable;
 import java.io.File;
@@ -1145,22 +1146,11 @@ class SPImpl implements SharedPreferences {
                 BugReportForTest.commitError(t);
             }
         } finally {
-            safeClose(os);
-            safeClose(osChannel);
+            StreamerUtils.safeClose(os);
+            StreamerUtils.safeClose(osChannel);
         }
     }
 
-    private void safeClose(Closeable obj) {
-        if (obj != null) {
-            try {
-                obj.close();
-            } catch (IOException e) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(e);
-                }
-            }
-        }
-    }
 
     private boolean loadFromBakFile() {
         boolean parseOK = true;
@@ -1191,8 +1181,7 @@ class SPImpl implements SharedPreferences {
             }
             throwable = t;
         } finally {
-            safeClose(is);
-
+            StreamerUtils.safeClose(is);
             try {
                 parseOK = parseBytesIntoMap(allBytes, false);
             } catch (Throwable e) {

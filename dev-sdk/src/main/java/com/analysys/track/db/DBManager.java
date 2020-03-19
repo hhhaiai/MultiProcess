@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.utils.StreamerUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -40,9 +41,7 @@ public class DBManager {
         try {
             if (mOpenWriteCounter.decrementAndGet() == 0) {
                 // Closing database
-                if (db != null) {
-                    db.close();
-                }
+                StreamerUtils.safeClose(db);
             }
         } catch (Throwable e) {
         }

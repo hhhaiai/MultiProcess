@@ -31,6 +31,7 @@ import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.OAIDHelper;
 import com.analysys.track.utils.PermissionUtils;
+import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.BufferedInputStream;
@@ -280,9 +281,7 @@ public class DeviceImpl {
                     BugReportForTest.commitError(e);
                 }
             } finally {
-                if (reader != null) {
-                    reader.close();
-                }
+                StreamerUtils.safeClose(reader);
             }
         }
         return DEFALT_MAC;
@@ -312,25 +311,8 @@ public class DeviceImpl {
                 BugReportForTest.commitError(e);
             }
         } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    if (BuildConfig.ENABLE_BUG_REPORT) {
-                        BugReportForTest.commitError(e);
-                    }
-                }
-            }
-            if (in != null) {
-
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    if (BuildConfig.ENABLE_BUG_REPORT) {
-                        BugReportForTest.commitError(e);
-                    }
-                }
-            }
+            StreamerUtils.safeClose(br);
+            StreamerUtils.safeClose(in);
         }
         return DEFALT_MAC;
     }

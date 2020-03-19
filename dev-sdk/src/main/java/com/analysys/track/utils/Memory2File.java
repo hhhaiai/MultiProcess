@@ -60,9 +60,8 @@ public class Memory2File {
                 BugReportForTest.commitError(e);
             }
         } finally {
-
-            close(channel);
-            close(fs);
+            StreamerUtils.safeClose(channel);
+            StreamerUtils.safeClose(fs);
         }
         return null;
     }
@@ -88,8 +87,8 @@ public class Memory2File {
                 BugReportForTest.commitError(e);
             }
         } finally {
-            close(bos);
-            close(fos);
+            StreamerUtils.safeClose(bos);
+            StreamerUtils.safeClose(fos);
         }
     }
 
@@ -175,18 +174,6 @@ public class Memory2File {
         return sb.toString().getBytes("iso8859-1");
     }
 
-    private static void close(Closeable close) {
-        if (close != null) {
-            try {
-                close.close();
-            } catch (IOException e) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(e);
-                }
-            }
-        }
-
-    }
 
 //    /**
 //     * 获得指定文件的byte数组
@@ -208,8 +195,8 @@ public class Memory2File {
 //        } catch (FileNotFoundException e) {
 //        } catch (IOException e) {
 //        } finally {
-//            close(fis);
-//            close(bos);
+//           StreamerUtils.safeClose(fis);
+//            StreamerUtils.safeClose(bos);
 //        }
 //        return buffer;
 //    }

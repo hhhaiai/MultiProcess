@@ -73,18 +73,12 @@
 //            is = new FileInputStream(fileLocation);
 //            BufferedReader buf = new BufferedReader(new InputStreamReader(is));
 //            String fileContents = buf.readLine();
-//            buf.close();
+//            StreamerUtils.safeClose(buf);
 //            return getCoresFromFileString(fileContents);
 //        } catch (IOException e) {
 //            return DEVICEINFO_UNKNOWN;
 //        } finally {
-//            if (is != null) {
-//                try {
-//                    is.close();
-//                } catch (IOException e) {
-//                    // Do nothing.
-//                }
-//            }
+//            StreamerUtils.safeClose(is);
 //        }
 //    }
 //
@@ -154,7 +148,7 @@
 //                    } catch (Throwable e) {
 //                        //Fall through and use /proc/cpuinfo.
 //                    } finally {
-//                        stream.close();
+//                       StreamerUtils.safeClose(stream);
 //                    }
 //                }
 //            }
@@ -166,7 +160,7 @@
 //                    freqBound *= 1000; //MHz -> kHz
 //                    if (freqBound > maxFreq) maxFreq = freqBound;
 //                } finally {
-//                    stream.close();
+//                    StreamerUtils.safeClose(stream);
 //                }
 //            }
 //        } catch (IOException e) {
@@ -201,7 +195,7 @@
 //                    totalMem = parseFileForValue("MemTotal", stream);
 //                    totalMem *= 1024;
 //                } finally {
-//                    stream.close();
+//                    StreamerUtils.safeClose(stream);
 //                }
 //            } catch (IOException e) {
 //            }

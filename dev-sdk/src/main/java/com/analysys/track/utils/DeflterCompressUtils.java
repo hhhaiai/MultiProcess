@@ -52,13 +52,7 @@ public class DeflterCompressUtils {
                 ELOG.e(e);
             }
         } finally {
-            try {
-                bos.close();
-            } catch (IOException e) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(e);
-                }
-            }
+            StreamerUtils.safeClose(bos);
         }
         compresser.end();
         return output;
@@ -96,35 +90,34 @@ public class DeflterCompressUtils {
      * Deflater 解压数据
      */
     public static byte[] decompress(byte[] data) {
-        if (data == null) {
-            return new byte[0];
-        }
-
 
         byte[] output = new byte[0];
-
-        Inflater decompresser = new Inflater();
-        decompresser.reset();
-        decompresser.setInput(data);
-
-        ByteArrayOutputStream o = new ByteArrayOutputStream(data.length);
         try {
-            byte[] buf = new byte[1024];
-            while (!decompresser.finished()) {
-                int i = decompresser.inflate(buf);
-                o.write(buf, 0, i);
+            if (data == null) {
+                return new byte[0];
             }
-            output = o.toByteArray();
-        } catch (Exception e) {
-            output = data;
-        } finally {
-            try {
-                o.close();
-            } catch (IOException e) {
-            }
-        }
+            Inflater decompresser = new Inflater();
+            decompresser.reset();
+            decompresser.setInput(data);
 
-        decompresser.end();
+            ByteArrayOutputStream o = null;
+            try {
+                o = new ByteArrayOutputStream(data.length);
+                byte[] buf = new byte[1024];
+                while (!decompresser.finished()) {
+                    int i = decompresser.inflate(buf);
+                    o.write(buf, 0, i);
+                }
+                output = o.toByteArray();
+            } catch (Exception e) {
+                output = data;
+            } finally {
+                StreamerUtils.safeClose(o);
+            }
+
+            decompresser.end();
+        } catch (Throwable e) {
+        }
         return output;
     }
 }

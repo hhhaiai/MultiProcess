@@ -690,9 +690,7 @@ public class TableProcess {
                 BugReportForTest.commitError(e);
             }
         } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
+            StreamerUtils.safeClose(cursor);
             DBManager.getInstance(mContext).closeDB();
         }
         return array;

@@ -22,6 +22,7 @@ import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MultiProcessChecker;
+import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -473,21 +474,9 @@ public class NetImpl {
                 BugReportForTest.commitError(BuildConfig.tag_netinfo, e);
             }
         } finally {
-            try {
-                if (bufferedReader != null) {
-                    bufferedReader.close();
-                }
-                if (reader != null) {
-                    reader.close();
-                }
-                if (fileInputStream != null) {
-                    fileInputStream.close();
-                }
-            } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(BuildConfig.tag_netinfo, e);
-                }
-            }
+            StreamerUtils.safeClose(bufferedReader);
+            StreamerUtils.safeClose(reader);
+            StreamerUtils.safeClose(fileInputStream);
         }
         return null;
     }
