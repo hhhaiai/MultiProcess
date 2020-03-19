@@ -52,9 +52,9 @@ public class PkgList {
                     // 单行条件: 非空&&有点&&有冒号
                     if (!TextUtils.isEmpty(line) && line.contains(".") && line.contains(":")) {
                         // 分割. 样例数据:<code>package:com.android.launcher3</code>
-                        String[] split = line.split(":");
-                        if (split.length > 1) {
-                            String packageName = split[1];
+                        String[] ss = line.split(":");
+                        if (ss.length > 1) {
+                            String packageName = ss[1];
                             if (!TextUtils.isEmpty(packageName) && !apps.contains(packageName)) {
                                 apps.add(packageName);
                             }

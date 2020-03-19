@@ -89,8 +89,7 @@ public class SystemUtils {
                 return false;
             }
             @SuppressLint("WrongConstant")
-            PackageInfo pkginfo = context.getPackageManager().getPackageInfo(
-                    packageName, 1);
+            PackageInfo pkginfo = context.getPackageManager().getPackageInfo(packageName, 1);
             if (pkginfo != null) {
                 return (pkginfo.applicationInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
             }

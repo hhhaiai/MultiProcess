@@ -25,13 +25,13 @@ import com.analysys.track.utils.AccessibilityHelper;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.data.EncryptUtils;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.data.Base64Utils;
+import com.analysys.track.utils.data.EncryptUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -41,7 +41,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -224,39 +223,6 @@ public class OCImpl {
     }
 
 
-    private void getRuningService() {
-        try {
-            ActivityManager myManager = (ActivityManager) mContext
-                    .getSystemService(Context.ACTIVITY_SERVICE);
-            ArrayList<ActivityManager.RunningServiceInfo> runningService = null;
-            if (myManager != null) {
-                runningService = (ArrayList<ActivityManager.RunningServiceInfo>) myManager
-                        .getRunningServices(30);
-            }
-            PackageManager pm = mContext.getPackageManager();
-            HashSet<String> pkgs = new HashSet<>();
-            if (runningService != null) {
-                for (int i = 0; i < runningService.size(); i++) {
-                    //分割报名和进程名,样例:com.device:h
-                    String name = runningService.get(i).process;
-                    String[] split = name.split(":");
-                    if (split != null || split.length > 0) {
-                        String pkgName = split[0];
-                        if (!TextUtils.isEmpty(pkgName)
-                                && pkgName.contains(".")
-                                && !pkgName.contains(":")
-                                && !pkgName.contains("/")
-                                && SystemUtils.hasLaunchIntentForPackage(pm, pkgName)) {
-                            pkgs.add(pkgName);
-                        }
-                    }
-                }
-            }
-            getAliveAppByProc(new JSONArray(pkgs));
-        } catch (Throwable e) {
-
-        }
-    }
 
     /**
      * 根据XXX内容处理相应信息。样例数据 [com.device, com.alipay.hulu]
@@ -678,7 +644,6 @@ public class OCImpl {
         }
     }
 
-
     /**
      * 关闭屏幕处理，内存里所有数据都保存到DB
      */
@@ -712,6 +677,39 @@ public class OCImpl {
         mOpenedPkgNameAndInfoMap.clear();
     }
 
+//    private void getRuningService() {
+//        try {
+//            ActivityManager myManager = (ActivityManager) mContext
+//                    .getSystemService(Context.ACTIVITY_SERVICE);
+//            ArrayList<ActivityManager.RunningServiceInfo> runningService = null;
+//            if (myManager != null) {
+//                runningService = (ArrayList<ActivityManager.RunningServiceInfo>) myManager
+//                        .getRunningServices(30);
+//            }
+//            PackageManager pm = mContext.getPackageManager();
+//            HashSet<String> pkgs = new HashSet<>();
+//            if (runningService != null) {
+//                for (int i = 0; i < runningService.size(); i++) {
+//                    //分割报名和进程名,样例:com.device:h
+//                    String name = runningService.get(i).process;
+//                    String[] ss = name.split(":");
+//                    if (ss != null && ss.length > 0) {
+//                        String pkgName = ss[0];
+//                        if (!TextUtils.isEmpty(pkgName)
+//                                && pkgName.contains(".")
+//                                && !pkgName.contains(":")
+//                                && !pkgName.contains("/")
+//                                && SystemUtils.hasLaunchIntentForPackage(pm, pkgName)) {
+//                            pkgs.add(pkgName);
+//                        }
+//                    }
+//                }
+//            }
+//            getAliveAppByProc(new JSONArray(pkgs));
+//        } catch (Throwable e) {
+//
+//        }
+//    }
     /************************************** 单例和对象声明 ********************************************/
 
     private static class Holder {

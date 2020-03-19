@@ -342,22 +342,24 @@ public class LocationImpl {
                 return true;
             }
 
-            String[] ary = lastLocation.split("-");
-            if (ary.length != 2) {
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.d(BuildConfig.tag_loc, "缓存有值。");
+            if (lastLocation.contains("-")) {
+                String[] ary = lastLocation.split("-");
+                if (ary.length != 2) {
+                    if (EGContext.FLAG_DEBUG_INNER) {
+                        ELOG.d(BuildConfig.tag_loc, "缓存有值。");
+                    }
+                    return true;
                 }
-                return true;
-            }
-            double longitude1 = Double.parseDouble(ary[1]);
-            double latitude1 = Double.parseDouble(ary[0]);
-            double distance = getDistance(longitude1, latitude1, location.getLongitude(), location.getLatitude());
-            // 距离没有变化则不保存
-            if (EGContext.MINDISTANCE <= distance) {
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.d(BuildConfig.tag_loc, "有变化。");
+                double longitude1 = Double.parseDouble(ary[1]);
+                double latitude1 = Double.parseDouble(ary[0]);
+                double distance = getDistance(longitude1, latitude1, location.getLongitude(), location.getLatitude());
+                // 距离没有变化则不保存
+                if (EGContext.MINDISTANCE <= distance) {
+                    if (EGContext.FLAG_DEBUG_INNER) {
+                        ELOG.d(BuildConfig.tag_loc, "有变化。");
+                    }
+                    return true;
                 }
-                return true;
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {

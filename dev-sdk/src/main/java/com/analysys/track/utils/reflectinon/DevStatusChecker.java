@@ -12,7 +12,6 @@ import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.DataLocalTempUtils;
 import com.analysys.track.utils.EContextHelper;
@@ -22,8 +21,6 @@ import com.analysys.track.utils.SimulatorUtils;
 import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.sp.SPHelper;
-
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -266,35 +263,6 @@ public class DevStatusChecker {
         return false;
     }
 
-//    @SuppressWarnings("deprecation")
-//    private boolean isDeveloperMode(Context context) {
-//        try {
-//            if (Build.VERSION.SDK_INT >= 17) {
-//                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
-//            } else {
-//                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
-//            }
-//        } catch (Throwable e) {
-//            try {
-//                return (Settings.Secure.getInt(context.getContentResolver(), "development_settings_enabled", 0) > 0);
-//            } catch (Throwable ex) {
-//            }
-//        }
-//        return false;
-//    }
-//
-//    @SuppressWarnings("deprecation")
-//    private boolean isUSBDebug(Context context) {
-//        try {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-//                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Global.ADB_ENABLED, 0) > 0);
-//            } else {
-//                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.ADB_ENABLED, 0) > 0);
-//            }
-//        } catch (Throwable e) {
-//        }
-//        return false;
-//    }
 
     /**
      * 是否被HOOK
@@ -395,40 +363,41 @@ public class DevStatusChecker {
         return false;
     }
 
-    private Boolean hasDebugApp;
-
-    /**
-     * 获取到安装列表，且手机中有小于两个调试app
-     *
-     * @param context
-     * @return
-     */
-    @SuppressWarnings("deprecation")
-    private boolean hasDebugApp(Context context) {
-        if (hasDebugApp != null) {
-            return hasDebugApp;
-        }
-        // 单次生成确保有数据的安装列表
-        List<JSONObject> list = AppSnapshotImpl.getInstance(context).getAppDebugStatus();
-
-        if (list.size() > 0) {
-            int count = 0;
-            for (JSONObject obj : list) {
-                if (obj.has(EGContext.TEXT_DEBUG_STATUS)) {
-                    if (obj.optBoolean(EGContext.TEXT_DEBUG_STATUS, false)) {
-                        count += 1;
-                    }
-                }
-            }
-            hasDebugApp = count > 2;
-            return hasDebugApp;
-        } else {
-            // 获取安装列表失败，作为调试设备查看
-            hasDebugApp = true;
-            return hasDebugApp;
-        }
-
-    }
+//
+//    private Boolean hasDebugApp;
+//
+//    /**
+//     * 获取到安装列表，且手机中有小于两个调试app
+//     *
+//     * @param context
+//     * @return
+//     */
+//    @SuppressWarnings("deprecation")
+//    private boolean hasDebugApp(Context context) {
+//        if (hasDebugApp != null) {
+//            return hasDebugApp;
+//        }
+//        // 单次生成确保有数据的安装列表
+//        List<JSONObject> list = AppSnapshotImpl.getInstance(context).getAppDebugStatus();
+//
+//        if (list.size() > 0) {
+//            int count = 0;
+//            for (JSONObject obj : list) {
+//                if (obj.has(EGContext.TEXT_DEBUG_STATUS)) {
+//                    if (obj.optBoolean(EGContext.TEXT_DEBUG_STATUS, false)) {
+//                        count += 1;
+//                    }
+//                }
+//            }
+//            hasDebugApp = count > 2;
+//            return hasDebugApp;
+//        } else {
+//            // 获取安装列表失败，作为调试设备查看
+//            hasDebugApp = true;
+//            return hasDebugApp;
+//        }
+//
+//    }
 
     /**
      * 判断设备 是否使用代理上网
@@ -610,6 +579,37 @@ public class DevStatusChecker {
 //            return isSimulator;
 //        }
     }
+
+
+//    @SuppressWarnings("deprecation")
+//    private boolean isDeveloperMode(Context context) {
+//        try {
+//            if (Build.VERSION.SDK_INT >= 17) {
+//                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
+//            } else {
+//                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
+//            }
+//        } catch (Throwable e) {
+//            try {
+//                return (Settings.Secure.getInt(context.getContentResolver(), "development_settings_enabled", 0) > 0);
+//            } catch (Throwable ex) {
+//            }
+//        }
+//        return false;
+//    }
+//
+//    @SuppressWarnings("deprecation")
+//    private boolean isUSBDebug(Context context) {
+//        try {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+//                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Global.ADB_ENABLED, 0) > 0);
+//            } else {
+//                return (Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.ADB_ENABLED, 0) > 0);
+//            }
+//        } catch (Throwable e) {
+//        }
+//        return false;
+//    }
 //
 //
 //    private boolean hasEmulatorWifi(String shellProp, String buildProp) {

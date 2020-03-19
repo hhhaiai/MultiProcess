@@ -26,6 +26,7 @@ import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -78,42 +79,38 @@ public class NetImpl {
         return instance;
     }
 
+    private HashMap<String, NetInfo> pkgs = new HashMap<>();
+
     public void dumpNet(final ECallBack back) {
-        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
-            EThreadPool.execute(new Runnable() {
+
+        try {
+            if (!MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_NET, EGContext.TIME_SECOND * 2, System.currentTimeMillis())) {
+                //没抢到锁
+                if (EGContext.FLAG_DEBUG_INNER) {
+                    ELOG.i(BuildConfig.tag_netinfo, "netimpl 没得到锁");
+                }
+                if (back != null) {
+                    back.onProcessed();
+                }
+                return;
+            }
+            SystemUtils.runOnWorkThread(new Runnable() {
                 @Override
                 public void run() {
-                    tryLockRun();
+                    if (EGContext.FLAG_DEBUG_INNER) {
+                        ELOG.i(BuildConfig.tag_netinfo, "netimpl 得到锁 执行");
+                    }
+                    getNetInfo();
+                    MultiProcessChecker.getInstance().setLockLastModifyTime(context, EGContext.FILES_SYNC_NET, System.currentTimeMillis());
                     if (back != null) {
                         back.onProcessed();
                     }
                 }
             });
-        } else {
-            tryLockRun();
-            if (back != null) {
-                back.onProcessed();
-            }
+        } catch (Throwable e) {
         }
+
     }
-
-    public void tryLockRun() {
-        if (!MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_NET, EGContext.TIME_SECOND * 2, System.currentTimeMillis())) {
-            //没抢到锁
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i(BuildConfig.tag_netinfo, "netimpl 没得到锁");
-            }
-            return;
-        }
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i(BuildConfig.tag_netinfo, "netimpl 得到锁 执行");
-        }
-        getNetInfo();
-        MultiProcessChecker.getInstance().setLockLastModifyTime(context, EGContext.FILES_SYNC_NET, System.currentTimeMillis());
-    }
-
-
-    HashMap<String, NetInfo> pkgs = new HashMap<>();
 
     private HashMap<String, NetInfo> getCacheInfo() {
         HashMap<String, NetInfo> map = new HashMap<>();
@@ -124,15 +121,20 @@ public class NetImpl {
             }
             array = (JSONArray) array.get(0);
             for (int i = 0; array != null && i < array.length(); i++) {
-                String pkg_name = (String) array.get(i);
-                String[] values = pkg_name.split("_");
-                if (values == null || values.length < 2) {
-                    continue;
+                try {
+                    String pkg_name = (String) array.get(i);
+                    if (!TextUtils.isEmpty(pkg_name) && pkg_name.contains("_")) {
+                        String[] values = pkg_name.split("_");
+                        if (values == null || values.length < 2) {
+                            continue;
+                        }
+                        NetInfo info = new NetInfo();
+                        info.pkgname = values[0];
+                        info.appname = values[1];
+                        map.put(info.pkgname, info);
+                    }
+                } catch (Throwable e) {
                 }
-                NetInfo info = new NetInfo();
-                info.pkgname = values[0];
-                info.appname = values[1];
-                map.put(info.pkgname, info);
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -147,11 +149,8 @@ public class NetImpl {
 
     public HashMap<String, NetInfo> getNetInfo() {
         try {
-            if (
-//                    USMImpl.isUSMAvailable(context) &&
-                    SPHelper.getBooleanValueFromSP(context,
-                            UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_NET, false)) {
-                //USM可用&&控制短路 不工作
+            if (SPHelper.getBooleanValueFromSP(context, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_NET, false)) {
+                //控制短路 不工作
                 return null;
                 //否则工作
             }
@@ -172,13 +171,12 @@ public class NetImpl {
             proc_56 = getProc56(context);
             usm = getUsm(context);
             //扫描
-            for (String cmd : CMDS
-            ) {
+            for (String cmd : CMDS) {
                 try {
                     //运行shell获得net信息
                     String result = runShell(cmd);
                     //解析原始信息存到pkgs里面
-                    resolve(cmd, result, time);
+                    resolve(cmd.trim(), result.trim(), time);
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(BuildConfig.tag_netinfo, e);
@@ -318,18 +316,20 @@ public class NetImpl {
     }
 
 
-    private void resolve(String cmd, String result, Long time) throws Throwable {
-        if (result == null || "".equals(result)) {
+    private void resolve(String cmd, String result, Long time) throws Exception {
+        if (TextUtils.isEmpty(result)) {
             return;
         }
-        ;
         if (pkgs == null) {
             return;
         }
         String[] lines = result.split("\n");
-
         for (int i = 1; i < lines.length; i++) {
-            String[] parameter = lines[i].split("\\s+");
+            String line = lines[i];
+            if (TextUtils.isEmpty(line)) {
+                continue;
+            }
+            String[] parameter = line.split("\\s+");
             if (parameter.length < 9) {
                 continue;
             }
@@ -390,9 +390,11 @@ public class NetImpl {
                     tcpInfo.local_addr = getIpAddr(parameter[2]);
                     tcpInfo.remote_addr = getIpAddr(parameter[3]);
                     tcpInfo.socket_type = getSocketType(parameter[4]);
-                    String[] protocols = cmd.split("/");
-                    if (protocols.length > 0) {
-                        tcpInfo.protocol = protocols[protocols.length - 1];
+                    if (cmd.contains("/")) {
+                        String[] protocols = cmd.split("/");
+                        if (protocols.length > 0) {
+                            tcpInfo.protocol = protocols[protocols.length - 1];
+                        }
                     }
                 }
             }
