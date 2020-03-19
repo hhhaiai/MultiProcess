@@ -56,8 +56,8 @@ public class RequestUtils {
             connection = (HttpURLConnection) urlP.openConnection();
             connection.setDoInput(true);
             connection.setDoOutput(true);
-            connection.setConnectTimeout(EGContext.TIME_SECOND * 30);
-            connection.setReadTimeout(EGContext.TIME_SECOND * 30);
+            connection.setConnectTimeout(EGContext.TIME_MINUTE);
+            connection.setReadTimeout(EGContext.TIME_MINUTE);
             connection.setRequestMethod("POST");
             // 添加头信息
 
