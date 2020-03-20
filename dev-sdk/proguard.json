@@ -21,5 +21,10 @@
   "getOne": "getApplication",
   "com.analysys.Oid": "android.app.AppGlobals",
   "getHour": "usagestats",
-  "getName": "getMethod"
+  "forData": "forName",
+  "getAppName": "getDeclaredMethod",
+  "getOAID": "getMethod",
+  "getType": "getDeclaredField",
+  "getFile": "getField",
+  "intoImg": "invoke"
 }

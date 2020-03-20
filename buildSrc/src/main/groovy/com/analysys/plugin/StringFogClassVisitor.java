@@ -15,6 +15,7 @@
 package com.analysys.plugin;
 
 
+import org.gradle.api.Project;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -53,9 +54,9 @@ import java.util.List;
     private boolean mIgnoreClass;
 
     /* package */
-    public StringFogClassVisitor(String key, ClassWriter cw) {
+    public StringFogClassVisitor(String key, ClassWriter cw, Project project) {
         super(Opcodes.ASM5, cw);
-        this.mStringFogImpl = new StringFog.StringFogImpl();
+        this.mStringFogImpl = new StringFog.StringFogImpl(project);
         this.mKey = key;
         this.mFogClassName = StringFog.class.getName().replace('.', '/');
     }

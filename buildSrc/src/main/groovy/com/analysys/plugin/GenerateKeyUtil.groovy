@@ -1,12 +1,9 @@
-import com.google.gson.JsonObject
-import groovy.json.JsonSlurper
 import org.gradle.api.Project
-import org.json.simple.JSONObject
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-class GenerateKeyUtil {
+public class GenerateKeyUtil {
     public static void generateKey(Project project) {
 
         String key = getVer(project)
@@ -48,7 +45,7 @@ class GenerateKeyUtil {
      * @param project
      * @return
      */
-    private static String getJson(Project project) {
+    static String getJson(Project project) {
         File file = new File(project.projectDir, "proguard.json")
         file.text
     }

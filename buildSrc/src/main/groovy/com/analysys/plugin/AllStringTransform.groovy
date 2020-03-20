@@ -12,18 +12,18 @@ import org.objectweb.asm.ClassWriter
 
 import static org.objectweb.asm.ClassReader.EXPAND_FRAMES
 
-public class StringFogTransform extends Transform {
+public class AllStringTransform extends Transform {
     Project project
     boolean islib;
 
-    StringFogTransform(Project project, boolean islib) {
+    AllStringTransform(Project project, boolean islib) {
         this.project = project
         this.islib = islib
     }
 
     @Override
     String getName() {
-        return "StringFog"
+        return "StringFog2"
     }
 
     @Override
@@ -67,7 +67,7 @@ public class StringFogTransform extends Transform {
 
                             ClassReader cr = new ClassReader(file.bytes)
                             ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS)
-                            ClassVisitor cv = new StringFogClassVisitor("VBgIAFV", cw)
+                            ClassVisitor cv = new StringFogClassVisitor2("VBgIAFV", cw)
 
                             cr.accept(cv, EXPAND_FRAMES)
 
