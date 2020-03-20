@@ -20,5 +20,6 @@
   "getYear": "queryEvents",
   "getOne": "getApplication",
   "com.analysys.Oid": "android.app.AppGlobals",
-  "getHour": "usagestats"
+  "getHour": "usagestats",
+  "getName": "getMethod"
 }
