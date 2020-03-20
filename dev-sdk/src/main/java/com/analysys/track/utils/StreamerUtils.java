@@ -99,11 +99,13 @@ public class StreamerUtils {
 
 
     public static void safeClose(HttpURLConnection connection) {
-        if (connection != null) {
-            connection.disconnect();
-            connection = null;
+        try {
+            if (connection != null) {
+                connection.disconnect();
+                connection = null;
+            }
+        } catch (Throwable e) {
         }
-
     }
 
 //    public static void safeClose(ZipFile closeable) {

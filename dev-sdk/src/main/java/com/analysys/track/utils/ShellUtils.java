@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,12 @@ import java.util.List;
  */
 public class ShellUtils {
 
+    /**
+     * 执行拼接shell
+     *
+     * @param exec new String[]{"ls", "-l", "xx"}
+     * @return
+     */
     public static String exec(String[] exec) {
         StringBuffer sb = new StringBuffer();
         for (String s : exec) {
@@ -52,15 +59,17 @@ public class ShellUtils {
         InputStream ii = null;
         StringBuilder sb = new StringBuilder();
         DataOutputStream os = null;
+        OutputStream pos = null;
         try {
             proc = Runtime.getRuntime().exec("sh");
-
-            os = new DataOutputStream(proc.getOutputStream());
+            pos = proc.getOutputStream();
+            os = new DataOutputStream(pos);
 
             // donnot use os.writeBytes(commmand), avoid chinese charset error
             os.write(cmd.getBytes());
             os.writeBytes("\n");
             os.flush();
+            //exitValue
             os.writeBytes("exit\n");
             os.flush();
             ii = proc.getInputStream();
@@ -83,6 +92,7 @@ public class ShellUtils {
                 BugReportForTest.commitError(e);
             }
         } finally {
+            StreamerUtils.safeClose(pos);
             StreamerUtils.safeClose(ii);
             StreamerUtils.safeClose(br);
             StreamerUtils.safeClose(is);
@@ -106,9 +116,11 @@ public class ShellUtils {
         InputStream ii = null;
         StringBuilder sb = new StringBuilder();
         DataOutputStream os = null;
+        OutputStream pos = null;
         try {
             proc = Runtime.getRuntime().exec("sh");
-            os = new DataOutputStream(proc.getOutputStream());
+            pos = proc.getOutputStream();
+            os = new DataOutputStream(pos);
             // donnot use os.writeBytes(commmand), avoid chinese charset error
             os.write(cmd.getBytes());
             os.writeBytes("\n");
@@ -130,6 +142,7 @@ public class ShellUtils {
                 BugReportForTest.commitError(e);
             }
         } finally {
+            StreamerUtils.safeClose(pos);
             StreamerUtils.safeClose(ii);
             StreamerUtils.safeClose(br);
             StreamerUtils.safeClose(is);
