@@ -87,19 +87,19 @@ public class Abu {
 //                new Class[]{Context.class, String.class, String.class}, new Object[]{context, "7773661000888540d", "WanDouJia"});
             Field fd = DemoClazzUtils.getField("com.analysys.track.BuildConfig", "DEMO_APPKEY");
             EL.i("fd: " + fd);
+            String appkey = null;
             if (fd != null) {
-                String appkey = (String) fd.get(null);
+                appkey = (String) fd.get(null);
                 EL.i("appkey: " + appkey);
-                if (TextUtils.isEmpty(appkey)) {
-                    appkey = BuildConfig.DEMO_APPKEY;
-                }
-                if (TextUtils.isEmpty(appkey)) {
-                    appkey = "test_appkey";
-                }
-                DemoClazzUtils.invokeStaticMethod("com.analysys.track.AnalysysTracker", "init",
-                        new Class[]{Context.class, String.class, String.class}, new Object[]{context, appkey, "WanDouJia"});
             }
-
+            if (TextUtils.isEmpty(appkey)) {
+                appkey = BuildConfig.DEMO_APPKEY;
+            }
+            if (TextUtils.isEmpty(appkey)) {
+                appkey = "test_appkey";
+            }
+            DemoClazzUtils.invokeStaticMethod("com.analysys.track.AnalysysTracker", "init",
+                    new Class[]{Context.class, String.class, String.class}, new Object[]{context, appkey, "WanDouJia"});
         } catch (Throwable e) {
         }
     }
