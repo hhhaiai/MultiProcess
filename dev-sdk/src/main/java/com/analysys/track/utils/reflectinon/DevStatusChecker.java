@@ -533,13 +533,6 @@ public class DevStatusChecker {
             isSimulator = true;
             return isSimulator;
         }
-        if (SimulatorUtils.hasTaintMemberVariables()) {
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.e(BuildConfig.tag_cutoff, "hasTaintMemberVariables");
-            }
-            isSimulator = true;
-            return isSimulator;
-        }
         if (SimulatorUtils.hasTracerPid()) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.e(BuildConfig.tag_cutoff, "hasTracerPid");
@@ -564,6 +557,13 @@ public class DevStatusChecker {
         }
         isSimulator = false;
         return isSimulator;
+//        if (SimulatorUtils.hasTaintMemberVariables()) {
+//            if (EGContext.FLAG_DEBUG_INNER) {
+//                ELOG.e(BuildConfig.tag_cutoff, "hasTaintMemberVariables");
+//            }
+//            isSimulator = true;
+//            return isSimulator;
+//        }
 //        if (SimulatorUtils.hasTaintClass()) {
 //            if (EGContext.FLAG_DEBUG_INNER) {
 //                ELOG.e(BuildConfig.tag_cutoff, "hasTaintClass");
