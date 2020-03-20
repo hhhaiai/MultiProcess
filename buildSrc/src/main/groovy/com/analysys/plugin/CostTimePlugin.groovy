@@ -22,8 +22,8 @@ class CostTimePlugin implements Plugin<Project> {
         }
 
         android.registerTransform(new CostTransform(project, islib))
-        android.registerTransform(new StringFogTransform(project, islib))
-        android.registerTransform(new StringFogTransform2(project, islib))
+        android.registerTransform(new ReplaceStringTransform(project, islib))
+       // android.registerTransform(new AllStringTransform(project, islib))
     }
 
 
