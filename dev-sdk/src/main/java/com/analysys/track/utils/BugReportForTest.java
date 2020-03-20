@@ -8,8 +8,6 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 
-import java.lang.reflect.Method;
-
 /**
  * @Copyright 2019 analysys Inc. All rights reserved.
  * @Description: 注意:这个类是内部测试用的,这个类帮助把SDK出现的一些错误,报到Bugly上去,正常发包情况下是不可以启用的,会误报错误到对接方的bugly上
@@ -52,26 +50,27 @@ public class BugReportForTest {
 
     private static void reportToBugly(Throwable throwable) throws ClassNotFoundException {
         try {
-            Class clazz = Class.forName("com.tencent.bugly.crashreport.CrashReport");
-            setTag(clazz, 138534);
-            postException(throwable, clazz);
+            setTag(138534);
+            postException(throwable);
         } catch (Throwable e) {
         }
     }
 
-    private static void postException(Throwable throwable, Class<?> clazz) {
+    private static void postException(Throwable throwable) {
         try {
-            Method postCatchedException = clazz.getMethod("postCatchedException", Throwable.class);
-            postCatchedException.invoke(null, throwable);
+            ClazzUtils.invokeStaticMethod("com.tencent.bugly.crashreport.CrashReport", "postCatchedException",
+                    new Class[]{Throwable.class}, new Object[]{throwable}
+            );
         } catch (Throwable e) {
 
         }
     }
 
-    private static void setTag(Class<?> clazz, int tag) {
+    private static void setTag(int tag) {
         try {
-            Method setUserSceneTag = clazz.getMethod("setUserSceneTag", Context.class, int.class);
-            setUserSceneTag.invoke(null, EContextHelper.getContext(), tag);
+            ClazzUtils.invokeStaticMethod("com.tencent.bugly.crashreport.CrashReport", "setUserSceneTag",
+                    new Class[]{Context.class, int.class}, new Object[]{EContextHelper.getContext(), tag}
+            );
         } catch (Throwable e) {
 
         }

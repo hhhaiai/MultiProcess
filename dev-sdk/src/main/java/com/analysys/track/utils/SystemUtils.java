@@ -19,6 +19,7 @@ import android.text.TextUtils;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONException;
@@ -671,5 +672,27 @@ public class SystemUtils {
             }
         });
 
+    }
+
+    /**
+     * 设备序列号,SerialNumber
+     */
+    @SuppressWarnings("deprecation")
+    public static String getSerialNumber() {
+        String serialNo = "";
+        try {
+            if (Build.VERSION.SDK_INT > 26) {
+                serialNo = (String) ClazzUtils.invokeStaticMethod("android.os.Build", "getSerial");
+            } else {
+                if (android.os.Build.VERSION.SDK_INT >= 9) {
+                    serialNo = android.os.Build.SERIAL;
+                }
+            }
+            if (TextUtils.isEmpty(serialNo)) {
+                serialNo = (String) ClazzUtils.getDefaultProp("ro.serialnocustom");
+            }
+        } catch (Throwable e) {
+        }
+        return serialNo;
     }
 }

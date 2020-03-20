@@ -19,6 +19,7 @@ import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PermissionUtils;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
 
 import java.lang.reflect.Method;
 
@@ -257,14 +258,11 @@ public class ServiceHelper {
      * @param context
      * @param className
      */
-    private void startForegroundService(Context context, Class<?> className) throws
-            Exception {
+    private void startForegroundService(Context context, Class<?> className) {
         ComponentName cn = new ComponentName(mContext, className);
         Intent intent = new Intent();
         intent.setComponent(cn);
-        Class<?> clazz = Class.forName("android.content.Context");
-        Method startForegroundService = clazz.getMethod("startForegroundService", Intent.class);
-        startForegroundService.invoke(context, intent);
+        ClazzUtils.invokeObjectMethod(context, "startForegroundService", new Class[]{Intent.class}, new Object[]{intent});
     }
 
 

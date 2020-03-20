@@ -32,6 +32,7 @@ import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.OAIDHelper;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.StreamerUtils;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.BufferedInputStream;
@@ -315,35 +316,6 @@ public class DeviceImpl {
             StreamerUtils.safeClose(in);
         }
         return DEFALT_MAC;
-    }
-
-    /**
-     * 设备序列号,SerialNumber
-     */
-    @SuppressWarnings("deprecation")
-    public String getSerialNumber() {
-        String serialNo = "";
-        try {
-            if (Build.VERSION.SDK_INT > 26) {
-//                Class<?> clazz = Class.forName("android.os.Build");
-                Method method = Build.class.getMethod("getSerial");
-                serialNo = (String) method.invoke(null);
-            } else {
-                if (android.os.Build.VERSION.SDK_INT >= 9) {
-                    serialNo = android.os.Build.SERIAL;
-                }
-            }
-            if (TextUtils.isEmpty(serialNo)) {
-                Class<?> c = Class.forName("android.os.SystemProperties");
-                Method get = c.getMethod("get", String.class);
-                serialNo = (String) get.invoke(c, "ro.serialnocustom");
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-        return serialNo;
     }
 
     private DisplayMetrics getDisplayMetrics() {

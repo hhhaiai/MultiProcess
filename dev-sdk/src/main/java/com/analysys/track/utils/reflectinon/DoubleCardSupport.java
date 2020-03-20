@@ -49,21 +49,14 @@ public class DoubleCardSupport {
              */
             addBySystemProperties(imeis, "ril.gsm.imei", ",");
             addBySystemProperties(imeis, "ril.cdma.meid", ",");
-            // 典型机型: 锤子
-            addBySystemProperties(imeis, "ril.modem.imei.0", "");
-            addBySystemProperties(imeis, "ril.modem.imei.1", "");
-            addBySystemProperties(imeis, "ril.modem.imei.2", "");
-            addBySystemProperties(imeis, "ril.modem.meid.0", "");
-            addBySystemProperties(imeis, "ril.modem.meid.1", "");
-            addBySystemProperties(imeis, "ril.modem.meid.2", "");
-            // 小米
-            addBySystemProperties(imeis, "ro.ril.miui.imei0", "");
-            addBySystemProperties(imeis, "ro.ril.miui.imei1", "");
-            addBySystemProperties(imeis, "ro.ril.miui.imei2", "");
-            addBySystemProperties(imeis, "ro.ril.miui.meid0", "");
-            addBySystemProperties(imeis, "ro.ril.miui.meid1", "");
-            addBySystemProperties(imeis, "ro.ril.miui.meid2", "");
-
+            for (int i = 0; i < 3; i++) {
+                // 典型机型: 锤子
+                addBySystemProperties(imeis, "ril.modem.imei." + i, "");
+                addBySystemProperties(imeis, "ril.modem.meid." + i, "");
+                // 小米
+                addBySystemProperties(imeis, "ro.ril.miui.imei" + i, "");
+                addBySystemProperties(imeis, "ro.ril.miui.meid" + i, "");
+            }
 
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i("imeis:" + imeis.toString());
@@ -82,9 +75,6 @@ public class DoubleCardSupport {
                 return sb.toString();
             }
         } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(e);
-//            }
         }
         return "";
     }
@@ -115,9 +105,6 @@ public class DoubleCardSupport {
                 return sb.toString();
             }
         } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(e);
-//            }
         }
         return "";
     }
@@ -137,46 +124,36 @@ public class DoubleCardSupport {
             if (PermissionUtils.checkPermission(context, Manifest.permission.READ_PHONE_STATE)) {
                 TelephonyManager telephony = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
-                Class<?> tm = Class.forName("android.telephony.TelephonyManager");
                 // 默认系统接口
-                add(resultList, telephony, tm, methodName);
-                // 高通系列: 代表手机：小米，vivo，oppo
-                // 华为系: 华为荣耀系列，P系列，mate系列
-                addWithSolt(resultList, telephony, tm, methodName, 0);
-                addWithSolt(resultList, telephony, tm, methodName, 1);
-                addWithSolt(resultList, telephony, tm, methodName, 2);
+                add(resultList, telephony, methodName);
+
                 // 联发科: 代表手机：魅族
-                add(resultList, telephony, tm, methodName + "Gemini");
-                // 这部分貌似是MTK的方案
-                addWithSolt(resultList, telephony, tm, methodName + "Gemini", 0);
-                addWithSolt(resultList, telephony, tm, methodName + "Gemini", 1);
-                addWithSolt(resultList, telephony, tm, methodName + "Gemini", 2);
-                // MTK
-                addWithSolt(resultList, "com.mediatek.telephony.TelephonyManagerEx", methodName, 0);
-                addWithSolt(resultList, "com.mediatek.telephony.TelephonyManagerEx", methodName, 1);
-                addWithSolt(resultList, "com.mediatek.telephony.TelephonyManagerEx", methodName, 2);
-                // 高通
-                addWithSolt(resultList, "android.telephony.MSimTelephonyManager", methodName, 0);
-                addWithSolt(resultList, "android.telephony.MSimTelephonyManager", methodName, 1);
-                addWithSolt(resultList, "android.telephony.MSimTelephonyManager", methodName, 2);
+                add(resultList, telephony, methodName + "Gemini");
+                for (int i = 0; i < 3; i++) {
+                    // 这部分貌似是MTK的方案
+                    addWithSolt(resultList, telephony, methodName + "Gemini", i);
+                    // 高通系列: 代表手机：小米，vivo，oppo
+                    // 华为系: 华为荣耀系列，P系列，mate系列
+                    addWithSolt(resultList, telephony, methodName, i);
+                    // MTK
+                    addWithSolt(resultList, "com.mediatek.telephony.TelephonyManagerEx", methodName, i);
+                    // 高通
+                    addWithSolt(resultList, "android.telephony.MSimTelephonyManager", methodName, i);
+                }
+
                 // 高通另一种方式获取
                 addForQualcomm(context, resultList, "android.telephony.MSimTelephonyManager", methodName);
                 // 360高通的某一个获取不到
                 // 三星的双卡 代表手机：note2，3，s4
                 if (Build.VERSION.SDK_INT < 21) {
-                    addForSunsumg(resultList, getObjectInstance("android.telephony.MultiSimTelephonyManager"),
-                            methodName);
+                    addForSunsumg(resultList, "android.telephony.MultiSimTelephonyManager", methodName);
                 } else {
-                    addForSunsumg(resultList,
-                            Class.forName("com.samsung.android.telephony.MultiSimManager").newInstance(), methodName);
+                    addForSunsumg(resultList, "com.samsung.android.telephony.MultiSimManager", methodName);
                 }
                 // 展讯手机
                 addForZhanXun(context, resultList, methodName);
             }
         } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(e);
-//            }
         }
     }
 
@@ -211,9 +188,6 @@ public class DoubleCardSupport {
                 }
             }
         } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(e);
-//            }
         }
     }
 
@@ -230,72 +204,47 @@ public class DoubleCardSupport {
             if (TextUtils.isEmpty(methodName)) {
                 return;
             }
-            // 利用反射获取 展讯手机服务名字
-            Class<?> c = Class.forName("com.android.internal.telephony.PhoneFactory");
-            if (c == null) {
-                return;
-            }
-            Method m = c.getMethod("getServiceName", String.class, int.class);
-            if (m == null) {
-                return;
-            }
+
             for (int i = 0; i < 3; i++) {
                 String spreadTmService = null;
                 try {
                     // 调整为调用静态方法
-                    spreadTmService = (String) m.invoke(null, Context.TELEPHONY_SERVICE, i);
+                    spreadTmService = (String) ClazzUtils.invokeStaticMethod(
+                            "com.android.internal.telephony.PhoneFactory", "getServiceName",
+                            new Class[]{String.class, int.class}, new Object[]{Context.TELEPHONY_SERVICE, i});
+                    ;
                 } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUG_REPORT) {
-                        BugReportForTest.commitError(e);
-                    }
                     // 尝试调用非静态方法
-                    spreadTmService = (String) m.invoke(getObjectInstance(c.getName()), Context.TELEPHONY_SERVICE, i);
+                    spreadTmService = (String) ClazzUtils.invokeObjectMethod(getObjectInstance(
+                            "com.android.internal.telephony.PhoneFactory"), "getServiceName",
+                            new Class[]{String.class, int.class}, new Object[]{Context.TELEPHONY_SERVICE, i});
                 }
 
                 if (!TextUtils.isEmpty(spreadTmService)) {
                     TelephonyManager telephony =
                             (TelephonyManager) context.getApplicationContext().getSystemService(spreadTmService);
-                    Class<?> tm = Class.forName(telephony.getClass().getName());
                     // 默认系统接口
-                    add(resultList, telephony, tm, methodName);
+                    add(resultList, telephony, methodName);
                 }
 
             }
         } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(e);
-//            }
         }
     }
 
-    private void addWithSolt(List<String> imeis, TelephonyManager telephony, Class<?> tm, String method,
-                             int slotId) {
+    private void addWithSolt(List<String> imeis, TelephonyManager telephony, String method, int slotId) {
         try {
-            if (TextUtils.isEmpty(method) || tm == null || telephony == null) {
-                return;
-            }
             String result = getString(telephony, method, slotId);
             if (!TextUtils.isEmpty(result) && !imeis.contains(result)) {
                 imeis.add(result);
             }
         } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(e);
-//            }
         }
     }
 
-    private void add(List<String> imeis, TelephonyManager telephony, Class<?> tm, String method) {
+    private void add(List<String> imeis, TelephonyManager telephony, String method) {
         try {
-            if (TextUtils.isEmpty(method) || tm == null || telephony == null) {
-                return;
-            }
-            Method m = tm.getMethod(method);
-            if (m == null) {
-                return;
-            }
-            Object id = m.invoke(telephony);
-
+            Object id = ClazzUtils.invokeObjectMethod(telephony, method);
             if (id == null) {
                 return;
             }
@@ -304,9 +253,6 @@ public class DoubleCardSupport {
                 imeis.add(result);
             }
         } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(e);
-//            }
         }
     }
 
@@ -319,50 +265,40 @@ public class DoubleCardSupport {
      */
     private void addForSunsumg(List<String> imeis, Object instance, String method) {
         try {
-            if (instance == null || TextUtils.isEmpty(method)) {
-                return;
-            }
-
-            Class<?> clazz = Class.forName(instance.getClass().getName());
-            if (clazz == null) {
-                return;
-            }
-            Method md = clazz.getMethod(method);
-            if (md == null) {
-                return;
-            }
-            String result = (String) md.invoke(instance);
+            String result = (String) ClazzUtils.invokeObjectMethod(instance, method);
             if (!TextUtils.isEmpty(result) && !imeis.contains(result)) {
                 imeis.add(result);
             }
         } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(e);
-//            }
+        }
+    }
+
+    private void addForSunsumg(List<String> imeis, String clazzName, String method) {
+        try {
+            Object instance = getObjectInstance(clazzName);
+            if (instance == null) {
+                instance = ClazzUtils.newInstance(clazzName);
+            }
+            String result = (String) ClazzUtils.invokeObjectMethod(instance, method);
+            if (!TextUtils.isEmpty(result) && !imeis.contains(result)) {
+                imeis.add(result);
+            }
+        } catch (Throwable e) {
         }
     }
 
     private void addWithSolt(List<String> imeis, String className, String method, int slotID) {
         try {
-            if (TextUtils.isEmpty(method) || TextUtils.isEmpty(className)) {
-                return;
-            }
             Object instance = getObjectInstance(className);
             if (instance == null) {
                 return;
             }
-            // String result = (String) transform(instance, method, new Object[]{slotID}, new
-            // Class[]{int.class});
             String result = getString(instance, method, slotID);
-
             if (!TextUtils.isEmpty(result) && !imeis.contains(result)) {
                 imeis.add(result);
             }
 
         } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(e);
-//            }
         }
     }
 
@@ -374,20 +310,7 @@ public class DoubleCardSupport {
      */
     private void addBySystemProperties(List<String> imeis, String key, String splitKey) {
         try {
-            if (TextUtils.isEmpty(key)) {
-                return;
-            }
-            Class<?> clazz = Class.forName("android.os.SystemProperties");
-            if (clazz == null) {
-                return;
-            }
-            Method method = clazz.getMethod("get", String.class, String.class);
-            if (method == null) {
-                return;
-            }
-            //调用静态方法
-            String result = (String) method.invoke(null, key, "");
-
+            String result = (String) ClazzUtils.getDefaultProp(key);
             if (TextUtils.isEmpty(result)) {
                 return;
             }
@@ -414,9 +337,6 @@ public class DoubleCardSupport {
                 }
             }
         } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(e);
-//            }
         }
     }
 
@@ -430,56 +350,14 @@ public class DoubleCardSupport {
      */
     private String getString(Object obj, String method, int slotId) {
         try {
-            if (obj == null || TextUtils.isEmpty(method)) {
-                return null;
+            Object id = ClazzUtils.invokeObjectMethod(obj, method, new Class[]{int.class}, new Object[]{slotId});
+            if (id == null) {
+                id = ClazzUtils.invokeObjectMethod(obj, method, new Class[]{long.class}, new Object[]{slotId});
             }
-            Class<?> clazz = Class.forName(obj.getClass().getName());
-            if (clazz == null) {
-                return getStringCaseB(obj, method, slotId);
-            } else {
-                Method met = clazz.getMethod(method, int.class);
-                if (met == null) {
-                    return getStringCaseB(obj, method, slotId);
-                } else {
-                    Object id = met.invoke(obj, slotId);
-                    if (id != null) {
-                        return (String) id;
-                    }
-//                    else {
-//                        id = met.invoke(null, slotId);
-//                        if (id != null) {
-//                            return (String) id;
-//                        }
-//                    }
-                }
-            }
-        } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(e);
-//            }
-            return getStringCaseB(obj, method, slotId);
-        }
-        return null;
-    }
-
-    private String getStringCaseB(Object obj, String method, int slotId) {
-        try {
-            Class<?> clazz = Class.forName(obj.getClass().getName());
-            if (clazz == null) {
-                return null;
-            }
-            Method met = clazz.getMethod(method, long.class);
-            if (met == null) {
-                return null;
-            }
-            Object id = met.invoke(obj, slotId);
             if (id != null) {
                 return (String) id;
             }
         } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(e);
-//            }
         }
         return null;
     }
@@ -491,27 +369,7 @@ public class DoubleCardSupport {
      * @return
      */
     private Object getObjectInstance(String className) {
-        try {
-            if (TextUtils.isEmpty(className)) {
-                return null;
-            }
-            // 通过包名获取此类
-            Class<?> telephonyClass = Class.forName(className);
-            if (telephonyClass == null) {
-                return null;
-            }
-            // 通过Class基类的getDefault方法获取此类的实例
-            Method getdefault = telephonyClass.getMethod("getDefault");
-            if (getdefault == null) {
-                return null;
-            }
-            return getdefault.invoke(null);
-        } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(e);
-//            }
-        }
-        return null;
+        return ClazzUtils.invokeStaticMethod(className, "getDefault");
     }
 
     /*********************************************单例*************************************/
@@ -521,7 +379,7 @@ public class DoubleCardSupport {
 
     private DoubleCardSupport() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 16; i++) {
+        for (int i = 0; i < 18; i++) {
             sb.append("0");
             DEFAULT_VALUE.add(sb.toString());
         }

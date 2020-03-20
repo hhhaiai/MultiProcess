@@ -209,23 +209,6 @@ public class SPHelper {
         }
     }
 
-    private static Object invokeObjectMethod(Object o, String methodName, Class<?>[] argsClass, Object[] args) {
-        Object returnValue = null;
-        try {
-            Class<?> c = o.getClass();
-            Method method;
-            method = c.getMethod(methodName, argsClass);
-            method.setAccessible(true);
-            returnValue = method.invoke(o, args);
-        } catch (Exception e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-
-        return returnValue;
-    }
-
     /**
      * 存int类型数据入sp
      *

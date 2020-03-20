@@ -1,11 +1,9 @@
 package com.analysys.track.utils.data;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -13,9 +11,8 @@ import android.util.Base64;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.PermissionUtils;
+import com.analysys.track.utils.SystemUtils;
 
-import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.util.UUID;
 
@@ -181,23 +178,7 @@ public class EncryptUtils {
                 if (canGetAndroidId(context)) {
                     preID = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
                 }
-                String serialNO = null;
-                if (Build.VERSION.SDK_INT > 24) {
-                    if (PermissionUtils.checkPermission(context, Manifest.permission.READ_PHONE_STATE)) {
-                        try {
-                            Class<?> clazz = Class.forName("android.os.Build");
-                            Method method = clazz.getMethod("getSerial");
-                            serialNO = (String) method.invoke(null);
-                        } catch (Exception e) {
-                            if (BuildConfig.ENABLE_BUG_REPORT) {
-                                BugReportForTest.commitError(e);
-                            }
-                        }
-                    }
-                } else {
-                    serialNO = Build.SERIAL;
-                }
-
+                String serialNO = SystemUtils.getSerialNumber();
                 // 确保preID非空
                 if (TextUtils.isEmpty(preID)) {
                     String uuid = String.valueOf(UUID.randomUUID());
@@ -341,26 +322,6 @@ public class EncryptUtils {
         cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
         return cipher.doFinal(input);
     }
-
-//    private static boolean checkPermission(Context context, String permission) {
-//        boolean result = false;
-//        if (Build.VERSION.SDK_INT >= 23) {
-//            try {
-//                Class<?> clazz = Class.forName("android.content.Context");
-//                Method method = clazz.getMethod("checkSelfPermission", String.class);
-//                int rest = (Integer) method.invoke(context, permission);
-//                result = rest == PackageManager.PERMISSION_GRANTED;
-//            } catch (Exception e) {
-//                result = false;
-//            }
-//        } else {
-//            PackageManager pm = context.getPackageManager();
-//            if (pm.checkPermission(permission, context.getPackageName()) == PackageManager.PERMISSION_GRANTED) {
-//                result = true;
-//            }
-//        }
-//        return result;
-//    }
 
     @SuppressWarnings("deprecation")
     private static boolean isAirplaneModeOn(Context context) {

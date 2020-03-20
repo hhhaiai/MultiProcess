@@ -258,6 +258,9 @@ public class ClazzUtils {
     }
 
 
+    public static Object invokeStaticMethod(String clazzName, String methodName) {
+        return invokeStaticMethod(getClass(clazzName), methodName, new Class<?>[]{}, new Object[]{});
+    }
     /**
      * call static method
      *
@@ -448,6 +451,20 @@ public class ClazzUtils {
         } catch (Throwable e) {
         }
         return "";
+    }
+
+    /**
+     * 反射SystemProperties.get(String).获取数据是default.prop中的数据.
+     * api 14-29均有
+     *
+     * @param key
+     * @return
+     */
+    public static Object getDefaultProp(String key) {
+        if (TextUtils.isEmpty(key)) {
+            return "";
+        }
+        return invokeStaticMethod("android.os.SystemProperties", "get", new Class[]{String.class}, new Object[]{key});
     }
 
 //
