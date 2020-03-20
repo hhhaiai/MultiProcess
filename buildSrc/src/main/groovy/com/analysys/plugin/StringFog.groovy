@@ -17,16 +17,16 @@ public class StringFog {
         public final Map<String, String> hset = new HashMap<>();
 
         public StringFogImpl(Project project) {
-            final String json = GenerateKeyUtil.getJson(project)
-            def jsonSlu = new JsonSlurper()
-            def jsonMap = jsonSlu.parseText(json)
-
-            assert jsonMap instanceof LazyMap
-
-            jsonMap.each { Map.Entry<String, Object> item ->
-                hset.put(item.value, item.key)
-
-               // println(item.value + " --> " + item.key)
+            try {
+                final String json = GenerateKeyUtil.getJson(project)
+                def jsonSlu = new JsonSlurper()
+                def jsonMap = jsonSlu.parseText(json)
+                assert jsonMap instanceof LazyMap
+                jsonMap.each { Map.Entry<String, Object> item ->
+                    hset.put(item.value, item.key)
+                    // println(item.value + " --> " + item.key)
+                }
+            } catch (Throwable) {
             }
         }
 
