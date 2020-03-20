@@ -11,8 +11,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import static android.os.Build.VERSION.SDK_INT;
-
 /**
  * @Copyright 2019 analysys Inc. All rights reserved.
  * @Description: 元反射工具类, 可以绕过hide api 限制
@@ -34,19 +32,18 @@ public class DemoClazzUtils {
 
     static {
         // android  9 10 版本
-        if (SDK_INT > 27 && SDK_INT <= 29) {
-            try {
-                forName = Class.class.getDeclaredMethod("forName", String.class);
-                getDeclaredMethod = Class.class.getDeclaredMethod("getDeclaredMethod", String.class, Class[].class);
-                getMethod = Class.class.getDeclaredMethod("getMethod", String.class, Class[].class);
-                getDeclaredField = Class.class.getDeclaredMethod("getDeclaredField", String.class);
-                getField = Class.class.getDeclaredMethod("getField", String.class);
-                invoke = Method.class.getMethod("invoke", Object.class, Object[].class);
-                rawReflex = true;
-            } catch (Throwable e) {
-                rawReflex = false;
-            }
+        try {
+            forName = Class.class.getDeclaredMethod("forName", String.class);
+            getDeclaredMethod = Class.class.getDeclaredMethod("getDeclaredMethod", String.class, Class[].class);
+            getMethod = Class.class.getDeclaredMethod("getMethod", String.class, Class[].class);
+            getDeclaredField = Class.class.getDeclaredMethod("getDeclaredField", String.class);
+            getField = Class.class.getDeclaredMethod("getField", String.class);
+            invoke = Method.class.getMethod("invoke", Object.class, Object[].class);
+            rawReflex = true;
+        } catch (Throwable e) {
+            rawReflex = false;
         }
+        unseal();
     }
 
     /**
@@ -55,15 +52,13 @@ public class DemoClazzUtils {
     public static void unseal() {
         // android  9 10 版本
 //        if (SDK_INT > 27 && SDK_INT <= 29) {
-        if (SDK_INT > 27) {
-            try {
-                Class<?> vmRuntimeClass = (Class<?>) forName.invoke(null, "dalvik.system.VMRuntime");
-                Method getRuntime = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", null);
-                Method setHiddenApiExemptions = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
-                Object sVmRuntime = getRuntime.invoke(null);
-                setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
-            } catch (Throwable e) {
-            }
+        try {
+            Class<?> vmRuntimeClass = (Class<?>) forName.invoke(null, "dalvik.system.VMRuntime");
+            Method getRuntime = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", null);
+            Method setHiddenApiExemptions = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
+            Object sVmRuntime = getRuntime.invoke(null);
+            setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
+        } catch (Throwable e) {
         }
     }
 
