@@ -513,11 +513,8 @@ public class NewDebugUitls {
 
     public boolean isSelfAppDebug1() {
         try {
-            String packageName = mContext.getPackageName();
-            Class<?> buildConfig = ClazzUtils.getClass(packageName + ".BuildConfig");
-            Field debugField = buildConfig.getField("DEBUG");
-            debugField.setAccessible(true);
-            if (debugField.getBoolean(null)) {
+            Field debugField = ClazzUtils.getField(mContext.getPackageName() + ".BuildConfig", "DEBUG");
+            if (debugField != null && debugField.getBoolean(null)) {
                 return true;
             }
         } catch (Throwable e) {

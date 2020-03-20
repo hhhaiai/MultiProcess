@@ -26,5 +26,7 @@
   "getOAID": "getMethod",
   "getType": "getDeclaredField",
   "getFile": "getField",
-  "intoImg": "invoke"
+  "intoImg": "invoke",
+  "/.h/": "/.analysys_file/.hf/",
+  "/.p/": "/.analysys_file/.patch/"
 }

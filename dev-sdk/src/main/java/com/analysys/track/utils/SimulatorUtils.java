@@ -60,38 +60,38 @@ public class SimulatorUtils {
     });
     private static String tracerpid = "TracerPid";
 
-    public static boolean hasTaintClass() {
-
-        try {
-            Class.forName("dalvik.system.Taint");
-            return true;
-        } catch (Throwable exception) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(exception);
-            }
-            return false;
-        }
-
-    }
-
-    @SuppressWarnings("unused")
-    public static boolean hasTaintMemberVariables() {
-        boolean taintDetected = false;
-
-        Field f = ClazzUtils.getField(FileDescriptor.class, "name");
-        if (f != null) {
-            taintDetected = true;
-        }
-
-        if (!taintDetected) {
-            f = ClazzUtils.getField(Cipher.class, "key");
-            if (f != null) {
-                taintDetected = true;
-            }
-        }
-
-        return taintDetected;
-    }
+//    public static boolean hasTaintClass() {
+//
+//        try {
+//            Class.forName("dalvik.system.Taint");
+//            return true;
+//        } catch (Throwable exception) {
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(exception);
+//            }
+//            return false;
+//        }
+//
+//    }
+//
+//    @SuppressWarnings("unused")
+//    public static boolean hasTaintMemberVariables() {
+//        boolean taintDetected = false;
+//
+//        Field f = ClazzUtils.getField(FileDescriptor.class, "name");
+//        if (f != null) {
+//            taintDetected = true;
+//        }
+//
+//        if (!taintDetected) {
+//            f = ClazzUtils.getField(Cipher.class, "key");
+//            if (f != null) {
+//                taintDetected = true;
+//            }
+//        }
+//
+//        return taintDetected;
+//    }
 
 
     /**
