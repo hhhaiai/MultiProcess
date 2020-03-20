@@ -33,7 +33,8 @@ public class ClazzUtils {
 
     static {
         // android  9 10 版本
-        if (SDK_INT > 27 && SDK_INT <= 29) {
+//        if (SDK_INT > 27 && SDK_INT <= 29) {
+        if (SDK_INT > 27) {
             try {
                 forName = Class.class.getDeclaredMethod("forName", String.class);
                 getDeclaredMethod = Class.class.getDeclaredMethod("getDeclaredMethod", String.class, Class[].class);
@@ -45,6 +46,7 @@ public class ClazzUtils {
             } catch (Throwable e) {
                 rawReflex = false;
             }
+            unseal();
         }
     }
 

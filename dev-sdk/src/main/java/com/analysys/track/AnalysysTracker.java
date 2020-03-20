@@ -6,6 +6,7 @@ import com.analysys.track.impl.HotFixTransform;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.

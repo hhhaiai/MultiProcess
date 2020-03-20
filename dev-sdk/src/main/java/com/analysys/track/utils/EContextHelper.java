@@ -42,15 +42,16 @@ public class EContextHelper {
     }
 
     public static void setContext(Context context) {
-        if (context != null && mContext == null) {
-            try {
+        try {
+            if (context != null && mContext == null) {
                 mContext = context.getApplicationContext();
+            }
             } catch (Throwable e) {
                 //热修包调用的时候，这里会有兼容性错误，保护
                 if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
             }
-        }
+
     }
 }

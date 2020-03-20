@@ -124,9 +124,6 @@ public class AnalysysInternal {
     private void init(String key, String channel, boolean initType) {
 
         try {
-            //禁止灰色 api logcat
-            ClazzUtils.unseal();
-
             // 检查是否有Context
             Context ctx = EContextHelper.getContext();
             if (ctx == null) {

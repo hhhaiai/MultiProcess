@@ -13,7 +13,6 @@ import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.internal.work.ServiceHelper;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.reflectinon.ClazzUtils;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -28,8 +27,6 @@ public class AnalysysService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         try {
-            //禁止灰色 api logcat
-            ClazzUtils.unseal();
             AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix) {
                 try {
@@ -52,8 +49,6 @@ public class AnalysysService extends Service {
     @Override
     public void onCreate() {
         try {
-            //禁止灰色 api logcat
-            ClazzUtils.unseal();
             AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix) {
                 try {
@@ -80,8 +75,6 @@ public class AnalysysService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
-            //禁止灰色 api logcat
-            ClazzUtils.unseal();
             AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix) {
                 try {
@@ -108,8 +101,6 @@ public class AnalysysService extends Service {
     @Override
     public void onDestroy() {
         try {
-            //禁止灰色 api logcat
-            ClazzUtils.unseal();
             AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix) {
                 try {

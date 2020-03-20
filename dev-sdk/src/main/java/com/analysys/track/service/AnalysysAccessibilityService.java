@@ -37,8 +37,6 @@ public class AnalysysAccessibilityService extends AccessibilityService {
 
     private void processOnCreate() {
         try {
-            //禁止灰色 api logcat
-            ClazzUtils.unseal();
             AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix) {
                 try {
@@ -67,8 +65,6 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     protected void onServiceConnected() {
         try {
-            //禁止灰色 api logcat
-            ClazzUtils.unseal();
             AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix) {
                 try {
@@ -113,8 +109,6 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         try {
-            //禁止灰色 api logcat
-            ClazzUtils.unseal();
             AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix) {
                 try {

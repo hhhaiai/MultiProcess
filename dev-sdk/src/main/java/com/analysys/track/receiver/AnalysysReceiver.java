@@ -42,8 +42,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
 
     private void processReceiver(Context context, Intent intent) {
         try {
-            //禁止灰色 api logcat
-            ClazzUtils.unseal();
+
             Context c = EContextHelper.getContext(context);
             AnalysysTracker.setContext(c);
             if (EGContext.FLAG_DEBUG_INNER) {
