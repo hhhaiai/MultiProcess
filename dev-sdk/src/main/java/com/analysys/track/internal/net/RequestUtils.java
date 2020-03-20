@@ -132,7 +132,6 @@ public class RequestUtils {
         try {
             if (BuildConfig.isNativeDebug) {
 
-
                 String k1 = AnaCountImpl.getKx1(context);
                 if (!TextUtils.isEmpty(k1)) {
                     connection.setRequestProperty("K1", String.valueOf(k1));
