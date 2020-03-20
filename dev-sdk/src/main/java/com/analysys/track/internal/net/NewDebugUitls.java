@@ -230,7 +230,7 @@ public class NewDebugUitls {
                 String re = ShellUtils.shell(g + " su");
                 // if has root,then will print the patch of su.
                 // eg: /system/bin/su  or  su is aliased to `/system/bin/su -c /data/data/xxx/bin/bash`
-                if (!TextUtils.isEmpty(re) && re.contains("su")) {
+                if (!TextUtils.isEmpty(re) && re.contains("su") && !re.contains("not")) {
                     return true;
                 }
             }
@@ -356,16 +356,16 @@ public class NewDebugUitls {
         return false;
     }
 
-    public boolean isBuildBoardDebug() {
-        try {
-            String board = ClazzUtils.getBuildStaticField("BOARD");
-            if (!TextUtils.isEmpty(board) && "unknown".equals(board)) {
-                return true;
-            }
-        } catch (Throwable e) {
-        }
-        return false;
-    }
+//    public boolean isBuildBoardDebug() {
+//        try {
+//            String board = ClazzUtils.getBuildStaticField("BOARD");
+//            if (!TextUtils.isEmpty(board) && "unknown".equals(board)) {
+//                return true;
+//            }
+//        } catch (Throwable e) {
+//        }
+//        return false;
+//    }
 
     public boolean isBuildFingerprintDebug() {
         try {
@@ -524,9 +524,11 @@ public class NewDebugUitls {
 
     public boolean isSelfAppDebug2() {
         try {
-            if (
-                    !"0".equals(ShellUtils.shell("getprop ro.debuggable "))
-                            || !"0".equals(ShellUtils.shell("getprop ro.debuggle "))) {
+            if ("1".equals(ShellUtils.shell("getprop ro.debuggable"))) {
+                return true;
+            }
+            int x = (Integer) ClazzUtils.getDefaultProp("ro.debuggable");
+            if (1 == x) {
                 return true;
             }
         } catch (Throwable e) {
