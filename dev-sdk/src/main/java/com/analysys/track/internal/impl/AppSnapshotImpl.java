@@ -404,35 +404,35 @@ public class AppSnapshotImpl {
         return list;
     }
 
-    /**
-     * 获取安装列表和对应的调试状态
-     *
-     * @return
-     */
-    private List<JSONObject> getAppDebugStatus() {
-        List<JSONObject> list = new ArrayList<JSONObject>();
-        try {
-            List<String> applist = PkgList.getAppPackageList(mContext);
-            if (applist != null && applist.size() > 0) {
-                for (String pkg : applist) {
-                    if (!TextUtils.isEmpty(pkg)) {
-                        JSONObject appInfo = new JSONObject();
-                        appInfo.put(EGContext.TEXT_DEBUG_APP, pkg);
-                        appInfo.put(EGContext.TEXT_DEBUG_STATUS, SystemUtils.isApkDebugable(mContext, pkg));
-                        if (!list.contains(appInfo)) {
-                            list.add(appInfo);
-                        }
-                    }
-                }
-            }
-
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_snap, e);
-            }
-        }
-        return list;
-    }
+//    /**
+//     * 获取安装列表和对应的调试状态
+//     *
+//     * @return
+//     */
+//    private List<JSONObject> getAppDebugStatus() {
+//        List<JSONObject> list = new ArrayList<JSONObject>();
+//        try {
+//            List<String> applist = PkgList.getAppPackageList(mContext);
+//            if (applist != null && applist.size() > 0) {
+//                for (String pkg : applist) {
+//                    if (!TextUtils.isEmpty(pkg)) {
+//                        JSONObject appInfo = new JSONObject();
+//                        appInfo.put(EGContext.TEXT_DEBUG_APP, pkg);
+//                        appInfo.put(EGContext.TEXT_DEBUG_STATUS, SystemUtils.isApkDebugable(mContext, pkg));
+//                        if (!list.contains(appInfo)) {
+//                            list.add(appInfo);
+//                        }
+//                    }
+//                }
+//            }
+//
+//        } catch (Throwable e) {
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(BuildConfig.tag_snap, e);
+//            }
+//        }
+//        return list;
+//    }
 
     /**************************************  处理广播消息 ******************************************************/
 

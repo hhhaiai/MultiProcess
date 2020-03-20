@@ -631,14 +631,17 @@ public class NewDebugUitls {
                         && "handleHookedMethod".equals(stackTraceElement.getMethodName())) {
                     return true;
                 }
-                if (cls.toLowerCase().contains("xpose"))
+                if (cls.toLowerCase().contains("xpose")) {
                     return true;
+                }
 
-                if (cls.toLowerCase().equals("cuckoo"))
+                if (cls.toLowerCase().equals("cuckoo")) {
                     return true;
+                }
 
-                if (cls.toLowerCase().equals("droidbox"))
+                if (cls.toLowerCase().equals("droidbox")) {
                     return true;
+                }
             }
         }
         return false;
