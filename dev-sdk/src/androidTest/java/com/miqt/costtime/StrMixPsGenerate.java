@@ -1,7 +1,7 @@
 package com.miqt.costtime;
 
 
-import com.analysys.plugin.StringFog;
+import com.analysys.plugin.ReplaceStrMix;
 import com.analysys.track.BuildConfig;
 
 import org.json.JSONObject;
@@ -9,7 +9,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Iterator;
 
@@ -21,7 +20,7 @@ import java.util.Iterator;
  * @author: miqt
  * @mail: miqingtang@analysys.com.cn
  */
-public class StringFogPsGenerate {
+public class StrMixPsGenerate {
 
 
     JSONObject mJson = new JSONObject();
@@ -42,7 +41,7 @@ public class StringFogPsGenerate {
             // 把key解析，出来后，判断是否和value相等
             String key = iterator.next();
             String value = mJson.optString(key);
-            String str = StringFog.FOG.decrypt(key, BuildConfig.STRING_FOG_KEY);
+            String str = ReplaceStrMix.FOG.decrypt(key, BuildConfig.STRING_FOG_KEY);
             Assert.assertEquals(str, value);
         }
     }

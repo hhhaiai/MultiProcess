@@ -7,16 +7,9 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.FileUitls;
 
-/**
- * @Copyright 2019 analysys Inc. All rights reserved.
- * @Description: 字符串加密
- * @Version: 1.0
- * @Create: 2019-12-07 12:58:44
- * @author: miqt
- * @mail: miqingtang@analysys.com.cn
- */
-public class StringFog {
-    public static final StringFogImpl FOG = new StringFogImpl();
+
+public class ReplaceStrMix {
+    public static final StrMixImpl FOG = new StrMixImpl();
 
     public static String encrypt(String data) {
         return FOG.encrypt(data, EGContext.STRING_FOG_KEY);
@@ -30,14 +23,11 @@ public class StringFog {
         return FOG.overflow(data, EGContext.STRING_FOG_KEY);
     }
 
-    public final static class StringFogImpl implements IStringFog {
+    public final static class StrMixImpl implements IStrMix {
         private static final byte[] bs = Key.bs;
 
-        /**
-         * 跟插件里面的混淆对应,必须严格对应
-         * (xor(".+".getBytes(),KEY)), ([0-9]{1,2})   ->   $2,$1
-         */
-        public StringFogImpl() {
+
+        public StrMixImpl() {
         }
 
         @Override
@@ -51,12 +41,12 @@ public class StringFog {
             try {
                 String result = FileUitls.getInstance(null).getString(data, bs);
                 if (EGContext.FLAG_DEBUG_INNER) {
-                    Log.d(BuildConfig.tag_stringfog, "[key=" + EGContext.STRING_FOG_KEY + "][" + data + "]-->[" + result + "]");
+                    Log.d(BuildConfig.tag_StrMix, "[key=" + EGContext.STRING_FOG_KEY + "][" + data + "]-->[" + result + "]");
                 }
                 return result;
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
-                    Log.e(BuildConfig.tag_stringfog, Log.getStackTraceString(e));
+                    Log.e(BuildConfig.tag_StrMix, Log.getStackTraceString(e));
                 }
             }
             return "";

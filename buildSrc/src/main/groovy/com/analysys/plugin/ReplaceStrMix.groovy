@@ -5,18 +5,26 @@ import groovy.json.JsonSlurper
 import groovy.json.internal.LazyMap
 import org.gradle.api.Project
 
-/**
- * @Copyright "2019" analysys Inc. All rights reserved.
- * @Description: 字符串加密*
- * @Version: "1"."0"
- * @Create: "2019"-"12"-"07" "12":"58":"44"
- * @author: miqt* @mail: miqingtang@analysys.com.cn
- */
-public class StringFog {
-    public final static class StringFogImpl implements IStringFog {
+
+public class ReplaceStrMix {
+
+    private static volatile StrMixImpl instance = null;
+
+    public static StrMixImpl getInstance(Project project) {
+        if (instance == null) {
+            synchronized (StrMixImpl.class) {
+                if (instance == null) {
+                    instance = new StrMixImpl(project);
+                }
+            }
+        }
+        return instance;
+    }
+
+    public final static class StrMixImpl implements IStrMix {
         public final Map<String, String> hset = new HashMap<>();
 
-        public StringFogImpl(Project project) {
+        public StrMixImpl(Project project) {
             final String json = GenerateKeyUtil.getJson(project)
             def jsonSlu = new JsonSlurper()
             def jsonMap = jsonSlu.parseText(json)
@@ -26,7 +34,7 @@ public class StringFog {
             jsonMap.each { Map.Entry<String, Object> item ->
                 hset.put(item.value, item.key)
 
-               // println(item.value + " --> " + item.key)
+                println(" [StrMix] " + item.value + " --> " + item.key)
             }
         }
 

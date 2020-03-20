@@ -10,7 +10,7 @@
 * 确定版本号: `dev-sdk/build.gradle` 中，`ver`、`date`、`subVersion`
     * 规则: jar包的`subVersion`必须为`00`，`dex`的包必须从`01`开始
 * 编译: 根目录下执行`sh build.sh`即可
-* 编译完成后，需要测试混淆字符串是否正确，需要手动调用对应测试case脚本`dev-sdk/src/androidTest/java/com/miqt/costtime/StringFogPsGenerate.java`， 跑**case**: `checkProguardText`
+* 编译完成后，需要测试混淆字符串是否正确，需要手动调用对应测试case脚本`dev-sdk/src/androidTest/java/com/miqt/costtime/StrMixPsGenerate.java`， 跑**case**: `checkProguardText`
 
 ## release 包 验证步骤
 1. 最后打了release 包之后,需要验证的事项, 防止操作人打包失误.

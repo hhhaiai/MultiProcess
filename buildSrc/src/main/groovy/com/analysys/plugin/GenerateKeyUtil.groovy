@@ -9,10 +9,10 @@ public class GenerateKeyUtil {
         String key = getVer(project)
         println("混淆字符串使用key: " + key)
         String str = getJson(project)
-        println("即将混淆字符串: " + str)
+        //println("即将混淆字符串: " + str)
         String json = new String(Base64.encoder.encode(str.getBytes("utf-8")), "utf-8");
         new File(project.projectDir, "src/androidTest/java/com/miqt/costtime/ProguardJson.java").withWriter('utf-8') {
-                //            writer -> writer.writeLine 'Hello World'
+
             writer ->
                 writer.write(
                         "package com.miqt.costtime;"
@@ -24,12 +24,11 @@ public class GenerateKeyUtil {
 
         }
 
-        // 生成 ps
         String ps = generatePs(key, str)
         println("generatePs success");
 
         new File(project.projectDir, "src/main/java/com/analysys/plugin/Key.java").withWriter('utf-8') {
-                //            writer -> writer.writeLine 'Hello World'
+
             writer ->
                 writer.write(
                         "package com.analysys.plugin;\r\n"
@@ -40,20 +39,13 @@ public class GenerateKeyUtil {
         }
     }
 
-    /**
-     * get proguard json
-     * @param project
-     * @return
-     */
+
     static String getJson(Project project) {
         File file = new File(project.projectDir, "proguard.json")
         file.text
     }
-    /**
-     * get version
-     * @param project
-     * @return
-     */
+
+
     private static String getVer(Project project) {
         File file = new File(project.projectDir, "build.gradle")
         String key = ""

@@ -23,7 +23,7 @@ public class ReplaceStringTransform extends Transform {
 
     @Override
     String getName() {
-        return "StringFog"
+        return "ReplaceStrMix"
     }
 
     @Override
@@ -51,7 +51,7 @@ public class ReplaceStringTransform extends Transform {
     void transform(Context context, Collection<TransformInput> inputs,
                    Collection<TransformInput> referencedInputs, TransformOutputProvider outputProvider,
                    boolean isIncremental) throws IOException, TransformException, InterruptedException {
-        println '//===============asm visit Stringfog start===============//'
+        println '//===============asm visit ReplaceStrMix start===============//'
         def startTime = System.currentTimeMillis()
 
         inputs.each { TransformInput input ->
@@ -61,13 +61,12 @@ public class ReplaceStringTransform extends Transform {
                         def name = file.name
                         if (name.endsWith(".class") && !name.startsWith("R\$") &&
                                 !"R.class".equals(name) && !"BuildConfig.class".equals(name)
-                                && !name.contains("StringFog")) {
+                                && !name.contains("ReplaceStrMix")) {
 
-//                            println name + ' is changing...'
 
                             ClassReader cr = new ClassReader(file.bytes)
                             ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS)
-                            ClassVisitor cv = new StringFogClassVisitor("VBgIAFV", cw, project)
+                            ClassVisitor cv = new StrMixClassVisitor("VBgIAFV", cw, project)
 
                             cr.accept(cv, EXPAND_FRAMES)
 

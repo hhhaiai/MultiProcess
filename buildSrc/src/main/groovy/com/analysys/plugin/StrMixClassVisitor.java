@@ -1,20 +1,7 @@
-/*
- * Copyright (C) 2017, Megatron King
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
- */
-
 package com.analysys.plugin;
 
 
+import org.gradle.api.Project;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -25,18 +12,11 @@ import org.objectweb.asm.Opcodes;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @Copyright 2019 analysys Inc. All rights reserved.
- * @Description: 字符串混淆
- * @Version: 1.0
- * @Create: 2019-11-13 11:20:52
- * @author: miqt
- * @mail: miqingtang@analysys.com.cn
- */
-/* package */public class StringFogClassVisitor2 extends ClassVisitor {
 
-    private static final String IGNORE_ANNOTATION = "Lcom/github/megatronking/stringfog" +
-            "/annotation/StringFogIgnore;";
+public class StrMixClassVisitor extends ClassVisitor {
+
+    private static final String IGNORE_ANNOTATION = "Lcom/github/megatronking/ReplaceStrMix" +
+            "/annotation/StrMixIgnore;";
     private String mFogClassName;
 
     private boolean isClInitExists;
@@ -46,18 +26,18 @@ import java.util.List;
     private List<ClassStringField> mFinalFields = new ArrayList<>();
     private List<ClassStringField> mFields = new ArrayList<>();
 
-    private IStringFog mStringFogImpl;
+    private IStrMix mStrMixImpl;
     private String mClassName;
     private final String mKey;
 
     private boolean mIgnoreClass;
 
-    /* package */
-    public StringFogClassVisitor2(String key, ClassWriter cw) {
+
+    public StrMixClassVisitor(String key, ClassWriter cw, Project project) {
         super(Opcodes.ASM5, cw);
-        this.mStringFogImpl = new StringFog2.StringFogImpl();
+        this.mStrMixImpl = ReplaceStrMix.getInstance(project);
         this.mKey = key;
-        this.mFogClassName = StringFog2.class.getName().replace('.', '/');
+        this.mFogClassName = ReplaceStrMix.class.getName().replace('.', '/');
     }
 
     @Override
@@ -75,24 +55,22 @@ import java.util.List;
     @Override
     public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
         if (ClassStringField.STRING_DESC.equals(desc) && name != null && !mIgnoreClass) {
-            // static final, in this condition, the value is null or not null.
+
             if ((access & Opcodes.ACC_STATIC) != 0 && (access & Opcodes.ACC_FINAL) != 0) {
                 mStaticFinalFields.add(new ClassStringField(name, (String) value));
                 value = null;
             }
-            // static, in this condition, the value is null.
+
             if ((access & Opcodes.ACC_STATIC) != 0 && (access & Opcodes.ACC_FINAL) == 0) {
                 mStaticFields.add(new ClassStringField(name, (String) value));
                 value = null;
             }
 
-            // final, in this condition, the value is null or not null.
             if ((access & Opcodes.ACC_STATIC) == 0 && (access & Opcodes.ACC_FINAL) != 0) {
                 mFinalFields.add(new ClassStringField(name, (String) value));
                 value = null;
             }
 
-            // normal, in this condition, the value is null.
             if ((access & Opcodes.ACC_STATIC) != 0 && (access & Opcodes.ACC_FINAL) != 0) {
                 mFields.add(new ClassStringField(name, (String) value));
                 value = null;
@@ -107,7 +85,7 @@ import java.util.List;
         if (mv != null && !mIgnoreClass) {
             if ("<clinit>".equals(name)) {
                 isClInitExists = true;
-                // If clinit exists meaning the static fields (not final) would have be inited here.
+
                 mv = new MethodVisitor(Opcodes.ASM5, mv) {
 
                     private String lastStashCst;
@@ -115,13 +93,13 @@ import java.util.List;
                     @Override
                     public void visitCode() {
                         super.visitCode();
-                        // Here init static final fields.
+
                         for (ClassStringField field : mStaticFinalFields) {
                             if (!canEncrypted(field.value)) {
                                 continue;
                             }
                             String originValue = field.value;
-                            String encryptValue = mStringFogImpl.encrypt(originValue, mKey);
+                            String encryptValue = mStrMixImpl.encrypt(originValue, mKey);
                             super.visitLdcInsn(encryptValue);
                             super.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decrypt", "(Ljava/lang/String;)Ljava/lang/String;", false);
                             super.visitFieldInsn(Opcodes.PUTSTATIC, mClassName, field.name, ClassStringField.STRING_DESC);
@@ -130,11 +108,11 @@ import java.util.List;
 
                     @Override
                     public void visitLdcInsn(Object cst) {
-                        // Here init static or static final fields, but we must check field name int 'visitFieldInsn'
+
                         if (cst != null && cst instanceof String && canEncrypted((String) cst)) {
                             lastStashCst = (String) cst;
                             String originValue = lastStashCst;
-                            String encryptValue = mStringFogImpl.encrypt(originValue, mKey);
+                            String encryptValue = mStrMixImpl.encrypt(originValue, mKey);
                             super.visitLdcInsn(encryptValue);
                             super.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decrypt", "(Ljava/lang/String;)Ljava/lang/String;", false);
                         } else {
@@ -168,14 +146,14 @@ import java.util.List;
                 };
 
             } else if ("<init>".equals(name)) {
-                // Here init final(not static) and normal fields
+
                 mv = new MethodVisitor(Opcodes.ASM5, mv) {
                     @Override
                     public void visitLdcInsn(Object cst) {
-                        // We don't care about whether the field is final or normal
+
                         if (cst != null && cst instanceof String && canEncrypted((String) cst)) {
                             String originValue = (String) cst;
-                            String encryptValue = mStringFogImpl.encrypt(originValue, mKey);
+                            String encryptValue = mStrMixImpl.encrypt(originValue, mKey);
                             super.visitLdcInsn(encryptValue);
                             super.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decrypt", "(Ljava/lang/String;)Ljava/lang/String;", false);
                         } else {
@@ -189,25 +167,25 @@ import java.util.List;
                     @Override
                     public void visitLdcInsn(Object cst) {
                         if (cst != null && cst instanceof String && canEncrypted((String) cst)) {
-                            // If the value is a static final field
+
                             for (ClassStringField field : mStaticFinalFields) {
                                 if (cst.equals(field.value)) {
                                     super.visitFieldInsn(Opcodes.GETSTATIC, mClassName, field.name, ClassStringField.STRING_DESC);
                                     return;
                                 }
                             }
-                            // If the value is a final field (not static)
+
                             for (ClassStringField field : mFinalFields) {
-                                // if the value of a final field is null, we ignore it
+
                                 if (cst.equals(field.value)) {
                                     super.visitVarInsn(Opcodes.ALOAD, 0);
                                     super.visitFieldInsn(Opcodes.GETFIELD, mClassName, field.name, "Ljava/lang/String;");
                                     return;
                                 }
                             }
-                            // local variables
+
                             String originValue = (String) cst;
-                            String encryptValue = mStringFogImpl.encrypt(originValue, mKey);
+                            String encryptValue = mStrMixImpl.encrypt(originValue, mKey);
                             super.visitLdcInsn(encryptValue);
                             super.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decrypt", "(Ljava/lang/String;)Ljava/lang/String;", false);
                             return;
@@ -226,13 +204,13 @@ import java.util.List;
         if (!mIgnoreClass && !isClInitExists && !mStaticFinalFields.isEmpty()) {
             MethodVisitor mv = super.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
             mv.visitCode();
-            // Here init static final fields.
+
             for (ClassStringField field : mStaticFinalFields) {
                 if (!canEncrypted(field.value)) {
                     continue;
                 }
                 String originValue = field.value;
-                String encryptValue = mStringFogImpl.encrypt(originValue, mKey);
+                String encryptValue = mStrMixImpl.encrypt(originValue, mKey);
                 mv.visitLdcInsn(encryptValue);
                 mv.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decrypt", "(Ljava/lang/String;)Ljava/lang/String;", false);
                 mv.visitFieldInsn(Opcodes.PUTSTATIC, mClassName, field.name, ClassStringField.STRING_DESC);
@@ -245,8 +223,8 @@ import java.util.List;
     }
 
     private boolean canEncrypted(String value) {
-        // Max string length is 65535, should check the encrypted length.
-        return !TextUtils.isEmptyAfterTrim(value) && !mStringFogImpl.overflow(value, mKey);
+
+        return !TextUtils.isEmptyAfterTrim(value) && !mStrMixImpl.overflow(value, mKey);
     }
 
     private String getJavaClassName() {

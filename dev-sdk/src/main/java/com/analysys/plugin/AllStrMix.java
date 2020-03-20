@@ -7,43 +7,27 @@ import com.analysys.track.internal.content.EGContext;
 
 import java.io.UnsupportedEncodingException;
 
-/**
- * @Copyright 2019 analysys Inc. All rights reserved.
- * @Description: 字符串混淆用的, 这个类在打包的时候,会通过ASM插桩到代码中
- * @Version: 1.0
- * @Create: 2019-11-06 11:38:19
- * @author: miqt
- * @mail: miqingtang@analysys.com.cn
- */
-public class StringFog2 {
 
-    /**
-     * 加密的key,应该跟插件中的key一致,不然会发生错误
-     */
+public class AllStrMix {
+
+
     public static final String key = "VBgIAFV";
-    public static final StringFogImpl FOG = new StringFogImpl();
+    public static final StrMixImpl FOG = new StrMixImpl();
 
     public static String encrypt(String data) {
-        return FOG.encrypt(data, StringFog2.key);
+        return FOG.encrypt(data, AllStrMix.key);
     }
 
     public static String decrypt(String data) {
-        return FOG.decrypt(data, StringFog2.key);
+        return FOG.decrypt(data, AllStrMix.key);
     }
 
     public static boolean overflow(String data) {
-        return FOG.overflow(data, StringFog2.key);
+        return FOG.overflow(data, AllStrMix.key);
     }
 
-    /**
-     * @Copyright 2019 analysys Inc. All rights reserved.
-     * @Description: 字符串混淆实现类
-     * @Version: 1.0
-     * @Create: 2019-11-06 11:40:04
-     * @author: miqt
-     * @mail: miqingtang@analysys.com.cn
-     */
-    public final static class StringFogImpl implements IStringFog {
+
+    public final static class StrMixImpl implements IStrMix {
 
         private static final String CHARSET_NAME_UTF_8 = "UTF-8";
 
@@ -57,7 +41,7 @@ public class StringFog2 {
                     newData = new String(Base64.encode(xor(data.getBytes(), key), Base64.NO_WRAP));
                 }
                 if (EGContext.FLAG_DEBUG_INNER) {
-                    Log.d(BuildConfig.tag_stringfog, "[key=" + key + "][" + data + "]-->[" + newData + "]");
+                    Log.d(BuildConfig.tag_StrMix, "[key=" + key + "][" + data + "]-->[" + newData + "]");
                 }
             } catch (Throwable e) {
             }
@@ -73,9 +57,8 @@ public class StringFog2 {
                 } catch (UnsupportedEncodingException e) {
                     newData = new String(xor(Base64.decode(data, Base64.NO_WRAP), key));
                 }
-//                if (EGContext.FLAG_DEBUG_INNER) {
-//                    Log.d(BuildConfig.tag_stringfog + "2", "[key=" + key + "][" + data + "]-->[" + newData + "]");
-//                }
+
+
             } catch (Throwable e) {
             }
 
