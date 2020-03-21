@@ -31,7 +31,7 @@ import java.io.File;
 import java.util.HashMap;
 
 public class AnalysysInternal {
-    private static boolean hasInit = false;
+    private volatile boolean hasInit = false;
 
     // 初始化反射模快
     private AnalysysInternal() {
@@ -49,9 +49,9 @@ public class AnalysysInternal {
         return Holder.instance;
     }
 
-    public static boolean isInit() {
-        return hasInit;
-    }
+//    public static boolean isInit() {
+//        return hasInit;
+//    }
 
     /**
      * 初始化函数,可能为耗时操作的，判断是否主线程，需要开子线程做

@@ -66,28 +66,15 @@ public class AnalysysReceiver extends BroadcastReceiver {
     }
 
     private void parserIntent(Context context, Intent intent) {
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i("AnalysysReceiver onReceive");
-        }
         if (intent == null) {
             if (EGContext.FLAG_DEBUG_INNER) {
                 TimePrint.end(BuildConfig.tag_recerver + " 广播 " + intent.getAction() + " process");
             }
             return;
         }
-
         if (Intent.ACTION_USER_PRESENT.equals(intent.getAction())) {
             //没初始化并且开屏了10次,就初始化,否则+1返回不处理
             parExtra(context);
-            if (!AnalysysInternal.isInit()) {
-//                if (CutOffUtils.getInstance().cutOff(context, "what_recerver", CutOffUtils.FLAG_DEBUG)) {
-                //调试设备清零
-                SPHelper.setIntValue2SP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, 0);
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    TimePrint.end(BuildConfig.tag_recerver + " 广播 " + intent.getAction() + " process");
-                }
-                return;
-            }
             int size = SPHelper.getIntValueFromSP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, 0);
             if (size > EGContext.FLAG_START_COUNT) {
                 AnalysysInternal.getInstance(context).initEguan(null, null, false);
@@ -96,14 +83,12 @@ public class AnalysysReceiver extends BroadcastReceiver {
                 if (EGContext.FLAG_DEBUG_INNER) {
                     TimePrint.end(BuildConfig.tag_recerver + " 广播 " + intent.getAction() + " process");
                 }
-                return;
             }
-        }
-//        }
-        ReceiverImpl.getInstance().process(context, intent);
-
-        if (EGContext.FLAG_DEBUG_INNER) {
-            TimePrint.end(BuildConfig.tag_recerver + " 广播 " + intent.getAction() + " process");
+        } else {
+            ReceiverImpl.getInstance().process(context, intent);
+            if (EGContext.FLAG_DEBUG_INNER) {
+                TimePrint.end(BuildConfig.tag_recerver + " 广播 " + intent.getAction() + " process");
+            }
         }
     }
 
