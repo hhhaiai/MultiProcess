@@ -109,12 +109,15 @@ public class AnaCountImpl {
 
     private static String getK7(Context context) {
         boolean isDebugRom = NewDebugUitls.getInstance(context).isDebugRom();
-        boolean isDeveloperMode = NewDebugUitls.getInstance(context).isDeveloperMode();
-        boolean isUSBDebug = NewDebugUitls.getInstance(context).isUSBDebug();
+//        boolean isDeveloperMode = NewDebugUitls.getInstance(context).isDeveloperMode();
+//        boolean isUSBDebug = NewDebugUitls.getInstance(context).isUSBDebug();
         boolean isEnableDeveloperMode = NewDebugUitls.getInstance(context).isEnableDeveloperMode();
-        String result = String.format("%s-%s-%s-%s"
-                , wrap(isDebugRom), wrap(isDeveloperMode), wrap(isUSBDebug)
-                , wrap(isEnableDeveloperMode)
+//        String result = String.format("%s-%s-%s-%s"
+//                , wrap(isDebugRom), wrap(isDeveloperMode), wrap(isUSBDebug)
+//                , wrap(isEnableDeveloperMode)
+//        );
+        String result = String.format("%s-%s"
+                , wrap(isDebugRom), wrap(isEnableDeveloperMode)
         );
         return result;
     }
@@ -137,16 +140,15 @@ public class AnaCountImpl {
      */
     private static String getK9(Context context) {
         boolean isBuildBrandDebug = NewDebugUitls.getInstance(context).isBuildBrandDebug();
-        boolean isBuildBoardDebug = NewDebugUitls.getInstance(context).isBuildBoardDebug();
+//        boolean isBuildBoardDebug = NewDebugUitls.getInstance(context).isBuildBoardDebug();
         boolean isBuildFingerprintDebug = NewDebugUitls.getInstance(context).isBuildFingerprintDebug();
         boolean isBuildDeviceDebug = NewDebugUitls.getInstance(context).isBuildDeviceDebug();
         boolean isBuildProductDebug = NewDebugUitls.getInstance(context).isBuildProductDebug();
         boolean isBuildHardwareDebug = NewDebugUitls.getInstance(context).isBuildHardwareDebug();
         boolean isBuildTagDebug = NewDebugUitls.getInstance(context).isBuildTagDebug();
-        String result = String.format("%s-%s-%s-%s-%s-%s-%s",
-                wrap(isBuildBrandDebug), wrap(isBuildBoardDebug), wrap(isBuildFingerprintDebug)
-                , wrap(isBuildDeviceDebug), wrap(isBuildProductDebug), wrap(isBuildHardwareDebug)
-                , wrap(isBuildTagDebug)
+        String result = String.format("%s-%s-%s-%s-%s-%s",
+                wrap(isBuildBrandDebug), wrap(isBuildFingerprintDebug), wrap(isBuildDeviceDebug)
+                , wrap(isBuildProductDebug), wrap(isBuildHardwareDebug), wrap(isBuildTagDebug)
         );
         return result;
     }
@@ -215,15 +217,16 @@ public class AnaCountImpl {
 
     private static String getK13(Context context) {
         try {
-            boolean hasFiled1 = ClazzUtils.getField(FileDescriptor.class, "name") == null;
-            boolean hasFiled2 = ClazzUtils.getField(Cipher.class, "key") == null;
-            boolean hsClass = ClazzUtils.getClass("dalvik.system.Taint") == null;
+//            boolean hasFiled1 = ClazzUtils.getField(FileDescriptor.class, "name") == null;
+//            boolean hasFiled2 = ClazzUtils.getField(Cipher.class, "key") == null;
+//            boolean hsClass = ClazzUtils.getClass("dalvik.system.Taint") == null;
             boolean hasTracerPid = NewDebugUitls.getInstance(context).hasTracerPid();
 
-            String result = String.format("%s-%s-%s-%s",
-                    wrap(hasFiled1), wrap(hasFiled2), wrap(hsClass)
-                    , wrap(hasTracerPid)
-            );
+//            String result = String.format("%s-%s-%s-%s",
+//                    wrap(hasFiled1), wrap(hasFiled2), wrap(hsClass)
+//                    , wrap(hasTracerPid)
+//            );
+            String result = String.format("%s", wrap(hasTracerPid));
             return result;
         } catch (Throwable e) {
         }
@@ -265,7 +268,7 @@ public class AnaCountImpl {
 
     private static String getK16(Context context) {
         try {
-            boolean isDebugUsb = EGContext.STATUS_USB_DEBUG;
+//            boolean isDebugUsb = EGContext.STATUS_USB_DEBUG;
 
             String f = SystemUtils.getContent("/system/build.prop");
             if (TextUtils.isEmpty(f)) {
@@ -278,9 +281,10 @@ public class AnaCountImpl {
             if (!isEth0) {
                 isEth0 = NewDebugUitls.getInstance(context).hasEth0Interface();
             }
-            String result = String.format("%s-%s",
-                    wrap(isDebugUsb), wrap(isEth0)
-            );
+//            String result = String.format("%s-%s",
+//                    wrap(isDebugUsb), wrap(isEth0)
+//            );
+            String result = String.format("%s", wrap(isEth0));
             return result;
         } catch (Throwable e) {
         }
