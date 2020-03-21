@@ -21,7 +21,7 @@ def date = "20200315"
 def subVersion = "00"
 
 // 宿主包(jar):true , 热修复包(dex):false
-def isPackageJar = true
+def isPackageJar = false
 // 上传时间，几小时
 def default_request_hours = 6
 // in HTTP Header use Kx, when debug

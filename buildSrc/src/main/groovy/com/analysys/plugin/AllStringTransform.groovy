@@ -66,6 +66,7 @@ public class AllStringTransform extends Transform {
 
                             ClassReader cr = new ClassReader(file.bytes)
                             ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS)
+                            //由 lysys2020ana base64而来
                             ClassVisitor cv = new AllStrMixClassVisitor("bHlzeXMyMDIwYW5h", cw)
 
                             cr.accept(cv, EXPAND_FRAMES)

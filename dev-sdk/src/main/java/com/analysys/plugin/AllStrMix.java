@@ -11,6 +11,7 @@ import java.io.UnsupportedEncodingException;
 public class AllStrMix {
 
 
+    //由 lysys2020ana base64而来
     public static final String key = "bHlzeXMyMDIwYW5h";
     public static final StrMixImpl FOG = new StrMixImpl();
 
