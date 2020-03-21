@@ -57,6 +57,7 @@ build()
 
 main()
 {
+    time=$(date "+%Y%m%d_%H%M%S")
     source_common
     build
 }
