@@ -9,6 +9,6 @@ public class AllStrMixTest {
     public void decrypt() {
 
         String str = AllStrMix.decrypt("AAAAAAAAAAAA");
-        Assert.assertEquals("fdsahgflj", str);
+        Assert.assertEquals("bHlzeXMyMDIwYW5h", str);
     }
 }

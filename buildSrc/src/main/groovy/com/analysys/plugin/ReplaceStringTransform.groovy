@@ -66,7 +66,7 @@ public class ReplaceStringTransform extends Transform {
 
                             ClassReader cr = new ClassReader(file.bytes)
                             ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS)
-                            ClassVisitor cv = new StrMixClassVisitor("fdsahgflj", cw, project)
+                            ClassVisitor cv = new StrMixClassVisitor("bHlzeXMyMDIwYW5h", cw, project)
 
                             cr.accept(cv, EXPAND_FRAMES)
 
