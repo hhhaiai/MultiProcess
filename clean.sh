@@ -10,7 +10,7 @@ source_common() {
 
 clean_task() {
     logw "[$filename]>>>>clean project<<<<"
-    dir=("app" "dev-sdk" "buildSrc" "dex")
+    dir=("app" "dev-sdk" "buildSrc" "dex" "check_demo")
     for element in ${dir[@]}; do
         #clean task
         rm -rf $element/build/

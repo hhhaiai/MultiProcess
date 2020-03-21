@@ -11,7 +11,7 @@ source_common() {
 clean_caches() {
 
     logw "[$filename]clean android studio cache!"
-    dir=("app" "dev-sdk" "buildSrc" "dex")
+    dir=("app" "dev-sdk" "buildSrc" "dex" "check_demo")
 
     for element in ${dir[@]}; do
         #clean task

@@ -11,7 +11,7 @@ source_common() {
 
 # clean cache
 clean() {
-    dir=("app" "dev-sdk" "buildSrc" "dex")
+    dir=("app" "dev-sdk" "buildSrc" "dex" "check_demo")
     for element in ${dir[@]}; do
         # clean sub dir
         rm -rf $element/build/

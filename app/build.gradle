@@ -3,7 +3,6 @@ apply plugin: 'com.android.application'
 
 def ver = "3.0.0"
 //demo appkey
-//def demoAppkey = "7773661000888540d"
 def demoAppkey = "test"
 android {
     compileSdkVersion 29

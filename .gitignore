@@ -16,13 +16,13 @@ import-summary.txt
 */__MACOSX
 */.DS_Store
 #test android studio module
-*.idea/
-*.gradle/
-*release/
-*build/
-*bin/
+.idea/
+.gradle/
+release/
+build/
+buildSrc/.gradle/
+*/bin/
 *releasebak/
-*.iml
 
 #for eclipse
 .settings/
@@ -34,7 +34,7 @@ local.properties
 *.bak
 
 *.pmd
-/sh.exe.stackdump
+sh.exe.stackdump
 
 */ProguardJson.java
 */Key.java

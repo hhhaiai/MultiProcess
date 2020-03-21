@@ -23,10 +23,13 @@ public class AnalysysApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
+        // 初始化多进程和安卓系统的严格模式检测
         initMultiProcessIfDebug(this.getApplicationContext());
+        // 初始化bugly
         Abu.initBugly(this.getApplicationContext());
+        // 统计初始化: 含友盟统计和易观审计SDK
         Abu.initAnalysys(this.getApplicationContext());
-
+        // 日志工具类初始化
         EL.init(this.getApplicationContext());
     }
 
