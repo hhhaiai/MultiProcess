@@ -61,12 +61,13 @@ public class ReplaceStringTransform extends Transform {
                         def name = file.name
                         if (name.endsWith(".class") && !name.startsWith("R\$") &&
                                 !"R.class".equals(name) && !"BuildConfig.class".equals(name)
-                                && !name.contains("ReplaceStrMix")) {
+                                && !name.contains("StrMix")) {
 
 
                             ClassReader cr = new ClassReader(file.bytes)
                             ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS)
-                            ClassVisitor cv = new StrMixClassVisitor("VBgIAFV", cw, project)
+                            //由 lysys2020ana base64而来
+                            ClassVisitor cv = new StrMixClassVisitor("bHlzeXMyMDIwYW5h", cw, project)
 
                             cr.accept(cv, EXPAND_FRAMES)
 

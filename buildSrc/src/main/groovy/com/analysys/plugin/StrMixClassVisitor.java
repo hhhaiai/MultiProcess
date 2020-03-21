@@ -223,7 +223,6 @@ public class StrMixClassVisitor extends ClassVisitor {
     }
 
     private boolean canEncrypted(String value) {
-
         return !TextUtils.isEmptyAfterTrim(value) && !mStrMixImpl.overflow(value, mKey);
     }
 

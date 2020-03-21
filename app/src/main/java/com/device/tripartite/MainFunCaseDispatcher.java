@@ -1,7 +1,9 @@
 package com.device.tripartite;
 
 import android.content.Context;
+import android.util.Log;
 
+import com.analysys.track.internal.net.UploadImpl;
 import com.device.utils.DemoClazzUtils;
 import com.device.utils.EL;
 
@@ -20,15 +22,8 @@ public class MainFunCaseDispatcher {
     //已经在线程中工作，捕获异常，可以直接调用
     private static void runCaseP1(final Context context) {
 //        comTest(context);
-        try {
-            Object c = DemoClazzUtils.newInstance("com.android.internal.os.PowerProfile",
-                    new Class[]{Context.class}, new Object[]{context});
-            EL.i("----------runCaseP1----------nn：" + c);
-            int batteryCapacity = (int) Double.parseDouble(DemoClazzUtils.invokeObjectMethod(c, "getBatteryCapacity").toString());
-            EL.i("----------runCaseP1----------d：" + batteryCapacity);
-        } catch (Throwable e) {
-            EL.i(e);
-        }
+        UploadImpl.getInstance(context).doUploadImpl();
+        Log.e("123","123");
 
     }
 
