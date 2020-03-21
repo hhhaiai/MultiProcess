@@ -1,24 +1,17 @@
 package com.analysys.track.internal.impl;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Message;
 import android.text.TextUtils;
 
-import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.EContextHelper;
-import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.SystemUtils;
-import com.analysys.track.utils.reflectinon.PatchHelper;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -40,9 +33,6 @@ public class ReceiverImpl {
      */
     public void process(final Context context, final Intent intent) {
         mContext = EContextHelper.getContext(context);
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.d(BuildConfig.tag_recerver + intent);
-        }
         if (intent == null) {
             return;
         }
@@ -57,9 +47,6 @@ public class ReceiverImpl {
 
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST,
                     EGContext.TIME_SECOND * 2, currentTime)) {
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.i(BuildConfig.tag_snap, "安装app:" + packageName);
-                }
                 AppSnapshotImpl.getInstance(context)
                         .processAppModifyMsg(packageName,
                                 Integer.parseInt(EGContext.SNAP_SHOT_INSTALL),
@@ -81,9 +68,6 @@ public class ReceiverImpl {
             }
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST,
                     EGContext.TIME_SECOND * 2, currentTime)) {
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.i(BuildConfig.tag_snap, "卸载app:" + packageName);
-                }
                 AppSnapshotImpl.getInstance(context)
                         .processAppModifyMsg(packageName,
                                 Integer.parseInt(EGContext.SNAP_SHOT_UNINSTALL),
@@ -103,9 +87,6 @@ public class ReceiverImpl {
             }
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST,
                     EGContext.TIME_SECOND * 2, currentTime)) {
-                if (EGContext.FLAG_DEBUG_INNER) {
-                    ELOG.i(BuildConfig.tag_snap, "更新app:" + packageName);
-                }
                 AppSnapshotImpl.getInstance(context)
                         .processAppModifyMsg(packageName,
                                 Integer.parseInt(EGContext.SNAP_SHOT_UPDATE),
