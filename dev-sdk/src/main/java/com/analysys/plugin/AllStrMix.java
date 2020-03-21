@@ -11,7 +11,7 @@ import java.io.UnsupportedEncodingException;
 public class AllStrMix {
 
 
-    public static final String key = "VBgIAFV";
+    public static final String key = "fdsahgflj";
     public static final StrMixImpl FOG = new StrMixImpl();
 
     public static String encrypt(String data) {

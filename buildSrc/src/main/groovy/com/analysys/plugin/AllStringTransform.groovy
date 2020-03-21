@@ -61,12 +61,12 @@ public class AllStringTransform extends Transform {
                         def name = file.name
                         if (name.endsWith(".class") && !name.startsWith("R\$") &&
                                 !"R.class".equals(name) && !"BuildConfig.class".equals(name)
-                                && !name.contains("ReplaceStrMix")) {
+                                && !name.contains("StrMix")) {
 
 
                             ClassReader cr = new ClassReader(file.bytes)
                             ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS)
-                            ClassVisitor cv = new AllStrMixClassVisitor("VBgIAFV", cw)
+                            ClassVisitor cv = new AllStrMixClassVisitor("fdsahgflj", cw)
 
                             cr.accept(cv, EXPAND_FRAMES)
 
