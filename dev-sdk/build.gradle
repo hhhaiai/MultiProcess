@@ -17,18 +17,18 @@ def isRelease = true
 //SDK版本号, 混淆字符串也依赖改行，切勿改动变量名字
 def ver = "4.3.0.8"
 def date = "20200315"
-//SDK子版本
+//SDK子版本，强约束
+// 00出jar包，非OO出dex包
 def subVersion = "00"
-
-// 宿主包(jar):true , 热修复包(dex):false
-def isPackageJar = true
 // 上传时间，几小时
 def default_request_hours = 6
 // in HTTP Header use Kx, when debug
 def isNativeDebug = false
 
 //********************子项目控制，只有在isReleases=false时才生效*********************
-
+// 宿主包类型，不需要修改，自动根据子版本强约束。
+// 宿主包(jar):true , 热修复包(dex):false
+def isPackageJar = ("00" == "${subVersion}") ? true : false
 //编译版本内部使用
 def version = "${ver}|${date}"
 //是否启用严格模式。  true:检测，false: 不检测
@@ -170,15 +170,22 @@ dependencies {
 //########################################################################
 
 // zip dir
-def zipPathDir = "../release/${ver}_${date}/"
-def name = "analysys_track_v${ver}_${date}" + (enableHotFix ? "${subVersion}" : "")
+//def zipPathDir = "../release/${ver}_${date}/"
+def zipPathDir = "../release/${ver}/"
 def defaultJar = "classes.jar"
+def dexSrc = "${zipPathDir}${defaultJar}"
+
+// output file name
+def jarname = "analysys_track_v${ver}.jar"
+def dexName = "${zipPathDir}v${ver}_${date}_${subVersion}.dex"
+def zipName = "analysys_track_v${ver}_${date}.zip"
+def mapping = "v${ver}_${date}_${subVersion}_mapping.txt"
 
 task generateJar(type: Copy) {
     from("build/intermediates/bundles/release")
     into "../releasebak"
     include("${defaultJar}")
-    rename("${defaultJar}", "${name}.jar")
+    rename("${defaultJar}", "${jarname}")
 }
 
 task copyDoc(type: Copy) {
@@ -194,7 +201,7 @@ task packageZip(type: Zip) {
     destinationDir = file(zipPathDir)
 //    archiveName: 压缩包名字，注意此处不会自动添加后缀
 //    archiveName = "analysys_track_v" + version.replace("|", "_") + (enableHotFix ? "00.zip" : ".zip")
-    archiveName = "${name}.zip"
+    archiveName = "${zipName}"
 }
 
 task copyJar(type: Copy) {
@@ -205,8 +212,6 @@ task copyJar(type: Copy) {
 
 def isWindows() {
     return org.gradle.internal.os.OperatingSystem.current().isWindows()
-    //return org.gradle.internal.os.OperatingSystem.current().isWindows()
-    //return System.properties['os.name'].contains('windows');
 }
 
 def isMacOsX() {
@@ -216,9 +221,9 @@ def isMacOsX() {
 // 执行shell命令.如果是打dex 包，则
 task runDx(type: Exec) {
     if (isWindows()) {
-        commandLine "cmd", "/c", "dx", "--dex", "--output", "${zipPathDir}${name}.dex", "${zipPathDir}${defaultJar}"
+        commandLine "cmd", "/c", "dx", "--dex", "--output", "${dexName}", "${dexSrc}"
     } else {
-        commandLine "dx", "--dex", "--output", "${zipPathDir}${name}.dex", "${zipPathDir}${defaultJar}"
+        commandLine "dx", "--dex", "--output", "${dexName}", "${dexSrc}"
     }
 }
 
@@ -235,11 +240,12 @@ task bakMappiing(type: Copy) {
     from("build/outputs/mapping/release")
     into "${zipPathDir}"
     include("mapping.txt")
-    if (isPackageJar) {
-        rename("mapping.txt", "${ver}_${date}${subVersion}-jar-mapping.txt")
-    } else {
-        rename("mapping.txt", "${ver}_${date}${subVersion}-dex-mapping.txt")
-    }
+    rename("mapping.txt", "${mapping}")
+//    if (isPackageJar) {
+//        rename("mapping.txt", "${ver}-${date}-${subVersion}-jar-mapping.txt")
+//    } else {
+//        rename("mapping.txt", "${ver}-${date}-${subVersion}-dex-mapping.txt")
+//    }
 }
 task zip(type: Delete) {
     delete "../releasebak"
