@@ -1,4 +1,4 @@
-package com.device.impls.usmcase;
+package com.device.tripartite.cases.usmcase;
 
 import android.app.usage.ConfigurationStats;
 import android.app.usage.UsageEvents;
@@ -8,7 +8,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
-import com.device.impls.usmcase.tools.IUSMImpl;
+import com.device.tripartite.cases.usmcase.tools.IUSMImpl;
 import com.device.utils.EL;
 
 import java.util.Collections;

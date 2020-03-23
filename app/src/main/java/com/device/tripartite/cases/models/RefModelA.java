@@ -1,4 +1,4 @@
-package com.device.impls.case2;
+package com.device.tripartite.cases.models;
 
 import com.device.utils.EL;
 

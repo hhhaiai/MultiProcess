@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
-import com.device.impls.MultiProcessFramework;
 import com.device.utils.ServicesProcess;
 
 public class MyServiceB extends Service {

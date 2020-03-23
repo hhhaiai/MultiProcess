@@ -1,4 +1,4 @@
-package com.device.impls.usmcase.tools;
+package com.device.tripartite.cases.usmcase.tools;
 
 import android.annotation.SuppressLint;
 import android.app.usage.UsageEvents;

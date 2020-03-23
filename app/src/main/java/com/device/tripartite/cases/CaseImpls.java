@@ -1,4 +1,4 @@
-//package com.device.impls.cases;
+//package com.device.tripartite.cases;
 //
 //import android.content.Context;
 //import android.media.Ringtone;

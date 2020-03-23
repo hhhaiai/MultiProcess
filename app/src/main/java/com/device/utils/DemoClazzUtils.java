@@ -245,6 +245,16 @@ public class DemoClazzUtils {
         return null;
     }
 
+    public static String getStringField(String clazzName, String methodName) {
+        try {
+            Field fd = getField(clazzName, methodName);
+            if (fd != null) {
+                return (String) fd.get(null);
+            }
+        } catch (Throwable e) {
+        }
+        return null;
+    }
 
     /**
      * call static method

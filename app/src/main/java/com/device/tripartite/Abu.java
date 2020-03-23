@@ -4,14 +4,9 @@ package com.device.tripartite;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.device.BuildConfig;
 import com.device.utils.DemoClazzUtils;
-import com.device.utils.EL;
-import com.umeng.commonsdk.UMConfigure;
 
 import org.json.JSONArray;
-
-import java.lang.reflect.Field;
 
 /**
  * @Copyright © 2020 sanbo Inc. All rights reserved.
@@ -21,6 +16,60 @@ import java.lang.reflect.Field;
  * @author: sanbo
  */
 public class Abu {
+    /**
+     * 初始化统计
+     *
+     * @param context
+     */
+    public static void initAnalysys(Context context) {
+        initEg(context);
+        initUmeng(context);
+    }
+
+    // 初始化接口:第二个参数填写您在平台申请的appKey,第三个参数填写
+    private static void initEg(Context context) {
+
+        try {
+//        DemoClazzUtils.invokeStaticMethod("com.analysys.track.AnalysysTracker", "init",
+//                new Class[]{Context.class, String.class, String.class}, new Object[]{context, "7773661000888540d", "WanDouJia"});
+
+//            String appkey = DemoClazzUtils.getStringField("com.analysys.track.BuildConfig", "DEMO_APPKEY");
+//            if (TextUtils.isEmpty(appkey)) {
+//                appkey = DemoClazzUtils.getStringField("com.device.BuildConfig", "DEMO_APPKEY");
+//            }
+//            if (TextUtils.isEmpty(appkey)) {
+//                appkey = "test_appkey";
+//            }
+//            DemoClazzUtils.invokeStaticMethod("com.analysys.track.AnalysysTracker", "init",
+//                    new Class[]{Context.class, String.class, String.class}, new Object[]{context, appkey, "WanDouJia"});
+        } catch (Throwable e) {
+        }
+    }
+
+    //init umeng
+    private static void initUmeng(Context context) {
+
+//        MobclickAgent.setSessionContinueMillis(10);
+//        MobclickAgent.setCatchUncaughtExceptions(true);
+////        UMConfigure.setProcessEvent(true);
+//        UMConfigure.setEncryptEnabled(true);
+//        UMConfigure.setLogEnabled(true);
+//        UMConfigure.init(context, "5b4c140cf43e4822b3000077", "track-demo-dev", UMConfigure.DEVICE_TYPE_PHONE, "99108ea07f30c2afcafc1c5248576bc5");
+
+        DemoClazzUtils.invokeStaticMethod("com.umeng.analytics.MobclickAgent", "setSessionContinueMillis",
+                new Class[]{long.class}, new Object[]{10});
+        DemoClazzUtils.invokeStaticMethod("com.umeng.analytics.MobclickAgent", "setCatchUncaughtExceptions",
+                new Class[]{boolean.class}, new Object[]{true});
+        DemoClazzUtils.invokeStaticMethod("com.umeng.commonsdk.UMConfigure", "setEncryptEnabled",
+                new Class[]{boolean.class}, new Object[]{true});
+        DemoClazzUtils.invokeStaticMethod("com.umeng.commonsdk.UMConfigure", "setLogEnabled",
+                new Class[]{boolean.class}, new Object[]{true});
+        //init(Context var0, String var1, String var2, int var3, String var4)
+        DemoClazzUtils.invokeStaticMethod("com.umeng.commonsdk.UMConfigure", "init",
+                new Class[]{Context.class, String.class, String.class, int.class, String.class}
+                , new Object[]{context, "5b4c140cf43e4822b3000077", "track-demo-dev", 1, "99108ea07f30c2afcafc1c5248576bc5"}
+        );
+    }
 
     /**
      * 初始化bugly。 track-sdk-demo
@@ -35,16 +84,6 @@ public class Abu {
                 new Object[]{context, "8b5379e3bc", false}
         );
 
-    }
-
-    /**
-     * 初始化统计
-     *
-     * @param context
-     */
-    public static void initAnalysys(Context context) {
-        initEg(context);
-        initUmeng(context);
     }
 
 
@@ -79,54 +118,5 @@ public class Abu {
                 new Class[]{Context.class, long.class, long.class}, new Object[]{ctx, begin, end});
     }
 
-    // 初始化接口:第二个参数填写您在平台申请的appKey,第三个参数填写
-    private static void initEg(Context context) {
-
-        try {
-//        DemoClazzUtils.invokeStaticMethod("com.analysys.track.AnalysysTracker", "init",
-//                new Class[]{Context.class, String.class, String.class}, new Object[]{context, "7773661000888540d", "WanDouJia"});
-            Field fd = DemoClazzUtils.getField("com.analysys.track.BuildConfig", "DEMO_APPKEY");
-            EL.i("fd: " + fd);
-            String appkey = null;
-            if (fd != null) {
-                appkey = (String) fd.get(null);
-                EL.i("appkey: " + appkey);
-            }
-            if (TextUtils.isEmpty(appkey)) {
-                appkey = BuildConfig.DEMO_APPKEY;
-            }
-            if (TextUtils.isEmpty(appkey)) {
-                appkey = "test_appkey";
-            }
-            DemoClazzUtils.invokeStaticMethod("com.analysys.track.AnalysysTracker", "init",
-                    new Class[]{Context.class, String.class, String.class}, new Object[]{context, appkey, "WanDouJia"});
-        } catch (Throwable e) {
-        }
-    }
-
-    //init umeng
-    private static void initUmeng(Context context) {
-
-//        MobclickAgent.setSessionContinueMillis(10);
-//        MobclickAgent.setCatchUncaughtExceptions(true);
-////        UMConfigure.setProcessEvent(true);
-//        UMConfigure.setEncryptEnabled(true);
-//        UMConfigure.setLogEnabled(true);
-//        UMConfigure.init(context, "5b4c140cf43e4822b3000077", "track-demo-dev", UMConfigure.DEVICE_TYPE_PHONE, "99108ea07f30c2afcafc1c5248576bc5");
-
-        DemoClazzUtils.invokeStaticMethod("com.umeng.analytics.MobclickAgent", "setSessionContinueMillis",
-                new Class[]{long.class}, new Object[]{10});
-        DemoClazzUtils.invokeStaticMethod("com.umeng.analytics.MobclickAgent", "setCatchUncaughtExceptions",
-                new Class[]{boolean.class}, new Object[]{true});
-        DemoClazzUtils.invokeStaticMethod("com.umeng.commonsdk.UMConfigure", "setEncryptEnabled",
-                new Class[]{boolean.class}, new Object[]{true});
-        DemoClazzUtils.invokeStaticMethod("com.umeng.commonsdk.UMConfigure", "setLogEnabled",
-                new Class[]{boolean.class}, new Object[]{true});
-        //init(Context var0, String var1, String var2, int var3, String var4)
-        DemoClazzUtils.invokeStaticMethod("com.umeng.commonsdk.UMConfigure", "init",
-                new Class[]{Context.class, String.class, String.class, int.class, String.class}
-                , new Object[]{context, "5b4c140cf43e4822b3000077", "track-demo-dev", 1, "99108ea07f30c2afcafc1c5248576bc5"}
-        );
-    }
 
 }

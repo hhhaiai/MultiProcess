@@ -1,4 +1,4 @@
-package com.device.impls.usmcase.tools;
+package com.device.tripartite.cases.usmcase.tools;
 
 import android.app.usage.UsageEvents;
 import android.app.usage.UsageStats;

@@ -1,24 +1,10 @@
-package com.device.impls;
+package com.device.services;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
 
-import com.device.services.MyServiceA;
-import com.device.services.MyServiceB;
-import com.device.services.MyServiceC;
-import com.device.services.MyServiceD;
-import com.device.services.MyServiceE;
-import com.device.services.MyServiceF;
-import com.device.services.MyServiceG;
-import com.device.services.MyServiceH;
-import com.device.services.MyServiceI;
-import com.device.services.MyServiceJ;
-import com.device.services.MyServiceK;
-import com.device.services.MyServiceL;
-import com.device.services.MyServiceM;
-import com.device.services.MyServiceN;
 import com.device.tripartite.MultiProcessCaseDispatcher;
 import com.device.utils.EL;
 import com.device.utils.MyLooper;

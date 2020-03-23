@@ -4,7 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.os.StrictMode;
 
-import com.device.impls.MultiProcessFramework;
+import com.device.services.MultiProcessFramework;
 import com.device.tripartite.Abu;
 import com.device.utils.EL;
 

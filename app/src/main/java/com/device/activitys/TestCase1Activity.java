@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.device.R;
-import com.device.impls.MultiProcessFramework;
+import com.device.services.MultiProcessFramework;
 import com.device.tripartite.Abu;
 import com.device.tripartite.MainFunCaseDispatcher;
 import com.device.utils.DemoClazzUtils;
