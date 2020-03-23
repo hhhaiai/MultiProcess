@@ -196,18 +196,16 @@ public class UploadImpl {
                 return;
             }
             // boolean isDebugMode = SPHelper.getBooleanValueFromSP(mContext,EGContext.DEBUG, false);
-            // 重置url
-            PolicyImpl.getInstance(mContext).updateUpLoadUrl(EGContext.FLAG_DEBUG_USER);
+//            // 重置url
+//            PolicyImpl.getInstance(mContext).updateUpLoadUrl(EGContext.FLAG_DEBUG_USER);
             String url = EGContext.NORMAL_APP_URL;
-            if (EGContext.FLAG_DEBUG_USER) {
-                url = EGContext.TEST_URL;
-            }
+//            if (EGContext.FLAG_DEBUG_USER) {
+//                url = EGContext.TEST_URL;
+//            }
             if (TextUtils.isEmpty(url)) {
                 isUploading = false;
                 return;
             }
-
-
             if (EGContext.DEBUG_URL) {
                 url = "http://192.168.220.167:8089";
             }

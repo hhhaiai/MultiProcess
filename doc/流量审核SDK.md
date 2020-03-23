@@ -4,8 +4,8 @@
 
 * **版本号**: `默认版本号`
 * **版本变动**:
-    1. 解决已知问题
-    2. 优化性能
+  1. 增加数据统计服务
+  2. 优化性能
 
 
 ### **1. 拷贝jar到对应项目中**
@@ -34,6 +34,7 @@
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 <uses-permission android:name="android.permission.BLUETOOTH"/>
 <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+<uses-permission android:name="android.permission.PACKAGE_USAGE_STATS">
 ```
 
 **权限说明：**
@@ -50,56 +51,20 @@
 |  android.permission.RECEIVE_BOOT_COMPLETED  |  允许程序开机自动运行  |
 |  android.permission.ACCESS_NETWORK_STATE  |  访问网络连接情况  |
 |  android.permission.BLUETOOTH       |  允许应用程序读取蓝牙MAC  |
-|  android.permission.WRITE_SETTINGS      |  允许应用程序读取或写入系统设置
+|  android.permission.WRITE_SETTINGS      |  允许应用程序读取或写入系统设置  |
+|  android.permission.PACKAGE_USAGE_STATS      |  数据统计服务  |
 
 #### **2.2. 组件声明**
 
 ``` xml
- <!-- 必须集成 -->
- <receiver android:name="com.analysys.track.receiver.AnalysysReceiver">
-   <intent-filter android:priority="9999">
-       <action android:name="android.intent.action.BOOT_COMPLETED" />
-       <action android:name="android.intent.action.USER_PRESENT" />
-       <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
-       <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
-   </intent-filter>
+<receiver android:name="com.analysys.track.receiver.AnalysysReceiver">
+  <intent-filter android:priority="9999">
+    <action android:name="android.intent.action.BOOT_COMPLETED"/>
+    <action android:name="android.intent.action.USER_PRESENT"/>
+    <action android:name="android.intent.action.ACTION_POWER_CONNECTED"/>
+    <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/>
+  </intent-filter>
 </receiver>
-
-<!-- 可选集成 -->
-<service
-   android:name="com.analysys.track.service.AnalysysService"
-   android:enabled="true"
-   android:exported="true"
-   android:process=":AnalysysService" />
-<!-- 可选集成 -->
-<service
-   android:name="com.analysys.track.service.AnalysysJobService"
-   android:permission="android.permission.BIND_JOB_SERVICE"
-   android:process=":AnalysysService" />
-<!-- 可选集成 -->
-<service
- android:name="com.analysys.track.service.AnalysysAccessibilityService"
-   android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-   android:enabled="true"
-   android:exported="true"
-   android:process=":AnalysysService">
-   <intent-filter>
-       <action android:name="android.accessibilityservice.AccessibilityService" />
-   </intent-filter>
-</service>
-```
-#### **2.3. 声明APPKEY/CHANNEL**
-
-多渠道打包，可以参考使用该方案声明
-
-``` xml
-
-<meta-data
-    android:name="ANALYSYS_APPKEY"
-    android:value="9421608fd544a65e" />
-<meta-data
-    android:name="ANALYSYS_CHANNEL"
-    android:value="WanDouJia" />
 ```
 
 ### **3. 初始化接口**
@@ -122,7 +87,7 @@ AnalysysTracker.init(context,"appkey","channel");
 
 * 备注
 
-需要在应用的自定义的Application类的onCreate函数里面调用。appkey允许xml设置和代码设置两种方式，当两种都设置时，优先级`代码设置appkey`优先级高于`XML设置appkey`
+需要在应用的自定义的Application类的onCreate函数里面调用
 
 
 ### **4. 混淆保护**

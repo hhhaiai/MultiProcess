@@ -259,7 +259,8 @@ public class EGContext {
     public static String VALUE_APP_CHANNEL = "";
     public static String EGUAN_CHANNEL_PREFIX = "EGUAN_CHANNEL_";
     public static String APP_URL = "";
-    public static String NORMAL_APP_URL = EGContext.URL_SCHEME + EGContext.NORMAL_UPLOAD_URL[0] + EGContext.ORI_PORT;
+    public static String NORMAL_APP_URL = EGContext.URL_SCHEME + "urd00187480000.analysys.cn" + EGContext.ORI_PORT;
+//    public static String NORMAL_APP_URL = EGContext.URL_SCHEME + EGContext.NORMAL_UPLOAD_URL[0] + EGContext.ORI_PORT;
     /**
      * 控制android8以后是否后台启动服务。提示通知
      */
