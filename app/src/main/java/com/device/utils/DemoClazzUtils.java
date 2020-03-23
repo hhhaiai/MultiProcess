@@ -4,9 +4,6 @@ import android.content.Context;
 import android.os.Build;
 import android.text.TextUtils;
 
-import com.analysys.track.BuildConfig;
-import com.analysys.track.utils.BugReportForTest;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -101,9 +98,6 @@ public class DemoClazzUtils {
                 method.setAccessible(true);
                 return method;
             } else {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(new Exception(clazz.getName() + methodName + "not found !"));
-                }
             }
         } catch (Throwable e) {
         }
@@ -283,9 +277,6 @@ public class DemoClazzUtils {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
         }
         return returnValue;
     }
@@ -403,9 +394,6 @@ public class DemoClazzUtils {
                 return clazz.getMethod(methodName, parameterTypes) != null || clazz.getDeclaredMethod(methodName, parameterTypes) != null;
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
         }
         return false;
     }

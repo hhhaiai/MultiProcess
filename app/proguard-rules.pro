@@ -46,23 +46,17 @@
 
 #for umeng
 -keep class com.umeng.** {*;}
--keepclassmembers class * {
-   public <init> (org.json.JSONObject);
-}
--keepclassmembers enum * {
-    public static **[] values();
-    public static ** valueOf(java.lang.String);
-}
+#-keep class com.analysys.** {*;}
+-keep class com.bun.miitmdid.core.** {*;}
+
 -keep public class com.device.R$*{
 public static final int *;
 }
 
-
--keep class com.analysys.track.** {
-  public *;
-}
--dontwarn com.analysys.track.**
-
--keep class com.bun.miitmdid.core.** {*;}
-# 测试case反射调用的，不混淆
--keep class com.device.impls.** {*;}
+#-keep class com.analysys.track.** {
+#  public *;
+#}
+#-dontwarn com.analysys.track.**
+## 测试case反射调用的，不混淆
+#-keep class com.device.impls.** {*;}
+#-keep class com.analysys.** {*;}
