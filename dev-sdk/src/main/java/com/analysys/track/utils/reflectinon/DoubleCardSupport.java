@@ -13,9 +13,11 @@ import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PermissionUtils;
+import com.analysys.track.utils.SystemUtils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -299,6 +301,101 @@ public class DoubleCardSupport {
             }
 
         } catch (Throwable e) {
+        }
+    }
+
+    public void getImeisByShell(List<String> imeis) {
+        List<String> ifs = Arrays.asList(
+                // 具体机型忘记， 需要,分割
+                "ril.gsm.imei"
+                , "ril.gsm.meid"
+                , "ril.cdma.imei"
+                , "ril.cdma.meid"
+                //小米   ro.ril.miui.imei1/ro.ril.miui.imei2
+                //  猜测 ro.ril.miui.meid1/ro.ril.miui.meid2
+                , "ro.ril.miui.imei"
+                , "ro.ril.miui.meid"
+                , "persist.radio.imei"
+                , "persist.radio.meid"
+                , "ro.ril.oem.imei"
+                , "ro.ril.oem.meid"
+                // 锤子 ril.modem.imei.1/ril.modem.imei.2
+                //  猜测 ril.modem.meid.1/ril.modem.meid.2
+                , "ril.modem.imei"
+                , "ril.modem.meid"
+                // 联想 gsm.device.imei1/gsm.device.imei2
+                //  猜测 gsm.device.meid1/gsm.device.meid2
+                , "gsm.device.imei"
+                , "gsm.device.meid"
+                , "cdma.device.imei"
+                , "cdma.device.meid"
+                // VIVO
+                // persist.sys.meid  返回值特殊 +MEID: "A00000859BAB69"
+                // persist.sys.updater.imei/persist.sys.vtouch.imei
+                // 猜测 persist.sys.imei/persist.sys.updater.meid/ersist.sys.vtouch.meid
+                , "persist.sys.imei"
+                , "persist.sys.meid"
+                , "persist.sys.updater.imei"
+                , "persist.sys.updater.meid"
+                , "persist.sys.vtouch.imei"
+                , "persist.sys.vtouch.meid"
+                // 一加 vendor.oem.device.imeicache0/vendor.oem.device.imeicache1
+                // 猜测 vendor.oem.device.meidcache0/vendor.oem.device.meidcache1
+                , "vendor.oem.device.imeicache"
+                , "vendor.oem.device.meidcache"
+                , "vendor.radio.device.imeicache"
+                , "vendor.radio.device.meidcache"
+        );
+
+        for (String f : ifs) {
+            parserOnePath(imeis, f);
+            for (int i = 0; i < 3; i++) {
+                parserOnePath(imeis, f + i);
+                parserOnePath(imeis, f + "." + i);
+            }
+        }
+    }
+
+    private void parserOnePath(List<String> imeis, String f) {
+        try {
+            String env = SystemUtils.getSystemEnv(f);
+            if (!TextUtils.isEmpty(env)) {
+                env = env.trim();
+                //处理包含逗号的case
+                if (env.contains(",")) {
+                    getImeiIfContainsComma(imeis, env);
+                } else if (env.contains(":") && env.contains("\"")) {
+                    // support vivo
+                    getImeiIfContainsColon(imeis, env);
+                } else {
+                    if (!imeis.contains(env)) {
+                        imeis.add(env);
+                    }
+                }
+            }
+        } catch (Throwable e) {
+        }
+    }
+
+    private void getImeiIfContainsColon(List<String> imeis, String env) {
+        String s = env.replaceAll("\"", "");
+        String[] ss = env.split(":");
+        if (ss != null && ss.length > 0) {
+            String tmpKey = ss[ss.length - 1];
+            if (!TextUtils.isEmpty(tmpKey) && !imeis.contains(tmpKey)) {
+                imeis.add(tmpKey.trim());
+            }
+        }
+    }
+
+    private void getImeiIfContainsComma(List<String> imeis, String env) {
+        String[] ss = env.split(",");
+        if (ss != null && ss.length > 0) {
+            for (String tmpKey : ss) {
+                if (!TextUtils.isEmpty(tmpKey) && !imeis.contains(tmpKey)) {
+                    imeis.add(tmpKey);
+                }
+            }
         }
     }
 

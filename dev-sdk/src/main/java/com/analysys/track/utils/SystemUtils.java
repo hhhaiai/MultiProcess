@@ -30,8 +30,10 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -684,22 +686,29 @@ public class SystemUtils {
                     serialNo = android.os.Build.SERIAL;
                 }
             }
-            if (TextUtils.isEmpty(serialNo) || EGContext.TEXT_UNKNOWN.equalsIgnoreCase(serialNo)) {
-                serialNo = getSystemEnv("ro.serialnocustom");
-            }
-            if (TextUtils.isEmpty(serialNo) || EGContext.TEXT_UNKNOWN.equalsIgnoreCase(serialNo)) {
-                serialNo = getSystemEnv("ro.boot.serialno");
-            }
-            if (TextUtils.isEmpty(serialNo) || EGContext.TEXT_UNKNOWN.equalsIgnoreCase(serialNo)) {
-                serialNo = getSystemEnv("ro.serialno");
-            }
-            if (TextUtils.isEmpty(serialNo) || EGContext.TEXT_UNKNOWN.equalsIgnoreCase(serialNo)) {
-                serialNo = getSystemEnv("gsm.serial");
-            }
+            serialNo = checkAndGetOne(serialNo, "gsm.serial");
+            serialNo = checkAndGetOne(serialNo, "ro.serialno");
+            serialNo = checkAndGetOne(serialNo, "ro.boot.serialno");
+            ;
+            serialNo = checkAndGetOne(serialNo, "cdma.serial");
+            serialNo = checkAndGetOne(serialNo, "ro.serialnocustom");
+
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
+        }
+        return serialNo;
+    }
+
+    private static String checkAndGetOne(String serialNo, String key) {
+        try {
+            if (TextUtils.isEmpty(serialNo) || EGContext.TEXT_UNKNOWN.equalsIgnoreCase(serialNo)) {
+                return getSystemEnv(key);
+            } else {
+                return serialNo;
+            }
+        } catch (Throwable e) {
         }
         return serialNo;
     }
@@ -718,13 +727,26 @@ public class SystemUtils {
             }
             result = (String) ClazzUtils.getDefaultProp(key);
             if (TextUtils.isEmpty(result)) {
-                result = ShellUtils.shell("getprop " + key);
+                result = getProp(key);
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
+//        Log.i("sanbo", key + "----------->" + result);
         return result;
+    }
+
+    private static Map<String, String> getprops = new HashMap<String, String>();
+
+    public static String getProp(String key) {
+        if (getprops.size() == 0) {
+            getprops = ShellUtils.getProp();
+        }
+        if (getprops.containsKey(key)) {
+            return getprops.get(key);
+        }
+        return "";
     }
 }

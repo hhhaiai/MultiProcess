@@ -1,8 +1,10 @@
 package com.analysys.track.utils;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.analysys.track.BuildConfig;
+import com.analysys.track.internal.work.ISayHello;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -11,7 +13,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -105,6 +109,20 @@ public class ShellUtils {
 
 
     public static List<String> getResultArrays(String cmd) {
+        return getArrays(cmd, null, true);
+    }
+
+
+    /**
+     * 核心工作方法
+     *
+     * @param cmd          执行指令
+     * @param call         回调函数
+     * @param isNeedResult 需要返回值
+     * @return
+     */
+    public static List<String> getArrays(String cmd, final ISayHello call, boolean isNeedResult) {
+
         if (TextUtils.isEmpty(cmd)) {
             return null;
         }
@@ -134,7 +152,12 @@ public class ShellUtils {
             String line = "";
             while ((line = br.readLine()) != null) {
                 if (!TextUtils.isEmpty(line) && !result.contains(line.trim())) {
-                    result.add(line.trim());
+                    if (isNeedResult) {
+                        result.add(line.trim());
+                    }
+                    if (call != null) {
+                        call.onProcessLine(line.trim());
+                    }
                 }
             }
         } catch (Throwable e) {
@@ -150,6 +173,66 @@ public class ShellUtils {
             StreamerUtils.safeClose(os);
         }
         return result;
+
+    }
+
+
+    public static Map<String, String> getProp() {
+        final Map<String, String> getprop = new HashMap<String, String>();
+
+        try {
+            getArrays("getprop", new ISayHello() {
+                @Override
+                public void onProcessLine(final String line) {
+
+                    // 处理单行
+                    SystemUtils.runOnWorkThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            process(getprop, line);
+                        }
+                    });
+                }
+            }, false);
+        } catch (Throwable e) {
+        }
+
+        return getprop;
+    }
+
+    private static void process(Map<String, String> getprop, String line) {
+        // line example:  [ro.serialno]: [7TZPDEY999999999]
+        if (line.contains("[")) {
+            line = line.replaceAll("\\[", "");
+        }
+        if (line.contains("]")) {
+            line = line.replaceAll("\\]", "");
+        }
+        if (line.contains(" ")) {
+            line = line.replaceAll("\\s+", "");
+        }
+        // contains :, and only has one
+        if (line.contains(":")) {
+            String[] ss = line.split(":");
+
+            if (ss != null) {
+                if (ss.length == 1) {
+                    Log.d("sanbo", "解析。ss 1。。line:" + line);
+                    getprop.put(ss[0], "");
+                } else if (ss.length == 2) {
+                    Log.d("sanbo", "解析正常。ss  2。。line:" + line);
+                    getprop.put(ss[0], ss[1]);
+                } else {
+                    String k = line.substring(0, line.indexOf(":"));
+                    String v = line.substring(line.indexOf(":") + 1, line.length());
+                    Log.d("sanbo", "多个分号:" + line);
+                    Log.d("sanbo", "多个分号[" + k + "]--->[" + v + "]");
+                    getprop.put(k, v);
+                }
+            }
+        } else {
+            Log.e("sanbo", "contains 不符合规则。。。。line:" + line);
+        }
     }
 
 //    /**
