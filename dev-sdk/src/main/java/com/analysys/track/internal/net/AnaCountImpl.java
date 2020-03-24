@@ -3,22 +3,17 @@ package com.analysys.track.internal.net;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
-import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.File;
-import java.io.FileDescriptor;
 import java.util.Arrays;
 import java.util.List;
-
-import javax.crypto.Cipher;
 
 /**
  * @Copyright © 2020 sanbo Inc. All rights reserved.
@@ -34,7 +29,6 @@ public class AnaCountImpl {
                 , wrap(AnaCountImpl.getK1(context)), wrap(PatchHelper.getK2()), wrap(k3)
                 , wrap(PatchHelper.getK4())
         );
-        Log.i("sanbo", "k1:" + result.length());
         return result;
     }
 
@@ -47,7 +41,6 @@ public class AnaCountImpl {
                 , wrap(getK14(context)), wrap(getK15(context)), wrap(getK16(context))
                 , wrap(getK17(context)), wrap(getK18(context)), wrap(getK19(context))
         );
-        Log.i("sanbo", "k2:" + result.length());
         return result;
     }
 
