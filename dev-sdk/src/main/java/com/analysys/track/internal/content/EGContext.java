@@ -128,6 +128,9 @@ public class EGContext {
     public static final String NETWORK_TYPE_5G = "5G";
     public static final String NETWORK_TYPE_WIFI = "WIFI";
     public static final String NETWORK_TYPE_NO_NET = "无网络";
+
+
+    public static final String TEXT_UNKNOWN = "unknown";
     /**
      * 非实时上传端口
      */

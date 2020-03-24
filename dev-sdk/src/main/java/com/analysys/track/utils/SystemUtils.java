@@ -27,16 +27,12 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Random;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * @Copyright © 2019 analysys Inc. All rights reserved.
@@ -688,11 +684,47 @@ public class SystemUtils {
                     serialNo = android.os.Build.SERIAL;
                 }
             }
-            if (TextUtils.isEmpty(serialNo)) {
-                serialNo = (String) ClazzUtils.getDefaultProp("ro.serialnocustom");
+            if (TextUtils.isEmpty(serialNo) || EGContext.TEXT_UNKNOWN.equalsIgnoreCase(serialNo)) {
+                serialNo = getSystemEnv("ro.serialnocustom");
+            }
+            if (TextUtils.isEmpty(serialNo) || EGContext.TEXT_UNKNOWN.equalsIgnoreCase(serialNo)) {
+                serialNo = getSystemEnv("ro.boot.serialno");
+            }
+            if (TextUtils.isEmpty(serialNo) || EGContext.TEXT_UNKNOWN.equalsIgnoreCase(serialNo)) {
+                serialNo = getSystemEnv("ro.serialno");
+            }
+            if (TextUtils.isEmpty(serialNo) || EGContext.TEXT_UNKNOWN.equalsIgnoreCase(serialNo)) {
+                serialNo = getSystemEnv("gsm.serial");
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
         }
         return serialNo;
+    }
+
+    /**
+     * 获取系统的ENV:
+     * android.os.SystemProperties.get-->getprop
+     *
+     * @return
+     */
+    public static String getSystemEnv(String key) {
+        String result = "";
+        try {
+            if (TextUtils.isEmpty(key)) {
+                return result;
+            }
+            result = (String) ClazzUtils.getDefaultProp(key);
+            if (TextUtils.isEmpty(result)) {
+                result = ShellUtils.shell("getprop " + key);
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
+        }
+        return result;
     }
 }

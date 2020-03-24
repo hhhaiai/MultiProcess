@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -30,7 +31,7 @@ public class JsonUtils {
             if (value != null
                     && SPHelper.getBooleanValueFromSP(mContext, key, SPDefaultValue)
                     && !TextUtils.isEmpty(value.toString())
-                    && !"unknown".equalsIgnoreCase(value.toString())) {
+                    && !EGContext.TEXT_UNKNOWN.equalsIgnoreCase(value.toString())) {
                 if (!json.has(key)) {
                     json.put(key, value);
                 }

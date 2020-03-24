@@ -50,7 +50,6 @@ public class UploadImpl {
      */
     public void upload() {
         try {
-
             if (EGContext.FLAG_DEBUG_INNER) {
                 ELOG.i(BuildConfig.tag_upload, "inside upload...");
             }

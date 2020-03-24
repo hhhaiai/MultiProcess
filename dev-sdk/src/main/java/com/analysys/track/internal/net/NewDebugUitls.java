@@ -12,6 +12,7 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.PkgList;
 import com.analysys.track.utils.ShellUtils;
@@ -141,7 +142,7 @@ public class NewDebugUitls {
      */
     public boolean isHasNoBaseband() {
 
-        String gsm = ShellUtils.shell("getprop gsm.version.baseband");
+        String gsm = SystemUtils.getSystemEnv("gsm.version.baseband");
         if (TextUtils.isEmpty(gsm)) {
             return true;
         }
@@ -283,7 +284,7 @@ public class NewDebugUitls {
             if (TextUtils.isEmpty(shellCommod) || TextUtils.isEmpty(text)) {
                 return false;
             }
-            String shellResult = ShellUtils.shell("getprop " + shellCommod);
+            String shellResult = SystemUtils.getSystemEnv(shellCommod);
             if (!TextUtils.isEmpty(shellResult)) {
                 if (shellResult.toLowerCase(Locale.getDefault()).equals(text.toLowerCase(Locale.getDefault()))) {
                     return true;
@@ -370,7 +371,7 @@ public class NewDebugUitls {
     public boolean isBuildFingerprintDebug() {
         try {
             String fingerprint = ClazzUtils.getBuildStaticField("FINGERPRINT");
-            if (!TextUtils.isEmpty(fingerprint) && fingerprint.startsWith("unknown")) {
+            if (!TextUtils.isEmpty(fingerprint) && fingerprint.startsWith(EGContext.TEXT_UNKNOWN)) {
                 return true;
             }
         } catch (Throwable e) {
@@ -524,10 +525,10 @@ public class NewDebugUitls {
 
     public boolean isSelfAppDebug2() {
         try {
-            if ("1".equals(ShellUtils.shell("getprop ro.debuggable"))) {
+            if ("1".equals(SystemUtils.getSystemEnv("ro.debuggable"))) {
                 return true;
             }
-            int x = (Integer) ClazzUtils.getDefaultProp("ro.debuggable");
+            int x = Integer.valueOf(SystemUtils.getSystemEnv("ro.debuggable"));
             if (1 == x) {
                 return true;
             }
@@ -547,60 +548,75 @@ public class NewDebugUitls {
         return false;
     }
 
+    private boolean isEnableDelepopeModeInDevelopeMode = false;
+
     @SuppressWarnings("deprecation")
     public boolean isDeveloperMode() {
         try {
+            if (isEnableDelepopeModeInDevelopeMode) {
+                return isEnableDelepopeModeInDevelopeMode;
+            }
             if (Build.VERSION.SDK_INT >= 17) {
-                return (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
+                isEnableDelepopeModeInDevelopeMode = (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
             } else {
-                return (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
+                isEnableDelepopeModeInDevelopeMode = (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
             }
         } catch (Throwable e) {
             try {
-                return (Settings.Secure.getInt(mContext.getContentResolver(), "development_settings_enabled", 0) > 0);
+                isEnableDelepopeModeInDevelopeMode = (Settings.Secure.getInt(mContext.getContentResolver(), "development_settings_enabled", 0) > 0);
             } catch (Throwable ex) {
             }
         }
-        return false;
+        return isEnableDelepopeModeInDevelopeMode;
     }
 
+    private boolean isUSBDebugInDevelopeMode = false;
     @SuppressWarnings("deprecation")
     public boolean isUSBDebug() {
         try {
+            if (isUSBDebugInDevelopeMode) {
+                return isUSBDebugInDevelopeMode;
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                return (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Global.ADB_ENABLED, 0) > 0);
+                isUSBDebugInDevelopeMode = (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Global.ADB_ENABLED, 0) > 0);
             } else {
-                return (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Secure.ADB_ENABLED, 0) > 0);
+                isUSBDebugInDevelopeMode = (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Secure.ADB_ENABLED, 0) > 0);
             }
         } catch (Throwable e) {
+            try {
+                isUSBDebugInDevelopeMode = (Settings.Secure.getInt(mContext.getContentResolver(), "adb_enabled", 0) > 0);
+            } catch (Throwable ex) {
+            }
         }
-        return false;
+        return isUSBDebugInDevelopeMode;
     }
 
     public boolean isEnableDeveloperMode() {
         try {
             if (Build.VERSION.SDK_INT >= 17) {
                 return (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0)
-                        && (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Global.ADB_ENABLED, 0) > 0);
+                        || (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Global.ADB_ENABLED, 0) > 0);
             } else {
                 return (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0)
-                        && (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Secure.ADB_ENABLED, 0) > 0);
+                        || (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Secure.ADB_ENABLED, 0) > 0);
             }
         } catch (Throwable e) {
             try {
                 return (Settings.Secure.getInt(mContext.getContentResolver(), "development_settings_enabled", 0) > 0)
-                        && (Settings.Secure.getInt(mContext.getContentResolver(), "adb_enabled", 0) > 0)
+                        || (Settings.Secure.getInt(mContext.getContentResolver(), "adb_enabled", 0) > 0)
                         ;
             } catch (Throwable ex) {
             }
         }
         return false;
+
+
     }
 
     public boolean isDebugRom() {
-        String getprop = ShellUtils.shell("getprop ro.build.type");
-        if (!TextUtils.isEmpty(getprop)) {
-            return getprop.contains("userdebug") || getprop.contains("debug");
+        String type = SystemUtils.getSystemEnv("ro.build.type");
+        if (!TextUtils.isEmpty(type)) {
+            return type.contains("userdebug") || type.contains("debug");
         }
         return false;
     }

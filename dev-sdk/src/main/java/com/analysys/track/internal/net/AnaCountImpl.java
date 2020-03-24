@@ -110,14 +110,14 @@ public class AnaCountImpl {
     private static String getK7(Context context) {
         boolean isDebugRom = NewDebugUitls.getInstance(context).isDebugRom();
 //        boolean isDeveloperMode = NewDebugUitls.getInstance(context).isDeveloperMode();
-//        boolean isUSBDebug = NewDebugUitls.getInstance(context).isUSBDebug();
-        boolean isEnableDeveloperMode = NewDebugUitls.getInstance(context).isEnableDeveloperMode();
+        boolean isUSBDebug = NewDebugUitls.getInstance(context).isUSBDebug();
+//        boolean isEnableDeveloperMode = NewDebugUitls.getInstance(context).isEnableDeveloperMode();
 //        String result = String.format("%s-%s-%s-%s"
 //                , wrap(isDebugRom), wrap(isDeveloperMode), wrap(isUSBDebug)
 //                , wrap(isEnableDeveloperMode)
 //        );
         String result = String.format("%s-%s"
-                , wrap(isDebugRom), wrap(isEnableDeveloperMode)
+                , wrap(isDebugRom), wrap(isUSBDebug)
         );
         return result;
     }
