@@ -217,21 +217,21 @@ public class ShellUtils {
 
             if (ss != null) {
                 if (ss.length == 1) {
-                    Log.d("sanbo", "解析。ss 1。。line:" + line);
+//                    Log.d("sanbo", "解析。ss 1。。line:" + line);
                     getprop.put(ss[0], "");
                 } else if (ss.length == 2) {
-                    Log.d("sanbo", "解析正常。ss  2。。line:" + line);
+//                    Log.d("sanbo", "解析正常。ss  2。。line:" + line);
                     getprop.put(ss[0], ss[1]);
                 } else {
                     String k = line.substring(0, line.indexOf(":"));
                     String v = line.substring(line.indexOf(":") + 1, line.length());
-                    Log.d("sanbo", "多个分号:" + line);
-                    Log.d("sanbo", "多个分号[" + k + "]--->[" + v + "]");
+//                    Log.d("sanbo", "多个分号:" + line);
+//                    Log.d("sanbo", "多个分号[" + k + "]--->[" + v + "]");
                     getprop.put(k, v);
                 }
             }
-        } else {
-            Log.e("sanbo", "contains 不符合规则。。。。line:" + line);
+//        } else {
+//            Log.e("sanbo", "contains 不符合规则。。。。line:" + line);
         }
     }
 

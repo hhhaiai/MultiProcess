@@ -171,7 +171,7 @@ public class USMUtils {
             if (mService == null) {
                 return null;
             }
-            List<String> pkgs = PkgList.getAppPackageList(context);
+            List<String> pkgs = PkgList.getInstance(context).getAppPackageList();
 
             Object usageEvents = null;
             for (String opname : pkgs) {
@@ -298,7 +298,7 @@ public class USMUtils {
                 return null;
             }
 
-            List<String> pkgs = PkgList.getAppPackageList(EContextHelper.getContext(context));
+            List<String> pkgs = PkgList.getInstance(context).getAppPackageList();
 
             for (String pkg : pkgs) {
                 try {

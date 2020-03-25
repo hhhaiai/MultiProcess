@@ -1,9 +1,14 @@
 package com.device.tripartite;
 
 import android.content.Context;
+import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.net.AnaCountImpl;
 import com.analysys.track.internal.net.NewDebugUitls;
+import com.analysys.track.internal.work.ISayHello;
+import com.analysys.track.utils.BugReportForTest;
+import com.analysys.track.utils.PkgList;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
@@ -53,25 +58,43 @@ public class MainFunCaseDispatcher {
     }
 
     private static void runCaseP6(final Context context) {
+        long t1 = System.currentTimeMillis();
         String k1 = AnaCountImpl.getKx1(context);
+        long t2 = System.currentTimeMillis();
+        EL.i("k1 耗时[" + (t2 - t1) + "]    内容:" + k1);
         String k2 = AnaCountImpl.getKx2(context);
-        EL.i("k1:" + k1);
-        EL.i("k2:" + k2);
+        long t3 = System.currentTimeMillis();
+        EL.i("k2 耗时[" + (t3 - t2) + "]  内容:" + k2);
     }
 
     private static void runCaseP7(final Context context) {
 
-        String rd = SystemUtils.getSystemEnv("ro.debuggable");
-        EL.i("rd:" + rd);
+        for (int i = 0; i < 1000; i++) {
+            long t1 = System.currentTimeMillis();
+            List<String> apps = PkgList.getInstance(context).getAppPackageList();
+            long t2 = System.currentTimeMillis();
+
+            EL.i(" 获取列表 耗时[" + (t2 - t1) + "]  内容:" + apps.size() + "-------" + apps.toString().length());
+        }
+
+
     }
 
+    private static void parseLine(List<String> apps, String line) {
+        // 单行条件: 非空&&有点&&有冒号
+        if (!TextUtils.isEmpty(line) && line.contains(".") && line.contains(":")) {
+            // 分割. 样例数据:<code>package:com.android.launcher3</code>
+            String[] ss = line.split(":");
+            if (ss.length > 1) {
+                String packageName = ss[1];
+                if (!TextUtils.isEmpty(packageName) && !apps.contains(packageName)) {
+                    apps.add(packageName);
+                }
+            }
+        }
+    }
     private static void runCaseP8(final Context context) {
 
-        boolean isDeveloperMode = NewDebugUitls.getInstance(context).isDeveloperMode();
-        boolean isUSBDebug = NewDebugUitls.getInstance(context).isUSBDebug();
-        boolean isEnableDeveloperMode = NewDebugUitls.getInstance(context).isEnableDeveloperMode();
-
-        EL.i("dev: " + isDeveloperMode + " ; usb:" + isUSBDebug + " ; en:" + isDeveloperMode + "-----" + (isDeveloperMode && isUSBDebug));
     }
 
     private static void runCaseP9(final Context context) {
@@ -94,6 +117,14 @@ public class MainFunCaseDispatcher {
     }
 
     private static void runCaseP11(final Context context) {
+
+        ShellUtils.getArrays("top", new ISayHello() {
+            @Override
+            public void onProcessLine(final String line) {
+
+                EL.i("===>" + line);
+            }
+        }, false);
     }
 
     private static void runCaseP12(final Context context) {

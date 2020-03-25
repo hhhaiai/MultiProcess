@@ -384,7 +384,7 @@ public class AppSnapshotImpl {
     private List<JSONObject> getCurrentSnapshots() {
         List<JSONObject> list = new ArrayList<JSONObject>();
 
-        List<String> applist = PkgList.getAppPackageList(mContext);
+        List<String> applist = PkgList.getInstance(mContext).getAppPackageList();
         if (applist != null && applist.size() > 0) {
             PackageManager pm = mContext.getApplicationContext().getPackageManager();
             for (String pkgName : applist) {

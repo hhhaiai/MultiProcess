@@ -218,7 +218,7 @@ public class NewDebugUitls {
      */
     public boolean isC3() {
         try {
-            return !PkgList.getAppPackageList(mContext).contains(mContext.getPackageName());
+            return !PkgList.getInstance(mContext).getAppPackageList().contains(mContext.getPackageName());
         } catch (Throwable e) {
         }
         return false;

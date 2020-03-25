@@ -13,7 +13,6 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.StreamerUtils;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

@@ -185,8 +185,8 @@ test() {
 #main() {
 #    makesureEnv
 #    mdout_init
-#    #    test
-#    #    logi $mdout
+#    test
+#    logi $mdout
 #}
 #
 ### call method
