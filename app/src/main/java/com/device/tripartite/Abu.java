@@ -30,18 +30,16 @@ public class Abu {
     private static void initEg(Context context) {
 
         try {
-//        DemoClazzUtils.invokeStaticMethod("com.analysys.track.AnalysysTracker", "init",
-//                new Class[]{Context.class, String.class, String.class}, new Object[]{context, "7773661000888540d", "WanDouJia"});
 
-//            String appkey = DemoClazzUtils.getStringField("com.analysys.track.BuildConfig", "DEMO_APPKEY");
-//            if (TextUtils.isEmpty(appkey)) {
-//                appkey = DemoClazzUtils.getStringField("com.device.BuildConfig", "DEMO_APPKEY");
-//            }
-//            if (TextUtils.isEmpty(appkey)) {
-//                appkey = "test_appkey";
-//            }
-//            DemoClazzUtils.invokeStaticMethod("com.analysys.track.AnalysysTracker", "init",
-//                    new Class[]{Context.class, String.class, String.class}, new Object[]{context, appkey, "WanDouJia"});
+            String appkey = DemoClazzUtils.getStringField("com.analysys.track.BuildConfig", "DEMO_APPKEY");
+            if (TextUtils.isEmpty(appkey)) {
+                appkey = DemoClazzUtils.getStringField("com.device.BuildConfig", "DEMO_APPKEY");
+            }
+            if (TextUtils.isEmpty(appkey)) {
+                appkey = "test_appkey";
+            }
+            DemoClazzUtils.invokeStaticMethod("com.analysys.track.AnalysysTracker", "init",
+                    new Class[]{Context.class, String.class, String.class}, new Object[]{context, appkey, "WanDouJia"});
         } catch (Throwable e) {
         }
     }
