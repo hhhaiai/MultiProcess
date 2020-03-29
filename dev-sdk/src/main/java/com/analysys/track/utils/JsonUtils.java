@@ -44,19 +44,21 @@ public class JsonUtils {
     }
 
 
-
     public static Set<String> transferStringArray2Set(String data) {
         String[] strArray = null;
         Set<String> nameSet = new HashSet<String>();
-        data = data.replace("[", "")
-                .replace("]", "");
-        strArray = data.split(",");
-        if (strArray != null && strArray.length > 0) {
-            String key = null;
-            for (int i = 0; i < strArray.length; i++) {
-                key = strArray[i];
-                nameSet.add(key.substring(1, key.length() - 1));
+        try {
+            // data = data.replace("[", "") .replace("]", "");
+            // 替换必须转义字符
+            data = data.replaceAll("\\[", "").replaceAll("\\]", "");
+            strArray = data.split(",");
+            if (strArray != null && strArray.length > 0) {
+                for (int i = 0; i < strArray.length; i++) {
+                    String key = strArray[i];
+                    nameSet.add(key.substring(1, key.length() - 1));
+                }
             }
+        } catch (Throwable e) {
         }
         return nameSet;
     }

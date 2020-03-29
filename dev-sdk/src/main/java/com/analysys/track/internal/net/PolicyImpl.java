@@ -13,11 +13,10 @@ import com.analysys.track.internal.model.PolicyInfo;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.FileUitls;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.Memory2File;
-import com.analysys.track.utils.data.Md5Utils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
+import com.analysys.track.utils.reflectinon.HotfHelper;
 import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -268,9 +267,8 @@ public class PolicyImpl {
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_cutoff, "=========saveRespParams 策略为新增策略 4====");
             }
-            // todo 为什么清除? 不是追加，替换？
-            //  @4306版本去除，支持多组策略叠加
-//            clear();
+            // 4306版本去除，支持多组策略叠加
+            // clear();
 
             // 解析策略到内存模型
             parsePolicyToMemoryModule(serverPolicy, PolicyInfo.getInstance());
@@ -302,64 +300,21 @@ public class PolicyImpl {
                 return;
             }
             if (serverPolicy.has(UploadKey.Response.HotFixResp.NAME)) {
-                JSONObject patch = serverPolicy.optJSONObject(UploadKey.Response.HotFixResp.NAME);
-                if (patch != null && patch.length() > 0) {
-                    if (patch.has(UploadKey.Response.HotFixResp.OPERA)) {
-                        String enable = patch.optString(UploadKey.Response.HotFixResp.OPERA, "");
+                JSONObject hotfix = serverPolicy.optJSONObject(UploadKey.Response.HotFixResp.NAME);
+                if (hotfix != null && hotfix.length() > 0) {
+                    if (hotfix.has(UploadKey.Response.HotFixResp.OPERA)) {
+                        String enable = hotfix.optString(UploadKey.Response.HotFixResp.OPERA, "");
                         if (UploadKey.Response.HotFixResp.RESET.equals(enable)) {
                             SPHelper.setStringValue2SP(mContext, EGContext.HOT_FIX_PATH, "");
-                            //SPHelper.setBooleanValue2SP(mContext, EGContext.HOT_FIX_ENABLE_STATE, false);
                             if (EGContext.FLAG_DEBUG_INNER) {
                                 ELOG.i(BuildConfig.tag_hotfix, "热修复重置[下次重启使用宿主]");
                             }
                             return;
                         }
                     }
-                    if (patch.has(UploadKey.Response.HotFixResp.DATA) &&
-                            patch.has(UploadKey.Response.HotFixResp.SIGN) &&
-                            patch.has(UploadKey.Response.HotFixResp.VERSION)) {
-                        String data = patch.optString(UploadKey.Response.HotFixResp.DATA, "");
-                        String version = patch.optString(UploadKey.Response.HotFixResp.VERSION, "");
-                        policyInfo.setHotfixVersion(version);
-//                        String sign = patch.optString(UploadKey.Response.HotFixResp.SIGN, "");
-//                        String code = Md5Utils.getMD5(data + "@" + version);
-//                        if (!TextUtils.isEmpty(sign) && sign.contains(code)) {
-                        String dirPath = mContext.getFilesDir().getAbsolutePath() + EGContext.HOTFIX_CACHE_HOTFIX_DIR;
-                        File dir = new File(dirPath);
-                        if (dir.exists() && !dir.isDirectory()) {
-                            dir.deleteOnExit();
-                        }
-                        if (!dir.exists()) {
-                            dir.mkdirs();
-                        }
-                        String path = "hf_" + version + ".dex";
-                        File file = new File(dir, path);
-                        try {
-                            Memory2File.savePatch(data, file);
-                            //默认这个dex 是正常的完整的
-                            EGContext.DEX_ERROR = false;
-                            // SPHelper.setStringValue2SP(mContext, EGContext.HOT_FIX_PATH_TEMP, file.getAbsolutePath());
-                            SPHelper.setStringValue2SPCommit(mContext, EGContext.HOT_FIX_PATH, file.getAbsolutePath());
-                            SPHelper.setBooleanValue2SPCommit(mContext, EGContext.HOT_FIX_ENABLE_STATE, true);
-                            if (EGContext.FLAG_DEBUG_INNER) {
-                                String p = SPHelper.getStringValueFromSP(mContext, EGContext.HOT_FIX_PATH, "");
-                                boolean e = SPHelper.getBooleanValueFromSP(mContext, EGContext.HOT_FIX_ENABLE_STATE, false);
-                                ELOG.e(BuildConfig.tag_hotfix, "新的热修复包下载成功:[path]" + p + " ; file status: " + file.exists() + " ; [enable]" + e);
-                            }
-                        } catch (Throwable e) {
-                            if (EGContext.FLAG_DEBUG_INNER) {
-                                ELOG.i(BuildConfig.tag_hotfix, "新的热修复包下载失败【存文件失败】【重置策略版本号】");
-                            }
-//                                SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_VERSION);
-                        }
-//                        }
 
-                    } else {
-                        if (EGContext.FLAG_DEBUG_INNER) {
-                            ELOG.i(BuildConfig.tag_hotfix, "新的热修复包下载失败【签名效验失败】【重置策略版本号】");
-                        }
-                        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_VERSION);
-                    }
+
+                    HotfHelper.getInstance(mContext).processAndSaveHotfix(policyInfo, hotfix);
                 }
             }
         } catch (Throwable e) {
@@ -470,22 +425,13 @@ public class PolicyImpl {
 
                 JSONObject patch = serverPolicy.optJSONObject(UploadKey.Response.PatchResp.PATCH_RESP_NAME);
                 if (patch != null && patch.length() > 0) {
-                    if (patch.has(UploadKey.Response.HotFixResp.OPERA)) {
-                        String reset = patch.optString(UploadKey.Response.HotFixResp.OPERA, "");
+                    if (patch.has(UploadKey.Response.PatchResp.OPERA)) {
+                        String reset = patch.optString(UploadKey.Response.PatchResp.OPERA, "");
                         /**
                          * 处理reset逻辑，处理完毕就停止处理
                          */
-                        if (UploadKey.Response.HotFixResp.RESET.equals(reset)) {
-                            // 清除老版本缓存文件
-                            String oldVersion = SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, "");
-                            if (!TextUtils.isEmpty(oldVersion)) {
-                                File dir = new File(mContext.getFilesDir(), EGContext.PATCH_CACHE_DIR);
-                                FileUitls.getInstance(mContext).deleteFile(dir);
-                            }
-
-                            // 清除本地缓存
-                            SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, "");
-                            SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, "");
+                        if (UploadKey.Response.PatchResp.RESET.equals(reset)) {
+                            PatchHelper.clearPatch(mContext);
                             return;
                         }
                     }

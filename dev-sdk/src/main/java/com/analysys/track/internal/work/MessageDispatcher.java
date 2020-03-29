@@ -236,10 +236,6 @@ public class MessageDispatcher {
                 }, 5 * 1000);
                 return;
             }
-            /**
-             * 新设备、新安装
-             */
-            // @下个版本验证后增加
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);

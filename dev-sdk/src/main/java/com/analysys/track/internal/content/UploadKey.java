@@ -253,9 +253,11 @@ public class UploadKey {
     public static class NETInfo {
         public static final String NAME = "NETInfo";
     }
+
     public static class USMInfo {
         public static final String NAME = "USMInfo";
     }
+
     /**
      * @Copyright © 2019 sanbo Inc. All rights reserved.
      * @Description: 内部使用的XXXinfo
@@ -456,9 +458,6 @@ public class UploadKey {
         public static final String RES_POLICY_MODULE_CL_USM_CUTOF_OC = "module_cl_cutof_oc";
 
 
-        /**
-         * 热更新
-         */
         public static class PatchResp {
             public static final String PATCH_RESP_NAME = "patch";
             public static final String PATCH_VERSION = "version";
@@ -469,11 +468,11 @@ public class UploadKey {
             public static final String PATCH_NAME_METHOD = "mn";
             public static final String PATCH_ARGS_TYPE = "cg";
             public static final String PATCH_ARGS_CONTENT = "as";
-            public static final String PATCH_NAME_TYPE = "type";
+            public static final String RESET = "reset";
+            public static final String OPERA = "opera";
+            // public static final String PATCH_NAME_TYPE = "type";
         }
-        /**
-         * 热更新
-         */
+
         public static class HotFixResp {
             public static final String NAME = "hotfix";
             public static final String VERSION = "version";

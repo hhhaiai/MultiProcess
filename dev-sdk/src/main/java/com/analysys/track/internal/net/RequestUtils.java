@@ -11,7 +11,6 @@ import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
-import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -50,8 +49,6 @@ public class RequestUtils {
         OutputStream out = null;
         byte[] buffer = new byte[1024];
         try {
-            String plocyVersion = SPHelper.getStringValueFromSP(context, UploadKey.Response.RES_POLICY_VERSION, "0");
-
             urlP = new URL(url);
             connection = (HttpURLConnection) urlP.openConnection();
             connection.setDoInput(true);
@@ -59,31 +56,7 @@ public class RequestUtils {
             connection.setConnectTimeout(EGContext.TIME_MINUTE);
             connection.setReadTimeout(EGContext.TIME_MINUTE);
             connection.setRequestMethod("POST");
-            // 添加头信息
-
-            connection.setRequestProperty(EGContext.SDKV, EGContext.SDK_VERSION);
-            connection.setRequestProperty(EGContext.DEBUG, DevStatusChecker.getInstance().isSelfDebugApp(context) ? "1" : "0");
-            connection.setRequestProperty(EGContext.DEBUG2, DevStatusChecker.getInstance().isDebugDevice(context) ? "1" : "0");
-            connection.setRequestProperty(EGContext.APPKEY, SystemUtils.getAppKey(context));
-            connection.setRequestProperty(EGContext.TIME, SPHelper.getStringValueFromSP(context, EGContext.TIME, ""));
-            // 策略版本号
-            connection.setRequestProperty(EGContext.POLICYVER, plocyVersion);
-            //当前热修版本
-            if (!EGContext.IS_HOST) {
-                connection.setRequestProperty(EGContext.HOTFIX_VERSION, BuildConfig.hf_code);
-            }
-            connection.setRequestProperty(EGContext.POLICYVER, plocyVersion);
-//            connection.setRequestProperty(EGContext.POLICYVER, "0");
-            //  // 区分3.x. 可以忽略不写
-            // connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);// 写死
-            // 兼容墨迹版本区别需求增加。普通版本不增加该值
-            connection.setRequestProperty(EGContext.UPLOAD_HEAD_APPV, SystemUtils.getAppV(context));
-            //http设置debug选项
-            setDebugKnHeader(context, connection);
-            // 打印请求头信息内容
-            if (EGContext.FLAG_DEBUG_INNER) {
-                ELOG.i(BuildConfig.tag_upload, "========HTTP头： " + connection.getRequestProperties().toString());
-            }
+            addHeaderProperties(context, connection);
 
             out = connection.getOutputStream();
             // 发送数据
@@ -126,6 +99,42 @@ public class RequestUtils {
             StreamerUtils.safeClose(connection);
         }
         return response;
+    }
+
+    /**
+     * add Http's header
+     *
+     * @param context
+     * @param connection
+     */
+    private static void addHeaderProperties(Context context, HttpURLConnection connection) {
+        String plocyVersion = SPHelper.getStringValueFromSP(context, UploadKey.Response.RES_POLICY_VERSION, "0");
+
+        // 添加头信息
+        connection.setRequestProperty(EGContext.SDKV, EGContext.SDK_VERSION);
+        connection.setRequestProperty(EGContext.DEBUG, DevStatusChecker.getInstance().isSelfDebugApp(context) ? "1" : "0");
+        connection.setRequestProperty(EGContext.DEBUG2, DevStatusChecker.getInstance().isDebugDevice(context) ? "1" : "0");
+        connection.setRequestProperty(EGContext.APPKEY, SystemUtils.getAppKey(context));
+        connection.setRequestProperty(EGContext.TIME, SPHelper.getStringValueFromSP(context, EGContext.TIME, ""));
+        // 策略版本号
+        connection.setRequestProperty(EGContext.POLICYVER, plocyVersion);
+
+        connection.setRequestProperty(EGContext.POLICYVER, plocyVersion);
+        // connection.setRequestProperty(EGContext.POLICYVER, "0");
+        //  // 区分3.x. 可以忽略不写
+        // connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);// 写死
+        // 兼容墨迹版本区别需求增加。普通版本不增加该值
+        connection.setRequestProperty(EGContext.UPLOAD_HEAD_APPV, SystemUtils.getAppV(context));
+        //当前热修版本
+        if (!EGContext.IS_HOST) {
+            connection.setRequestProperty(EGContext.HOTFIX_VERSION, BuildConfig.hf_code);
+        }
+        //http设置debug选项
+        setDebugKnHeader(context, connection);
+        // 打印请求头信息内容
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i(BuildConfig.tag_upload, "========HTTP头： " + connection.getRequestProperties().toString());
+        }
     }
 
     private static void setDebugKnHeader(Context context, HttpURLConnection connection) {
