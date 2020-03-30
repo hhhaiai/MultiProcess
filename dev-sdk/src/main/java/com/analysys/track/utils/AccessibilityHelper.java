@@ -45,13 +45,13 @@ public class AccessibilityHelper {
              * 2.确认xml中声明该类。声明权限
              */
             if (!AndroidManifestHelper.isServiceDefineInManifest(context, clazz)) {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.i("please define  service [" + clazz.getCanonicalName() + "]  in AndroidManifest.xml! ");
                 }
                 return false;
             }
             if (!AndroidManifestHelper.isPermissionDefineInManifest(context, permission.BIND_ACCESSIBILITY_SERVICE)) {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.i("please check android.permission.BIND_ACCESSIBILITY_SERVICEAndroid about service["
                             + clazz.getCanonicalName() + "] in AndroidManifest.xml !");
                 }

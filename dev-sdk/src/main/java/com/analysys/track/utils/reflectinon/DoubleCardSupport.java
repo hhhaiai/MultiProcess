@@ -60,7 +60,7 @@ public class DoubleCardSupport {
                 addBySystemProperties(imeis, "ro.ril.miui.meid" + i, "");
             }
 
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.i("imeis:" + imeis.toString());
             }
             //保存值到对应字段，以3
@@ -90,7 +90,7 @@ public class DoubleCardSupport {
             }
             getContent(context, imsis, "getSubscriberId");
 
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.i("imsis:" + imsis.toString());
             }
             //保存值到对应字段，以3

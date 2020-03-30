@@ -69,7 +69,7 @@ public class RequestUtils {
      */
     public String httpRequest(String url, String value) {
 
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (BuildConfig.logcat) {
             ELOG.i("httpRequest url : " + url);
         }
         URL urlP;
@@ -100,7 +100,7 @@ public class RequestUtils {
             pw.flush();
 
             int status = connection.getResponseCode();
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_upload, "http response status:" + status);
             }
             // 获取数据
@@ -201,7 +201,7 @@ public class RequestUtils {
             out.flush();
             connection.connect();
             int status = connection.getResponseCode();
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_upload, "https response status:" + status);
             }
             // 获取数据

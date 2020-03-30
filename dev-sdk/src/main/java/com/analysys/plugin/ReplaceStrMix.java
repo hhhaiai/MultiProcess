@@ -40,7 +40,7 @@ public class ReplaceStrMix {
         public String decrypt(String data, String key) {
             try {
                 String result = FileUitls.getInstance(null).getString(data, bs);
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     Log.d(BuildConfig.tag_StrMix, "[key=" + EGContext.STRING_FOG_KEY + "][" + data + "]-->[" + result + "]");
                 }
                 return result;

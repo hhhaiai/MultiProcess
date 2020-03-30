@@ -48,7 +48,7 @@ public class DeflterCompressUtils {
                 BugReportForTest.commitError(e);
             }
             output = data;
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.e(e);
             }
         } finally {
@@ -59,7 +59,7 @@ public class DeflterCompressUtils {
     }
 
     public static String makeSercretKey(String key, Context ctx) {
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (BuildConfig.logcat) {
             ELOG.i(BuildConfig.tag_upload, " 入参 参考key：" + key);
         }
         StringBuilder sb = new StringBuilder();

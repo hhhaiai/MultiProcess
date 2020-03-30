@@ -87,25 +87,25 @@ public class ServiceHelper {
     private void startServiceWhen5x7() throws Exception {
         // 1. 后台任务器长期启动
         boolean isJobStarted = startJobService();
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (BuildConfig.logcat) {
             ELOG.i("...isJobStarted: " + isJobStarted);
         }
         // 2. 能启动服务的直接启动
         if (AndroidManifestHelper.isServiceDefineInManifest(mContext, AnalysysService.class)) {
             // 服务未工作的
             if (!isServiceWorking(mContext, AnalysysService.class.getName())) {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.i("...canStartService....");
                 }
                 startServiceLowThanO(mContext, AnalysysService.class);
             } else {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.i(".. 服务已经开启....");
                 }
             }
         } else {
             if (!isJobStarted) {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.i(" ....直接讯息启动....");
                 }
                 MessageDispatcher.getInstance(mContext).initModule();

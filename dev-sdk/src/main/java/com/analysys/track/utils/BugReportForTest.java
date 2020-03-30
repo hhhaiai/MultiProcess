@@ -24,7 +24,7 @@ public class BugReportForTest {
 
     public static void commitError(String tag, Throwable throwable) {
         try {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 if (!TextUtils.isEmpty(tag)) {
                     //使用log的原因是防止 ELOG 内部异常出现循环打印
                     Log.e(tag, Log.getStackTraceString(throwable));

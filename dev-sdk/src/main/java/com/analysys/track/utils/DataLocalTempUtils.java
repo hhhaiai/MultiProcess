@@ -138,7 +138,7 @@ public class DataLocalTempUtils {
                 mJson.put(key, value);
                 flash();
             } else {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.e(methodName + "(" + key + ", " + value + ") Failed. file not exits. please check!");
                 }
             }

@@ -50,7 +50,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (BuildConfig.logcat) {
             ELOG.e("触发升级逻辑");
         }
         //数据库版本机密算法变动，简单粗暴直接删除老的库，重新构建新库

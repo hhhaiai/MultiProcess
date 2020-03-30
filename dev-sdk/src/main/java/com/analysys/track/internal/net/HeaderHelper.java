@@ -57,7 +57,7 @@ public class HeaderHelper {
             //http设置debug选项
             setDebugKnHeader(context, connection);
             // 打印请求头信息内容
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_upload, "========HTTP头： " + connection.getRequestProperties().toString());
             }
         } catch (Throwable e) {

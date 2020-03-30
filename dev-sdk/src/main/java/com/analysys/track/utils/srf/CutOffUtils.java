@@ -75,7 +75,7 @@
 //        int currentFlag = getCurrentFlag(context);
 //        boolean result = (currentFlag & control) != 0;
 //
-//        if (EGContext.FLAG_DEBUG_INNER && !result) {
+//        if (BuildConfig.logcat && !result) {
 //            ELOG.d(BuildConfig.tag_cutoff, "what=" + what +
 //                    " currentFlag=" + Integer.toString(cutoffFlag, 2) +
 //                    " control=" + Integer.toString(control, 2));

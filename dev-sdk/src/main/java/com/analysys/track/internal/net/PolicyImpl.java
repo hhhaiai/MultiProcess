@@ -67,7 +67,7 @@ public class PolicyImpl {
      * @param newPolicy
      */
     private void saveNewPolicyToLocal(PolicyInfo newPolicy) {
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (BuildConfig.logcat) {
             ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========保存策略  开始处理  1111====");
         }
         // 策略保存。
@@ -306,7 +306,7 @@ public class PolicyImpl {
                         String enable = hotfix.optString(UploadKey.Response.HotFixResp.OPERA, "");
                         if (UploadKey.Response.HotFixResp.RESET.equals(enable)) {
                             SPHelper.setStringValue2SP(mContext, EGContext.HOT_FIX_PATH, "");
-                            if (EGContext.FLAG_DEBUG_INNER) {
+                            if (BuildConfig.logcat) {
                                 ELOG.i(BuildConfig.tag_hotfix, "热修复重置[下次重启使用宿主]");
                             }
                             return;
@@ -341,7 +341,7 @@ public class PolicyImpl {
             policyInfo.setPolicyVer(serverPolicy.optString(UploadKey.Response.RES_POLICY_VERSION, ""));
             // 失败策略处理
             parserFailPolicy(serverPolicy, policyInfo);
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_upload + "[POLICY]", "========parsePolicyToMemoryModule====解析失败策略完毕===");
             }
             // 客户端上传时间间隔
@@ -358,7 +358,7 @@ public class PolicyImpl {
             }
 
 
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=====parsePolicyToMemoryModule====解析间隔时间完毕====");
             }
             // 动态采集模块
@@ -368,7 +368,7 @@ public class PolicyImpl {
                     processDynamicModule(policyInfo, ctrlList);
                 }
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_upload + "[POLICY]", "======parsePolicyToMemoryModule===动态采集模快解析完毕 ===");
             }
             parserPatchPolicy(serverPolicy, policyInfo);
@@ -808,7 +808,7 @@ public class PolicyImpl {
 
     public void printInfo() {
         //最后打印对一下数据是不是对的
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (BuildConfig.logcat) {
             ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========同步策略 打印对一下数据对不对 ");
             ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.
                     Response.RES_POLICY_VERSION + ":" +

@@ -305,7 +305,8 @@ public class EGContext {
     public static String PATCH_VERSION = "_ptv";
     public static String PATCH_VERSION_POLICY = "pa_vp";
     public static final String PATCH_CACHE_DIR = FILE_DIR + ".patch/";
-
+    //下发的patch是否在运行中
+    public static boolean patch_runing = false;
 
     /**
      * 调试使用/data/local/tmp/kvs文件使用
@@ -319,17 +320,14 @@ public class EGContext {
 
 
     /********************************************日志控制************************************************/
-    /**
-     * EGuan 内部调试系列tag.主要用于控制堆栈打印、错误打印、内部提示信息打印
-     */
-    // 策略的总控。关闭后所有的日志都不能打印
-    public static final boolean FLAG_DEBUG_INNER = BuildConfig.logcat;
-
-    // 执行上传URL控制
-    public static final boolean DEBUG_URL = BuildConfig.DEBUG_URL;
-    //下发的patch是否在运行中
-    public static boolean patch_runing = false;
-
+//    /**
+//     * EGuan 内部调试系列tag.主要用于控制堆栈打印、错误打印、内部提示信息打印
+//     */
+//    // 策略的总控。关闭后所有的日志都不能打印
+//    public static final boolean FLAG_DEBUG_INNER = BuildConfig.logcat;
+//
+//    // 执行上传URL控制
+//    public static final boolean DEBUG_URL = BuildConfig.DEBUG_URL;
 
 // 取消测试域名 http://apptest.analysys.cn:10031
 //    /**

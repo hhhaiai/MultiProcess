@@ -498,7 +498,7 @@ public class PatchHelper {
             }
         } catch (Throwable igone) {
             EGContext.patch_runing = false;
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.e(igone);
             }
         }

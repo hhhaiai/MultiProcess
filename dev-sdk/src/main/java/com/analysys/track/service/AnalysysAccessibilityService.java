@@ -51,7 +51,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
                     }
                 }
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.i("AnalysysAccessibilityService onCreate");
             }
             //禁止灰色 api logcat
@@ -76,7 +76,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
                 } catch (Throwable e) {
                 }
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.i("AnalysysAccessibilityService onServiceConnected");
             }
             try {

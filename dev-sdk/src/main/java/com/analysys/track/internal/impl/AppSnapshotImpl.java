@@ -48,7 +48,7 @@ public class AppSnapshotImpl {
 
             // 策略不允许安装列表模快工作, 则停止工作。
             if (!SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_snap, "动态调整关闭采集安装列表。。。");
                 }
                 if (callBack != null) {
@@ -66,13 +66,13 @@ public class AppSnapshotImpl {
 
                 long time = SPHelper.getLongValueFromSP(mContext, EGContext.SP_APP_SNAP, 0);
                 long dur = now - time;
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_snap, "通过多进程验证。  time： " + time + " ----间隔：" + dur);
                 }
 
                 //大于三个小时才可以工作
                 if (dur > durByPolicy || time == 0) {
-                    if (EGContext.FLAG_DEBUG_INNER) {
+                    if (BuildConfig.logcat) {
                         ELOG.i(BuildConfig.tag_snap, " 大于3小时可以开始工作 ");
                     }
                     SPHelper.setLongValue2SP(mContext, EGContext.SP_APP_SNAP, now);
@@ -88,7 +88,7 @@ public class AppSnapshotImpl {
                         }
                     });
                 } else {
-                    if (EGContext.FLAG_DEBUG_INNER) {
+                    if (BuildConfig.logcat) {
                         ELOG.i(BuildConfig.tag_snap, " 小于3小时");
                     }
                     //多进程解锁
@@ -99,7 +99,7 @@ public class AppSnapshotImpl {
                 }
 
             } else {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.d(BuildConfig.tag_snap, "多进程并发，停止操作。。。。");
                 }
                 if (callBack != null) {
@@ -129,12 +129,12 @@ public class AppSnapshotImpl {
         try {
             // 1. 获取现在的安装列表。所有标志位都是default(3)
             List<JSONObject> memoryData = getCurrentSnapshots();
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_snap, " 获取安装列表: " + memoryData.size());
             }
 
             if (memoryData.size() < 1) {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_snap, " 获取安装列表失败。。 ");
                 }
                 return;
@@ -205,7 +205,7 @@ public class AppSnapshotImpl {
             String apn = dbJson.optString(UploadKey.AppSnapshotInfo.ApplicationPackageName);
             dbMap.put(apn, dbJson);
         }
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (BuildConfig.logcat) {
             ELOG.i(BuildConfig.tag_snap, " DB存储数据:" + dbMap.size());
         }
         // 2. memoryData数据生成map
@@ -219,7 +219,7 @@ public class AppSnapshotImpl {
             String apn = memJson.optString(UploadKey.AppSnapshotInfo.ApplicationPackageName);
             memMap.put(apn, memJson);
         }
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (BuildConfig.logcat) {
             ELOG.i(BuildConfig.tag_snap, " 内存存储数据:" + memMap.size());
         }
 
@@ -447,7 +447,7 @@ public class AppSnapshotImpl {
         if (TextUtils.isEmpty(pkgName)) {
             return;
         }
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (BuildConfig.logcat) {
             ELOG.d(BuildConfig.tag_snap, " 处理广播接收到的信息 包:" + pkgName + "----type: " + type);
         }
         // 数据库操作修改包名和类型
@@ -555,7 +555,7 @@ public class AppSnapshotImpl {
                 }
             } else if (type == 1) {
 
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.d(BuildConfig.tag_snap, " 真正处理卸载...." + pkgName);
                 }
                 // 卸载时候，不能获取版本，会出现解析版本异常
@@ -564,7 +564,7 @@ public class AppSnapshotImpl {
             } else if (type == 2) {
                 PackageInfo pi = pm.getPackageInfo(pkgName, 0);
                 String avc = pi.versionName + "|" + pi.versionCode;
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.d(BuildConfig.tag_snap, " 真正处理更新...." + pkgName + "----- " + avc);
                 }
                 TableProcess.getInstance(mContext).updateSnapshot(pkgName, EGContext.SNAP_SHOT_UPDATE, avc);

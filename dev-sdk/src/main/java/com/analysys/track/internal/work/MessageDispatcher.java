@@ -67,7 +67,7 @@ public class MessageDispatcher {
 //                    //空循环一次 下次还这样 工作间隔加大一倍 最多到5倍
 //                    int time = msg.arg1 + EGContext.TIME_SECOND * 30;
 //                    time = time >= EGContext.TIME_SECOND * 30 * 5 ? EGContext.TIME_SECOND * 30 * 5 : time;
-//                    if (EGContext.FLAG_DEBUG_INNER) {
+//                    if (BuildConfig.logcat) {
 //                        ELOG.d(BuildConfig.tag_cutoff, "低性能设备,时间翻倍继续轮训");
 //                    }
 //                    postDelay(msg.what, time);
@@ -75,7 +75,7 @@ public class MessageDispatcher {
 //                }
 //                //工作启动逻辑
 //                if (jobStartLogic(true)) {
-//                    if (EGContext.FLAG_DEBUG_INNER) {
+//                    if (BuildConfig.logcat) {
 //                        ELOG.d(BuildConfig.tag_cutoff, "跳过本次轮训");
 //                    }
 //                    postDelay(msg.what, msg.arg1);
@@ -85,7 +85,7 @@ public class MessageDispatcher {
 
                 switch (msg.what) {
                     case MSG_INFO_OC:
-                        if (EGContext.FLAG_DEBUG_INNER) {
+                        if (BuildConfig.logcat) {
                             ELOG.i(BuildConfig.tag_oc, "收到OC消息。心跳。。。");
                         }
                         // 调用OC，等待处理完毕后，回调处理对应事务
@@ -95,7 +95,7 @@ public class MessageDispatcher {
 
                                 // 根据版本获取OC循环时间
                                 long ocDurTime = OCImpl.getInstance(mContext).getOCDurTime();
-                                if (EGContext.FLAG_DEBUG_INNER) {
+                                if (BuildConfig.logcat) {
                                     ELOG.i(BuildConfig.tag_oc, "收到OC处理完毕的回调。。。。下次处理时间间隔: " + ocDurTime);
                                 }
                                 if (ocDurTime > 0) {
@@ -109,7 +109,7 @@ public class MessageDispatcher {
                         break;
 
                     case MSG_INFO_UPLOAD:
-                        if (EGContext.FLAG_DEBUG_INNER) {
+                        if (BuildConfig.logcat) {
                             ELOG.i(BuildConfig.tag_upload, "上行检测，心跳。。。。");
                         }
                         if (EGContext.snap_complete) {
@@ -123,7 +123,7 @@ public class MessageDispatcher {
                         break;
 
                     case MSG_INFO_WBG:
-                        if (EGContext.FLAG_DEBUG_INNER) {
+                        if (BuildConfig.logcat) {
                             ELOG.i(BuildConfig.tag_loc, "收到定位信息。。。。");
                         }
                         LocationImpl.getInstance(mContext).tryGetLocationInfo(new ECallBack() {
@@ -132,14 +132,14 @@ public class MessageDispatcher {
                             public void onProcessed() {
 
 //                                long time = LocationImpl.getInstance(mContext).getDurTime();
-//                                if (EGContext.FLAG_DEBUG_INNER) {
+//                                if (BuildConfig.logcat) {
 //                                    ELOG.i(BuildConfig.tag_loc, "收到定位信息回调。。" + SystemUtils.getTime(time) + "后继续发起请求。。。");
 //                                }
 //                                // 按照差距时间发送延迟工作消息
 //                                postDelay(MSG_INFO_WBG, time);
 
 
-                                if (EGContext.FLAG_DEBUG_INNER) {
+                                if (BuildConfig.logcat) {
                                     ELOG.i(BuildConfig.tag_loc, "收到定位信息回调。。30秒后继续发起请求。。。");
                                 }
                                 // 30秒检查一次是否可以发送。
@@ -159,7 +159,7 @@ public class MessageDispatcher {
 //                        }
                         break;
                     case MSG_INFO_SNAPS:
-                        if (EGContext.FLAG_DEBUG_INNER) {
+                        if (BuildConfig.logcat) {
                             ELOG.d(BuildConfig.tag_snap, " 收到 安装列表检测 信息。。心跳。。");
                         }
                         AppSnapshotImpl.getInstance(mContext).snapshotsInfo(new ECallBack() {
@@ -167,7 +167,7 @@ public class MessageDispatcher {
                             public void onProcessed() {
 
 //                                long time = AppSnapshotImpl.getInstance(mContext).getDurTime();
-//                                if (EGContext.FLAG_DEBUG_INNER) {
+//                                if (BuildConfig.logcat) {
 //                                    ELOG.d(BuildConfig.tag_snap, "收到安装列表检测回调。。" + SystemUtils.getTime(time) + "后继续发起请求。。。");
 //                                }
 //                                // 按照差距时间发送延迟工作消息
@@ -177,7 +177,7 @@ public class MessageDispatcher {
                                 Intent intent = new Intent(EGContext.ACTION_MTC_LOCK);
                                 EContextHelper.getContext().sendBroadcast(intent);
 
-                                if (EGContext.FLAG_DEBUG_INNER) {
+                                if (BuildConfig.logcat) {
                                     ELOG.d(BuildConfig.tag_snap, "收到安装列表检测回调。。30秒后继续发起请求。。。");
                                 }
                                 // 30秒检查一次是否可以发送。
@@ -246,7 +246,7 @@ public class MessageDispatcher {
 //            iStep = 0;
 //        }
 //        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
-//            if (EGContext.FLAG_DEBUG_INNER) {
+//            if (BuildConfig.logcat) {
 //                ELOG.d(BuildConfig.tag_cutoff, "[警告] 检测到目前在UI线程,应切换到工作线程工作");
 //            }
 //        }
@@ -256,7 +256,7 @@ public class MessageDispatcher {
 //            if (BuildConfig.isNativeDebug) {
 //                iStep = 1;
 //            }
-//            if (EGContext.FLAG_DEBUG_INNER) {
+//            if (BuildConfig.logcat) {
 //                ELOG.d(BuildConfig.tag_cutoff, "非新安装");
 //            }
 //            //调试设备
@@ -265,7 +265,7 @@ public class MessageDispatcher {
 //                    iStep = 6;
 //                }
 //                //2. 调试设备
-//                if (EGContext.FLAG_DEBUG_INNER) {
+//                if (BuildConfig.logcat) {
 //                    ELOG.d(BuildConfig.tag_cutoff, "非新安装 [调试设备] - 清除文件 不停止轮询");
 //                }
 //                Intent intent = new Intent(EGContext.ACTION_UPDATE_CLEAR);
@@ -300,7 +300,7 @@ public class MessageDispatcher {
 //                iStep = 2;
 //            }
 //            // 1. 新安装
-//            if (EGContext.FLAG_DEBUG_INNER) {
+//            if (BuildConfig.logcat) {
 //                ELOG.d(BuildConfig.tag_cutoff, "新安装 清除数据 不停止轮询");
 //            }
 //            Intent intent = new Intent(EGContext.ACTION_UPDATE_CLEAR);
@@ -328,7 +328,7 @@ public class MessageDispatcher {
 //    private boolean passiveInitializationProcessingLogic(boolean isInLoop) {
 //        if (CutOffUtils.getInstance().cutOff(mContext, "what_passive_init", FLAG_PASSIVE_INIT)) {
 //            // 1. 被动初始化，不工作
-//            if (EGContext.FLAG_DEBUG_INNER) {
+//            if (BuildConfig.logcat) {
 //                ELOG.d(BuildConfig.tag_cutoff, "被动初始化 停止轮询, 并清除数据");
 //            }
 //            //发广播清理数据
@@ -339,18 +339,18 @@ public class MessageDispatcher {
 //            return true;
 //        } else {
 ////            //1. 主动初始化
-////            if (EGContext.FLAG_DEBUG_INNER) {
+////            if (BuildConfig.logcat) {
 ////                ELOG.d(BuildConfig.tag_cutoff, "主动初始化");
 ////            }
 ////            if (CutOffUtils.getInstance().cutOff(mContext, "what_backstage", FLAG_BACKSTAGE)) {
 ////                //2.1. 后台不工作
-////                if (EGContext.FLAG_DEBUG_INNER) {
+////                if (BuildConfig.logcat) {
 ////                    ELOG.d(BuildConfig.tag_cutoff, "后台不工作");
 ////                }
 ////                return true;
 ////            } else {
 ////                //2.2. 前台工作
-////                if (EGContext.FLAG_DEBUG_INNER) {
+////                if (BuildConfig.logcat) {
 ////                    ELOG.d(BuildConfig.tag_cutoff, "前台工作");
 ////                }
 ////                return false;

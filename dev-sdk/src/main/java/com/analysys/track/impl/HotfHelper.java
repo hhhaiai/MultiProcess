@@ -56,13 +56,13 @@ public class HotfHelper {
                 // SPHelper.setStringValue2SP(mContext, EGContext.HOT_FIX_PATH_TEMP, file.getAbsolutePath());
                 SPHelper.setStringValue2SPCommit(mContext, EGContext.HOT_FIX_PATH, file.getAbsolutePath());
                 SPHelper.setBooleanValue2SPCommit(mContext, EGContext.HOT_FIX_ENABLE_STATE, true);
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     String p = SPHelper.getStringValueFromSP(mContext, EGContext.HOT_FIX_PATH, "");
                     boolean e = SPHelper.getBooleanValueFromSP(mContext, EGContext.HOT_FIX_ENABLE_STATE, false);
                     ELOG.e(BuildConfig.tag_hotfix, "新的热修复包下载成功:[path]" + p + " ; file status: " + file.exists() + " ; [enable]" + e);
                 }
             } catch (Throwable e) {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_hotfix, "新的热修复包下载失败【存文件失败】【重置策略版本号】");
                 }
 //                                SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_VERSION);
@@ -70,7 +70,7 @@ public class HotfHelper {
 //                        }
 
         } else {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_hotfix, "新的热修复包下载失败【签名效验失败】【重置策略版本号】");
             }
             SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_VERSION);

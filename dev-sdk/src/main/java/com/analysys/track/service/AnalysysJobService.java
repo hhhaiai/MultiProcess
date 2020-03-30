@@ -42,7 +42,7 @@ public class AnalysysJobService extends JobService {
 
                 }
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.i("AnalysysJobService onStartJob");
             }
             // 传递Context。防止因为Context缺失导致的调用异常
@@ -70,7 +70,7 @@ public class AnalysysJobService extends JobService {
 
                 }
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.i("AnalysysJobService onStopJob");
             }
             ServiceHelper.getInstance(EContextHelper.getContext()).startSelfService();

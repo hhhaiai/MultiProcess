@@ -50,7 +50,7 @@ public class UploadImpl {
      */
     public void upload() {
         try {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_upload, "inside upload...");
             }
             // 1. 没网络停止工作
@@ -65,7 +65,7 @@ public class UploadImpl {
             // 3. 失败重试
             final int failNum = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);
             if (failNum > 0) {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_upload, "失败重试。。。。failNum：" + failNum);
                 }
                 int maxFailCount = SPHelper.getIntValueFromSP(mContext, UploadKey.Response.RES_POLICY_FAIL_COUNT, EGContext.FAIL_COUNT_DEFALUT);
@@ -92,7 +92,7 @@ public class UploadImpl {
 
                             @Override
                             public void run() {
-                                if (EGContext.FLAG_DEBUG_INNER) {
+                                if (BuildConfig.logcat) {
                                     ELOG.i(BuildConfig.tag_upload, "失败重试 [" + failNum + "] 。即将进入发送。。。。");
                                 }
                                 doUploadImpl();
@@ -100,12 +100,12 @@ public class UploadImpl {
                             }
                         });
                     } else {
-                        if (EGContext.FLAG_DEBUG_INNER) {
+                        if (BuildConfig.logcat) {
                             ELOG.i(BuildConfig.tag_upload, "失败重试 时间间隔不对。即将停止。。。");
                         }
                     }
                 } else {
-                    if (EGContext.FLAG_DEBUG_INNER) {
+                    if (BuildConfig.logcat) {
                         ELOG.i(BuildConfig.tag_upload, "失败重试。。。多进程并发。。中断发送。");
                     }
                 }
@@ -116,19 +116,19 @@ public class UploadImpl {
             // 3. 多调用入口。增加进程锁同步。6小时只能发起一次(跟本地时间对比。可以忽略时间修改导致的不能上传)
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.MULTI_FILE_UPLOAD, EGContext.TIME_SECOND * 3, now)) {
                 long lastReqTime = SPHelper.getLongValueFromSP(mContext, EGContext.LASTQUESTTIME, 0);
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_upload, "lastReqTime:" + lastReqTime + "--->上传间隔：" + (System.currentTimeMillis() - lastReqTime));
                 }
 
                 if ((now - lastReqTime) < EGContext.TIME_DEFAULT_REQUEST_SERVER) {
                     MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.MULTI_FILE_UPLOAD, System.currentTimeMillis());
 
-                    if (EGContext.FLAG_DEBUG_INNER) {
+                    if (BuildConfig.logcat) {
                         ELOG.e(BuildConfig.tag_upload, "小于6小时停止工作");
                     }
                     return;
                 } else {
-                    if (EGContext.FLAG_DEBUG_INNER) {
+                    if (BuildConfig.logcat) {
                         ELOG.i(BuildConfig.tag_upload, "大于6小时可以工作");
                     }
                     MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.MULTI_FILE_UPLOAD, System.currentTimeMillis());
@@ -137,7 +137,7 @@ public class UploadImpl {
                     EThreadPool.post(new Runnable() {
                         @Override
                         public void run() {
-                            if (EGContext.FLAG_DEBUG_INNER) {
+                            if (BuildConfig.logcat) {
                                 ELOG.i(BuildConfig.tag_upload, "正常模式。。。即将进入发送。。。。");
                             }
                             doUploadImpl();
@@ -147,7 +147,7 @@ public class UploadImpl {
 
 
             } else {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_upload, "正常模式。。。多进程并发。。中断发送。");
                 }
                 //多进程并发导致中断了
@@ -167,14 +167,14 @@ public class UploadImpl {
      */
     public void doUploadImpl() {
         try {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_upload, "inside doUploadImpl。。。即将发送");
             }
             SPHelper.setLongValue2SP(mContext, EGContext.LASTQUESTTIME, System.currentTimeMillis());
             isChunkUpload = false;
             isUploading = true;
             String uploadInfo = getInfo();
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_upload, uploadInfo);
             }
             if (TextUtils.isEmpty(uploadInfo)) {
@@ -188,15 +188,15 @@ public class UploadImpl {
                 isUploading = false;
                 return;
             }
-            if (EGContext.DEBUG_URL) {
+            if (BuildConfig.DEBUG_URL) {
                 if (BuildConfig.isUseHttps) {
                     url = EGContext.URL_SCHEME_HTTPS + "192.168.220.167" + EGContext.HTTPS_PORT;
                 } else {
                     url = EGContext.URL_SCHEME_HTTP + "192.168.220.167" + EGContext.HTTP_PORT;
                 }
             }
-            if (EGContext.DEBUG_URL) {
-                ELOG.e("上传的状态: " + EGContext.DEBUG_URL + ", 上传的URL：" + url);
+            if (BuildConfig.logcat) {
+                ELOG.i("上传的URL：" + url);
             }
             handleUpload(url, messageEncrypt(uploadInfo));
             int failNum = SPHelper.getIntValueFromSP(mContext, EGContext.FAILEDNUMBER, 0);
@@ -204,7 +204,7 @@ public class UploadImpl {
             // int maxFailCount = PolicyImpl.getInstance(mContext).getSP()  .getInt(UploadKey.Response.RES_POLICY_FAIL_COUNT, EGContext.FAIL_COUNT_DEFALUT);
             // 3. 兼容多次分包的上传
             while (isChunkUpload && failNum < maxFailCount) {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.i("开始分包上传...");
                 }
                 isChunkUpload = false;
@@ -248,12 +248,12 @@ public class UploadImpl {
             if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
 
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.w(BuildConfig.tag_loc, "  上传允许采集位置信息，即将获取数据  useFulLength：" + useFulLength + "----isChunkUpload：" + isChunkUpload);
                 }
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray locationInfo = getModuleInfos(mContext, object, MODULE_LOCATION, useFulLength);
-                    if (EGContext.FLAG_DEBUG_INNER) {
+                    if (BuildConfig.logcat) {
                         ELOG.w(BuildConfig.tag_loc, "  上传位置信息个数：" + locationInfo.length());
                     }
                     if (locationInfo != null && locationInfo.length() > 0) {
@@ -261,7 +261,7 @@ public class UploadImpl {
                     }
                 }
             } else {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_loc, "  上传不允许采集位置信息，即将清除本地数据 ");
                 }
                 TableProcess.getInstance(mContext).deleteAllLocation();
@@ -270,13 +270,13 @@ public class UploadImpl {
 //            if (PolicyImpl.getInstance(mContext) .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
             if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_snap, " 上传允许组装 安装列表。。。useFulLength：" + useFulLength + " -----isChunkUpload-->" + isChunkUpload);
                 }
                 if (useFulLength > 0 && !isChunkUpload) {
                     JSONArray snapshotJar = getModuleInfos(mContext, object, MODULE_SNAPSHOT, useFulLength);
 
-                    if (EGContext.FLAG_DEBUG_INNER) {
+                    if (BuildConfig.logcat) {
                         ELOG.i(BuildConfig.tag_snap, " 上传获取 安装列表。。：" + snapshotJar.length());
                     }
                     if (snapshotJar != null && snapshotJar.length() > 0) {
@@ -284,7 +284,7 @@ public class UploadImpl {
                     }
                 }
             } else {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_snap, " 上传不允许组装 ，即将清除数据 ");
                 }
                 TableProcess.getInstance(mContext).deleteAllSnapshot();
@@ -374,7 +374,7 @@ public class UploadImpl {
             }
         }
 
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (BuildConfig.logcat) {
             ELOG.i(BuildConfig.tag_upload, " =========上行key=============" + object.length() + " ======================");
         }
         return object.toString();
@@ -492,7 +492,7 @@ public class UploadImpl {
     // {"code": 500,"policy": {"policyVer": "20190725185335","patch": {"version": "002","sign": "1245ac90db2fc1cb2106172559657804","data": "UEsDBBQACAgIAO6O+U4AAAAAAAAAAAAAAAAUAAQATUVUQS1JTkYvTUFOSUZFU1QuTUb+ygAA803My0xLLS7RDUstKs7Mz7NSMNQz4OVySa3Q9clPTiwBCyXnJBYXpxbrpaRW8HI5F6UmlqSm6DpVWimkVACVG5rxcvFyAQBQSwcI8N6zmEcAAABJAAAAUEsDBBQACAgIAO6O+U4AAAAAAAAAAAAAAAALAAAAY2xhc3Nlcy5kZXidlE1oE0EUx9/MbnaTWtPY2prmtJprSQrqxYhYKX7Aig1CQHvatmvYkmxC3Jb05MfBu3jTCoKChXrRg149VulFvRSh0EsVQUHwLPp/M9MPqyc3+c2bffPezHsz83Ym7PaMHj1ODx/9TH4sr18Yma+tyqf0tbSZ3L97b3VlySZqE1G3dqyfzJOGrkBa3wPWgMMDQv3pPJp9kBPmfQnNhiRagXwB+Ra8Bx/ButRjm+AL+AZsiygPRsA5MAnmwQK4AW6DO+ABeAyWwXPwErwGbwD+lOJYQcbEyTH1gv0gBzgh20AmB+4vIgbX+D+R2jZtbA6YPuu3+s8k+0oaUltgqZwFZsoqmaJBoz8EKaHPE8en7VLbUtKAWXOYeH1b6V20B/XWKiwThzTyu1EI9SP6YOkc2jmeKYv5hPJZQ8PxHcGMBRi2vQzyysv6u4uvPrlXTsejPeRZvTSFsdjjtbNqHvbd+A9fzodj/GzpfKbYX6QQl4PxguyDpUuHqVewHGOZS2OE323MnjX5mmulYhHqLIeKxeKIoVTcfsg5GcVRcoqcsdJsMB+QGCfhk+WPVUj648CnQZ9HylGrPNGJ4uRy0gmDZoX6tboRxPXypanZcDr5Uwe7KK5XaPgv3Zm5qDETdvaYL1xPwua2eRJ2k/J4OB01g8bZVqcZYHZRJbtarZ4gUSNZ82lg8h/LOUG7HcYz5FxTXmQ3gygmqzWXULrNJn6rTi73kkZM6aSlHXFkLvZfoP11FfdeiT5+Ffk+PlFBt27aK5bMbFgis2gLsWbrmqA9e75V43JXnVu7an3rTLjeU7RT8w7t1L3wtB3Xvshpf64v6en5+XtgGRu+u+RpX3Wvc7rP35vfUEsHCFo9p8uGAgAAqAQAAFBLAQIUABQACAgIAO6O+U7w3rOYRwAAAEkAAAAUAAQAAAAAAAAAAAAAAAAAAABNRVRBLUlORi9NQU5JRkVTVC5NRv7KAABQSwECFAAUAAgICADujvlOWj2ny4YCAACoBAAACwAAAAAAAAAAAAAAAACNAAAAY2xhc3Nlcy5kZXhQSwUGAAAAAAIAAgB/AAAATAMAAAAA"}},"tmpid":"","egid":""}
     public void handleUpload(final String url, final String uploadInfo) {
 
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (BuildConfig.logcat) {
             ELOG.i(" inside  url: " + url);
         }
         if (TextUtils.isEmpty(url)) {
@@ -500,7 +500,7 @@ public class UploadImpl {
             return;
         }
         String result = RequestUtils.getInstance(mContext).postRequest(url, uploadInfo);
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (BuildConfig.logcat) {
             ELOG.i(" result: " + result);
 //            saveDataToFile(result);
         }
@@ -641,7 +641,7 @@ public class UploadImpl {
                 default:
                     break;
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.i("isChunkUpload:  " + isChunkUpload);
             }
             if (arr == null || arr.length() <= 1) {

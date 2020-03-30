@@ -63,7 +63,7 @@ public class AnalysysService extends Service {
             }
             super.onCreate();
 
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.i("AnalysysService onCreate");
             }
             AnalysysInternal.getInstance(EContextHelper.getContext());
@@ -90,7 +90,7 @@ public class AnalysysService extends Service {
 
                 }
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.i("AnalysysService onStartCommand");
             }
         } catch (Throwable e) {
@@ -113,7 +113,7 @@ public class AnalysysService extends Service {
 
                 }
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.i("AnalysysService onDestroy");
             }
             ServiceHelper.getInstance(EContextHelper.getContext()).startSelfService();

@@ -117,7 +117,7 @@ public class ELOG {
 
     // 防止混淆编译还能看到所有字符串的情况
     static {
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (BuildConfig.logcat) {
             mContext = null;
 
             // 解析属性最大层级
@@ -126,7 +126,7 @@ public class ELOG {
             BR = System.getProperty("line.separator");
             JSON_INDENT = 2;
             // 是否打印bug.用于开发者自己排查问题打印
-            DEV_DEBUG = EGContext.FLAG_DEBUG_INNER;
+            DEV_DEBUG = BuildConfig.logcat;
             // 是否接受shell控制打印
             isShellControl = true;
             // 是否打印详细log,详细打印调用的堆栈
@@ -174,7 +174,7 @@ public class ELOG {
     }
 
     public static void init(Context context) {
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (BuildConfig.logcat) {
             mContext = EContextHelper.getContext();
         }
     }
@@ -186,7 +186,7 @@ public class ELOG {
      */
     /*********************************************************************************************************/
     public static void v(Object... args) {
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (BuildConfig.logcat) {
             if (isShellControl) {
                 if (!Log.isLoggable(DEFAULT_TAG, Log.VERBOSE)) {
                     Log.v(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "VERBOSE");
@@ -201,7 +201,7 @@ public class ELOG {
     }
 
     public static void d(Object... args) {
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (BuildConfig.logcat) {
             if (isShellControl) {
                 if (!Log.isLoggable(DEFAULT_TAG, Log.DEBUG)) {
                     Log.d(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "DEBUG");
@@ -213,7 +213,7 @@ public class ELOG {
     }
 
     public static void i(Object... args) {
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (BuildConfig.logcat) {
             if (isShellControl) {
                 if (!Log.isLoggable(DEFAULT_TAG, Log.INFO)) {
                     Log.i(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "INFO");
@@ -226,7 +226,7 @@ public class ELOG {
 
 
     public static void w(Object... args) {
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (BuildConfig.logcat) {
             if (isShellControl) {
                 if (!Log.isLoggable(DEFAULT_TAG, Log.WARN)) {
                     Log.w(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "WARN");
@@ -239,7 +239,7 @@ public class ELOG {
     }
 
     public static void e(Object... args) {
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (BuildConfig.logcat) {
             if (isShellControl) {
                 if (!Log.isLoggable(DEFAULT_TAG, Log.ERROR)) {
                     Log.e(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "ERROR");
@@ -251,7 +251,7 @@ public class ELOG {
     }
 
     public static void wtf(Object... args) {
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (BuildConfig.logcat) {
             if (isShellControl) {
                 if (!Log.isLoggable(DEFAULT_TAG, Log.ASSERT)) {
                     Log.wtf(DEFAULT_TAG, CONTENT_WARNNING_SHELL + "ASSERT");
@@ -272,7 +272,7 @@ public class ELOG {
      * @param args
      */
     private static void parserArgsMain(int level, Object[] args) {
-        if (EGContext.FLAG_DEBUG_INNER) {
+        if (BuildConfig.logcat) {
             try {
                 String tag = DEFAULT_TAG;
                 if (!DEV_DEBUG) {
@@ -281,7 +281,7 @@ public class ELOG {
                 }
                 StringBuilder sb = new StringBuilder();
 
-                if (EGContext.FLAG_DEBUG_INNER && BuildConfig.enableHotFix) {
+                if (BuildConfig.logcat && BuildConfig.enableHotFix) {
                     sb.append("[HOST]:").append(EGContext.IS_HOST)
                             .append("[SDKV]:").append(EGContext.SDK_VERSION)
 //                            .append("[CHANNEL]:").append(EGContext.HOT_FIX_CHANNEL)

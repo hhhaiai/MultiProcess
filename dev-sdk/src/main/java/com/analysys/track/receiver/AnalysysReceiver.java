@@ -45,7 +45,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
 
             Context c = EContextHelper.getContext(context);
             AnalysysTracker.setContext(c);
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.d(BuildConfig.tag_recerver, " 收到广播: " + intent.getAction());
             }
             if (BuildConfig.enableHotFix) {
@@ -66,7 +66,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
 
     private void parserIntent(Context context, Intent intent) {
         if (intent == null) {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.d(BuildConfig.tag_recerver, " intent 为空，即将返回 ");
             }
             return;
@@ -75,17 +75,17 @@ public class AnalysysReceiver extends BroadcastReceiver {
             //没初始化并且开屏了10次,就初始化,否则+1返回不处理
             parExtra(context);
             int size = SPHelper.getIntValueFromSP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, 0);
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.w(BuildConfig.tag_recerver, " 解锁屏次数:" + size);
             }
             // 默认从0开始计数，为确保第N次生效，比较条件应为大于等于N-1
             if (size >= (EGContext.FLAG_START_COUNT - 1)) {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_recerver, " 即将进行初始化。。。");
                 }
                 AnalysysInternal.getInstance(context).initEguan(null, null, false);
             } else {
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     ELOG.d(BuildConfig.tag_recerver, " 即将进保存初始化次数，并退出");
                 }
                 SPHelper.setIntValue2SP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, size + 1);
