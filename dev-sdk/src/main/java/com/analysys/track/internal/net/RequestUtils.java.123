@@ -16,14 +16,13 @@ import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.StreamerUtils;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.security.KeyStore;
 import java.security.SecureRandom;
@@ -55,152 +54,80 @@ public class RequestUtils {
         if (BuildConfig.logcat) {
             ELOG.i(BuildConfig.tag_upload, "will send message to server: " + url);
         }
-        /**
-         * 1. get connection
-         */
-        URLConnection connection = initConnection(url);
-        if (connection == null) {
-            return EGContext.RSPONSE_FAIL;
+        if (url.startsWith("http://")) {
+            return httpRequest(url, uploadInfo);
+        } else if (url.startsWith("https://")) {
+            return httpsRequest(url, uploadInfo);
         }
-        /**
-         * 2. post msg
-         */
+
+        return EGContext.RSPONSE_FAIL;
+    }
+
+
+    /**
+     * HTTP request
+     */
+    public String httpRequest(String url, String value) {
+
+        if (EGContext.FLAG_DEBUG_INNER) {
+            ELOG.i("httpRequest url : " + url);
+        }
+        URL urlP;
+        HttpURLConnection connection = null;
         InputStream is = null;
         ByteArrayOutputStream bos = null;
+        PrintWriter pw = null;
         OutputStream out = null;
         byte[] buffer = new byte[1024];
         try {
-            return sendMsgToServer(uploadInfo, connection, is, bos, out, buffer);
+            urlP = new URL(url);
+            connection = (HttpURLConnection) urlP.openConnection();
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            connection.setConnectTimeout(EGContext.TIME_MINUTE);
+            connection.setReadTimeout(EGContext.TIME_MINUTE);
+            connection.setRequestMethod("POST");
+            HeaderHelper.addHeaderProperties(mContext, connection);
+
+            out = connection.getOutputStream();
+            // 发送数据
+            pw = new PrintWriter(out);
+            if (TextUtils.isEmpty(value)) {
+                pw.print(EGContext.UPLOAD_KEY_WORDS + "=");
+            } else {
+                pw.print(EGContext.UPLOAD_KEY_WORDS + "=" + URLEncoder.encode(value, "UTF-8"));
+            }
+            pw.flush();
+
+            int status = connection.getResponseCode();
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i(BuildConfig.tag_upload, "http response status:" + status);
+            }
+            // 获取数据
+            if (HttpURLConnection.HTTP_OK == status) {
+                is = connection.getInputStream();
+                bos = new ByteArrayOutputStream();
+                int len;
+                while (-1 != (len = is.read(buffer))) {
+                    bos.write(buffer, 0, len);
+                }
+                bos.flush();
+                return bos.toString("utf-8");
+            } else if (HttpURLConnection.HTTP_ENTITY_TOO_LARGE == connection.getResponseCode()) {
+                return EGContext.HTTP_STATUS_413;
+            }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         } finally {
             StreamerUtils.safeClose(out);
+            StreamerUtils.safeClose(pw);
             StreamerUtils.safeClose(is);
             StreamerUtils.safeClose(bos);
         }
-
-
         return EGContext.RSPONSE_FAIL;
     }
-
-    private String sendMsgToServer(String uploadInfo, URLConnection connection, InputStream is, ByteArrayOutputStream bos, OutputStream out, byte[] buffer) throws IOException {
-        out = connection.getOutputStream();
-        String msg = EGContext.UPLOAD_KEY_WORDS + "=";
-        // 发送数据
-        if (!TextUtils.isEmpty(uploadInfo)) {
-            msg = EGContext.UPLOAD_KEY_WORDS + "=" + URLEncoder.encode(uploadInfo, "UTF-8");
-        }
-        out.write(msg.getBytes());
-        out.flush();
-        connection.connect();
-
-        int status = 200;
-        if (connection instanceof HttpURLConnection) {
-            status = ((HttpURLConnection) connection).getResponseCode();
-        } else if (connection instanceof HttpsURLConnection) {
-            status = ((HttpsURLConnection) connection).getResponseCode();
-        }
-        if (BuildConfig.logcat) {
-            ELOG.i(BuildConfig.tag_upload, "server response status:" + status);
-        }
-        // 获取数据
-        if (HttpURLConnection.HTTP_OK == status) {
-            is = connection.getInputStream();
-            bos = new ByteArrayOutputStream();
-            int len;
-            while (-1 != (len = is.read(buffer))) {
-                bos.write(buffer, 0, len);
-            }
-            bos.flush();
-            return bos.toString("utf-8");
-        } else if (HttpURLConnection.HTTP_ENTITY_TOO_LARGE == status) {
-            return EGContext.HTTP_STATUS_413;
-        } else {
-            return EGContext.RSPONSE_FAIL;
-        }
-    }
-
-    private URLConnection initConnection(String url) {
-        URLConnection connection = null;
-        if (url.startsWith("http://")) {
-            connection = getHttpConnectionForPost(url);
-        } else if (url.startsWith("https://")) {
-            connection = getHttpsConnectionForPost(url);
-        }
-        if (connection != null) {
-            initConnectionArgs(connection);
-        }
-        return connection;
-    }
-
-    private void initConnectionArgs(URLConnection connection) {
-        try {
-            connection.setDoInput(true);
-            connection.setDoOutput(true);
-            connection.setConnectTimeout(EGContext.TIME_MINUTE);
-            connection.setReadTimeout(EGContext.TIME_MINUTE);
-            connection.setUseCaches(false);
-            HeaderHelper.addHeaderProperties(mContext, connection);
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-    }
-
-    private URLConnection getHttpConnectionForPost(String url) {
-
-        try {
-            URL urlP = new URL(url);
-            HttpURLConnection connection = null;
-            if (shouldUseProxy()) {
-                Proxy proxy = new Proxy(java.net.Proxy.Type.HTTP, new InetSocketAddress(mProxyIp, mProxyPort));
-                connection = (HttpURLConnection) urlP.openConnection(proxy);
-            } else {
-                connection = (HttpURLConnection) urlP.openConnection();
-            }
-            connection.setRequestMethod("POST");
-            return connection;
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-        return null;
-    }
-
-    private URLConnection getHttpsConnectionForPost(String url) {
-        try {
-            HttpsURLConnection connection = null;
-            if (shouldUseProxy()) {
-                Proxy proxy = new Proxy(java.net.Proxy.Type.HTTP, new InetSocketAddress(mProxyIp, mProxyPort));
-                connection = (HttpsURLConnection) new URL(url).openConnection(proxy);
-            } else {
-                connection = (HttpsURLConnection) new URL(url).openConnection();
-            }
-
-            SSLContext sc = SSLContext.getInstance("TLS");
-            sc.init(null, new TrustManager[]{new MyTrustManager()}, new SecureRandom());
-            connection.setDefaultHostnameVerifier(new HostnameVerifier() {
-
-                @Override
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }
-            });
-            connection.setSSLSocketFactory(sc.getSocketFactory());
-            connection.setRequestMethod("POST");
-            return connection;
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-        return null;
-    }
-
 
     private boolean shouldUseProxy() {
         PackageManager pm = mContext.getPackageManager();
@@ -227,6 +154,81 @@ public class RequestUtils {
 
         return false;
     }
+
+
+    public String httpsRequest(String url, String value) {
+
+        HttpsURLConnection connection = null;
+        InputStream is = null;
+        ByteArrayOutputStream bos = null;
+        OutputStream out = null;
+        byte[] buffer = new byte[1024];
+        try {
+
+            if (shouldUseProxy()) {
+                Proxy proxy = new Proxy(java.net.Proxy.Type.HTTP, new InetSocketAddress(mProxyIp, mProxyPort));
+                connection = (HttpsURLConnection) new URL(url).openConnection(proxy);
+            } else {
+                connection = (HttpsURLConnection) new URL(url).openConnection();
+            }
+
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, new TrustManager[]{new MyTrustManager()}, new SecureRandom());
+            connection.setDefaultHostnameVerifier(new HostnameVerifier() {
+
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            });
+            connection.setSSLSocketFactory(sc.getSocketFactory());
+
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            connection.setConnectTimeout(EGContext.TIME_MINUTE);
+            connection.setReadTimeout(EGContext.TIME_MINUTE);
+            connection.setRequestMethod("POST");
+            connection.setUseCaches(false);
+            HeaderHelper.addHeaderProperties(mContext, connection);
+
+            out = connection.getOutputStream();
+            String msg = EGContext.UPLOAD_KEY_WORDS + "=";
+            // 发送数据
+            if (!TextUtils.isEmpty(value)) {
+                msg = EGContext.UPLOAD_KEY_WORDS + "=" + URLEncoder.encode(value, "UTF-8");
+            }
+            out.write(msg.getBytes());
+            out.flush();
+            connection.connect();
+            int status = connection.getResponseCode();
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.i(BuildConfig.tag_upload, "https response status:" + status);
+            }
+            // 获取数据
+            if (HttpURLConnection.HTTP_OK == status) {
+                is = connection.getInputStream();
+                bos = new ByteArrayOutputStream();
+                int len;
+                while (-1 != (len = is.read(buffer))) {
+                    bos.write(buffer, 0, len);
+                }
+                bos.flush();
+                return bos.toString("utf-8");
+            } else if (HttpURLConnection.HTTP_ENTITY_TOO_LARGE == connection.getResponseCode()) {
+                return EGContext.HTTP_STATUS_413;
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
+        } finally {
+            StreamerUtils.safeClose(out);
+            StreamerUtils.safeClose(is);
+            StreamerUtils.safeClose(bos);
+        }
+        return EGContext.RSPONSE_FAIL;
+    }
+
 
     /********************* get instance begin **************************/
     public static RequestUtils getInstance(Context context) {

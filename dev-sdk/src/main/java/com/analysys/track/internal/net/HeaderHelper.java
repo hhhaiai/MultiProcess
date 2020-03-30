@@ -11,7 +11,7 @@ import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.sp.SPHelper;
 
-import java.net.HttpURLConnection;
+import java.net.URLConnection;
 
 /**
  * @Copyright © 2020 sanbo Inc. All rights reserved.
@@ -28,7 +28,7 @@ public class HeaderHelper {
      * @param context
      * @param connection
      */
-    public static void addHeaderProperties(Context context, HttpURLConnection connection) {
+    public static void addHeaderProperties(Context context, URLConnection connection) {
         try {
             if (connection == null) {
                 return;
@@ -64,7 +64,7 @@ public class HeaderHelper {
         }
     }
 
-    private static void setDebugKnHeader(Context context, HttpURLConnection connection) {
+    private static void setDebugKnHeader(Context context, URLConnection connection) {
         try {
             if (BuildConfig.isNativeDebug) {
 

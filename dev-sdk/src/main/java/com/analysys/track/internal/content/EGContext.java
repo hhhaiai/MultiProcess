@@ -270,6 +270,7 @@ public class EGContext {
             NORMAL_APP_URL = EGContext.URL_SCHEME_HTTP + EGContext.NORMAL_UPLOAD_URL[0] + EGContext.HTTP_PORT;
         }
     }
+
     /**
      * 控制android8以后是否后台启动服务。提示通知
      */
@@ -295,8 +296,8 @@ public class EGContext {
     public static final String HOTFIX_VERSION = "HF";
     public static final String FILE_DIR = "/.analysys_file/";
     public static final String HOTFIX_CACHE_HOTFIX_DIR = FILE_DIR + ".hf/";
-//    public static final String HOTFIX_TIME = "hf_time";
-
+    //    public static final String HOTFIX_TIME = "hf_time";
+    public static final String RSPONSE_FAIL = "-1";
 
     /**
      * pathch default version

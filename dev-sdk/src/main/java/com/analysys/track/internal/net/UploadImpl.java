@@ -504,10 +504,14 @@ public class UploadImpl {
             ELOG.i(" result: " + result);
 //            saveDataToFile(result);
         }
-        if (TextUtils.isEmpty(result)) {
-            isUploading = false;
-            return;
-        } else if (fail.equals(result)) {
+//        if (TextUtils.isEmpty(result)) {
+//            isUploading = false;
+//            return;
+//        } else if (EGContext.RSPONSE_FAIL.equals(result)) {
+//            isUploading = false;
+//            return;
+//        }
+        if (TextUtils.isEmpty(result) || EGContext.RSPONSE_FAIL.equals(result)) {
             isUploading = false;
             return;
         }
@@ -678,7 +682,7 @@ public class UploadImpl {
      */
     public static List<String> idList = new ArrayList<String>();
     private Context mContext;
-    private String fail = "-1";
+//    private String fail = "-1";
 
     /**
      * 上传数据时取数据类型
