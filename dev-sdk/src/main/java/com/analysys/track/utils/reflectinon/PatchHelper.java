@@ -10,6 +10,7 @@ import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.FileUitls;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.sp.SPHelper;
@@ -203,7 +204,9 @@ public class PatchHelper {
      */
     public static void clearPatch(final Context context) {
 
-        SystemUtils.runOnWorkThread(new Runnable() {
+        // 先不广播里处理，广播里信息，先空置
+        SystemUtils.notifyClearCache(context, EGContext.NotifyStatus.NOTIFY_DEBUG);
+        EThreadPool.postDelayed(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -257,8 +260,7 @@ public class PatchHelper {
                     }
                 }
             }
-        });
-
+        }, 5 * 1000);
     }
 
     private static void cleanPatchPolicy(Context context, String s, int i, int i2) {

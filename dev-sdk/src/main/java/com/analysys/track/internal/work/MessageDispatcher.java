@@ -226,14 +226,7 @@ public class MessageDispatcher {
              */
             if (DevStatusChecker.getInstance().isDebugDevice(mContext)) {
                 isDebugProcess = true;
-                // 先不广播里处理，广播里信息，先空置
-                SystemUtils.notifyClearCache(mContext, EGContext.NotifyStatus.NOTIFY_DEBUG);
-                EThreadPool.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        PatchHelper.clearPatch(mContext);
-                    }
-                }, 5 * 1000);
+                PatchHelper.clearPatch(mContext);
                 return;
             }
         } catch (Throwable e) {
