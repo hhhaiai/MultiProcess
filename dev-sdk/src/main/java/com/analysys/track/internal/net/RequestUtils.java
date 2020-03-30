@@ -7,19 +7,33 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.utils.BugReportForTest;
+import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.utils.sp.SPHelper;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -30,12 +44,23 @@ import java.net.URLEncoder;
  */
 public class RequestUtils {
 
-    public static final String FAIL = "-1";
+
+    public String postRequest(String url, String uploadInfo) {
+
+        if (TextUtils.isEmpty(url)) {
+            return FAIL;
+        }
+
+        return FAIL;
+    }
+
+
+
 
     /**
      * HTTP request
      */
-    public static String httpRequest(String url, String value, Context context) {
+    public String httpRequest(String url, String value, Context context) {
 
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i("httpRequest url : " + url);
@@ -56,7 +81,7 @@ public class RequestUtils {
             connection.setConnectTimeout(EGContext.TIME_MINUTE);
             connection.setReadTimeout(EGContext.TIME_MINUTE);
             connection.setRequestMethod("POST");
-            addHeaderProperties(context, connection);
+            HeaderHelper.addHeaderProperties(context, connection);
 
             out = connection.getOutputStream();
             // 发送数据
@@ -101,136 +126,110 @@ public class RequestUtils {
         return response;
     }
 
+
     /**
-     * add Http's header
-     *
-     * @param context
-     * @param connection
+     * HTTPS
      */
-    private static void addHeaderProperties(Context context, HttpURLConnection connection) {
-        String plocyVersion = SPHelper.getStringValueFromSP(context, UploadKey.Response.RES_POLICY_VERSION, "0");
-
-        // 添加头信息
-        connection.setRequestProperty(EGContext.SDKV, EGContext.SDK_VERSION);
-        connection.setRequestProperty(EGContext.DEBUG, DevStatusChecker.getInstance().isSelfDebugApp(context) ? "1" : "0");
-        connection.setRequestProperty(EGContext.DEBUG2, DevStatusChecker.getInstance().isDebugDevice(context) ? "1" : "0");
-        connection.setRequestProperty(EGContext.APPKEY, SystemUtils.getAppKey(context));
-        connection.setRequestProperty(EGContext.TIME, SPHelper.getStringValueFromSP(context, EGContext.TIME, ""));
-        // 策略版本号
-        connection.setRequestProperty(EGContext.POLICYVER, plocyVersion);
-
-        connection.setRequestProperty(EGContext.POLICYVER, plocyVersion);
-        // connection.setRequestProperty(EGContext.POLICYVER, "0");
-        //  // 区分3.x. 可以忽略不写
-        // connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);// 写死
-        // 兼容墨迹版本区别需求增加。普通版本不增加该值
-        connection.setRequestProperty(EGContext.UPLOAD_HEAD_APPV, SystemUtils.getAppV(context));
-        //当前热修版本
-        if (!EGContext.IS_HOST) {
-            connection.setRequestProperty(EGContext.HOTFIX_VERSION, BuildConfig.hf_code);
-        }
-        //http设置debug选项
-        setDebugKnHeader(context, connection);
-        // 打印请求头信息内容
-        if (EGContext.FLAG_DEBUG_INNER) {
-            ELOG.i(BuildConfig.tag_upload, "========HTTP头： " + connection.getRequestProperties().toString());
-        }
-    }
-
-    private static void setDebugKnHeader(Context context, HttpURLConnection connection) {
+    public String httpsRequest(String url, String value) {
+        HttpsURLConnection connection = null;
+        OutputStream outputStream = null;
         try {
-            if (BuildConfig.isNativeDebug) {
-
-                String k1 = AnaCountImpl.getKx1(context);
-                if (!TextUtils.isEmpty(k1)) {
-                    connection.setRequestProperty("K1", String.valueOf(k1));
-                }
-                String k2 = AnaCountImpl.getKx2(context);
-                if (!TextUtils.isEmpty(k2)) {
-                    connection.setRequestProperty("K2", String.valueOf(k2));
-                }
+            URL urlP = new URL(url);
+            connection = (HttpsURLConnection) urlP.openConnection();
+            connection.setSSLSocketFactory(createSSL());
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            connection.setUseCaches(false);
+            connection.setRequestMethod("POST");
+            connection.setConnectTimeout(20 * 1000);
+            connection.setReadTimeout(20 * 1000);
+            // connection.setRequestProperty("spv", spv);
+            connection.connect();
+            if (!TextUtils.isEmpty(value)) {
+                outputStream = connection.getOutputStream();
+                outputStream.write(value.getBytes("UTF-8"));
+            }
+            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                return readStream(connection.getInputStream());
+            } else {
+                return null;
             }
         } catch (Throwable e) {
+            if (EGContext.FLAG_DEBUG_INNER) {
+                ELOG.e(e);
+            }
+        } finally {
+            StreamerUtils.safeClose(connection);
+            StreamerUtils.safeClose(connection);
         }
+        return null;
     }
 
-//    /**
-//     * HTTPS
-//     */
-//    public static String httpsRequest(String url, String value) {
-//        HttpsURLConnection connection = null;
-//        OutputStream outputStream = null;
-//        try {
-//            URL urlP = new URL(url);
-//            connection = (HttpsURLConnection) urlP.openConnection();
-//            connection.setSSLSocketFactory(createSSL());
-//            connection.setDoInput(true);
-//            connection.setDoOutput(true);
-//            connection.setUseCaches(false);
-//            connection.setRequestMethod("POST");
-//            connection.setConnectTimeout(20 * 1000);
-//            connection.setReadTimeout(20 * 1000);
-//            // connection.setRequestProperty("spv", spv);
-//            connection.connect();
-//            if (!TextUtils.isEmpty(value)) {
-//                outputStream = connection.getOutputStream();
-//                outputStream.write(value.getBytes("UTF-8"));
-//            }
-//            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-//                return readStream(connection.getInputStream());
-//            } else {
-//                return null;
-//            }
-//        } catch (Throwable e) {
-//            if (EGContext.FLAG_DEBUG_INNER) {
-//                ELOG.e(e);
-//            }
-//        } finally {
-//            StreamerUtils.safeClose(connection);
-//            StreamerUtils.safeClose(connection);
-//        }
-//        return null;
-//    }
-//
-//    public static SSLSocketFactory createSSL() throws NoSuchAlgorithmException, KeyManagementException {
-//        if (tm != null) {
-//            tm = new TrustManager[]{myX509TrustManager};
-//        }
-//        if (sslContext == null) {
-//            sslContext = SSLContext.getInstance("TLS");
-//        }
-//        sslContext.init(null, tm, null);
-//        if (ssf == null) {
-//            ssf = sslContext.getSocketFactory();
-//        }
-//        return ssf;
-//    }
-//
-//    public static String readStream(InputStream inputStream) throws IOException {
-//        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-//        String line = null;
-//        StringBuffer sb = new StringBuffer();
-//        while ((line = reader.readLine()) != null) {
-//            sb.append(line);
-//        }
-//        StreamerUtils.safeClose(reader);
-//        return String.valueOf(sb);
-//    }
-//    private static TrustManager[] tm = null;
-//    private static SSLContext sslContext = null;
-//    private static SSLSocketFactory ssf = null;
-//    private static TrustManager myX509TrustManager = new X509TrustManager() {
-//        @Override
-//        public X509Certificate[] getAcceptedIssuers() {
-//            return null;
-//        }
-//
-//        @Override
-//        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-//        }
-//
-//        @Override
-//        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-//        }
-//    };
+    public SSLSocketFactory createSSL() throws NoSuchAlgorithmException, KeyManagementException {
+        if (tm != null) {
+            tm = new TrustManager[]{myX509TrustManager};
+        }
+        if (sslContext == null) {
+            sslContext = SSLContext.getInstance("TLS");
+        }
+        sslContext.init(null, tm, null);
+        if (ssf == null) {
+            ssf = sslContext.getSocketFactory();
+        }
+        return ssf;
+    }
+
+    public String readStream(InputStream inputStream) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line = null;
+        StringBuffer sb = new StringBuffer();
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        StreamerUtils.safeClose(reader);
+        return String.valueOf(sb);
+    }
+
+
+    private TrustManager myX509TrustManager = new X509TrustManager() {
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return null;
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        }
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        }
+    };
+
+    /********************* get instance begin **************************/
+    public static RequestUtils getInstance(Context context) {
+        return HLODER.INSTANCE.ininContext(context);
+    }
+
+    private RequestUtils ininContext(Context context) {
+        if (mContext == null) {
+            mContext = EContextHelper.getContext(context);
+        }
+        return HLODER.INSTANCE;
+    }
+
+    private static class HLODER {
+        private static final RequestUtils INSTANCE = new RequestUtils();
+    }
+
+    private RequestUtils() {
+    }
+
+    /********************* get instance end **************************/
+    public final String FAIL = "-1";
+    private Context mContext = null;
+    private TrustManager[] tm = null;
+    private SSLContext sslContext = null;
+    private SSLSocketFactory ssf = null;
 }

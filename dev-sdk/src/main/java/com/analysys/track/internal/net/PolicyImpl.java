@@ -49,17 +49,17 @@ public class PolicyImpl {
         return PolicyImpl.Holder.INSTANCE;
     }
 
-    /**
-     * @param debug 是否Debug模式
-     */
-    public void updateUpLoadUrl(boolean debug) {
-        if (debug) {
-            EGContext.APP_URL = EGContext.TEST_URL;
-        } else {
-            setNormalUploadUrl(mContext);
-            EGContext.APP_URL = EGContext.NORMAL_APP_URL;
-        }
-    }
+//    /**
+//     * @param debug 是否Debug模式
+//     */
+//    public void updateUpLoadUrl(boolean debug) {
+////        if (debug) {
+////            EGContext.APP_URL = EGContext.TEST_URL;
+////        } else {
+//            setNormalUploadUrl(mContext);
+////            EGContext.APP_URL = EGContext.NORMAL_APP_URL;
+////        }
+//    }
 
     /**
      * 保存策略到本地
@@ -778,7 +778,7 @@ public class PolicyImpl {
         }
     }
 
-    private void setNormalUploadUrl(Context context) {
+    public void setNormalUploadUrl(Context context) {
         int sum = 0;
         String key = SPHelper.getStringValueFromSP(context, EGContext.SP_APP_KEY, "");
         int index = 0;
@@ -792,7 +792,13 @@ public class PolicyImpl {
             index = new Random().nextInt(10);
         }
 
-        EGContext.NORMAL_APP_URL = EGContext.URL_SCHEME + EGContext.NORMAL_UPLOAD_URL[index] + EGContext.ORI_PORT;
+//        EGContext.NORMAL_APP_URL = EGContext.URL_SCHEME_HTTPS + EGContext.NORMAL_UPLOAD_URL[index] + EGContext.HTTPS_PORT;
+
+        if (BuildConfig.isUseHttps) {
+            EGContext.NORMAL_APP_URL = EGContext.URL_SCHEME_HTTPS + EGContext.NORMAL_UPLOAD_URL[index] + EGContext.HTTPS_PORT;
+        } else {
+            EGContext.NORMAL_APP_URL = EGContext.URL_SCHEME_HTTP + EGContext.NORMAL_UPLOAD_URL[index] + EGContext.HTTP_PORT;
+        }
     }
 
     public void updatePolicyForReceiver(Intent intent) {

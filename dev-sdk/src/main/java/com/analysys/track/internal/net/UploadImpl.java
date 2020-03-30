@@ -182,21 +182,19 @@ public class UploadImpl {
                 return;
             }
             // 重置url
-            PolicyImpl.getInstance(mContext).updateUpLoadUrl(EGContext.FLAG_DEBUG_USER);
+            PolicyImpl.getInstance(mContext).setNormalUploadUrl(mContext);
             String url = EGContext.NORMAL_APP_URL;
-            if (EGContext.FLAG_DEBUG_USER) {
-                url = EGContext.TEST_URL;
-            }
             if (TextUtils.isEmpty(url)) {
                 isUploading = false;
                 return;
             }
-
-
             if (EGContext.DEBUG_URL) {
-                url = "http://192.168.220.167:8089";
+                if (BuildConfig.isUseHttps) {
+                    url = EGContext.URL_SCHEME_HTTPS + "192.168.220.167" + EGContext.HTTPS_PORT;
+                } else {
+                    url = EGContext.URL_SCHEME_HTTP + "192.168.220.167" + EGContext.HTTP_PORT;
+                }
             }
-
             if (EGContext.DEBUG_URL) {
                 ELOG.e("上传的状态: " + EGContext.DEBUG_URL + ", 上传的URL：" + url);
             }
@@ -501,7 +499,7 @@ public class UploadImpl {
             isUploading = false;
             return;
         }
-        String result = RequestUtils.httpRequest(url, uploadInfo, mContext);
+        String result = RequestUtils.getInstance(mContext).postRequest(url, uploadInfo);
         if (EGContext.FLAG_DEBUG_INNER) {
             ELOG.i(" result: " + result);
 //            saveDataToFile(result);

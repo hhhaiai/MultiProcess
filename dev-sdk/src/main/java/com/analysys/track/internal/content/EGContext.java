@@ -119,7 +119,6 @@ public class EGContext {
     public static final int FAIL_COUNT_DEFALUT = 3;
     // 地理位置信息获取距离/米
     public static final long MINDISTANCE = 1000;
-    public final static String URL_SCHEME = "http://";
 
 
     public static final String NETWORK_TYPE_2G = "2G";
@@ -131,18 +130,17 @@ public class EGContext {
 
 
     public static final String TEXT_UNKNOWN = "unknown";
+
+
     /**
      * 非实时上传端口
      */
-    public final static String ORI_PORT = ":8089";
-    /**
-     * 测试回传接口.Debug模式
-     */
-    public final static String TEST_CALLBACK_PORT = ":10031";
-    /**
-     * 测试域名
-     */
-    public static final String TEST_CALLBACK_DOMAIN_NAME = "apptest.analysys.cn";
+    public final static String HTTP_PORT = ":8089";
+    public final static String HTTPS_PORT = ":8443";
+    public final static String URL_SCHEME_HTTP = "http://";
+    public final static String URL_SCHEME_HTTPS = "https://";
+//    http://urd103.analysys.cn:8089
+//    https://urd103.analysys.cn:8443
     /**
      * 非实时上传是,使用的域名池,以urd开始的为设备上传接口
      */
@@ -158,7 +156,7 @@ public class EGContext {
             "urd025.analysys.cn", // 9
             "urd339.analysys.cn"// 头部应用 用作测试
     };
-    public static final String TEST_URL = URL_SCHEME + TEST_CALLBACK_DOMAIN_NAME + TEST_CALLBACK_PORT;
+    //    public static final String TEST_URL = URL_SCHEME + TEST_CALLBACK_DOMAIN_NAME + TEST_CALLBACK_PORT;
     public static final String ORIGINKEY_STRING = "analysys";
     public static final String EGUANFILE = "eg.a";
 
@@ -217,8 +215,8 @@ public class EGContext {
     public static final String FILES_SYNC_SNAP_UPDATE_BROADCAST = "T-SUPDATE";
     public static final String FILES_SYNC_BATTERY_BROADCAST = "T-BATTERY";
 
-    // 多进程同步. 同步版本号
-    public static final String MULTIPROCESS_SP = "T-SP";
+//    // 多进程同步. 同步版本号
+//    public static final String MULTIPROCESS_SP = "T-SP";
 
     // 位置信息,通进程只有一个工作,两次间隔29分钟
     public static final String FILES_SYNC_LOCATION = "T-LCT";
@@ -252,17 +250,26 @@ public class EGContext {
     public static final String MODULE_CUT_OC = "M_CUT_OC";
     public static final String MODULE_CUT_XXX = "M_CUT_XXX";
     public static final String SPUTIL = "sptrack";
-    /**
-     * 判断是否debug App列表
-     */
-    public static final String TEXT_DEBUG_APP = "packageName";
-    public static final String TEXT_DEBUG_STATUS = "debugable";
+//    /**
+//     * 判断是否debug App列表
+//     */
+//    public static final String TEXT_DEBUG_APP = "packageName";
+//    public static final String TEXT_DEBUG_STATUS = "debugable";
 
     public static String VALUE_APPKEY = "";
     public static String VALUE_APP_CHANNEL = "";
-    public static String EGUAN_CHANNEL_PREFIX = "EGUAN_CHANNEL_";
+    //    public static String EGUAN_CHANNEL_PREFIX = "EGUAN_CHANNEL_";
     public static String APP_URL = "";
-    public static String NORMAL_APP_URL = EGContext.URL_SCHEME + EGContext.NORMAL_UPLOAD_URL[0] + EGContext.ORI_PORT;
+    //    public static String NORMAL_APP_URL = EGContext.URL_SCHEME + EGContext.NORMAL_UPLOAD_URL[0] + EGContext.ORI_PORT;
+    public static String NORMAL_APP_URL = "";
+
+    static {
+        if (BuildConfig.isUseHttps) {
+            NORMAL_APP_URL = EGContext.URL_SCHEME_HTTPS + EGContext.NORMAL_UPLOAD_URL[0] + EGContext.HTTPS_PORT;
+        } else {
+            NORMAL_APP_URL = EGContext.URL_SCHEME_HTTP + EGContext.NORMAL_UPLOAD_URL[0] + EGContext.HTTP_PORT;
+        }
+    }
     /**
      * 控制android8以后是否后台启动服务。提示通知
      */
@@ -288,7 +295,7 @@ public class EGContext {
     public static final String HOTFIX_VERSION = "HF";
     public static final String FILE_DIR = "/.analysys_file/";
     public static final String HOTFIX_CACHE_HOTFIX_DIR = FILE_DIR + ".hf/";
-    public static final String HOTFIX_TIME = "hf_time";
+//    public static final String HOTFIX_TIME = "hf_time";
 
 
     /**
@@ -321,4 +328,15 @@ public class EGContext {
     public static final boolean DEBUG_URL = BuildConfig.DEBUG_URL;
     //下发的patch是否在运行中
     public static boolean patch_runing = false;
+
+
+// 取消测试域名 http://apptest.analysys.cn:10031
+//    /**
+//     * 测试回传接口.Debug模式
+//     */
+//    public final static String TEST_CALLBACK_PORT = ":10031";
+//    /**
+//     * 测试域名
+//     */
+//    public static final String TEST_CALLBACK_DOMAIN_NAME = "apptest.analysys.cn";
 }
