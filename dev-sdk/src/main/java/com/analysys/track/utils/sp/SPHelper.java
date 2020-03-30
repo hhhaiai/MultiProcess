@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -326,6 +327,16 @@ public class SPHelper {
     public static void removeKey(Context ctx, String key) {
         try {
             getEditor(ctx).remove(key).commit();
+        } catch (Throwable e) {
+        }
+    }
+
+    public static void removeKeys(Context ctx, List<String> keys) {
+        try {
+            for (String k : keys) {
+                getEditor(ctx).remove(k);
+            }
+            getEditor(ctx).commit();
         } catch (Throwable e) {
         }
     }

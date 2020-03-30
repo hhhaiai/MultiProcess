@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
@@ -19,6 +18,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -57,25 +57,20 @@ public class HotFixTransform {
     }
 
     public static void init(Context context) {
-        if (!isInit()) {
+        if (!isinit) {
             synchronized (HotFixTransform.class) {
-                if (!isInit()) {
+                if (!isinit) {
                     try {
                         String path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH, "");
-//                       Log.i(BuildConfig.tag_hotfix,"取出patch路径: " +path);
                         boolean enable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
-                        if (EGContext.FLAG_DEBUG_INNER) {
-                            Log.i(BuildConfig.tag_hotfix, "初始化:[path]" + path + "[enable]" + enable);
+                        if (BuildConfig.logcat) {
+                            Log.i(BuildConfig.tag_hotfix, "初始化 hf路径:" + path + " ;enable: " + enable);
                         }
                         //热修之前宿主判断
                         if (isSdkUpdateInHost(context)) {
                             //清除短路控制变量
-                            SPHelper.removeKey(context, "case1");
-                            SPHelper.removeKey(context, "case2");
-                            SPHelper.removeKey(context, "case3");
-                            SPHelper.removeKey(context, "case4");
-                            SPHelper.removeKey(context, "case_d");
-                            SPHelper.removeKey(context, "what_dev");
+                            List<String> ifs = Arrays.asList("case1", "case2", "case3", "case4", "case_d", "what_dev");
+                            SPHelper.removeKeys(context, ifs);
                         }
                         //清除热修相关的（如果未激活或文件不存在或宿主变动）
                         //激活，热修文件存在，宿主一致
@@ -86,7 +81,7 @@ public class HotFixTransform {
                             SPHelper.setStringValue2SP(context, EGContext.HOT_FIX_PATH, "");
                             path = null;
                         }
-                        isinit = true;
+//                        isinit = true;
                         //主进程进行清理旧的dex文件
                         deleteOldDex(context, path);
                         //记录当前宿主版本号
@@ -107,18 +102,18 @@ public class HotFixTransform {
     private static boolean isSdkUpdateInHost(Context context) {
         String hostV = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_HOST_VERSION, "");
         if (TextUtils.isEmpty(hostV)) {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 Log.d(BuildConfig.tag_hotfix, "热修宿主没变");
             }
             return false;
         }
         if (!hostV.equals(EGContext.SDK_VERSION)) {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 Log.d(BuildConfig.tag_hotfix, "热修宿主变化【清除所有的旧热修dex包，清除所有的patch，清除短路变量控制】");
             }
             return true;
         } else {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 Log.d(BuildConfig.tag_hotfix, "热修宿主没变");
             }
             return false;
@@ -150,10 +145,13 @@ public class HotFixTransform {
                         });
             }
 
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 Log.i(BuildConfig.tag_hotfix, "热修包应用成功:" + path);
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
         }
     }
 
@@ -164,7 +162,7 @@ public class HotFixTransform {
 
                 if (TextUtils.isEmpty(path)) {
                     FileUitls.getInstance(context).deleteFile(new File(dirPath));
-                    if (EGContext.FLAG_DEBUG_INNER) {
+                    if (BuildConfig.logcat) {
                         Log.i(BuildConfig.tag_hotfix, "删除旧dex和odex等文件:" + dirPath);
                     }
                     return;
@@ -182,7 +180,7 @@ public class HotFixTransform {
                 for (File file : files) {
                     if (!path.contains(file.getName())) {
                         boolean b = file.delete();
-                        if (EGContext.FLAG_DEBUG_INNER) {
+                        if (BuildConfig.logcat) {
                             Log.i(BuildConfig.tag_hotfix, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
                         }
                     }
@@ -200,15 +198,15 @@ public class HotFixTransform {
             return false;
         }
         if (new File(path).isFile()) {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 Log.i(BuildConfig.tag_hotfix, "dex 存在 path = " + path);
             }
             return true;
         } else {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 Log.i(BuildConfig.tag_hotfix, "dex 不存在 path = " + path);
             }
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 Log.i(BuildConfig.tag_hotfix, "dex path 存在 文件实际不存在【清除策略号】下次重新获取" + path);
             }
             //需要考虑文件被删除，sp有文件名
@@ -218,13 +216,10 @@ public class HotFixTransform {
         }
     }
 
-    private static boolean isInit() {
-        return isinit;
-    }
 
     public static void dexError(Context context) {
         try {
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.e(BuildConfig.tag_hotfix, "dexError[损坏]");
             }
             EGContext.DEX_ERROR = true;
@@ -240,13 +235,13 @@ public class HotFixTransform {
             //</editor-fold>
             SPHelper.setStringValue2SP(EContextHelper.getContext(), EGContext.HOT_FIX_PATH, "");
             //激活状态设置为不激活
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 Log.i(BuildConfig.tag_hotfix, "dexError path = " + path);
             }
             SPHelper.setBooleanValue2SP(EContextHelper.getContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
             //重新设置classloader
             loader = null;
-            if (EGContext.FLAG_DEBUG_INNER) {
+            if (BuildConfig.logcat) {
                 ELOG.e(BuildConfig.tag_hotfix, "dexError[损坏][重置策略版本号]");
             }
 //            clearHotFixPolicyVersion(context);
@@ -257,31 +252,6 @@ public class HotFixTransform {
         }
     }
 
-//    /**
-//     * 清除本地版本
-//     *
-//     * @param context
-//     */
-//    private static void clearHotFixPolicyVersion(Context context) {
-//        String patchPolicyV = SPHelper.getStringValueFromSP(context, EGContext.PATCH_VERSION_POLICY, "");
-//        String curPolicyV = SPHelper.getStringValueFromSP(context, UploadKey.Response.RES_POLICY_VERSION, "");
-//
-//        if (!TextUtils.isEmpty(curPolicyV) && !patchPolicyV.equals(curPolicyV)) {
-//            // not null. current policyversion same as patch version, then clean then
-//            SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
-//            SPHelper.removeKey(context, EGContext.PATCH_VERSION_POLICY);
-//        }
-//    }
-//
-//    public static void getStat() {
-//        StackTraceElement[] stackElement = Thread.currentThread().getStackTrace();
-//        boolean isWork = false;
-//        for (StackTraceElement ste : stackElement) {
-//            if (ste.getClassName().equals(HotFixTransform.class.getName())) {
-//                isWork = true;
-//            }
-//        }
-//    }
 
     /**
      * 逻辑转发方法,由宿主转到热修复dex
@@ -293,40 +263,45 @@ public class HotFixTransform {
      * @param <T>
      * @return
      */
-    public static <T> T transform(Object object, String classname, String methodName,
-                                  Object... pram) throws HotFixTransformCancel {
-        canTransForm();
-
-        if (classname == null || methodName == null || classname.length() == 0 || methodName.length() == 0) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(new Exception(
-                        "[HotFixTransform transform error]" + classname + "," + methodName));
-            }
-            return null;
-        }
-
+    public static <T> T transform(Object object, String classname, String methodName, Object... pram) {
         try {
-//            Class<T> ap = (Class<T>) loader.loadClass(classname);
-            Class ap = (Class) ClazzUtils.invokeObjectMethod(loader, "loadClass", new Class[]{String.class}, new Object[]{classname});
-            Method[] methods = ap.getDeclaredMethods();
-            Method method = null;
-            if (pram == null || pram.length == 0) {
-                method = ap.getDeclaredMethod(methodName);
-            } else {
-                for (int i = 0; i < methods.length; i++) {
-                    if (methods[i].getName().equals(methodName)
-                            && isFound(methods[i].getParameterTypes(), pram)) {
-                        method = methods[i];
-                        break;
+            canTransForm();
+
+            if (classname == null || methodName == null || classname.length() == 0 || methodName.length() == 0) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
+                    BugReportForTest.commitError(new Exception(
+                            "[HotFixTransform transform error]" + classname + "," + methodName));
+                }
+                return null;
+            }
+
+            try {
+                //            Class<T> ap = (Class<T>) loader.loadClass(classname);
+                Class ap = (Class) ClazzUtils.invokeObjectMethod(loader, "loadClass", new Class[]{String.class}, new Object[]{classname});
+                Method[] methods = ap.getDeclaredMethods();
+                Method method = null;
+                if (pram == null || pram.length == 0) {
+                    method = ap.getDeclaredMethod(methodName);
+                } else {
+                    for (int i = 0; i < methods.length; i++) {
+                        if (methods[i].getName().equals(methodName)
+                                && isFound(methods[i].getParameterTypes(), pram)) {
+                            method = methods[i];
+                            break;
+                        }
                     }
                 }
-            }
 
-            if (method == null) {
-                ELOG.e(BuildConfig.tag_hotfix, "[" + classname + "." + methodName + "]" + "No function found corresponding to the parameter type");
+                if (method == null) {
+                    ELOG.e(BuildConfig.tag_hotfix, "[" + classname + "." + methodName + "]" + "No function found corresponding to the parameter type");
+                }
+                method.setAccessible(true);
+                return (T) method.invoke(object, pram);
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
+                    BugReportForTest.commitError(e);
+                }
             }
-            method.setAccessible(true);
-            return (T) method.invoke(object, pram);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
@@ -335,65 +310,85 @@ public class HotFixTransform {
         return null;
     }
 
-    private static void canTransForm() throws HotFixTransformCancel {
+    private static void canTransForm() {
         if (!EGContext.IS_HOST) {
-            throw new HotFixTransformCancel("非宿主 不初始化,不转向");
+            if (BuildConfig.logcat) {
+                ELOG.e("非宿主 不初始化,不转向");
+            }
+            return;
         }
         if (EGContext.DEX_ERROR) {
-            throw new HotFixTransformCancel("dex损坏 不初始化,不转向");
+            if (BuildConfig.logcat) {
+                ELOG.e("dex损坏 不初始化,不转向");
+            }
+            return;
         }
         Context context = EContextHelper.getContext();
         if (context == null) {
-            throw new HotFixTransformCancel("context == null 不初始化,不转向");
+            if (BuildConfig.logcat) {
+                ELOG.e("context == null 不初始化,不转向");
+            }
+            return;
         }
 
-        if (!isInit()) {
-            if (EGContext.FLAG_DEBUG_INNER) {
+        if (!isinit) {
+            if (BuildConfig.logcat) {
                 Log.i(BuildConfig.tag_hotfix, "未初始化");
             }
             init(context);
         }
         boolean b = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
         if (!b) {
-            throw new HotFixTransformCancel("未激活 不转向");
+            if (BuildConfig.logcat) {
+                ELOG.e("未激活 不转向");
+            }
+            return;
         }
 
         if (loader == null) {
-            throw new HotFixTransformCancel("类加载器不对 不转向");
+            if (BuildConfig.logcat) {
+                ELOG.e("类加载器不对 不转向");
+            }
+            return;
         }
     }
 
-    public static <T> T make(String classname, Object... pram) throws HotFixTransformCancel {
-
-        canTransForm();
-
-        if (classname == null || classname.length() == 0) {
-            return null;
-        }
+    public static <T> T make(String classname, Object... pram) {
         try {
-//            Class<T> ap = (Class<T>) loader.loadClass(classname);
-            Class ap = (Class) ClazzUtils.invokeObjectMethod(loader, "loadClass", new Class[]{String.class}, new Object[]{classname});
-            Constructor<T>[] constructors = (Constructor<T>[]) ap.getDeclaredConstructors();
-            Constructor<T> constructor = null;
-            if (pram == null || pram.length == 0) {
-                constructor = ap.getConstructor();
-            } else {
-                for (Constructor<T> constructor1 : constructors) {
-                    Class[] aClass = constructor1.getParameterTypes();
-                    //识别是不是正确的构造方法
-                    if (isFound(aClass, pram)) {
-                        constructor = constructor1;
-                        break;
+            canTransForm();
+
+            if (classname == null || classname.length() == 0) {
+                return null;
+            }
+            try {
+                //            Class<T> ap = (Class<T>) loader.loadClass(classname);
+                Class ap = (Class) ClazzUtils.invokeObjectMethod(loader, "loadClass", new Class[]{String.class}, new Object[]{classname});
+                Constructor<T>[] constructors = (Constructor<T>[]) ap.getDeclaredConstructors();
+                Constructor<T> constructor = null;
+                if (pram == null || pram.length == 0) {
+                    constructor = ap.getConstructor();
+                } else {
+                    for (Constructor<T> constructor1 : constructors) {
+                        Class[] aClass = constructor1.getParameterTypes();
+                        //识别是不是正确的构造方法
+                        if (isFound(aClass, pram)) {
+                            constructor = constructor1;
+                            break;
+                        }
                     }
                 }
-            }
 
-            if (constructor == null) {
-                ELOG.e(BuildConfig.tag_hotfix, "[" + classname + "]" + "not has parameter type constructor,if this is a innerClass");
+                if (constructor == null) {
+                    ELOG.e(BuildConfig.tag_hotfix, "[" + classname + "]" + "not has parameter type constructor,if this is a innerClass");
+                }
+                constructor.setAccessible(true);
+                T o = constructor.newInstance(pram);
+                return o;
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
+                    BugReportForTest.commitError(e);
+                }
             }
-            constructor.setAccessible(true);
-            T o = constructor.newInstance(pram);
-            return o;
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
@@ -463,4 +458,34 @@ public class HotFixTransform {
         }
         return result;
     }
+//
+//    private static boolean isInit() {
+//        return isinit;
+//    }
+//
+//    /**
+//     * 清除本地版本
+//     *
+//     * @param context
+//     */
+//    private static void clearHotFixPolicyVersion(Context context) {
+//        String patchPolicyV = SPHelper.getStringValueFromSP(context, EGContext.PATCH_VERSION_POLICY, "");
+//        String curPolicyV = SPHelper.getStringValueFromSP(context, UploadKey.Response.RES_POLICY_VERSION, "");
+//
+//        if (!TextUtils.isEmpty(curPolicyV) && !patchPolicyV.equals(curPolicyV)) {
+//            // not null. current policyversion same as patch version, then clean then
+//            SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
+//            SPHelper.removeKey(context, EGContext.PATCH_VERSION_POLICY);
+//        }
+//    }
+//
+//    public static void getStat() {
+//        StackTraceElement[] stackElement = Thread.currentThread().getStackTrace();
+//        boolean isWork = false;
+//        for (StackTraceElement ste : stackElement) {
+//            if (ste.getClassName().equals(HotFixTransform.class.getName())) {
+//                isWork = true;
+//            }
+//        }
+//    }
 }

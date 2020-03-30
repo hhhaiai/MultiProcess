@@ -41,7 +41,7 @@ public class AllStrMix {
                 } catch (UnsupportedEncodingException e) {
                     newData = new String(Base64.encode(xor(data.getBytes(), key), Base64.NO_WRAP));
                 }
-                if (EGContext.FLAG_DEBUG_INNER) {
+                if (BuildConfig.logcat) {
                     Log.d(BuildConfig.tag_StrMix, "[key=" + key + "][" + data + "]-->[" + newData + "]");
                 }
             } catch (Throwable e) {
