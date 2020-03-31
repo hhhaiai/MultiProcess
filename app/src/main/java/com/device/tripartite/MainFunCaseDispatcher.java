@@ -15,6 +15,7 @@ import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.device.tripartite.cases.PubCases;
 import com.device.utils.EL;
+import com.device.utils.memot.M2Fmapping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,6 +94,7 @@ public class MainFunCaseDispatcher {
             }
         }
     }
+
     private static void runCaseP8(final Context context) {
 
     }
@@ -128,6 +130,18 @@ public class MainFunCaseDispatcher {
     }
 
     private static void runCaseP12(final Context context) {
+
+        List<String> pks= PkgList.getInstance(context).getAppPackageList();
+
+        for (int i = 0; i < 10000; i++) {
+            long start = System.currentTimeMillis();
+            boolean isA = M2Fmapping.getInstance(context).save(pks.toString());
+//            EL.i("save: " + isA);
+            byte[] v = M2Fmapping.getInstance(context).load();
+//            EL.i("load: " + v.length + "-----" + new String(v).trim());
+            long end = System.currentTimeMillis();
+            EL.i("写入[" + pks.toString().length() + "], 耗用时间[" + (end - start) + "] 读取byte大小: " + v.length);
+        }
     }
 
     private static void runCaseP13(final Context context) {
@@ -166,7 +180,6 @@ public class MainFunCaseDispatcher {
     private static void runCaseP22(final Context context) {
 
     }
-
 
 
 }
