@@ -4,9 +4,8 @@ import android.content.Context;
 
 import com.analysys.track.impl.HotFixTransform;
 import com.analysys.track.internal.AnalysysInternal;
-import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
-import com.analysys.track.utils.reflectinon.ClazzUtils;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -27,17 +26,22 @@ public class AnalysysTracker {
      */
     public static void init(Context context, String appKey, String channel) {
         try {
-            AnalysysTracker.setContext(context);
+            setContext(context);
             if (BuildConfig.enableHotFix) {
                 try {
-                    HotFixTransform.transform(null, AnalysysTracker.class.getName(), "init", context, appKey, channel);
+                    HotFixTransform.transform(false, AnalysysTracker.class.getName(), "init", context, appKey, channel);
                     return;
                 } catch (Throwable e) {
-
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
+                        BugReportForTest.commitError(e);
+                    }
                 }
             }
             AnalysysInternal.getInstance(context).initEguan(appKey, channel, true);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
         }
     }
 
@@ -50,16 +54,36 @@ public class AnalysysTracker {
     @Deprecated
     public static void setDebugMode(Context context, boolean isDebug) {
         try {
-            AnalysysTracker.setContext(context);
+            setContext(context);
             if (BuildConfig.enableHotFix) {
                 try {
-                    HotFixTransform.transform(null, AnalysysTracker.class.getName(), "setDebugMode", context, isDebug);
+                    HotFixTransform.transform(false, AnalysysTracker.class.getName(), "setDebugMode", context, isDebug);
                     return;
                 } catch (Throwable e) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
+                        BugReportForTest.commitError(e);
+                    }
                 }
             }
-            EGContext.FLAG_DEBUG_USER = isDebug;
+//            EGContext.FLAG_DEBUG_USER = isDebug;
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
+        }
+    }
+
+    @Deprecated
+    public static void setDebugMode(boolean isDebug) {
+        if (BuildConfig.enableHotFix) {
+            try {
+                HotFixTransform.transform(false, AnalysysTracker.class.getName(), "setDebugMode", isDebug);
+                return;
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
+                    BugReportForTest.commitError(e);
+                }
+            }
         }
     }
 
@@ -67,9 +91,11 @@ public class AnalysysTracker {
         EContextHelper.setContext(context);
         if (BuildConfig.enableHotFix) {
             try {
-                HotFixTransform.transform(null, AnalysysTracker.class.getName(), "setContext", context);
+                HotFixTransform.transform(false, AnalysysTracker.class.getName(), "setContext", context);
             } catch (Throwable e) {
-
+                if (BuildConfig.ENABLE_BUG_REPORT) {
+                    BugReportForTest.commitError(e);
+                }
             }
         }
     }

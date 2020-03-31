@@ -14,7 +14,7 @@ import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
-import com.analysys.track.utils.Memory2File;
+import com.analysys.track.utils.data.Memory2File;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
 import com.analysys.track.impl.HotfHelper;
 import com.analysys.track.utils.reflectinon.PatchHelper;

@@ -9,7 +9,6 @@ import android.view.accessibility.AccessibilityEvent;
 import com.analysys.track.AnalysysTracker;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.impl.HotFixTransform;
-import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.utils.BugReportForTest;
@@ -38,19 +37,21 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     private void processOnCreate() {
         try {
             AnalysysTracker.setContext(this);
-            if (BuildConfig.enableHotFix) {
-                try {
+
+            try {
+                if (BuildConfig.enableHotFix) {
                     HotFixTransform.transform(
-                            HotFixTransform.make(AnalysysAccessibilityService.class.getName())
+                            true
                             , AnalysysAccessibilityService.class.getName()
                             , "onCreate");
                     return;
+                }
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(e);
                     }
                 }
-            }
+
             if (BuildConfig.logcat) {
                 ELOG.i("AnalysysAccessibilityService onCreate");
             }
@@ -69,7 +70,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
             if (BuildConfig.enableHotFix) {
                 try {
                     HotFixTransform.transform(
-                            HotFixTransform.make(AnalysysAccessibilityService.class.getName())
+                            true
                             , AnalysysAccessibilityService.class.getName()
                             , "onServiceConnected");
                     return;
@@ -113,7 +114,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
             if (BuildConfig.enableHotFix) {
                 try {
                     HotFixTransform.transform(
-                            HotFixTransform.make(AnalysysAccessibilityService.class.getName())
+                            true
                             , AnalysysAccessibilityService.class.getName()
                             , "onAccessibilityEvent", event);
                     return;
@@ -148,7 +149,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
             if (BuildConfig.enableHotFix) {
                 try {
                     HotFixTransform.transform(
-                            HotFixTransform.make(AnalysysAccessibilityService.class.getName())
+                            true
                             , AnalysysAccessibilityService.class.getName()
                             , "onInterrupt");
                     return;

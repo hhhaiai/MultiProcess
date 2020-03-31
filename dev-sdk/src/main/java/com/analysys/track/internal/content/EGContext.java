@@ -32,7 +32,7 @@ public class EGContext {
      * 可疑设备 新设备 || 调试设备
      */
     public static final String DEBUG2 = "d";
-    public static boolean FLAG_DEBUG_USER = false;
+    //    public static boolean FLAG_DEBUG_USER = false;
     public static int DEBUG_VALUE = -999;
 
 

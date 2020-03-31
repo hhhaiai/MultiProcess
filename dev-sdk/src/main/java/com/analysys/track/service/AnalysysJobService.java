@@ -32,7 +32,7 @@ public class AnalysysJobService extends JobService {
             if (BuildConfig.enableHotFix) {
                 try {
                     Boolean aBoolean = HotFixTransform.transform(
-                            HotFixTransform.make(AnalysysJobService.class.getName())
+                            true
                             , AnalysysJobService.class.getName()
                             , "onStartJob", params);
                     if (aBoolean != null) {
@@ -60,7 +60,7 @@ public class AnalysysJobService extends JobService {
             if (BuildConfig.enableHotFix) {
                 try {
                     Boolean aBoolean = HotFixTransform.transform(
-                            HotFixTransform.make(AnalysysJobService.class.getName())
+                            true
                             , AnalysysJobService.class.getName()
                             , "onStopJob", params);
                     if (aBoolean != null) {

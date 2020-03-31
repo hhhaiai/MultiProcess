@@ -28,11 +28,11 @@ public class AnalysysTrackerTest {
         Assert.assertEquals(SystemUtils.getAppChannel(mContext), channel);
     }
 
-    @Test
-    public void setDebugMode() {
-        AnalysysTracker.setDebugMode(mContext,true);
-        Assert.assertTrue(EGContext.FLAG_DEBUG_USER);
-        AnalysysTracker.setDebugMode(mContext,false);
-        Assert.assertFalse(EGContext.FLAG_DEBUG_USER);
-    }
+//    @Test
+//    public void setDebugMode() {
+//        AnalysysTracker.setDebugMode(mContext,true);
+//        Assert.assertTrue(EGContext.FLAG_DEBUG_USER);
+//        AnalysysTracker.setDebugMode(mContext,false);
+//        Assert.assertFalse(EGContext.FLAG_DEBUG_USER);
+//    }
 }

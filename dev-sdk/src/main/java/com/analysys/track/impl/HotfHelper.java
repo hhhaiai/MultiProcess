@@ -7,7 +7,7 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.model.PolicyInfo;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.Memory2File;
+import com.analysys.track.utils.data.Memory2File;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONObject;

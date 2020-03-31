@@ -4,9 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
-import android.util.Log;
 
-import com.analysys.plugin.TimePrint;
 import com.analysys.track.AnalysysTracker;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.impl.HotFixTransform;
@@ -17,7 +15,6 @@ import com.analysys.track.internal.impl.ReceiverImpl;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.MClipManager;
-import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -48,16 +45,16 @@ public class AnalysysReceiver extends BroadcastReceiver {
             if (BuildConfig.logcat) {
                 ELOG.d(BuildConfig.tag_recerver, " 收到广播: " + intent.getAction());
             }
-            if (BuildConfig.enableHotFix) {
-                try {
-                    HotFixTransform.transform(
-                            HotFixTransform.make(AnalysysReceiver.class.getName())
+
+            try {
+                if (BuildConfig.enableHotFix) {
+                    HotFixTransform.transform(true
                             , AnalysysReceiver.class.getName()
                             , "onReceive", c, intent);
                     return;
-                } catch (Throwable e) {
-
                 }
+            } catch (Throwable e) {
+
             }
             parserIntent(c, intent);
         } catch (Throwable e) {

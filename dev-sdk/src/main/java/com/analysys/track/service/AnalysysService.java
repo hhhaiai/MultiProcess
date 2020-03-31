@@ -31,7 +31,7 @@ public class AnalysysService extends Service {
             if (BuildConfig.enableHotFix) {
                 try {
                     IBinder iBinder = HotFixTransform.transform(
-                            HotFixTransform.make(AnalysysService.class.getName())
+                            true
                             , AnalysysService.class.getName()
                             , "onBind", intent);
                     if (iBinder != null) {
@@ -53,7 +53,7 @@ public class AnalysysService extends Service {
             if (BuildConfig.enableHotFix) {
                 try {
                     HotFixTransform.transform(
-                            HotFixTransform.make(AnalysysService.class.getName())
+                            true
                             , AnalysysService.class.getName()
                             , "onCreate");
                     return;
@@ -79,7 +79,7 @@ public class AnalysysService extends Service {
             if (BuildConfig.enableHotFix) {
                 try {
                     Integer o = HotFixTransform.transform(
-                            HotFixTransform.make(AnalysysService.class.getName())
+                            true
                             , AnalysysService.class.getName()
                             , "onStartCommand", intent, flags, startId);
                     if (o != null) {
@@ -105,7 +105,7 @@ public class AnalysysService extends Service {
             if (BuildConfig.enableHotFix) {
                 try {
                     HotFixTransform.transform(
-                            HotFixTransform.make(AnalysysService.class.getName())
+                            true
                             , AnalysysService.class.getName()
                             , "onDestroy");
                     return;

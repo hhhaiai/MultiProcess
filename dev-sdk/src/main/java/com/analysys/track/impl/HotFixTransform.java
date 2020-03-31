@@ -49,11 +49,154 @@ public class HotFixTransform {
         mapMemberClass.put(Long.class, "long");
         mapMemberClass.put(Byte.class, "byte");
 
-        MYCLASS_NAME.add("com.analysys.track.AnalysysTracker");
-        MYCLASS_NAME.add("com.analysys.track.service.AnalysysAccessibilityService");
-        MYCLASS_NAME.add("com.analysys.track.service.AnalysysJobService");
-        MYCLASS_NAME.add("com.analysys.track.service.AnalysysService");
-        MYCLASS_NAME.add("com.analysys.track.receiver.AnalysysReceiver");
+//       // 验证dex中是否包含该类。
+//        MYCLASS_NAME.add("com.analysys.track.AnalysysTracker");
+//        MYCLASS_NAME.add("com.analysys.track.service.AnalysysAccessibilityService");
+//        MYCLASS_NAME.add("com.analysys.track.service.AnalysysJobService");
+//        MYCLASS_NAME.add("com.analysys.track.service.AnalysysService");
+//        MYCLASS_NAME.add("com.analysys.track.receiver.AnalysysReceiver");
+    }
+
+
+    /**
+     * @param isNeedMakeObj
+     * @param classname
+     * @param methodName
+     * @param pram
+     * @param <T>
+     * @return
+     * @throws Exception
+     */
+    public static <T> T transform(boolean isNeedMakeObj, String classname, String methodName, Object... pram) throws Exception {
+        canTransForm();
+        if (classname == null || methodName == null || classname.length() == 0 || methodName.length() == 0) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(new Exception(
+                        "[HotFixTransform transform error]" + classname + "," + methodName));
+            }
+            throw new Exception("classname or methodName is empty~");
+        }
+        if (isNeedMakeObj) {
+            return transform(make(classname), classname, methodName, pram);
+        } else {
+            return transform(null, classname, methodName, pram);
+        }
+    }
+
+    /**
+     * 逻辑转发方法,由宿主转到热修复dex
+     *
+     * @param object
+     * @param classname
+     * @param methodName
+     * @param pram
+     * @param <T>
+     * @return
+     */
+    private static <T> T transform(Object object, String classname, String methodName,
+                                   Object... pram) throws Exception {
+//        canTransForm();
+//        if (classname == null || methodName == null || classname.length() == 0 || methodName.length() == 0) {
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(new Exception(
+//                        "[HotFixTransform transform error]" + classname + "," + methodName));
+//            }
+//            return null;
+//        }
+
+        try {
+//            Class<T> ap = (Class<T>) loader.loadClass(classname);
+            Class ap = (Class) ClazzUtils.invokeObjectMethod(loader, "loadClass", new Class[]{String.class}, new Object[]{classname});
+            Method[] methods = ap.getDeclaredMethods();
+            Method method = null;
+            if (pram == null || pram.length == 0) {
+                method = ap.getDeclaredMethod(methodName);
+            } else {
+                for (int i = 0; i < methods.length; i++) {
+                    if (methods[i].getName().equals(methodName)
+                            && isFound(methods[i].getParameterTypes(), pram)) {
+                        method = methods[i];
+                        break;
+                    }
+                }
+            }
+
+            if (method == null) {
+                ELOG.e(BuildConfig.tag_hotfix, "[" + classname + "." + methodName + "]" + "No function found corresponding to the parameter type");
+            }
+            method.setAccessible(true);
+            return (T) method.invoke(object, pram);
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
+        }
+        return null;
+    }
+
+    private static <T> T make(String classname, Object... pram) throws Exception {
+//        canTransForm();
+//        if (classname == null || classname.length() == 0) {
+//            return null;
+//        }
+        try {
+//            Class<T> ap = (Class<T>) loader.loadClass(classname);
+            Class ap = (Class) ClazzUtils.invokeObjectMethod(loader, "loadClass", new Class[]{String.class}, new Object[]{classname});
+            Constructor<T>[] constructors = (Constructor<T>[]) ap.getDeclaredConstructors();
+            Constructor<T> constructor = null;
+            if (pram == null || pram.length == 0) {
+                constructor = ap.getConstructor();
+            } else {
+                for (Constructor<T> constructor1 : constructors) {
+                    Class[] aClass = constructor1.getParameterTypes();
+                    //识别是不是正确的构造方法
+                    if (isFound(aClass, pram)) {
+                        constructor = constructor1;
+                        break;
+                    }
+                }
+            }
+
+            if (constructor == null) {
+                ELOG.e(BuildConfig.tag_hotfix, "[" + classname + "]" + "not has parameter type constructor,if this is a innerClass");
+            }
+            constructor.setAccessible(true);
+            T o = constructor.newInstance(pram);
+            return o;
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
+        }
+        return null;
+    }
+
+    private static void canTransForm() throws Exception {
+        if (!EGContext.IS_HOST) {
+            throw new Exception("非宿主 不初始化,不转向");
+        }
+        if (EGContext.DEX_ERROR) {
+            throw new Exception("dex损坏 不初始化,不转向");
+        }
+        Context context = EContextHelper.getContext();
+        if (context == null) {
+            throw new Exception("context == null 不初始化,不转向");
+        }
+
+        if (!isinit) {
+            if (BuildConfig.logcat) {
+                Log.i(BuildConfig.tag_hotfix, "未初始化");
+            }
+            init(context);
+        }
+        boolean b = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
+        if (!b) {
+            throw new Exception("未激活 不转向");
+        }
+
+        if (loader == null) {
+            throw new Exception("类加载器不对 不转向");
+        }
     }
 
     public static void init(Context context) {
@@ -81,7 +224,7 @@ public class HotFixTransform {
                             SPHelper.setStringValue2SP(context, EGContext.HOT_FIX_PATH, "");
                             path = null;
                         }
-//                        isinit = true;
+                        isinit = true;
                         //主进程进行清理旧的dex文件
                         deleteOldDex(context, path);
                         //记录当前宿主版本号
@@ -149,9 +292,6 @@ public class HotFixTransform {
                 Log.i(BuildConfig.tag_hotfix, "热修包应用成功:" + path);
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
         }
     }
 
@@ -197,6 +337,8 @@ public class HotFixTransform {
         if (TextUtils.isEmpty(path)) {
             return false;
         }
+
+//        new File(path).exists() &&new File(path).isFile();
         if (new File(path).isFile()) {
             if (BuildConfig.logcat) {
                 Log.i(BuildConfig.tag_hotfix, "dex 存在 path = " + path);
@@ -250,151 +392,6 @@ public class HotFixTransform {
                 BugReportForTest.commitError(e);
             }
         }
-    }
-
-
-    /**
-     * 逻辑转发方法,由宿主转到热修复dex
-     *
-     * @param object
-     * @param classname
-     * @param methodName
-     * @param pram
-     * @param <T>
-     * @return
-     */
-    public static <T> T transform(Object object, String classname, String methodName, Object... pram) {
-        try {
-            canTransForm();
-
-            if (classname == null || methodName == null || classname.length() == 0 || methodName.length() == 0) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(new Exception(
-                            "[HotFixTransform transform error]" + classname + "," + methodName));
-                }
-                return null;
-            }
-
-            try {
-                //            Class<T> ap = (Class<T>) loader.loadClass(classname);
-                Class ap = (Class) ClazzUtils.invokeObjectMethod(loader, "loadClass", new Class[]{String.class}, new Object[]{classname});
-                Method[] methods = ap.getDeclaredMethods();
-                Method method = null;
-                if (pram == null || pram.length == 0) {
-                    method = ap.getDeclaredMethod(methodName);
-                } else {
-                    for (int i = 0; i < methods.length; i++) {
-                        if (methods[i].getName().equals(methodName)
-                                && isFound(methods[i].getParameterTypes(), pram)) {
-                            method = methods[i];
-                            break;
-                        }
-                    }
-                }
-
-                if (method == null) {
-                    ELOG.e(BuildConfig.tag_hotfix, "[" + classname + "." + methodName + "]" + "No function found corresponding to the parameter type");
-                }
-                method.setAccessible(true);
-                return (T) method.invoke(object, pram);
-            } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(e);
-                }
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-        return null;
-    }
-
-    private static void canTransForm() {
-        if (!EGContext.IS_HOST) {
-            if (BuildConfig.logcat) {
-                ELOG.e("非宿主 不初始化,不转向");
-            }
-            return;
-        }
-        if (EGContext.DEX_ERROR) {
-            if (BuildConfig.logcat) {
-                ELOG.e("dex损坏 不初始化,不转向");
-            }
-            return;
-        }
-        Context context = EContextHelper.getContext();
-        if (context == null) {
-            if (BuildConfig.logcat) {
-                ELOG.e("context == null 不初始化,不转向");
-            }
-            return;
-        }
-
-        if (!isinit) {
-            if (BuildConfig.logcat) {
-                Log.i(BuildConfig.tag_hotfix, "未初始化");
-            }
-            init(context);
-        }
-        boolean b = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
-        if (!b) {
-            if (BuildConfig.logcat) {
-                ELOG.e("未激活 不转向");
-            }
-            return;
-        }
-
-        if (loader == null) {
-            if (BuildConfig.logcat) {
-                ELOG.e("类加载器不对 不转向");
-            }
-            return;
-        }
-    }
-
-    public static <T> T make(String classname, Object... pram) {
-        try {
-            canTransForm();
-
-            if (classname == null || classname.length() == 0) {
-                return null;
-            }
-            try {
-                //            Class<T> ap = (Class<T>) loader.loadClass(classname);
-                Class ap = (Class) ClazzUtils.invokeObjectMethod(loader, "loadClass", new Class[]{String.class}, new Object[]{classname});
-                Constructor<T>[] constructors = (Constructor<T>[]) ap.getDeclaredConstructors();
-                Constructor<T> constructor = null;
-                if (pram == null || pram.length == 0) {
-                    constructor = ap.getConstructor();
-                } else {
-                    for (Constructor<T> constructor1 : constructors) {
-                        Class[] aClass = constructor1.getParameterTypes();
-                        //识别是不是正确的构造方法
-                        if (isFound(aClass, pram)) {
-                            constructor = constructor1;
-                            break;
-                        }
-                    }
-                }
-
-                if (constructor == null) {
-                    ELOG.e(BuildConfig.tag_hotfix, "[" + classname + "]" + "not has parameter type constructor,if this is a innerClass");
-                }
-                constructor.setAccessible(true);
-                T o = constructor.newInstance(pram);
-                return o;
-            } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(e);
-                }
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-        return null;
     }
 
     /**
@@ -458,11 +455,32 @@ public class HotFixTransform {
         }
         return result;
     }
+
+    /********************* get instance begin **************************/
+    public static HotFixTransform getInstance(Context context) {
+        return HLODER.INSTANCE.initContext(context);
+    }
+
+    private HotFixTransform initContext(Context context) {
+        if (mContext == null && context != null) {
+            mContext = context.getApplicationContext();
+        }
+        return HLODER.INSTANCE;
+    }
+
+    private static class HLODER {
+        private static final HotFixTransform INSTANCE = new HotFixTransform();
+    }
+
+    private HotFixTransform() {
+    }
+
+    private Context mContext = null;
+    /********************* get instance end **************************/
 //
 //    private static boolean isInit() {
 //        return isinit;
 //    }
-//
 //    /**
 //     * 清除本地版本
 //     *
@@ -488,4 +506,5 @@ public class HotFixTransform {
 //            }
 //        }
 //    }
+
 }
