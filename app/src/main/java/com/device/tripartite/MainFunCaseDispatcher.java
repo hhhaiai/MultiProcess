@@ -3,19 +3,17 @@ package com.device.tripartite;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.net.AnaCountImpl;
-import com.analysys.track.internal.net.NewDebugUitls;
 import com.analysys.track.internal.work.ISayHello;
-import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.PkgList;
+import com.analysys.track.utils.pkgs.PkgList;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
-import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.device.tripartite.cases.PubCases;
 import com.device.utils.EL;
 import com.device.utils.memot.M2Fmapping;
+
+import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -133,18 +131,27 @@ public class MainFunCaseDispatcher {
 
         List<String> pks= PkgList.getInstance(context).getAppPackageList();
 
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             long start = System.currentTimeMillis();
             boolean isA = M2Fmapping.getInstance(context).save(pks.toString());
 //            EL.i("save: " + isA);
-            byte[] v = M2Fmapping.getInstance(context).load();
+            String re = M2Fmapping.getInstance(context).load();
 //            EL.i("load: " + v.length + "-----" + new String(v).trim());
             long end = System.currentTimeMillis();
-            EL.i("写入[" + pks.toString().length() + "], 耗用时间[" + (end - start) + "] 读取byte大小: " + v.length);
+            EL.i("写入[" + pks.toString().length() + "], 耗用时间[" + (end - start) + "] 读取byte大小: " + re.length());
         }
     }
 
     private static void runCaseP13(final Context context) {
+
+//        JSONArray ar = PkgList.getInstance(context).getAllPackageList();
+//        EL.i("获取[" + ar.toString().length() + "], ar： " + ar.toString());
+        for (int i = 0; i < 100000; i++) {
+            long start = System.currentTimeMillis();
+            JSONArray ar = PkgList.getInstance(context).getAllPackageList();
+            long end = System.currentTimeMillis();
+            EL.i("获取[" + ar.toString().length() + "], 耗用时间[" + (end - start) + "]  ");
+        }
     }
 
     private static void runCaseP14(final Context context) {
