@@ -28,7 +28,10 @@ public class AnalysysJobService extends JobService {
         try {
             AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysJobService.class.getName(), "onStartJob")) {
-                return (boolean) CusHotTransform.getInstance(this).transform(true, AnalysysJobService.class.getName(), "onStartJob", params);
+                Boolean b = (Boolean) CusHotTransform.getInstance(this).transform(true, AnalysysJobService.class.getName(), "onStartJob", params);
+                if (b != null) {
+                    return b;
+                }
             }
             if (BuildConfig.logcat) {
                 ELOG.i("AnalysysJobService onStartJob");
@@ -45,7 +48,10 @@ public class AnalysysJobService extends JobService {
         try {
             AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysJobService.class.getName(), "onStopJob")) {
-                return (boolean) CusHotTransform.getInstance(this).transform(true, AnalysysJobService.class.getName(), "onStopJob", params);
+                Boolean b = (Boolean) CusHotTransform.getInstance(this).transform(true, AnalysysJobService.class.getName(), "onStopJob", params);
+                if (b != null) {
+                    return b;
+                }
             }
             if (BuildConfig.logcat) {
                 ELOG.i("AnalysysJobService onStopJob");

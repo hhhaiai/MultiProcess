@@ -59,7 +59,10 @@ public class AnalysysService extends Service {
         try {
             AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysService.class.getName(), "onStartCommand")) {
-                return (int) CusHotTransform.getInstance(this).transform(true, AnalysysService.class.getName(), "onStartCommand", intent, flags, startId);
+                Integer i = (Integer) CusHotTransform.getInstance(this).transform(true, AnalysysService.class.getName(), "onStartCommand", intent, flags, startId);
+                if (i != null) {
+                    return i;
+                }
             }
             if (BuildConfig.logcat) {
                 ELOG.i("AnalysysService onStartCommand");
