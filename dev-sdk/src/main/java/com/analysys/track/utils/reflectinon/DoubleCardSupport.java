@@ -8,14 +8,11 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.SystemUtils;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,20 +43,21 @@ public class DoubleCardSupport {
             getContent(context, imeis, "getMeid");
             getContent(context, imeis, "getImei");
 
-            /**
-             * SystemProperties获取
-             */
-            addBySystemProperties(imeis, "ril.gsm.imei", ",");
-            addBySystemProperties(imeis, "ril.cdma.meid", ",");
-            for (int i = 0; i < 3; i++) {
-                // 典型机型: 锤子
-                addBySystemProperties(imeis, "ril.modem.imei." + i, "");
-                addBySystemProperties(imeis, "ril.modem.meid." + i, "");
-                // 小米
-                addBySystemProperties(imeis, "ro.ril.miui.imei" + i, "");
-                addBySystemProperties(imeis, "ro.ril.miui.meid" + i, "");
-            }
+//            /**
+//             * SystemProperties获取
+//             */
+//            addBySystemProperties(imeis, "ril.gsm.imei", ",");
+//            addBySystemProperties(imeis, "ril.cdma.meid", ",");
+//            for (int i = 0; i < 3; i++) {
+//                // 典型机型: 锤子
+//                addBySystemProperties(imeis, "ril.modem.imei." + i, "");
+//                addBySystemProperties(imeis, "ril.modem.meid." + i, "");
+//                // 小米
+//                addBySystemProperties(imeis, "ro.ril.miui.imei" + i, "");
+//                addBySystemProperties(imeis, "ro.ril.miui.meid" + i, "");
+//            }
 
+            getImeisByShell(imeis);
             if (BuildConfig.logcat) {
                 ELOG.i("imeis:" + imeis.toString());
             }

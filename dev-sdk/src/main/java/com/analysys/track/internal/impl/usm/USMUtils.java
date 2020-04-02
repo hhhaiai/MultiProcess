@@ -125,7 +125,6 @@ public class USMUtils {
         try {
 //            UsageStatsManager usm = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
 //            UsageEvents usageEvents = usm.queryEvents(beginTime, endTime);
-
             return ClazzUtils.invokeObjectMethod(context.getApplicationContext()
                             .getSystemService(Context.USAGE_STATS_SERVICE), "queryEvents",
                     new Class[]{long.class, long.class}, new Object[]{beginTime, endTime});

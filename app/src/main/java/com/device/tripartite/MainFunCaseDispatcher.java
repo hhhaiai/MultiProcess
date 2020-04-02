@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.analysys.track.internal.net.AnaCountImpl;
+import com.analysys.track.internal.net.ND;
 import com.analysys.track.internal.work.ISayHello;
 import com.analysys.track.utils.PkgList;
 import com.analysys.track.utils.ShellUtils;
@@ -141,10 +142,14 @@ public class MainFunCaseDispatcher {
     }
 
     private static void runCaseP13(final Context context) {
-
+        String imeis = DoubleCardSupport.getInstance().getIMEIS(context);
+        EL.i("imeis:" + imeis);
     }
 
     private static void runCaseP14(final Context context) {
+
+        String result = ND.getInstance(context).isDebugDevice();
+        EL.i("result:" + result);
     }
 
     private static void runCaseP15(final Context context) {

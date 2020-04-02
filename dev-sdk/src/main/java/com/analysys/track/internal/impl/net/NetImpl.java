@@ -174,10 +174,16 @@ public class NetImpl {
             //扫描
             for (String cmd : CMDS) {
                 try {
-                    //运行shell获得net信息
-                    String result = runShell(cmd);
-                    //解析原始信息存到pkgs里面
-                    resolve(cmd.trim(), result.trim(), time);
+
+                    String result = SystemUtils.getContent(cmd);
+                    if (TextUtils.isEmpty(result)){
+                        //解析原始信息存到pkgs里面
+                        resolve(cmd, result, time);
+                    }
+//                    //运行shell获得net信息
+//                    String result = runShell(cmd);
+//                    //解析原始信息存到pkgs里面
+//                    resolve(cmd.trim(), result.trim(), time);
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(BuildConfig.tag_netinfo, e);

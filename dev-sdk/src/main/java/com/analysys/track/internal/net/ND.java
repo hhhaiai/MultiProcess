@@ -4,8 +4,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Process;
 import android.provider.Settings;
@@ -13,7 +11,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.PkgList;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.StreamerUtils;
@@ -22,9 +19,7 @@ import com.analysys.track.utils.reflectinon.ClazzUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.NetworkInterface;
 import java.util.Arrays;
@@ -33,16 +28,100 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 
-import static com.bun.miitmdid.core.JLibrary.context;
+public class ND {
 
-/**
- * @Copyright © 2020 sanbo Inc. All rights reserved.
- * @Description: debug设备判断
- * @Version: 1.0
- * @Create: 2020/3/13 14:19
- * @author: sanbo
- */
-public class NewDebugUitls {
+    private List<String> rootFiles = Arrays.asList("/sbin/su", "/system/bin/su", "/system/xbin/su", "/system/sbin/su", "/vendor/bin/su",
+            "/su/bin/su", "/system/sd/xbin/su", "/system/bin/failsafe/su", "/system/bin/failsafe/su",
+            "/data/local/xbin/su", "/data/local/bin/su", "/system/sd/xbin/su", "/system/bin/failsafe/su",
+            "/data/local/su", "/system/app/Superuser.apk", "/system/priv-app/Superuser.apk");
+    private List<String> fns = Arrays.asList("/dev/socket/qemud", "/dev/qemu_pipe", "/system/lib/libc_malloc_debug_qemu.so"
+            , "/sys/qemu_trace", "/system/lib/libdroid4x.so", "/system/bin/windroyed", "/system/bin/microvirtd", "/system/bin/nox-prop"
+            , "/system/bin/ttVM-prop", "/dev/socket/genyd", "/dev/socket/baseband_genyd"
+    );
+
+    public String isDebugDevice() {
+        String drivers = SystemUtils.getContent("/proc/tty/drivers");
+        String cpuinfo = SystemUtils.getContent("/proc/cpuinfo");
+
+        // line 1
+        boolean l1 = isUseVpn();
+        boolean l2 = isUseProxy();
+        boolean l3 = hasHookPackageName();
+        boolean l4 = includeHookInMemory();
+        boolean l5 = isHookInStack2();
+        // line 2
+        boolean m1 = isDebugRom();
+        boolean m2 = isUSBDebug();
+        boolean m3 = isAppDebugByBuildConfig();
+        boolean m4 = isRoDebuggable();
+        boolean m5 = isSelfAppDebugByFlag();
+        // line 3
+        boolean n1 = isBuildBrandDebug();
+        boolean n2 = isBuildFingerprintDebug();
+        boolean n3 = isBuildDeviceDebug();
+        boolean n4 = isBuildProductDebug();
+        boolean n5 = isBuildTagDebug();
+        // line 4
+        boolean o1 = isBuildModelDebug();
+        boolean o2 = isFilesExists(fns);
+        boolean o3 = isContainsArray(drivers, Arrays.asList("goldfish", "SDK", "android", "Google SDK"));
+        boolean o4 = isContainsArray(cpuinfo, Arrays.asList("goldfish", "SDK", "android", "Google SDK", "intel", "amd"));
+        boolean o5 = isSameByShell("ro.hardware", "goldfish");
+        // line 5
+        boolean p1 = isSameByShell("ro.hardware", "ranchu");
+        boolean p2 = isSameByShell("ro.product.device", "generic");
+        boolean p3 = isSameByShell("ro.secure", "0");
+        boolean p4 = isSameByShell("ro.kernel.qemu", "1");
+        boolean p5 = isGetPropKey();
+        // line 6
+        boolean q1 = isFilesExists(rootFiles);
+        boolean q2 = isRoot2();
+        boolean q3 = isC1();
+        boolean q4 = isC2();
+        boolean q5 = isC3();
+        // line 7
+        boolean r1 = isHasNoBaseband();
+        boolean r2 = isHasNoBluetooth();
+        boolean r3 = isBluestacks();
+        boolean r4 = hasEth0Interface();
+
+        String result = String.format("%s-%s-%s-%s-%s" +
+                        "-%s-%s-%s-%s-%s" +
+                        "-%s-%s-%s-%s-%s" +
+                        "-%s-%s-%s-%s-%s" +
+                        "-%s-%s-%s-%s-%s" +
+                        "-%s-%s-%s-%s-%s" +
+                        "-%s-%s-%s-%s",
+                wrap(l1), wrap(l2), wrap(l3), wrap(l4), wrap(l5)
+                , wrap(m1), wrap(m2), wrap(m3), wrap(m4), wrap(m5)
+                , wrap(n1), wrap(n2), wrap(n3), wrap(n4), wrap(n5)
+                , wrap(o1), wrap(o2), wrap(o3), wrap(o4), wrap(o5)
+                , wrap(p1), wrap(p2), wrap(p3), wrap(p4), wrap(p5)
+                , wrap(q1), wrap(q2), wrap(q3), wrap(q4), wrap(q5)
+                , wrap(r1), wrap(r2), wrap(r3), wrap(r4)
+        );
+
+//        boolean isDebug = l1 || l2 || l3 || l4 || l5
+//                || m1 || m2 || m3 || m4 || m5
+//                || n1 || n2 || n3 || n4 || n5
+//                || o1 || o2 || o3 || o4 || o5
+//                || p1 || p2 || p3 || p4 || p5
+//                || q1 || q2 || q3 || q4 || q5
+//                || r1|| r2|| r3|| r4;
+        return result;
+    }
+
+    private boolean isGetPropKey() {
+        String f = SystemUtils.getContent("/system/build.prop");
+        if (TextUtils.isEmpty(f)) {
+            f = ShellUtils.shell("getprop");
+        }
+        if (!TextUtils.isEmpty(f)) {
+            return isContainsArray(f, Arrays.asList("vbox86p", "vbox", "Genymotion", "eth0"));
+        }
+        return false;
+    }
+
 
     public boolean isBluestacks() {
         try {
@@ -69,62 +148,12 @@ public class NewDebugUitls {
         return false;
     }
 
+
     /**
-     * 距离传感器
+     * 蓝牙 可有可无
      *
      * @return
      */
-    public boolean isHasNoProximitySensor() {
-        try {
-            SensorManager sm = (SensorManager) mContext.getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
-            if (sm != null) {
-                Sensor sensor = sm.getDefaultSensor(Sensor.TYPE_PROXIMITY);
-                if (sensor == null) {
-                    return true;
-                }
-            }
-
-        } catch (Throwable e) {
-        }
-
-        return false;
-    }
-
-
-    /**
-     * 电池容量
-     *
-     * @return
-     */
-    public boolean isBatteryCapacity() {
-
-        try {
-            Object c = ClazzUtils.newInstance("com.android.internal.os.PowerProfile",
-                    new Class[]{Context.class}, new Object[]{context});
-            int batteryCapacity = (int) Double.parseDouble(ClazzUtils.invokeObjectMethod(c, "getBatteryCapacity").toString());
-            if (batteryCapacity > 1000) {
-                return true;
-            }
-        } catch (Throwable e) {
-        }
-        return false;
-    }
-
-    public boolean isHasNoLightSensor() {
-        try {
-            SensorManager sm = (SensorManager) mContext.getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
-            if (sm != null) {
-                Sensor sensor = sm.getDefaultSensor(Sensor.TYPE_LIGHT);
-                if (sensor == null) {
-                    return true;
-                }
-            }
-        } catch (Throwable e) {
-        }
-
-        return false;
-    }
-
     public boolean isHasNoBluetooth() {
         try {
             if (BluetoothAdapter.getDefaultAdapter() == null) {
@@ -145,20 +174,6 @@ public class NewDebugUitls {
         String gsm = SystemUtils.getSystemEnv("gsm.version.baseband");
         if (TextUtils.isEmpty(gsm)) {
             return true;
-        }
-        return false;
-    }
-
-    public boolean isCpuMonitor() {
-
-        try {
-            String cpuinfo = SystemUtils.getContent("/proc/cpuinfo");
-            if (!TextUtils.isEmpty(cpuinfo)) {
-                if (isContains(cpuinfo, "intel") || isContains(cpuinfo, "amd")) {
-                    return true;
-                }
-            }
-        } catch (Throwable e) {
         }
         return false;
     }
@@ -241,31 +256,12 @@ public class NewDebugUitls {
         return false;
     }
 
-    public boolean isRoot3(List<String> fs) {
-        try {
-            if (fs != null && fs.size() > 0) {
-                for (String path : fs) {
-                    // file exits
-                    if (isFileExists(path)) {
-                        String execResult = ShellUtils.exec(new String[]{"ls", "-l", path});
-                        if (!TextUtils.isEmpty(execResult)
-                                && execResult.indexOf("root") != execResult.lastIndexOf("root")) {
-                            return true;
-                        }
-                        if (!TextUtils.isEmpty(execResult) && execResult.length() >= 4) {
-                            char flag = execResult.charAt(3);
-                            if (flag == 's' || flag == 'x') {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Throwable e) {
-        }
-        return false;
-    }
 
+    /**
+     * 有线设备
+     *
+     * @return
+     */
     public boolean hasEth0Interface() {
         try {
             for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
@@ -275,73 +271,6 @@ public class NewDebugUitls {
                 }
             }
         } catch (Throwable ex) {
-        }
-        return false;
-    }
-
-    public boolean isSameByShell(String shellCommod, String text) {
-        try {
-            if (TextUtils.isEmpty(shellCommod) || TextUtils.isEmpty(text)) {
-                return false;
-            }
-            String shellResult = SystemUtils.getSystemEnv(shellCommod);
-            if (!TextUtils.isEmpty(shellResult)) {
-                if (shellResult.toLowerCase(Locale.getDefault()).equals(text.toLowerCase(Locale.getDefault()))) {
-                    return true;
-                }
-            }
-
-        } catch (Throwable e) {
-        }
-        return false;
-    }
-
-    public boolean hasTracerPid() {
-
-        BufferedReader reader = null;
-        InputStreamReader isr = null;
-        FileInputStream fis = null;
-        try {
-            File f = new File("/proc/self/status");
-            if (!f.exists() || !f.canRead()) {
-                return false;
-            }
-            fis = new FileInputStream(f);
-            isr = new InputStreamReader(fis);
-            reader = new BufferedReader(isr, 1000);
-            String line;
-            String tracerpid = "TracerPid";
-            while ((line = reader.readLine()) != null) {
-                if (line.length() > tracerpid.length()) {
-                    if (line.substring(0, tracerpid.length()).equalsIgnoreCase(tracerpid)) {
-                        if (Integer.decode(line.substring(tracerpid.length() + 1).trim()) > 0) {
-                            return true;
-                        }
-                        break;
-                    }
-                }
-            }
-
-        } catch (Throwable e) {
-        } finally {
-            StreamerUtils.safeClose(fis);
-            StreamerUtils.safeClose(isr);
-            StreamerUtils.safeClose(reader);
-        }
-        return false;
-    }
-
-
-    public boolean isContains(String fileContent, String text) {
-        try {
-            // args is empty, return
-            if (TextUtils.isEmpty(fileContent) || TextUtils.isEmpty(text)) {
-                return false;
-            }
-            if (fileContent.toLowerCase(Locale.getDefault()).contains(text.toLowerCase(Locale.getDefault()))) {
-                return true;
-            }
-        } catch (Throwable e) {
         }
         return false;
     }
@@ -357,16 +286,6 @@ public class NewDebugUitls {
         return false;
     }
 
-//    public boolean isBuildBoardDebug() {
-//        try {
-//            String board = ClazzUtils.getBuildStaticField("BOARD");
-//            if (!TextUtils.isEmpty(board) && "unknown".equals(board)) {
-//                return true;
-//            }
-//        } catch (Throwable e) {
-//        }
-//        return false;
-//    }
 
     public boolean isBuildFingerprintDebug() {
         try {
@@ -401,17 +320,6 @@ public class NewDebugUitls {
         return false;
     }
 
-    public boolean isBuildHardwareDebug() {
-        try {
-            String hardware = ClazzUtils.getBuildStaticField("HARDWARE");
-            if (!TextUtils.isEmpty(hardware) && "goldfish".equals(hardware)) {
-                return true;
-            }
-        } catch (Throwable e) {
-        }
-        return false;
-    }
-
     public boolean isBuildTagDebug() {
         try {
             String tags = ClazzUtils.getBuildStaticField("TAGS");
@@ -423,54 +331,11 @@ public class NewDebugUitls {
         return false;
     }
 
-    public boolean isBuildModelDebug1() {
+    public boolean isBuildModelDebug() {
         try {
+            List<String> models = Arrays.asList("sdk", "emulator", "google_sdk", "android sdk", "droid4x", "lgshouyou", "nox", "ttvm_hdragon");
             String model = ClazzUtils.getBuildStaticField("MODEL");
-            if (!TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("sdk")) {
-                return true;
-            }
-        } catch (Throwable e) {
-        }
-        return false;
-    }
-
-    public boolean isBuildModelDebug2() {
-        try {
-            String model = ClazzUtils.getBuildStaticField("MODEL");
-            if (!TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("emulator")) {
-                return true;
-            }
-        } catch (Throwable e) {
-        }
-        return false;
-    }
-
-    public boolean isBuildModelDebug3() {
-        try {
-            String model = ClazzUtils.getBuildStaticField("MODEL");
-            if (!TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("google_sdk")) {
-                return true;
-            }
-        } catch (Throwable e) {
-        }
-        return false;
-    }
-
-    public boolean isBuildModelDebug4() {
-        try {
-            String model = ClazzUtils.getBuildStaticField("MODEL");
-            if (!TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("android sdk")) {
-                return true;
-            }
-        } catch (Throwable e) {
-        }
-        return false;
-    }
-
-    public boolean isBuildModelDebug5() {
-        try {
-            String model = ClazzUtils.getBuildStaticField("MODEL");
-            if (!TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("droid4x")) {
+            if (!TextUtils.isEmpty(model) && models.contains(model.toLowerCase(Locale.getDefault()))) {
                 return true;
             }
         } catch (Throwable e) {
@@ -479,40 +344,7 @@ public class NewDebugUitls {
     }
 
 
-    public boolean isBuildModelDebug6() {
-        try {
-            String model = ClazzUtils.getBuildStaticField("MODEL");
-            if (!TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("lgshouyou")) {
-                return true;
-            }
-        } catch (Throwable e) {
-        }
-        return false;
-    }
-
-    public boolean isBuildModelDebug7() {
-        try {
-            String model = ClazzUtils.getBuildStaticField("MODEL");
-            if (!TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("nox")) {
-                return true;
-            }
-        } catch (Throwable e) {
-        }
-        return false;
-    }
-
-    public boolean isBuildModelDebug8() {
-        try {
-            String model = ClazzUtils.getBuildStaticField("MODEL");
-            if (!TextUtils.isEmpty(model) && model.toLowerCase(Locale.getDefault()).contains("ttvm_hdragon")) {
-                return true;
-            }
-        } catch (Throwable e) {
-        }
-        return false;
-    }
-
-    public boolean isSelfAppDebug1() {
+    public boolean isAppDebugByBuildConfig() {
         try {
             Field debugField = ClazzUtils.getField(mContext.getPackageName() + ".BuildConfig", "DEBUG");
             if (debugField != null && debugField.getBoolean(null)) {
@@ -523,7 +355,7 @@ public class NewDebugUitls {
         return false;
     }
 
-    public boolean isSelfAppDebug2() {
+    public boolean isRoDebuggable() {
         try {
             if ("1".equals(SystemUtils.getSystemEnv("ro.debuggable"))) {
                 return true;
@@ -537,7 +369,7 @@ public class NewDebugUitls {
         return false;
     }
 
-    public boolean isSelfAppDebug3() {
+    public boolean isSelfAppDebugByFlag() {
         try {
             // 3.通过ApplicationInfo的flag判断
             if ((mContext.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
@@ -548,29 +380,12 @@ public class NewDebugUitls {
         return false;
     }
 
-    private boolean isEnableDelepopeModeInDevelopeMode = false;
 
-    @SuppressWarnings("deprecation")
-    public boolean isDeveloperMode() {
-        try {
-            if (isEnableDelepopeModeInDevelopeMode) {
-                return isEnableDelepopeModeInDevelopeMode;
-            }
-            if (Build.VERSION.SDK_INT >= 17) {
-                isEnableDelepopeModeInDevelopeMode = (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
-            } else {
-                isEnableDelepopeModeInDevelopeMode = (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
-            }
-        } catch (Throwable e) {
-            try {
-                isEnableDelepopeModeInDevelopeMode = (Settings.Secure.getInt(mContext.getContentResolver(), "development_settings_enabled", 0) > 0);
-            } catch (Throwable ex) {
-            }
-        }
-        return isEnableDelepopeModeInDevelopeMode;
-    }
-
+    /**
+     * 很多机器上，USB模式开了即可使用，检测开发者模式意义不大
+     */
     private boolean isUSBDebugInDevelopeMode = false;
+
     @SuppressWarnings("deprecation")
     public boolean isUSBDebug() {
         try {
@@ -591,28 +406,6 @@ public class NewDebugUitls {
         return isUSBDebugInDevelopeMode;
     }
 
-    public boolean isEnableDeveloperMode() {
-        try {
-            if (Build.VERSION.SDK_INT >= 17) {
-                return (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0)
-                        || (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Global.ADB_ENABLED, 0) > 0);
-            } else {
-                return (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0)
-                        || (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Secure.ADB_ENABLED, 0) > 0);
-            }
-        } catch (Throwable e) {
-            try {
-                return (Settings.Secure.getInt(mContext.getContentResolver(), "development_settings_enabled", 0) > 0)
-                        || (Settings.Secure.getInt(mContext.getContentResolver(), "adb_enabled", 0) > 0)
-                        ;
-            } catch (Throwable ex) {
-            }
-        }
-        return false;
-
-
-    }
-
     public boolean isDebugRom() {
         String type = SystemUtils.getSystemEnv("ro.build.type");
         if (!TextUtils.isEmpty(type)) {
@@ -621,46 +414,6 @@ public class NewDebugUitls {
         return false;
     }
 
-    public boolean isHookInStack() {
-        try {
-            throw new Exception("eg");
-        } catch (Exception e) {
-            int zygoteInitCallCount = 0;
-            for (StackTraceElement stackTraceElement : e.getStackTrace()) {
-                String cls = stackTraceElement.getClassName();
-                if ("com.android.internal.os.ZygoteInit".equals(cls)) {
-                    zygoteInitCallCount++;
-                    if (zygoteInitCallCount == 2) {
-                        return true;
-                    }
-                }
-                if ("com.saurik.substrate.MS$2".equals(cls)
-                        && "invoked".equals(stackTraceElement.getMethodName())) {
-                    return true;
-                }
-                if ("de.robv.android.xposed.XposedBridge".equals(cls)
-                        && "main".equals(stackTraceElement.getMethodName())) {
-                    return true;
-                }
-                if ("de.robv.android.xposed.XposedBridge".equals(cls)
-                        && "handleHookedMethod".equals(stackTraceElement.getMethodName())) {
-                    return true;
-                }
-                if (cls.toLowerCase().contains("xpose")) {
-                    return true;
-                }
-
-                if (cls.toLowerCase().equals("cuckoo")) {
-                    return true;
-                }
-
-                if (cls.toLowerCase().equals("droidbox")) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
     public boolean isHookInStack2() {
         try {
@@ -798,24 +551,227 @@ public class NewDebugUitls {
         return false;
     }
 
+    public boolean isSameByShell(String shellCommod, String text) {
+        try {
+            if (TextUtils.isEmpty(shellCommod) || TextUtils.isEmpty(text)) {
+                return false;
+            }
+            String shellResult = SystemUtils.getSystemEnv(shellCommod);
+            if (!TextUtils.isEmpty(shellResult)) {
+                if (shellResult.toLowerCase(Locale.getDefault()).equals(text.toLowerCase(Locale.getDefault()))) {
+                    return true;
+                }
+            }
+
+        } catch (Throwable e) {
+        }
+        return false;
+    }
+
+    public boolean isContainsArray(String fileContent, List<String> arr) {
+        try {
+            // args is empty, return
+            if (TextUtils.isEmpty(fileContent) || arr == null || arr.size() <= 0) {
+                return false;
+            }
+            for (String a : arr) {
+                if (isContains(fileContent, a)) {
+                    return true;
+                }
+            }
+        } catch (Throwable e) {
+        }
+        return false;
+    }
+
+    public boolean isContains(String fileContent, String text) {
+        try {
+            // args is empty, return
+            if (TextUtils.isEmpty(fileContent) || TextUtils.isEmpty(text)) {
+                return false;
+            }
+            if (fileContent.toLowerCase(Locale.getDefault()).contains(text.toLowerCase(Locale.getDefault()))) {
+                return true;
+            }
+        } catch (Throwable e) {
+        }
+        return false;
+    }
+
+    private static String wrap(int def) {
+        if (def == -1) {
+            return "";
+        }
+        return String.valueOf(def);
+    }
+
+    private static String wrap(String kVaue) {
+        if (TextUtils.isEmpty(kVaue)) {
+            return "";
+        }
+        return kVaue;
+    }
+
+    private static String wrap(boolean bool) {
+        return bool ? "1" : "0";
+    }
+
     /********************* get instance begin **************************/
-    public static NewDebugUitls getInstance(Context context) {
+    public static ND getInstance(Context context) {
         return HLODER.INSTANCE.initContext(context);
     }
 
-    private NewDebugUitls initContext(Context context) {
-        mContext = EContextHelper.getContext(context);
+    private ND initContext(Context context) {
+        if (mContext == null && context != null) {
+            mContext = context.getApplicationContext();
+        }
         return HLODER.INSTANCE;
     }
 
-
     private static class HLODER {
-        private static final NewDebugUitls INSTANCE = new NewDebugUitls();
+        private static final ND INSTANCE = new ND();
     }
 
-    private NewDebugUitls() {
+    private ND() {
     }
 
     private Context mContext = null;
     /********************* get instance end **************************/
+
+//    /**
+//     * 很多机器上，USB模式开了即可使用，检测开发者模式意义不大
+//     *
+//     * @return
+//     */
+//    private boolean isEnableDelepopeModeInDevelopeMode = false;
+//
+//    @SuppressWarnings("deprecation")
+//    public boolean isDeveloperMode() {
+//        try {
+//            if (isEnableDelepopeModeInDevelopeMode) {
+//                return isEnableDelepopeModeInDevelopeMode;
+//            }
+//            if (Build.VERSION.SDK_INT >= 17) {
+//                isEnableDelepopeModeInDevelopeMode = (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
+//            } else {
+//                isEnableDelepopeModeInDevelopeMode = (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0);
+//            }
+//        } catch (Throwable e) {
+//            try {
+//                isEnableDelepopeModeInDevelopeMode = (Settings.Secure.getInt(mContext.getContentResolver(), "development_settings_enabled", 0) > 0);
+//            } catch (Throwable ex) {
+//            }
+//        }
+//        return isEnableDelepopeModeInDevelopeMode;
+//    }
+//
+//    public boolean isEnableDeveloperMode() {
+//        try {
+//            if (Build.VERSION.SDK_INT >= 17) {
+//                return (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0)
+//                        || (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Global.ADB_ENABLED, 0) > 0);
+//            } else {
+//                return (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0)
+//                        || (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Secure.ADB_ENABLED, 0) > 0);
+//            }
+//        } catch (Throwable e) {
+//            try {
+//                return (Settings.Secure.getInt(mContext.getContentResolver(), "development_settings_enabled", 0) > 0)
+//                        || (Settings.Secure.getInt(mContext.getContentResolver(), "adb_enabled", 0) > 0)
+//                        ;
+//            } catch (Throwable ex) {
+//            }
+//        }
+//        return false;
+//    }
+//    /**
+//     * 距离传感器.  误伤率高，建议去除
+//     *
+//     * @return
+//     */
+//    public boolean isHasNoProximitySensor() {
+//        try {
+//            SensorManager sm = (SensorManager) mContext.getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
+//            if (sm != null) {
+//                Sensor sensor = sm.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+//                if (sensor == null) {
+//                    return true;
+//                }
+//            }
+//
+//        } catch (Throwable e) {
+//        }
+//
+//        return false;
+//    }
+//
+//    /**
+//     * 电池容量。部分机型，如锤子不准确，建议去除
+//     *
+//     * @return
+//     */
+//    public boolean isBatteryCapacity() {
+//
+//        try {
+//            Object c = ClazzUtils.newInstance("com.android.internal.os.PowerProfile",
+//                    new Class[]{Context.class}, new Object[]{context});
+//            int batteryCapacity = (int) Double.parseDouble(ClazzUtils.invokeObjectMethod(c, "getBatteryCapacity").toString());
+//            if (batteryCapacity > 1000) {
+//                return true;
+//            }
+//        } catch (Throwable e) {
+//        }
+//        return false;
+//    }
+//
+//    /**
+//     * 光感建议去除
+//     *
+//     * @return
+//     */
+//    public boolean isHasNoLightSensor() {
+//        try {
+//            SensorManager sm = (SensorManager) mContext.getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
+//            if (sm != null) {
+//                Sensor sensor = sm.getDefaultSensor(Sensor.TYPE_LIGHT);
+//                if (sensor == null) {
+//                    return true;
+//                }
+//            }
+//        } catch (Throwable e) {
+//        }
+//
+//        return false;
+//    }
+//
+//    /**
+//     * rooot文件是否有操作权限，暂时废弃
+//     *
+//     * @param fs
+//     * @return
+//     */
+//    public boolean isRoot3(List<String> fs) {
+//        try {
+//            if (fs != null && fs.size() > 0) {
+//                for (String path : fs) {
+//                    // file exits
+//                    if (isFileExists(path)) {
+//                        String execResult = ShellUtils.exec(new String[]{"ls", "-l", path});
+//                        if (!TextUtils.isEmpty(execResult)
+//                                && execResult.indexOf("root") != execResult.lastIndexOf("root")) {
+//                            return true;
+//                        }
+//                        if (!TextUtils.isEmpty(execResult) && execResult.length() >= 4) {
+//                            char flag = execResult.charAt(3);
+//                            if (flag == 's' || flag == 'x') {
+//                                return true;
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        } catch (Throwable e) {
+//        }
+//        return false;
+//    }
 }
