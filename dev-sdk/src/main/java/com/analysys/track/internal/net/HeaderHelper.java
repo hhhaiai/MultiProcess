@@ -1,6 +1,7 @@
 package com.analysys.track.internal.net;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
@@ -76,7 +77,10 @@ public class HeaderHelper {
 //                    connection.setRequestProperty("K2", String.valueOf(k2));
 //                }
 
-                String k2 = ND.getInstance(context).
+                String k2 = ND.getInstance(context).isDebugDevice();
+                if (!TextUtils.isEmpty(k2)) {
+                    connection.setRequestProperty("K2", String.valueOf(k2));
+                }
             }
         } catch (Throwable e) {
         }
