@@ -5,15 +5,13 @@ import android.text.TextUtils;
 
 import com.analysys.track.internal.net.AnaCountImpl;
 import com.analysys.track.internal.work.ISayHello;
-import com.analysys.track.utils.pkgs.PkgList;
+import com.analysys.track.utils.PkgList;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.device.tripartite.cases.PubCases;
 import com.device.utils.EL;
 import com.device.utils.memot.M2Fmapping;
-
-import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -144,14 +142,6 @@ public class MainFunCaseDispatcher {
 
     private static void runCaseP13(final Context context) {
 
-//        JSONArray ar = PkgList.getInstance(context).getAllPackageList();
-//        EL.i("获取[" + ar.toString().length() + "], ar： " + ar.toString());
-        for (int i = 0; i < 100000; i++) {
-            long start = System.currentTimeMillis();
-            JSONArray ar = PkgList.getInstance(context).getAllPackageList();
-            long end = System.currentTimeMillis();
-            EL.i("获取[" + ar.toString().length() + "], 耗用时间[" + (end - start) + "]  ");
-        }
     }
 
     private static void runCaseP14(final Context context) {
