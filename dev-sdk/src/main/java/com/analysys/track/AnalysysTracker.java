@@ -2,7 +2,7 @@ package com.analysys.track;
 
 import android.content.Context;
 
-import com.analysys.track.impl.HotFixTransform;
+import com.analysys.track.impl.CusHotTransform;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
@@ -29,7 +29,7 @@ public class AnalysysTracker {
             setContext(context);
             if (BuildConfig.enableHotFix) {
                 try {
-                    HotFixTransform.transform(false, AnalysysTracker.class.getName(), "init", context, appKey, channel);
+                    CusHotTransform.transform(false, AnalysysTracker.class.getName(), "init", context, appKey, channel);
                     return;
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -57,7 +57,7 @@ public class AnalysysTracker {
             setContext(context);
             if (BuildConfig.enableHotFix) {
                 try {
-                    HotFixTransform.transform(false, AnalysysTracker.class.getName(), "setDebugMode", context, isDebug);
+                    CusHotTransform.transform(false, AnalysysTracker.class.getName(), "setDebugMode", context, isDebug);
                     return;
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -77,7 +77,7 @@ public class AnalysysTracker {
     public static void setDebugMode(boolean isDebug) {
         if (BuildConfig.enableHotFix) {
             try {
-                HotFixTransform.transform(false, AnalysysTracker.class.getName(), "setDebugMode", isDebug);
+                CusHotTransform.transform(false, AnalysysTracker.class.getName(), "setDebugMode", isDebug);
                 return;
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -91,7 +91,7 @@ public class AnalysysTracker {
         EContextHelper.setContext(context);
         if (BuildConfig.enableHotFix) {
             try {
-                HotFixTransform.transform(false, AnalysysTracker.class.getName(), "setContext", context);
+                CusHotTransform.transform(false, AnalysysTracker.class.getName(), "setContext", context);
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);

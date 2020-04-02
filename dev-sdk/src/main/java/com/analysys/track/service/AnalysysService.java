@@ -6,9 +6,8 @@ import android.os.IBinder;
 
 import com.analysys.track.AnalysysTracker;
 import com.analysys.track.BuildConfig;
-import com.analysys.track.impl.HotFixTransform;
+import com.analysys.track.impl.CusHotTransform;
 import com.analysys.track.internal.AnalysysInternal;
-import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.internal.work.ServiceHelper;
 import com.analysys.track.utils.EContextHelper;
@@ -30,7 +29,7 @@ public class AnalysysService extends Service {
             AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix) {
                 try {
-                    IBinder iBinder = HotFixTransform.transform(
+                    IBinder iBinder = CusHotTransform.transform(
                             true
                             , AnalysysService.class.getName()
                             , "onBind", intent);
@@ -52,7 +51,7 @@ public class AnalysysService extends Service {
             AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix) {
                 try {
-                    HotFixTransform.transform(
+                    CusHotTransform.transform(
                             true
                             , AnalysysService.class.getName()
                             , "onCreate");
@@ -78,7 +77,7 @@ public class AnalysysService extends Service {
             AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix) {
                 try {
-                    Integer o = HotFixTransform.transform(
+                    Integer o = CusHotTransform.transform(
                             true
                             , AnalysysService.class.getName()
                             , "onStartCommand", intent, flags, startId);
@@ -104,7 +103,7 @@ public class AnalysysService extends Service {
             AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix) {
                 try {
-                    HotFixTransform.transform(
+                    CusHotTransform.transform(
                             true
                             , AnalysysService.class.getName()
                             , "onDestroy");

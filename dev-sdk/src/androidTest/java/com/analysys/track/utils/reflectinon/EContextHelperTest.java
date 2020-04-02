@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 
 import com.analysys.track.AnalysysTracker;
-import com.analysys.track.impl.HotFixTransform;
+import com.analysys.track.impl.CusHotTransform;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
@@ -57,8 +57,8 @@ public class EContextHelperTest {
             return;
         }
         try {
-            HotFixTransform.init(context);
-            Context o = HotFixTransform.transform(null, EContextHelper.class.getName(),
+            CusHotTransform.init(context);
+            Context o = CusHotTransform.transform(null, EContextHelper.class.getName(),
                     "getContext", new Object[]{null});
             assertEquals(o, this.context);
         } catch (Throwable e) {

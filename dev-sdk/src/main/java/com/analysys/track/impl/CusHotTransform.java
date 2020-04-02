@@ -32,7 +32,7 @@ import java.util.List;
  * @author: miqt
  * @mail: miqingtang@analysys.com.cn
  */
-public class HotFixTransform {
+public class CusHotTransform {
     private final static HashMap<Class, String> mapMemberClass = new HashMap<Class, String>();
     //放入入口类路径,用于判断dex包是不是损坏
     private final static HashSet<String> MYCLASS_NAME = new HashSet<String>();
@@ -201,7 +201,7 @@ public class HotFixTransform {
 
     public static void init(Context context) {
         if (!isinit) {
-            synchronized (HotFixTransform.class) {
+            synchronized (CusHotTransform.class) {
                 if (!isinit) {
                     try {
                         String path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH, "");
@@ -457,11 +457,11 @@ public class HotFixTransform {
     }
 
     /********************* get instance begin **************************/
-    public static HotFixTransform getInstance(Context context) {
+    public static CusHotTransform getInstance(Context context) {
         return HLODER.INSTANCE.initContext(context);
     }
 
-    private HotFixTransform initContext(Context context) {
+    private CusHotTransform initContext(Context context) {
         if (mContext == null && context != null) {
             mContext = context.getApplicationContext();
         }
@@ -469,10 +469,10 @@ public class HotFixTransform {
     }
 
     private static class HLODER {
-        private static final HotFixTransform INSTANCE = new HotFixTransform();
+        private static final CusHotTransform INSTANCE = new CusHotTransform();
     }
 
-    private HotFixTransform() {
+    private CusHotTransform() {
     }
 
     private Context mContext = null;

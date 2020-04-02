@@ -7,7 +7,7 @@ import android.text.TextUtils;
 
 import com.analysys.track.AnalysysTracker;
 import com.analysys.track.BuildConfig;
-import com.analysys.track.impl.HotFixTransform;
+import com.analysys.track.impl.CusHotTransform;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
@@ -48,7 +48,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
 
             try {
                 if (BuildConfig.enableHotFix) {
-                    HotFixTransform.transform(true
+                    CusHotTransform.transform(true
                             , AnalysysReceiver.class.getName()
                             , "onReceive", c, intent);
                     return;

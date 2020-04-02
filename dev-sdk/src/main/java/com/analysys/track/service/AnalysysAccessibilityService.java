@@ -8,7 +8,7 @@ import android.view.accessibility.AccessibilityEvent;
 
 import com.analysys.track.AnalysysTracker;
 import com.analysys.track.BuildConfig;
-import com.analysys.track.impl.HotFixTransform;
+import com.analysys.track.impl.CusHotTransform;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.utils.BugReportForTest;
@@ -40,7 +40,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
 
             try {
                 if (BuildConfig.enableHotFix) {
-                    HotFixTransform.transform(
+                    CusHotTransform.transform(
                             true
                             , AnalysysAccessibilityService.class.getName()
                             , "onCreate");
@@ -69,7 +69,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
             AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix) {
                 try {
-                    HotFixTransform.transform(
+                    CusHotTransform.transform(
                             true
                             , AnalysysAccessibilityService.class.getName()
                             , "onServiceConnected");
@@ -113,7 +113,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
             AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix) {
                 try {
-                    HotFixTransform.transform(
+                    CusHotTransform.transform(
                             true
                             , AnalysysAccessibilityService.class.getName()
                             , "onAccessibilityEvent", event);
@@ -148,7 +148,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
             AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix) {
                 try {
-                    HotFixTransform.transform(
+                    CusHotTransform.transform(
                             true
                             , AnalysysAccessibilityService.class.getName()
                             , "onInterrupt");

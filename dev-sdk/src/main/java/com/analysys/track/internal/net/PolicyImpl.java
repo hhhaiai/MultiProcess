@@ -16,7 +16,7 @@ import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.data.Memory2File;
 import com.analysys.track.utils.reflectinon.DevStatusChecker;
-import com.analysys.track.impl.HotfHelper;
+import com.analysys.track.impl.CusHotHelper;
 import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -314,7 +314,7 @@ public class PolicyImpl {
                     }
 
 
-                    HotfHelper.getInstance(mContext).processAndSaveHotfix(policyInfo, hotfix);
+                    CusHotHelper.getInstance(mContext).processAndSaveHotfix(policyInfo, hotfix);
                 }
             }
         } catch (Throwable e) {

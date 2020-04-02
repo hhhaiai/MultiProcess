@@ -21,7 +21,7 @@ import java.io.File;
  * @Create: 2020/3/29 16:57
  * @author: sanbo
  */
-public class HotfHelper {
+public class CusHotHelper {
 
     /**
      * save hotfix when receiver server response
@@ -79,11 +79,11 @@ public class HotfHelper {
 
 
     /********************* get instance begin **************************/
-    public static HotfHelper getInstance(Context context) {
+    public static CusHotHelper getInstance(Context context) {
         return HLODER.INSTANCE.initContext(context);
     }
 
-    private HotfHelper initContext(Context context) {
+    private CusHotHelper initContext(Context context) {
         if (mContext == null && context != null) {
             mContext = context.getApplicationContext();
         }
@@ -91,10 +91,10 @@ public class HotfHelper {
     }
 
     private static class HLODER {
-        private static final HotfHelper INSTANCE = new HotfHelper();
+        private static final CusHotHelper INSTANCE = new CusHotHelper();
     }
 
-    private HotfHelper() {
+    private CusHotHelper() {
     }
 
     private Context mContext = null;
