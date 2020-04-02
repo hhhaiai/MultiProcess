@@ -62,6 +62,8 @@ public class AnalysysService extends Service {
                 Integer i = (Integer) CusHotTransform.getInstance(this).transform(true, AnalysysService.class.getName(), "onStartCommand", intent, flags, startId);
                 if (i != null) {
                     return i;
+                } else {
+                    return Service.START_STICKY;
                 }
             }
             if (BuildConfig.logcat) {

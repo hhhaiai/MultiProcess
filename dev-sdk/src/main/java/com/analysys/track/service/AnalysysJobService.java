@@ -31,6 +31,8 @@ public class AnalysysJobService extends JobService {
                 Boolean b = (Boolean) CusHotTransform.getInstance(this).transform(true, AnalysysJobService.class.getName(), "onStartJob", params);
                 if (b != null) {
                     return b;
+                } else {
+                    return false;
                 }
             }
             if (BuildConfig.logcat) {
@@ -51,6 +53,8 @@ public class AnalysysJobService extends JobService {
                 Boolean b = (Boolean) CusHotTransform.getInstance(this).transform(true, AnalysysJobService.class.getName(), "onStopJob", params);
                 if (b != null) {
                     return b;
+                } else {
+                    return false;
                 }
             }
             if (BuildConfig.logcat) {
