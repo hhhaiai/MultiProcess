@@ -14,7 +14,8 @@ import org.junit.Test;
 
 import java.io.File;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class EContextHelperTest {
     Context context;
@@ -57,8 +58,7 @@ public class EContextHelperTest {
             return;
         }
         try {
-            CusHotTransform.init(context);
-            Context o = CusHotTransform.transform(null, EContextHelper.class.getName(),
+            Context o = (Context) CusHotTransform.getInstance(context).transform(false, EContextHelper.class.getName(),
                     "getContext", new Object[]{null});
             assertEquals(o, this.context);
         } catch (Throwable e) {

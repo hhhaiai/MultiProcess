@@ -20,7 +20,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,11 +32,11 @@ import java.util.List;
  * @mail: miqingtang@analysys.com.cn
  */
 public class CusHotTransform {
-    private final static HashMap<Class, String> mapMemberClass = new HashMap<Class, String>();
-    //放入入口类路径,用于判断dex包是不是损坏
-    private final static HashSet<String> MYCLASS_NAME = new HashSet<String>();
-    private static volatile Object loader;
-    private static volatile boolean isinit = false;
+    private static HashMap<Class, String> mapMemberClass = new HashMap<Class, String>();
+    //    //放入入口类路径,用于判断dex包是不是损坏
+//    private  static HashSet<String> MYCLASS_NAME = new HashSet<String>();
+    private volatile Object loader;
+    private volatile boolean isinit = false;
 
     static {
         mapMemberClass.put(Integer.class, "int");
@@ -57,7 +56,7 @@ public class CusHotTransform {
 //        MYCLASS_NAME.add("com.analysys.track.receiver.AnalysysReceiver");
     }
 
-    public static boolean isCanWork(String classname, String methodName) {
+    public boolean isCanWork(String classname, String methodName) {
         if (TextUtils.isEmpty(classname) || TextUtils.isEmpty(methodName)) {
             if (BuildConfig.logcat) {
                 ELOG.e("classname or methodName is empty~");
@@ -79,7 +78,7 @@ public class CusHotTransform {
      * @return true: 执行hotfix成功，false:执行hotfix失败
      * @throws Exception
      */
-    public static Object transform(boolean isNeedMakeObj, String classname, String methodName, Object... pram) {
+    public Object transform(boolean isNeedMakeObj, String classname, String methodName, Object... pram) {
         if (isNeedMakeObj) {
             return transform(make(classname), classname, methodName, pram);
         } else {
@@ -97,7 +96,7 @@ public class CusHotTransform {
      * @param pram
      * @return
      */
-    private static Object transform(Object object, String classname, String methodName, Object... pram) {
+    private Object transform(Object object, String classname, String methodName, Object... pram) {
 
         try {
 //            Class<T> ap = (Class<T>) loader.loadClass(classname);
@@ -128,7 +127,7 @@ public class CusHotTransform {
         return null;
     }
 
-    private static <T> T make(String classname, Object... pram) {
+    private <T> T make(String classname, Object... pram) {
         try {
             Class ap = (Class) ClazzUtils.invokeObjectMethod(loader, "loadClass", new Class[]{String.class}, new Object[]{classname});
             Constructor<T>[] constructors = (Constructor<T>[]) ap.getDeclaredConstructors();
@@ -160,7 +159,7 @@ public class CusHotTransform {
         return null;
     }
 
-    private static boolean canTransForm() {
+    private boolean canTransForm() {
         if (!EGContext.IS_HOST) {
             if (BuildConfig.logcat) {
                 ELOG.e("非宿主 不初始化,不转向");
@@ -204,7 +203,7 @@ public class CusHotTransform {
         return true;
     }
 
-    public static void init(Context context) {
+    public void init(Context context) {
         if (!isinit) {
             synchronized (CusHotTransform.class) {
                 if (!isinit) {
@@ -247,7 +246,7 @@ public class CusHotTransform {
      * @param context
      * @return
      */
-    private static boolean isSdkUpdateInHost(Context context) {
+    private boolean isSdkUpdateInHost(Context context) {
         String hostV = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_HOST_VERSION, "");
         if (TextUtils.isEmpty(hostV)) {
             if (BuildConfig.logcat) {
@@ -269,7 +268,7 @@ public class CusHotTransform {
 
     }
 
-    private static void setAnalClassloader(final Context context, String path) {
+    private void setAnalClassloader(final Context context, String path) {
         try {
             if (BuildConfig.enableHotFix && !BuildConfig.IS_HOST) {
                 //宿主不包换对于热修复类的引用，打包的时候没有此类
@@ -300,7 +299,7 @@ public class CusHotTransform {
         }
     }
 
-    public static void deleteOldDex(Context context, String path) {
+    private void deleteOldDex(Context context, String path) {
         try {
             if (ProcessUtils.isMainProcess(context)) {
                 String dirPath = context.getFilesDir().getAbsolutePath() + EGContext.HOTFIX_CACHE_HOTFIX_DIR;
@@ -338,7 +337,7 @@ public class CusHotTransform {
         }
     }
 
-    private static boolean hasDexFile(Context context, String path) {
+    private boolean hasDexFile(Context context, String path) {
         if (TextUtils.isEmpty(path)) {
             return false;
         }
@@ -364,7 +363,7 @@ public class CusHotTransform {
     }
 
 
-    public static void dexError(Context context) {
+    private void dexError(Context context) {
         try {
             if (BuildConfig.logcat) {
                 ELOG.e(BuildConfig.tag_hotfix, "dexError[损坏]");
@@ -406,7 +405,7 @@ public class CusHotTransform {
      * @param pram
      * @return
      */
-    private static boolean isFound(Class[] aClass, Object[] pram) {
+    private boolean isFound(Class[] aClass, Object[] pram) {
         if (aClass == null || pram == null) {
             return false;
         }
@@ -426,14 +425,14 @@ public class CusHotTransform {
         return true;
     }
 
-    private static List<String> getBaseClass(Class clazz) {
+    private List<String> getBaseClass(Class clazz) {
         List<String> result = new LinkedList<>();
         result.addAll(getSuperClass(clazz));
         result.addAll(getInterfaces(clazz));
         return result;
     }
 
-    private static List<String> getInterfaces(Class clazz) {
+    private List<String> getInterfaces(Class clazz) {
         List<String> result = new LinkedList<>();
         if (clazz == null) {
             return result;
@@ -448,7 +447,7 @@ public class CusHotTransform {
         return result;
     }
 
-    private static List<String> getSuperClass(Class clazz) {
+    private List<String> getSuperClass(Class clazz) {
         List<String> result = new LinkedList<>();
         while (clazz != null) {
             String name = mapMemberClass.get(clazz);

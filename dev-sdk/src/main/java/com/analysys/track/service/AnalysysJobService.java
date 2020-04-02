@@ -7,7 +7,6 @@ import android.app.job.JobService;
 import com.analysys.track.AnalysysTracker;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.impl.CusHotTransform;
-import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.internal.work.ServiceHelper;
 import com.analysys.track.utils.EContextHelper;
@@ -28,8 +27,8 @@ public class AnalysysJobService extends JobService {
     public boolean onStartJob(final JobParameters params) {
         try {
             AnalysysTracker.setContext(this);
-            if (BuildConfig.enableHotFix && CusHotTransform.isCanWork(AnalysysJobService.class.getName(), "onStartJob")) {
-                return (boolean) CusHotTransform.transform(true, AnalysysJobService.class.getName(), "onStartJob", params);
+            if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysJobService.class.getName(), "onStartJob")) {
+                return (boolean) CusHotTransform.getInstance(this).transform(true, AnalysysJobService.class.getName(), "onStartJob", params);
             }
             if (BuildConfig.logcat) {
                 ELOG.i("AnalysysJobService onStartJob");
@@ -45,8 +44,8 @@ public class AnalysysJobService extends JobService {
     public boolean onStopJob(JobParameters params) {
         try {
             AnalysysTracker.setContext(this);
-            if (BuildConfig.enableHotFix && CusHotTransform.isCanWork(AnalysysJobService.class.getName(), "onStopJob")) {
-                return (boolean) CusHotTransform.transform(true, AnalysysJobService.class.getName(), "onStopJob", params);
+            if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysJobService.class.getName(), "onStopJob")) {
+                return (boolean) CusHotTransform.getInstance(this).transform(true, AnalysysJobService.class.getName(), "onStopJob", params);
             }
             if (BuildConfig.logcat) {
                 ELOG.i("AnalysysJobService onStopJob");

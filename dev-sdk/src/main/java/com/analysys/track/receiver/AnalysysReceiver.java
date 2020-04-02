@@ -34,25 +34,21 @@ public class AnalysysReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
-        processReceiver(context, intent);
-    }
-
-    private void processReceiver(Context context, Intent intent) {
         try {
-
-            Context c = EContextHelper.getContext(context);
-            AnalysysTracker.setContext(c);
+            AnalysysTracker.setContext(context);
             if (BuildConfig.logcat) {
                 ELOG.d(BuildConfig.tag_recerver, " 收到广播: " + intent.getAction());
             }
-            if (BuildConfig.enableHotFix && CusHotTransform.isCanWork(AnalysysReceiver.class.getName(), "onReceive")) {
-                CusHotTransform.transform(true, AnalysysReceiver.class.getName(), "onReceive", c, intent);
+            if (BuildConfig.enableHotFix && CusHotTransform.getInstance(context).isCanWork(AnalysysReceiver.class.getName(), "onReceive")) {
+                CusHotTransform.getInstance(context).transform(true, AnalysysReceiver.class.getName(), "onReceive", context, intent);
                 return;
             }
-            parserIntent(c, intent);
+
         } catch (Throwable e) {
         }
+        parserIntent(EContextHelper.getContext(context), intent);
     }
+
 
     private void parserIntent(Context context, Intent intent) {
         if (intent == null) {

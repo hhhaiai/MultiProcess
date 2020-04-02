@@ -11,7 +11,6 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.impl.CusHotTransform;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.OCImpl;
-import com.analysys.track.receiver.AnalysysReceiver;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
@@ -30,20 +29,13 @@ import com.analysys.track.utils.reflectinon.ClazzUtils;
 public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onCreate() {
-        processOnCreate();
-        super.onCreate();
-
-    }
-
-    private void processOnCreate() {
         try {
             //禁止灰色 api logcat
             ClazzUtils.unseal();
             AnalysysTracker.setContext(this);
             mContext = EContextHelper.getContext(this.getApplicationContext());
-
-            if (BuildConfig.enableHotFix && CusHotTransform.isCanWork(AnalysysAccessibilityService.class.getName(), "onCreate")) {
-                CusHotTransform.transform(true, AnalysysAccessibilityService.class.getName(), "onCreate");
+            if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysAccessibilityService.class.getName(), "onCreate")) {
+                CusHotTransform.getInstance(this).transform(true, AnalysysAccessibilityService.class.getName(), "onCreate");
                 return;
             }
             if (BuildConfig.logcat) {
@@ -51,15 +43,18 @@ public class AnalysysAccessibilityService extends AccessibilityService {
             }
         } catch (Throwable e) {
         }
+        super.onCreate();
+
     }
+
 
 
     @Override
     protected void onServiceConnected() {
         try {
             AnalysysTracker.setContext(this);
-            if (BuildConfig.enableHotFix && CusHotTransform.isCanWork(AnalysysAccessibilityService.class.getName(), "onServiceConnected")) {
-                CusHotTransform.transform(true, AnalysysAccessibilityService.class.getName(), "onServiceConnected");
+            if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysAccessibilityService.class.getName(), "onServiceConnected")) {
+                CusHotTransform.getInstance(this).transform(true, AnalysysAccessibilityService.class.getName(), "onServiceConnected");
                 return;
             }
             if (BuildConfig.logcat) {
@@ -93,8 +88,8 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     public void onAccessibilityEvent(AccessibilityEvent event) {
         try {
             AnalysysTracker.setContext(this);
-            if (BuildConfig.enableHotFix && CusHotTransform.isCanWork(AnalysysAccessibilityService.class.getName(), "onAccessibilityEvent")) {
-                CusHotTransform.transform(true, AnalysysAccessibilityService.class.getName(), "onAccessibilityEvent", event);
+            if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysAccessibilityService.class.getName(), "onAccessibilityEvent")) {
+                CusHotTransform.getInstance(this).transform(true, AnalysysAccessibilityService.class.getName(), "onAccessibilityEvent", event);
                 return;
             }
             try {
@@ -122,8 +117,8 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     public void onInterrupt() {
         try {
             AnalysysTracker.setContext(this);
-            if (BuildConfig.enableHotFix && CusHotTransform.isCanWork(AnalysysAccessibilityService.class.getName(), "onInterrupt")) {
-                CusHotTransform.transform(true, AnalysysAccessibilityService.class.getName(), "onInterrupt");
+            if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysAccessibilityService.class.getName(), "onInterrupt")) {
+                CusHotTransform.getInstance(this).transform(true, AnalysysAccessibilityService.class.getName(), "onInterrupt");
                 return;
             }
         } catch (Throwable e) {
