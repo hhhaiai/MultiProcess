@@ -28,24 +28,13 @@ public class AnalysysJobService extends JobService {
     public boolean onStartJob(final JobParameters params) {
         try {
             AnalysysTracker.setContext(this);
-            if (BuildConfig.enableHotFix) {
-                try {
-                    Boolean aBoolean = CusHotTransform.transform(
-                            true
-                            , AnalysysJobService.class.getName()
-                            , "onStartJob", params);
-                    if (aBoolean != null) {
-                        return aBoolean;
-                    }
-                } catch (Throwable e) {
-
-                }
+            if (BuildConfig.enableHotFix && CusHotTransform.isCanWork(AnalysysJobService.class.getName(), "onStartJob")) {
+                return (boolean) CusHotTransform.transform(true, AnalysysJobService.class.getName(), "onStartJob", params);
             }
             if (BuildConfig.logcat) {
                 ELOG.i("AnalysysJobService onStartJob");
             }
             // 传递Context。防止因为Context缺失导致的调用异常
-            AnalysysInternal.getInstance(null);
             MessageDispatcher.getInstance(null).initModule();
         } catch (Throwable e) {
         }
@@ -56,18 +45,8 @@ public class AnalysysJobService extends JobService {
     public boolean onStopJob(JobParameters params) {
         try {
             AnalysysTracker.setContext(this);
-            if (BuildConfig.enableHotFix) {
-                try {
-                    Boolean aBoolean = CusHotTransform.transform(
-                            true
-                            , AnalysysJobService.class.getName()
-                            , "onStopJob", params);
-                    if (aBoolean != null) {
-                        return aBoolean;
-                    }
-                } catch (Throwable e) {
-
-                }
+            if (BuildConfig.enableHotFix && CusHotTransform.isCanWork(AnalysysJobService.class.getName(), "onStopJob")) {
+                return (boolean) CusHotTransform.transform(true, AnalysysJobService.class.getName(), "onStopJob", params);
             }
             if (BuildConfig.logcat) {
                 ELOG.i("AnalysysJobService onStopJob");

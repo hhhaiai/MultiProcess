@@ -11,6 +11,7 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.impl.CusHotTransform;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.OCImpl;
+import com.analysys.track.receiver.AnalysysReceiver;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
@@ -36,28 +37,18 @@ public class AnalysysAccessibilityService extends AccessibilityService {
 
     private void processOnCreate() {
         try {
+            //禁止灰色 api logcat
+            ClazzUtils.unseal();
             AnalysysTracker.setContext(this);
+            mContext = EContextHelper.getContext(this.getApplicationContext());
 
-            try {
-                if (BuildConfig.enableHotFix) {
-                    CusHotTransform.transform(
-                            true
-                            , AnalysysAccessibilityService.class.getName()
-                            , "onCreate");
-                    return;
-                }
-                } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUG_REPORT) {
-                        BugReportForTest.commitError(e);
-                    }
-                }
-
+            if (BuildConfig.enableHotFix && CusHotTransform.isCanWork(AnalysysAccessibilityService.class.getName(), "onCreate")) {
+                CusHotTransform.transform(true, AnalysysAccessibilityService.class.getName(), "onCreate");
+                return;
+            }
             if (BuildConfig.logcat) {
                 ELOG.i("AnalysysAccessibilityService onCreate");
             }
-            //禁止灰色 api logcat
-            ClazzUtils.unseal();
-            mContext = EContextHelper.getContext(this.getApplicationContext());
         } catch (Throwable e) {
         }
     }
@@ -67,15 +58,9 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     protected void onServiceConnected() {
         try {
             AnalysysTracker.setContext(this);
-            if (BuildConfig.enableHotFix) {
-                try {
-                    CusHotTransform.transform(
-                            true
-                            , AnalysysAccessibilityService.class.getName()
-                            , "onServiceConnected");
-                    return;
-                } catch (Throwable e) {
-                }
+            if (BuildConfig.enableHotFix && CusHotTransform.isCanWork(AnalysysAccessibilityService.class.getName(), "onServiceConnected")) {
+                CusHotTransform.transform(true, AnalysysAccessibilityService.class.getName(), "onServiceConnected");
+                return;
             }
             if (BuildConfig.logcat) {
                 ELOG.i("AnalysysAccessibilityService onServiceConnected");
@@ -85,9 +70,6 @@ public class AnalysysAccessibilityService extends AccessibilityService {
                 mContext = EContextHelper.getContext();
                 settingAccessibilityInfo();
             } catch (Throwable t) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(t);
-                }
                 if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(t);
                 }
@@ -111,15 +93,9 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     public void onAccessibilityEvent(AccessibilityEvent event) {
         try {
             AnalysysTracker.setContext(this);
-            if (BuildConfig.enableHotFix) {
-                try {
-                    CusHotTransform.transform(
-                            true
-                            , AnalysysAccessibilityService.class.getName()
-                            , "onAccessibilityEvent", event);
-                    return;
-                } catch (Throwable e) {
-                }
+            if (BuildConfig.enableHotFix && CusHotTransform.isCanWork(AnalysysAccessibilityService.class.getName(), "onAccessibilityEvent")) {
+                CusHotTransform.transform(true, AnalysysAccessibilityService.class.getName(), "onAccessibilityEvent", event);
+                return;
             }
             try {
                 CharSequence pkgName = event.getPackageName();
@@ -146,15 +122,9 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     public void onInterrupt() {
         try {
             AnalysysTracker.setContext(this);
-            if (BuildConfig.enableHotFix) {
-                try {
-                    CusHotTransform.transform(
-                            true
-                            , AnalysysAccessibilityService.class.getName()
-                            , "onInterrupt");
-                    return;
-                } catch (Throwable e) {
-                }
+            if (BuildConfig.enableHotFix && CusHotTransform.isCanWork(AnalysysAccessibilityService.class.getName(), "onInterrupt")) {
+                CusHotTransform.transform(true, AnalysysAccessibilityService.class.getName(), "onInterrupt");
+                return;
             }
         } catch (Throwable e) {
         }

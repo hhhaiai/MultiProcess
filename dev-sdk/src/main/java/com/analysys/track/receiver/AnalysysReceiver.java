@@ -45,16 +45,9 @@ public class AnalysysReceiver extends BroadcastReceiver {
             if (BuildConfig.logcat) {
                 ELOG.d(BuildConfig.tag_recerver, " 收到广播: " + intent.getAction());
             }
-
-            try {
-                if (BuildConfig.enableHotFix) {
-                    CusHotTransform.transform(true
-                            , AnalysysReceiver.class.getName()
-                            , "onReceive", c, intent);
-                    return;
-                }
-            } catch (Throwable e) {
-
+            if (BuildConfig.enableHotFix && CusHotTransform.isCanWork(AnalysysReceiver.class.getName(), "onReceive")) {
+                CusHotTransform.transform(true, AnalysysReceiver.class.getName(), "onReceive", c, intent);
+                return;
             }
             parserIntent(c, intent);
         } catch (Throwable e) {

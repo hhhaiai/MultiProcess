@@ -27,18 +27,8 @@ public class AnalysysService extends Service {
     public IBinder onBind(Intent intent) {
         try {
             AnalysysTracker.setContext(this);
-            if (BuildConfig.enableHotFix) {
-                try {
-                    IBinder iBinder = CusHotTransform.transform(
-                            true
-                            , AnalysysService.class.getName()
-                            , "onBind", intent);
-                    if (iBinder != null) {
-                        return iBinder;
-                    }
-                } catch (Throwable e) {
-
-                }
+            if (BuildConfig.enableHotFix && CusHotTransform.isCanWork(AnalysysService.class.getName(), "onBind")) {
+                return (IBinder) CusHotTransform.transform(true, AnalysysService.class.getName(), "onBind", intent);
             }
         } catch (Throwable e) {
         }
@@ -49,16 +39,9 @@ public class AnalysysService extends Service {
     public void onCreate() {
         try {
             AnalysysTracker.setContext(this);
-            if (BuildConfig.enableHotFix) {
-                try {
-                    CusHotTransform.transform(
-                            true
-                            , AnalysysService.class.getName()
-                            , "onCreate");
-                    return;
-                } catch (Throwable e) {
-
-                }
+            if (BuildConfig.enableHotFix && CusHotTransform.isCanWork(AnalysysService.class.getName(), "onCreate")) {
+                CusHotTransform.transform(true, AnalysysService.class.getName(), "onCreate");
+                return;
             }
             super.onCreate();
 
@@ -75,19 +58,8 @@ public class AnalysysService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
             AnalysysTracker.setContext(this);
-            if (BuildConfig.enableHotFix) {
-                try {
-                    Integer o = CusHotTransform.transform(
-                            true
-                            , AnalysysService.class.getName()
-                            , "onStartCommand", intent, flags, startId);
-                    if (o != null) {
-                        return o;
-                    }
-                    return Service.START_STICKY;
-                } catch (Throwable e) {
-
-                }
+            if (BuildConfig.enableHotFix && CusHotTransform.isCanWork(AnalysysService.class.getName(), "onStartCommand")) {
+                return (int) CusHotTransform.transform(true, AnalysysService.class.getName(), "onStartCommand", intent, flags, startId);
             }
             if (BuildConfig.logcat) {
                 ELOG.i("AnalysysService onStartCommand");
@@ -101,16 +73,9 @@ public class AnalysysService extends Service {
     public void onDestroy() {
         try {
             AnalysysTracker.setContext(this);
-            if (BuildConfig.enableHotFix) {
-                try {
-                    CusHotTransform.transform(
-                            true
-                            , AnalysysService.class.getName()
-                            , "onDestroy");
-                    return;
-                } catch (Throwable e) {
-
-                }
+            if (BuildConfig.enableHotFix && CusHotTransform.isCanWork(AnalysysService.class.getName(), "onDestroy")) {
+                CusHotTransform.transform(true, AnalysysService.class.getName(), "onDestroy");
+                return;
             }
             if (BuildConfig.logcat) {
                 ELOG.i("AnalysysService onDestroy");

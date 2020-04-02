@@ -57,31 +57,36 @@ public class CusHotTransform {
 //        MYCLASS_NAME.add("com.analysys.track.receiver.AnalysysReceiver");
     }
 
+    public static boolean isCanWork(String classname, String methodName) {
+        if (TextUtils.isEmpty(classname) || TextUtils.isEmpty(methodName)) {
+            if (BuildConfig.logcat) {
+                ELOG.e("classname or methodName is empty~");
+            }
+            return false;
+        }
+        if (!canTransForm()) {
+            return false;
+        }
+        return true;
+    }
+
 
     /**
      * @param isNeedMakeObj
      * @param classname
      * @param methodName
      * @param pram
-     * @param <T>
-     * @return
+     * @return true: 执行hotfix成功，false:执行hotfix失败
      * @throws Exception
      */
-    public static <T> T transform(boolean isNeedMakeObj, String classname, String methodName, Object... pram) throws Exception {
-        canTransForm();
-        if (classname == null || methodName == null || classname.length() == 0 || methodName.length() == 0) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(new Exception(
-                        "[HotFixTransform transform error]" + classname + "," + methodName));
-            }
-            throw new Exception("classname or methodName is empty~");
-        }
+    public static Object transform(boolean isNeedMakeObj, String classname, String methodName, Object... pram) {
         if (isNeedMakeObj) {
             return transform(make(classname), classname, methodName, pram);
         } else {
             return transform(null, classname, methodName, pram);
         }
     }
+
 
     /**
      * 逻辑转发方法,由宿主转到热修复dex
@@ -90,19 +95,9 @@ public class CusHotTransform {
      * @param classname
      * @param methodName
      * @param pram
-     * @param <T>
      * @return
      */
-    private static <T> T transform(Object object, String classname, String methodName,
-                                   Object... pram) throws Exception {
-//        canTransForm();
-//        if (classname == null || methodName == null || classname.length() == 0 || methodName.length() == 0) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(new Exception(
-//                        "[HotFixTransform transform error]" + classname + "," + methodName));
-//            }
-//            return null;
-//        }
+    private static Object transform(Object object, String classname, String methodName, Object... pram) {
 
         try {
 //            Class<T> ap = (Class<T>) loader.loadClass(classname);
@@ -125,22 +120,16 @@ public class CusHotTransform {
                 ELOG.e(BuildConfig.tag_hotfix, "[" + classname + "." + methodName + "]" + "No function found corresponding to the parameter type");
             }
             method.setAccessible(true);
-            return (T) method.invoke(object, pram);
+            return method.invoke(object, pram);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
+            // 需要测试兼容性
+            dexError(EContextHelper.getContext());
         }
         return null;
     }
 
-    private static <T> T make(String classname, Object... pram) throws Exception {
-//        canTransForm();
-//        if (classname == null || classname.length() == 0) {
-//            return null;
-//        }
+    private static <T> T make(String classname, Object... pram) {
         try {
-//            Class<T> ap = (Class<T>) loader.loadClass(classname);
             Class ap = (Class) ClazzUtils.invokeObjectMethod(loader, "loadClass", new Class[]{String.class}, new Object[]{classname});
             Constructor<T>[] constructors = (Constructor<T>[]) ap.getDeclaredConstructors();
             Constructor<T> constructor = null;
@@ -171,16 +160,25 @@ public class CusHotTransform {
         return null;
     }
 
-    private static void canTransForm() throws Exception {
+    private static boolean canTransForm() {
         if (!EGContext.IS_HOST) {
-            throw new Exception("非宿主 不初始化,不转向");
+            if (BuildConfig.logcat) {
+                ELOG.e("非宿主 不初始化,不转向");
+            }
+            return false;
         }
         if (EGContext.DEX_ERROR) {
-            throw new Exception("dex损坏 不初始化,不转向");
+            if (BuildConfig.logcat) {
+                ELOG.e("文件d损坏 不初始化,不转向");
+            }
+            return false;
         }
         Context context = EContextHelper.getContext();
         if (context == null) {
-            throw new Exception("context == null 不初始化,不转向");
+            if (BuildConfig.logcat) {
+                ELOG.e("context is null. 不初始化,不转向");
+            }
+            return false;
         }
 
         if (!isinit) {
@@ -191,12 +189,19 @@ public class CusHotTransform {
         }
         boolean b = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
         if (!b) {
-            throw new Exception("未激活 不转向");
+            if (BuildConfig.logcat) {
+                ELOG.e("未激活 不转向");
+            }
+            return false;
         }
 
         if (loader == null) {
-            throw new Exception("类加载器不对 不转向");
+            if (BuildConfig.logcat) {
+                ELOG.e("类加载器不对 不转向");
+            }
+            return false;
         }
+        return true;
     }
 
     public static void init(Context context) {
