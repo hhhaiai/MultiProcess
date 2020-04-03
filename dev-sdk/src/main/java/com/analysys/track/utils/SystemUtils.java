@@ -366,32 +366,30 @@ public class SystemUtils {
         return getContentFromFile(new File(filePath.trim()));
     }
 
+//    public static String getContentFromFile(File f) {
+//        if (!f.exists()) {
+//            return "";
+//        }
+//        byte[] data = new byte[1024];
+//        InputStream is = null;
+//        try {
+//            is = new FileInputStream(f);
+//            is.read(data);
+//        } catch (Throwable e) {
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(e);
+//            }
+//        } finally {
+//            StreamerUtils.safeClose(is);
+//        }
+//
+//        return new String(data);
+//    }
+
     public static String getContentFromFile(File f) {
-        if (!f.exists() || !f.canRead()) {
+        if (!f.exists()) {
             return "";
         }
-
-        byte[] data = new byte[1024];
-        InputStream is = null;
-        try {
-            is = new FileInputStream(f);
-            is.read(data);
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        } finally {
-            StreamerUtils.safeClose(is);
-        }
-
-        return new String(data);
-    }
-
-    public static String getContentFromFile2(File f) {
-        if (!f.exists() || !f.canRead()) {
-            return "";
-        }
-
         BufferedReader reader = null;
         InputStreamReader isr = null;
         FileInputStream fis = null;
@@ -401,7 +399,7 @@ public class SystemUtils {
             reader = new BufferedReader(isr, 1000);
 
             StringBuffer sb = new StringBuffer();
-            String line;
+            String line = null;
             while ((line = reader.readLine()) != null) {
                 sb.append(line).append("\n");
             }

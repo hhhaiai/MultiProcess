@@ -268,7 +268,7 @@ public class DeviceImpl {
             BufferedReader reader = null;
             try {
                 File file = new File(new String(Base64.decode(FILE_LIST[i], Base64.DEFAULT)));
-                if (file.exists() && file.canRead()) {
+                if (file.exists()) {
                     reader = new BufferedReader(new FileReader(file));
                     String tempString = null;
                     while ((tempString = reader.readLine()) != null) {

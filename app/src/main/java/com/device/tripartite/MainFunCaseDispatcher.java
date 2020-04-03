@@ -3,6 +3,7 @@ package com.device.tripartite;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.net.ND;
 import com.analysys.track.internal.work.ISayHello;
@@ -14,6 +15,11 @@ import com.device.tripartite.cases.PubCases;
 import com.device.utils.EL;
 import com.device.utils.memot.M2Fmapping;
 
+import java.io.File;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,17 +101,21 @@ public class MainFunCaseDispatcher {
     private static void runCaseP8(final Context context) {
 //        NetImpl.getInstance(context).getNetInfo();
 
-        String ss = SystemUtils.getContentFromFile("/proc/net/tcp6");
-        EL.e("=====S: " + ss);
+//        String ss = SystemUtils.getContentFromFile("/proc/net/tcp6");
+//        EL.e("=====S: " + ss);
 
-
+        String result = SystemUtils.getContent("/proc/net/tcp6");
+        EL.e("=====result: " + result);
         for (int i = 0; i < 10000; i++) {
-            long t1 = System.currentTimeMillis();
-            NetImpl.getInstance(context).runShell("/proc/net/tcp6");
+//            long t1 = System.currentTimeMillis();
+//            NetImpl.getInstance(context).runShell("/proc/net/tcp6");
             long t2 = System.currentTimeMillis();
             ShellUtils.shell("cat /proc/net/tcp6");
             long t3 = System.currentTimeMillis();
-            EL.e("文件获取耗时:" + (t2 - t1) + " ----- shell耗时: " + (t3 - t2));
+            SystemUtils.getContent("/proc/net/tcp6");
+            long t4 = System.currentTimeMillis();
+//            EL.e("文件获取耗时:" + (t2 - t1) + " ----- shell耗时: " + (t3 - t2) + "----->" + (t4 - t3));
+            EL.e("shell耗时: " + (t3 - t2) + "----->" + (t4 - t3));
         }
 
     }
@@ -167,15 +177,42 @@ public class MainFunCaseDispatcher {
     }
 
     private static void runCaseP15(final Context context) {
+
+
+        for (int i = 0; i < 1000; i++) {
+            LocationImpl.getInstance(context).getLocationInfoInThread();
+        }
     }
 
     private static void runCaseP16(final Context context) {
+        String s = SystemUtils.getContentFromFile("/proc/net/tcp6");
+        EL.i("s:" + s);
     }
+
 
 
     private static void runCaseP17(final Context context) {
 
 
+        try {
+            FileChannel fc = new RandomAccessFile(new File("/proc/net/tcp6"), "r").getChannel();
+            EL.i("fc: " + fc.size());
+            long size = fc.size() - 10;
+
+            MappedByteBuffer mBuffer = fc.map(FileChannel.MapMode.READ_ONLY, 0, 1024);
+            if (mBuffer != null) {
+                mBuffer.position(0);
+            }
+            byte[] result = new byte[(int) size];
+            if (mBuffer.remaining() > 0) {
+                mBuffer.get(result, 0, mBuffer.remaining());
+            }
+            if (result.length > 0) {
+                EL.i(new String(result, "UTF-8"));
+            }
+        } catch (Throwable e) {
+            EL.i(e);
+        }
     }
 
     private static void runCaseP18(final Context context) {

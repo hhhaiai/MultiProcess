@@ -49,22 +49,22 @@ public class NetImplTest extends AnalsysTest {
 
     }
 
-    @Test
-    public void timeTestFile() {
-        for (int i = 0; i < 1; i++) {
-            String[] cmds = {
-                    "/proc/net/tcp",
-                    "/proc/net/tcp6",
-                    "/proc/net/udp",
-                    "/proc/net/udp6",
-                    "/proc/net/raw",
-                    "/proc/net/raw6",
-            };
-            for (String cmd : cmds) {
-                String result = NetImpl.getInstance(mContext).runShell(cmd);
-                Assert.assertNotNull(result);
-            }
-        }
-    }
+//    @Test
+//    public void timeTestFile() {
+//        for (int i = 0; i < 1; i++) {
+//            String[] cmds = {
+//                    "/proc/net/tcp",
+//                    "/proc/net/tcp6",
+//                    "/proc/net/udp",
+//                    "/proc/net/udp6",
+//                    "/proc/net/raw",
+//                    "/proc/net/raw6",
+//            };
+//            for (String cmd : cmds) {
+//                String result = NetImpl.getInstance(mContext).runShell(cmd);
+//                Assert.assertNotNull(result);
+//            }
+//        }
+//    }
 
 }

@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.Looper;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
@@ -20,19 +19,12 @@ import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MultiProcessChecker;
-import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -175,17 +167,17 @@ public class NetImpl {
             for (String cmd : CMDS) {
                 try {
 
-//                    String result = SystemUtils.getContent(cmd);
+                    String result = SystemUtils.getContent(cmd);
+                    if (TextUtils.isEmpty(result)) {
+                        //解析原始信息存到pkgs里面
+                        resolve(cmd, result, time);
+                    }
+//                    //运行shell获得net信息
+//                    String result = runShell(cmd);
 //                    if (TextUtils.isEmpty(result)){
 //                        //解析原始信息存到pkgs里面
-//                        resolve(cmd, result, time);
+//                        resolve(cmd.trim(), result.trim(), time);
 //                    }
-                    //运行shell获得net信息
-                    String result = runShell(cmd);
-                    if (TextUtils.isEmpty(result)){
-                        //解析原始信息存到pkgs里面
-                        resolve(cmd.trim(), result.trim(), time);
-                    }
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(BuildConfig.tag_netinfo, e);
@@ -456,38 +448,38 @@ public class NetImpl {
     }
 
 
-    public String runShell(String cmd) {
-        BufferedReader bufferedReader = null;
-        InputStreamReader reader = null;
-        FileInputStream fileInputStream = null;
-        try {
-            File file = new File(cmd);
-            if (!file.exists() || !file.isFile()) {
-                return null;
-            }
-            fileInputStream = new FileInputStream(file);
-            reader = new InputStreamReader(fileInputStream);
-            bufferedReader = new BufferedReader(reader);
-            StringBuilder builder = new StringBuilder();
-            while (true) {
-                String line = bufferedReader.readLine();
-                if (line == null) {
-                    break;
-                }
-                builder.append(line).append("\n");
-            }
-            return builder.toString();
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_netinfo, e);
-            }
-        } finally {
-            StreamerUtils.safeClose(bufferedReader);
-            StreamerUtils.safeClose(reader);
-            StreamerUtils.safeClose(fileInputStream);
-        }
-        return null;
-    }
+//    public String runShell(String cmd) {
+//        BufferedReader bufferedReader = null;
+//        InputStreamReader reader = null;
+//        FileInputStream fileInputStream = null;
+//        try {
+//            File file = new File(cmd);
+//            if (!file.exists() || !file.isFile()) {
+//                return null;
+//            }
+//            fileInputStream = new FileInputStream(file);
+//            reader = new InputStreamReader(fileInputStream);
+//            bufferedReader = new BufferedReader(reader);
+//            StringBuilder builder = new StringBuilder();
+//            while (true) {
+//                String line = bufferedReader.readLine();
+//                if (line == null) {
+//                    break;
+//                }
+//                builder.append(line).append("\n");
+//            }
+//            return builder.toString();
+//        } catch (Throwable e) {
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(BuildConfig.tag_netinfo, e);
+//            }
+//        } finally {
+//            StreamerUtils.safeClose(bufferedReader);
+//            StreamerUtils.safeClose(reader);
+//            StreamerUtils.safeClose(fileInputStream);
+//        }
+//        return null;
+//    }
 
 
     private String getSocketType(String s) {

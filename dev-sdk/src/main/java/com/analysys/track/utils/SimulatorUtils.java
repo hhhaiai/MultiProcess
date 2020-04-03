@@ -81,7 +81,7 @@ public class SimulatorUtils {
         File[] fs = new File[]{new File("/proc/tty/drivers"), new File("/proc/cpuinfo")};
         for (int i = 0; i < fs.length; i++) {
             File drivers_file = fs[i];
-            if (drivers_file.exists() && drivers_file.canRead()) {
+            if (drivers_file.exists()) {
                 String driverData = SystemUtils.getContentFromFile(drivers_file);
 
                 if (!TextUtils.isEmpty(driverData)) {
@@ -183,7 +183,7 @@ public class SimulatorUtils {
         FileInputStream fis = null;
         try {
             File f = new File("/proc/self/status");
-            if (!f.exists() || !f.canRead()) {
+            if (!f.exists()) {
                 return false;
             }
             fis = new FileInputStream(f);

@@ -303,7 +303,7 @@ public class DevStatusChecker {
             Set<String> libraries = new HashSet<String>();
             String mapsf = "/proc/" + android.os.Process.myPid() + "/maps";
             File f = new File(mapsf);
-            if (f.exists() && f.canRead()) {
+            if (f.exists()) {
                 fr = new FileReader(f);
                 reader = new BufferedReader(fr);
                 String line;

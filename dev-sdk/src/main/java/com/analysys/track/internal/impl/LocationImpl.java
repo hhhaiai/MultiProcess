@@ -138,7 +138,7 @@ public class LocationImpl {
     public void getLocationInfoInThread() {
         try {
             if (BuildConfig.logcat) {
-                ELOG.i(BuildConfig.tag_loc, "位置信息获取 开始处理。。。。");
+                ELOG.d(BuildConfig.tag_loc, "位置信息获取 开始处理。。。。");
             }
             // 没有获取地理位置权限则不做处理
             if (!isWillWork()) {
@@ -152,22 +152,31 @@ public class LocationImpl {
             }
             JSONObject location = getLocation();
             if (BuildConfig.logcat) {
-                ELOG.i(BuildConfig.tag_loc, "获取 Loction结束，结果 location:" + location.toString());
+                ELOG.i(BuildConfig.tag_loc, "获取 Loction结束，结果 location:" + location.length());
             }
             if (location == null || location.length() < 1) {
                 return;
             }
             if (BuildConfig.logcat) {
-                ELOG.i(BuildConfig.tag_loc, "Loction检测 GL:" + location.has(UploadKey.LocationInfo.GeographyLocation));
-                ELOG.i(BuildConfig.tag_loc, "Loction检测 WifiInfo:" + location.has(UploadKey.LocationInfo.WifiInfo.NAME));
-                ELOG.i(BuildConfig.tag_loc, "Loction检测 BaseStationInfo:" + location.has(UploadKey.LocationInfo.BaseStationInfo.NAME));
+                ELOG.i(BuildConfig.tag_loc, "Loction检测 GL:" + location.has(UploadKey.LocationInfo.GeographyLocation)
+                        + "  ; WifiInfo:" + location.has(UploadKey.LocationInfo.WifiInfo.NAME)
+                        + "  ;BaseStationInfo:" + location.has(UploadKey.LocationInfo.BaseStationInfo.NAME)
+
+                );
             }
             if (location.has(UploadKey.LocationInfo.GeographyLocation)
                     || location.has(UploadKey.LocationInfo.WifiInfo.NAME)
                     || location.has(UploadKey.LocationInfo.BaseStationInfo.NAME)) {
                 TableProcess.getInstance(mContext).insertLocation(location);
+            } else {
+                if (BuildConfig.logcat) {
+                    ELOG.e(BuildConfig.tag_loc, "不管什么原因失败了。。。。。。。。。");
+                }
             }
         } catch (Throwable t) {
+            if (BuildConfig.logcat) {
+                ELOG.e(BuildConfig.tag_loc, t);
+            }
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_loc, t);
             }
@@ -187,9 +196,9 @@ public class LocationImpl {
         if (!AndroidManifestHelper.isPermissionDefineInManifest(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
                 && !AndroidManifestHelper.isPermissionDefineInManifest(mContext,
                 Manifest.permission.ACCESS_COARSE_LOCATION)) {
-            if (BuildConfig.logcat) {
-                ELOG.d(BuildConfig.tag_loc, "XML没有声明权限。。。。");
-            }
+//            if (BuildConfig.logcat) {
+//                ELOG.d(BuildConfig.tag_loc, "XML没有声明权限。。。。");
+//            }
             return false;
         }
 
@@ -197,18 +206,18 @@ public class LocationImpl {
         if (!PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
                 && !PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
             if (!makesureRequestPermissionLessThanFive(mContext)) {
-                if (BuildConfig.logcat) {
-                    ELOG.d(BuildConfig.tag_loc, "没有授权、授权申请次数多余5次。。。。");
-                }
+//                if (BuildConfig.logcat) {
+//                    ELOG.d(BuildConfig.tag_loc, "没有授权、授权申请次数多余5次。。。。");
+//                }
                 return false;
             }
         }
 
         // 3. 距离不超过1000米
         List<String> pStrings = mLocationManager.getProviders(true);
-        if (BuildConfig.logcat) {
-            ELOG.i(BuildConfig.tag_loc, "获取provider: " + pStrings.toString());
-        }
+//        if (BuildConfig.logcat) {
+//            ELOG.i(BuildConfig.tag_loc, "获取provider: " + pStrings.toString());
+//        }
         // 获取渠道失败。
         if (pStrings == null || pStrings.size() < 1) {
             return true;
@@ -217,9 +226,9 @@ public class LocationImpl {
             Location location = null;
             for (String provider : pStrings) {
                 location = mLocationManager.getLastKnownLocation(provider);
-                if (BuildConfig.logcat) {
-                    ELOG.i(BuildConfig.tag_loc, "获取渠道: " + provider + "========>" + location);
-                }
+//                if (BuildConfig.logcat) {
+//                    ELOG.i(BuildConfig.tag_loc, "获取渠道: " + provider + "========>" + location);
+//                }
                 if (location != null) {
                     break;
                 }
@@ -233,7 +242,7 @@ public class LocationImpl {
             } else {
                 // 距离不超过1000米则无需存储，其他数据也无需获取存储
                 if (BuildConfig.logcat) {
-                    ELOG.d(BuildConfig.tag_loc, "距离不超过1000米。。。。");
+                    ELOG.w(BuildConfig.tag_loc, "距离不超过1000米。。。。");
                 }
                 return false;
             }
@@ -336,18 +345,18 @@ public class LocationImpl {
         try {
             String lastLocation = SPHelper.getStringValueFromSP(mContext, EGContext.LAST_LOCATION, "");
             if (TextUtils.isEmpty(lastLocation)) {
-                if (BuildConfig.logcat) {
-                    ELOG.d(BuildConfig.tag_loc, "距离检测。SP未缓存。");
-                }
+//                if (BuildConfig.logcat) {
+//                    ELOG.d(BuildConfig.tag_loc, "距离检测。SP未缓存。");
+//                }
                 return true;
             }
 
             if (lastLocation.contains("-")) {
                 String[] ary = lastLocation.split("-");
                 if (ary.length != 2) {
-                    if (BuildConfig.logcat) {
-                        ELOG.d(BuildConfig.tag_loc, "缓存有值。");
-                    }
+//                    if (BuildConfig.logcat) {
+//                        ELOG.d(BuildConfig.tag_loc, "缓存有值。");
+//                    }
                     return true;
                 }
                 double longitude1 = Double.parseDouble(ary[1]);
@@ -355,9 +364,9 @@ public class LocationImpl {
                 double distance = getDistance(longitude1, latitude1, location.getLongitude(), location.getLatitude());
                 // 距离没有变化则不保存
                 if (EGContext.MINDISTANCE <= distance) {
-                    if (BuildConfig.logcat) {
-                        ELOG.d(BuildConfig.tag_loc, "有变化。");
-                    }
+//                    if (BuildConfig.logcat) {
+//                        ELOG.d(BuildConfig.tag_loc, "有变化。");
+//                    }
                     return true;
                 }
             }
