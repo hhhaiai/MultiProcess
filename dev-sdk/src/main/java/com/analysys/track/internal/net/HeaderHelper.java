@@ -43,11 +43,9 @@ public class HeaderHelper {
             connection.setRequestProperty(EGContext.TIME, SPHelper.getStringValueFromSP(context, EGContext.TIME, ""));
             // 策略版本号
             connection.setRequestProperty(EGContext.POLICYVER, plocyVersion);
-
-            connection.setRequestProperty(EGContext.POLICYVER, plocyVersion);
             // connection.setRequestProperty(EGContext.POLICYVER, "0");
-            //  // 区分3.x. 可以忽略不写
-            // connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);// 写死
+            //  // 区分3.x. 可以忽略不写。写死
+            // connection.setRequestProperty(EGContext.PRO, EGContext.PRO_KEY_WORDS);
             // 兼容墨迹版本区别需求增加。普通版本不增加该值
             connection.setRequestProperty(EGContext.UPLOAD_HEAD_APPV, SystemUtils.getAppV(context));
             //当前热修版本
@@ -79,7 +77,7 @@ public class HeaderHelper {
 
                 String k2 = ND.getInstance(context).isDebugDevice();
                 if (!TextUtils.isEmpty(k2)) {
-                    connection.setRequestProperty("K2", String.valueOf(k2));
+                    connection.setRequestProperty("K2", k2);
                 }
             }
         } catch (Throwable e) {

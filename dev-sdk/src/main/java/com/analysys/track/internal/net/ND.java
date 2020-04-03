@@ -48,7 +48,7 @@ public class ND {
         boolean l2 = isUseProxy();
         boolean l3 = hasHookPackageName();
         boolean l4 = includeHookInMemory();
-        boolean l5 = isHookInStack2();
+        boolean l5 = isHookInStack();
         // line 2
         boolean m1 = isDebugRom();
         boolean m2 = isUSBDebug();
@@ -117,7 +117,8 @@ public class ND {
             f = ShellUtils.shell("getprop");
         }
         if (!TextUtils.isEmpty(f)) {
-            return isContainsArray(f, Arrays.asList("vbox86p", "vbox", "Genymotion", "eth0"));
+//            return isContainsArray(f, Arrays.asList("vbox86p", "vbox", "Genymotion", "eth0"));
+            return isContainsArray(f, Arrays.asList("vbox86p", "vbox", "Genymotion"));
         }
         return false;
     }
@@ -278,7 +279,7 @@ public class ND {
     public boolean isBuildBrandDebug() {
         try {
             String brand = ClazzUtils.getBuildStaticField("BRAND");
-            if (!TextUtils.isEmpty(brand) && "general".equals(brand)) {
+            if (!TextUtils.isEmpty(brand) && "general".equalsIgnoreCase(brand)) {
                 return true;
             }
         } catch (Throwable e) {
@@ -301,7 +302,7 @@ public class ND {
     public boolean isBuildDeviceDebug() {
         try {
             String device = ClazzUtils.getBuildStaticField("DEVICE");
-            if (!TextUtils.isEmpty(device) && "generic".equals(device)) {
+            if (!TextUtils.isEmpty(device) && "generic".equalsIgnoreCase(device)) {
                 return true;
             }
         } catch (Throwable e) {
@@ -312,7 +313,7 @@ public class ND {
     public boolean isBuildProductDebug() {
         try {
             String product = ClazzUtils.getBuildStaticField("PRODUCT");
-            if (!TextUtils.isEmpty(product) && "sdk".equals(product)) {
+            if (!TextUtils.isEmpty(product) && "sdk".equalsIgnoreCase(product)) {
                 return true;
             }
         } catch (Throwable e) {
@@ -415,7 +416,7 @@ public class ND {
     }
 
 
-    public boolean isHookInStack2() {
+    public boolean isHookInStack() {
         try {
             throw new Exception("eg");
         } catch (Exception e) {

@@ -25,9 +25,11 @@ import com.analysys.track.utils.sp.SPHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -385,7 +387,39 @@ public class SystemUtils {
         return new String(data);
     }
 
+    public static String getContentFromFile2(File f) {
+        if (!f.exists() || !f.canRead()) {
+            return "";
+        }
 
+        BufferedReader reader = null;
+        InputStreamReader isr = null;
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(f);
+            isr = new InputStreamReader(fis);
+            reader = new BufferedReader(isr, 1000);
+
+            StringBuffer sb = new StringBuffer();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+            if (sb.length() > 0) {
+                return sb.toString();
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
+        } finally {
+            StreamerUtils.safeClose(fis);
+            StreamerUtils.safeClose(isr);
+            StreamerUtils.safeClose(reader);
+        }
+
+        return "";
+    }
     /**
      * @param key     优先级 传入==>metaData==>XML
      * @param channel 多渠道打包==>代码==>XML

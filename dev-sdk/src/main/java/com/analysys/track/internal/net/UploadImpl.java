@@ -318,7 +318,7 @@ public class UploadImpl {
                 TableProcess.getInstance(mContext).deleteAll();
             }
             //组装net数据
-            if (EGContext.ENABLE_NET_INFO) {
+            if (BuildConfig.ENABLE_NETINFO) {
                 if (
 //                        USMImpl.isUSMAvailable(mContext) &&
                         SPHelper.getBooleanValueFromSP(mContext,

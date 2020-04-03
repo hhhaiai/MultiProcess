@@ -24,7 +24,6 @@ public class EGContext {
     public static final String LOGTAG_USER = "analysys";
     public static final String UPLOAD_HEAD_APPV = "appVer";
     public static final int FLAG_START_COUNT = 5;
-    public static final boolean ENABLE_NET_INFO = true;
     public static final String KEY_INIT_TYPE = "init_type";
     public static final String SP_INSTALL_TIME = "install_time";
     public static final String LOGTAG_INNER = "analysys";

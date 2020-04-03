@@ -3,7 +3,7 @@ package com.device.tripartite;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.analysys.track.internal.net.AnaCountImpl;
+import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.net.ND;
 import com.analysys.track.internal.work.ISayHello;
 import com.analysys.track.utils.PkgList;
@@ -56,13 +56,13 @@ public class MainFunCaseDispatcher {
     }
 
     private static void runCaseP6(final Context context) {
-        long t1 = System.currentTimeMillis();
-        String k1 = AnaCountImpl.getKx1(context);
-        long t2 = System.currentTimeMillis();
-        EL.i("k1 耗时[" + (t2 - t1) + "]    内容:" + k1);
-        String k2 = AnaCountImpl.getKx2(context);
-        long t3 = System.currentTimeMillis();
-        EL.i("k2 耗时[" + (t3 - t2) + "]  内容:" + k2);
+//        long t1 = System.currentTimeMillis();
+//        String k1 = AnaCountImpl.getKx1(context);
+//        long t2 = System.currentTimeMillis();
+//        EL.i("k1 耗时[" + (t2 - t1) + "]    内容:" + k1);
+//        String k2 = AnaCountImpl.getKx2(context);
+//        long t3 = System.currentTimeMillis();
+//        EL.i("k2 耗时[" + (t3 - t2) + "]  内容:" + k2);
     }
 
     private static void runCaseP7(final Context context) {
@@ -93,6 +93,20 @@ public class MainFunCaseDispatcher {
     }
 
     private static void runCaseP8(final Context context) {
+//        NetImpl.getInstance(context).getNetInfo();
+
+        String ss = SystemUtils.getContentFromFile("/proc/net/tcp6");
+        EL.e("=====S: " + ss);
+
+
+        for (int i = 0; i < 10000; i++) {
+            long t1 = System.currentTimeMillis();
+            NetImpl.getInstance(context).runShell("/proc/net/tcp6");
+            long t2 = System.currentTimeMillis();
+            ShellUtils.shell("cat /proc/net/tcp6");
+            long t3 = System.currentTimeMillis();
+            EL.e("文件获取耗时:" + (t2 - t1) + " ----- shell耗时: " + (t3 - t2));
+        }
 
     }
 

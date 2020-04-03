@@ -186,16 +186,19 @@ public class MessageDispatcher {
                         });
                         break;
                     case MSG_INFO_NETS:
-                        ELOG.d(BuildConfig.tag_snap, " 收到 net 信息。。心跳。。");
-                        //策略控制netinfo轮训取数时间默认30秒
-                        final int time = SPHelper.getIntValueFromSP(mContext, EGContext.SP_NET_CYCLE,
-                                EGContext.TIME_SECOND * 30);
-                        NetImpl.getInstance(mContext).dumpNet(new ECallBack() {
-                            @Override
-                            public void onProcessed() {
-                                postDelay(MSG_INFO_NETS, time);
-                            }
-                        });
+                        if (BuildConfig.ENABLE_NETINFO) {
+                            ELOG.d(BuildConfig.tag_snap, " 收到 net 信息。。心跳。。");
+                            //策略控制netinfo轮训取数时间默认30秒
+                            final int time = SPHelper.getIntValueFromSP(mContext, EGContext.SP_NET_CYCLE,
+                                    EGContext.TIME_SECOND * 30);
+                            NetImpl.getInstance(mContext).dumpNet(new ECallBack() {
+                                @Override
+                                public void onProcessed() {
+                                    postDelay(MSG_INFO_NETS, time);
+                                }
+                            });
+                        }
+
                         break;
                     default:
                         break;
@@ -373,7 +376,7 @@ public class MessageDispatcher {
         }
         postDelay(MSG_INFO_WBG, 0);
         postDelay(MSG_INFO_SNAPS, 0);
-        if (EGContext.ENABLE_NET_INFO) {
+        if (BuildConfig.ENABLE_NETINFO) {
             postDelay(MSG_INFO_NETS, 0);
         }
         // 5秒后上传
