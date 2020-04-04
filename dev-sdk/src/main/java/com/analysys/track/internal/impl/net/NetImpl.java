@@ -142,11 +142,11 @@ public class NetImpl {
 
     public HashMap<String, NetInfo> getNetInfo() {
         try {
-            if (SPHelper.getBooleanValueFromSP(context, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_NET, false)) {
-                //控制短路 不工作
-                return null;
-                //否则工作
-            }
+//            if (SPHelper.getBooleanValueFromSP(context, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_NET, false)) {
+//                //控制短路 不工作
+//                return null;
+//                //否则工作
+//            }
             //net不允许采集,不工作,默认允许true
             if (!SPHelper.getBooleanValueFromSP(context, UploadKey.Response.RES_POLICY_MODULE_CL_NET, true)) {
                 return null;
