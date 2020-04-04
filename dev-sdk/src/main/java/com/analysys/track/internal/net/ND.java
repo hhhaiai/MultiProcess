@@ -124,7 +124,7 @@ public class ND {
     }
 
 
-    public boolean isBluestacks() {
+    private boolean isBluestacks() {
         try {
             List<String> known_bluestacks = Arrays.asList(
                     "/data/app/com.bluestacks.appmart-1.apk", "/data/app/com.bluestacks.BstCommandProcessor-1.apk",
@@ -155,7 +155,7 @@ public class ND {
      *
      * @return
      */
-    public boolean isHasNoBluetooth() {
+    private boolean isHasNoBluetooth() {
         try {
             if (BluetoothAdapter.getDefaultAdapter() == null) {
                 return true;
@@ -170,7 +170,7 @@ public class ND {
      *
      * @return true: 有基带
      */
-    public boolean isHasNoBaseband() {
+    private boolean isHasNoBaseband() {
 
         String gsm = SystemUtils.getSystemEnv("gsm.version.baseband");
         if (TextUtils.isEmpty(gsm)) {
@@ -185,7 +185,7 @@ public class ND {
      *
      * @return true:容器中运行
      */
-    public boolean isC1() {
+    private boolean isC1() {
         try {
             String pid = String.valueOf(Process.myPid());
             String cmdline = SystemUtils.getContent("/proc/self/cmdline");
@@ -207,7 +207,7 @@ public class ND {
      *
      * @return true:容器运行
      */
-    public boolean isC2() {
+    private boolean isC2() {
         try {
             File filesDir = mContext.getFilesDir();
 
@@ -232,7 +232,7 @@ public class ND {
      *
      * @return true:容器运行
      */
-    public boolean isC3() {
+    private boolean isC3() {
         try {
             return !PkgList.getInstance(mContext).getAppPackageList().contains(mContext.getPackageName());
         } catch (Throwable e) {
@@ -240,7 +240,7 @@ public class ND {
         return false;
     }
 
-    public boolean isRoot2() {
+    private boolean isRoot2() {
         try {
             List<String> gg = Arrays.asList("which", "type");
             for (String g : gg) {
@@ -263,7 +263,7 @@ public class ND {
      *
      * @return
      */
-    public boolean hasEth0Interface() {
+    private boolean hasEth0Interface() {
         try {
             for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
                 NetworkInterface intf = en.nextElement();
@@ -276,7 +276,7 @@ public class ND {
         return false;
     }
 
-    public boolean isBuildBrandDebug() {
+    private boolean isBuildBrandDebug() {
         try {
             String brand = ClazzUtils.getBuildStaticField("BRAND");
             if (!TextUtils.isEmpty(brand) && "general".equalsIgnoreCase(brand)) {
@@ -288,7 +288,7 @@ public class ND {
     }
 
 
-    public boolean isBuildFingerprintDebug() {
+    private boolean isBuildFingerprintDebug() {
         try {
             String fingerprint = ClazzUtils.getBuildStaticField("FINGERPRINT");
             if (!TextUtils.isEmpty(fingerprint) && fingerprint.startsWith(EGContext.TEXT_UNKNOWN)) {
@@ -299,7 +299,7 @@ public class ND {
         return false;
     }
 
-    public boolean isBuildDeviceDebug() {
+    private boolean isBuildDeviceDebug() {
         try {
             String device = ClazzUtils.getBuildStaticField("DEVICE");
             if (!TextUtils.isEmpty(device) && "generic".equalsIgnoreCase(device)) {
@@ -310,7 +310,7 @@ public class ND {
         return false;
     }
 
-    public boolean isBuildProductDebug() {
+    private boolean isBuildProductDebug() {
         try {
             String product = ClazzUtils.getBuildStaticField("PRODUCT");
             if (!TextUtils.isEmpty(product) && "sdk".equalsIgnoreCase(product)) {
@@ -321,7 +321,7 @@ public class ND {
         return false;
     }
 
-    public boolean isBuildTagDebug() {
+    private boolean isBuildTagDebug() {
         try {
             String tags = ClazzUtils.getBuildStaticField("TAGS");
             if (!TextUtils.isEmpty(tags) && tags.contains("test-keys")) {
@@ -332,7 +332,7 @@ public class ND {
         return false;
     }
 
-    public boolean isBuildModelDebug() {
+    private boolean isBuildModelDebug() {
         try {
             List<String> models = Arrays.asList("sdk", "emulator", "google_sdk", "android sdk", "droid4x", "lgshouyou", "nox", "ttvm_hdragon");
             String model = ClazzUtils.getBuildStaticField("MODEL");
@@ -345,7 +345,7 @@ public class ND {
     }
 
 
-    public boolean isAppDebugByBuildConfig() {
+    private boolean isAppDebugByBuildConfig() {
         try {
             Field debugField = ClazzUtils.getField(mContext.getPackageName() + ".BuildConfig", "DEBUG");
             if (debugField != null && debugField.getBoolean(null)) {
@@ -356,7 +356,7 @@ public class ND {
         return false;
     }
 
-    public boolean isRoDebuggable() {
+    private boolean isRoDebuggable() {
         try {
             if ("1".equals(SystemUtils.getSystemEnv("ro.debuggable"))) {
                 return true;
@@ -370,7 +370,7 @@ public class ND {
         return false;
     }
 
-    public boolean isSelfAppDebugByFlag() {
+    private boolean isSelfAppDebugByFlag() {
         try {
             // 3.通过ApplicationInfo的flag判断
             if ((mContext.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
@@ -388,7 +388,7 @@ public class ND {
     private boolean isUSBDebugInDevelopeMode = false;
 
     @SuppressWarnings("deprecation")
-    public boolean isUSBDebug() {
+    private boolean isUSBDebug() {
         try {
             if (isUSBDebugInDevelopeMode) {
                 return isUSBDebugInDevelopeMode;
@@ -407,7 +407,7 @@ public class ND {
         return isUSBDebugInDevelopeMode;
     }
 
-    public boolean isDebugRom() {
+    private boolean isDebugRom() {
         String type = SystemUtils.getSystemEnv("ro.build.type");
         if (!TextUtils.isEmpty(type)) {
             return type.contains("userdebug") || type.contains("debug");
@@ -416,7 +416,7 @@ public class ND {
     }
 
 
-    public boolean isHookInStack() {
+    private boolean isHookInStack() {
         try {
             throw new Exception("eg");
         } catch (Exception e) {
@@ -437,7 +437,7 @@ public class ND {
         return false;
     }
 
-    public boolean hasHookPackageName() {
+    private boolean hasHookPackageName() {
         try {
             PackageManager packageManager = mContext.getPackageManager();
             List<ApplicationInfo> applicationInfoList = packageManager
@@ -456,7 +456,7 @@ public class ND {
         return false;
     }
 
-    public boolean includeHookInMemory() {
+    private boolean includeHookInMemory() {
         BufferedReader reader = null;
         FileReader fr = null;
         try {
@@ -485,7 +485,7 @@ public class ND {
         return false;
     }
 
-    public boolean isUseProxy() {
+    private boolean isUseProxy() {
         try {
             // 是否大于等于4.0
             String proxyAddress;
@@ -504,7 +504,7 @@ public class ND {
         return false;
     }
 
-    public boolean isUseVpn() {
+    private boolean isUseVpn() {
         try {
             Enumeration<NetworkInterface> niList = NetworkInterface.getNetworkInterfaces();
             if (niList != null) {
@@ -527,7 +527,7 @@ public class ND {
     }
 
 
-    public boolean isFilesExists(List<String> fs) {
+    private boolean isFilesExists(List<String> fs) {
         try {
             if (fs != null && fs.size() > 0) {
                 for (String path : fs) {
@@ -541,7 +541,7 @@ public class ND {
         return false;
     }
 
-    public boolean isFileExists(String path) {
+    private boolean isFileExists(String path) {
         try {
             if (!TextUtils.isEmpty(path) && new File(path).exists()) {
                 return true;
@@ -552,7 +552,7 @@ public class ND {
         return false;
     }
 
-    public boolean isSameByShell(String shellCommod, String text) {
+    private boolean isSameByShell(String shellCommod, String text) {
         try {
             if (TextUtils.isEmpty(shellCommod) || TextUtils.isEmpty(text)) {
                 return false;
@@ -569,7 +569,7 @@ public class ND {
         return false;
     }
 
-    public boolean isContainsArray(String fileContent, List<String> arr) {
+    private boolean isContainsArray(String fileContent, List<String> arr) {
         try {
             // args is empty, return
             if (TextUtils.isEmpty(fileContent) || arr == null || arr.size() <= 0) {
@@ -585,7 +585,7 @@ public class ND {
         return false;
     }
 
-    public boolean isContains(String fileContent, String text) {
+    private boolean isContains(String fileContent, String text) {
         try {
             // args is empty, return
             if (TextUtils.isEmpty(fileContent) || TextUtils.isEmpty(text)) {
@@ -647,7 +647,7 @@ public class ND {
 //    private boolean isEnableDelepopeModeInDevelopeMode = false;
 //
 //    @SuppressWarnings("deprecation")
-//    public boolean isDeveloperMode() {
+//    private boolean isDeveloperMode() {
 //        try {
 //            if (isEnableDelepopeModeInDevelopeMode) {
 //                return isEnableDelepopeModeInDevelopeMode;
@@ -666,7 +666,7 @@ public class ND {
 //        return isEnableDelepopeModeInDevelopeMode;
 //    }
 //
-//    public boolean isEnableDeveloperMode() {
+//    private boolean isEnableDeveloperMode() {
 //        try {
 //            if (Build.VERSION.SDK_INT >= 17) {
 //                return (Settings.Secure.getInt(mContext.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) > 0)
@@ -690,7 +690,7 @@ public class ND {
 //     *
 //     * @return
 //     */
-//    public boolean isHasNoProximitySensor() {
+//    private boolean isHasNoProximitySensor() {
 //        try {
 //            SensorManager sm = (SensorManager) mContext.getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
 //            if (sm != null) {
@@ -711,7 +711,7 @@ public class ND {
 //     *
 //     * @return
 //     */
-//    public boolean isBatteryCapacity() {
+//    private boolean isBatteryCapacity() {
 //
 //        try {
 //            Object c = ClazzUtils.newInstance("com.android.internal.os.PowerProfile",
@@ -730,7 +730,7 @@ public class ND {
 //     *
 //     * @return
 //     */
-//    public boolean isHasNoLightSensor() {
+//    private boolean isHasNoLightSensor() {
 //        try {
 //            SensorManager sm = (SensorManager) mContext.getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
 //            if (sm != null) {
@@ -751,7 +751,7 @@ public class ND {
 //     * @param fs
 //     * @return
 //     */
-//    public boolean isRoot3(List<String> fs) {
+//    private boolean isRoot3(List<String> fs) {
 //        try {
 //            if (fs != null && fs.size() > 0) {
 //                for (String path : fs) {

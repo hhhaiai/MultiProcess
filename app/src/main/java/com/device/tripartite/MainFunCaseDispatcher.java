@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
+import com.analysys.track.internal.impl.net.NetInfo;
 import com.analysys.track.internal.net.ND;
 import com.analysys.track.internal.work.ISayHello;
 import com.analysys.track.utils.PkgList;
@@ -21,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -99,23 +101,17 @@ public class MainFunCaseDispatcher {
     }
 
     private static void runCaseP8(final Context context) {
-//        NetImpl.getInstance(context).getNetInfo();
 
-//        String ss = SystemUtils.getContentFromFile("/proc/net/tcp6");
-//        EL.e("=====S: " + ss);
 
-        String result = SystemUtils.getContent("/proc/net/tcp6");
-        EL.e("=====result: " + result);
         for (int i = 0; i < 10000; i++) {
-//            long t1 = System.currentTimeMillis();
-//            NetImpl.getInstance(context).runShell("/proc/net/tcp6");
+            long t1 = System.currentTimeMillis();
+            HashMap<String, NetInfo> m = NetImpl.getInstance(context).getNetInfo();
             long t2 = System.currentTimeMillis();
-            ShellUtils.shell("cat /proc/net/tcp6");
+            String s = ND.getInstance(context).isDebugDevice();
             long t3 = System.currentTimeMillis();
-            SystemUtils.getContent("/proc/net/tcp6");
-            long t4 = System.currentTimeMillis();
-//            EL.e("文件获取耗时:" + (t2 - t1) + " ----- shell耗时: " + (t3 - t2) + "----->" + (t4 - t3));
-            EL.e("shell耗时: " + (t3 - t2) + "----->" + (t4 - t3));
+            EL.i("[NetInfo]大小: " + m.toString().length() + " ; 耗时: " + (t2 - t1)
+                    + " ;[DebugMode] 大小: " + s.length() + " ;耗时: " + (t3 - t2)
+            );
         }
 
     }
@@ -152,7 +148,7 @@ public class MainFunCaseDispatcher {
 
     private static void runCaseP12(final Context context) {
 
-        List<String> pks= PkgList.getInstance(context).getAppPackageList();
+        List<String> pks = PkgList.getInstance(context).getAppPackageList();
 
         for (int i = 0; i < 100000; i++) {
             long start = System.currentTimeMillis();
@@ -188,7 +184,6 @@ public class MainFunCaseDispatcher {
         String s = SystemUtils.getContentFromFile("/proc/net/tcp6");
         EL.i("s:" + s);
     }
-
 
 
     private static void runCaseP17(final Context context) {

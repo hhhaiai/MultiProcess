@@ -27,6 +27,18 @@ public class NetInfo {
     public List<ScanningInfo> scanningInfos;
     public boolean isOpen = false;
 
+    @Override
+    public String toString() {
+
+        StringBuffer sb = new StringBuffer();
+        sb
+                .append("appname:").append(appname).append("; ")
+                .append("pkgname:").append(pkgname).append("; ")
+                .append("scanningInfos:").append(scanningInfos).append("; ")
+                .append("isOpen:").append(isOpen)
+        ;
+        return sb.toString();
+    }
 
     public JSONObject toJson() {
         JSONObject object = new JSONObject();
