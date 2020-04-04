@@ -304,6 +304,8 @@ public class EGContext {
     public static String PATCH_VERSION = "_ptv";
     public static String PATCH_VERSION_POLICY = "pa_vp";
     public static final String PATCH_CACHE_DIR = FILE_DIR + ".patch/";
+    //更新文件夹名字.
+    public static final String PATCH_NET_CACHE_DIR = FILE_DIR + ".p/";
     //下发的patch是否在运行中
     public static boolean patch_runing = false;
 

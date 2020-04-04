@@ -173,8 +173,12 @@ public class PolicyImpl {
 
         File dir = new File(mContext.getFilesDir(), EGContext.PATCH_CACHE_DIR);
         if (!dir.exists()) {
+            dir = new File(mContext.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR);
             dir.mkdirs();
+        } else {
+            dir.renameTo(new File(mContext.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR));
         }
+
         // 保存文件到本地
         File file = new File(dir, "patch_" + version + ".jar");
 

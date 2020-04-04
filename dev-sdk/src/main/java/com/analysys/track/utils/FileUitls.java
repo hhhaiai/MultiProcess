@@ -194,6 +194,15 @@ public class FileUitls {
         return data;
     }
 
+    public void deleteFile(String path) {
+        try {
+            if (!TextUtils.isEmpty(path)) {
+                deleteFile(new File(mContext.getFilesDir(), path));
+            }
+        } catch (Throwable e) {
+        }
+    }
+
     public void deleteFile(File file) {
         try {
             if (file == null || !file.exists()) {
