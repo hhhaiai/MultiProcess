@@ -10,11 +10,14 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.DataLocalTempUtils;
 import com.analysys.track.utils.PkgList;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -42,6 +45,30 @@ public class DebugDev {
     private volatile boolean isDebugDevice = false;
 
     public boolean isDebugDevice() {
+
+        /**
+         * 1.如果有/data/local/tmp/kvs拦截，直接生效。
+         */
+        int ignoreeDebugTmp = DataLocalTempUtils.getInstance(mContext).getInt(EGContext.KVS_KEY_DEBUG, EGContext.DEBUG_VALUE);
+        if (ignoreeDebugTmp != EGContext.DEBUG_VALUE) {
+            return false;
+        }
+        /**
+         * 2.  若服务器有下发则以服务器下发为主
+         */
+        int igoneDebugSP = SPHelper.getIntValueFromSP(mContext, EGContext.KVS_KEY_DEBUG, EGContext.DEBUG_VALUE);
+        if (igoneDebugSP != EGContext.DEBUG_VALUE) {
+            return false;
+        }
+        /**
+         * 3. 编译控制是否启用严格模式
+         */
+        if (!BuildConfig.BUILD_USE_STRICTMODE) {
+            return false;
+        }
+        /**
+         * 4. 使用内存变量，避免多次检测
+         */
         if (isDebugDevice) {
             return true;
         }
