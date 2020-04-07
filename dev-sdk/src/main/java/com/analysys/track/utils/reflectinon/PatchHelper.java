@@ -352,8 +352,8 @@ public class PatchHelper {
                 }
                 // patch 按照预定参数，没找到类，可能是patch包有问题，删除策略号尝试重新下载
 //                SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
-
-                cleanPatchPolicy(context, "---------- loadStatic.---patchPolicyV: ", 901, 902);
+                // 加载失败，可能下发有问题，为避免出问题，暂停删除，特殊场景会死循环
+//                cleanPatchPolicy(context, "---------- loadStatic.---patchPolicyV: ", 901, 902);
             }
             EGContext.patch_runing = true;
         } catch (Throwable igone) {

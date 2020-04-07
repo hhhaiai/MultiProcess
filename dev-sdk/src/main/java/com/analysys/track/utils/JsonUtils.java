@@ -29,7 +29,7 @@ public class JsonUtils {
     public static void pushToJSON(Context mContext, JSONObject json, String key, Object value, boolean SPDefaultValue) {
         try {
             if (value != null
-                    && SPHelper.getBooleanValueFromSP(mContext, key, SPDefaultValue)
+//                    && SPHelper.getBooleanValueFromSP(mContext, key, SPDefaultValue)
                     && !TextUtils.isEmpty(value.toString())
                     && !EGContext.TEXT_UNKNOWN.equalsIgnoreCase(value.toString())) {
                 if (!json.has(key)) {

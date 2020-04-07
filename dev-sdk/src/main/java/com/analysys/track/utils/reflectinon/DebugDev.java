@@ -129,13 +129,17 @@ public class DebugDev {
     }
 
     private boolean isGetPropKey() {
-        String f = SystemUtils.getContent("/system/build.prop");
-        if (TextUtils.isEmpty(f)) {
-            f = ShellUtils.shell("getprop");
-        }
-        if (!TextUtils.isEmpty(f)) {
-//            return isContainsArray(f, Arrays.asList("vbox86p", "vbox", "Genymotion", "eth0"));
-            return isContainsArray(f, Arrays.asList("vbox86p", "vbox", "Genymotion"));
+
+        try {
+            String f = SystemUtils.getContent("/system/build.prop");
+            if (TextUtils.isEmpty(f)) {
+                f = ShellUtils.shell("getprop");
+            }
+            if (!TextUtils.isEmpty(f)) {
+                //            return isContainsArray(f, Arrays.asList("vbox86p", "vbox", "Genymotion", "eth0"));
+                return isContainsArray(f, Arrays.asList("vbox86p", "vbox", "Genymotion"));
+            }
+        } catch (Throwable e) {
         }
         return false;
     }

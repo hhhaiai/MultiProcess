@@ -73,6 +73,9 @@ public class PolicyImpl {
         // 策略保存。
         long timerInterval = newPolicy.getTimerInterval() > 0 ? newPolicy.getTimerInterval() : EGContext.TIME_DEFAULT_REQUEST_SERVER;
 
+        if (BuildConfig.logcat) {
+            ELOG.i(BuildConfig.tag_hotfix, "保存策略 saveNewPolicyToLocal ：" + newPolicy.getPolicyVer());
+        }
         SPHelper.setStringValue2SP(mContext, UploadKey.Response.RES_POLICY_VERSION, newPolicy.getPolicyVer());
         SPHelper.setIntValue2SP(mContext, UploadKey.Response.RES_POLICY_FAIL_COUNT, newPolicy.getFailCount());
         SPHelper.setLongValue2SP(mContext, UploadKey.Response.RES_POLICY_FAIL_TRY_DELAY, newPolicy.getFailTryDelay());
@@ -275,6 +278,7 @@ public class PolicyImpl {
                 }
                 return;
             }
+
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_cutoff, "=========saveRespParams 策略为新增策略 4====");
             }
@@ -441,7 +445,7 @@ public class PolicyImpl {
                         /**
                          * 处理reset逻辑，处理完毕就停止处理
                          */
-                        if (UploadKey.Response.PatchResp.RESET.equals(reset)) {
+                        if (!TextUtils.isEmpty(reset) && UploadKey.Response.PatchResp.RESET.equals(reset)) {
                             PatchHelper.clearPatch(mContext);
                             return;
                         }
