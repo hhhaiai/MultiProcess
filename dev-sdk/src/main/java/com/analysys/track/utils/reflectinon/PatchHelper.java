@@ -68,7 +68,6 @@ public class PatchHelper {
         });
     }
 
-
     public static void loads(final Context context) {
         try {
             isTryInit = true;
@@ -130,8 +129,8 @@ public class PatchHelper {
      */
     public static void clearPatch(final Context context) {
 
-        // 先不广播里处理，广播里信息，先空置
-        SystemUtils.notifyClearCache(context, EGContext.NotifyStatus.NOTIFY_DEBUG);
+//        // 先不广播里处理，广播里信息，先空置
+//        SystemUtils.notifyClearCache(context, EGContext.NotifyStatus.NOTIFY_DEBUG);
         EThreadPool.postDelayed(new Runnable() {
             @Override
             public void run() {

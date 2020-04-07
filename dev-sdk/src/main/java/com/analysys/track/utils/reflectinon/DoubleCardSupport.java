@@ -26,12 +26,6 @@ import java.util.List;
  */
 public class DoubleCardSupport {
 
-    /**
-     * 获取IMEIS 1) TelephonyManager.getDeviceId(int) API21就开始有api未公开。API23开始有。26版本废弃 2). getMeid 26 之后才有的功能 .
-     * 国产低版本手机这方法很早就提供了。。。 3). getImei 20版本已经包含，公开在26之后
-     *
-     * @param context
-     */
     public String getIMEIS(Context context) {
         List<String> imeis = new ArrayList<String>();
         try {

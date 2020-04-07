@@ -19,7 +19,6 @@ import com.analysys.track.utils.SystemUtils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.lang.reflect.Field;
 import java.net.NetworkInterface;
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,33 +45,25 @@ public class DebugDev {
         if (isDebugDevice) {
             return true;
         }
-        // line 1
         boolean l1 = isUseVpn();
         boolean l2 = isUseProxy();
-        // line 2
         boolean m1 = isDebugRom();
         boolean m2 = isUSBDebug();
-//        boolean m3 = isAppDebugByBuildConfig();
         boolean m4 = isRoDebuggable();
         boolean m5 = isSelfAppDebugByFlag();
-        // line 3
         boolean n1 = isBuildBrandDebug();
         boolean n2 = isBuildFingerprintDebug();
         boolean n3 = isBuildDeviceDebug();
         boolean n4 = isBuildProductDebug();
         boolean n5 = isBuildTagDebug();
-
-        // line 6
         boolean q1 = isFilesExists(rootFiles);
         boolean q2 = isRoot2();
         boolean q3 = isC1();
         boolean q4 = isC2();
         boolean q5 = isC3();
-        // line 7
         boolean r1 = isHasNoBaseband();
         boolean r2 = isHasNoBluetooth();
         boolean r3 = isBluestacks();
-//        boolean r4 = hasEth0Interface();
 
         isDebugDevice = l1 || l2
                 || m1 || m2 || m4 || m5

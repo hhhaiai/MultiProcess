@@ -682,27 +682,26 @@ public class SystemUtils {
         }
     }
 
-    /**
-     * nodify clear cache
-     *
-     * @param context
-     * @param type
-     */
-    public static void notifyClearCache(final Context context, final int type) {
-        runOnWorkThread(new Runnable() {
-            @Override
-            public void run() {
-                // make sure receiver msg , send 4 times
-                for (int i = 0; i < 4; i++) {
-                    Intent intent = new Intent(EGContext.ACTION_NOTIFY_CLEAR);
-                    intent.putExtra(EGContext.NOTIFY_PKG, context.getPackageName());
-                    intent.putExtra(EGContext.NOTIFY_TYPE, type);
-                    context.sendBroadcast(intent);
-                }
-            }
-        });
-
-    }
+//    /**
+//     * nodify clear cache
+//     *
+//     * @param context
+//     * @param type
+//     */
+//    public static void notifyClearCache(final Context context, final int type) {
+//        runOnWorkThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                // make sure receiver msg , send 4 times
+//                for (int i = 0; i < 4; i++) {
+//                    Intent intent = new Intent(EGContext.ACTION_NOTIFY_CLEAR);
+//                    intent.putExtra(EGContext.NOTIFY_PKG, context.getPackageName());
+//                    intent.putExtra(EGContext.NOTIFY_TYPE, type);
+//                    context.sendBroadcast(intent);
+//                }
+//            }
+//        });
+//    }
 
     /**
      * 设备序列号,SerialNumber
