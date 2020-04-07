@@ -26,7 +26,7 @@ def isNativeDebug = false
 // use https request
 def isUseHttps = true
 // use netinfo module
-def isUseNetInfo = true
+def isUseNetInfo = false
 //********************子项目控制，只有在isReleases=false时才生效*********************
 // 宿主包类型，不需要修改，自动根据子版本强约束。
 // 宿主包(jar):true , 热修复包(dex):false
