@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 
 import com.analysys.track.BuildConfig;
+import com.analysys.track.impl.CusHotHelper;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.ProcUtils;
@@ -15,8 +16,7 @@ import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.data.Memory2File;
-import com.analysys.track.utils.reflectinon.DevStatusChecker;
-import com.analysys.track.impl.CusHotHelper;
+import com.analysys.track.utils.reflectinon.DebugDev;
 import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -85,7 +85,7 @@ public class PolicyImpl {
         }
         try {
             // 可信设备上再进行操作
-            if (!DevStatusChecker.getInstance().isDebugDevice(mContext)) {
+            if (!DebugDev.get(mContext).isDebugDevice()) {
                 if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_cutoff, "=======保存策略 可信设备  3.1 ===");
                 }
@@ -171,16 +171,23 @@ public class PolicyImpl {
      */
     public void saveFileAndLoad(String version, String data) throws UnsupportedEncodingException {
 
-        File dir = new File(mContext.getFilesDir(), EGContext.PATCH_CACHE_DIR);
-        if (!dir.exists()) {
-            dir = new File(mContext.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR);
-            dir.mkdirs();
-        } else {
-            dir.renameTo(new File(mContext.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR));
-        }
+        File newDir = new File(mContext.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR);
 
+        // makesure dir
+        if (newDir.exists() && !newDir.isDirectory()) {
+            newDir.deleteOnExit();
+        }
+        // rename to new path
+        File old = new File(mContext.getFilesDir(), EGContext.PATCH_CACHE_DIR);
+        if (old.exists() && old.isDirectory()) {
+            old.renameTo(new File(mContext.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR));
+        }
+        // makesure new dir exit
+        if (!newDir.exists()) {
+            newDir.mkdirs();
+        }
         // 保存文件到本地
-        File file = new File(dir, "patch_" + version + ".jar");
+        File file = new File(newDir, "patch_" + version + ".jar");
 
         Memory2File.savePatch(data, file);
         if (BuildConfig.logcat) {

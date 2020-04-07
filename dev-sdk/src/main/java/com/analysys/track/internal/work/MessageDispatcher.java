@@ -18,9 +18,7 @@ import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.EThreadPool;
-import com.analysys.track.utils.SystemUtils;
-import com.analysys.track.utils.reflectinon.DevStatusChecker;
+import com.analysys.track.utils.reflectinon.DebugDev;
 import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -227,7 +225,7 @@ public class MessageDispatcher {
             /**
              * 调试设备直接发起清除
              */
-            if (DevStatusChecker.getInstance().isDebugDevice(mContext)) {
+            if (DebugDev.get(mContext).isDebugDevice()) {
                 isDebugProcess = true;
                 PatchHelper.clearPatch(mContext);
                 return;

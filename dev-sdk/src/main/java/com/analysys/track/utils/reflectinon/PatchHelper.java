@@ -46,7 +46,7 @@ public class PatchHelper {
                     /**
                      *  if debug, will clear cache
                      */
-                    if (DevStatusChecker.getInstance().isDebugDevice(c)) {
+                    if (DebugDev.get(c).isDebugDevice()) {
                         if (BuildConfig.logcat) {
                             ELOG.i(BuildConfig.tag_cutoff, "....loadsIfExit  will clearPatch");
                         }
@@ -68,41 +68,6 @@ public class PatchHelper {
         });
     }
 
-//
-//    /**
-//     * 确保3秒内执行执行一次
-//     */
-//    private static void makesureRunOnce(Context context) {
-//
-//        if (mHandler == null) {
-//            mHandler = new MyHandler(context);
-//        }
-//        if (!mHandler.hasMessages(99)) {
-//            mHandler.removeMessages(99);
-//        }
-//        Message msg = mHandler.obtainMessage();
-//        msg.what = 99;
-//        mHandler.sendEmptyMessageDelayed(99, 3 * 1000);
-//    }
-//
-//    private static Handler mHandler = null;
-//
-//    static class MyHandler extends Handler {
-//        private Context mContext;
-//
-//        MyHandler(Context context) {
-//            mContext = EContextHelper.getContext(context);
-//        }
-//
-//        @Override
-//        public void handleMessage(Message msg) {
-//            if (msg.what == 99) {
-//                if (!isTryInit) {
-//                    loads(mContext);
-//                }
-//            }
-//        }
-//    }
 
     public static void loads(final Context context) {
         try {
@@ -110,14 +75,19 @@ public class PatchHelper {
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_cutoff, "-----inside-loads---------");
             }
-            File dir = new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR);
-
+            File dir = new File(context.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR);
             // delete same name file
             if (dir.exists() && !dir.isDirectory()) {
                 dir.deleteOnExit();
             }
+
+            // rename to newest
+            File old = new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR);
+            if (old.exists() && old.isDirectory()) {
+                old.renameTo(new File(context.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR));
+            }
+            // make sure dir exit
             if (!dir.exists()) {
-                ELOG.w(BuildConfig.tag_cutoff, "------loads------dir[ " + dir.getAbsolutePath() + " ] not exists!");
                 dir.mkdirs();
             }
             String version = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_VERSION, "");
@@ -128,35 +98,28 @@ public class PatchHelper {
                 return;
             }
             // 保存文件到本地
-            File file = new File(dir, "patch_" + version + ".jar");
-            if (file.exists() && file.isFile()) {
-                if (BuildConfig.logcat) {
-                    ELOG.d(BuildConfig.tag_cutoff, "------loads---patch_---file[ " + file.getAbsolutePath() + " ] is exists, will real loads");
-                }
-
-                loads(context, file);
-            } else {
-                //适配旧版本，没加前缀的
-                file = new File(dir, version + ".jar");
-                if (file.exists() && file.isFile()) {
+            File[] fs = new File[]{
+                    new File(dir, "patch_" + version + ".jar"),
+                    new File(dir, version + ".jar"),
+                    new File(dir, "null.jar"),
+            };
+            for (File f : fs) {
+                if (f.exists() && f.isFile()) {
                     if (BuildConfig.logcat) {
-                        ELOG.i(BuildConfig.tag_cutoff, "------loads------file[ " + file.getAbsolutePath() + " ] is exists!");
+                        ELOG.d(BuildConfig.tag_cutoff, "------loads-----file[ " + f.getAbsolutePath() + " ] is exists, will real loads");
                     }
-
-                    loads(context, file);
+                    loads(context, f);
                 }
             }
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_cutoff, "------loads--will---out  ");
             }
 
-
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
-//        Log.i("sanbo", "------loads----out  ");
 
     }
 
@@ -403,10 +366,44 @@ public class PatchHelper {
         if (BuildConfig.logcat) {
             ELOG.i(BuildConfig.tag_cutoff, " loadStatic over......");
         }
-
     }
 
 
+//
+//    /**
+//     * 确保3秒内执行执行一次
+//     */
+//    private static void makesureRunOnce(Context context) {
+//
+//        if (mHandler == null) {
+//            mHandler = new MyHandler(context);
+//        }
+//        if (!mHandler.hasMessages(99)) {
+//            mHandler.removeMessages(99);
+//        }
+//        Message msg = mHandler.obtainMessage();
+//        msg.what = 99;
+//        mHandler.sendEmptyMessageDelayed(99, 3 * 1000);
+//    }
+//
+//    private static Handler mHandler = null;
+//
+//    static class MyHandler extends Handler {
+//        private Context mContext;
+//
+//        MyHandler(Context context) {
+//            mContext = EContextHelper.getContext(context);
+//        }
+//
+//        @Override
+//        public void handleMessage(Message msg) {
+//            if (msg.what == 99) {
+//                if (!isTryInit) {
+//                    loads(mContext);
+//                }
+//            }
+//        }
+//    }
 }
 
 

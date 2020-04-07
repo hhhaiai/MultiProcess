@@ -5,11 +5,10 @@ import android.content.Context;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.data.Md5Utils;
-import com.analysys.track.utils.reflectinon.DevStatusChecker;
+import com.analysys.track.utils.reflectinon.DebugDev;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
@@ -78,7 +77,7 @@ public class DeflterCompressUtils {
         // app自身的debug模式
 //        sb.append(DevStatusChecker.getInstance().isSelfDebugApp(ctx) ? "1" : "0");// 是否debug模式，0/1值
         // 是否debug模式，0/1值
-        sb.append(DevStatusChecker.getInstance().isSelfDebugApp(ctx) ? "1" : "0");
+        sb.append(DebugDev.get(ctx).isSelfAppDebugByFlag() ? "1" : "0");
         sb.append(key);// 前三位
         long time = System.currentTimeMillis();
         SPHelper.setStringValue2SP(ctx, EGContext.TIME, String.valueOf(time));

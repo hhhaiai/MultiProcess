@@ -6,11 +6,11 @@ import android.text.TextUtils;
 import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.net.NetInfo;
-import com.analysys.track.internal.net.ND;
 import com.analysys.track.internal.work.ISayHello;
 import com.analysys.track.utils.PkgList;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.reflectinon.DebugDev;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.device.tripartite.cases.PubCases;
 import com.device.utils.EL;
@@ -18,7 +18,6 @@ import com.device.utils.memot.M2Fmapping;
 
 import java.io.File;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -107,11 +106,11 @@ public class MainFunCaseDispatcher {
             long t1 = System.currentTimeMillis();
             HashMap<String, NetInfo> m = NetImpl.getInstance(context).getNetInfo();
             long t2 = System.currentTimeMillis();
-            String s = ND.getInstance(context).isDebugDevice();
-            long t3 = System.currentTimeMillis();
-            EL.i("[NetInfo]大小: " + m.toString().length() + " ; 耗时: " + (t2 - t1)
-                    + " ;[DebugMode] 大小: " + s.length() + " ;耗时: " + (t3 - t2)
-            );
+//            boolean s = DebugDevice.getInstance(context).isDebugDevice();
+//            long t3 = System.currentTimeMillis();
+//            EL.i("[NetInfo]大小: " + m.toString().length() + " ; 耗时: " + (t2 - t1)
+//                    + " ;[DebugMode] 大小: " + s.length() + " ;耗时: " + (t3 - t2)
+//            );
         }
 
     }
@@ -168,13 +167,15 @@ public class MainFunCaseDispatcher {
 
     private static void runCaseP14(final Context context) {
 
-        String result = ND.getInstance(context).isDebugDevice();
-        EL.i("result:" + result);
+        for (int i = 0; i < 10000000; i++) {
+            long start = System.currentTimeMillis();
+            boolean result = DebugDev.get(context).isDebugDevice();
+            long end = System.currentTimeMillis();
+            EL.i("result:" + result + "---------" + (end - start));
+        }
     }
 
     private static void runCaseP15(final Context context) {
-
-
         for (int i = 0; i < 1000; i++) {
             LocationImpl.getInstance(context).getLocationInfoInThread();
         }

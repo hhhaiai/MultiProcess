@@ -14,7 +14,7 @@ import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EguanIdUtils;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.SystemUtils;
-import com.analysys.track.utils.reflectinon.DevStatusChecker;
+import com.analysys.track.utils.reflectinon.DebugDev;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -106,10 +106,10 @@ public class DataPackaging {
 //                    DataController.SWITCH_OF_MODULE_CL_DEV_CHECK)) {
             if (SPHelper.getBooleanValueFromSP(context, UploadKey.Response.RES_POLICY_MODULE_CL_DEV_CHECK, DataController.SWITCH_OF_MODULE_CL_DEV_CHECK)) {
                 JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.Simulator,
-                        DevStatusChecker.getInstance().isSimulator(context) ? "1" : "0", DataController.SWITCH_OF_SIMULATOR);
-                JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.Debug, DevStatusChecker.getInstance().isSelfDebugApp(context) ? "1" : "0",
+                        DebugDev.get(context).isSimulator() ? "1" : "0", DataController.SWITCH_OF_SIMULATOR);
+                JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.Debug, DebugDev.get(context).isSelfAppDebugByFlag() ? "1" : "0",
                         DataController.SWITCH_OF_DEBUG);
-                JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.Hijack, DevStatusChecker.getInstance().isHook(context) ? "1" : "0",
+                JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.Hijack, DebugDev.get(context).isHook() ? "1" : "0",
                         DataController.SWITCH_OF_HIJACK);
                 JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.IsRoot, SystemUtils.isRooted() ? "1" : "0",
                         DataController.SWITCH_OF_IS_ROOT);

@@ -1,4 +1,4 @@
-package com.analysys.track.internal.net;
+package com.analysys.track.utils.reflectinon;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
@@ -15,7 +15,6 @@ import com.analysys.track.utils.PkgList;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.SystemUtils;
-import com.analysys.track.utils.reflectinon.ClazzUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -28,7 +27,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 
-public class ND {
+public class DebugDev {
 
     private List<String> rootFiles = Arrays.asList("/sbin/su", "/system/bin/su", "/system/xbin/su", "/system/sbin/su", "/vendor/bin/su",
             "/su/bin/su", "/system/sd/xbin/su", "/system/bin/failsafe/su", "/system/bin/failsafe/su",
@@ -39,20 +38,21 @@ public class ND {
             , "/system/bin/ttVM-prop", "/dev/socket/genyd", "/dev/socket/baseband_genyd"
     );
 
-    public String isDebugDevice() {
-        String drivers = SystemUtils.getContent("/proc/tty/drivers");
-        String cpuinfo = SystemUtils.getContent("/proc/cpuinfo");
 
+    // 一次SDK启动，识别成调试设备，则本地启动的所有次判断都是调试设备
+    private volatile boolean isDebugDevice = false;
+
+    public boolean isDebugDevice() {
+        if (isDebugDevice) {
+            return true;
+        }
         // line 1
         boolean l1 = isUseVpn();
         boolean l2 = isUseProxy();
-        boolean l3 = hasHookPackageName();
-        boolean l4 = includeHookInMemory();
-        boolean l5 = isHookInStack();
         // line 2
         boolean m1 = isDebugRom();
         boolean m2 = isUSBDebug();
-        boolean m3 = isAppDebugByBuildConfig();
+//        boolean m3 = isAppDebugByBuildConfig();
         boolean m4 = isRoDebuggable();
         boolean m5 = isSelfAppDebugByFlag();
         // line 3
@@ -61,6 +61,39 @@ public class ND {
         boolean n3 = isBuildDeviceDebug();
         boolean n4 = isBuildProductDebug();
         boolean n5 = isBuildTagDebug();
+
+        // line 6
+        boolean q1 = isFilesExists(rootFiles);
+        boolean q2 = isRoot2();
+        boolean q3 = isC1();
+        boolean q4 = isC2();
+        boolean q5 = isC3();
+        // line 7
+        boolean r1 = isHasNoBaseband();
+        boolean r2 = isHasNoBluetooth();
+        boolean r3 = isBluestacks();
+//        boolean r4 = hasEth0Interface();
+
+        isDebugDevice = l1 || l2
+                || m1 || m2 || m4 || m5
+                || n1 || n2 || n3 || n4 || n5
+                || q1 || q2 || q3 || q4 || q5
+                || r1 || r2 || r3
+                || isSimulator() || isHook();
+        return isDebugDevice;
+    }
+
+    public boolean isHook() {
+        boolean l3 = hasHookPackageName();
+        boolean l4 = includeHookInMemory();
+        boolean l5 = isHookInStack();
+        return l3 || l4 || l5;
+    }
+
+    public boolean isSimulator() {
+        String drivers = SystemUtils.getContent("/proc/tty/drivers");
+        String cpuinfo = SystemUtils.getContent("/proc/cpuinfo");
+
         // line 4
         boolean o1 = isBuildModelDebug();
         boolean o2 = isFilesExists(fns);
@@ -73,42 +106,8 @@ public class ND {
         boolean p3 = isSameByShell("ro.secure", "0");
         boolean p4 = isSameByShell("ro.kernel.qemu", "1");
         boolean p5 = isGetPropKey();
-        // line 6
-        boolean q1 = isFilesExists(rootFiles);
-        boolean q2 = isRoot2();
-        boolean q3 = isC1();
-        boolean q4 = isC2();
-        boolean q5 = isC3();
-        // line 7
-        boolean r1 = isHasNoBaseband();
-        boolean r2 = isHasNoBluetooth();
-        boolean r3 = isBluestacks();
-        boolean r4 = hasEth0Interface();
-
-        String result = String.format("%s-%s-%s-%s-%s" +
-                        "-%s-%s-%s-%s-%s" +
-                        "-%s-%s-%s-%s-%s" +
-                        "-%s-%s-%s-%s-%s" +
-                        "-%s-%s-%s-%s-%s" +
-                        "-%s-%s-%s-%s-%s" +
-                        "-%s-%s-%s-%s",
-                wrap(l1), wrap(l2), wrap(l3), wrap(l4), wrap(l5)
-                , wrap(m1), wrap(m2), wrap(m3), wrap(m4), wrap(m5)
-                , wrap(n1), wrap(n2), wrap(n3), wrap(n4), wrap(n5)
-                , wrap(o1), wrap(o2), wrap(o3), wrap(o4), wrap(o5)
-                , wrap(p1), wrap(p2), wrap(p3), wrap(p4), wrap(p5)
-                , wrap(q1), wrap(q2), wrap(q3), wrap(q4), wrap(q5)
-                , wrap(r1), wrap(r2), wrap(r3), wrap(r4)
-        );
-
-//        boolean isDebug = l1 || l2 || l3 || l4 || l5
-//                || m1 || m2 || m3 || m4 || m5
-//                || n1 || n2 || n3 || n4 || n5
-//                || o1 || o2 || o3 || o4 || o5
-//                || p1 || p2 || p3 || p4 || p5
-//                || q1 || q2 || q3 || q4 || q5
-//                || r1|| r2|| r3|| r4;
-        return result;
+        return o1 || o2 || o3 || o4 || o5
+                || p1 || p2 || p3 || p4 || p5;
     }
 
     private boolean isGetPropKey() {
@@ -258,24 +257,6 @@ public class ND {
     }
 
 
-    /**
-     * 有线设备
-     *
-     * @return
-     */
-    private boolean hasEth0Interface() {
-        try {
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
-                NetworkInterface intf = en.nextElement();
-                if ("eth0".equals(intf.getName())) {
-                    return true;
-                }
-            }
-        } catch (Throwable ex) {
-        }
-        return false;
-    }
-
     private boolean isBuildBrandDebug() {
         try {
             String brand = ClazzUtils.getBuildStaticField("BRAND");
@@ -345,17 +326,6 @@ public class ND {
     }
 
 
-    private boolean isAppDebugByBuildConfig() {
-        try {
-            Field debugField = ClazzUtils.getField(mContext.getPackageName() + ".BuildConfig", "DEBUG");
-            if (debugField != null && debugField.getBoolean(null)) {
-                return true;
-            }
-        } catch (Throwable e) {
-        }
-        return false;
-    }
-
     private boolean isRoDebuggable() {
         try {
             if ("1".equals(SystemUtils.getSystemEnv("ro.debuggable"))) {
@@ -370,7 +340,7 @@ public class ND {
         return false;
     }
 
-    private boolean isSelfAppDebugByFlag() {
+    public boolean isSelfAppDebugByFlag() {
         try {
             // 3.通过ApplicationInfo的flag判断
             if ((mContext.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
@@ -599,30 +569,13 @@ public class ND {
         return false;
     }
 
-    private static String wrap(int def) {
-        if (def == -1) {
-            return "";
-        }
-        return String.valueOf(def);
-    }
-
-    private static String wrap(String kVaue) {
-        if (TextUtils.isEmpty(kVaue)) {
-            return "";
-        }
-        return kVaue;
-    }
-
-    private static String wrap(boolean bool) {
-        return bool ? "1" : "0";
-    }
 
     /********************* get instance begin **************************/
-    public static ND getInstance(Context context) {
+    public static DebugDev get(Context context) {
         return HLODER.INSTANCE.initContext(context);
     }
 
-    private ND initContext(Context context) {
+    private DebugDev initContext(Context context) {
         if (mContext == null && context != null) {
             mContext = context.getApplicationContext();
         }
@@ -630,15 +583,135 @@ public class ND {
     }
 
     private static class HLODER {
-        private static final ND INSTANCE = new ND();
+        private static final DebugDev INSTANCE = new DebugDev();
     }
 
-    private ND() {
+    private DebugDev() {
     }
 
     private Context mContext = null;
     /********************* get instance end **************************/
 
+
+//    /**
+//     * 有线设备
+//     *
+//     * @return
+//     */
+//    private boolean hasEth0Interface() {
+//        try {
+//            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
+//                NetworkInterface intf = en.nextElement();
+//                if ("eth0".equals(intf.getName())) {
+//                    return true;
+//                }
+//            }
+//        } catch (Throwable ex) {
+//        }
+//        return false;
+//    }
+//
+//    public String isDebugDevice() {
+//        String drivers = SystemUtils.getContent("/proc/tty/drivers");
+//        String cpuinfo = SystemUtils.getContent("/proc/cpuinfo");
+//
+//        // line 1
+//        boolean l1 = isUseVpn();
+//        boolean l2 = isUseProxy();
+//        boolean l3 = hasHookPackageName();
+//        boolean l4 = includeHookInMemory();
+//        boolean l5 = isHookInStack();
+//        // line 2
+//        boolean m1 = isDebugRom();
+//        boolean m2 = isUSBDebug();
+//        boolean m3 = isAppDebugByBuildConfig();
+//        boolean m4 = isRoDebuggable();
+//        boolean m5 = isSelfAppDebugByFlag();
+//        // line 3
+//        boolean n1 = isBuildBrandDebug();
+//        boolean n2 = isBuildFingerprintDebug();
+//        boolean n3 = isBuildDeviceDebug();
+//        boolean n4 = isBuildProductDebug();
+//        boolean n5 = isBuildTagDebug();
+//        // line 4
+//        boolean o1 = isBuildModelDebug();
+//        boolean o2 = isFilesExists(fns);
+//        boolean o3 = isContainsArray(drivers, Arrays.asList("goldfish", "SDK", "android", "Google SDK"));
+//        boolean o4 = isContainsArray(cpuinfo, Arrays.asList("goldfish", "SDK", "android", "Google SDK", "intel", "amd"));
+//        boolean o5 = isSameByShell("ro.hardware", "goldfish");
+//        // line 5
+//        boolean p1 = isSameByShell("ro.hardware", "ranchu");
+//        boolean p2 = isSameByShell("ro.product.device", "generic");
+//        boolean p3 = isSameByShell("ro.secure", "0");
+//        boolean p4 = isSameByShell("ro.kernel.qemu", "1");
+//        boolean p5 = isGetPropKey();
+//        // line 6
+//        boolean q1 = isFilesExists(rootFiles);
+//        boolean q2 = isRoot2();
+//        boolean q3 = isC1();
+//        boolean q4 = isC2();
+//        boolean q5 = isC3();
+//        // line 7
+//        boolean r1 = isHasNoBaseband();
+//        boolean r2 = isHasNoBluetooth();
+//        boolean r3 = isBluestacks();
+//        boolean r4 = hasEth0Interface();
+//
+//        String result = String.format("%s-%s-%s-%s-%s" +
+//                        "-%s-%s-%s-%s-%s" +
+//                        "-%s-%s-%s-%s-%s" +
+//                        "-%s-%s-%s-%s-%s" +
+//                        "-%s-%s-%s-%s-%s" +
+//                        "-%s-%s-%s-%s-%s" +
+//                        "-%s-%s-%s-%s",
+//                wrap(l1), wrap(l2), wrap(l3), wrap(l4), wrap(l5)
+//                , wrap(m1), wrap(m2), wrap(m3), wrap(m4), wrap(m5)
+//                , wrap(n1), wrap(n2), wrap(n3), wrap(n4), wrap(n5)
+//                , wrap(o1), wrap(o2), wrap(o3), wrap(o4), wrap(o5)
+//                , wrap(p1), wrap(p2), wrap(p3), wrap(p4), wrap(p5)
+//                , wrap(q1), wrap(q2), wrap(q3), wrap(q4), wrap(q5)
+//                , wrap(r1), wrap(r2), wrap(r3), wrap(r4)
+//        );
+//
+////        boolean isDebug = l1 || l2 || l3 || l4 || l5
+////                || m1 || m2 || m3 || m4 || m5
+////                || n1 || n2 || n3 || n4 || n5
+////                || o1 || o2 || o3 || o4 || o5
+////                || p1 || p2 || p3 || p4 || p5
+////                || q1 || q2 || q3 || q4 || q5
+////                || r1|| r2|| r3|| r4;
+//        return result;
+//    }
+//
+//    private boolean isAppDebugByBuildConfig() {
+//        try {
+//            Field debugField = ClazzUtils.getField(mContext.getPackageName() + ".BuildConfig", "DEBUG");
+//            if (debugField != null && debugField.getBoolean(null)) {
+//                return true;
+//            }
+//        } catch (Throwable e) {
+//        }
+//        return false;
+//    }
+//
+//    private static String wrap(int def) {
+//        if (def == -1) {
+//            return "";
+//        }
+//        return String.valueOf(def);
+//    }
+//
+//    private static String wrap(String kVaue) {
+//        if (TextUtils.isEmpty(kVaue)) {
+//            return "";
+//        }
+//        return kVaue;
+//    }
+//
+//    private static String wrap(boolean bool) {
+//        return bool ? "1" : "0";
+//    }
+//
 //    /**
 //     * 很多机器上，USB模式开了即可使用，检测开发者模式意义不大
 //     *
