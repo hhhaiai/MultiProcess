@@ -19,9 +19,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author: sanbo
  */
 public class PkgList {
-    //若不考虑内存占用，可使用CopyOnWriteArrayList(线程安全)
-//    private static List<String> apps = new CopyOnWriteArrayList<String>();
-    private List<String> apps = null;
 
     public synchronized List<String> getAppPackageList() {
 
@@ -93,6 +90,17 @@ public class PkgList {
         }
     }
 
+    public void add(String pkgName) {
+        if (!TextUtils.isEmpty(pkgName) && !apps.contains(pkgName)) {
+            apps.add(pkgName);
+        }
+    }
+
+    public void del(String pkgName) {
+        if (apps.contains(pkgName)) {
+            apps.remove(pkgName);
+        }
+    }
     /********************* get instance begin **************************/
     public static PkgList getInstance(Context context) {
         return HLODER.INSTANCE.initContext(context);
@@ -114,4 +122,7 @@ public class PkgList {
 
     private Context mContext = null;
     /********************* get instance end **************************/
+    //若不考虑内存占用，可使用CopyOnWriteArrayList(线程安全)
+//    private static List<String> apps = new CopyOnWriteArrayList<String>();
+    private List<String> apps = null;
 }

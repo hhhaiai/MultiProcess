@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.os.Build;
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.SystemUtils;
 
@@ -40,17 +42,28 @@ public class ReceiverImpl {
         long currentTime = System.currentTimeMillis();
 
         if (Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction())) {
-            String packageName = getPkgName(intent);
+            final String packageName = getPkgName(intent);
             if (TextUtils.isEmpty(packageName)) {
                 return;
             }
 
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST,
                     EGContext.TIME_SECOND * 2, currentTime)) {
-                AppSnapshotImpl.getInstance(context)
-                        .processAppModifyMsg(packageName,
-                                Integer.parseInt(EGContext.SNAP_SHOT_INSTALL),
-                                EGContext.FILES_SYNC_SNAP_ADD_BROADCAST);
+//                AppSnapshotImpl.getInstance(context)
+//                        .processAppModifyMsg(packageName,
+//                                Integer.parseInt(EGContext.SNAP_SHOT_INSTALL),
+//                                EGContext.FILES_SYNC_SNAP_ADD_BROADCAST);
+
+                if (BuildConfig.logcat) {
+                    ELOG.d(BuildConfig.tag_snap, " 处理广播接收到的信息 包:" + packageName + "----type: " + EGContext.SNAP_SHOT_INSTALL);
+                }
+                // 数据库操作修改包名和类型
+                SystemUtils.runOnWorkThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        AppSnapshotImpl.getInstance(context).realProcessInThread(EGContext.SNAP_SHOT_INSTALL, packageName, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST);
+                    }
+                });
 
             } else {
 //                if (BuildConfig.logcat) {
@@ -61,17 +74,29 @@ public class ReceiverImpl {
 
 
         } else if (Intent.ACTION_PACKAGE_REMOVED.equals(intent.getAction())) {
-            String packageName = getPkgName(intent);
+            final String packageName = getPkgName(intent);
 
             if (TextUtils.isEmpty(packageName)) {
                 return;
             }
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST,
                     EGContext.TIME_SECOND * 2, currentTime)) {
-                AppSnapshotImpl.getInstance(context)
-                        .processAppModifyMsg(packageName,
-                                Integer.parseInt(EGContext.SNAP_SHOT_UNINSTALL),
-                                EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST);
+//                AppSnapshotImpl.getInstance(context)
+//                        .processAppModifyMsg(packageName,
+//                                Integer.parseInt(EGContext.SNAP_SHOT_UNINSTALL),
+//                                EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST);
+                if (BuildConfig.logcat) {
+                    ELOG.d(BuildConfig.tag_snap, " 处理广播接收到的信息 包:" + packageName + "----type: " + EGContext.SNAP_SHOT_INSTALL);
+                }
+                // 数据库操作修改包名和类型
+                SystemUtils.runOnWorkThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        AppSnapshotImpl.getInstance(context).realProcessInThread(EGContext.SNAP_SHOT_UNINSTALL,
+                                packageName, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST);
+                    }
+                });
+
             } else {
 //                if (BuildConfig.logcat) {
 //                    ELOG.v(BuildConfig.tag_snap, "卸载app:" + packageName + "---->多进程中断");
@@ -80,17 +105,29 @@ public class ReceiverImpl {
             }
 
         } else if (Intent.ACTION_MY_PACKAGE_REPLACED.equals(intent.getAction())) {
-            String packageName = getPkgName(intent);
+            final String packageName = getPkgName(intent);
 
             if (TextUtils.isEmpty(packageName)) {
                 return;
             }
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST,
                     EGContext.TIME_SECOND * 2, currentTime)) {
-                AppSnapshotImpl.getInstance(context)
-                        .processAppModifyMsg(packageName,
-                                Integer.parseInt(EGContext.SNAP_SHOT_UPDATE),
-                                EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST);
+//                AppSnapshotImpl.getInstance(context)
+//                        .processAppModifyMsg(packageName,
+//                                Integer.parseInt(EGContext.SNAP_SHOT_UPDATE),
+//                                EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST);
+
+                if (BuildConfig.logcat) {
+                    ELOG.d(BuildConfig.tag_snap, " 处理广播接收到的信息 包:" + packageName + "----type: " + EGContext.SNAP_SHOT_INSTALL);
+                }
+                // 数据库操作修改包名和类型
+                SystemUtils.runOnWorkThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        AppSnapshotImpl.getInstance(context).realProcessInThread(EGContext.SNAP_SHOT_UPDATE,
+                                packageName, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST);
+                    }
+                });
             } else {
 //                if (BuildConfig.logcat) {
 //                    ELOG.v(BuildConfig.tag_snap, "更新app:" + packageName + "---->多进程中断");

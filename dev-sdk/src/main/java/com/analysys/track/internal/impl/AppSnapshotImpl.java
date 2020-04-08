@@ -114,16 +114,6 @@ public class AppSnapshotImpl {
             }
         }
     }
-//    // 获取下次应该工作的时间
-//    public long getDurTime() {
-//        // 获取时间间隔
-//        long durByPolicy = SPHelper.getIntValueFromSP(mContext, EGContext.SP_SNAPSHOT_CYCLE, EGContext.TIME_HOUR * 3);
-//        // 获取上次运行时间
-//        long time = SPHelper.getLongValueFromSP(mContext, EGContext.SP_APP_SNAP, 0);
-//        // 获取上次运行到现在的时间间隔
-//        long dur = System.currentTimeMillis() - time;
-//        return durByPolicy - dur;
-//    }
 
     public void getSnapShotInfo() {
         try {
@@ -134,42 +124,31 @@ public class AppSnapshotImpl {
             }
 
             if (memoryData.size() < 1) {
-                if (BuildConfig.logcat) {
-                    ELOG.i(BuildConfig.tag_snap, " 获取安装列表失败。。 ");
-                }
                 return;
             }
 
             // 2. 获取DB数据
             JSONArray dbData = TableProcess.getInstance(mContext).selectSnapshot(EGContext.LEN_MAX_UPDATE_SIZE);
-            if (dbData.length() < 5) {
-                //DB没存数据,存入. 兼容场景首次、不允许采集->允许采集
-                TableProcess.getInstance(mContext).insertSnapshot(memoryData);
-            } else {
-                // 双列表对比，处理
-                checkDiff(dbData, memoryData);
-            }
-            memoryData.clear();
-            dbData = null;
-            memoryData = null;
+//            if (dbData.length() < 5) {
+//                //DB没存数据,存入. 兼容场景首次、不允许采集->允许采集
+//                TableProcess.getInstance(mContext).insertSnapshot(memoryData);
+//            } else {
+//                // 双列表对比，处理
+//                checkDiff(dbData, memoryData);
+//            }
+            // 双列表对比，处理
+            checkDiff(dbData, memoryData);
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_snap, t);
             }
         }
     }
-
-    //    private final String SHELL_PM_LIST_PACKAGES = "pm list packages";// all
-//    private final String APP_LIST_SYSTEM = "pm list packages -s";// system
-//    // private final String APP_LIST_USER = "pm list packages -3";// third party
-//    // 获取系统应用列表
-//    private final Set<String> mSystemAppSet = new HashSet<String>();
-    //    private boolean isSnapShotBlockRunning = false;
-    private Context mContext;
-
-    public static AppSnapshotImpl getInstance(Context context) {
-        return Holder.INSTANCE.initContext(context);
+    public void resetDB() {
+        TableProcess.getInstance(mContext).deleteAllSnapshot();
+        getSnapShotInfo();
     }
+
 
     /**
      * 内存列表和数据库安装列表对比
@@ -193,7 +172,6 @@ public class AppSnapshotImpl {
          *  UploadKey.AppSnapshotInfo.ActionHappenTime
          *
          */
-
         // 1. dbData生成MAP
         Map<String, JSONObject> dbMap = new HashMap<String, JSONObject>();
         //先单节点遍历生成，内存map
@@ -300,6 +278,206 @@ public class AppSnapshotImpl {
 
     }
 
+
+    public String getAppType(String pkg) {
+        return isSystemApps(pkg) ? UploadKey.OCInfo.APPLICATIONTYPE_SYSTEM_APP : UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP;
+    }
+
+    /**
+     * 获取应用列表快照
+     */
+    private List<JSONObject> getCurrentSnapshots() {
+        List<JSONObject> list = new ArrayList<JSONObject>();
+
+        List<String> applist = PkgList.getInstance(mContext).getAppPackageList();
+        if (applist != null && applist.size() > 0) {
+            PackageManager pm = mContext.getApplicationContext().getPackageManager();
+            for (String pkgName : applist) {
+                try {
+                    if (!TextUtils.isEmpty(pkgName) && SystemUtils.hasLaunchIntentForPackage(pm, pkgName)) {
+                        PackageInfo pi = mContext.getPackageManager().getPackageInfo(pkgName, 0);
+                        JSONObject appInfo = getAppInfo(pi, pm, EGContext.SNAP_SHOT_DEFAULT);
+                        if (appInfo != null && !list.contains(appInfo)) {
+                            list.add(appInfo);
+                        }
+                    }
+                } catch (Throwable e) {
+                }
+            }
+        }
+
+        return list;
+    }
+
+    /**************************************  处理广播消息 ******************************************************/
+
+    public void realProcessInThread(String type, String pkgName, String lockFileName) {
+        try {
+            PackageManager pm = mContext.getPackageManager();
+            if (type == EGContext.SNAP_SHOT_INSTALL) {
+                PackageInfo pi = pm.getPackageInfo(pkgName, 0);
+                // SNAP_SHOT_INSTALL 解锁
+                if (pi != null && SystemUtils.hasLaunchIntentForPackage(pm, pkgName)) {
+                    JSONObject obj = getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL);
+                    if (obj != null && obj.length() > 0) {
+                        TableProcess.getInstance(mContext).insertSnapshot(obj);
+                    }
+                }
+                PkgList.getInstance(mContext).add(pkgName);
+            } else if (type == EGContext.SNAP_SHOT_UNINSTALL) {
+
+                if (BuildConfig.logcat) {
+                    ELOG.d(BuildConfig.tag_snap, " 真正处理卸载...." + pkgName);
+                }
+                // 卸载时候，不能获取版本，会出现解析版本异常
+                TableProcess.getInstance(mContext).updateSnapshot(pkgName, EGContext.SNAP_SHOT_UNINSTALL, "");
+                PkgList.getInstance(mContext).del(pkgName);
+                // SNAP_SHOT_UNINSTALL 解锁
+            } else if (type == EGContext.SNAP_SHOT_UPDATE) {
+                PackageInfo pi = pm.getPackageInfo(pkgName, 0);
+                String avc = pi.versionName + "|" + pi.versionCode;
+                if (BuildConfig.logcat) {
+                    ELOG.d(BuildConfig.tag_snap, " 真正处理更新...." + pkgName + "----- " + avc);
+                }
+                TableProcess.getInstance(mContext).updateSnapshot(pkgName, EGContext.SNAP_SHOT_UPDATE, avc);
+                // SNAP_SHOT_UPDATE 解锁
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(BuildConfig.tag_snap, e);
+            }
+        }
+        if (!TextUtils.isEmpty(lockFileName)) {
+            MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, lockFileName, System.currentTimeMillis());
+        }
+    }
+
+    /**
+     * 是否为系统应用:
+     * <p>
+     * 1. shell获取到三方列表判断
+     * <p>
+     * 2. 获取异常的使用其他方式判断
+     *
+     * @param pkg
+     * @return
+     */
+    public boolean isSystemApps(String pkg) {
+            try {
+                // 1. 使用系统方法判断
+                mContext = EContextHelper.getContext();
+                if (mContext == null) {
+                    return false;
+                }
+                PackageManager pm = mContext.getPackageManager();
+                if (pm == null) {
+                    return false;
+                }
+                PackageInfo pInfo = pm.getPackageInfo(pkg, 0);
+                if ((pInfo.applicationInfo.flags & android.content.pm.ApplicationInfo.FLAG_SYSTEM) == 1) {
+                    return true;
+                }
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
+                    BugReportForTest.commitError(BuildConfig.tag_snap, e);
+                }
+            }
+
+
+        return false;
+    }
+
+    /**
+     * 获取APP详情
+     *
+     * @param pkgInfo
+     * @param packageManager
+     * @param tag
+     * @return
+     */
+    @SuppressWarnings("deprecation")
+    private JSONObject getAppInfo(PackageInfo pkgInfo, PackageManager packageManager, String tag) {
+        JSONObject appInfo = new JSONObject();
+
+        try {
+            String pkg = pkgInfo.packageName;
+//            if (!TextUtils.isEmpty(pkg) && pkg.contains(".") && SystemUtils.hasLaunchIntentForPackage(packageManager, pkg)) {
+            if (!TextUtils.isEmpty(pkg) && pkg.contains(".")) {
+                JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationPackageName,
+                        pkgInfo.packageName, DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
+                try {
+                    JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationName,
+                            String.valueOf(pkgInfo.applicationInfo.loadLabel(packageManager)),
+                            DataController.SWITCH_OF_APPLICATION_NAME);
+                } catch (Throwable e) {
+                }
+                JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationVersionCode,
+                        pkgInfo.versionName + "|" + pkgInfo.versionCode, DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
+                JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ActionType, tag,
+                        DataController.SWITCH_OF_ACTION_TYPE);
+                JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ActionHappenTime,
+                        String.valueOf(System.currentTimeMillis()), DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
+            }
+        } catch (Throwable e) {
+        }
+
+        return appInfo;
+    }
+    /**************************************  单例和变量 ******************************************************/
+
+    private AppSnapshotImpl() {
+    }
+
+
+
+    private static class Holder {
+        private static final AppSnapshotImpl INSTANCE = new AppSnapshotImpl();
+    }
+
+
+    private AppSnapshotImpl initContext(Context context) {
+        if (mContext == null) {
+            mContext = EContextHelper.getContext(context);
+        }
+        return Holder.INSTANCE;
+    }
+
+    //    private final String SHELL_PM_LIST_PACKAGES = "pm list packages";// all
+//    private final String APP_LIST_SYSTEM = "pm list packages -s";// system
+//    // private final String APP_LIST_USER = "pm list packages -3";// third party
+//    // 获取系统应用列表
+//    private final Set<String> mSystemAppSet = new HashSet<String>();
+    //    private boolean isSnapShotBlockRunning = false;
+    private Context mContext;
+
+    public static AppSnapshotImpl getInstance(Context context) {
+        return Holder.INSTANCE.initContext(context);
+    }
+//
+//    /**
+//     * 处理消息中的应用安装、卸载、更新广播
+//     *
+//     * @param pkgName
+//     * @param type
+//     * @param lockFileName
+//     */
+//    public void processAppModifyMsg(final String pkgName, final int type, final String lockFileName) {
+//        if (TextUtils.isEmpty(pkgName)) {
+//            return;
+//        }
+//        if (BuildConfig.logcat) {
+//            ELOG.d(BuildConfig.tag_snap, " 处理广播接收到的信息 包:" + pkgName + "----type: " + type);
+//        }
+//        // 数据库操作修改包名和类型
+//        SystemUtils.runOnWorkThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                realProcessInThread(type, pkgName, lockFileName);
+//            }
+//        });
+//    }
+//
+//
 //    /**
 //     * shell方式获取文件名字，然后解析出app详情
 //     *
@@ -372,38 +550,7 @@ public class AppSnapshotImpl {
 //        }
 //        return appSet;
 //    }
-
-
-    public String getAppType(String pkg) {
-        return isSystemApps(pkg) ? UploadKey.OCInfo.APPLICATIONTYPE_SYSTEM_APP : UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP;
-    }
-
-    /**
-     * 获取应用列表快照
-     */
-    private List<JSONObject> getCurrentSnapshots() {
-        List<JSONObject> list = new ArrayList<JSONObject>();
-
-        List<String> applist = PkgList.getInstance(mContext).getAppPackageList();
-        if (applist != null && applist.size() > 0) {
-            PackageManager pm = mContext.getApplicationContext().getPackageManager();
-            for (String pkgName : applist) {
-                try {
-                    if (!TextUtils.isEmpty(pkgName) && SystemUtils.hasLaunchIntentForPackage(pm, pkgName)) {
-                        PackageInfo pi = mContext.getPackageManager().getPackageInfo(pkgName, 0);
-                        JSONObject appInfo = getAppInfo(pi, pm, EGContext.SNAP_SHOT_DEFAULT);
-                        if (appInfo != null && !list.contains(appInfo)) {
-                            list.add(appInfo);
-                        }
-                    }
-                } catch (Throwable e) {
-                }
-            }
-        }
-
-        return list;
-    }
-
+//
 //    /**
 //     * 获取安装列表和对应的调试状态
 //     *
@@ -433,159 +580,5 @@ public class AppSnapshotImpl {
 //        }
 //        return list;
 //    }
-
-    /**************************************  处理广播消息 ******************************************************/
-
-    /**
-     * 处理消息中的应用安装、卸载、更新广播
-     *
-     * @param pkgName
-     * @param type
-     * @param lockFileName
-     */
-    public void processAppModifyMsg(final String pkgName, final int type, final String lockFileName) {
-        if (TextUtils.isEmpty(pkgName)) {
-            return;
-        }
-        if (BuildConfig.logcat) {
-            ELOG.d(BuildConfig.tag_snap, " 处理广播接收到的信息 包:" + pkgName + "----type: " + type);
-        }
-        // 数据库操作修改包名和类型
-        SystemUtils.runOnWorkThread(new Runnable() {
-            @Override
-            public void run() {
-                realProcessInThread(type, pkgName, lockFileName);
-            }
-        });
-    }
-
-    /**
-     * 是否为系统应用:
-     * <p>
-     * 1. shell获取到三方列表判断
-     * <p>
-     * 2. 获取异常的使用其他方式判断
-     *
-     * @param pkg
-     * @return
-     */
-    public boolean isSystemApps(String pkg) {
-            try {
-                // 1. 使用系统方法判断
-                mContext = EContextHelper.getContext();
-                if (mContext == null) {
-                    return false;
-                }
-                PackageManager pm = mContext.getPackageManager();
-                if (pm == null) {
-                    return false;
-                }
-                PackageInfo pInfo = pm.getPackageInfo(pkg, 0);
-                if ((pInfo.applicationInfo.flags & android.content.pm.ApplicationInfo.FLAG_SYSTEM) == 1) {
-                    return true;
-                }
-            } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(BuildConfig.tag_snap, e);
-                }
-            }
-
-
-        return false;
-    }
-
-    /**************************************  单例和变量 ******************************************************/
-
-    private AppSnapshotImpl() {
-    }
-
-
-    private static class Holder {
-        private static final AppSnapshotImpl INSTANCE = new AppSnapshotImpl();
-    }
-
-    /**
-     * 获取APP详情
-     *
-     * @param pkgInfo
-     * @param packageManager
-     * @param tag
-     * @return
-     */
-    @SuppressWarnings("deprecation")
-    private JSONObject getAppInfo(PackageInfo pkgInfo, PackageManager packageManager, String tag) {
-        JSONObject appInfo = new JSONObject();
-
-        try {
-            String pkg = pkgInfo.packageName;
-//            if (!TextUtils.isEmpty(pkg) && pkg.contains(".") && SystemUtils.hasLaunchIntentForPackage(packageManager, pkg)) {
-            if (!TextUtils.isEmpty(pkg) && pkg.contains(".")) {
-                JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationPackageName,
-                        pkgInfo.packageName, DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
-                try {
-                    JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationName,
-                            String.valueOf(pkgInfo.applicationInfo.loadLabel(packageManager)),
-                            DataController.SWITCH_OF_APPLICATION_NAME);
-                } catch (Throwable e) {
-                }
-                JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationVersionCode,
-                        pkgInfo.versionName + "|" + pkgInfo.versionCode, DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
-                JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ActionType, tag,
-                        DataController.SWITCH_OF_ACTION_TYPE);
-                JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ActionHappenTime,
-                        String.valueOf(System.currentTimeMillis()), DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
-            }
-        } catch (Throwable e) {
-        }
-
-        return appInfo;
-    }
-
-    private void realProcessInThread(int type, String pkgName, String lockFileName) {
-        try {
-            PackageManager pm = mContext.getPackageManager();
-            if (type == 0) {
-                PackageInfo pi = pm.getPackageInfo(pkgName, 0);
-                // SNAP_SHOT_INSTALL 解锁
-                if (pi != null && SystemUtils.hasLaunchIntentForPackage(pm, pkgName)) {
-                    JSONObject obj = getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL);
-                    if (obj != null && obj.length() > 0) {
-                        TableProcess.getInstance(mContext).insertSnapshot(obj);
-                    }
-                }
-            } else if (type == 1) {
-
-                if (BuildConfig.logcat) {
-                    ELOG.d(BuildConfig.tag_snap, " 真正处理卸载...." + pkgName);
-                }
-                // 卸载时候，不能获取版本，会出现解析版本异常
-                TableProcess.getInstance(mContext).updateSnapshot(pkgName, EGContext.SNAP_SHOT_UNINSTALL, "");
-                // SNAP_SHOT_UNINSTALL 解锁
-            } else if (type == 2) {
-                PackageInfo pi = pm.getPackageInfo(pkgName, 0);
-                String avc = pi.versionName + "|" + pi.versionCode;
-                if (BuildConfig.logcat) {
-                    ELOG.d(BuildConfig.tag_snap, " 真正处理更新...." + pkgName + "----- " + avc);
-                }
-                TableProcess.getInstance(mContext).updateSnapshot(pkgName, EGContext.SNAP_SHOT_UPDATE, avc);
-                // SNAP_SHOT_UPDATE 解锁
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_snap, e);
-            }
-        }
-        if (!TextUtils.isEmpty(lockFileName)) {
-            MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, lockFileName, System.currentTimeMillis());
-        }
-    }
-
-    private AppSnapshotImpl initContext(Context context) {
-        if (mContext == null) {
-            mContext = EContextHelper.getContext(context);
-        }
-        return Holder.INSTANCE;
-    }
-
 
 }

@@ -10,6 +10,7 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
+import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.net.NetInfo;
 import com.analysys.track.internal.impl.usm.USMImpl;
 import com.analysys.track.utils.BugReportForTest;
@@ -500,6 +501,7 @@ public class UploadImpl {
             return;
         }
         String result = RequestUtils.getInstance(mContext).postRequest(url, uploadInfo);
+
         if (BuildConfig.logcat) {
             ELOG.i(" result: " + result);
 //            saveDataToFile(result);
@@ -525,6 +527,7 @@ public class UploadImpl {
     private void uploadSuccess(long time) {
         try {
             isUploading = false;
+
 //            SPHelper.setIntValue2SP(mContext, EGContext.REQUEST_STATE, EGContext.sPrepare);
             if (time != SPHelper.getLongValueFromSP(mContext, EGContext.INTERVALTIME, 0)) {
                 SPHelper.setLongValue2SP(mContext, EGContext.INTERVALTIME, time);
@@ -538,7 +541,8 @@ public class UploadImpl {
             SPHelper.setLongValue2SP(mContext, EGContext.RETRYTIME, 0);
             TableProcess.getInstance(mContext).deleteOC();
             // 上传完成回来清理数据的时候，snapshot删除卸载的，其余的统一恢复成正常值
-            TableProcess.getInstance(mContext).resetSnapshot();
+//            TableProcess.getInstance(mContext).resetSnapshot();
+            AppSnapshotImpl.getInstance(mContext).resetDB();
 
             // location全部删除已读的数据，最后一条无需保留，sp里有
             TableProcess.getInstance(mContext).deleteLocation();

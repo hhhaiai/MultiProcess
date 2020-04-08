@@ -14,6 +14,7 @@ import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.ReceiverImpl;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MClipManager;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -46,7 +47,12 @@ public class AnalysysReceiver extends BroadcastReceiver {
 
         } catch (Throwable e) {
         }
-        parserIntent(EContextHelper.getContext(context), intent);
+        EThreadPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                parserIntent(EContextHelper.getContext(context), intent);
+            }
+        });
     }
 
 
