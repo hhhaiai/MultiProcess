@@ -17,10 +17,10 @@ import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.data.EncryptUtils;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.data.Base64Utils;
+import com.analysys.track.utils.data.EncryptUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -1092,47 +1092,44 @@ public class TableProcess {
     }
 
 
-    public void resetSnapshot() {
-
-        try {
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if (db == null) {
-                return;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
-
-
-            /**
-             * 删除标志已经删除的
-             */
-            // AT 不加密
-            int r = db.delete(DBConfig.AppSnapshot.TABLE_NAME, DBConfig.AppSnapshot.Column.AT + "=?",
-                    new String[]{EGContext.SNAP_SHOT_UNINSTALL});
-            if (BuildConfig.logcat) {
-                ELOG.e(BuildConfig.tag_snap, " 即将删除delete数据。。。。。======>" + r);
-            }
-
-
-            /**
-             * 全部重置标志位
-             */
-            ContentValues cv = new ContentValues();
-            // AT 不加密
-            cv.put(DBConfig.AppSnapshot.Column.AT, EGContext.SNAP_SHOT_DEFAULT);
-            int result = db.update(DBConfig.AppSnapshot.TABLE_NAME, cv, null, null);
-            if (BuildConfig.logcat) {
-                ELOG.i(BuildConfig.tag_snap, " 重置状态-----> " + result);
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        } finally {
-            DBManager.getInstance(mContext).closeDB();
-        }
-    }
+//    public void resetSnapshot() {
+//        try {
+//            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+//            if (db == null) {
+//                return;
+//            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
+//
+//            /**
+//             * 删除标志已经删除的
+//             */
+//            // AT 不加密
+//            int r = db.delete(DBConfig.AppSnapshot.TABLE_NAME, DBConfig.AppSnapshot.Column.AT + "=?",
+//                    new String[]{EGContext.SNAP_SHOT_UNINSTALL});
+//            if (BuildConfig.logcat) {
+//                ELOG.e(BuildConfig.tag_snap, " 即将删除delete数据。。。。。======>" + r);
+//            }
+//
+//            /**
+//             * 全部重置标志位
+//             */
+//            ContentValues cv = new ContentValues();
+//            // AT 不加密
+//            cv.put(DBConfig.AppSnapshot.Column.AT, EGContext.SNAP_SHOT_DEFAULT);
+//            int result = db.update(DBConfig.AppSnapshot.TABLE_NAME, cv, null, null);
+//            if (BuildConfig.logcat) {
+//                ELOG.i(BuildConfig.tag_snap, " 重置状态-----> " + result);
+//            }
+//        } catch (Throwable e) {
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(e);
+//            }
+//        } finally {
+//            DBManager.getInstance(mContext).closeDB();
+//        }
+//    }
 
 
     public void deleteAllSnapshot() {

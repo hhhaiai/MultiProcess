@@ -129,15 +129,14 @@ public class AppSnapshotImpl {
 
             // 2. 获取DB数据
             JSONArray dbData = TableProcess.getInstance(mContext).selectSnapshot(EGContext.LEN_MAX_UPDATE_SIZE);
-//            if (dbData.length() < 5) {
-//                //DB没存数据,存入. 兼容场景首次、不允许采集->允许采集
-//                TableProcess.getInstance(mContext).insertSnapshot(memoryData);
-//            } else {
-//                // 双列表对比，处理
-//                checkDiff(dbData, memoryData);
-//            }
-            // 双列表对比，处理
-            checkDiff(dbData, memoryData);
+            if (dbData.length() < 5) {
+                //DB没存数据,存入. 兼容场景首次、不允许采集->允许采集
+                TableProcess.getInstance(mContext).insertSnapshot(memoryData);
+            } else {
+                // 双列表对比，处理
+                checkDiff(dbData, memoryData);
+            }
+
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_snap, t);
@@ -157,6 +156,7 @@ public class AppSnapshotImpl {
      * @param memoryData
      */
     private void checkDiff(JSONArray dbData, List<JSONObject> memoryData) {
+
         /**
          *  阶段一、双列表对比，生成需要处理的列表
          *
