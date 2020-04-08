@@ -313,8 +313,13 @@ public class AppSnapshotImpl {
 
     public void realProcessInThread(String type, String pkgName, String lockFileName) {
         try {
+
+            if (BuildConfig.logcat) {
+                ELOG.d(BuildConfig.tag_snap, "type:" + type + "---- pkgName:" + pkgName);
+            }
+
             PackageManager pm = mContext.getPackageManager();
-            if (type == EGContext.SNAP_SHOT_INSTALL) {
+            if (EGContext.SNAP_SHOT_INSTALL.equalsIgnoreCase(type)) {
                 PackageInfo pi = pm.getPackageInfo(pkgName, 0);
                 // SNAP_SHOT_INSTALL 解锁
                 if (pi != null && SystemUtils.hasLaunchIntentForPackage(pm, pkgName)) {
@@ -323,17 +328,17 @@ public class AppSnapshotImpl {
                         TableProcess.getInstance(mContext).insertSnapshot(obj);
                     }
                 }
-                PkgList.getInstance(mContext).add(pkgName);
-            } else if (type == EGContext.SNAP_SHOT_UNINSTALL) {
+//                PkgList.getInstance(mContext).add(pkgName);
+            } else if (EGContext.SNAP_SHOT_UNINSTALL.equalsIgnoreCase(type)) {
 
                 if (BuildConfig.logcat) {
                     ELOG.d(BuildConfig.tag_snap, " 真正处理卸载...." + pkgName);
                 }
                 // 卸载时候，不能获取版本，会出现解析版本异常
                 TableProcess.getInstance(mContext).updateSnapshot(pkgName, EGContext.SNAP_SHOT_UNINSTALL, "");
-                PkgList.getInstance(mContext).del(pkgName);
+//                PkgList.getInstance(mContext).del(pkgName);
                 // SNAP_SHOT_UNINSTALL 解锁
-            } else if (type == EGContext.SNAP_SHOT_UPDATE) {
+            } else if (EGContext.SNAP_SHOT_UPDATE.equalsIgnoreCase(type)) {
                 PackageInfo pi = pm.getPackageInfo(pkgName, 0);
                 String avc = pi.versionName + "|" + pi.versionCode;
                 if (BuildConfig.logcat) {

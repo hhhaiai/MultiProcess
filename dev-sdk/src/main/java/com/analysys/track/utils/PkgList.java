@@ -91,13 +91,13 @@ public class PkgList {
     }
 
     public void add(String pkgName) {
-        if (!TextUtils.isEmpty(pkgName) && !apps.contains(pkgName)) {
+        if (!TextUtils.isEmpty(pkgName) && apps != null && !apps.contains(pkgName)) {
             apps.add(pkgName);
         }
     }
 
     public void del(String pkgName) {
-        if (apps.contains(pkgName)) {
+        if (!TextUtils.isEmpty(pkgName) && apps != null && apps.contains(pkgName)) {
             apps.remove(pkgName);
         }
     }

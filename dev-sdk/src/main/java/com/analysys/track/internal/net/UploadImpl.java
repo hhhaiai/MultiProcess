@@ -541,8 +541,8 @@ public class UploadImpl {
             SPHelper.setLongValue2SP(mContext, EGContext.RETRYTIME, 0);
             TableProcess.getInstance(mContext).deleteOC();
             // 上传完成回来清理数据的时候，snapshot删除卸载的，其余的统一恢复成正常值
-//            TableProcess.getInstance(mContext).resetSnapshot();
-            AppSnapshotImpl.getInstance(mContext).resetDB();
+            TableProcess.getInstance(mContext).resetSnapshot();
+//            AppSnapshotImpl.getInstance(mContext).resetDB();
 
             // location全部删除已读的数据，最后一条无需保留，sp里有
             TableProcess.getInstance(mContext).deleteLocation();

@@ -6,6 +6,6 @@ import com.analysys.track.AnalysysTracker
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
-        AnalysysTracker.init(this, "appkey", "channel")
+        AnalysysTracker.init(this, "testappkey", "channel")
     }
 }

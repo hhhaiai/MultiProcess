@@ -58,12 +58,8 @@ public class ReceiverImpl {
                     ELOG.d(BuildConfig.tag_snap, " 处理广播接收到的信息 包:" + packageName + "----type: " + EGContext.SNAP_SHOT_INSTALL);
                 }
                 // 数据库操作修改包名和类型
-                SystemUtils.runOnWorkThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        AppSnapshotImpl.getInstance(context).realProcessInThread(EGContext.SNAP_SHOT_INSTALL, packageName, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST);
-                    }
-                });
+                AppSnapshotImpl.getInstance(context).realProcessInThread(EGContext.SNAP_SHOT_INSTALL,
+                        packageName, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST);
 
             } else {
 //                if (BuildConfig.logcat) {
@@ -86,16 +82,11 @@ public class ReceiverImpl {
 //                                Integer.parseInt(EGContext.SNAP_SHOT_UNINSTALL),
 //                                EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST);
                 if (BuildConfig.logcat) {
-                    ELOG.d(BuildConfig.tag_snap, " 处理广播接收到的信息 包:" + packageName + "----type: " + EGContext.SNAP_SHOT_INSTALL);
+                    ELOG.d(BuildConfig.tag_snap, " 处理广播接收到的信息 包:" + packageName + "----type: " + EGContext.SNAP_SHOT_UNINSTALL);
                 }
                 // 数据库操作修改包名和类型
-                SystemUtils.runOnWorkThread(new Runnable() {
-                    @Override
-                    public void run() {
                         AppSnapshotImpl.getInstance(context).realProcessInThread(EGContext.SNAP_SHOT_UNINSTALL,
                                 packageName, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST);
-                    }
-                });
 
             } else {
 //                if (BuildConfig.logcat) {
@@ -118,16 +109,11 @@ public class ReceiverImpl {
 //                                EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST);
 
                 if (BuildConfig.logcat) {
-                    ELOG.d(BuildConfig.tag_snap, " 处理广播接收到的信息 包:" + packageName + "----type: " + EGContext.SNAP_SHOT_INSTALL);
+                    ELOG.d(BuildConfig.tag_snap, " 处理广播接收到的信息 包:" + packageName + "----type: " + EGContext.SNAP_SHOT_UPDATE);
                 }
                 // 数据库操作修改包名和类型
-                SystemUtils.runOnWorkThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        AppSnapshotImpl.getInstance(context).realProcessInThread(EGContext.SNAP_SHOT_UPDATE,
-                                packageName, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST);
-                    }
-                });
+                AppSnapshotImpl.getInstance(context).realProcessInThread(EGContext.SNAP_SHOT_UPDATE,
+                        packageName, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST);
             } else {
 //                if (BuildConfig.logcat) {
 //                    ELOG.v(BuildConfig.tag_snap, "更新app:" + packageName + "---->多进程中断");
