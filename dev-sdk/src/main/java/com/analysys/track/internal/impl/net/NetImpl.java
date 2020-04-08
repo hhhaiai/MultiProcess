@@ -77,6 +77,9 @@ public class NetImpl {
     public void dumpNet(final ECallBack back) {
 
         try {
+            if (!BuildConfig.ENABLE_NETINFO) {
+                return;
+            }
             if (!MultiProcessChecker.getInstance().isNeedWorkByLockFile(context, EGContext.FILES_SYNC_NET, EGContext.TIME_SECOND * 2, System.currentTimeMillis())) {
                 //没抢到锁
                 if (BuildConfig.logcat) {
@@ -147,6 +150,9 @@ public class NetImpl {
 //                return null;
 //                //否则工作
 //            }
+            if (!BuildConfig.ENABLE_NETINFO) {
+                return null;
+            }
             //net不允许采集,不工作,默认允许true
             if (!SPHelper.getBooleanValueFromSP(context, UploadKey.Response.RES_POLICY_MODULE_CL_NET, true)) {
                 return null;

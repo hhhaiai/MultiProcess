@@ -319,12 +319,12 @@ public class UploadImpl {
             }
             //组装net数据
             if (BuildConfig.ENABLE_NETINFO) {
-                if (
-//                        USMImpl.isUSMAvailable(mContext) &&
-                        SPHelper.getBooleanValueFromSP(mContext,
-                                UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_NET, false)) {
-                    //USM 可用且net控制短路不上传
-                } else {
+//                if (
+////                        USMImpl.isUSMAvailable(mContext) &&
+//                        SPHelper.getBooleanValueFromSP(mContext,
+//                                UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_NET, false)) {
+//                    //USM 可用且net控制短路不上传
+//                } else {
                     //USM 不可用,net数据上传
                     //net允许采集,上传
                     if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_NET, true)) {
@@ -340,7 +340,7 @@ public class UploadImpl {
                         TableProcess.getInstance(mContext).deleteNet();
                         TableProcess.getInstance(mContext).deleteScanningInfos();
                     }
-                }
+//                }
             }
             // 组装XXXInfo数据
 //            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true)) {
