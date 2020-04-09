@@ -5,7 +5,6 @@ import android.content.Context;
 import com.analysys.track.impl.CusHotTransform;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.EContextHelper;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -26,7 +25,7 @@ public class AnalysysTracker {
      */
     public static void init(Context context, String appKey, String channel) {
         try {
-            setContext(context);
+//            setContext(context);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(context).isCanWork(AnalysysTracker.class.getName(), "init")) {
                 CusHotTransform.getInstance(context).transform(false, AnalysysTracker.class.getName(), "init", context, appKey, channel);
                 return;
@@ -48,7 +47,7 @@ public class AnalysysTracker {
     @Deprecated
     public static void setDebugMode(Context context, boolean isDebug) {
         try {
-            setContext(context);
+//            setContext(context);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(context).isCanWork(AnalysysTracker.class.getName(), "setDebugMode")) {
                 CusHotTransform.getInstance(context).transform(false, AnalysysTracker.class.getName(), "setDebugMode", context, isDebug);
                 return;
@@ -63,7 +62,6 @@ public class AnalysysTracker {
 
     @Deprecated
     public static void setDebugMode(boolean isDebug) {
-
         if (BuildConfig.enableHotFix && CusHotTransform.getInstance(null).isCanWork(AnalysysTracker.class.getName(), "setDebugMode")) {
             CusHotTransform.getInstance(null).transform(false, AnalysysTracker.class.getName(), "setDebugMode", isDebug);
             return;
@@ -71,10 +69,10 @@ public class AnalysysTracker {
     }
 
     public static void setContext(Context context) {
-        EContextHelper.setContext(context);
-        if (BuildConfig.enableHotFix && CusHotTransform.getInstance(context).isCanWork(AnalysysTracker.class.getName(), "setContext")) {
-            CusHotTransform.getInstance(context).transform(false, AnalysysTracker.class.getName(), "setContext", context);
-            return;
-        }
+//        EContextHelper.setContext(context);
+//        if (BuildConfig.enableHotFix && CusHotTransform.getInstance(context).isCanWork(AnalysysTracker.class.getName(), "setContext")) {
+//            CusHotTransform.getInstance(context).transform(false, AnalysysTracker.class.getName(), "setContext", context);
+//            return;
+//        }
     }
 }

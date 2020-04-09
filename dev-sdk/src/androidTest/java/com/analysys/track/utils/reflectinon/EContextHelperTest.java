@@ -45,11 +45,10 @@ public class EContextHelperTest {
     public void getContextByHotFix() {
         this.context = context.getApplicationContext();
         assertNotNull(this.context);
-        AnalysysTracker.setContext(context);
+//        AnalysysTracker.setContext(context);
 
         assertEquals(context, this.context);
-
-        AnalysysTracker.setContext(context);
+//        AnalysysTracker.setContext(context);
 
         assertEquals(context, this.context);
         String path = "/data/user/0/com.device/fileshf_track_v4.3.0.5_20191023.dex";

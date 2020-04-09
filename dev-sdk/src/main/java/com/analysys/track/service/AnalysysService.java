@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
-import com.analysys.track.AnalysysTracker;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.impl.CusHotTransform;
 import com.analysys.track.internal.AnalysysInternal;
@@ -26,7 +25,7 @@ public class AnalysysService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         try {
-            AnalysysTracker.setContext(this);
+//            AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysService.class.getName(), "onBind")) {
                 return (IBinder) CusHotTransform.getInstance(this).transform(true, AnalysysService.class.getName(), "onBind", intent);
             }
@@ -38,7 +37,7 @@ public class AnalysysService extends Service {
     @Override
     public void onCreate() {
         try {
-            AnalysysTracker.setContext(this);
+//            AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysService.class.getName(), "onCreate")) {
                 CusHotTransform.getInstance(this).transform(true, AnalysysService.class.getName(), "onCreate");
                 return;
@@ -57,7 +56,7 @@ public class AnalysysService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
-            AnalysysTracker.setContext(this);
+//            AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysService.class.getName(), "onStartCommand")) {
                 Integer i = (Integer) CusHotTransform.getInstance(this).transform(true, AnalysysService.class.getName(), "onStartCommand", intent, flags, startId);
                 if (i != null) {
@@ -77,7 +76,7 @@ public class AnalysysService extends Service {
     @Override
     public void onDestroy() {
         try {
-            AnalysysTracker.setContext(this);
+//            AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysService.class.getName(), "onDestroy")) {
                 CusHotTransform.getInstance(this).transform(true, AnalysysService.class.getName(), "onDestroy");
                 return;

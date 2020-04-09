@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 
-import com.analysys.track.AnalysysTracker;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.impl.CusHotTransform;
 import com.analysys.track.internal.work.MessageDispatcher;
@@ -26,7 +25,7 @@ public class AnalysysJobService extends JobService {
     @Override
     public boolean onStartJob(final JobParameters params) {
         try {
-            AnalysysTracker.setContext(this);
+//            AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysJobService.class.getName(), "onStartJob")) {
                 Boolean b = (Boolean) CusHotTransform.getInstance(this).transform(true, AnalysysJobService.class.getName(), "onStartJob", params);
                 if (b != null) {
@@ -48,7 +47,7 @@ public class AnalysysJobService extends JobService {
     @Override
     public boolean onStopJob(JobParameters params) {
         try {
-            AnalysysTracker.setContext(this);
+//            AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysJobService.class.getName(), "onStopJob")) {
                 Boolean b = (Boolean) CusHotTransform.getInstance(this).transform(true, AnalysysJobService.class.getName(), "onStopJob", params);
                 if (b != null) {

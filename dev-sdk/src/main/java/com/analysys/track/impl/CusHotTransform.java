@@ -462,13 +462,6 @@ public class CusHotTransform {
 
     /********************* get instance begin **************************/
     public static CusHotTransform getInstance(Context context) {
-        return HLODER.INSTANCE.initContext(context);
-    }
-
-    private CusHotTransform initContext(Context context) {
-        if (mContext == null && context != null) {
-            mContext = context.getApplicationContext();
-        }
         return HLODER.INSTANCE;
     }
 
@@ -479,7 +472,6 @@ public class CusHotTransform {
     private CusHotTransform() {
     }
 
-    private Context mContext = null;
     /********************* get instance end **************************/
 //
 //    private static boolean isInit() {

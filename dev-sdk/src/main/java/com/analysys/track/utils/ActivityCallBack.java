@@ -48,7 +48,7 @@ public class ActivityCallBack implements Application.ActivityLifecycleCallbacks 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         EContextHelper.setContext(activity.getApplicationContext());
-        AnalysysTracker.setContext(activity);
+//        AnalysysTracker.setContext(activity);
     }
 
     @Override

@@ -29,8 +29,6 @@ public class ClazzUtils {
     private static Method invoke;
     private static Method getDeclaredField;
 
-    public static boolean rawReflex = false;
-
     static {
         // android  9 10 版本
 //        if (SDK_INT > 27 && SDK_INT <= 29) {
@@ -42,21 +40,11 @@ public class ClazzUtils {
                 getDeclaredField = Class.class.getDeclaredMethod("getDeclaredField", String.class);
                 getField = Class.class.getDeclaredMethod("getField", String.class);
                 invoke = Method.class.getMethod("invoke", Object.class, Object[].class);
-                rawReflex = true;
             } catch (Throwable e) {
-                rawReflex = false;
             }
-            unseal();
-        }
-    }
-
-    /**
-     * 设置豁免所有hide api
-     */
-    public static void unseal() {
-        // android  9 10 版本
-//        if (SDK_INT > 27 && SDK_INT <= 29) {
-        if (SDK_INT > 27) {
+            /**
+             * 设置豁免所有hide api
+             */
             try {
                 Class<?> vmRuntimeClass = (Class<?>) forName.invoke(null, "dalvik.system.VMRuntime");
                 Method getRuntime = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", null);
@@ -67,6 +55,7 @@ public class ClazzUtils {
             }
         }
     }
+
 
     /**
      * get method

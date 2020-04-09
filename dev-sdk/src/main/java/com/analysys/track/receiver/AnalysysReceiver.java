@@ -36,7 +36,7 @@ public class AnalysysReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, final Intent intent) {
         try {
-            AnalysysTracker.setContext(context);
+//            AnalysysTracker.setContext(context);
             if (BuildConfig.logcat) {
                 ELOG.d(BuildConfig.tag_recerver, " 收到广播: " + intent.getAction());
             }

@@ -30,9 +30,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onCreate() {
         try {
-            //禁止灰色 api logcat
-            ClazzUtils.unseal();
-            AnalysysTracker.setContext(this);
+//            AnalysysTracker.setContext(this);
             mContext = EContextHelper.getContext(this.getApplicationContext());
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysAccessibilityService.class.getName(), "onCreate")) {
                 CusHotTransform.getInstance(this).transform(true, AnalysysAccessibilityService.class.getName(), "onCreate");
@@ -52,7 +50,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     protected void onServiceConnected() {
         try {
-            AnalysysTracker.setContext(this);
+//            AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysAccessibilityService.class.getName(), "onServiceConnected")) {
                 CusHotTransform.getInstance(this).transform(true, AnalysysAccessibilityService.class.getName(), "onServiceConnected");
                 return;
@@ -87,7 +85,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         try {
-            AnalysysTracker.setContext(this);
+//            AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysAccessibilityService.class.getName(), "onAccessibilityEvent")) {
                 CusHotTransform.getInstance(this).transform(true, AnalysysAccessibilityService.class.getName(), "onAccessibilityEvent", event);
                 return;
@@ -116,7 +114,7 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onInterrupt() {
         try {
-            AnalysysTracker.setContext(this);
+//            AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysAccessibilityService.class.getName(), "onInterrupt")) {
                 CusHotTransform.getInstance(this).transform(true, AnalysysAccessibilityService.class.getName(), "onInterrupt");
                 return;
