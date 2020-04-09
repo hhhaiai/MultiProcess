@@ -35,15 +35,6 @@ public class MessageDispatcher {
 
     private final HandlerThread thread;
 
-    public void quit() {
-        mHandler.removeCallbacksAndMessages(null);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            thread.quitSafely();
-        } else {
-            thread.quit();
-        }
-    }
-
 
     /**
      * @Copyright © 2018 Analysys Inc. All rights reserved.
@@ -146,7 +137,7 @@ public class MessageDispatcher {
                         });
                         break;
 
-                    case MSG_INFO_HOTFIX:
+//                    case MSG_INFO_HOTFIX:
 //                        if (BuildConfig.enableHotFix) {
 //                            HotFixImpl.reqHotFix(mContext, new ECallBack() {
 //                                @Override
@@ -155,7 +146,7 @@ public class MessageDispatcher {
 //                                }
 //                            });
 //                        }
-                        break;
+//                        break;
                     case MSG_INFO_SNAPS:
                         if (BuildConfig.logcat) {
                             ELOG.d(BuildConfig.tag_snap, " 收到 安装列表检测 信息。。心跳。。");
@@ -164,17 +155,11 @@ public class MessageDispatcher {
                             @Override
                             public void onProcessed() {
 
-//                                long time = AppSnapshotImpl.getInstance(mContext).getDurTime();
-//                                if (BuildConfig.logcat) {
-//                                    ELOG.d(BuildConfig.tag_snap, "收到安装列表检测回调。。" + SystemUtils.getTime(time) + "后继续发起请求。。。");
-//                                }
-//                                // 按照差距时间发送延迟工作消息
-//                                postDelay(MSG_INFO_SNAPS, time);
-
-                                //EGContext.snap_complete = true;
-                                Intent intent = new Intent(EGContext.ACTION_MTC_LOCK);
-                                EContextHelper.getContext().sendBroadcast(intent);
-
+                                try {
+                                    Intent intent = new Intent(EGContext.ACTION_MTC_LOCK);
+                                    EContextHelper.getContext(mContext).sendBroadcast(intent);
+                                } catch (Throwable e) {
+                                }
                                 if (BuildConfig.logcat) {
                                     ELOG.d(BuildConfig.tag_snap, "收到安装列表检测回调。。30秒后继续发起请求。。。");
                                 }
@@ -237,6 +222,132 @@ public class MessageDispatcher {
         }
     }
 
+
+    /************************************* 外部调用信息入口************************************************/
+
+    public void initModule() {
+        if (isInit) {
+            return;
+        }
+        isInit = true;
+        if (Build.VERSION.SDK_INT < 24) {
+            postDelay(MSG_INFO_OC, 0);
+        }
+        postDelay(MSG_INFO_WBG, 0);
+        postDelay(MSG_INFO_SNAPS, 0);
+        if (BuildConfig.ENABLE_NETINFO) {
+            postDelay(MSG_INFO_NETS, 0);
+        }
+        // 5秒后上传
+        postDelay(MSG_INFO_UPLOAD, 5 * EGContext.TIME_SECOND);
+//        //10 秒后检查热修复
+//        if (BuildConfig.enableHotFix) {
+//            postDelay(MSG_INFO_HOTFIX, 10 * EGContext.TIME_SECOND);
+//        }
+
+    }
+
+
+    /************************************* 发送消息************************************************/
+
+    /**
+     * 延迟发送
+     *
+     * @param what
+     * @param delayTime
+     */
+    private void postDelay(int what, long delayTime) {
+        try {
+            if (mHandler != null && !mHandler.hasMessages(what) && thread != null && thread.isAlive()) {
+                Message msg = Message.obtain();
+                msg.what = what;
+                msg.arg1 = delayTime == 0 ? EGContext.TIME_SECOND * 30 : (int) delayTime;
+                mHandler.sendMessageDelayed(msg, delayTime > 0 ? delayTime : 0);
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
+        }
+
+    }
+
+    /************************************* 单例: 初始化************************************************/
+
+    private MessageDispatcher() {
+        thread = new HandlerThread(EGContext.THREAD_NAME,
+                android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE);
+        thread.start();
+        mHandler = new AnalysyHandler(thread.getLooper());
+    }
+
+    private static class Holder {
+        private static final MessageDispatcher INSTANCE = new MessageDispatcher();
+    }
+
+    public static MessageDispatcher getInstance(Context context) {
+        Holder.INSTANCE.init(context);
+        return Holder.INSTANCE;
+    }
+
+    private void init(Context context) {
+        if (Holder.INSTANCE.mContext == null) {
+            Holder.INSTANCE.mContext = EContextHelper.getContext();
+
+        }
+    }
+
+    private Context mContext = null;
+    private final Handler mHandler;
+    //是否初始化
+    private volatile boolean isInit = false;
+    // oc 轮训消息
+    private static final int MSG_INFO_OC = 0x001;
+    // 上传轮训消息
+    private static final int MSG_INFO_UPLOAD = 0x002;
+    // 定位信息轮训
+    private static final int MSG_INFO_WBG = 0x003;
+    // 安装列表.每三个小时轮训一次
+    private static final int MSG_INFO_SNAPS = 0x004;
+    // net 信息
+    private static final int MSG_INFO_NETS = 0x005;
+
+//    //热更新
+//    private static final int MSG_INFO_HOTFIX = 0x006;
+//
+//    public void reallyLoop() {
+//        try {
+//            if (mHandler == null) {
+//                return;
+//            }
+//            if (Build.VERSION.SDK_INT < 24) {
+//                if (!mHandler.hasMessages(MSG_INFO_OC)) {
+//                    postDelay(MSG_INFO_OC, 0);
+//                }
+//            }
+//            if (!mHandler.hasMessages(MSG_INFO_WBG)) {
+//                postDelay(MSG_INFO_WBG, 0);
+//            }
+//            if (!mHandler.hasMessages(MSG_INFO_SNAPS)) {
+//                postDelay(MSG_INFO_SNAPS, 0);
+//            }
+//            // 5秒后上传
+//            if (!mHandler.hasMessages(MSG_INFO_UPLOAD)) {
+//                postDelay(MSG_INFO_UPLOAD, 5 * EGContext.TIME_SECOND);
+//            }
+//        } catch (Throwable e) {
+//        }
+//
+//    }
+//
+//    public void quit() {
+//        mHandler.removeCallbacksAndMessages(null);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+//            thread.quitSafely();
+//        } else {
+//            thread.quit();
+//        }
+//    }
 //    /**
 //     * 工作启动逻辑
 //     *
@@ -361,123 +472,4 @@ public class MessageDispatcher {
 //        }
 //    }
 
-
-    /************************************* 外部调用信息入口************************************************/
-
-    public void initModule() {
-        if (isInit) {
-            return;
-        }
-        isInit = true;
-        if (Build.VERSION.SDK_INT < 24) {
-            postDelay(MSG_INFO_OC, 0);
-        }
-        postDelay(MSG_INFO_WBG, 0);
-        postDelay(MSG_INFO_SNAPS, 0);
-        if (BuildConfig.ENABLE_NETINFO) {
-            postDelay(MSG_INFO_NETS, 0);
-        }
-        // 5秒后上传
-        postDelay(MSG_INFO_UPLOAD, 5 * EGContext.TIME_SECOND);
-        //10 秒后检查热修复
-        if (BuildConfig.enableHotFix) {
-            postDelay(MSG_INFO_HOTFIX, 10 * EGContext.TIME_SECOND);
-        }
-
-    }
-
-//    public void reallyLoop() {
-//        try {
-//            if (mHandler == null) {
-//                return;
-//            }
-//            if (Build.VERSION.SDK_INT < 24) {
-//                if (!mHandler.hasMessages(MSG_INFO_OC)) {
-//                    postDelay(MSG_INFO_OC, 0);
-//                }
-//            }
-//            if (!mHandler.hasMessages(MSG_INFO_WBG)) {
-//                postDelay(MSG_INFO_WBG, 0);
-//            }
-//            if (!mHandler.hasMessages(MSG_INFO_SNAPS)) {
-//                postDelay(MSG_INFO_SNAPS, 0);
-//            }
-//            // 5秒后上传
-//            if (!mHandler.hasMessages(MSG_INFO_UPLOAD)) {
-//                postDelay(MSG_INFO_UPLOAD, 5 * EGContext.TIME_SECOND);
-//            }
-//        } catch (Throwable e) {
-//        }
-//
-//    }
-
-
-    /************************************* 发送消息************************************************/
-
-    /**
-     * 延迟发送
-     *
-     * @param what
-     * @param delayTime
-     */
-    private void postDelay(int what, long delayTime) {
-        try {
-            if (mHandler != null && !mHandler.hasMessages(what) && thread != null && thread.isAlive()) {
-                Message msg = Message.obtain();
-                msg.what = what;
-                msg.arg1 = delayTime == 0 ? EGContext.TIME_SECOND * 30 : (int) delayTime;
-                mHandler.sendMessageDelayed(msg, delayTime > 0 ? delayTime : 0);
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-
-    }
-
-
-    /************************************* 单例: 初始化************************************************/
-
-
-    private MessageDispatcher() {
-        thread = new HandlerThread(EGContext.THREAD_NAME,
-                android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE);
-        thread.start();
-        mHandler = new AnalysyHandler(thread.getLooper());
-    }
-
-    private static class Holder {
-        private static final MessageDispatcher INSTANCE = new MessageDispatcher();
-    }
-
-    public static MessageDispatcher getInstance(Context context) {
-        Holder.INSTANCE.init(context);
-        return Holder.INSTANCE;
-    }
-
-    private void init(Context context) {
-        if (Holder.INSTANCE.mContext == null) {
-            Holder.INSTANCE.mContext = EContextHelper.getContext();
-
-        }
-    }
-
-
-    private Context mContext = null;
-    private final Handler mHandler;
-    //是否初始化
-    private volatile boolean isInit = false;
-    // oc 轮训消息
-    private static final int MSG_INFO_OC = 0x001;
-    // 上传轮训消息
-    private static final int MSG_INFO_UPLOAD = 0x002;
-    // 定位信息轮训
-    private static final int MSG_INFO_WBG = 0x003;
-    // 安装列表.每三个小时轮训一次
-    private static final int MSG_INFO_SNAPS = 0x004;
-    // net 信息
-    private static final int MSG_INFO_NETS = 0x005;
-    //热更新
-    private static final int MSG_INFO_HOTFIX = 0x006;
 }

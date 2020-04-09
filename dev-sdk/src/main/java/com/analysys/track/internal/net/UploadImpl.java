@@ -473,16 +473,14 @@ public class UploadImpl {
                     uploadFailure(mContext);
 //                    return;
                 }
-
             } else {
                 // 返回值为空
                 uploadFailure(mContext);
 //                return;
             }
 
-
             Intent intent = new Intent(EGContext.ACTION_UPDATE_POLICY);
-            EContextHelper.getContext().sendBroadcast(intent);
+            EContextHelper.getContext(mContext).sendBroadcast(intent);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_upload, e);
