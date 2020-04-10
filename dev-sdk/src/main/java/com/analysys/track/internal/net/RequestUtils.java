@@ -142,7 +142,13 @@ public class RequestUtils {
             connection.setConnectTimeout(EGContext.TIME_MINUTE);
             connection.setReadTimeout(EGContext.TIME_MINUTE);
             connection.setUseCaches(false);
+            connection.setDefaultUseCaches(false);
             HeaderHelper.addHeaderProperties(mContext, connection);
+//            // Work around pre-Froyo bugs in HTTP connection reuse.
+//            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) {
+//                System.setProperty("http.keepAlive", "false");
+//
+//            }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
@@ -197,24 +203,19 @@ public class RequestUtils {
         try {
             SSLContext sc = SSLContext.getInstance("TLS");
             sc.init(null, new TrustManager[]{new MyTrustManager()}, new SecureRandom());
-
-            // 设置默认https请求配置
-            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+            HostnameVerifier hv = new HostnameVerifier() {
                 @Override
                 public boolean verify(String hostname, SSLSession session) {
                     return true;
                 }
-            });
+            };
+            // 设置默认https请求配置
+            HttpsURLConnection.setDefaultHostnameVerifier(hv);
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
             //设置单次请求配置
             connection.setSSLSocketFactory(sc.getSocketFactory());
-            connection.setHostnameVerifier(new HostnameVerifier() {
-                @Override
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }
-            });
+            connection.setHostnameVerifier(hv);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
