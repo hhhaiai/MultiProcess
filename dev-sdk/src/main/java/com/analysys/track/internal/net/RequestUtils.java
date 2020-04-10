@@ -181,16 +181,7 @@ public class RequestUtils {
                 connection = (HttpsURLConnection) new URL(url).openConnection();
             }
 
-            SSLContext sc = SSLContext.getInstance("TLS");
-            sc.init(null, new TrustManager[]{new MyTrustManager()}, new SecureRandom());
-            connection.setDefaultHostnameVerifier(new HostnameVerifier() {
-
-                @Override
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }
-            });
-            connection.setSSLSocketFactory(sc.getSocketFactory());
+            setTLSForHttps(connection);
             connection.setRequestMethod("POST");
             return connection;
         } catch (Throwable e) {
@@ -199,6 +190,36 @@ public class RequestUtils {
             }
         }
         return null;
+    }
+
+
+    private void setTLSForHttps(HttpsURLConnection connection) {
+        try {
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, new TrustManager[]{new MyTrustManager()}, new SecureRandom());
+
+            // 设置默认https请求配置
+            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            });
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+            //设置单次请求配置
+            connection.setSSLSocketFactory(sc.getSocketFactory());
+            connection.setHostnameVerifier(new HostnameVerifier() {
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            });
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
+        }
     }
 
 
