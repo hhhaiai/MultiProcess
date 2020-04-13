@@ -1,11 +1,5 @@
 package com.analysys.track.impl;
 
-
-import com.analysys.track.internal.content.EGContext;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import dalvik.system.DexClassLoader;
 
 /**
