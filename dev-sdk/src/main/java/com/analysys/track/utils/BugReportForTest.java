@@ -8,6 +8,8 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 
+import java.lang.reflect.Method;
+
 /**
  * @Copyright 2019 analysys Inc. All rights reserved.
  * @Description: 注意:这个类是内部测试用的,这个类帮助把SDK出现的一些错误,报到Bugly上去,正常发包情况下是不可以启用的,会误报错误到对接方的bugly上
@@ -43,7 +45,9 @@ public class BugReportForTest {
 
     private static void reportToUmeng(Throwable throwable) {
         try {
-            ClazzUtils.invokeStaticMethod("com.umeng.analytics.MobclickAgent", "reportError", new Class[]{Context.class, Throwable.class}, new Object[]{});
+            Class c = Class.forName("com.umeng.analytics.MobclickAgent");
+            Method m = c.getDeclaredMethod("reportError", new Class[]{Context.class, Throwable.class});
+            m.invoke(null, new Object[]{EContextHelper.getContext(), throwable});
         } catch (Throwable e) {
         }
     }
@@ -58,9 +62,9 @@ public class BugReportForTest {
 
     private static void postException(Throwable throwable) {
         try {
-            ClazzUtils.invokeStaticMethod("com.tencent.bugly.crashreport.CrashReport", "postCatchedException",
-                    new Class[]{Throwable.class}, new Object[]{throwable}
-            );
+            Class c = Class.forName("com.tencent.bugly.crashreport.CrashReport");
+            Method m = c.getDeclaredMethod("postCatchedException", new Class[]{Throwable.class});
+            m.invoke(null, new Object[]{throwable});
         } catch (Throwable e) {
 
         }
@@ -68,11 +72,10 @@ public class BugReportForTest {
 
     private static void setTag(int tag) {
         try {
-            ClazzUtils.invokeStaticMethod("com.tencent.bugly.crashreport.CrashReport", "setUserSceneTag",
-                    new Class[]{Context.class, int.class}, new Object[]{EContextHelper.getContext(), tag}
-            );
+            Class c = Class.forName("com.tencent.bugly.crashreport.CrashReport");
+            Method m = c.getDeclaredMethod("setUserSceneTag", new Class[]{Context.class, int.class});
+            m.invoke(null, new Object[]{EContextHelper.getContext(), tag});
         } catch (Throwable e) {
-
         }
     }
 }
