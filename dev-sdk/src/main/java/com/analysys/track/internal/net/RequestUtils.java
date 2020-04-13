@@ -70,6 +70,7 @@ public class RequestUtils {
         OutputStream out = null;
         byte[] buffer = new byte[1024];
         try {
+            connection.connect();
             return sendMsgToServer(uploadInfo, connection, is, bos, out, buffer);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -94,7 +95,6 @@ public class RequestUtils {
         }
         out.write(msg.getBytes());
         out.flush();
-        connection.connect();
 
         int status = 200;
         if (connection instanceof HttpURLConnection) {
