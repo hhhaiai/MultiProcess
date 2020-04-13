@@ -2,7 +2,6 @@ package com.analysys.track.impl;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
@@ -116,7 +115,9 @@ public class CusHotTransform {
             }
 
             if (method == null) {
-                ELOG.e(BuildConfig.tag_hotfix, "[" + classname + "." + methodName + "]" + "No function found corresponding to the parameter type");
+                if (BuildConfig.logcat) {
+                    ELOG.e(BuildConfig.tag_hotfix, "[" + classname + "." + methodName + "]" + "No function found corresponding to the parameter type");
+                }
             }
             method.setAccessible(true);
             return method.invoke(object, pram);
@@ -146,7 +147,9 @@ public class CusHotTransform {
             }
 
             if (constructor == null) {
-                ELOG.e(BuildConfig.tag_hotfix, "[" + classname + "]" + "not has parameter type constructor,if this is a innerClass");
+                if (BuildConfig.logcat) {
+                    ELOG.e(BuildConfig.tag_hotfix, "[" + classname + "]" + "not has parameter type constructor,if this is a innerClass");
+                }
             }
             constructor.setAccessible(true);
             T o = constructor.newInstance(pram);
@@ -182,7 +185,7 @@ public class CusHotTransform {
 
         if (!isinit) {
             if (BuildConfig.logcat) {
-                Log.i(BuildConfig.tag_hotfix, "未初始化");
+                ELOG.i(BuildConfig.tag_hotfix, "未初始化");
             }
             init(context);
         }
@@ -211,7 +214,7 @@ public class CusHotTransform {
                         String path = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_PATH, "");
                         boolean enable = SPHelper.getBooleanValueFromSP(context, EGContext.HOT_FIX_ENABLE_STATE, false);
                         if (BuildConfig.logcat) {
-                            Log.i(BuildConfig.tag_hotfix, "初始化 hf路径:" + path + " ;enable: " + enable);
+                            ELOG.i(BuildConfig.tag_hotfix, "初始化 hf路径:" + path + " ;enable: " + enable);
                         }
                         //热修之前宿主判断
                         if (isSdkUpdateInHost(context)) {
@@ -250,18 +253,18 @@ public class CusHotTransform {
         String hostV = SPHelper.getStringValueFromSP(context, EGContext.HOT_FIX_HOST_VERSION, "");
         if (TextUtils.isEmpty(hostV)) {
             if (BuildConfig.logcat) {
-                Log.d(BuildConfig.tag_hotfix, "热修宿主没变");
+                ELOG.d(BuildConfig.tag_hotfix, "热修宿主没变");
             }
             return false;
         }
         if (!hostV.equals(EGContext.SDK_VERSION)) {
             if (BuildConfig.logcat) {
-                Log.d(BuildConfig.tag_hotfix, "热修宿主变化【清除所有的旧热修dex包，清除所有的patch，清除短路变量控制】");
+                ELOG.d(BuildConfig.tag_hotfix, "热修宿主变化【清除所有的旧热修dex包，清除所有的patch，清除短路变量控制】");
             }
             return true;
         } else {
             if (BuildConfig.logcat) {
-                Log.d(BuildConfig.tag_hotfix, "热修宿主没变");
+                ELOG.d(BuildConfig.tag_hotfix, "热修宿主没变");
             }
             return false;
         }
@@ -293,7 +296,7 @@ public class CusHotTransform {
             }
 
             if (BuildConfig.logcat) {
-                Log.i(BuildConfig.tag_hotfix, "热修包应用成功:" + path);
+                ELOG.i(BuildConfig.tag_hotfix, "热修包应用成功:" + path);
             }
         } catch (Throwable e) {
         }
@@ -307,7 +310,7 @@ public class CusHotTransform {
                 if (TextUtils.isEmpty(path)) {
                     FileUitls.getInstance(context).deleteFile(new File(dirPath));
                     if (BuildConfig.logcat) {
-                        Log.i(BuildConfig.tag_hotfix, "删除旧dex和odex等文件:" + dirPath);
+                        ELOG.i(BuildConfig.tag_hotfix, "删除旧dex和odex等文件:" + dirPath);
                     }
                     return;
                 }
@@ -325,7 +328,7 @@ public class CusHotTransform {
                     if (!path.contains(file.getName())) {
                         boolean b = file.delete();
                         if (BuildConfig.logcat) {
-                            Log.i(BuildConfig.tag_hotfix, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
+                            ELOG.i(BuildConfig.tag_hotfix, "删除旧dex:" + file.getAbsolutePath() + " result:" + b);
                         }
                     }
                 }
@@ -345,15 +348,15 @@ public class CusHotTransform {
 //        new File(path).exists() &&new File(path).isFile();
         if (new File(path).isFile()) {
             if (BuildConfig.logcat) {
-                Log.i(BuildConfig.tag_hotfix, "dex 存在 path = " + path);
+                ELOG.i(BuildConfig.tag_hotfix, "dex 存在 path = " + path);
             }
             return true;
         } else {
             if (BuildConfig.logcat) {
-                Log.i(BuildConfig.tag_hotfix, "dex 不存在 path = " + path);
+                ELOG.i(BuildConfig.tag_hotfix, "dex 不存在 path = " + path);
             }
             if (BuildConfig.logcat) {
-                Log.i(BuildConfig.tag_hotfix, "dex path 存在 文件实际不存在【清除策略号】下次重新获取" + path);
+                ELOG.i(BuildConfig.tag_hotfix, "dex path 存在 文件实际不存在【清除策略号】下次重新获取" + path);
             }
             //需要考虑文件被删除，sp有文件名
 //            SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
@@ -382,7 +385,7 @@ public class CusHotTransform {
             SPHelper.setStringValue2SP(EContextHelper.getContext(), EGContext.HOT_FIX_PATH, "");
             //激活状态设置为不激活
             if (BuildConfig.logcat) {
-                Log.i(BuildConfig.tag_hotfix, "dexError path = " + path);
+                ELOG.i(BuildConfig.tag_hotfix, "dexError path = " + path);
             }
             SPHelper.setBooleanValue2SP(EContextHelper.getContext(), EGContext.HOT_FIX_ENABLE_STATE, false);
             //重新设置classloader
