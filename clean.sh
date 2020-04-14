@@ -25,6 +25,7 @@ clean_task() {
     rm -rf releasebak/
     rm -rf sh.exe.stackdump
     rm -rf classes.dex
+	rm -rf .vs/
 
     if [ $# == 0 ]; then
         logi "[$filename]clean project success. "
