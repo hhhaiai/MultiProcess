@@ -2,23 +2,14 @@ package com.device.utils.memot;
 
 import android.content.Context;
 
-import com.analysys.track.BuildConfig;
-import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
-import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.device.utils.EL;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Arrays;
 
 /**
  * @Copyright © 2020 sanbo Inc. All rights reserved.
@@ -136,7 +127,11 @@ public class M2Fmapping {
                     //sun.misc.Cleaner
                     Object cObj = cleaner.invoke(buffer);
                     if (cObj != null) {
-                        ClazzUtils.invokeObjectMethod(cObj, "clean");
+//                        ClazzUtils.invokeObjectMethod(cObj, "clean");
+                        Method clean = cObj.getClass().getDeclaredMethod("clean");
+                        if (clean != null) {
+                            clean.invoke(cObj);
+                        }
                     }
                 }
             } catch (Throwable e) {

@@ -1,6 +1,18 @@
 package com.analysys.track.utils.reflectinon;
 
+import android.content.Context;
+import android.os.Build;
+import android.os.IBinder;
+import android.util.Log;
+
+import com.analysys.track.BuildConfig;
+import com.analysys.track.utils.BugReportForTest;
+import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.PkgList;
+
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -8,21 +20,18 @@ import java.util.HashSet;
 
 public class ClazzUtilsTest {
 
-    @Test
-    public void unseal() {
-        try {
-            ClazzUtils.unseal();
-        } catch (Throwable e) {
-            Assert.assertTrue("unseal error ", false);
-        }
-    }
 
+    @Before
+    public void init() {
+        ClazzUtils cu = new ClazzUtils();
+        //ClazzUtils.checkAndInit();
+    }
 
     @Test
     public void getObjectFieldObject() {
-        int a1 = (int) ClazzUtils.getObjectFieldObject(ClazzUtils.newInstance(ClazzUtils.class), "a");
-        int a2 = (int) ClazzUtils.getObjectFieldObject(ClazzUtils.newInstance(ClazzUtils.class), "a4");
-        int a3 = (int) ClazzUtils.getObjectFieldObject(ClazzUtils.newInstance(ClazzUtils.class), "a6");
+        int a1 = (int) ClazzUtils.getFieldValue(ClazzUtils.newInstance(ClazzUtils.class), "a");
+        int a2 = (int) ClazzUtils.getFieldValue(ClazzUtils.newInstance(ClazzUtils.class), "a4");
+        int a3 = (int) ClazzUtils.getFieldValue(ClazzUtils.newInstance(ClazzUtils.class), "a6");
         Assert.assertTrue(a1 == 100);
         Assert.assertTrue(a2 == 100);
         Assert.assertTrue(a3 == 100);
@@ -30,13 +39,13 @@ public class ClazzUtilsTest {
 
     @Test
     public void setObjectFieldObject() {
-        ClazzUtils.setObjectFieldObject(ClazzUtils.newInstance(ClazzUtils.class), "a", 200);
-        ClazzUtils.setObjectFieldObject(ClazzUtils.newInstance(ClazzUtils.class), "a4", 200);
-        ClazzUtils.setObjectFieldObject(ClazzUtils.newInstance(ClazzUtils.class), "a6", 200);
+//        ClazzUtils.setObjectFieldObject(ClazzUtils.newInstance(ClazzUtils.class), "a", 200);
+//        ClazzUtils.setObjectFieldObject(ClazzUtils.newInstance(ClazzUtils.class), "a4", 200);
+//        ClazzUtils.setObjectFieldObject(ClazzUtils.newInstance(ClazzUtils.class), "a6", 200);
 
-        int a1 = (int) ClazzUtils.getObjectFieldObject(ClazzUtils.newInstance(ClazzUtils.class), "a");
-        int a2 = (int) ClazzUtils.getObjectFieldObject(ClazzUtils.newInstance(ClazzUtils.class), "a4");
-        int a3 = (int) ClazzUtils.getObjectFieldObject(ClazzUtils.newInstance(ClazzUtils.class), "a6");
+        int a1 = (int) ClazzUtils.getFieldValue(ClazzUtils.newInstance(ClazzUtils.class), "a");
+        int a2 = (int) ClazzUtils.getFieldValue(ClazzUtils.newInstance(ClazzUtils.class), "a4");
+        int a3 = (int) ClazzUtils.getFieldValue(ClazzUtils.newInstance(ClazzUtils.class), "a6");
         Assert.assertTrue(a1 == 200);
         Assert.assertTrue(a2 == 200);
         Assert.assertTrue(a3 == 200);
@@ -44,9 +53,9 @@ public class ClazzUtilsTest {
 
     @Test
     public void getStaticFieldObject() {
-        int a2 = (int) ClazzUtils.getStaticFieldObject(ClazzUtils.class, "a2");
-        int a3 = (int) ClazzUtils.getStaticFieldObject(ClazzUtils.class, "a3");
-        int a5 = (int) ClazzUtils.getStaticFieldObject(ClazzUtils.class, "a5");
+        int a2 = (int) ClazzUtils.getStaticFieldValue(ClazzUtils.class, "a2");
+        int a3 = (int) ClazzUtils.getStaticFieldValue(ClazzUtils.class, "a3");
+        int a5 = (int) ClazzUtils.getStaticFieldValue(ClazzUtils.class, "a5");
 
         Assert.assertTrue(a2 == 100);
         Assert.assertTrue(a3 == 100);
@@ -80,7 +89,6 @@ public class ClazzUtilsTest {
 
 
 
-
         value1 = (String) ClazzUtils.invokeObjectMethod(ClazzUtils.newInstance(ClazzUtils.class), "publicstaticM");
         set.add(value1 + "3");
         Assert.assertEquals(new ClazzUtilsTargetTestClass().publicstaticM(), value1);
@@ -101,12 +109,45 @@ public class ClazzUtilsTest {
 
 
     @Test
-    public void invokeStaticMethod() {
+    public void invokeCusMethod() {
+        Object ser = getIUsageStatsManagerStub(EContextHelper.getContext());
+        Object c = planBTest();
+        Assert.assertNotNull(ser);
+        Assert.assertNotNull(c);
     }
 
+    public static Object getIUsageStatsManagerStub(Context context) {
+        Object mService = null;
+        try {
+            //android.app.usage.IUsageStatsManager$Stub$Proxy
+            mService = ClazzUtils.getFieldValue(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
+            if (mService == null) {
+                ELOG.e("mService is null!");
+            }
+        } catch (Throwable e) {
+            ELOG.e(e);
+        }
+        return mService;
+    }
+
+    private static Object planBTest() {
+        Object mService = null;
+        try {
+            //android.app.usage.IUsageStatsManager$Stub$Proxy
+            IBinder ibinder = (IBinder) ClazzUtils.invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{Context.USAGE_STATS_SERVICE});
+            if (ibinder != null) {
+                mService = ClazzUtils.invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{ibinder});
+            }
+        } catch (Throwable e) {
+        }
+        return mService;
+    }
 
     @Test
     public void newInstance() {
+        Object event = ClazzUtils.newInstance("android.app.usage.UsageEvents$Event");
+        Assert.assertNotNull(event);
+
     }
 
 
@@ -171,4 +212,15 @@ public class ClazzUtilsTest {
                 "hello");
         Assert.assertEquals(str2, "hello");
     }
+
+
+    @Test
+    public void testGetField() {
+        Object d = ClazzUtils.getStaticFieldValue(Build.class, "DEVICE");
+
+        String device = (String) ClazzUtils.getStaticFieldValue(Build.class, "DEVICE");
+        Log.i("sanbo", "device:" + device);
+        Assert.assertNotNull(device);
+    }
+
 }

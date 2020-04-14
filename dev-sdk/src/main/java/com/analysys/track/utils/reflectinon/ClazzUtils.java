@@ -5,7 +5,6 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.ELOG;
 
 import java.lang.reflect.Constructor;
@@ -23,309 +22,191 @@ import static android.os.Build.VERSION.SDK_INT;
  * @mail: miqingtang@analysys.com.cn
  */
 public class ClazzUtils {
-    private static Method mYmForName;
-    private static Method mYmInvoke;
-    private static Method mYmGetDeclaredMethod;
-    private static Method mYmGetMethod;
+    private static Method forName = null;
+    private static Method invoke = null;
 
-    private static Method mYmGetDeclaredField;
-    private static Method mYmGetField;
+    private static Method getDeclaredMethod = null;
+    private static Method getMethod = null;
 
-    private static Method mYmGetDeclaredConstructor;
-    private static Method mYmGetConstructor;
-    private static Method mYmNewInstance;
+    private static Method getDeclaredField = null;
+    private static Method getField = null;
 
+
+    private static Method getDeclaredConstructor = null;
+    private static Method getConstructor = null;
+    private static Method newInstance = null;
+
+//    public static void checkAndInit() {
+//        if (forName == null || invoke == null
+//                || getDeclaredMethod == null || getMethod == null
+//                || getDeclaredField == null || getField == null
+//                || getDeclaredConstructor == null || getConstructor == null || newInstance == null
+//        ) {
+//            try {
+//                forName = Class.class.getDeclaredMethod("forName", String.class);
+//                invoke = Method.class.getMethod("invoke", Object.class, Object[].class);
+//                // 反射获取方法
+//                getDeclaredMethod = Class.class.getDeclaredMethod("getDeclaredMethod", String.class, Class[].class);
+//                getMethod = Class.class.getDeclaredMethod("getMethod", String.class, Class[].class);
+//
+//                // 反射获取变量
+//                getDeclaredField = Class.class.getDeclaredMethod("getDeclaredField", String.class);
+//                getField = Class.class.getDeclaredMethod("getField", String.class);
+//
+//                // 反射实例化代码
+//                getDeclaredConstructor = Class.class.getDeclaredMethod("getDeclaredConstructor", Class[].class);
+//                getConstructor = Class.class.getDeclaredMethod("getConstructor", Class[].class);
+//                newInstance = Constructor.class.getDeclaredMethod("newInstance", Object[].class);
+//
+//            } catch (Throwable e) {
+//                if (BuildConfig.logcat) {
+//                    ELOG.e(e);
+//                }
+//            }
+//            /**
+//             * 设置豁免所有hide api
+//             */
+//            try {
+//                Class<?> vmRuntimeClass = (Class<?>) forName.invoke(null, "dalvik.system.VMRuntime");
+//                Method getRuntime = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", null);
+//                Method setHiddenApiExemptions = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
+//                Object sVmRuntime = getRuntime.invoke(null);
+//                setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
+//            } catch (Throwable e) {
+//                if (BuildConfig.logcat) {
+//                    ELOG.e(e);
+//                }
+//            }
+//        }
+//    }
     static {
-        // android  9 10 版本
-//        if (SDK_INT > 27 && SDK_INT <= 29) {
-        if (SDK_INT > 27) {
+        // android p/9以上设备，使用元反射
+//        if (SDK_INT > 27) {
             try {
-                mYmForName = Class.class.getDeclaredMethod("forName", String.class);
-                mYmInvoke = Method.class.getMethod("invoke", Object.class, Object[].class);
+                forName = Class.class.getDeclaredMethod("forName", String.class);
+                invoke = Method.class.getMethod("invoke", Object.class, Object[].class);
+                // 反射获取方法
+                getDeclaredMethod = Class.class.getDeclaredMethod("getDeclaredMethod", String.class, Class[].class);
+                getMethod = Class.class.getDeclaredMethod("getMethod", String.class, Class[].class);
 
-                mYmGetDeclaredMethod = Class.class.getDeclaredMethod("getDeclaredMethod", String.class, Class[].class);
-                mYmGetMethod = Class.class.getDeclaredMethod("getMethod", String.class, Class[].class);
+                // 反射获取变量
+                getDeclaredField = Class.class.getDeclaredMethod("getDeclaredField", String.class);
+                getField = Class.class.getDeclaredMethod("getField", String.class);
 
-                mYmGetDeclaredField = Class.class.getDeclaredMethod("getDeclaredField", String.class);
-                mYmGetField = Class.class.getDeclaredMethod("getField", String.class);
-
-                mYmGetDeclaredConstructor = Class.class.getDeclaredMethod("getDeclaredConstructor", Class[].class);
-                mYmGetConstructor = Class.class.getDeclaredMethod("getConstructor", Class[].class);
-
-                mYmNewInstance = Constructor.class.getDeclaredMethod("newInstance", Object[].class);
+                // 反射实例化代码
+                getDeclaredConstructor = Class.class.getDeclaredMethod("getDeclaredConstructor", Class[].class);
+                getConstructor = Class.class.getDeclaredMethod("getConstructor", Class[].class);
+                newInstance = Constructor.class.getDeclaredMethod("newInstance", Object[].class);
 
             } catch (Throwable e) {
+                if (BuildConfig.logcat) {
+                    ELOG.e(e);
+                }
             }
             /**
              * 设置豁免所有hide api
              */
             try {
-//                Class<?> vmRuntimeClass = (Class<?>) mYmForName.invoke(null, "dalvik.system.VMRuntime");
-//                Method getRuntime = (Method) mYmGetDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", null);
-//                Method setHiddenApiExemptions = (Method) mYmGetDeclaredMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
-//                Object sVmRuntime = getRuntime.invoke(null);
-//                setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
-                Class<?> vmRuntimeClass = (Class<?>) invokeYmMethod(mYmForName, null, "dalvik.system.VMRuntime");
-                Method getRuntime = (Method) invokeYmMethod(mYmGetDeclaredMethod, vmRuntimeClass, "getRuntime", null);
-                Method setHiddenApiExemptions = (Method) invokeYmMethod(mYmGetDeclaredMethod, vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
-                Object sVmRuntime = invokeYmMethod(getRuntime, null);
-                invokeYmMethod(setHiddenApiExemptions, sVmRuntime, new Object[]{new String[]{"L"}});
+                Class<?> vmRuntimeClass = (Class<?>) forName.invoke(null, "dalvik.system.VMRuntime");
+                Method getRuntime = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", null);
+                Method setHiddenApiExemptions = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
+                Object sVmRuntime = getRuntime.invoke(null);
+                setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
             } catch (Throwable e) {
-            }
-        }
-    }
-
-
-    /**
-     * get method
-     *
-     * @param clazzName
-     * @param methodName
-     * @param parameterTypes
-     * @return
-     */
-    public static Method getMethod(String clazzName, String methodName, Class<?>... parameterTypes) {
-        return getMethod(getClass(clazzName), methodName, parameterTypes);
-    }
-
-    public static Method getMethod(Class clazz, String methodName, Class<?>... parameterTypes) {
-        try {
-            if (clazz == null || TextUtils.isEmpty(methodName)) {
-                return null;
-            }
-            Method method = (Method) invokeYmMethod(mYmGetDeclaredMethod, clazz, methodName, parameterTypes);
-            if (method == null) {
-                method = (Method) invokeYmMethod(mYmGetMethod, clazz, methodName, parameterTypes);
-            }
-            if (method != null) {
-                method.setAccessible(true);
-                return method;
-            } else {
-                return getMethodPlanB(clazz, methodName, parameterTypes);
-            }
-        } catch (Throwable e) {
-            return getMethodPlanB(clazz, methodName, parameterTypes);
-        }
-    }
-
-    private static Method getMethodPlanB(Class clazz, String methodName, Class<?>... parameterTypes) {
-        try {
-            if (clazz == null || TextUtils.isEmpty(methodName)) {
-                return null;
-            }
-            Method method = clazz.getDeclaredMethod(methodName, parameterTypes);
-            if (method == null) {
-                method = clazz.getMethod(methodName, parameterTypes);
-            }
-            if (method != null) {
-                method.setAccessible(true);
-                return method;
-            } else {
                 if (BuildConfig.logcat) {
-                    ELOG.e(clazz.getName() + "." + methodName + " not found !");
+                    ELOG.e(e);
                 }
             }
-        } catch (Throwable e) {
-        }
-
-        return null;
-    }
-
-    /**
-     * get field
-     *
-     * @param className
-     * @param fieldName
-     * @return
-     */
-    public static Field getField(String className, String fieldName) {
-        return getField(getClass(className), fieldName);
-    }
-
-    public static Field getField(Class clazz, String fieldName) {
-        try {
-            if (clazz == null || TextUtils.isEmpty(fieldName)) {
-                return null;
-            }
-            Field field = (Field) invokeYmMethod(mYmGetDeclaredField, clazz, fieldName);
-            if (field == null) {
-                field = (Field) invokeYmMethod(mYmGetField, clazz, fieldName);
-            }
-            if (field != null) {
-                field.setAccessible(true);
-                return field;
-            } else {
-                return getFieldPlanB(clazz, fieldName);
-            }
-        } catch (Throwable e) {
-            return getFieldPlanB(clazz, fieldName);
-        }
-    }
-
-    public static Field getFieldPlanB(Class clazz, String fieldName) {
-        try {
-            if (clazz == null || TextUtils.isEmpty(fieldName)) {
-                return null;
-            }
-            Field field = clazz.getDeclaredField(fieldName);
-            if (field == null) {
-                field = clazz.getField(fieldName);
-            }
-            if (field != null) {
-                field.setAccessible(true);
-                return field;
-            }
-        } catch (Throwable e) {
-        }
-
-        return null;
-    }
-
-    /**
-     * get object's field
-     *
-     * @param o
-     * @param fieldName
-     * @return
-     */
-    public static Object getObjectFieldObject(Object o, String fieldName) {
-        try {
-            if (o == null) {
-                return null;
-            }
-            Field field = getField(o.getClass(), fieldName);
-            if (field != null) {
-                return field.get(o);
-            }
-        } catch (Throwable e) {
-        }
-        return null;
-    }
-
-    public static void setObjectFieldObject(Object o, String fieldName, Object value) {
-
-        try {
-            if (o == null || fieldName == null) {
-                return;
-            }
-            Field field = getField(o.getClass(), fieldName);
-            if (field != null) {
-                field.set(o, value);
-            }
-        } catch (Throwable e) {
-        }
-    }
-
-    public static Object getStaticFieldObject(Class clazz, String fieldName) {
-
-        try {
-            if (clazz == null || fieldName == null) {
-                return null;
-            }
-            Field field = getField(clazz.getClass(), fieldName);
-            if (field != null) {
-                return field.get(null);
-            }
-        } catch (Throwable e) {
-
-        }
-        return null;
-    }
-
-    /**
-     * invoke  private/default/protected method
-     *
-     * @param o
-     * @param methodName
-     * @return
-     */
-    public static Object invokeObjectMethod(Object o, String methodName) {
-        return invokeObjectMethod(o, methodName, new Class[]{}, new Object[]{});
-    }
-
-    public static Object invokeObjectMethod(Object o, String methodName, Class<?>[] argsClass, Object[] args) {
-        try {
-            if (o == null || methodName == null) {
-                return null;
-            }
-            Method method = getMethod(o.getClass(), methodName, argsClass);
-            if (method != null) {
-                return invokeYmMethod(method, o, args);
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.logcat) {
-                ELOG.e(e);
-            }
-        }
-        return null;
-    }
-
-    public static Object invokeObjectMethod(Object o, String methodName, String[] argsClassNames, Object[] args) {
-        try {
-            if (o == null || methodName == null) {
-                return null;
-            }
-            if (argsClassNames != null) {
-                Class[] argsClass = new Class[argsClassNames.length];
-                for (int i = 0; i < argsClassNames.length; i++) {
-                    try {
-                        argsClass[i] = getClass(argsClassNames[i]);
-                    } catch (Throwable e) {
-                    }
-                }
-                return invokeObjectMethod(o, methodName, argsClass, args);
-            } else {
-                return invokeObjectMethod(o, methodName, new Class[]{}, new Object[]{});
-            }
-        } catch (Throwable e) {
-        }
-        return null;
+//        }
     }
 
 
     public static Object invokeStaticMethod(String clazzName, String methodName) {
         return invokeStaticMethod(getClass(clazzName), methodName, new Class<?>[]{}, new Object[]{});
     }
-    /**
-     * call static method
-     *
-     * @param clazzName
-     * @param methodName
-     * @param argsClass
-     * @param args
-     * @return
-     */
+
     public static Object invokeStaticMethod(String clazzName, String methodName, Class<?>[] argsClass, Object[] args) {
         return invokeStaticMethod(getClass(clazzName), methodName, argsClass, args);
     }
 
     public static Object invokeStaticMethod(Class clazz, String methodName, Class<?>[] argsClass, Object[] args) {
-        Object returnValue = null;
+        return getMethodProcess(clazz, methodName, null, argsClass, args);
+    }
+
+    public static Object invokeObjectMethod(Object o, String methodName) {
+        return invokeObjectMethod(o, methodName, new Class[]{}, new Object[]{});
+    }
+
+    public static Object invokeObjectMethod(Object o, String methodName, String[] argsClassNames, Object[] args) {
+        return invokeObjectMethod(o, methodName, converStringToClass(argsClassNames), args);
+    }
+
+    public static Object invokeObjectMethod(Object o, String methodName, Class<?>[] argsClass, Object[] args) {
+        if (o == null || TextUtils.isEmpty(methodName)) {
+            return null;
+        }
+        return getMethodProcess(o.getClass(), methodName, o, argsClass, args);
+    }
+
+    private static Object getMethodProcess(Class clazz, String methodName, Object o, Class<?>[] types, Object[] values) {
+        if (clazz == null || TextUtils.isEmpty(methodName)) {
+            return null;
+        }
+        if (!(types != null && values != null && types.length == values.length)) {
+            return null;
+        }
+        return goInvoke(getMethod(clazz, methodName, types), o, values);
+    }
+
+
+    public static Method getMethod(String clazzName, String methodName, Class<?>... types) {
+        return getMethod(getClass(clazzName), methodName, types);
+    }
+
+    public static Method getMethod(Class clazz, String methodName, Class<?>... types) {
+        Method method = null;
         try {
-            if (clazz == null || methodName == null) {
-                return returnValue;
+            if (clazz == null || TextUtils.isEmpty(methodName)) {
+                return method;
             }
-            Method method = null;
-            if (argsClass == null) {
-                // 木有参数的直接准确调用
-                method = getMethod(clazz, methodName);
-                if (method != null) {
-                    returnValue = invokeYmMethod(method, null);
-                }
+            method = (Method) goInvoke(getDeclaredMethod, clazz, methodName, types);
+            if (method == null) {
+                method = (Method) goInvoke(getMethod, clazz, methodName, types);
+            }
+            if (method != null) {
+                method.setAccessible(true);
+                return method;
             } else {
-                if (args != null && (argsClass.length == args.length)) {
-                    method = getMethod(clazz, methodName, argsClass);
-                    if (method != null) {
-                        returnValue = invokeYmMethod(method, null, args);
-                    }
-                }
+                return getMethodB(clazz, methodName, types);
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
+            return getMethodB(clazz, methodName, types);
         }
-        return returnValue;
+    }
+
+    private static Method getMethodB(Class clazz, String methodName, Class<?>[] parameterTypes) {
+        Method method = null;
+        try {
+            if (method == null) {
+                try {
+                    method = clazz.getDeclaredMethod(methodName, parameterTypes);
+                } catch (Throwable e) {
+                }
+            }
+            if (method == null) {
+                try {
+                    method = clazz.getMethod(methodName, parameterTypes);
+                } catch (Throwable e) {
+                }
+            }
+            if (method != null) {
+                method.setAccessible(true);
+                return method;
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 
@@ -352,49 +233,176 @@ public class ClazzUtils {
             if (clazz == null) {
                 return null;
             }
-            if (types == null) {
-                types = new Class[]{};
-                values = new Object[]{};
+            if (!(types != null && values != null && types.length == values.length)) {
+                return null;
             }
-
-            Constructor ctor = (Constructor) invokeYmMethod(mYmGetDeclaredConstructor, clazz, types);
-            if (ctor == null) {
-                ctor = (Constructor) invokeYmMethod(mYmGetConstructor, clazz, types);
+            Constructor ctor = null;
+            if (types == null || types.length == 0) {
+                ctor = (Constructor) goInvoke(getDeclaredConstructor, clazz, new Class[]{null});
+                if (ctor == null) {
+                    ctor = (Constructor) goInvoke(getConstructor, clazz, new Class[]{null});
+                }
+            } else {
+                ctor = (Constructor) goInvoke(getDeclaredConstructor, clazz, types);
+                if (ctor == null) {
+                    ctor = (Constructor) goInvoke(getConstructor, clazz, types);
+                }
             }
             if (ctor != null) {
                 ctor.setAccessible(true);
-                //  return ctor.newInstance(values);
-                return invokeYmMethod(mYmNewInstance, ctor, values);
+                if (types == null || types.length == 0) {
+                    return goInvoke(newInstance, ctor, new Object[]{null});
+                } else {
+                    return goInvoke(newInstance, ctor, values);
+                }
             } else {
-                return newInstancePlanB(clazz, types, values);
+                return newInstanceImplB(clazz, types, values);
             }
         } catch (Throwable igone) {
-            return newInstancePlanB(clazz, types, values);
+            if (BuildConfig.DEBUG_UTILS) {
+                ELOG.e(igone);
+            }
+            return newInstanceImplB(clazz, types, values);
         }
     }
 
-    private static Object newInstancePlanB(Class clazz, Class[] types, Object[] values) {
+
+    private static Object newInstanceImplB(Class clazz, Class[] types, Object[] values) {
         try {
-            if (clazz == null) {
-                return null;
-            }
-            if (types == null) {
-                types = new Class[]{};
-                values = new Object[]{};
-            }
-            Constructor ctor = clazz.getDeclaredConstructor(types);
+            Constructor ctor = null;
+
             if (ctor == null) {
-                ctor = clazz.getConstructor(types);
+                try {
+                    clazz.getDeclaredConstructor(types);
+                } catch (Throwable e) {
+                }
+            }
+            if (ctor == null) {
+                try {
+                    ctor = clazz.getConstructor(types);
+                } catch (Throwable e) {
+                }
             }
             if (ctor != null) {
                 ctor.setAccessible(true);
                 return ctor.newInstance(values);
             }
-        } catch (Throwable igone) {
+        } catch (Throwable e) {
+            if (BuildConfig.DEBUG_UTILS) {
+                ELOG.e(e);
+            }
         }
         return null;
     }
 
+
+    /**
+     * 获取非静态的变量
+     *
+     * @param o
+     * @param fieldName
+     * @return
+     */
+    public static Object getFieldValue(Object o, String fieldName) {
+        try {
+            if (o == null || TextUtils.isEmpty(fieldName)) {
+                return null;
+            }
+            Field field = getFieldImpl(o.getClass(), fieldName);
+            if (field != null) {
+                return field.get(o);
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.DEBUG_UTILS) {
+                ELOG.e(e);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 获取静态变量
+     *
+     * @param clazz
+     * @param fieldName
+     * @return
+     */
+    public static Object getStaticFieldValue(Class clazz, String fieldName) {
+        try {
+            if (clazz == null || TextUtils.isEmpty(fieldName)) {
+                return null;
+            }
+            Field field = getFieldImpl(clazz, fieldName);
+            if (field != null) {
+                return field.get(null);
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.DEBUG_UTILS) {
+                ELOG.e(e);
+            }
+        }
+        return null;
+    }
+
+    //内部元反射获取变量，无须关注异常，不打印日志
+    private static Field getFieldImpl(Class clazz, String fieldName) {
+        Field field = null;
+        try {
+            if (clazz == null || TextUtils.isEmpty(fieldName)) {
+                return field;
+            }
+
+            field = (Field) goInvoke(getDeclaredField, clazz, fieldName);
+            if (field == null) {
+                field = (Field) goInvoke(getField, clazz, fieldName);
+            }
+
+            if (field == null) {
+                return getFieldImplB(clazz, fieldName);
+            } else {
+                field.setAccessible(true);
+                return field;
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.DEBUG_UTILS) {
+                ELOG.e(e);
+            }
+            return getFieldImplB(clazz, fieldName);
+        }
+    }
+
+    //内部常规反射获取变量，无须关注异常，不打印日志
+    private static Field getFieldImplB(Class clazz, String fieldName) {
+        Field field = null;
+        try {
+            if (clazz == null || TextUtils.isEmpty(fieldName)) {
+                return field;
+            }
+
+            if (field == null) {
+                try {
+                    field = clazz.getDeclaredField(fieldName);
+                } catch (Throwable e) {
+                }
+            }
+            if (field == null) {
+                try {
+                    field = clazz.getField(fieldName);
+                } catch (Throwable e) {
+                }
+            }
+            if (field != null) {
+                field.setAccessible(true);
+                return field;
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.DEBUG_UTILS) {
+                ELOG.e(e);
+            }
+        }
+
+        return null;
+    }
 
     /**
      * 通过名称获取类. 元反射可用则元反射获取
@@ -405,78 +413,56 @@ public class ClazzUtils {
     public static Class getClass(String name) {
         Class result = null;
         try {
-
             if (TextUtils.isEmpty(name)) {
                 return result;
             }
-            //  Class.forName(name);
-            result = (Class) invokeYmMethod(mYmForName, null, name);
+            result = (Class) goInvoke(forName, null, name);
             if (result == null) {
                 result = Class.forName(name);
             }
         } catch (Throwable e) {
+            if (BuildConfig.DEBUG_UTILS) {
+                ELOG.e(e);
+            }
         }
 
         return result;
     }
-
-
-//    /**
-//     * 是否包含方法. 还需要考虑返回值的问题。
-//     *
-//     * @param clazz
-//     * @param methodName
-//     * @param parameterTypes
-//     * @return
-//     */
-//    public static boolean hasMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
-//        try {
-//            if (clazz == null || TextUtils.isEmpty(methodName)) {
-//                return false;
-//            }
-//            if (parameterTypes == null || parameterTypes.length == 0) {
-//                return clazz.getMethod(methodName) != null || clazz.getDeclaredMethod(methodName) != null;
-//            } else {
-//                return clazz.getMethod(methodName, parameterTypes) != null || clazz.getDeclaredMethod(methodName, parameterTypes) != null;
-//            }
-//        } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(e);
-//            }
-//        }
-//        return false;
-//    }
-
-    /*****************************************************反射工具方法**************************************************/
-
     /**
-     * 元反射的invoke.
+     * 公用的反射方法， 执行invoke方法
      *
-     * @param method
-     * @param obj
-     * @param argsValues
+     * @param method     调用谁的方法
+     * @param obj        若静态则为null,非静态则为对象
+     * @param argsValue  参数
      * @return
      */
-    private static Object invokeYmMethod(Method method, Object obj, Object... argsValues) {
+    private static Object goInvoke(Method method, Object obj, Object... argsValue) {
         try {
-            if (method == null) {
-                return null;
+            if (method != null) {
+                return method.invoke(obj, argsValue);
             }
-            //原始调用方法
-//            return method.invoke(obj, argsValues);
-            return mYmInvoke.invoke(method, obj, argsValues);
         } catch (Throwable e) {
-            if (BuildConfig.logcat) {
+            if (BuildConfig.DEBUG_UTILS) {
                 ELOG.e(e);
             }
         }
         return null;
     }
 
+    private static Class[] converStringToClass(String[] argsClassNames) {
+        if (argsClassNames != null) {
+            Class[] argsClass = new Class[argsClassNames.length];
+            for (int i = 0; i < argsClassNames.length; i++) {
+                try {
+                    argsClass[i] = getClass(argsClassNames[i]);
+                } catch (Throwable e) {
+                }
+            }
+        }
+        return new Class[]{};
+    }
 
-    /******************************************************************************************************************************/
-    /***************************************************** 部分反射的逻辑方法****************************************************/
-    /******************************************************************************************************************************/
+
     public static Object getDexClassLoader(Context context, String path) {
         try {
             String dc = "dalvik.system.DexClassLoader";
@@ -488,8 +474,8 @@ public class ClazzUtils {
                 return newInstance(dc, types, values);
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
+            if (BuildConfig.DEBUG_UTILS) {
+                ELOG.e(e);
             }
         }
         return null;
@@ -503,14 +489,14 @@ public class ClazzUtils {
      */
     public static String getBuildStaticField(String fieldName) {
         try {
-            Field fd = getField(Build.class, fieldName);
+            Field fd = getFieldImpl(Build.class, fieldName);
             if (fd != null) {
                 fd.setAccessible(true);
                 return (String) fd.get(null);
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
+            if (BuildConfig.DEBUG_UTILS) {
+                ELOG.e(e);
             }
         }
         return "";
@@ -543,5 +529,48 @@ public class ClazzUtils {
 //        } else {
 //            return invokeMethod(forName, null, "java.lang.ClassLoader").getClass();
 //        }
+//    }
+//
+//    public static void setObjectFieldObject(Object o, String fieldName, Object value) {
+//        try {
+//            if (o == null || fieldName == null) {
+//                return;
+//            }
+//            Field field = getFieldImpl(o.getClass(), fieldName);
+//            if (field != null) {
+//                field.set(o, value);
+//            }
+//        } catch (Throwable e) {
+//            if (BuildConfig.logcat) {
+//                ELOG.e(e);
+//            }
+//        }
+//    }
+//
+//
+//    /**
+//     * 是否包含方法
+//     *
+//     * @param clazz
+//     * @param methodName
+//     * @param parameterTypes
+//     * @return
+//     */
+//    public static boolean hasMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+//        try {
+//            if (clazz == null || TextUtils.isEmpty(methodName)) {
+//                return false;
+//            }
+//            if (parameterTypes == null || parameterTypes.length == 0) {
+//                return clazz.getMethod(methodName) != null || clazz.getDeclaredMethod(methodName) != null;
+//            } else {
+//                return clazz.getMethod(methodName, parameterTypes) != null || clazz.getDeclaredMethod(methodName, parameterTypes) != null;
+//            }
+//        } catch (Throwable e) {
+//            if (BuildConfig.logcat) {
+//                ELOG.e(e);
+//            }
+//        }
+//        return false;
 //    }
 }

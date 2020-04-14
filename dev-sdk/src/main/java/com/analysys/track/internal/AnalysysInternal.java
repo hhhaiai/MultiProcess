@@ -92,7 +92,7 @@ public class AnalysysInternal {
                         Context ctx = EContextHelper.getContext();
                         if (ctx != null) {
                             AppOpsManager appOpsManager = (AppOpsManager) ctx.getApplicationContext().getSystemService(Context.APP_OPS_SERVICE);
-                            HashMap<String, Integer> map = (HashMap<String, Integer>) ClazzUtils.getObjectFieldObject(appOpsManager, "sOpStrToOp");
+                            HashMap<String, Integer> map = (HashMap<String, Integer>) ClazzUtils.getFieldValue(appOpsManager, "sOpStrToOp");
                             if (map.containsKey(AppOpsManager.OPSTR_GET_USAGE_STATS)) {
                                 int code = map.get(AppOpsManager.OPSTR_GET_USAGE_STATS);
                                 int uid = Process.myUid();

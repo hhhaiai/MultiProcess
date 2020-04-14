@@ -345,7 +345,7 @@ public class USMUtils {
         Object mService = null;
         try {
             //android.app.usage.IUsageStatsManager$Stub$Proxy
-            mService = ClazzUtils.getObjectFieldObject(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
+            mService = ClazzUtils.getFieldValue(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
             if (mService == null) {
                 IBinder ibinder = null;
                 try {
@@ -378,6 +378,7 @@ public class USMUtils {
                 }
             }
         } catch (Throwable e) {
+            ELOG.e(e);
         }
         return mService;
     }
