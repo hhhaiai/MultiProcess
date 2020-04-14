@@ -34,7 +34,8 @@ clean_caches() {
     rm -rf sh.exe.stackdump
     rm -rf classes.dex
     rm -rf local.properties
-	rm -rf .vs/
+    rm -rf .vs/
+    rm -rf .vscode/
 
     if [ $# == 0 ]; then
         logw "[$filename]clean project success."

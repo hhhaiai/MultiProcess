@@ -38,3 +38,5 @@ sh.exe.stackdump
 
 */ProguardJson.java
 */Key.java
+.vs/
+.vscode/
