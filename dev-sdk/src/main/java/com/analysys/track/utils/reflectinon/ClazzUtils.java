@@ -99,7 +99,7 @@ public class ClazzUtils {
                 newInstance = Constructor.class.getDeclaredMethod("newInstance", Object[].class);
 
             } catch (Throwable e) {
-                if (BuildConfig.logcat) {
+                if (BuildConfig.DEBUG_UTILS) {
                     ELOG.e(e);
                 }
             }
@@ -113,7 +113,7 @@ public class ClazzUtils {
                 Object sVmRuntime = getRuntime.invoke(null);
                 setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
             } catch (Throwable e) {
-                if (BuildConfig.logcat) {
+                if (BuildConfig.DEBUG_UTILS) {
                     ELOG.e(e);
                 }
             }
@@ -180,6 +180,9 @@ public class ClazzUtils {
                 return getMethodB(clazz, methodName, types);
             }
         } catch (Throwable e) {
+            if (BuildConfig.DEBUG_UTILS) {
+                ELOG.e(e);
+            }
             return getMethodB(clazz, methodName, types);
         }
     }
@@ -204,7 +207,9 @@ public class ClazzUtils {
                 return method;
             }
         } catch (Throwable e) {
-            e.printStackTrace();
+            if (BuildConfig.DEBUG_UTILS) {
+                ELOG.e(e);
+            }
         }
         return null;
     }
