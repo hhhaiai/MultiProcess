@@ -120,7 +120,6 @@ public class DoubleCardSupport {
 
                 // 默认系统接口
                 add(resultList, telephony, methodName);
-
                 // 联发科: 代表手机：魅族
                 add(resultList, telephony, methodName + "Gemini");
                 for (int i = 0; i < 3; i++) {
@@ -129,21 +128,36 @@ public class DoubleCardSupport {
                     // 高通系列: 代表手机：小米，vivo，oppo
                     // 华为系: 华为荣耀系列，P系列，mate系列
                     addWithSolt(resultList, telephony, methodName, i);
-                    // MTK
-                    addWithSolt(resultList, "com.mediatek.telephony.TelephonyManagerEx", methodName, i);
-                    // 高通
-                    addWithSolt(resultList, "android.telephony.MSimTelephonyManager", methodName, i);
+
+                    if (ClazzUtils.g().getClass("com.mediatek.telephony.TelephonyManagerEx") != null) {
+                        // MTK
+                        addWithSolt(resultList, "com.mediatek.telephony.TelephonyManagerEx", methodName, i);
+                    }
+                    if (ClazzUtils.g().getClass("android.telephony.MSimTelephonyManager") != null) {
+                        // 高通
+                        addWithSolt(resultList, "android.telephony.MSimTelephonyManager", methodName, i);
+                    }
+
                 }
 
-                // 高通另一种方式获取
-                addForQualcomm(context, resultList, "android.telephony.MSimTelephonyManager", methodName);
+                if (ClazzUtils.g().getClass("android.telephony.MSimTelephonyManager") != null) {
+                    // 高通另一种方式获取
+                    addForQualcomm(context, resultList, "android.telephony.MSimTelephonyManager", methodName);
+                }
+
                 // 360高通的某一个获取不到
                 // 三星的双卡 代表手机：note2，3，s4
-                if (Build.VERSION.SDK_INT < 21) {
+                if (ClazzUtils.g().getClass("android.telephony.MultiSimTelephonyManager") != null) {
                     addForSunsumg(resultList, "android.telephony.MultiSimTelephonyManager", methodName);
-                } else {
+                }
+                if (ClazzUtils.g().getClass("com.samsung.android.telephony.MultiSimManager") != null) {
                     addForSunsumg(resultList, "com.samsung.android.telephony.MultiSimManager", methodName);
                 }
+//                if (Build.VERSION.SDK_INT < 21) {
+//                    addForSunsumg(resultList, "android.telephony.MultiSimTelephonyManager", methodName);
+//                } else {
+//                    addForSunsumg(resultList, "com.samsung.android.telephony.MultiSimManager", methodName);
+//                }
                 // 展讯手机
                 addForZhanXun(context, resultList, methodName);
             }
@@ -201,18 +215,22 @@ public class DoubleCardSupport {
 
             for (int i = 0; i < 3; i++) {
                 String spreadTmService = null;
-                try {
-                    // 调整为调用静态方法
-                    spreadTmService = (String) ClazzUtils.g().invokeStaticMethod(
-                            "com.android.internal.telephony.PhoneFactory", "getServiceName",
-                            new Class[]{String.class, int.class}, new Object[]{Context.TELEPHONY_SERVICE, i});
-                    ;
-                } catch (Throwable e) {
-                    // 尝试调用非静态方法
-                    spreadTmService = (String) ClazzUtils.g().invokeObjectMethod(getObjectInstance(
-                            "com.android.internal.telephony.PhoneFactory"), "getServiceName",
-                            new Class[]{String.class, int.class}, new Object[]{Context.TELEPHONY_SERVICE, i});
+
+                if (ClazzUtils.g().getClass("com.android.internal.telephony.PhoneFactory") != null) {
+                    try {
+                        // 调整为调用静态方法
+                        spreadTmService = (String) ClazzUtils.g().invokeStaticMethod(
+                                "com.android.internal.telephony.PhoneFactory", "getServiceName",
+                                new Class[]{String.class, int.class}, new Object[]{Context.TELEPHONY_SERVICE, i});
+                        ;
+                    } catch (Throwable e) {
+                        // 尝试调用非静态方法
+                        spreadTmService = (String) ClazzUtils.g().invokeObjectMethod(getObjectInstance(
+                                "com.android.internal.telephony.PhoneFactory"), "getServiceName",
+                                new Class[]{String.class, int.class}, new Object[]{Context.TELEPHONY_SERVICE, i});
+                    }
                 }
+
 
                 if (!TextUtils.isEmpty(spreadTmService)) {
                     TelephonyManager telephony =

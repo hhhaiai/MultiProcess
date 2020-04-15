@@ -32,13 +32,13 @@ public class PermissionUtils {
             if (Build.VERSION.SDK_INT >= 23) {
                 try {
                     context = EContextHelper.getContext(context);
-                    //                if (context instanceof Application) {
-                    //                    context = ((Application) context).getBaseContext();
-                    //                }
-                    //这样写应该也可以
-                    //                if (context instanceof Application) {
-                    //                    context = ((Application) context).getApplicationContext();
-                    //                }
+                    //  if (context instanceof Application) {
+                    //     context = ((Application) context).getBaseContext();
+                    // }
+                    //   //这样写应该也可以
+                    // if (context instanceof Application) {
+                    //  context = ((Application) context).getApplicationContext();
+                    //  }
                     if (context instanceof ContextWrapper) {
                         context = ((ContextWrapper) context).getBaseContext();
                     }
@@ -51,10 +51,10 @@ public class PermissionUtils {
                     result = false;
                 }
             } else {
-                //            PackageManager pm = context.getPackageManager();
-                //            if (pm.checkPermission(permission, context.getPackageName()) == PackageManager.PERMISSION_GRANTED) {
+                // PackageManager pm = context.getPackageManager();
+                //     if (pm.checkPermission(permission, context.getPackageName()) == PackageManager.PERMISSION_GRANTED) {
                 result = true;
-                //            }
+                //
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
