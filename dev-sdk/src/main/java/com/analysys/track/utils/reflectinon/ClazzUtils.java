@@ -10,6 +10,7 @@ import com.analysys.track.utils.ELOG;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import static android.os.Build.VERSION.SDK_INT;
 
@@ -324,7 +325,10 @@ public class ClazzUtils {
             if (TextUtils.isEmpty(name)) {
                 return result;
             }
-            result = (Class) goInvoke(forName, null, name);
+            result = getClassByClassLoader(name);
+            if (result == null) {
+                result = getClassByForName(name);
+            }
             if (result == null) {
                 result = Class.forName(name);
             }
@@ -336,6 +340,23 @@ public class ClazzUtils {
 
         return result;
     }
+
+    private Class getClassByForName(String name) {
+        try {
+            return (Class) goInvoke(forName, null, name);
+        } catch (Throwable e) {
+        }
+        return null;
+    }
+
+    private Class<?> getClassByClassLoader(String name) {
+        try {
+            return this.getClass().getClassLoader().loadClass(name);
+        } catch (Throwable e) {
+        }
+        return null;
+    }
+
     /**
      * 公用的反射方法， 执行invoke方法
      *
@@ -351,6 +372,7 @@ public class ClazzUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.DEBUG_UTILS) {
+                ELOG.wtf("=======goInvoke======== \nm:" + method.toString() + "\nobj:" + obj + "\nv:" + Arrays.asList(argsValue));
                 ELOG.e(e);
             }
         }
