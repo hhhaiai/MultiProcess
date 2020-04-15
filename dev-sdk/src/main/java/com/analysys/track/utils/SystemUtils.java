@@ -658,9 +658,6 @@ public class SystemUtils {
                 }
             }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
         }
         return "";
     }

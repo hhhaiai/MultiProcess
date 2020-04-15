@@ -447,9 +447,9 @@ public class ClazzUtils {
                 return method.invoke(obj, argsValue);
             }
         } catch (Throwable e) {
-            if (BuildConfig.DEBUG_UTILS) {
-                ELOG.e(e);
-            }
+//            if (BuildConfig.DEBUG_UTILS) {
+//                ELOG.e(e);
+//            }
         }
         return null;
     }
