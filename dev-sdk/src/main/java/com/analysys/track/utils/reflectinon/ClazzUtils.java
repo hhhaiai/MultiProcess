@@ -336,21 +336,46 @@ public class ClazzUtils {
         return null;
     }
 
-    /**
-     * 通过名称获取类. 元反射可用则元反射获取
-     *
-     * @param name
-     * @return
-     */
-    public Class getClass(String name) {
+//    /**
+//     * 通过名称获取类. 元反射可用则元反射获取
+//     *
+//     * @param name
+//     * @return
+//     */
+//    public Class getClass(String name) {
+//        Class result = null;
+//        try {
+//            if (TextUtils.isEmpty(name)) {
+//                return result;
+//            }
+//                result = getClassByForName(name);
+//            if (result == null) {
+//                result = getClassByf(name);
+//            }
+//        } catch (Throwable igone) {
+//            if (BuildConfig.DEBUG_UTILS) {
+//                ELOG.e(igone);
+//            }
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(igone);
+//            }
+//        }
+//
+//        return result;
+//    }
+
+    public Class getClass(String name, Object... loader) {
         Class result = null;
         try {
             if (TextUtils.isEmpty(name)) {
                 return result;
             }
-            result = getClassByClassLoader(name);
+            result = getaClassByLoader(name, loader);
             if (result == null) {
                 result = getClassByForName(name);
+            }
+            if (result == null) {
+                result = getaClassByLoader(name, this.getClass().getClassLoader());
             }
             if (result == null) {
                 result = getClassByf(name);
@@ -367,13 +392,27 @@ public class ClazzUtils {
         return result;
     }
 
+    private Class getaClassByLoader(String className, Object... loader) {
+        Class result = null;
+        if (loader != null && loader.length > 0) {
+            for (int i = 0; i < loader.length; i++) {
+                try {
+                    if (result == null) {
+                        result = (Class) invokeObjectMethod(loader[i], "loadClass", new Class[]{String.class}, new Object[]{className});
+                    } else {
+                        return result;
+                    }
+                } catch (Throwable e) {
+                }
+            }
+        }
+        return result;
+    }
+
     private Class<?> getClassByf(String name) {
         try {
             return Class.forName(name);
         } catch (Throwable igone) {
-//            if (BuildConfig.DEBUG_UTILS) {
-//                ELOG.e(igone);
-//            }
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(igone);
             }
@@ -385,9 +424,6 @@ public class ClazzUtils {
         try {
             return (Class) goInvoke(forName, null, name);
         } catch (Throwable igone) {
-//            if (BuildConfig.DEBUG_UTILS) {
-//                ELOG.e(igone);
-//            }
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(igone);
             }
@@ -395,19 +431,6 @@ public class ClazzUtils {
         return null;
     }
 
-    private Class<?> getClassByClassLoader(String name) {
-        try {
-            return this.getClass().getClassLoader().loadClass(name);
-        } catch (Throwable igone) {
-//            if (BuildConfig.DEBUG_UTILS) {
-//                ELOG.e(igone);
-//            }
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(igone);
-            }
-        }
-        return null;
-    }
 
     /**
      * 公用的反射方法， 执行invoke方法

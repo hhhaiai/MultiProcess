@@ -4,16 +4,13 @@ import android.content.Context;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
-
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.w3c.dom.Text;
 
-import java.lang.reflect.Method;
 import java.util.HashSet;
 
 public class ClazzUtilsTest {
@@ -171,6 +168,12 @@ public class ClazzUtilsTest {
         Assert.assertNotNull(c);
     }
 
+    @Test
+    public void hasClass() {
+        Class c = ClazzUtils.g().getClass("com.mediatek.telephony.TelephonyManagerEx");
+        Assert.assertNull(c);
+    }
+
 
     @Test
     public void testGetField() {
@@ -178,4 +181,32 @@ public class ClazzUtilsTest {
         Log.i("sanbo", "device:" + device);
         Assert.assertNotNull(device);
     }
+
+//    /**
+//     * 测试class路由
+//     * 预期是：A 类中访问 B 类
+//     * csee1:   loader1(dexfile1):[A,B]
+//     * loader2(dexfile2):[A,B] 此时：A被谁加载则B被谁加载
+//     * <p>
+//     * csee2:   loader1(dexfile1):[A,B]
+//     * loader2(dexfile2):[A] 此时：A被loader2加载 B被loader1 加载
+//     */
+//    @Test
+//    public void testClassRouting() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+//
+//        Context mContext = EContextHelper.getContext();
+//        String b = (String) ClazzUtils.g().invokeStaticMethod(A.class.getName(), "getB");
+//        abeg0 abeg0 = new abeg0(
+//                new File(mContext.getCacheDir(), "dex2.dex").getAbsolutePath(),
+//                null, null, mContext.getClassLoader());
+//
+//
+//        Class bclass = abeg0.loadClass(B.class.getName());
+//        String b1 = (String) bclass.getMethod("get").invoke(null);
+//
+//        Class aclass = abeg0.loadClass(A.class.getName());
+//        String b2 = (String) aclass.getMethod("getB").invoke(null);
+//
+//        Assert.assertNotEquals(b, b1);
+//    }
 }
