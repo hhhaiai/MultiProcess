@@ -90,7 +90,7 @@ public class USMUtils {
             Object usageEvents = getUsageEventsByApi(beginTime, endTime, context);
 //            Log.e("sanbo", "getUsageEventsByApi usageEvents: " + usageEvents);
             if (usageEvents != null) {
-                hasNextEvent = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
+                hasNextEvent = (boolean) ClazzUtils.g().invokeObjectMethod(usageEvents, "hasNextEvent");
                 if (hasNextEvent) {
                     return usageEvents;
                 }
@@ -99,7 +99,7 @@ public class USMUtils {
 //            Log.e("sanbo", "usageEvents usageEvents: " + usageEvents);
 
             if (usageEvents != null) {
-                hasNextEvent = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
+                hasNextEvent = (boolean) ClazzUtils.g().invokeObjectMethod(usageEvents, "hasNextEvent");
                 if (hasNextEvent) {
                     return usageEvents;
                 }
@@ -125,7 +125,7 @@ public class USMUtils {
         try {
 //            UsageStatsManager usm = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
 //            UsageEvents usageEvents = usm.queryEvents(beginTime, endTime);
-            return ClazzUtils.invokeObjectMethod(context.getApplicationContext()
+            return ClazzUtils.g().invokeObjectMethod(context.getApplicationContext()
                             .getSystemService(Context.USAGE_STATS_SERVICE), "queryEvents",
                     new Class[]{long.class, long.class}, new Object[]{beginTime, endTime});
         } catch (Throwable e) {
@@ -176,13 +176,13 @@ public class USMUtils {
             for (String opname : pkgs) {
                 try {
                     //UsageEvents
-                    usageEvents = ClazzUtils.invokeObjectMethod(mService, "queryEvents", new Class[]{long.class, long.class, String.class}, new Object[]{beginTime, endTime, opname});
+                    usageEvents = ClazzUtils.g().invokeObjectMethod(mService, "queryEvents", new Class[]{long.class, long.class, String.class}, new Object[]{beginTime, endTime, opname});
 //                    Log.d("sanbo", "getUsageEventsByInvoke [" + opname + "]  usageEvents: " + usageEvents);
 
                     if (usageEvents == null) {
                         continue;
                     }
-                    boolean b = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
+                    boolean b = (boolean) ClazzUtils.g().invokeObjectMethod(usageEvents, "hasNextEvent");
                     if (b) {
                         return usageEvents;
                     }
@@ -260,7 +260,7 @@ public class USMUtils {
 //        List<UsageStats> uss = usm.queryUsageStats( UsageStatsManager.INTERVAL_BEST, beginTime, endTime);
         for (int i = UsageStatsManager.INTERVAL_BEST; i == 0; i--) {
             try {
-                List<UsageStats> lus = (List<UsageStats>) ClazzUtils.invokeObjectMethod(context.getApplicationContext()
+                List<UsageStats> lus = (List<UsageStats>) ClazzUtils.g().invokeObjectMethod(context.getApplicationContext()
                                 .getSystemService(Context.USAGE_STATS_SERVICE), "queryUsageStats",
                         new Class[]{int.class, long.class, long.class}, new Object[]{i, beginTime, endTime});
                 if (lus != null && lus.size() > 0) {
@@ -304,13 +304,13 @@ public class USMUtils {
                     for (int i = UsageStatsManager.INTERVAL_BEST; i == 0; i--) {
                         try {
                             // 返回值android.content.pm.ParceledListSlice
-                            Object parceledListSlice = ClazzUtils.invokeObjectMethod(mService, "queryUsageStats",
+                            Object parceledListSlice = ClazzUtils.g().invokeObjectMethod(mService, "queryUsageStats",
                                     new Class[]{int.class, long.class, long.class, String.class},
                                     new Object[]{i, beginTime, endTime, pkg}
                             );
                             // Log.d("sanbo", "getUsageStatsListByInvoke [" + pkg + "]---:" + parceledListSlice);
                             if (parceledListSlice != null) {
-                                List<UsageStats> lus = (List<UsageStats>) ClazzUtils.invokeObjectMethod(parceledListSlice, "getList");
+                                List<UsageStats> lus = (List<UsageStats>) ClazzUtils.g().invokeObjectMethod(parceledListSlice, "getList");
                                 if (lus != null && lus.size() > 0) {
                                     return lus;
                                 }
@@ -345,12 +345,12 @@ public class USMUtils {
         Object mService = null;
         try {
             //android.app.usage.IUsageStatsManager$Stub$Proxy
-            mService = ClazzUtils.getFieldValue(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
+            mService = ClazzUtils.g().getFieldValue(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
             if (mService == null) {
                 IBinder ibinder = null;
                 try {
                     Class<?> serviceManager = Class.forName("android.os.ServiceManager");
-                    Method getService = ClazzUtils.getMethod(serviceManager, "getService", String.class);
+                    Method getService = ClazzUtils.g().getMethod(serviceManager, "getService", String.class);
                     ibinder = (IBinder) getService.invoke(null, Context.USAGE_STATS_SERVICE);
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -358,11 +358,11 @@ public class USMUtils {
                     }
                 }
                 if (ibinder == null) {
-                    ibinder = (IBinder) ClazzUtils.invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{Context.USAGE_STATS_SERVICE});
+                    ibinder = (IBinder) ClazzUtils.g().invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{Context.USAGE_STATS_SERVICE});
                 }
                 if (ibinder != null) {
                     try {
-                        Method asInterface = ClazzUtils.getMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", IBinder.class);
+                        Method asInterface = ClazzUtils.g().getMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", IBinder.class);
                         if (asInterface != null) {
                             mService = asInterface.invoke(null, ibinder);
                         }
@@ -373,7 +373,7 @@ public class USMUtils {
                     }
 
                     if (mService == null) {
-                        mService = ClazzUtils.invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{ibinder});
+                        mService = ClazzUtils.g().invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{ibinder});
                     }
                 }
             }

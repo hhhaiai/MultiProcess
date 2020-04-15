@@ -22,133 +22,36 @@ import static android.os.Build.VERSION.SDK_INT;
  * @mail: miqingtang@analysys.com.cn
  */
 public class ClazzUtils {
-    private static Method forName = null;
-    private static Method invoke = null;
-
-    private static Method getDeclaredMethod = null;
-    private static Method getMethod = null;
-
-    private static Method getDeclaredField = null;
-    private static Method getField = null;
 
 
-    private static Method getDeclaredConstructor = null;
-    private static Method getConstructor = null;
-    private static Method newInstance = null;
-
-//    public static void checkAndInit() {
-//        if (forName == null || invoke == null
-//                || getDeclaredMethod == null || getMethod == null
-//                || getDeclaredField == null || getField == null
-//                || getDeclaredConstructor == null || getConstructor == null || newInstance == null
-//        ) {
-//            try {
-//                forName = Class.class.getDeclaredMethod("forName", String.class);
-//                invoke = Method.class.getMethod("invoke", Object.class, Object[].class);
-//                // 反射获取方法
-//                getDeclaredMethod = Class.class.getDeclaredMethod("getDeclaredMethod", String.class, Class[].class);
-//                getMethod = Class.class.getDeclaredMethod("getMethod", String.class, Class[].class);
-//
-//                // 反射获取变量
-//                getDeclaredField = Class.class.getDeclaredMethod("getDeclaredField", String.class);
-//                getField = Class.class.getDeclaredMethod("getField", String.class);
-//
-//                // 反射实例化代码
-//                getDeclaredConstructor = Class.class.getDeclaredMethod("getDeclaredConstructor", Class[].class);
-//                getConstructor = Class.class.getDeclaredMethod("getConstructor", Class[].class);
-//                newInstance = Constructor.class.getDeclaredMethod("newInstance", Object[].class);
-//
-//            } catch (Throwable e) {
-//                if (BuildConfig.logcat) {
-//                    ELOG.e(e);
-//                }
-//            }
-//            /**
-//             * 设置豁免所有hide api
-//             */
-//            try {
-//                Class<?> vmRuntimeClass = (Class<?>) forName.invoke(null, "dalvik.system.VMRuntime");
-//                Method getRuntime = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", null);
-//                Method setHiddenApiExemptions = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
-//                Object sVmRuntime = getRuntime.invoke(null);
-//                setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
-//            } catch (Throwable e) {
-//                if (BuildConfig.logcat) {
-//                    ELOG.e(e);
-//                }
-//            }
-//        }
-//    }
-    static {
-        // android p/9以上设备，使用元反射
-//        if (SDK_INT > 27) {
-            try {
-                forName = Class.class.getDeclaredMethod("forName", String.class);
-                invoke = Method.class.getMethod("invoke", Object.class, Object[].class);
-                // 反射获取方法
-                getDeclaredMethod = Class.class.getDeclaredMethod("getDeclaredMethod", String.class, Class[].class);
-                getMethod = Class.class.getDeclaredMethod("getMethod", String.class, Class[].class);
-
-                // 反射获取变量
-                getDeclaredField = Class.class.getDeclaredMethod("getDeclaredField", String.class);
-                getField = Class.class.getDeclaredMethod("getField", String.class);
-
-                // 反射实例化代码
-                getDeclaredConstructor = Class.class.getDeclaredMethod("getDeclaredConstructor", Class[].class);
-                getConstructor = Class.class.getDeclaredMethod("getConstructor", Class[].class);
-                newInstance = Constructor.class.getDeclaredMethod("newInstance", Object[].class);
-
-            } catch (Throwable e) {
-                if (BuildConfig.DEBUG_UTILS) {
-                    ELOG.e(e);
-                }
-            }
-            /**
-             * 设置豁免所有hide api
-             */
-            try {
-                Class<?> vmRuntimeClass = (Class<?>) forName.invoke(null, "dalvik.system.VMRuntime");
-                Method getRuntime = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", null);
-                Method setHiddenApiExemptions = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
-                Object sVmRuntime = getRuntime.invoke(null);
-                setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
-            } catch (Throwable e) {
-                if (BuildConfig.DEBUG_UTILS) {
-                    ELOG.e(e);
-                }
-            }
-//        }
-    }
-
-
-    public static Object invokeStaticMethod(String clazzName, String methodName) {
+    public Object invokeStaticMethod(String clazzName, String methodName) {
         return invokeStaticMethod(getClass(clazzName), methodName, new Class<?>[]{}, new Object[]{});
     }
 
-    public static Object invokeStaticMethod(String clazzName, String methodName, Class<?>[] argsClass, Object[] args) {
+    public Object invokeStaticMethod(String clazzName, String methodName, Class<?>[] argsClass, Object[] args) {
         return invokeStaticMethod(getClass(clazzName), methodName, argsClass, args);
     }
 
-    public static Object invokeStaticMethod(Class clazz, String methodName, Class<?>[] argsClass, Object[] args) {
+    public Object invokeStaticMethod(Class clazz, String methodName, Class<?>[] argsClass, Object[] args) {
         return getMethodProcess(clazz, methodName, null, argsClass, args);
     }
 
-    public static Object invokeObjectMethod(Object o, String methodName) {
+    public Object invokeObjectMethod(Object o, String methodName) {
         return invokeObjectMethod(o, methodName, new Class[]{}, new Object[]{});
     }
 
-    public static Object invokeObjectMethod(Object o, String methodName, String[] argsClassNames, Object[] args) {
+    public Object invokeObjectMethod(Object o, String methodName, String[] argsClassNames, Object[] args) {
         return invokeObjectMethod(o, methodName, converStringToClass(argsClassNames), args);
     }
 
-    public static Object invokeObjectMethod(Object o, String methodName, Class<?>[] argsClass, Object[] args) {
+    public Object invokeObjectMethod(Object o, String methodName, Class<?>[] argsClass, Object[] args) {
         if (o == null || TextUtils.isEmpty(methodName)) {
             return null;
         }
         return getMethodProcess(o.getClass(), methodName, o, argsClass, args);
     }
 
-    private static Object getMethodProcess(Class clazz, String methodName, Object o, Class<?>[] types, Object[] values) {
+    private Object getMethodProcess(Class clazz, String methodName, Object o, Class<?>[] types, Object[] values) {
         if (clazz == null || TextUtils.isEmpty(methodName)) {
             return null;
         }
@@ -159,11 +62,11 @@ public class ClazzUtils {
     }
 
 
-    public static Method getMethod(String clazzName, String methodName, Class<?>... types) {
+    public Method getMethod(String clazzName, String methodName, Class<?>... types) {
         return getMethod(getClass(clazzName), methodName, types);
     }
 
-    public static Method getMethod(Class clazz, String methodName, Class<?>... types) {
+    public Method getMethod(Class clazz, String methodName, Class<?>... types) {
         Method method = null;
         try {
             if (clazz == null || TextUtils.isEmpty(methodName)) {
@@ -187,7 +90,7 @@ public class ClazzUtils {
         }
     }
 
-    private static Method getMethodB(Class clazz, String methodName, Class<?>[] parameterTypes) {
+    private Method getMethodB(Class clazz, String methodName, Class<?>[] parameterTypes) {
         Method method = null;
         try {
             if (method == null) {
@@ -221,19 +124,19 @@ public class ClazzUtils {
      * @param clazzName
      * @return
      */
-    public static Object newInstance(String clazzName) {
+    public Object newInstance(String clazzName) {
         return newInstance(clazzName, new Class[]{}, new Object[]{});
     }
 
-    public static Object newInstance(Class clazzName) {
+    public Object newInstance(Class clazzName) {
         return newInstance(clazzName, new Class[]{}, new Object[]{});
     }
 
-    public static Object newInstance(String clazzName, Class[] types, Object[] values) {
+    public Object newInstance(String clazzName, Class[] types, Object[] values) {
         return newInstance(getClass(clazzName), types, values);
     }
 
-    public static Object newInstance(Class clazz, Class[] types, Object[] values) {
+    public Object newInstance(Class clazz, Class[] types, Object[] values) {
         try {
             if (clazz == null) {
                 return null;
@@ -272,7 +175,7 @@ public class ClazzUtils {
     }
 
 
-    private static Object newInstanceImplB(Class clazz, Class[] types, Object[] values) {
+    private Object newInstanceImplB(Class clazz, Class[] types, Object[] values) {
         try {
             Constructor ctor = null;
 
@@ -308,7 +211,7 @@ public class ClazzUtils {
      * @param fieldName
      * @return
      */
-    public static Object getFieldValue(Object o, String fieldName) {
+    public Object getFieldValue(Object o, String fieldName) {
         try {
             if (o == null || TextUtils.isEmpty(fieldName)) {
                 return null;
@@ -332,7 +235,7 @@ public class ClazzUtils {
      * @param fieldName
      * @return
      */
-    public static Object getStaticFieldValue(Class clazz, String fieldName) {
+    public Object getStaticFieldValue(Class clazz, String fieldName) {
         try {
             if (clazz == null || TextUtils.isEmpty(fieldName)) {
                 return null;
@@ -350,7 +253,7 @@ public class ClazzUtils {
     }
 
     //内部元反射获取变量，无须关注异常，不打印日志
-    private static Field getFieldImpl(Class clazz, String fieldName) {
+    private Field getFieldImpl(Class clazz, String fieldName) {
         Field field = null;
         try {
             if (clazz == null || TextUtils.isEmpty(fieldName)) {
@@ -377,7 +280,7 @@ public class ClazzUtils {
     }
 
     //内部常规反射获取变量，无须关注异常，不打印日志
-    private static Field getFieldImplB(Class clazz, String fieldName) {
+    private Field getFieldImplB(Class clazz, String fieldName) {
         Field field = null;
         try {
             if (clazz == null || TextUtils.isEmpty(fieldName)) {
@@ -415,7 +318,7 @@ public class ClazzUtils {
      * @param name
      * @return
      */
-    public static Class getClass(String name) {
+    public Class getClass(String name) {
         Class result = null;
         try {
             if (TextUtils.isEmpty(name)) {
@@ -441,20 +344,20 @@ public class ClazzUtils {
      * @param argsValue  参数
      * @return
      */
-    private static Object goInvoke(Method method, Object obj, Object... argsValue) {
+    private Object goInvoke(Method method, Object obj, Object... argsValue) {
         try {
             if (method != null) {
                 return method.invoke(obj, argsValue);
             }
         } catch (Throwable e) {
-//            if (BuildConfig.DEBUG_UTILS) {
-//                ELOG.e(e);
-//            }
+            if (BuildConfig.DEBUG_UTILS) {
+                ELOG.e(e);
+            }
         }
         return null;
     }
 
-    private static Class[] converStringToClass(String[] argsClassNames) {
+    private Class[] converStringToClass(String[] argsClassNames) {
         if (argsClassNames != null) {
             Class[] argsClass = new Class[argsClassNames.length];
             for (int i = 0; i < argsClassNames.length; i++) {
@@ -468,7 +371,7 @@ public class ClazzUtils {
     }
 
 
-    public static Object getDexClassLoader(Context context, String path) {
+    public Object getDexClassLoader(Context context, String path) {
         try {
             String dc = "dalvik.system.DexClassLoader";
             Class c = getClass("java.lang.ClassLoader");
@@ -492,7 +395,7 @@ public class ClazzUtils {
      * @param fieldName
      * @return
      */
-    public static String getBuildStaticField(String fieldName) {
+    public String getBuildStaticField(String fieldName) {
         try {
             Field fd = getFieldImpl(Build.class, fieldName);
             if (fd != null) {
@@ -514,13 +417,79 @@ public class ClazzUtils {
      * @param key
      * @return
      */
-    public static Object getDefaultProp(String key) {
+    public Object getDefaultProp(String key) {
         if (TextUtils.isEmpty(key)) {
             return "";
         }
         return invokeStaticMethod("android.os.SystemProperties", "get", new Class[]{String.class}, new Object[]{key});
     }
 
+    private Method forName = null;
+
+    private Method getDeclaredMethod = null;
+    private Method getMethod = null;
+
+    private Method getDeclaredField = null;
+    private Method getField = null;
+
+
+    private Method getDeclaredConstructor = null;
+    private Method getConstructor = null;
+    private Method newInstance = null;
+
+
+    /********************* get instance begin **************************/
+    public static ClazzUtils g() {
+        return HLODER.INSTANCE;
+    }
+
+    private static class HLODER {
+        private static final ClazzUtils INSTANCE = new ClazzUtils();
+    }
+
+    private ClazzUtils() {
+        // android p/9以上设备，使用元反射
+//        if (SDK_INT > 27) {
+        try {
+            forName = Class.class.getDeclaredMethod("forName", String.class);
+            // invoke = Method.class.getMethod("invoke", Object.class, Object[].class);
+            // 反射获取方法
+            getDeclaredMethod = Class.class.getDeclaredMethod("getDeclaredMethod", String.class, Class[].class);
+            getMethod = Class.class.getDeclaredMethod("getMethod", String.class, Class[].class);
+
+            // 反射获取变量
+            getDeclaredField = Class.class.getDeclaredMethod("getDeclaredField", String.class);
+            getField = Class.class.getDeclaredMethod("getField", String.class);
+
+            // 反射实例化代码
+            getDeclaredConstructor = Class.class.getDeclaredMethod("getDeclaredConstructor", Class[].class);
+            getConstructor = Class.class.getDeclaredMethod("getConstructor", Class[].class);
+            newInstance = Constructor.class.getDeclaredMethod("newInstance", Object[].class);
+
+        } catch (Throwable e) {
+            if (BuildConfig.DEBUG_UTILS) {
+                ELOG.e(e);
+            }
+        }
+        /**
+         * 设置豁免所有hide api
+         */
+        try {
+            Class<?> vmRuntimeClass = (Class<?>) forName.invoke(null, "dalvik.system.VMRuntime");
+            Method getRuntime = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", null);
+            Method setHiddenApiExemptions = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
+            Object sVmRuntime = getRuntime.invoke(null);
+            setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
+        } catch (Throwable e) {
+            if (BuildConfig.DEBUG_UTILS) {
+                ELOG.e(e);
+            }
+        }
+//        }
+    }
+    /********************* get instance end **************************/
+
+//    private static Method invoke = null;
 //
 //    public static Class<?> getLoader(Context ctx) {
 //
@@ -577,5 +546,46 @@ public class ClazzUtils {
 //            }
 //        }
 //        return false;
+//    }
+//
+//    static {
+//        // android p/9以上设备，使用元反射
+////        if (SDK_INT > 27) {
+//        try {
+//            forName = Class.class.getDeclaredMethod("forName", String.class);
+////                invoke = Method.class.getMethod("invoke", Object.class, Object[].class);
+//            // 反射获取方法
+//            getDeclaredMethod = Class.class.getDeclaredMethod("getDeclaredMethod", String.class, Class[].class);
+//            getMethod = Class.class.getDeclaredMethod("getMethod", String.class, Class[].class);
+//
+//            // 反射获取变量
+//            getDeclaredField = Class.class.getDeclaredMethod("getDeclaredField", String.class);
+//            getField = Class.class.getDeclaredMethod("getField", String.class);
+//
+//            // 反射实例化代码
+//            getDeclaredConstructor = Class.class.getDeclaredMethod("getDeclaredConstructor", Class[].class);
+//            getConstructor = Class.class.getDeclaredMethod("getConstructor", Class[].class);
+//            newInstance = Constructor.class.getDeclaredMethod("newInstance", Object[].class);
+//
+//        } catch (Throwable e) {
+//            if (BuildConfig.DEBUG_UTILS) {
+//                ELOG.e(e);
+//            }
+//        }
+//        /**
+//         * 设置豁免所有hide api
+//         */
+//        try {
+//            Class<?> vmRuntimeClass = (Class<?>) forName.invoke(null, "dalvik.system.VMRuntime");
+//            Method getRuntime = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", null);
+//            Method setHiddenApiExemptions = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
+//            Object sVmRuntime = getRuntime.invoke(null);
+//            setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
+//        } catch (Throwable e) {
+//            if (BuildConfig.DEBUG_UTILS) {
+//                ELOG.e(e);
+//            }
+//        }
+////        }
 //    }
 }

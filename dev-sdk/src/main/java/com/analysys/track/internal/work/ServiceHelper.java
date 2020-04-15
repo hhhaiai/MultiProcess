@@ -262,7 +262,7 @@ public class ServiceHelper {
         ComponentName cn = new ComponentName(mContext, className);
         Intent intent = new Intent();
         intent.setComponent(cn);
-        ClazzUtils.invokeObjectMethod(context, "startForegroundService", new Class[]{Intent.class}, new Object[]{intent});
+        ClazzUtils.g().invokeObjectMethod(context, "startForegroundService", new Class[]{Intent.class}, new Object[]{intent});
     }
 
 

@@ -337,15 +337,15 @@ public class PatchHelper {
         try {
             //1. get DexClassLoader
             // need hide ClassLoader
-            Object ca = ClazzUtils.getDexClassLoader(context, file.getPath());
+            Object ca = ClazzUtils.g().getDexClassLoader(context, file.getPath());
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_cutoff, " loadStatic DexClassLoader over. result: " + ca);
             }
             // 2. load class
-            Class<?> c = (Class<?>) ClazzUtils.invokeObjectMethod(ca, "loadClass", new Class[]{String.class}, new Object[]{className});
+            Class<?> c = (Class<?>) ClazzUtils.g().invokeObjectMethod(ca, "loadClass", new Class[]{String.class}, new Object[]{className});
             if (c != null) {
                 // 2. invoke method
-                ClazzUtils.invokeStaticMethod(c, methodName, pareTyples, pareVaules);
+                ClazzUtils.g().invokeStaticMethod(c, methodName, pareTyples, pareVaules);
             } else {
                 if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_cutoff, " loadStatic failed[get class load failed]......");

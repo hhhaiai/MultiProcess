@@ -32,7 +32,7 @@ public class DemoPermissionH {
             try {
                 Class<?> clazz = Class.forName("android.content.Context");
                 Method method = clazz.getMethod("checkSelfPermission", String.class);
-                int rest = (Integer) method.invoke(context, permission);
+                int rest = (Integer) method.invoke(context.getApplicationContext(), permission);
                 return rest == PackageManager.PERMISSION_GRANTED;
             } catch (Throwable e) {
                 result = false;

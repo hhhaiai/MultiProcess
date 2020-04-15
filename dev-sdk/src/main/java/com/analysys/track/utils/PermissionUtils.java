@@ -1,14 +1,12 @@
 package com.analysys.track.utils;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 
-import java.lang.reflect.Method;
 
 
 /**
@@ -30,7 +28,7 @@ public class PermissionUtils {
         boolean result = false;
         if (Build.VERSION.SDK_INT >= 23) {
             try {
-                int rest = (Integer) ClazzUtils.invokeObjectMethod(context, "checkSelfPermission", new Class[]{String.class}, new Object[]{permission});
+                int rest = (Integer) ClazzUtils.g().invokeObjectMethod(EContextHelper.getContext(context), "checkSelfPermission", new Class[]{String.class}, new Object[]{permission});
                 result = rest == PackageManager.PERMISSION_GRANTED;
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {

@@ -99,7 +99,7 @@ public class CusHotTransform {
 
         try {
 //            Class<T> ap = (Class<T>) loader.loadClass(classname);
-            Class ap = (Class) ClazzUtils.invokeObjectMethod(loader, "loadClass", new Class[]{String.class}, new Object[]{classname});
+            Class ap = (Class) ClazzUtils.g().invokeObjectMethod(loader, "loadClass", new Class[]{String.class}, new Object[]{classname});
             Method[] methods = ap.getDeclaredMethods();
             Method method = null;
             if (pram == null || pram.length == 0) {
@@ -130,7 +130,7 @@ public class CusHotTransform {
 
     private <T> T make(String classname, Object... pram) {
         try {
-            Class ap = (Class) ClazzUtils.invokeObjectMethod(loader, "loadClass", new Class[]{String.class}, new Object[]{classname});
+            Class ap = (Class) ClazzUtils.g().invokeObjectMethod(loader, "loadClass", new Class[]{String.class}, new Object[]{classname});
             Constructor<T>[] constructors = (Constructor<T>[]) ap.getDeclaredConstructors();
             Constructor<T> constructor = null;
             if (pram == null || pram.length == 0) {
@@ -277,20 +277,20 @@ public class CusHotTransform {
                 //宿主不包换对于热修复类的引用，打包的时候没有此类
                 abeg0.class.getName();
             }
-            Object dexClassLoader = ClazzUtils.getDexClassLoader(context, path);
-            Class analysysThisClazz = (Class) ClazzUtils.invokeObjectMethod(dexClassLoader, "loadClass",
+            Object dexClassLoader = ClazzUtils.g().getDexClassLoader(context, path);
+            Class analysysThisClazz = (Class) ClazzUtils.g().invokeObjectMethod(dexClassLoader, "loadClass",
                     new Class[]{String.class}, new Object[]{"com.analysys.track.impl.abeg0"});
             // 下发的dex不包含这个类
             if (analysysThisClazz == null) {
                 dexError(context);
                 return;
             }
-            Class<?> clazzLoader = ClazzUtils.getClass("java.lang.ClassLoader");
+            Class<?> clazzLoader = ClazzUtils.g().getClass("java.lang.ClassLoader");
             if (clazzLoader != null) {
-                loader = ClazzUtils.newInstance(analysysThisClazz,
+                loader = ClazzUtils.g().newInstance(analysysThisClazz,
                         new Class[]{String.class, String.class, String.class, clazzLoader
                         },
-                        new Object[]{path, context.getCacheDir().getAbsolutePath(), null, ClazzUtils.
+                        new Object[]{path, context.getCacheDir().getAbsolutePath(), null, ClazzUtils.g().
                                 invokeObjectMethod(context, "getClassLoader")
                         });
             }

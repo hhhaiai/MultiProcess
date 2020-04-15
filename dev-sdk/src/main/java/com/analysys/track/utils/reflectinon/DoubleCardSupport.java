@@ -203,13 +203,13 @@ public class DoubleCardSupport {
                 String spreadTmService = null;
                 try {
                     // 调整为调用静态方法
-                    spreadTmService = (String) ClazzUtils.invokeStaticMethod(
+                    spreadTmService = (String) ClazzUtils.g().invokeStaticMethod(
                             "com.android.internal.telephony.PhoneFactory", "getServiceName",
                             new Class[]{String.class, int.class}, new Object[]{Context.TELEPHONY_SERVICE, i});
                     ;
                 } catch (Throwable e) {
                     // 尝试调用非静态方法
-                    spreadTmService = (String) ClazzUtils.invokeObjectMethod(getObjectInstance(
+                    spreadTmService = (String) ClazzUtils.g().invokeObjectMethod(getObjectInstance(
                             "com.android.internal.telephony.PhoneFactory"), "getServiceName",
                             new Class[]{String.class, int.class}, new Object[]{Context.TELEPHONY_SERVICE, i});
                 }
@@ -238,7 +238,7 @@ public class DoubleCardSupport {
 
     private void add(List<String> imeis, TelephonyManager telephony, String method) {
         try {
-            Object id = ClazzUtils.invokeObjectMethod(telephony, method);
+            Object id = ClazzUtils.g().invokeObjectMethod(telephony, method);
             if (id == null) {
                 return;
             }
@@ -259,7 +259,7 @@ public class DoubleCardSupport {
      */
     private void addForSunsumg(List<String> imeis, Object instance, String method) {
         try {
-            String result = (String) ClazzUtils.invokeObjectMethod(instance, method);
+            String result = (String) ClazzUtils.g().invokeObjectMethod(instance, method);
             if (!TextUtils.isEmpty(result) && !imeis.contains(result)) {
                 imeis.add(result);
             }
@@ -271,9 +271,9 @@ public class DoubleCardSupport {
         try {
             Object instance = getObjectInstance(clazzName);
             if (instance == null) {
-                instance = ClazzUtils.newInstance(clazzName);
+                instance = ClazzUtils.g().newInstance(clazzName);
             }
-            String result = (String) ClazzUtils.invokeObjectMethod(instance, method);
+            String result = (String) ClazzUtils.g().invokeObjectMethod(instance, method);
             if (!TextUtils.isEmpty(result) && !imeis.contains(result)) {
                 imeis.add(result);
             }
@@ -399,7 +399,7 @@ public class DoubleCardSupport {
      */
     private void addBySystemProperties(List<String> imeis, String key, String splitKey) {
         try {
-            String result = (String) ClazzUtils.getDefaultProp(key);
+            String result = (String) ClazzUtils.g().getDefaultProp(key);
             if (TextUtils.isEmpty(result)) {
                 return;
             }
@@ -439,9 +439,9 @@ public class DoubleCardSupport {
      */
     private String getString(Object obj, String method, int slotId) {
         try {
-            Object id = ClazzUtils.invokeObjectMethod(obj, method, new Class[]{int.class}, new Object[]{slotId});
+            Object id = ClazzUtils.g().invokeObjectMethod(obj, method, new Class[]{int.class}, new Object[]{slotId});
             if (id == null) {
-                id = ClazzUtils.invokeObjectMethod(obj, method, new Class[]{long.class}, new Object[]{slotId});
+                id = ClazzUtils.g().invokeObjectMethod(obj, method, new Class[]{long.class}, new Object[]{slotId});
             }
             if (id != null) {
                 return (String) id;
@@ -458,7 +458,7 @@ public class DoubleCardSupport {
      * @return
      */
     private Object getObjectInstance(String className) {
-        return ClazzUtils.invokeStaticMethod(className, "getDefault");
+        return ClazzUtils.g().invokeStaticMethod(className, "getDefault");
     }
 
     /*********************************************单例*************************************/

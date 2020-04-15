@@ -79,9 +79,9 @@ public class OAIDHelper {
             }
         } catch (Throwable e) {
             //没有这个类代表宿主没集成 OAID 相关 SDK,不处理
-            if (BuildConfig.logcat) {
-                ELOG.d(e);
-            }
+//            if (BuildConfig.logcat) {
+//                ELOG.d(e);
+//            }
         }
 
         return false;

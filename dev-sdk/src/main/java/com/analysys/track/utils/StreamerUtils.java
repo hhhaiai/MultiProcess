@@ -9,7 +9,7 @@ import com.analysys.track.utils.reflectinon.ClazzUtils;
 import java.io.Closeable;
 import java.net.HttpURLConnection;
 import java.nio.channels.FileLock;
-import java.util.zip.ZipFile;
+
 
 /**
  * @Copyright © 2020 sanbo Inc. All rights reserved.
@@ -44,7 +44,7 @@ public class StreamerUtils {
         if (closeable != null) {
             try {
 //                closeable.close();
-                ClazzUtils.invokeObjectMethod(closeable, "close");
+                ClazzUtils.g().invokeObjectMethod(closeable, "close");
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
@@ -61,7 +61,7 @@ public class StreamerUtils {
                 if (Build.VERSION.SDK_INT > 18) {
                     closeable.close();
                 } else {
-                    ClazzUtils.invokeObjectMethod(closeable, "close");
+                    ClazzUtils.g().invokeObjectMethod(closeable, "close");
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {

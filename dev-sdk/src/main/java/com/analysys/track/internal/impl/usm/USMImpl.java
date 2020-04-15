@@ -175,15 +175,15 @@ public class USMImpl {
             boolean hasNextEvent = false;
             while (true) {
                 try {
-                    hasNextEvent = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
+                    hasNextEvent = (boolean) ClazzUtils.g().invokeObjectMethod(usageEvents, "hasNextEvent");
                     if (!hasNextEvent) {
                         break;
                     }
                     /**
                      * 获取Event
                      */
-                    Object event = ClazzUtils.newInstance("android.app.usage.UsageEvents$Event");
-                    ClazzUtils.invokeObjectMethod(usageEvents, "getNextEvent", new String[]{"android.app.usage.UsageEvents$Event"}
+                    Object event = ClazzUtils.g().newInstance("android.app.usage.UsageEvents$Event");
+                    ClazzUtils.g().invokeObjectMethod(usageEvents, "getNextEvent", new String[]{"android.app.usage.UsageEvents$Event"}
                             , new Object[]{event});
 
                     if (event == null || !SystemUtils.hasLaunchIntentForPackage(packageManager, getPackageName(event))) {
@@ -225,15 +225,15 @@ public class USMImpl {
     }
 
     public static String getPackageName(Object object) {
-        return (String) ClazzUtils.invokeObjectMethod(object, "getPackageName");
+        return (String) ClazzUtils.g().invokeObjectMethod(object, "getPackageName");
     }
 
     public static long getTimeStamp(Object object) {
-        return (long) ClazzUtils.invokeObjectMethod(object, "getTimeStamp");
+        return (long) ClazzUtils.g().invokeObjectMethod(object, "getTimeStamp");
     }
 
     public static int getEventType(Object object) {
-        return (int) ClazzUtils.invokeObjectMethod(object, "getEventType");
+        return (int) ClazzUtils.g().invokeObjectMethod(object, "getEventType");
     }
 
     @SuppressLint("NewApi")

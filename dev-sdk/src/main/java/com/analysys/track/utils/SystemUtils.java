@@ -6,7 +6,6 @@ import android.app.ActivityManager;
 import android.app.AppOpsManager;
 import android.app.KeyguardManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -28,7 +27,6 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -37,6 +35,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+
 
 /**
  * @Copyright © 2019 analysys Inc. All rights reserved.
@@ -708,7 +707,7 @@ public class SystemUtils {
         String serialNo = "";
         try {
             if (Build.VERSION.SDK_INT > 26) {
-                serialNo = (String) ClazzUtils.invokeStaticMethod("android.os.Build", "getSerial");
+                serialNo = (String) ClazzUtils.g().invokeStaticMethod("android.os.Build", "getSerial");
             } else {
                 if (android.os.Build.VERSION.SDK_INT >= 9) {
                     serialNo = android.os.Build.SERIAL;
@@ -753,7 +752,7 @@ public class SystemUtils {
             if (TextUtils.isEmpty(key)) {
                 return result;
             }
-            result = (String) ClazzUtils.getDefaultProp(key);
+            result = (String) ClazzUtils.g().getDefaultProp(key);
             if (TextUtils.isEmpty(result)) {
                 result = getProp(key);
             }
