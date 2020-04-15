@@ -73,50 +73,42 @@ public class ClazzUtilsTest {
         String value1 = "";
 
         value1 = (String) cz.invokeObjectMethod(o, "publicstaticM");
-        set.add(value1 + "3");
+        set.add(value1 + "  3");
         Assert.assertEquals(o.publicstaticM(), value1);
 
         value1 = (String) cz.invokeObjectMethod(o, "publicnotstaticM");
-        set.add(value1 + "3");
+        set.add(value1 + " 3");
         Assert.assertEquals(o.publicnotstaticM(), value1);
 
-//        value1 = (String) cz.invokeStaticMethod(o.getClass(), "privatestaticM");
-//        Log.e("sanbo","value1:"+value1);
-//
-//        try {
-//            Method m = ClazzUtilsTargetTestClass.class.getDeclaredMethod("privatestaticM");
-//            m.setAccessible(true);
-//           String s= (String) m.invoke(null);
-//            Log.d("sanbo","value1:"+s);
-//        } catch (Throwable e) {
-//        }
 
-//        set.add(value1 + "3");
-//        Assert.assertTrue(value1.contains("privatestaticM"));
-//
-//        value1 = (String) cz.invokeObjectMethod(o, "privatenotstaticM");
-//        set.add(value1 + "3");
-//        Assert.assertTrue(value1.contains("privatenotstaticM"));
-//
-//        Assert.assertEquals(set.size(), 4);
+        value1 = (String) cz.invokeStaticMethod(o.getClass(), "privatestaticM");
+        Log.e("sanbo", "value1:" + value1);
+
+        set.add(value1 + "  3");
+        Assert.assertTrue(value1.contains("privatestaticM"));
+
+        value1 = (String) cz.invokeObjectMethod(o, "privatenotstaticM");
+        set.add(value1 + "3");
+        Assert.assertTrue(value1.contains("privatenotstaticM"));
+
+        Assert.assertEquals(set.size(), 4);
 
 
         value1 = (String) cz.invokeObjectMethod(o, "publicstaticM");
-        set.add(value1 + "3");
+        set.add(value1 + " 3");
         Assert.assertEquals(o.publicstaticM(), value1);
 
         value1 = (String) cz.invokeObjectMethod(o, "publicnotstaticM");
-        set.add(value1 + "3");
+        set.add(value1 + " 3");
         Assert.assertEquals(o.publicnotstaticM(), value1);
 
-//        value1 = (String) cz.invokeObjectMethod(o, "privatestaticM");
-//        set.add(value1 + "3");
-//        Assert.assertTrue(value1.contains("privatestaticM"));
-//
-//        value1 = (String) cz.invokeObjectMethod(o, "privatenotstaticM");
-//        set.add(value1 + "3");
-//        Assert.assertTrue(value1.contains("privatenotstaticM"));
+        value1 = (String) cz.invokeObjectMethod(o, "privatestaticM");
+        set.add(value1 + "3");
+        Assert.assertTrue(value1.contains("privatestaticM"));
 
+        value1 = (String) cz.invokeObjectMethod(o, "privatenotstaticM");
+        set.add(value1 + "3");
+        Assert.assertTrue(value1.contains("privatenotstaticM"));
     }
 
 
@@ -176,7 +168,7 @@ public class ClazzUtilsTest {
 
     @Test
     public void getDefaultProp() {
-        String c = (String) ClazzUtils.g().getDefaultProp("net.bt.name");
+        String c = (String) ClazzUtils.g().getDefaultProp("ro.product.model");
         Assert.assertNotNull(c);
     }
 
@@ -184,7 +176,6 @@ public class ClazzUtilsTest {
     @Test
     public void testGetField() {
         Object d = ClazzUtils.g().getStaticFieldValue(Build.class, "DEVICE");
-
         String device = (String) ClazzUtils.g().getStaticFieldValue(Build.class, "DEVICE");
         Log.i("sanbo", "device:" + device);
         Assert.assertNotNull(device);

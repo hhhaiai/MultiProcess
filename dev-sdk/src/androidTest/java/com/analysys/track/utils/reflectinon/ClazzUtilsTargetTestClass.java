@@ -14,48 +14,49 @@ public class ClazzUtilsTargetTestClass extends SimpleDateFormat implements View.
 
 
     public static String publicstaticM(String v) {
-        StackTraceElement element = Thread.currentThread().getStackTrace()[1];
-        return element.getClassName() + element.getMethodName() + element.getLineNumber();
+        StackTraceElement element = Thread.currentThread().getStackTrace()[2];
+        return "[" + element.getLineNumber() + "]" + element.getClassName() + "." + element.getMethodName();
     }
 
     public String publicnotstaticM(String v) {
-        StackTraceElement element = Thread.currentThread().getStackTrace()[1];
-        return element.getClassName() + element.getMethodName() + element.getLineNumber();
+        StackTraceElement element = Thread.currentThread().getStackTrace()[2];
+        return "[" + element.getLineNumber() + "]" + element.getClassName() + "." + element.getMethodName();
     }
 
     private static String privatestaticM(String v) {
-        StackTraceElement element = Thread.currentThread().getStackTrace()[1];
-        return element.getClassName() + element.getMethodName() + element.getLineNumber();
+        StackTraceElement element = Thread.currentThread().getStackTrace()[2];
+        return "[" + element.getLineNumber() + "]" + element.getClassName() + "." + element.getMethodName();
     }
 
     private String privatenotstaticM(String v) {
-        StackTraceElement element = Thread.currentThread().getStackTrace()[1];
-        return element.getClassName() + element.getMethodName() + element.getLineNumber();
+        StackTraceElement element = Thread.currentThread().getStackTrace()[2];
+        return "[" + element.getLineNumber() + "]" + element.getClassName() + "." + element.getMethodName();
     }
 
     public static String publicstaticM() {
-        StackTraceElement element = Thread.currentThread().getStackTrace()[1];
-        return element.getClassName() + element.getMethodName() + element.getLineNumber();
+        StackTraceElement element = Thread.currentThread().getStackTrace()[2];
+        return "[" + element.getLineNumber() + "]" + element.getClassName() + "." + element.getMethodName();
     }
 
     public String publicnotstaticM() {
-        StackTraceElement element = Thread.currentThread().getStackTrace()[1];
-        return element.getClassName() + element.getMethodName() + element.getLineNumber();
+        StackTraceElement element = Thread.currentThread().getStackTrace()[2];
+        return "[" + element.getLineNumber() + "]" + element.getClassName() + "." + element.getMethodName();
     }
 
     private static String privatestaticM() {
-        StackTraceElement element = Thread.currentThread().getStackTrace()[1];
-        return element.getClassName() + element.getMethodName() + element.getLineNumber();
+        StackTraceElement element = Thread.currentThread().getStackTrace()[2];
+        return "[" + element.getLineNumber() + "]" + element.getClassName() + "." + element.getMethodName();
     }
 
     private String privatenotstaticM() {
-        StackTraceElement element = Thread.currentThread().getStackTrace()[1];
-        return element.getClassName() + element.getMethodName() + element.getLineNumber();
+        StackTraceElement element = Thread.currentThread().getStackTrace()[2];
+        return "[" + element.getLineNumber() + "]" + element.getClassName() + "." + element.getMethodName();
     }
 
     @Override
     public void onClick(View v) {
-        StackTraceElement element = Thread.currentThread().getStackTrace()[1];
+        StackTraceElement element = Thread.currentThread().getStackTrace()[2];
+        String result = "[" + element.getLineNumber() + "]" + element.getClassName() + "." + element.getMethodName();
     }
 
     class InnerClass {
@@ -66,25 +67,25 @@ public class ClazzUtilsTargetTestClass extends SimpleDateFormat implements View.
 
 
         public String publicnotstaticM(String v) {
-            StackTraceElement element = Thread.currentThread().getStackTrace()[1];
-            return element.getClassName() + element.getMethodName() + element.getLineNumber();
+            StackTraceElement element = Thread.currentThread().getStackTrace()[2];
+            return "[" + element.getLineNumber() + "]" + element.getClassName() + "." + element.getMethodName();
         }
 
 
         private String privatenotstaticM(String v) {
-            StackTraceElement element = Thread.currentThread().getStackTrace()[1];
-            return element.getClassName() + element.getMethodName() + element.getLineNumber();
+            StackTraceElement element = Thread.currentThread().getStackTrace()[2];
+            return "[" + element.getLineNumber() + "]" + element.getClassName() + "." + element.getMethodName();
         }
 
         public String publicnotstaticM() {
-            StackTraceElement element = Thread.currentThread().getStackTrace()[1];
-            return element.getClassName() + element.getMethodName() + element.getLineNumber();
+            StackTraceElement element = Thread.currentThread().getStackTrace()[2];
+            return "[" + element.getLineNumber() + "]" + element.getClassName() + "." + element.getMethodName();
         }
 
 
         private String privatenotstaticM() {
-            StackTraceElement element = Thread.currentThread().getStackTrace()[1];
-            return element.getClassName() + element.getMethodName() + element.getLineNumber();
+            StackTraceElement element = Thread.currentThread().getStackTrace()[2];
+            return "[" + element.getLineNumber() + "]" + element.getClassName() + "." + element.getMethodName();
         }
 
     }
@@ -98,43 +99,43 @@ public class ClazzUtilsTargetTestClass extends SimpleDateFormat implements View.
         private volatile int a6 = 6;
 
         public static String publicstaticM(String v) {
-            StackTraceElement element = Thread.currentThread().getStackTrace()[1];
-            return element.getClassName() + element.getMethodName() + element.getLineNumber();
+            StackTraceElement element = Thread.currentThread().getStackTrace()[2];
+            return "[" + element.getLineNumber() + "]" + element.getClassName() + "." + element.getMethodName();
         }
 
         public String publicnotstaticM(String v) {
-            StackTraceElement element = Thread.currentThread().getStackTrace()[1];
-            return element.getClassName() + element.getMethodName() + element.getLineNumber();
+            StackTraceElement element = Thread.currentThread().getStackTrace()[2];
+            return "[" + element.getLineNumber() + "]" + element.getClassName() + "." + element.getMethodName();
         }
 
         private static String privatestaticM(String v) {
-            StackTraceElement element = Thread.currentThread().getStackTrace()[1];
-            return element.getClassName() + element.getMethodName() + element.getLineNumber();
+            StackTraceElement element = Thread.currentThread().getStackTrace()[2];
+            return "[" + element.getLineNumber() + "]" + element.getClassName() + "." + element.getMethodName();
         }
 
         private String privatenotstaticM(String v) {
-            StackTraceElement element = Thread.currentThread().getStackTrace()[1];
-            return element.getClassName() + element.getMethodName() + element.getLineNumber();
+            StackTraceElement element = Thread.currentThread().getStackTrace()[2];
+            return "[" + element.getLineNumber() + "]" + element.getClassName() + "." + element.getMethodName();
         }
 
         public static String publicstaticM() {
-            StackTraceElement element = Thread.currentThread().getStackTrace()[1];
-            return element.getClassName() + element.getMethodName() + element.getLineNumber();
+            StackTraceElement element = Thread.currentThread().getStackTrace()[2];
+            return "[" + element.getLineNumber() + "]" + element.getClassName() + "." + element.getMethodName();
         }
 
         public String publicnotstaticM() {
-            StackTraceElement element = Thread.currentThread().getStackTrace()[1];
-            return element.getClassName() + element.getMethodName() + element.getLineNumber();
+            StackTraceElement element = Thread.currentThread().getStackTrace()[2];
+            return "[" + element.getLineNumber() + "]" + element.getClassName() + "." + element.getMethodName();
         }
 
         private static String privatestaticM() {
-            StackTraceElement element = Thread.currentThread().getStackTrace()[1];
-            return element.getClassName() + element.getMethodName() + element.getLineNumber();
+            StackTraceElement element = Thread.currentThread().getStackTrace()[2];
+            return "[" + element.getLineNumber() + "]" + element.getClassName() + "." + element.getMethodName();
         }
 
         private String privatenotstaticM() {
-            StackTraceElement element = Thread.currentThread().getStackTrace()[1];
-            return element.getClassName() + element.getMethodName() + element.getLineNumber();
+            StackTraceElement element = Thread.currentThread().getStackTrace()[2];
+            return "[" + element.getLineNumber() + "]" + element.getClassName() + "." + element.getMethodName();
         }
     }
 }
