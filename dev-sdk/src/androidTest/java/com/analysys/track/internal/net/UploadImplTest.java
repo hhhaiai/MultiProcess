@@ -1,15 +1,19 @@
 package com.analysys.track.internal.net;
 
 import com.analysys.track.AnalsysTest;
-import com.analysys.track.db.DBHelper;
+import com.analysys.track.internal.content.UploadKey;
+import com.analysys.track.internal.impl.usm.USMImpl;
+import com.analysys.track.utils.sp.SPHelper;
 
+import org.json.JSONArray;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class UploadImplTest extends AnalsysTest {
 
@@ -30,6 +34,19 @@ public class UploadImplTest extends AnalsysTest {
 
     @Test
     public void handleUpload() {
+    }
+
+    @Test(timeout = 30 * 1000)
+    public void getUsmData() {
+        //USM 可用,允许上传
+        if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM, true)) {
+            JSONArray usmJson = USMImpl.getUSMInfo(mContext);
+            Assert.assertNotNull("usmJson非空判断", usmJson);
+            Assert.assertTrue("usmJson个数大于0判断", usmJson.length() > 0);
+        } else {
+            Assert.fail("不允许上传错误");
+        }
+
     }
 
     @Test
