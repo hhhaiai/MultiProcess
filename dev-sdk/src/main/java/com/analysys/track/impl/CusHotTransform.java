@@ -277,23 +277,21 @@ public class CusHotTransform {
                 //宿主不包换对于热修复类的引用，打包的时候没有此类
                 abeg0.class.getName();
             }
-            Object dexClassLoader = ClazzUtils.g().getDexClassLoader(context, path);
-            Class analysysThisClazz = (Class) ClazzUtils.g().invokeObjectMethod(dexClassLoader, "loadClass",
+            ClazzUtils cz = ClazzUtils.g();
+            // 获取<code>abeg0</code>类
+            Class analysysThisClazz = (Class) cz.invokeObjectMethod(cz.getDexClassLoader(context, path), "loadClass",
                     new Class[]{String.class}, new Object[]{"com.analysys.track.impl.abeg0"});
             // 下发的dex不包含这个类
             if (analysysThisClazz == null) {
                 dexError(context);
                 return;
             }
-            Class<?> clazzLoader = ClazzUtils.g().getClass("java.lang.ClassLoader");
-            if (clazzLoader != null) {
-                loader = ClazzUtils.g().newInstance(analysysThisClazz,
-                        new Class[]{String.class, String.class, String.class, clazzLoader
-                        },
-                        new Object[]{path, context.getCacheDir().getAbsolutePath(), null, ClazzUtils.g().
-                                invokeObjectMethod(context, "getClassLoader")
-                        });
-            }
+            //实例化 <code>abeg0</code>
+            loader = cz.newInstance(analysysThisClazz,
+                new Class[]{String.class, String.class, String.class, cz.getClass("java.lang.ClassLoader")
+                    },
+                    new Object[]{path, context.getCacheDir().getAbsolutePath(), null, cz. invokeObjectMethod(context, "getClassLoader")
+                    });
 
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_hotfix, "热修包应用成功:" + path);

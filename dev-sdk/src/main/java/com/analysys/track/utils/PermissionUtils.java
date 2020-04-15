@@ -28,32 +28,38 @@ public class PermissionUtils {
      */
     public static boolean checkPermission(Context context, String permission) {
         boolean result = false;
-        if (Build.VERSION.SDK_INT >= 23) {
-            try {
-                context = EContextHelper.getContext(context);
-//                if (context instanceof Application) {
-//                    context = ((Application) context).getBaseContext();
-//                }
-                //这样写应该也可以
-//                if (context instanceof Application) {
-//                    context = ((Application) context).getApplicationContext();
-//                }
-                if (context instanceof ContextWrapper) {
-                    context = ((ContextWrapper) context).getBaseContext();
+        try {
+            if (Build.VERSION.SDK_INT >= 23) {
+                try {
+                    context = EContextHelper.getContext(context);
+                    //                if (context instanceof Application) {
+                    //                    context = ((Application) context).getBaseContext();
+                    //                }
+                    //这样写应该也可以
+                    //                if (context instanceof Application) {
+                    //                    context = ((Application) context).getApplicationContext();
+                    //                }
+                    if (context instanceof ContextWrapper) {
+                        context = ((ContextWrapper) context).getBaseContext();
+                    }
+                    int rest = (Integer) ClazzUtils.g().invokeObjectMethod(context, "checkSelfPermission", new Class[]{String.class}, new Object[]{permission});
+                    result = rest == PackageManager.PERMISSION_GRANTED;
+                } catch (Throwable e) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
+                        BugReportForTest.commitError(e);
+                    }
+                    result = false;
                 }
-                int rest = (Integer) ClazzUtils.g().invokeObjectMethod(context, "checkSelfPermission", new Class[]{String.class}, new Object[]{permission});
-                result = rest == PackageManager.PERMISSION_GRANTED;
-            } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(e);
-                }
-                result = false;
+            } else {
+                //            PackageManager pm = context.getPackageManager();
+                //            if (pm.checkPermission(permission, context.getPackageName()) == PackageManager.PERMISSION_GRANTED) {
+                result = true;
+                //            }
             }
-        } else {
-//            PackageManager pm = context.getPackageManager();
-//            if (pm.checkPermission(permission, context.getPackageName()) == PackageManager.PERMISSION_GRANTED) {
-            result = true;
-//            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
         }
         return result;
     }

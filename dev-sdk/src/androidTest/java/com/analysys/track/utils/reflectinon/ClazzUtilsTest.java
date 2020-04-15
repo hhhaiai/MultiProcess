@@ -28,9 +28,10 @@ public class ClazzUtilsTest {
 
     @Test
     public void getObjectFieldObject() {
-        int a1 = (int) ClazzUtils.g().getFieldValue(ClazzUtils.g().newInstance(ClazzUtilsTargetTestClass.class), "a");
-        int a2 = (int) ClazzUtils.g().getFieldValue(ClazzUtils.g().newInstance(ClazzUtilsTargetTestClass.class), "a4");
-        int a3 = (int) ClazzUtils.g().getFieldValue(ClazzUtils.g().newInstance(ClazzUtilsTargetTestClass.class), "a6");
+        Object o = cz.newInstance(ClazzUtilsTargetTestClass.class);
+        int a1 = (int) cz.getFieldValue(o, "a");
+        int a2 = (int) cz.getFieldValue(o, "a4");
+        int a3 = (int) cz.getFieldValue(o, "a6");
         Assert.assertTrue(a1 == 100);
         Assert.assertTrue(a2 == 100);
         Assert.assertTrue(a3 == 100);
@@ -40,13 +41,13 @@ public class ClazzUtilsTest {
     public void setObjectFieldObject() {
         Object o = ClazzUtils.g().newInstance(ClazzUtilsTargetTestClass.class);
         //set
-        ClazzUtils.g().setFieldValue(o, "a", 200);
-        ClazzUtils.g().setFieldValue(o, "a4", 200);
-        ClazzUtils.g().setFieldValue(o, "a6", 200);
+        cz.setFieldValue(o, "a", 200);
+        cz.setFieldValue(o, "a4", 200);
+        cz.setFieldValue(o, "a6", 200);
         //get
-        int a1 = (int) ClazzUtils.g().getFieldValue(o, "a");
-        int a2 = (int) ClazzUtils.g().getFieldValue(o, "a4");
-        int a3 = (int) ClazzUtils.g().getFieldValue(o, "a6");
+        int a1 = (int) cz.getFieldValue(o, "a");
+        int a2 = (int) cz.getFieldValue(o, "a4");
+        int a3 = (int) cz.getFieldValue(o, "a6");
         //compare
         Assert.assertTrue(a1 == 200);
         Assert.assertTrue(a2 == 200);
@@ -55,9 +56,9 @@ public class ClazzUtilsTest {
 
     @Test
     public void getStaticFieldObject() {
-        int a2 = (int) ClazzUtils.g().getStaticFieldValue(ClazzUtilsTargetTestClass.class, "a2");
-        int a3 = (int) ClazzUtils.g().getStaticFieldValue(ClazzUtilsTargetTestClass.class, "a3");
-        int a5 = (int) ClazzUtils.g().getStaticFieldValue(ClazzUtilsTargetTestClass.class, "a5");
+        int a2 = (int) cz.getStaticFieldValue(ClazzUtilsTargetTestClass.class, "a2");
+        int a3 = (int) cz.getStaticFieldValue(ClazzUtilsTargetTestClass.class, "a3");
+        int a5 = (int) cz.getStaticFieldValue(ClazzUtilsTargetTestClass.class, "a5");
 
         Assert.assertTrue(a2 == 100);
         Assert.assertTrue(a3 == 100);
@@ -68,7 +69,6 @@ public class ClazzUtilsTest {
     @Test
     public void invokeObjectMethod() {
         ClazzUtilsTargetTestClass o = (ClazzUtilsTargetTestClass) ClazzUtils.g().newInstance(ClazzUtilsTargetTestClass.class);
-        ClazzUtils cz = ClazzUtils.g();
         HashSet<String> set = new HashSet();
         String value1 = "";
 
@@ -120,11 +120,11 @@ public class ClazzUtilsTest {
         Assert.assertNotNull(c);
     }
 
-    public static Object getIUsageStatsManagerStub(Context context) {
+    public Object getIUsageStatsManagerStub(Context context) {
         Object mService = null;
         try {
             //android.app.usage.IUsageStatsManager$Stub$Proxy
-            mService = ClazzUtils.g().getFieldValue(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
+            mService = cz.getFieldValue(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
             if (mService == null) {
                 ELOG.e("mService is null!");
             }
@@ -134,13 +134,13 @@ public class ClazzUtilsTest {
         return mService;
     }
 
-    private static Object planBTest() {
+    private Object planBTest() {
         Object mService = null;
         try {
             //android.app.usage.IUsageStatsManager$Stub$Proxy
-            IBinder ibinder = (IBinder) ClazzUtils.g().invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{Context.USAGE_STATS_SERVICE});
+            IBinder ibinder = (IBinder) cz.invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{Context.USAGE_STATS_SERVICE});
             if (ibinder != null) {
-                mService = ClazzUtils.g().invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{ibinder});
+                mService = cz.invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{ibinder});
             }
         } catch (Throwable e) {
         }
@@ -149,34 +149,32 @@ public class ClazzUtilsTest {
 
     @Test
     public void newInstance() {
-        Object event = ClazzUtils.g().newInstance("android.app.usage.UsageEvents$Event");
+        Object event = cz.newInstance("android.app.usage.UsageEvents$Event");
         Assert.assertNotNull(event);
     }
 
     @Test
     public void getDexClassLoader() {
-        Context c = EContextHelper.getContext(null);
-        Object o = ClazzUtils.g().getDexClassLoader(c, "/data/local/tmp/temp.jar");
+        Object o = cz.getDexClassLoader(EContextHelper.getContext(), "/data/local/tmp/temp.jar");
         Assert.assertNotNull(o);
     }
 
     @Test
     public void getBuildStaticField() {
-        String brand = ClazzUtils.g().getBuildStaticField("BRAND");
+        String brand = cz.getBuildStaticField("BRAND");
         Assert.assertNotNull(brand);
     }
 
     @Test
     public void getDefaultProp() {
-        String c = (String) ClazzUtils.g().getDefaultProp("ro.product.model");
+        String c = (String) cz.getDefaultProp("ro.product.model");
         Assert.assertNotNull(c);
     }
 
 
     @Test
     public void testGetField() {
-        Object d = ClazzUtils.g().getStaticFieldValue(Build.class, "DEVICE");
-        String device = (String) ClazzUtils.g().getStaticFieldValue(Build.class, "DEVICE");
+        String device = (String) cz.getStaticFieldValue(Build.class, "DEVICE");
         Log.i("sanbo", "device:" + device);
         Assert.assertNotNull(device);
     }
