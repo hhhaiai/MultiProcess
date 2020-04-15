@@ -77,6 +77,7 @@ android {
             ENABLE_BUG_REPORT = false
             DEBUG_URL = false
             logcat = false
+            debug_utils = false
             BUILD_USE_STRICTMODE = true
         }
 //        buildConfigField "String", "json_proguard", "\"${jp}\""
