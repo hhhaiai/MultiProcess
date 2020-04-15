@@ -5,14 +5,13 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.ELOG;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-
-import static android.os.Build.VERSION.SDK_INT;
 
 /**
  * @Copyright 2019 analysys Inc. All rights reserved.
@@ -27,6 +26,9 @@ public class ClazzUtils {
 
     public Object invokeStaticMethod(String clazzName, String methodName) {
         return invokeStaticMethod(getClass(clazzName), methodName, new Class<?>[]{}, new Object[]{});
+    }
+    public Object invokeStaticMethod(Class clazz, String methodName) {
+        return invokeStaticMethod(clazz, methodName, new Class<?>[]{}, new Object[]{});
     }
 
     public Object invokeStaticMethod(String clazzName, String methodName, Class<?>[] argsClass, Object[] args) {
@@ -59,6 +61,10 @@ public class ClazzUtils {
         if (!(types != null && values != null && types.length == values.length)) {
             return null;
         }
+        if (types == null || values == null) {
+            types = new Class[]{};
+            values = new Object[]{};
+        }
         return goInvoke(getMethod(clazz, methodName, types), o, values);
     }
 
@@ -83,9 +89,12 @@ public class ClazzUtils {
             } else {
                 return getMethodB(clazz, methodName, types);
             }
-        } catch (Throwable e) {
+        } catch (Throwable igone) {
             if (BuildConfig.DEBUG_UTILS) {
-                ELOG.e(e);
+                ELOG.e(igone);
+            }
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(igone);
             }
             return getMethodB(clazz, methodName, types);
         }
@@ -110,9 +119,12 @@ public class ClazzUtils {
                 method.setAccessible(true);
                 return method;
             }
-        } catch (Throwable e) {
+        } catch (Throwable igone) {
             if (BuildConfig.DEBUG_UTILS) {
-                ELOG.e(e);
+                ELOG.e(igone);
+            }
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(igone);
             }
         }
         return null;
@@ -171,6 +183,9 @@ public class ClazzUtils {
             if (BuildConfig.DEBUG_UTILS) {
                 ELOG.e(igone);
             }
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(igone);
+            }
             return newInstanceImplB(clazz, types, values);
         }
     }
@@ -196,63 +211,65 @@ public class ClazzUtils {
                 ctor.setAccessible(true);
                 return ctor.newInstance(values);
             }
-        } catch (Throwable e) {
+        } catch (Throwable igone) {
             if (BuildConfig.DEBUG_UTILS) {
-                ELOG.e(e);
+                ELOG.e(igone);
+            }
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(igone);
             }
         }
         return null;
     }
 
 
-    /**
-     * 获取非静态的变量
-     *
-     * @param o
-     * @param fieldName
-     * @return
-     */
+
     public Object getFieldValue(Object o, String fieldName) {
+        if (o == null) {
+            return null;
+        }
+        return getFieldValueImpl(o.getClass(), fieldName, o);
+    }
+    public Object getStaticFieldValue(Class clazz, String fieldName) {
+        return getFieldValueImpl(clazz, fieldName, null);
+    }
+
+
+    public void setFieldValue(Object o, String fieldName, Object value) {
         try {
-            if (o == null || TextUtils.isEmpty(fieldName)) {
-                return null;
+            if (o == null) {
+                return;
             }
             Field field = getFieldImpl(o.getClass(), fieldName);
             if (field != null) {
-                return field.get(o);
+                field.set(o, value);
             }
-        } catch (Throwable e) {
+        } catch (Throwable igone) {
             if (BuildConfig.DEBUG_UTILS) {
-                ELOG.e(e);
+                ELOG.e(igone);
+            }
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(igone);
             }
         }
-        return null;
     }
 
-    /**
-     * 获取静态变量
-     *
-     * @param clazz
-     * @param fieldName
-     * @return
-     */
-    public Object getStaticFieldValue(Class clazz, String fieldName) {
+    private Object getFieldValueImpl(Class clazz, String fieldName, Object o) {
         try {
-            if (clazz == null || TextUtils.isEmpty(fieldName)) {
-                return null;
-            }
             Field field = getFieldImpl(clazz, fieldName);
             if (field != null) {
-                return field.get(null);
+                return field.get(o);
             }
-        } catch (Throwable e) {
+        } catch (Throwable igone) {
             if (BuildConfig.DEBUG_UTILS) {
-                ELOG.e(e);
+                ELOG.e(igone);
+            }
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(igone);
             }
         }
         return null;
     }
-
     //内部元反射获取变量，无须关注异常，不打印日志
     private Field getFieldImpl(Class clazz, String fieldName) {
         Field field = null;
@@ -272,9 +289,12 @@ public class ClazzUtils {
                 field.setAccessible(true);
                 return field;
             }
-        } catch (Throwable e) {
+        } catch (Throwable igone) {
             if (BuildConfig.DEBUG_UTILS) {
-                ELOG.e(e);
+                ELOG.e(igone);
+            }
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(igone);
             }
             return getFieldImplB(clazz, fieldName);
         }
@@ -304,9 +324,12 @@ public class ClazzUtils {
                 field.setAccessible(true);
                 return field;
             }
-        } catch (Throwable e) {
+        } catch (Throwable igone) {
             if (BuildConfig.DEBUG_UTILS) {
-                ELOG.e(e);
+                ELOG.e(igone);
+            }
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(igone);
             }
         }
 
@@ -330,21 +353,44 @@ public class ClazzUtils {
                 result = getClassByForName(name);
             }
             if (result == null) {
-                result = Class.forName(name);
+                result = getClassByf(name);
             }
-        } catch (Throwable e) {
+        } catch (Throwable igone) {
             if (BuildConfig.DEBUG_UTILS) {
-                ELOG.e(e);
+                ELOG.e(igone);
+            }
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(igone);
             }
         }
 
         return result;
     }
 
+    private Class<?> getClassByf(String name) {
+        try {
+            return Class.forName(name);
+        } catch (Throwable igone) {
+//            if (BuildConfig.DEBUG_UTILS) {
+//                ELOG.e(igone);
+//            }
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(igone);
+            }
+        }
+        return null;
+    }
+
     private Class getClassByForName(String name) {
         try {
             return (Class) goInvoke(forName, null, name);
-        } catch (Throwable e) {
+        } catch (Throwable igone) {
+//            if (BuildConfig.DEBUG_UTILS) {
+//                ELOG.e(igone);
+//            }
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(igone);
+            }
         }
         return null;
     }
@@ -352,7 +398,13 @@ public class ClazzUtils {
     private Class<?> getClassByClassLoader(String name) {
         try {
             return this.getClass().getClassLoader().loadClass(name);
-        } catch (Throwable e) {
+        } catch (Throwable igone) {
+//            if (BuildConfig.DEBUG_UTILS) {
+//                ELOG.e(igone);
+//            }
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(igone);
+            }
         }
         return null;
     }
@@ -372,8 +424,21 @@ public class ClazzUtils {
             }
         } catch (Throwable e) {
             if (BuildConfig.DEBUG_UTILS) {
-                ELOG.wtf("=======goInvoke======== \nm:" + method.toString() + "\nobj:" + obj + "\nv:" + Arrays.asList(argsValue));
-                ELOG.e(e);
+                try {
+                    if (method.toString().contains("IUsageStatsManager$Stub$Proxy.queryEvents")) {
+                        ELOG.d("=======goInvoke========\nqueryEvents error pkg:" + Arrays.asList(argsValue).get(2));
+                    } else if (obj.toString().contains("telephony")) {
+                        ELOG.d("=======goInvoke========\ntelephony obj:" + obj + ", " + Arrays.asList(argsValue));
+                    } else {
+                        ELOG.wtf("=======goInvoke======== \nm:" + method.toString() + "\nobj:" + obj + "\nv:" + Arrays.asList(argsValue));
+                        ELOG.e(e);
+                    }
+                } catch (Throwable ex) {
+                }
+            }
+
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
             }
         }
         return null;
@@ -403,9 +468,12 @@ public class ClazzUtils {
                 Object[] values = new Object[]{path, context.getCacheDir().getAbsolutePath(), null, invokeObjectMethod(context, "getClassLoader")};
                 return newInstance(dc, types, values);
             }
-        } catch (Throwable e) {
+        } catch (Throwable igone) {
             if (BuildConfig.DEBUG_UTILS) {
-                ELOG.e(e);
+                ELOG.e(igone);
+            }
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(igone);
             }
         }
         return null;
@@ -424,9 +492,12 @@ public class ClazzUtils {
                 fd.setAccessible(true);
                 return (String) fd.get(null);
             }
-        } catch (Throwable e) {
+        } catch (Throwable igone) {
             if (BuildConfig.DEBUG_UTILS) {
-                ELOG.e(e);
+                ELOG.e(igone);
+            }
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(igone);
             }
         }
         return "";
@@ -488,9 +559,12 @@ public class ClazzUtils {
             getConstructor = Class.class.getDeclaredMethod("getConstructor", Class[].class);
             newInstance = Constructor.class.getDeclaredMethod("newInstance", Object[].class);
 
-        } catch (Throwable e) {
+        } catch (Throwable igone) {
             if (BuildConfig.DEBUG_UTILS) {
-                ELOG.e(e);
+                ELOG.e(igone);
+            }
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(igone);
             }
         }
         /**
@@ -502,9 +576,12 @@ public class ClazzUtils {
             Method setHiddenApiExemptions = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
             Object sVmRuntime = getRuntime.invoke(null);
             setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
-        } catch (Throwable e) {
+        } catch (Throwable igone) {
             if (BuildConfig.DEBUG_UTILS) {
-                ELOG.e(e);
+                ELOG.e(igone);
+            }
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(igone);
             }
         }
 //        }
