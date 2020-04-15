@@ -231,8 +231,7 @@ public class RequestUtils {
             return false;
         }
         try {
-            ConnectivityManager connectivity = (ConnectivityManager) mContext
-                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+            ConnectivityManager connectivity = (ConnectivityManager) mContext.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
             if (!PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_NETWORK_STATE)) {
                 return false;
             }

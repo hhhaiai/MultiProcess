@@ -1,8 +1,11 @@
 package com.device.utils;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
+
+import com.analysys.track.utils.EContextHelper;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -30,9 +33,13 @@ public class DemoPermissionH {
         boolean result = false;
         if (Build.VERSION.SDK_INT >= 23) {
             try {
+                context = DemoEContextHelper.getContext(context);
+                if (context instanceof Application) {
+                    context = ((Application) context).getBaseContext();
+                }
                 Class<?> clazz = Class.forName("android.content.Context");
                 Method method = clazz.getMethod("checkSelfPermission", String.class);
-                int rest = (Integer) method.invoke(context.getApplicationContext(), permission);
+                int rest = (Integer) method.invoke(context, permission);
                 return rest == PackageManager.PERMISSION_GRANTED;
             } catch (Throwable e) {
                 result = false;
