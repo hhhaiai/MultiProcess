@@ -333,12 +333,18 @@ public class DoubleCardSupport {
                 //  猜测 ril.modem.meid.1/ril.modem.meid.2
                 , "ril.modem.imei"
                 , "ril.modem.meid"
-                // 联想 gsm.device.imei1/gsm.device.imei2
-                //  猜测 gsm.device.meid1/gsm.device.meid2
+                // 联想 gsm.device.imei1/gsm.device.imei2/gsm.device.meid1
+                //  猜测 cdma.device.imei1/cdma.device.imei2/cdma.device.meid1
                 , "gsm.device.imei"
                 , "gsm.device.meid"
                 , "cdma.device.imei"
                 , "cdma.device.meid"
+                // 联想 gsm.meid/gsm.imei1/gsm.imei2
+                //  猜测 cdma.meid/cdma.imei1/cdma.imei2
+                , "gsm.meid"
+                , "gsm.imei"
+                , "cdma.meid"
+                , "cdma.imei"
                 // VIVO
                 // persist.sys.meid  返回值特殊 +MEID: "A00000859BAB69"
                 // persist.sys.updater.imei/persist.sys.vtouch.imei
