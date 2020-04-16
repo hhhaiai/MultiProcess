@@ -1,30 +1,42 @@
 package com.analysys.track.utils.reflectinon;
 
-import com.analysys.track.utils.EContextHelper;
+import android.content.Context;
+import android.support.test.InstrumentationRegistry;
+
 import com.analysys.track.utils.ELOG;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 public class DoubleCardSupportTest {
 
+    private Context context;
+
+    @Test
+    public void init() {
+        context = InstrumentationRegistry.getTargetContext();
+    }
     @Test
     public void getIMEIS() {
         long begin = System.currentTimeMillis();
-        String imeis = DoubleCardSupport.getInstance().getIMEIS(EContextHelper.getContext());
+        String imeis = DoubleCardSupport.getInstance().getIMEIS(context);
         long end = System.currentTimeMillis();
         ELOG.i("imei获取耗时:" + (end - begin));
-        Assert.assertNotNull(imeis);
+        Assert.assertNotNull("imei获取", imeis);
     }
 
-    @Test
+    @Test(timeout = 500)
     public void getIMSIS() {
-
+        long begin = System.currentTimeMillis();
+        String imsis = DoubleCardSupport.getInstance().getIMSIS(context);
+        long end = System.currentTimeMillis();
+        ELOG.i("imsi获取耗时:" + (end - begin));
+        Assert.assertNotNull("imsi获取", imsis);
     }
 
     @Test
     public void getInstance() {
+        Assert.assertNotNull("单例获取非空", DoubleCardSupport.getInstance());
+        Assert.assertTrue("对比单例获取结果", DoubleCardSupport.getInstance() == DoubleCardSupport.getInstance());
     }
 }
