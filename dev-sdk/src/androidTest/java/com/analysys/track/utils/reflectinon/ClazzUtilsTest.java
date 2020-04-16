@@ -1,19 +1,30 @@
 package com.analysys.track.utils.reflectinon;
 
+import android.Manifest;
+import android.app.Application;
+import android.app.usage.UsageEvents;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+
+import com.analysys.track.AnalsysTest;
+import com.analysys.track.internal.impl.usm.USMUtils;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.SystemUtils;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashSet;
+import java.util.List;
 
-public class ClazzUtilsTest {
+import dalvik.system.DexClassLoader;
+
+public class ClazzUtilsTest extends AnalsysTest {
 
 
     private ClazzUtils cz = null;
@@ -209,4 +220,110 @@ public class ClazzUtilsTest {
 //
 //        Assert.assertNotEquals(b, b1);
 //    }
+
+
+    @Test(timeout = 5000)
+    public void usmUE() {
+        // private static Object getUsageEventsByInvoke(
+        // long beginTime,long endTime,Context context)
+
+        Object o = ClazzUtils.g().invokeStaticMethod(USMUtils.class, "getUsageEventsByInvoke",
+                new Class[]{long.class, long.class, Context.class},
+                new Object[]{0, System.currentTimeMillis(), mContext});
+
+
+        Assert.assertNotNull("获取USM—UE为空", o);
+        Assert.assertTrue("获取USM—UE类型错误", o instanceof UsageEvents);
+
+
+
+    }
+    @Test(timeout = 5000)
+    public void usmUS() {
+        // private static List<UsageStats> getUsageStatsListByInvoke(
+        // Context context, long beginTime, long endTime)
+
+        Object o1 = ClazzUtils.g().invokeStaticMethod(USMUtils.class, "getUsageStatsListByInvoke",
+                new Class[]{Context.class, long.class, long.class},
+                new Object[]{mContext, 0, System.currentTimeMillis()});
+
+
+        Assert.assertNotNull("获取USM—US为空", o1);
+        Assert.assertTrue("获取USM—US类型错误", o1 instanceof List);
+
+
+
+    }
+
+    @Test(timeout = 5000)
+    public void getContext() {
+        Context innerContext = null;
+        Application app = null;
+        Object at = ClazzUtils.g().invokeStaticMethod("android.app.ActivityThread", "currentActivityThread");
+        app = (Application) ClazzUtils.g().invokeObjectMethod(at, "getApplication");
+        if (app != null) {
+            innerContext = app.getApplicationContext();
+        }
+        if (innerContext == null) {
+            app = (Application) ClazzUtils.g().invokeStaticMethod("android.app.AppGlobals", "getInitialApplication");
+            if (app != null) {
+                innerContext = app.getApplicationContext();
+            }
+        }
+
+        Assert.assertNotNull("获取 context 为空", innerContext);
+        Assert.assertEquals("获取 context 实例错误", innerContext, mContext.getApplicationContext());
+    }
+
+    @Test(timeout = 5000)
+    public void getDexLoader() {
+        Object dexClassLoader = ClazzUtils.g().getDexClassLoader(mContext, mContext.getCacheDir() + "/test.dex");
+        Assert.assertNotNull("获取dexclassloader 错误", dexClassLoader);
+        Assert.assertTrue("获取 dexclassloader 类型错误", dexClassLoader instanceof DexClassLoader);
+        DexClassLoader loader = (DexClassLoader) dexClassLoader;
+        try {
+            Class aClass = loader.loadClass(Object.class.getName());
+            Assert.assertEquals("类获取错误", aClass, Object.class);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            Assert.fail("双亲委派异常：" + e.getMessage());
+        }
+    }
+
+    @Test(timeout = 3000)
+    public void permissionTest() {
+        int result1 = (int) ClazzUtils.g().invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.BLUETOOTH});
+        Assert.assertTrue(result1 == PackageManager.PERMISSION_GRANTED || result1 == PackageManager.PERMISSION_DENIED);
+        result1 = (int) ClazzUtils.g().invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.READ_PHONE_STATE});
+        Assert.assertTrue(result1 == PackageManager.PERMISSION_GRANTED || result1 == PackageManager.PERMISSION_DENIED);
+        result1 = (int) ClazzUtils.g().invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.WRITE_SETTINGS});
+        Assert.assertTrue(result1 == PackageManager.PERMISSION_GRANTED || result1 == PackageManager.PERMISSION_DENIED);
+        result1 = (int) ClazzUtils.g().invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.ACCESS_FINE_LOCATION});
+        Assert.assertTrue(result1 == PackageManager.PERMISSION_GRANTED || result1 == PackageManager.PERMISSION_DENIED);
+        result1 = (int) ClazzUtils.g().invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.ACCESS_COARSE_LOCATION});
+        Assert.assertTrue(result1 == PackageManager.PERMISSION_GRANTED || result1 == PackageManager.PERMISSION_DENIED);
+        result1 = (int) ClazzUtils.g().invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.ACCESS_NETWORK_STATE});
+        Assert.assertTrue(result1 == PackageManager.PERMISSION_GRANTED || result1 == PackageManager.PERMISSION_DENIED);
+        result1 = (int) ClazzUtils.g().invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.GET_TASKS});
+        Assert.assertTrue(result1 == PackageManager.PERMISSION_GRANTED || result1 == PackageManager.PERMISSION_DENIED);
+        result1 = (int) ClazzUtils.g().invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.CHANGE_WIFI_STATE});
+        Assert.assertTrue(result1 == PackageManager.PERMISSION_GRANTED || result1 == PackageManager.PERMISSION_DENIED);
+        result1 = (int) ClazzUtils.g().invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.ACCESS_WIFI_STATE});
+        Assert.assertTrue(result1 == PackageManager.PERMISSION_GRANTED || result1 == PackageManager.PERMISSION_DENIED);
+    }
+
+    @Test
+    public void getSystemEnv(){
+        SystemUtils.getSystemEnv("ro.build.type");
+    }
+    @Test
+    public void getBuildStaticField2(){
+        ClazzUtils.g().getBuildStaticField("BRAND");
+        ClazzUtils.g().getBuildStaticField("FINGERPRINT");
+        ClazzUtils.g().getBuildStaticField("DEVICE");
+        ClazzUtils.g().getBuildStaticField("PRODUCT");
+        ClazzUtils.g().getBuildStaticField("TAGS");
+        ClazzUtils.g().getBuildStaticField("MODEL");
+    }
+
 }
