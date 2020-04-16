@@ -196,7 +196,13 @@ public class USMImpl {
             USMInfo openEvent = null;
             Object lastEvent = null;
             boolean hasNextEvent = false;
-            while (true) {
+
+            int count = (int) ClazzUtils.g().getFieldValue(usageEvents, "mEventCount");
+
+            if (count <= 0) {
+                count = 50;
+            }
+            for (int i = 0; i < count; i++) {
                 try {
                     hasNextEvent = (boolean) ClazzUtils.g().invokeObjectMethod(usageEvents, "hasNextEvent");
                     if (!hasNextEvent) {
@@ -209,7 +215,8 @@ public class USMImpl {
                     ClazzUtils.g().invokeObjectMethod(usageEvents, "getNextEvent", new String[]{"android.app.usage.UsageEvents$Event"}
                             , new Object[]{event});
 
-                    if (event == null || !SystemUtils.hasLaunchIntentForPackage(packageManager, getPackageName(event))) {
+                    String pkg = getPackageName(event);
+                    if (TextUtils.isEmpty(pkg) || !SystemUtils.hasLaunchIntentForPackage(packageManager, pkg)) {
                         continue;
                     }
                     /**

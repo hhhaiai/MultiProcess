@@ -5,7 +5,9 @@ import android.support.test.InstrumentationRegistry;
 import android.util.Log;
 
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.ELOG;
 
+import org.json.JSONArray;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,7 +25,10 @@ public class USMImplTest {
 
     @Test
     public void testTestGetUSMInfo() {
-        USMImpl.getUSMInfo(context);
+        long start = System.currentTimeMillis();
+        JSONArray usm = USMImpl.getUSMInfo(context, 0, System.currentTimeMillis());
+        long end = System.currentTimeMillis();
+        ELOG.i("耗时：" + (end - start) + "----[" + usm.length() + "]-----" + usm.toString());
     }
 
     public void testParserUsageStatsList() {

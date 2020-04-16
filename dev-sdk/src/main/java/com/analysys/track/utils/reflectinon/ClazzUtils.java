@@ -3,6 +3,7 @@ package com.analysys.track.utils.reflectinon;
 import android.content.Context;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.BugReportForTest;
@@ -593,9 +594,10 @@ public class ClazzUtils {
             getDeclaredConstructor = Class.class.getDeclaredMethod("getDeclaredConstructor", Class[].class);
             getConstructor = Class.class.getDeclaredMethod("getConstructor", Class[].class);
             newInstance = Constructor.class.getDeclaredMethod("newInstance", Object[].class);
-
         } catch (Throwable igone) {
-
+            if (BuildConfig.DEBUG_UTILS) {
+                Log.e("analysys", Log.getStackTraceString(igone));
+            }
         }
         /**
          * 设置豁免所有hide api
@@ -607,7 +609,9 @@ public class ClazzUtils {
             Object sVmRuntime = getRuntime.invoke(null);
             setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
         } catch (Throwable igone) {
-
+            if (BuildConfig.DEBUG_UTILS) {
+                Log.e("analysys", Log.getStackTraceString(igone));
+            }
         }
 //        }
     }
