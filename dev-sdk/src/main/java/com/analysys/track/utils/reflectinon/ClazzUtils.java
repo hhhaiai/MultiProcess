@@ -166,9 +166,9 @@ public class ClazzUtils {
                     ctor = (Constructor) goInvoke(getConstructor, clazz, new Class[]{null});
                 }
             } else {
-                ctor = (Constructor) goInvoke(getDeclaredConstructor, clazz, types);
+                ctor = (Constructor) goInvoke(getDeclaredConstructor, clazz, new Object[]{types});
                 if (ctor == null) {
-                    ctor = (Constructor) goInvoke(getConstructor, clazz, types);
+                    ctor = (Constructor) goInvoke(getConstructor, clazz, new Object[]{types});
                 }
             }
             if (ctor != null) {
@@ -176,7 +176,7 @@ public class ClazzUtils {
                 if (types == null || types.length == 0) {
                     return goInvoke(newInstance, ctor, new Object[]{null});
                 } else {
-                    return goInvoke(newInstance, ctor, values);
+                    return goInvoke(newInstance, ctor, new Object[]{values});
                 }
             } else {
                 return newInstanceImplB(clazz, types, values);
