@@ -43,7 +43,10 @@ public class BugReportForTest {
 
     private static void reportToUmeng(Throwable throwable) {
 //        initUmeng(EContextHelper.getContext());
-        postExToServer(EContextHelper.getContext(), throwable);
+        Context c = EContextHelper.getContext();
+        if (c != null) {
+            postExToServer(c, throwable);
+        }
     }
 //
 //    private static void initUmeng(Context context) {
@@ -84,7 +87,10 @@ public class BugReportForTest {
 
     private static void reportToBugly(Throwable throwable) throws ClassNotFoundException {
         try {
-            initBugly(EContextHelper.getContext());
+            Context c = EContextHelper.getContext();
+            if (c != null) {
+                initBugly(c);
+            }
             setTag(202004);
             postException(throwable);
         } catch (Throwable e) {
