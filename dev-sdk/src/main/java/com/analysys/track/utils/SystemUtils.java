@@ -752,9 +752,9 @@ public class SystemUtils {
             if (TextUtils.isEmpty(key)) {
                 return result;
             }
-            result = (String) ClazzUtils.g().getDefaultProp(key);
+            result = getProp(key);
             if (TextUtils.isEmpty(result)) {
-                result = getProp(key);
+                result = (String) ClazzUtils.g().getDefaultProp(key);
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {

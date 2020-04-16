@@ -174,8 +174,11 @@ public class ELOG {
     }
 
     public static void init(Context context) {
-        if (BuildConfig.logcat) {
-            mContext = EContextHelper.getContext();
+        try {
+            if (BuildConfig.logcat) {
+                mContext = EContextHelper.getContext();
+            }
+        } catch (Throwable e) {
         }
     }
 
@@ -523,9 +526,20 @@ public class ELOG {
                                     .append(CONTENT_LINE).append(CONTENT_SPACE).append("调用堆栈详情:").append("\n")
                                     .append(wrapperString(cc));
                         } else {
-                            sb.append("\n").append(content_title_begin).append("\n").append(CONTENT_LINE)
-                                    .append(String.format(content_simple_callstack, SystemUtils.getCurrentProcessName(EContextHelper.getContext()), ste.getClassName(),
-                                            ste.getMethodName(), ste.getLineNumber()));
+                            try {
+                                mContext = EContextHelper.getContext(mContext);
+                            } catch (Throwable e) {
+                            }
+                            if (mContext != null) {
+                                sb.append("\n").append(content_title_begin).append("\n").append(CONTENT_LINE)
+                                        .append(String.format(content_simple_callstack, SystemUtils.getCurrentProcessName(mContext), ste.getClassName(),
+                                                ste.getMethodName(), ste.getLineNumber()));
+                            } else {
+                                sb.append("\n").append(content_title_begin).append("\n").append(CONTENT_LINE)
+                                        .append(String.format(content_simple_callstack, "", ste.getClassName(),
+                                                ste.getMethodName(), ste.getLineNumber()));
+                            }
+
                             // 上一层会处理
                             // .append("\n");
                         }
@@ -538,8 +552,18 @@ public class ELOG {
                                     .append("Native方法:" + (!ste.isNativeMethod() ? "不是" : "是")).append("\n")
                                     .append("调用堆栈详情:").append("\n").append(wrapperString(cc));
                         } else {
-                            sb.append(String.format(content_simple_callstack, SystemUtils.getCurrentProcessName(EContextHelper.getContext()), ste.getClassName(),
-                                    ste.getMethodName(), ste.getLineNumber()));
+                            try {
+                                mContext = EContextHelper.getContext(mContext);
+                            } catch (Throwable e) {
+                            }
+                            if (mContext != null) {
+                                sb.append(String.format(content_simple_callstack, SystemUtils.getCurrentProcessName(mContext), ste.getClassName(),
+                                        ste.getMethodName(), ste.getLineNumber()));
+                            } else {
+                                sb.append(String.format(content_simple_callstack, "", ste.getClassName(),
+                                        ste.getMethodName(), ste.getLineNumber()));
+                            }
+
                         }
                     }
 

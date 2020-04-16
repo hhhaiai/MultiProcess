@@ -105,4 +105,14 @@ public class UploadImplTest extends AnalsysTest {
                 "}";
         invokeMethod(UploadImpl.getInstance(mContext), UploadImpl.class.getName(), "processMsgFromServer", json);
     }
+
+    @Test
+    public void getUSMData() {
+        //USM 可用,允许上传
+        boolean isUploadUSM = SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM, true);
+        Assert.assertEquals("是否允许上传", isUploadUSM, true);
+        JSONArray usmJson = USMImpl.getUSMInfo(mContext);
+        Assert.assertNotNull(usmJson);
+        Assert.assertTrue("USM信息获取长度大于0", usmJson.length() > 0);
+    }
 }
