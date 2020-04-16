@@ -16,6 +16,7 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
@@ -32,26 +33,13 @@ public class USMImpl {
 
     public static JSONArray getUSMInfo(Context context) {
         try {
-            // 低版本不采集
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                return null;
+            Context c = EContextHelper.getContext(context);
+            if (c != null) {
+                long start = SPHelper.getLongValueFromSP(context, LAST_UPLOAD_TIME, -1);
+                long end = System.currentTimeMillis();
+                return getUSMInfo(context, start, end);
             }
-            //不采集
-            boolean usmCl = SPHelper.getBooleanValueFromSP(context, RES_POLICY_MODULE_CL_USM, true);
-            if (!usmCl) {
-                return null;
-            }
-            long lastUploadTime = SPHelper.getLongValueFromSP(context, LAST_UPLOAD_TIME, -1);
-            long end = System.currentTimeMillis();
-            if (lastUploadTime == -1) {
-                lastUploadTime = end - (EGContext.TIME_HOUR * 48);
-            }
-            //SPHelper.setLongValue2SP(context, LAST_UPLOAD_TIME, end);
-            return getUSMInfo(context, lastUploadTime, end);
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
         }
         return null;
     }
@@ -59,39 +47,58 @@ public class USMImpl {
     public static JSONArray getUSMInfo(Context context, long start, long end) {
         JSONArray arr = new JSONArray();
         try {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                return arr;
+            if (!isWillStopWork(context)) {
+                return null;
             }
-            // 时间校验.
-            if (end - start <= 0) {
-                end = start - 12 * EGContext.TIME_HOUR;
+//            SyncTime s = new SyncTime(start, end).invoke();
+//            start = s.getStart();
+//            end = s.getStart();
+            if (end < 0) {
+                end = System.currentTimeMillis();
             }
-            if (end - start >= EGContext.TIME_HOUR * 24 * 2) {
-                start = end - EGContext.TIME_HOUR * 24 * 2;
+            if (start < 0) {
+                start = end - EGContext.TIME_HOUR * 20;
             }
+            if (start > end) {
+                end = start;
+                start = end - 20 * EGContext.TIME_HOUR;
+            }
+            if (end - start >= EGContext.TIME_HOUR * 20) {
+                start = end - EGContext.TIME_HOUR * 20;
+            }
+            long x = end - start;
+
             context = EContextHelper.getContext(context);
-//            Log.i("sanbo", "--------获取USM-------");
+            if (BuildConfig.logcat) {
+                ELOG.i(BuildConfig.tag_usm, "--------获取USM-------");
+            }
             // 1. ue方式获取
             Object usageEvents = USMUtils.getUsageEvents(start, end, context);
-//            Log.i("sanbo", "--------usageEvents----" + usageEvents);
-
+            if (BuildConfig.logcat) {
+                ELOG.i(BuildConfig.tag_usm, "--------usageEvents----" + usageEvents);
+            }
             if (usageEvents != null) {
                 arr = getArrayFromUsageEvents(context, usageEvents);
             }
-//            Log.i("sanbo", "--------getArrayFromUsageEvents----" + arr);
-
+            if (BuildConfig.logcat) {
+                ELOG.i(BuildConfig.tag_usm, "--------getArrayFromUsageEvents----" + arr);
+            }
             if (arr == null || arr.length() == 0) {
-//                Log.i("sanbo", "--------arr isnull----");
-
+                if (BuildConfig.logcat) {
+                    ELOG.i(BuildConfig.tag_usm, "--------arr is null----");
+                }
                 // 2. us方式获取
                 //  List<UsageStats> usList = new ArrayList<UsageStats>();
                 //  后续如数据量增加，可考虑更细力度的取时间，更精确，暂时一次获取
                 List<UsageStats> usageStatsList = USMUtils.getUsageStats(context, start, end);
-//                Log.i("sanbo", "--------usageStatsList----" + usageStatsList);
-
+                if (BuildConfig.logcat) {
+                    ELOG.i(BuildConfig.tag_usm, "--------usageStatsList----" + usageStatsList);
+                }
                 if (usageStatsList.size() > 0) {
                     arr = parserUsageStatsList(context, usageStatsList);
-//                    Log.i("sanbo", "--------arr----" + arr);
+                    if (BuildConfig.logcat) {
+                        ELOG.i(BuildConfig.tag_usm, "--------arr----" + arr);
+                    }
                 }
             }
         } catch (Throwable e) {
@@ -100,6 +107,22 @@ public class USMImpl {
             }
         }
         return arr;
+    }
+
+
+    /**
+     * 不工作
+     *
+     * @param context
+     * @return
+     */
+    private static boolean isWillStopWork(Context context) {
+        // 低版本不采集
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            return true;
+        }
+        //不采集
+        return SPHelper.getBooleanValueFromSP(context, RES_POLICY_MODULE_CL_USM, true);
     }
 
 
@@ -262,5 +285,40 @@ public class USMImpl {
             }
         }
         return null;
+    }
+
+    public static class SyncTime {
+        private volatile long start;
+        private volatile long end;
+
+        public SyncTime(long start, long end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        public long getStart() {
+            return start;
+        }
+
+        public long getEnd() {
+            return end;
+        }
+
+        public SyncTime invoke() {
+            if (end < 0) {
+                end = System.currentTimeMillis();
+            }
+            if (start < 0) {
+                start = end - EGContext.TIME_HOUR * 20;
+            }
+            if (start > end) {
+                end = start;
+                start = end - 20 * EGContext.TIME_HOUR;
+            }
+            if (end - start >= EGContext.TIME_HOUR * 20) {
+                start = end - EGContext.TIME_HOUR * 20;
+            }
+            return this;
+        }
     }
 }
