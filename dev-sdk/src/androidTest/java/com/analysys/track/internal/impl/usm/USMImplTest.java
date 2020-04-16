@@ -60,7 +60,7 @@ public class USMImplTest {
         long start = 60 * 60 * 60 * 1000;
         long end = 90 * 60 * 60 * 1000;
 
-        USMImpl.SyncTime s = new USMImpl.SyncTime(start, end).invoke();
+        SyncTime s = new SyncTime(start, end).invoke();
         start = s.getStart();
         end = s.getEnd();
 
@@ -73,7 +73,7 @@ public class USMImplTest {
         long start = 90 * 60 * 60 * 1000;
         long end = 60 * 60 * 60 * 1000;
 
-        USMImpl.SyncTime s = new USMImpl.SyncTime(start, end).invoke();
+        SyncTime s = new SyncTime(start, end).invoke();
         start = s.getStart();
         end = s.getEnd();
 
@@ -86,7 +86,7 @@ public class USMImplTest {
         long start = System.currentTimeMillis();
         long end = -1;
 
-        USMImpl.SyncTime s = new USMImpl.SyncTime(start, end).invoke();
+        SyncTime s = new SyncTime(start, end).invoke();
         start = s.getStart();
         end = s.getEnd();
 
@@ -98,7 +98,7 @@ public class USMImplTest {
     private void case1() {
         long start = -1;
         long end = System.currentTimeMillis();
-        USMImpl.SyncTime s = new USMImpl.SyncTime(start, end).invoke();
+        SyncTime s = new SyncTime(start, end).invoke();
         start = s.getStart();
         end = s.getEnd();
         Log.i("sanbo", "case1 start:" + start);

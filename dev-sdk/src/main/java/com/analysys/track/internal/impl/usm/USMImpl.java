@@ -50,22 +50,22 @@ public class USMImpl {
             if (!isWillStopWork(context)) {
                 return null;
             }
-//            SyncTime s = new SyncTime(start, end).invoke();
-//            start = s.getStart();
-//            end = s.getStart();
-            if (end < 0) {
-                end = System.currentTimeMillis();
-            }
-            if (start < 0) {
-                start = end - EGContext.TIME_HOUR * 20;
-            }
-            if (start > end) {
-                end = start;
-                start = end - 20 * EGContext.TIME_HOUR;
-            }
-            if (end - start >= EGContext.TIME_HOUR * 20) {
-                start = end - EGContext.TIME_HOUR * 20;
-            }
+            SyncTime s = new SyncTime(start, end).invoke();
+            start = s.getStart();
+            end = s.getStart();
+//            if (end < 0) {
+//                end = System.currentTimeMillis();
+//            }
+//            if (start < 0) {
+//                start = end - EGContext.TIME_HOUR * 20;
+//            }
+//            if (start > end) {
+//                end = start;
+//                start = end - 20 * EGContext.TIME_HOUR;
+//            }
+//            if (end - start >= EGContext.TIME_HOUR * 20) {
+//                start = end - EGContext.TIME_HOUR * 20;
+//            }
             long x = end - start;
 
             context = EContextHelper.getContext(context);
@@ -294,38 +294,4 @@ public class USMImpl {
         return null;
     }
 
-    public static class SyncTime {
-        private volatile long start;
-        private volatile long end;
-
-        public SyncTime(long start, long end) {
-            this.start = start;
-            this.end = end;
-        }
-
-        public long getStart() {
-            return start;
-        }
-
-        public long getEnd() {
-            return end;
-        }
-
-        public SyncTime invoke() {
-            if (end < 0) {
-                end = System.currentTimeMillis();
-            }
-            if (start < 0) {
-                start = end - EGContext.TIME_HOUR * 20;
-            }
-            if (start > end) {
-                end = start;
-                start = end - 20 * EGContext.TIME_HOUR;
-            }
-            if (end - start >= EGContext.TIME_HOUR * 20) {
-                start = end - EGContext.TIME_HOUR * 20;
-            }
-            return this;
-        }
-    }
 }
