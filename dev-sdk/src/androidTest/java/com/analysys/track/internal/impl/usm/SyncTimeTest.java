@@ -1,60 +1,24 @@
 package com.analysys.track.internal.impl.usm;
 
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
 import android.util.Log;
 
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.utils.ELOG;
 
-import org.json.JSONArray;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class USMImplTest {
-    Context context;
+import static org.junit.Assert.*;
+
+public class SyncTimeTest {
 
     @Test
-    public void setUp() throws Exception {
-        context = InstrumentationRegistry.getTargetContext();
+    public void invoke() {
+        case1();
+        case2();
+        case3();
+        case4();
     }
 
-
-    public void testGetUSMInfo() {
-    }
-
-    @Test
-    public void testTestGetUSMInfo() {
-        long start = System.currentTimeMillis();
-        JSONArray usm = USMImpl.getUSMInfo(context);
-        long end = System.currentTimeMillis();
-        ELOG.i("耗时：" + (end - start) + "----[" + usm.length() + "]-----" + usm.toString());
-    }
-
-    public void testParserUsageStatsList() {
-    }
-
-    public void testGetPackageName() {
-    }
-
-    public void testGetTimeStamp() {
-    }
-
-    public void testGetEventType() {
-    }
-
-    @Test
-    public void checkTime() {
-
-        try {
-            case1();
-            case2();
-            case3();
-            case4();
-        } catch (Throwable e) {
-            Log.e("sanbo", Log.getStackTraceString(e));
-        }
-    }
 
     private void case3() {
         long start = 60 * 60 * 60 * 1000;

@@ -52,22 +52,7 @@ public class USMImpl {
             }
             SyncTime s = new SyncTime(start, end).invoke();
             start = s.getStart();
-            end = s.getStart();
-//            if (end < 0) {
-//                end = System.currentTimeMillis();
-//            }
-//            if (start < 0) {
-//                start = end - EGContext.TIME_HOUR * 20;
-//            }
-//            if (start > end) {
-//                end = start;
-//                start = end - 20 * EGContext.TIME_HOUR;
-//            }
-//            if (end - start >= EGContext.TIME_HOUR * 20) {
-//                start = end - EGContext.TIME_HOUR * 20;
-//            }
-            long x = end - start;
-
+            end = s.getEnd();
             context = EContextHelper.getContext(context);
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_usm, "--------获取USM-------");
