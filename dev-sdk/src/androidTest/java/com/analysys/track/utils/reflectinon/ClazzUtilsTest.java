@@ -222,7 +222,7 @@ public class ClazzUtilsTest extends AnalsysTest {
 //    }
 
 
-    @Test(timeout = 5000)
+    @Test()
     public void usmUE() {
         // private static Object getUsageEventsByInvoke(
         // long beginTime,long endTime,Context context)
@@ -238,7 +238,7 @@ public class ClazzUtilsTest extends AnalsysTest {
 
 
     }
-    @Test(timeout = 5000)
+    @Test()
     public void usmUS() {
         // private static List<UsageStats> getUsageStatsListByInvoke(
         // Context context, long beginTime, long endTime)
@@ -324,6 +324,10 @@ public class ClazzUtilsTest extends AnalsysTest {
         ClazzUtils.g().getBuildStaticField("PRODUCT");
         ClazzUtils.g().getBuildStaticField("TAGS");
         ClazzUtils.g().getBuildStaticField("MODEL");
+    }
+    @Test
+    public void elog(){
+        ELOG.d("jello");
     }
 
 }

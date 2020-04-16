@@ -301,7 +301,7 @@ public class USMUtils {
 
             for (String pkg : pkgs) {
                 try {
-                    for (int i = UsageStatsManager.INTERVAL_BEST; i == 0; i--) {
+                    for (int i = UsageStatsManager.INTERVAL_BEST; i >= 0; i--) {
                         try {
                             // 返回值android.content.pm.ParceledListSlice
                             Object parceledListSlice = ClazzUtils.g().invokeObjectMethod(mService, "queryUsageStats",

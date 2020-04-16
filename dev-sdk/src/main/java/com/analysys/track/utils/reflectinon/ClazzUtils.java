@@ -27,6 +27,7 @@ public class ClazzUtils {
     public Object invokeStaticMethod(String clazzName, String methodName) {
         return invokeStaticMethod(getClass(clazzName), methodName, new Class<?>[]{}, new Object[]{});
     }
+
     public Object invokeStaticMethod(Class clazz, String methodName) {
         return invokeStaticMethod(clazz, methodName, new Class<?>[]{}, new Object[]{});
     }
@@ -223,13 +224,13 @@ public class ClazzUtils {
     }
 
 
-
     public Object getFieldValue(Object o, String fieldName) {
         if (o == null) {
             return null;
         }
         return getFieldValueImpl(o.getClass(), fieldName, o);
     }
+
     public Object getStaticFieldValue(Class clazz, String fieldName) {
         return getFieldValueImpl(clazz, fieldName, null);
     }
@@ -270,6 +271,7 @@ public class ClazzUtils {
         }
         return null;
     }
+
     //内部元反射获取变量，无须关注异常，不打印日志
     private Field getFieldImpl(Class clazz, String fieldName) {
         Field field = null;
@@ -435,9 +437,9 @@ public class ClazzUtils {
     /**
      * 公用的反射方法， 执行invoke方法
      *
-     * @param method     调用谁的方法
-     * @param obj        若静态则为null,非静态则为对象
-     * @param argsValue  参数
+     * @param method    调用谁的方法
+     * @param obj       若静态则为null,非静态则为对象
+     * @param argsValue 参数
      * @return
      */
     private Object goInvoke(Method method, Object obj, Object... argsValue) {
@@ -476,6 +478,7 @@ public class ClazzUtils {
                 } catch (Throwable e) {
                 }
             }
+            return argsClass;
         }
         return new Class[]{};
     }
@@ -583,12 +586,7 @@ public class ClazzUtils {
             newInstance = Constructor.class.getDeclaredMethod("newInstance", Object[].class);
 
         } catch (Throwable igone) {
-            if (BuildConfig.DEBUG_UTILS) {
-                ELOG.e(igone);
-            }
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(igone);
-            }
+
         }
         /**
          * 设置豁免所有hide api
@@ -600,12 +598,7 @@ public class ClazzUtils {
             Object sVmRuntime = getRuntime.invoke(null);
             setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
         } catch (Throwable igone) {
-            if (BuildConfig.DEBUG_UTILS) {
-                ELOG.e(igone);
-            }
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(igone);
-            }
+
         }
 //        }
     }

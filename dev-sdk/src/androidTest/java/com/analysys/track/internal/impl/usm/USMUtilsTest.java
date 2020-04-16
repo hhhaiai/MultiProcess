@@ -32,7 +32,7 @@ public class USMUtilsTest extends AnalsysTest {
 
     @Test
     public void getUsageEvents() {
-        for (int i = 0; i < 7; i++) {
+        for (int i = 1; i < 7; i++) {
             long stime = EGContext.TIME_HOUR * i;
             long time = 0;
             long timeEnd = 0;
