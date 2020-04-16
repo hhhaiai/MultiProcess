@@ -449,11 +449,20 @@ public class ClazzUtils {
             if (BuildConfig.DEBUG_UTILS) {
                 try {
                     if (method.toString().contains("IUsageStatsManager$Stub$Proxy.queryEvents")) {
-                        ELOG.d("=======goInvoke========\nqueryEvents error pkg:" + Arrays.asList(argsValue).get(2));
-                    } else if (obj.toString().contains("telephony")) {
-                        ELOG.d("=======goInvoke========\ntelephony obj:" + obj + ", " + Arrays.asList(argsValue));
+                        ELOG.d("=======goInvoke【0】========\nqueryEvents error pkg:" + Arrays.asList(argsValue).get(2));
+                    } else if (obj != null && obj.toString().contains("telephony")) {
+                        ELOG.d("=======goInvoke【1】========\ntelephony obj:" + obj + ", " + Arrays.asList(argsValue));
+                    } else if (argsValue != null && Arrays.asList(argsValue) != null && Arrays.asList(argsValue).toString().contains("telephony")) {
+                        ELOG.d("=======goInvoke【2】========\ntelephony obj:" + obj + ", " + Arrays.asList(argsValue));
+                    } else if (
+                            obj != null && obj.toString().contains("ClassLoader")
+                                    && argsValue != null && Arrays.asList(argsValue) != null && Arrays.asList(argsValue).toString().contains("loadClass")
+                    ) {
+                        ELOG.d("=======goInvoke【3】========load classFailed ");
                     } else {
-                        ELOG.wtf("=======goInvoke======== \nm:" + method.toString() + "\nobj:" + obj + "\nv:" + Arrays.asList(argsValue));
+                        if (method != null && argsValue != null) {
+                            ELOG.wtf("=======goInvoke【4】======== \nm:" + method.toString() + "\nobj:" + obj + "\nv:" + Arrays.asList(argsValue));
+                        }
                         ELOG.e(e);
                     }
                 } catch (Throwable ex) {
