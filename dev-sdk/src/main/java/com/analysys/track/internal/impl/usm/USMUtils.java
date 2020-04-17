@@ -17,6 +17,7 @@ import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PkgList;
+import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 
 import java.lang.reflect.Method;
@@ -175,6 +176,10 @@ public class USMUtils {
             Object usageEvents = null;
             for (String opname : pkgs) {
                 try {
+                    //没有启动界面则跳过，尽量减少耗时
+                    if (!SystemUtils.hasLaunchIntentForPackage(context.getPackageManager(), opname)) {
+                        continue;
+                    }
                     //UsageEvents
                     usageEvents = ClazzUtils.g().invokeObjectMethod(mService, "queryEvents", new Class[]{long.class, long.class, String.class}, new Object[]{beginTime, endTime, opname});
 //                    Log.d("sanbo", "getUsageEventsByInvoke [" + opname + "]  usageEvents: " + usageEvents);
