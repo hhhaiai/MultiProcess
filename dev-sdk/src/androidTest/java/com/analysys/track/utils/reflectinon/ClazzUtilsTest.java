@@ -222,7 +222,7 @@ public class ClazzUtilsTest extends AnalsysTest {
 //    }
 
 
-    @Test()
+    @Test(timeout = 5000)
     public void usmUE() {
         // private static Object getUsageEventsByInvoke(
         // long beginTime,long endTime,Context context)
@@ -236,8 +236,8 @@ public class ClazzUtilsTest extends AnalsysTest {
         Assert.assertTrue("获取USM—UE类型错误", o instanceof UsageEvents);
 
 
-
     }
+
     @Test()
     public void usmUS() {
         // private static List<UsageStats> getUsageStatsListByInvoke(
@@ -250,7 +250,6 @@ public class ClazzUtilsTest extends AnalsysTest {
 
         Assert.assertNotNull("获取USM—US为空", o1);
         Assert.assertTrue("获取USM—US类型错误", o1 instanceof List);
-
 
 
     }
@@ -313,11 +312,12 @@ public class ClazzUtilsTest extends AnalsysTest {
     }
 
     @Test
-    public void getSystemEnv(){
+    public void getSystemEnv() {
         SystemUtils.getSystemEnv("ro.build.type");
     }
+
     @Test
-    public void getBuildStaticField2(){
+    public void getBuildStaticField2() {
         ClazzUtils.g().getBuildStaticField("BRAND");
         ClazzUtils.g().getBuildStaticField("FINGERPRINT");
         ClazzUtils.g().getBuildStaticField("DEVICE");
@@ -325,8 +325,9 @@ public class ClazzUtilsTest extends AnalsysTest {
         ClazzUtils.g().getBuildStaticField("TAGS");
         ClazzUtils.g().getBuildStaticField("MODEL");
     }
+
     @Test
-    public void elog(){
+    public void elog() {
         ELOG.d("jello");
     }
 

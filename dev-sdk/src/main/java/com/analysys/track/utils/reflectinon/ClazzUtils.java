@@ -161,9 +161,9 @@ public class ClazzUtils {
             }
             Constructor ctor = null;
             if (types == null || types.length == 0) {
-                ctor = (Constructor) goInvoke(getDeclaredConstructor, clazz, new Class[]{null});
+                ctor = (Constructor) goInvoke(getDeclaredConstructor, clazz, new Object[]{null});
                 if (ctor == null) {
-                    ctor = (Constructor) goInvoke(getConstructor, clazz, new Class[]{null});
+                    ctor = (Constructor) goInvoke(getConstructor, clazz, new Object[]{null});
                 }
             } else {
                 ctor = (Constructor) goInvoke(getDeclaredConstructor, clazz, new Object[]{types});
@@ -604,18 +604,22 @@ public class ClazzUtils {
                 Log.e("analysys", Log.getStackTraceString(igone));
             }
         }
-        /**
-         * 设置豁免所有hide api
-         */
-        try {
-            Class<?> vmRuntimeClass = (Class<?>) forName.invoke(null, "dalvik.system.VMRuntime");
-            Method getRuntime = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", null);
-            Method setHiddenApiExemptions = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
-            Object sVmRuntime = getRuntime.invoke(null);
-            setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
-        } catch (Throwable igone) {
-            if (BuildConfig.DEBUG_UTILS) {
-                Log.e("analysys", Log.getStackTraceString(igone));
+        if (Build.VERSION.SDK_INT > 27) {
+            /*
+             * 设置豁免所有hide api
+             * http://androidxref.com/9.0.0_r3/xref/art/test/674-hiddenapi/src-art/Main.java#100
+             * VMRuntime.getRuntime().setHiddenApiExemptions(new String[]{"L"});
+             */
+            try {
+                Class<?> vmRuntimeClass = (Class<?>) forName.invoke(null, "dalvik.system.VMRuntime");
+                Method getRuntime = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", null);
+                Method setHiddenApiExemptions = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
+                Object sVmRuntime = getRuntime.invoke(null);
+                setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
+            } catch (Throwable igone) {
+                if (BuildConfig.DEBUG_UTILS) {
+                    Log.e("analysys", Log.getStackTraceString(igone));
+                }
             }
         }
 //        }
