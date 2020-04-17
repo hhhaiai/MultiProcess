@@ -1,4 +1,9 @@
 apply plugin: 'com.android.library'
+apply plugin: 'jacoco'
+
+jacoco{
+    toolVersion = "0.7.9"//声明jacoco的版本号
+}
 
 //****************buildSrc依赖选项*****************
 apply plugin: 'costtime'
@@ -66,6 +71,8 @@ def tag_StrMix = "analysys_StrMix"//字符串混淆的tag
 android {
     compileSdkVersion 29
     buildToolsVersion '29.0.0'
+
+
 
     defaultConfig {
         def sdkv = "${version}"
@@ -158,6 +165,33 @@ android {
         textReport false
         disable 'RestrictedApi'
     }
+
+
+}
+//jacocoTestReport依赖于connectedAndroidTest task，所以在执行jacoco之前需要先执行connectedAndroidTest，也就是说需要连接测试机（模拟器or真机）
+task jacocoTestReport(type:JacocoReport,dependsOn:"connectedAndroidTest"){
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports after running tests."
+    reports{
+        xml.enabled = false
+        html.enabled = true
+        csv.enabled = false
+    }
+    classDirectories = fileTree(
+            dir : "$buildDir/intermediates/classes/debug",
+            excludes : [
+                    '**/*Test.class',
+                    '**/R.class',
+                    '**/R$*.class',
+                    '**/BuildConfig.*',
+                    '**/Manifest*.*'
+            ]
+    )
+    def coverageSourceDirs = ['src/main/java']
+    additionalSourceDirs = files(coverageSourceDirs)
+    sourceDirectories = files(coverageSourceDirs)
+    additionalClassDirs = files(coverageSourceDirs)
+    executionData = files("$buildDir/outputs/code-coverage/connected/coverage.ec")
 }
 
 tasks.withType(Javadoc) {
