@@ -74,46 +74,41 @@ public class PatchHelper {
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_cutoff, "-----inside-loads---------");
             }
-            File dir = new File(context.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR);
-            // delete same name file
-            if (dir.exists() && !dir.isDirectory()) {
-                dir.deleteOnExit();
-            }
-
-            // rename to newest
-            File old = new File(context.getFilesDir(), EGContext.PATCH_CACHE_DIR);
-            if (old.exists() && old.isDirectory()) {
-                old.renameTo(new File(context.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR));
-            }
-            // make sure dir exit
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-            String version = SPHelper.getStringValueFromSP(context, UploadKey.Response.PatchResp.PATCH_VERSION, "");
-            if (BuildConfig.logcat) {
-                ELOG.w(BuildConfig.tag_cutoff, "------loads------version: " + version);
-            }
-            if (TextUtils.isEmpty(version)) {
-                return;
-            }
-            // 保存文件到本地
-            File[] fs = new File[]{
-                    new File(dir, "patch_" + version + ".jar"),
-                    new File(dir, version + ".jar"),
-                    new File(dir, "null.jar"),
-            };
-            for (File f : fs) {
-                if (f.exists() && f.isFile()) {
-                    if (BuildConfig.logcat) {
-                        ELOG.d(BuildConfig.tag_cutoff, "------loads-----file[ " + f.getAbsolutePath() + " ] is exists, will real loads");
+            Context ctx = EContextHelper.getContext(context);
+            if (ctx != null) {
+                File old = new File(context.getFilesDir(), EGContext.PATCH_OLD_CACHE_DIR);
+                File dir = new File(context.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR);
+                // rename to newest
+                FileUitls.getInstance(context).rename(old, dir, true);
+                // make sure dir exit
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                String version = SPHelper.getStringValueFromSP(ctx, UploadKey.Response.PatchResp.PATCH_VERSION, "");
+                if (BuildConfig.logcat) {
+                    ELOG.w(BuildConfig.tag_cutoff, "------loads------version: " + version);
+                }
+                if (TextUtils.isEmpty(version)) {
+                    return;
+                }
+                // 保存文件到本地
+                File[] fs = new File[]{
+                        new File(dir, "patch_" + version + ".jar"),
+                        new File(dir, version + ".jar"),
+                        new File(dir, "null.jar"),
+                };
+                for (File f : fs) {
+                    if (f.exists() && f.isFile()) {
+                        if (BuildConfig.logcat) {
+                            ELOG.d(BuildConfig.tag_cutoff, "------loads-----file[ " + f.getAbsolutePath() + " ] is exists, will real loads");
+                        }
+                        loads(context, f);
                     }
-                    loads(context, f);
+                }
+                if (BuildConfig.logcat) {
+                    ELOG.i(BuildConfig.tag_cutoff, "------loads--will---out  ");
                 }
             }
-            if (BuildConfig.logcat) {
-                ELOG.i(BuildConfig.tag_cutoff, "------loads--will---out  ");
-            }
-
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
@@ -148,8 +143,9 @@ public class PatchHelper {
                         ELOG.i(BuildConfig.tag_cutoff, "---------- clearPatch.---clearn oldversion:  " + oldVersion);
                     }
                     //清除新版本存储目录
-                    FileUitls.getInstance(cc).deleteFile(EGContext.PATCH_CACHE_DIR);
+                    FileUitls.getInstance(cc).deleteFile(EGContext.PATCH_OLD_CACHE_DIR);
                     FileUitls.getInstance(cc).deleteFile(EGContext.PATCH_NET_CACHE_DIR);
+                    FileUitls.getInstance(cc).deleteFile(EGContext.PATCH_DIR);
                     // 清除patch部分缓存
                     SPHelper.removeKey(context, UploadKey.Response.PatchResp.PATCH_METHODS);
                     SPHelper.removeKey(context, UploadKey.Response.PatchResp.PATCH_SIGN);

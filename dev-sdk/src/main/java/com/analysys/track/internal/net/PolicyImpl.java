@@ -181,7 +181,7 @@ public class PolicyImpl {
             newDir.deleteOnExit();
         }
         // rename to new path
-        File old = new File(mContext.getFilesDir(), EGContext.PATCH_CACHE_DIR);
+        File old = new File(mContext.getFilesDir(), EGContext.PATCH_OLD_CACHE_DIR);
         if (old.exists() && old.isDirectory()) {
             old.renameTo(new File(mContext.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR));
         }

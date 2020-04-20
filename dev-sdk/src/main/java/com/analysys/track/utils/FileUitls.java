@@ -161,6 +161,24 @@ public class FileUitls {
         return 0;
     }
 
+    public void rename(File oldFile, File newFile, boolean isDir) {
+        // 1. remove new file
+        if (isDir) {
+            // makesure dir
+            if (newFile.exists() && !newFile.isDirectory()) {
+                newFile.deleteOnExit();
+            }
+        } else {
+            if (newFile.exists()) {
+                newFile.deleteOnExit();
+            }
+        }
+        // 2. rename
+        if (oldFile.exists()) {
+            oldFile.renameTo(oldFile);
+        }
+    }
+
     /********************* get instance begin **************************/
     public static FileUitls getInstance(Context context) {
         return HLODER.INSTANCE.initContext(context);
@@ -168,7 +186,7 @@ public class FileUitls {
 
     private FileUitls initContext(Context context) {
         if (mContext == null && context != null) {
-            mContext = context.getApplicationContext();
+            mContext = EContextHelper.getContext(context);
         }
         return HLODER.INSTANCE;
     }
@@ -200,6 +218,9 @@ public class FileUitls {
                 deleteFile(new File(mContext.getFilesDir(), path));
             }
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
         }
     }
 

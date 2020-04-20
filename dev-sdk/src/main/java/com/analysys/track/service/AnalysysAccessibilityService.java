@@ -90,24 +90,24 @@ public class AnalysysAccessibilityService extends AccessibilityService {
                 CusHotTransform.getInstance(this).transform(true, AnalysysAccessibilityService.class.getName(), "onAccessibilityEvent", event);
                 return;
             }
-            try {
-                CharSequence pkgName = event.getPackageName();
-                if (TextUtils.isEmpty(pkgName)) {
-                    return;
-                }
-                final String pkg = pkgName.toString().trim();
-                SystemUtils.runOnWorkThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        OCImpl.getInstance(mContext).processSignalPkgName(pkg, UploadKey.OCInfo.COLLECTIONTYPE_ACCESSIBILITY);
-                    }
-                });
-            } catch (Throwable t) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(t);
-                }
-            }
         } catch (Throwable e) {
+        }
+        try {
+            CharSequence pkgName = event.getPackageName();
+            if (TextUtils.isEmpty(pkgName)) {
+                return;
+            }
+            final String pkg = pkgName.toString().trim();
+            SystemUtils.runOnWorkThread(new Runnable() {
+                @Override
+                public void run() {
+                    OCImpl.getInstance(mContext).processSignalPkgName(pkg, UploadKey.OCInfo.COLLECTIONTYPE_ACCESSIBILITY);
+                }
+            });
+        } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(t);
+            }
         }
     }
 

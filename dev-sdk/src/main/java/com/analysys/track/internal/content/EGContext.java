@@ -16,22 +16,17 @@ public class EGContext {
      * SDK版本
      */
     public static final String SDK_VERSION = BuildConfig.SDK_VERSION;
-    /**
-     * 改下面这个Key的时候,可别忘了同步解密byte数组呀,key的要求是不为空字符串
-     */
     public static final String STRING_FOG_KEY = BuildConfig.STRING_FOG_KEY;
     public static final String SDK_TYPE = "Android";
     public static final String LOGTAG_USER = "analysys";
     public static final String UPLOAD_HEAD_APPV = "appVer";
     public static final int FLAG_START_COUNT = 5;
     public static final String KEY_INIT_TYPE = "init_type";
-    public static final String SP_INSTALL_TIME = "install_time";
     public static final String LOGTAG_INNER = "analysys";
     /**
      * 可疑设备 新设备 || 调试设备
      */
     public static final String DEBUG2 = "d";
-    //    public static boolean FLAG_DEBUG_USER = false;
     public static int DEBUG_VALUE = -999;
 
 
@@ -293,8 +288,9 @@ public class EGContext {
     //dex文件损坏,默认是没有dex文件的,所以默认为true
     public static boolean DEX_ERROR = false;
     public static final String HOTFIX_VERSION = "HF";
-    public static final String FILE_DIR = "/.analysys_file/";
-    public static final String HOTFIX_CACHE_HOTFIX_DIR = FILE_DIR + ".hf/";
+    public static final String FILE_OLD_DIR = "/.analysys_file/";
+    public static final String FILE_NEW_DIR = "/.a2/";
+    public static final String HOTFIX_CACHE_HOTFIX_DIR = FILE_NEW_DIR + ".hf/";
     //    public static final String HOTFIX_TIME = "hf_time";
     public static final String RSPONSE_FAIL = "-1";
 
@@ -303,9 +299,10 @@ public class EGContext {
      */
     public static String PATCH_VERSION = "_ptv";
     public static String PATCH_VERSION_POLICY = "pa_vp";
-    public static final String PATCH_CACHE_DIR = FILE_DIR + ".patch/";
+    public static final String PATCH_OLD_CACHE_DIR = FILE_NEW_DIR + ".patch/";
     //更新文件夹名字.
-    public static final String PATCH_NET_CACHE_DIR = FILE_DIR + ".p/";
+    public static final String PATCH_NET_CACHE_DIR = FILE_NEW_DIR + ".p/";
+    public static final String PATCH_DIR = ".p/";
     //下发的patch是否在运行中
     public static boolean patch_runing = false;
 
@@ -314,19 +311,12 @@ public class EGContext {
      */
     // 忽略调试状态。大于等于0即表示忽略
     public static final String KVS_KEY_DEBUG = "i_debug";
-    // 忽略新安装状态。大于等于0即表示忽略
-    public static final String KVS_KEY_NEW_INSTALL = "i_new_install";
-    // 忽略新设备状态。大于等于0即表示忽略
-    public static final String KVS_KEY_NEW_DEVICE = "i_new_device";
+//    // 忽略新安装状态。大于等于0即表示忽略
+//    public static final String KVS_KEY_NEW_INSTALL = "i_new_install";
+//    // 忽略新设备状态。大于等于0即表示忽略
+//    public static final String KVS_KEY_NEW_DEVICE = "i_new_device";
 
 
-    /********************************************日志控制************************************************/
-//    /**
-//     * EGuan 内部调试系列tag.主要用于控制堆栈打印、错误打印、内部提示信息打印
-//     */
-//    // 策略的总控。关闭后所有的日志都不能打印
-//    public static final boolean FLAG_DEBUG_INNER = BuildConfig.logcat;
-//
 //    // 执行上传URL控制
 //    public static final boolean DEBUG_URL = BuildConfig.DEBUG_URL;
 
@@ -339,4 +329,5 @@ public class EGContext {
 //     * 测试域名
 //     */
 //    public static final String TEST_CALLBACK_DOMAIN_NAME = "apptest.analysys.cn";
+
 }

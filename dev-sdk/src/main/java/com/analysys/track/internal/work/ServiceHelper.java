@@ -143,7 +143,7 @@ public class ServiceHelper {
     /**
      * P和之后版本的逻辑：后台任务确保活着==>有服务就启动==>没服务/未声明权限且没后台任务，直接消息启动
      */
-    private void startServiceWhenP() throws Exception {
+    private void startServiceWhenP() {
         // 1. 后台任务器长期启动
         boolean isJobStarted = startJobService();
         boolean isServiceStarted = false;
