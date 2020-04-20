@@ -1,6 +1,9 @@
 package com.device.tripartite;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.text.TextUtils;
 
 import com.analysys.track.internal.impl.LocationImpl;
@@ -13,7 +16,10 @@ import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.DebugDev;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.device.tripartite.cases.PubCases;
+import com.device.tripartite.cases.traffic.planA.A;
+import com.device.tripartite.cases.traffic.planc.WtfTs;
 import com.device.utils.EL;
+import com.device.tripartite.cases.traffic.planB.WtfNSManager;
 import com.device.utils.memot.M2Fmapping;
 
 import java.io.File;
@@ -212,18 +218,24 @@ public class MainFunCaseDispatcher {
     }
 
     private static void runCaseP18(final Context context) {
-
+        A.getTrafficInfo(context);
     }
+
 
     private static void runCaseP19(final Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            WtfNSManager.getInstance(context).getStr();
+        }
     }
 
-    private static void runCaseP20(final Context context) {
 
+    private static void runCaseP20(final Context context) {
+        WtfTs.getWifiTraffic();
     }
 
     private static void runCaseP21(final Context context) {
-        PubCases.runCasePatch(context);
+        WtfTs.fk(context);
+//        PubCases.runCasePatch(context);
     }
 
     private static void runCaseP22(final Context context) {

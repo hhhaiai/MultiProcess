@@ -25,9 +25,7 @@
     <uses-permission
         android:name="android.permission.WRITE_SETTINGS"
         tools:ignore="ProtectedPermissions" /> <!-- UsageStatsManager权限 -->
-    <uses-permission
-        android:name="android.permission.PACKAGE_USAGE_STATS"
-        tools:ignore="ProtectedPermissions" /> <!-- P和以后版本 服务需要该权限 -->
+   <!-- P和以后版本 服务需要该权限 -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <!-- 下面权限新版本建议增加 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -57,7 +55,12 @@
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-
+<!--    <uses-permission-->
+<!--        android:name="android.permission.READ_NETWORK_USAGE_HISTORY"-->
+<!--        tools:ignore="ProtectedPermissions" />-->
+<!--    <uses-permission-->
+<!--        android:name="android.permission.PACKAGE_USAGE_STATS"-->
+<!--        tools:ignore="ProtectedPermissions" />-->
     <application
         android:name=".AnalysysApplication"
         android:allowBackup="true"
