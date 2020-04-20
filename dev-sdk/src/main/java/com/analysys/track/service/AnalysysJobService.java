@@ -6,9 +6,7 @@ import android.app.job.JobService;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.impl.CusHotTransform;
-import com.analysys.track.internal.work.MessageDispatcher;
-import com.analysys.track.internal.work.ServiceHelper;
-import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.utils.ELOG;
 
 /**
@@ -25,7 +23,6 @@ public class AnalysysJobService extends JobService {
     @Override
     public boolean onStartJob(final JobParameters params) {
         try {
-//            AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysJobService.class.getName(), "onStartJob")) {
                 Boolean b = (Boolean) CusHotTransform.getInstance(this).transform(true, AnalysysJobService.class.getName(), "onStartJob", params);
                 if (b != null) {
@@ -37,8 +34,9 @@ public class AnalysysJobService extends JobService {
             if (BuildConfig.logcat) {
                 ELOG.i("AnalysysJobService onStartJob");
             }
-            // 传递Context。防止因为Context缺失导致的调用异常
-            MessageDispatcher.getInstance(null).initModule();
+//            // 传递Context。防止因为Context缺失导致的调用异常
+//            MessageDispatcher.getInstance(null).initModule();
+            AnalysysInternal.getInstance(this).aliave();
         } catch (Throwable e) {
         }
         return false;
@@ -47,7 +45,6 @@ public class AnalysysJobService extends JobService {
     @Override
     public boolean onStopJob(JobParameters params) {
         try {
-//            AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysJobService.class.getName(), "onStopJob")) {
                 Boolean b = (Boolean) CusHotTransform.getInstance(this).transform(true, AnalysysJobService.class.getName(), "onStopJob", params);
                 if (b != null) {
@@ -59,7 +56,8 @@ public class AnalysysJobService extends JobService {
             if (BuildConfig.logcat) {
                 ELOG.i("AnalysysJobService onStopJob");
             }
-            ServiceHelper.getInstance(EContextHelper.getContext()).startSelfService();
+//            ServiceHelper.getInstance(EContextHelper.getContext()).startSelfService();
+            AnalysysInternal.getInstance(this).aliave();
         } catch (Throwable e) {
         }
         return false;

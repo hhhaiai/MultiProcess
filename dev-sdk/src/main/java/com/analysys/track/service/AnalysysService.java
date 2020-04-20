@@ -7,9 +7,6 @@ import android.os.IBinder;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.impl.CusHotTransform;
 import com.analysys.track.internal.AnalysysInternal;
-import com.analysys.track.internal.work.MessageDispatcher;
-import com.analysys.track.internal.work.ServiceHelper;
-import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 
 /**
@@ -25,10 +22,10 @@ public class AnalysysService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         try {
-//            AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysService.class.getName(), "onBind")) {
                 return (IBinder) CusHotTransform.getInstance(this).transform(true, AnalysysService.class.getName(), "onBind", intent);
             }
+            AnalysysInternal.getInstance(this).aliave();
         } catch (Throwable e) {
         }
         return null;
@@ -37,7 +34,6 @@ public class AnalysysService extends Service {
     @Override
     public void onCreate() {
         try {
-//            AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysService.class.getName(), "onCreate")) {
                 CusHotTransform.getInstance(this).transform(true, AnalysysService.class.getName(), "onCreate");
                 return;
@@ -47,8 +43,9 @@ public class AnalysysService extends Service {
             if (BuildConfig.logcat) {
                 ELOG.i("AnalysysService onCreate");
             }
-            AnalysysInternal.getInstance(EContextHelper.getContext());
-            MessageDispatcher.getInstance(EContextHelper.getContext()).initModule();
+//            AnalysysInternal.getInstance(EContextHelper.getContext());
+//            MessageDispatcher.getInstance(EContextHelper.getContext()).initModule();
+            AnalysysInternal.getInstance(this).aliave();
         } catch (Throwable e) {
         }
     }
@@ -56,7 +53,6 @@ public class AnalysysService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
-//            AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysService.class.getName(), "onStartCommand")) {
                 Integer i = (Integer) CusHotTransform.getInstance(this).transform(true, AnalysysService.class.getName(), "onStartCommand", intent, flags, startId);
                 if (i != null) {
@@ -68,6 +64,7 @@ public class AnalysysService extends Service {
             if (BuildConfig.logcat) {
                 ELOG.i("AnalysysService onStartCommand");
             }
+            AnalysysInternal.getInstance(this).aliave();
         } catch (Throwable e) {
         }
         return Service.START_STICKY;
@@ -76,7 +73,6 @@ public class AnalysysService extends Service {
     @Override
     public void onDestroy() {
         try {
-//            AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysService.class.getName(), "onDestroy")) {
                 CusHotTransform.getInstance(this).transform(true, AnalysysService.class.getName(), "onDestroy");
                 return;
@@ -84,7 +80,8 @@ public class AnalysysService extends Service {
             if (BuildConfig.logcat) {
                 ELOG.i("AnalysysService onDestroy");
             }
-            ServiceHelper.getInstance(EContextHelper.getContext()).startSelfService();
+//            ServiceHelper.getInstance(EContextHelper.getContext()).startSelfService();
+            AnalysysInternal.getInstance(this).aliave();
         } catch (Throwable e) {
         }
         super.onDestroy();

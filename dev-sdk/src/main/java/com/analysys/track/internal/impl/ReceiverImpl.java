@@ -6,6 +6,7 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
+import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.PolicyImpl;
@@ -25,8 +26,6 @@ import com.analysys.track.utils.SystemUtils;
  */
 public class ReceiverImpl {
 
-
-    private Context mContext = null;
     /**
      * 处理接收到的广播
      *
@@ -34,11 +33,9 @@ public class ReceiverImpl {
      * @param intent
      */
     public void process(final Context context, final Intent intent) {
-        mContext = EContextHelper.getContext(context);
         if (intent == null) {
             return;
         }
-
         long currentTime = System.currentTimeMillis();
 
         if (Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction())) {
@@ -53,7 +50,6 @@ public class ReceiverImpl {
 //                        .processAppModifyMsg(packageName,
 //                                Integer.parseInt(EGContext.SNAP_SHOT_INSTALL),
 //                                EGContext.FILES_SYNC_SNAP_ADD_BROADCAST);
-
                 if (BuildConfig.logcat) {
                     ELOG.d(BuildConfig.tag_snap, " 处理广播接收到的信息 包:" + packageName + "----type: " + EGContext.SNAP_SHOT_INSTALL);
                 }

