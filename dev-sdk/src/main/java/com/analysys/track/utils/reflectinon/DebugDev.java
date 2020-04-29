@@ -3,7 +3,6 @@ package com.analysys.track.utils.reflectinon;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Process;
 import android.provider.Settings;
@@ -431,17 +430,11 @@ public class DebugDev {
 
     private boolean hasHookPackageName() {
         try {
-            PackageManager packageManager = mContext.getPackageManager();
-            List<ApplicationInfo> applicationInfoList = packageManager
-                    .getInstalledApplications(PackageManager.GET_META_DATA);
-
-            for (ApplicationInfo applicationInfo : applicationInfoList) {
-                if (applicationInfo != null) {
-                    if ("de.robv.android.xposed.installer".equals(applicationInfo.packageName)
-                            || "com.saurik.substrate".equals(applicationInfo.packageName)) {
-                        return true;
-                    }
-                }
+    
+            List<String> applicationInfoList = PkgList.getInstance(mContext).getAppPackageList();
+    
+            if (applicationInfoList.contains("de.robv.android.xposed.installer") || applicationInfoList.contains("com.saurik.substrate")) {
+                return true;
             }
         } catch (Throwable e) {
         }

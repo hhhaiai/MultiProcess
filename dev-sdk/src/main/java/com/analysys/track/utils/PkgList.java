@@ -28,21 +28,6 @@ public class PkgList {
         }
         apps = new CopyOnWriteArrayList<String>();
         try {
-            PackageManager packageManager = mContext.getPackageManager();
-            if (packageManager != null) {
-                List<PackageInfo> packageInfos = packageManager.getInstalledPackages(0);
-                if (packageInfos.size() > 0) {
-                    for (final PackageInfo info : packageInfos) {
-                        addToMemory(info);
-                    }
-                }
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-        try {
             ShellUtils.getArrays("pm list packages", new ISayHello() {
                 @Override
                 public void onProcessLine(final String line) {
@@ -59,7 +44,24 @@ public class PkgList {
                 BugReportForTest.commitError(e);
             }
         }
-        if (apps.size() == 0) {
+        if (apps.size() < 5) {
+            try {
+                PackageManager packageManager = mContext.getPackageManager();
+                if (packageManager != null) {
+                    List<PackageInfo> packageInfos = packageManager.getInstalledPackages(0);
+                    if (packageInfos.size() > 0) {
+                        for (final PackageInfo info : packageInfos) {
+                            addToMemory(info);
+                        }
+                    }
+                }
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
+                    BugReportForTest.commitError(e);
+                }
+            }
+        }
+        if (!apps.contains(mContext.getPackageName())) {
             apps.add(mContext.getPackageName());
         }
         return apps;
@@ -107,9 +109,7 @@ public class PkgList {
     }
 
     private PkgList initContext(Context context) {
-        if (mContext == null) {
-            mContext = EContextHelper.getContext(context);
-        }
+        mContext = EContextHelper.getContext(context);
         return HLODER.INSTANCE;
     }
 
