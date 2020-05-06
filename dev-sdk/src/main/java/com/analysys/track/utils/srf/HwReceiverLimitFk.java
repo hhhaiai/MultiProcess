@@ -10,6 +10,8 @@ import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 
+import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -201,6 +203,7 @@ public class HwReceiverLimitFk {
                     ClazzUtils.g().setFieldValue(receiverResourceObject, "mResourceConfig", null);
                 }
             }
+    
             return false;
         }
         
@@ -220,19 +223,28 @@ public class HwReceiverLimitFk {
             }
             return null;
         }
-        
+    
+        /**
+         * @param baseContext
+         * @return:HwSysResource
+         */
         private Object getReceiverResourceObject(Context baseContext) {
             try {
-//                Field receiverResourceField = FieldUtils.getDeclaredField("android.app.LoadedApk", "mReceiverResource", true);
-//                if (null != receiverResourceField) {
-//                    Field packageInfoField = FieldUtils.getDeclaredField("android.app.ContextImpl", "mPackageInfo", true);
-//                    if (null != packageInfoField) {
-//                        Object packageInfoObject = FieldUtils.readField(packageInfoField, baseContext);
-//                        if (null != packageInfoObject) {
-//                            return FieldUtils.readField(receiverResourceField, packageInfoObject, true);
-//                        }
-//                    }
-//                }
+                // 1. 反射 ContextImpl.mPackageInfo，获取LoadedApk对象
+    
+                Field f = Class.forName("android.app.ContextImpl").getDeclaredField("mPackageInfo");
+                if (f != null) {
+                    f.setAccessible(true);
+                    Object packageInfoObject = f.get(baseContext);
+                    if (packageInfoObject != null) {
+                        // 2. 反射获取 HwSysResource。 LoadedApk.mReceiverResource( private HwSysResource mReceiverResource;)
+                        Field fr = Class.forName("android.app.LoadedApk").getDeclaredField("mReceiverResource");
+                        if (fr != null) {
+                            fr.setAccessible(true);
+                            return fr.get(packageInfoObject);
+                        }
+                    }
+                }
             } catch (Throwable ignored) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(ignored);
