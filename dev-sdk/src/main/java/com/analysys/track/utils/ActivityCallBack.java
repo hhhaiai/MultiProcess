@@ -9,15 +9,24 @@ import com.analysys.track.AnalysysTracker;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ActivityCallBack implements Application.ActivityLifecycleCallbacks {
-
-
-    private volatile AtomicInteger num;
-
-    /********************* get instance begin **************************/
+    
+    
+    private volatile boolean isFront = false;
+    private Object lock = new Object();
+    
+    
     public static ActivityCallBack getInstance() {
         return HLODER.INSTANCE;
     }
-
+    
+    //初始化时，直接标记是前台
+    public Application.ActivityLifecycleCallbacks init() {
+        synchronized (lock) {
+            this.isFront = true;
+        }
+        return HLODER.INSTANCE;
+    }
+    
     private static class HLODER {
         private static final ActivityCallBack INSTANCE = new ActivityCallBack();
     }
@@ -25,80 +34,52 @@ public class ActivityCallBack implements Application.ActivityLifecycleCallbacks 
     private ActivityCallBack() {
     }
 
-//    /********************* get instance end **************************/
-//    private static volatile ActivityCallBack instance = null;
-//
-//
-//    /********************* get instance end **************************/
-//
-//    public static ActivityCallBack getInstance() {
-//        if (instance == null) {
-//            synchronized (ActivityCallBack.class) {
-//                if (instance == null) {
-//                    instance = new ActivityCallBack();
-//                }
-//            }
-//        }
-//        return instance;
-//    }
-//
-//    private ActivityCallBack() {
-//    }
-
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-        EContextHelper.setContext(activity.getApplicationContext());
-//        AnalysysTracker.setContext(activity);
+        setContext(activity);
     }
-
+    
+    
     @Override
     public void onActivityStarted(Activity activity) {
-        try {
-            if (num == null) {
-                num = new AtomicInteger(0);
-            }
-            num.incrementAndGet();
-        } catch (Throwable e) {
-        }
+        setContext(activity);
     }
 
     @Override
     public void onActivityResumed(Activity activity) {
-        EContextHelper.setContext(activity.getApplicationContext());
+        setContext(activity);
+        isFront = true;
     }
 
     @Override
     public void onActivityPaused(Activity activity) {
-        EContextHelper.setContext(activity.getApplicationContext());
+        setContext(activity);
+        isFront = false;
     }
 
     @Override
     public void onActivityStopped(Activity activity) {
-        try {
-            if (num == null) {
-                num = new AtomicInteger(0);
-            }
-            num.decrementAndGet();
-        } catch (Throwable e) {
-        }
-
+        setContext(activity);
     }
 
     @Override
     public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-        EContextHelper.setContext(activity.getApplicationContext());
+        setContext(activity);
     }
 
     @Override
     public void onActivityDestroyed(Activity activity) {
-
+        setContext(activity);
     }
-
-    public boolean isBackGround() {
-        //app 初始化的时候,还没来得及回调. 默认是在前台
-        if (num == null) {
-            return false;
+    
+    private void setContext(Activity activity) {
+        EContextHelper.setContext(activity.getApplicationContext());
+    }
+    
+    public synchronized boolean isAppAliaveInFront() {
+        synchronized (lock) {
+            return this.isFront;
         }
-        return ActivityCallBack.getInstance().num.get() == 0;
     }
+    
 }
