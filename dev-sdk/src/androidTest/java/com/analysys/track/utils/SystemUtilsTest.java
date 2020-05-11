@@ -96,6 +96,24 @@ public class SystemUtilsTest extends AnalsysTest {
     @Test
     public void getCloseTime() {
     }
+    
+    @Test
+    public void containsInProp() {
+        boolean s = SystemUtils.containsInProp("imei");
+        assertFalse(s);
+    }
+    
+    @Test
+    public void containsKeyInProp() {
+        boolean isMIui = SystemUtils.containsKeyInProp("miui");
+        assertTrue(isMIui);
+    }
+    
+    @Test
+    public void containsValuesInProp() {
+        boolean meid = SystemUtils.containsValuesInProp("miui");
+        assertTrue(meid);
+    }
 
     @Test(timeout = 120)
     public void isMainThread() throws InterruptedException {
