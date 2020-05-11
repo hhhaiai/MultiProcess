@@ -28,30 +28,20 @@ import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.EThreadPool;
-import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.OAIDHelper;
 import com.analysys.track.utils.PermissionUtils;
-import com.analysys.track.utils.StreamerUtils;
-import com.analysys.track.utils.reflectinon.ClazzUtils;
+import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.sp.SPHelper;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Method;
 import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
-
-import static java.lang.Runtime.getRuntime;
 
 
 /**
@@ -77,6 +67,7 @@ public class DeviceImpl {
 //    private final String ONE = "1";
     private final String DEFALT_MAC = "02:00:00:00:00:00";
     private final String[] FILE_LIST = {
+            Base64.encodeToString("/sys/class/net/wlan1/address".getBytes(), Base64.DEFAULT),
             Base64.encodeToString("/sys/class/net/wlan0/address".getBytes(), Base64.DEFAULT),
             Base64.encodeToString("/sys/class/net/eth0/address".getBytes(), Base64.DEFAULT),
             Base64.encodeToString("/sys/devices/virtual/net/wlan0/address".getBytes(), Base64.DEFAULT)};
@@ -165,40 +156,41 @@ public class DeviceImpl {
      * MAC 地址
      */
     public String getMac() {
-        if (mContext == null) {
-            return null;
+        if (!TextUtils.isEmpty(mMemoryMac)) {
+            return mMemoryMac;
         }
-        String mac = DEFALT_MAC;
-        try {
-            if (Build.VERSION.SDK_INT < 23) {
-                mac = getMacByAndridAPI();
-            } else {
-                if (NetworkUtils.isWifiAlive(mContext)) {
-                    mac = getMacByJavaAPI();
+        mMemoryMac = SPHelper.getStringValueFromSP(mContext, EGContext.SP_MAC_ADDRESS, DEFALT_MAC);
+        if (!isInValid(mMemoryMac)) {
+            try {
+                if (mContext != null && Build.VERSION.SDK_INT < 23) {
+                    mMemoryMac = getMacByAndridAPI();
+                }
+                if (isInValid(mMemoryMac)) {
+                    mMemoryMac = getMacByJavaAPI();
                 } else {
-                    mac = getMacFile();
+                    if (isInValid(mMemoryMac)) {
+                        mMemoryMac = getMacByFile();
+                    }
+                }
+            
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
+                    BugReportForTest.commitError(e);
                 }
             }
-            if (mac.equals(DEFALT_MAC)) {
-                mac = getMacByShell();
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
+    
+            if (isInValid(mMemoryMac)) {
+                SPHelper.setStringValue2SP(mContext, EGContext.SP_MAC_ADDRESS, mMemoryMac);
             }
         }
-
-        if (!mac.equals(DEFALT_MAC)) {
-            SPHelper.setStringValue2SP(mContext, EGContext.SP_MAC_ADDRESS, mac);
-        }
-        return mac;
+    
+        return mMemoryMac;
     }
 
     /**
-     * MAC 地址
+     * android api获取MAC
      */
     private String getMacByAndridAPI() {
-        String macAddress = "";
         try {
             WifiManager wifi = (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             if (PermissionUtils.checkPermission(mContext, permission.ACCESS_WIFI_STATE)) {
@@ -207,37 +199,34 @@ public class DeviceImpl {
                     info = wifi.getConnectionInfo();
                 }
                 if (info != null) {
-                    macAddress = info.getMacAddress();
+                    return info.getMacAddress();
                 }
-
-            } else {
-                macAddress = DEFALT_MAC;
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
-            macAddress = DEFALT_MAC;
         }
-        return macAddress;
+        return DEFALT_MAC;
     }
 
-    /**
-     * 需要打开wifi才能获取
-     *
-     * @throws SocketException
-     */
     @TargetApi(9)
     private String getMacByJavaAPI() {
         String mac = "";
+        Map<String, String> map = new HashMap<String, String>();
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             while (interfaces.hasMoreElements()) {
+                mac = "";
                 NetworkInterface netInterface = interfaces.nextElement();
-                if ("wlan0".equals(netInterface.getName()) || "eth0".equals(netInterface.getName())) {
+                String name = netInterface.getName();
+                if ("wlan0".equalsIgnoreCase(name)
+                        || "wlan1".equalsIgnoreCase(name)
+                        || "eth0".equalsIgnoreCase(name)
+                ) {
                     byte[] addr = netInterface.getHardwareAddress();
                     if (addr == null || addr.length == 0) {
-                        return "";
+                        continue;
                     }
                     StringBuilder buf = new StringBuilder();
                     for (byte b : addr) {
@@ -247,78 +236,68 @@ public class DeviceImpl {
                         buf.deleteCharAt(buf.length() - 1);
                     }
                     mac = String.valueOf(buf).toLowerCase(Locale.getDefault());
+                    map.put(name, mac);
                 }
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
-            mac = DEFALT_MAC;
         }
-
-        return mac;
+    
+        if (map.containsKey("wlan1")) {
+            String mf = map.get("wlan1");
+            if (isInValid(mf)) {
+                return mf;
+            }
+        }
+        if (map.containsKey("wlan0")) {
+            String mf = map.get("wlan0");
+            if (isInValid(mf)) {
+                return mf;
+            }
+        }
+        if (map.containsKey("eth0")) {
+            String mf = map.get("eth0");
+            if (isInValid(mf)) {
+                return mf;
+            }
+        }
+        map.clear();
+        map = null;
+        return DEFALT_MAC;
     }
-
-    /**
-     * android 9以上没权限获取
-     *
-     * @throws IOException
-     */
-    private String getMacFile() {
+    
+ 
+    private String getMacByFile() {
         for (int i = 0; i < FILE_LIST.length; i++) {
-            BufferedReader reader = null;
-            try {
-                File file = new File(new String(Base64.decode(FILE_LIST[i], Base64.DEFAULT)));
-                if (file.exists()) {
-                    reader = new BufferedReader(new FileReader(file));
-                    String tempString = null;
-                    while ((tempString = reader.readLine()) != null) {
-                        if (!TextUtils.isEmpty(tempString)) {
-                            return tempString;
-                        }
-                    }
-                }
-            } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(e);
-                }
-            } finally {
-                StreamerUtils.safeClose(reader);
+            String mac = SystemUtils.getContent(new String(Base64.decode(FILE_LIST[i], Base64.DEFAULT)));
+            if (isInValid(mac)) {
+                return mac;
             }
         }
         return DEFALT_MAC;
     }
-
-    private String getMacByShell() {
-        Process proc = null;
-        BufferedInputStream in = null;
-        BufferedReader br = null;
-        StringBuilder sb;
-        try {
-            sb = new StringBuilder();
-            for (int i = 0; i < FILE_LIST.length; i++) {
-                proc = getRuntime().exec("cat " + new String(Base64.decode(FILE_LIST[i], Base64.DEFAULT)));
-                in = new BufferedInputStream(proc.getInputStream());
-                br = new BufferedReader(new InputStreamReader(in));
-                String line;
-                while ((line = br.readLine()) != null) {
-                    sb.append(line);
-                }
-                if (sb.length() > 0) {
-                    return String.valueOf(sb);
-                }
-            }
-        } catch (Exception e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        } finally {
-            StreamerUtils.safeClose(br);
-            StreamerUtils.safeClose(in);
+    
+    /**
+     * mac是否无效
+     *
+     * @param mac
+     * @return true: 无效
+     * fasle: 有效
+     */
+    private boolean isInValid(String mac) {
+        if (TextUtils.isEmpty(mac)) {
+            return true;
         }
-        return DEFALT_MAC;
+        if (DEFALT_MAC.equalsIgnoreCase(mac)) {
+            return true;
+        }
+        return false;
     }
-
+    
+    
+    
     private DisplayMetrics getDisplayMetrics() {
         DisplayMetrics displayMetrics;
         try {
