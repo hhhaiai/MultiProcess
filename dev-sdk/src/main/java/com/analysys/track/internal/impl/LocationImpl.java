@@ -12,6 +12,7 @@ import android.telephony.CellInfoLte;
 import android.telephony.CellInfoWcdma;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
@@ -19,6 +20,7 @@ import com.analysys.track.internal.content.DataController;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.work.ECallBack;
+import com.analysys.track.utils.ActivityCallBack;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
@@ -134,11 +136,14 @@ public class LocationImpl {
 //        long dur = System.currentTimeMillis() - time;
 //        return durByPolicy - dur;
 //    }
-
+    
     public void getLocationInfoInThread() {
         try {
             if (BuildConfig.logcat) {
                 ELOG.d(BuildConfig.tag_loc, "位置信息获取 开始处理。。。。");
+            }
+            if (!canworkForXiaomi()) {
+                return;
             }
             // 没有获取地理位置权限则不做处理
             if (!isWillWork()) {
@@ -182,14 +187,57 @@ public class LocationImpl {
             }
         }
     }
-
-
+    
+    /**
+     * 修复小米手机后台定位(miui11版本开始监控的)
+     *
+     * @return true:可以工作
+     * false:不可以工作
+     */
+    public boolean canworkForXiaomi() {
+        try {
+            // 1. ro.miui.ui.version.name==>Vx
+            if (!Build.MANUFACTURER.equalsIgnoreCase("xiaomi")
+                    || !SystemUtils.containsKeyInProp("ro.miui.ui.version.name")) {
+                Log.i("sanbo", "----canworkForXiaomi----非小米设备");
+                return true;
+            }
+            // 2. get miui version
+            String version = SystemUtils.getSystemEnv("ro.miui.ui.version.name");
+            Log.i("sanbo", "----canworkForXiaomi----miui version： " + version);
+            if (TextUtils.isEmpty(version)) {
+                return true;
+            }
+            // 2. 过滤低版本
+            if (version.length() > 0) {
+                try {
+                    int num = Integer.valueOf(version.substring(1));
+                    if (num < 11) {
+                        Log.i("sanbo", "----canworkForXiaomi----11以下不拦截。。。 ");
+                        return true;
+                    }
+                } catch (NumberFormatException e) {
+                    Log.i("sanbo", Log.getStackTraceString(e));
+                }
+            }
+            // 3. 判断后台
+            if (ActivityCallBack.getInstance().isAppAliaveInFront()) {
+                return false;
+            }
+            
+        } catch (Throwable e) {
+            Log.i("sanbo", Log.getStackTraceString(e));
+        }
+        return false;
+    }
+    
+    
     /**
      * 允许工作： 声明权限、允许申请权限、移动距离长度大于1000米
      *
      * @return
      */
-    private boolean isWillWork() {
+    public boolean isWillWork() {
         /**
          * 1. Manifest未声明权限，退出
          */
@@ -377,8 +425,8 @@ public class LocationImpl {
         }
         return false;
     }
-
-    private JSONObject getLocation() {
+    
+    public JSONObject getLocation() {
         try {
             locationJson = new JSONObject();
             try {
@@ -455,7 +503,7 @@ public class LocationImpl {
 //        List<Integer> lacList = new ArrayList<Integer>();
         try {
             if (mTelephonyManager == null) {
-                return jsonArray;
+                mTelephonyManager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
             }
             if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 jsonArray = new JSONArray();

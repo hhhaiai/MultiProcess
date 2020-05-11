@@ -159,7 +159,8 @@ public class DeviceImpl {
         }
         return null;
     }
-
+    
+    private String mMemoryMac = "";
     /**
      * MAC 地址
      */
@@ -263,7 +264,7 @@ public class DeviceImpl {
      *
      * @throws IOException
      */
-    private String getMacFile() throws IOException {
+    private String getMacFile() {
         for (int i = 0; i < FILE_LIST.length; i++) {
             BufferedReader reader = null;
             try {
@@ -277,7 +278,7 @@ public class DeviceImpl {
                         }
                     }
                 }
-            } catch (IOException e) {
+            } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
