@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -151,12 +152,13 @@ public class ShellUtils {
             br = new BufferedReader(is);
             String line = "";
             while ((line = br.readLine()) != null) {
-                if (!TextUtils.isEmpty(line) && !result.contains(line.trim())) {
-                    if (isNeedResult) {
-                        result.add(line.trim());
+                if (!TextUtils.isEmpty(line)) {
+                    line = line.trim().toLowerCase(Locale.getDefault());
+                    if (isNeedResult && !result.contains(line)) {
+                        result.add(line);
                     }
                     if (call != null) {
-                        call.onProcessLine(line.trim());
+                        call.onProcessLine(line);
                     }
                 }
             }

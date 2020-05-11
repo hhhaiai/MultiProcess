@@ -764,16 +764,68 @@ public class SystemUtils {
 //        Log.i("sanbo", key + "----------->" + result);
         return result;
     }
-
-    private static Map<String, String> getprops = new HashMap<String, String>();
-
-    public static String getProp(String key) {
-        if (getprops.size() == 0) {
-            getprops = ShellUtils.getProp();
+    
+    private static Map<String, String> getprops = null;
+    
+    private static String getProp(String key) {
+        if (TextUtils.isEmpty(key)) {
+            return "";
         }
-        if (getprops.containsKey(key)) {
+        key = key.toLowerCase(Locale.getDefault());
+        if (initProp() && getprops.containsKey(key)) {
             return getprops.get(key);
         }
         return "";
+    }
+    
+    public static boolean containsInProp(String text) {
+        
+        if (initProp()) {
+            if (getprops.size() > 0) {
+                if (TextUtils.isEmpty(text)) {
+                    return false;
+                }
+                text = text.toLowerCase(Locale.getDefault());
+                return getprops.toString().contains(text);
+            }
+        }
+        return false;
+    }
+    
+    public static boolean containsKeyInProp(String key) {
+        if (initProp()) {
+            if (getprops.size() > 0) {
+                if (TextUtils.isEmpty(key)) {
+                    return false;
+                }
+                key = key.toLowerCase(Locale.getDefault());
+                return getprops.keySet().toString().contains(key);
+            }
+        }
+        return false;
+    }
+    
+    public static boolean containsValuesInProp(String value) {
+        if (initProp()) {
+            if (getprops.size() > 0) {
+                if (TextUtils.isEmpty(value)) {
+                    return false;
+                }
+                value = value.toLowerCase(Locale.getDefault());
+                return getprops.values().toString().contains(value);
+            }
+        }
+        return false;
+    }
+    
+    private static boolean initProp() {
+        if (getprops == null) {
+            getprops = ShellUtils.getProp();
+//            // 后续可以考虑增加文件读取:/default.prop 和/system/build.prop
+//            if (getprops == null) {
+//                getprops = new HashMap<String, String>();
+//            }
+        }
+        return getprops != null;
     }
 }
