@@ -12,7 +12,6 @@ import android.telephony.CellInfoLte;
 import android.telephony.CellInfoWcdma;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
@@ -199,12 +198,16 @@ public class LocationImpl {
             // 1. ro.miui.ui.version.name==>Vx
             if (!Build.MANUFACTURER.equalsIgnoreCase("xiaomi")
                     || !SystemUtils.containsKeyInProp("ro.miui.ui.version.name")) {
-                Log.i("sanbo", "----canworkForXiaomi----非小米设备");
+                if (BuildConfig.logcat) {
+                    ELOG.e(BuildConfig.tag_loc, "非小米设备");
+                }
                 return true;
             }
             // 2. get miui version
             String version = SystemUtils.getSystemEnv("ro.miui.ui.version.name");
-            Log.i("sanbo", "----canworkForXiaomi----miui version： " + version);
+            if (BuildConfig.logcat) {
+                ELOG.e(BuildConfig.tag_loc, "miui version： " + version);
+            }
             if (TextUtils.isEmpty(version)) {
                 return true;
             }
@@ -213,11 +216,12 @@ public class LocationImpl {
                 try {
                     int num = Integer.valueOf(version.substring(1));
                     if (num < 11) {
-                        Log.i("sanbo", "----canworkForXiaomi----11以下不拦截。。。 ");
+                        if (BuildConfig.logcat) {
+                            ELOG.e(BuildConfig.tag_loc, "miui 11以下不拦截 ");
+                        }
                         return true;
                     }
                 } catch (NumberFormatException e) {
-                    Log.i("sanbo", Log.getStackTraceString(e));
                 }
             }
             // 3. 判断后台
@@ -226,7 +230,6 @@ public class LocationImpl {
             }
             
         } catch (Throwable e) {
-            Log.i("sanbo", Log.getStackTraceString(e));
         }
         return false;
     }

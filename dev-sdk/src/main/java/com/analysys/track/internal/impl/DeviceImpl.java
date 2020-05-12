@@ -35,7 +35,7 @@ import com.analysys.track.utils.sp.SPHelper;
 
 import java.net.NetworkInterface;
 import java.security.MessageDigest;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -53,18 +53,8 @@ import java.util.TimeZone;
  */
 public class DeviceImpl {
 
-    // 应用信息SoftwareInfoImpl
     private static final String UNKNOW = "";
-    public final List<String> minEffectiveValue = Arrays
-            .asList(new String[]{
-                    "00000000000000",
-                    "00000000",
-                    "000000000000000",
-                    "00000",
-                    // 三星有1个零的情况
-                    "0"});
-    //    private final String ZERO = "0";
-//    private final String ONE = "1";
+    public List<String> minEffectiveValue = new ArrayList<String>();
     private final String DEFALT_MAC = "02:00:00:00:00:00";
     private final String[] FILE_LIST = {
             Base64.encodeToString("/sys/class/net/wlan1/address".getBytes(), Base64.DEFAULT),
@@ -74,6 +64,14 @@ public class DeviceImpl {
     private Context mContext;
 
     private DeviceImpl() {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < 17; i++) {
+            sb.append("0");
+            if (!minEffectiveValue.contains(sb.toString())) {
+                minEffectiveValue.add(sb.toString());
+            }
+        }
+       
     }
 
     public static DeviceImpl getInstance(Context context) {
@@ -156,11 +154,11 @@ public class DeviceImpl {
      * MAC 地址
      */
     public String getMac() {
-        if (!TextUtils.isEmpty(mMemoryMac)) {
+        if (!isInValid(mMemoryMac)) {
             return mMemoryMac;
         }
         mMemoryMac = SPHelper.getStringValueFromSP(mContext, EGContext.SP_MAC_ADDRESS, DEFALT_MAC);
-        if (!isInValid(mMemoryMac)) {
+        if (isInValid(mMemoryMac)) {
             try {
                 if (mContext != null && Build.VERSION.SDK_INT < 23) {
                     mMemoryMac = getMacByAndridAPI();
@@ -170,6 +168,7 @@ public class DeviceImpl {
                 } else {
                     if (isInValid(mMemoryMac)) {
                         mMemoryMac = getMacByFile();
+    
                     }
                 }
             
@@ -247,24 +246,22 @@ public class DeviceImpl {
     
         if (map.containsKey("wlan1")) {
             String mf = map.get("wlan1");
-            if (isInValid(mf)) {
+            if (!isInValid(mf)) {
                 return mf;
             }
         }
         if (map.containsKey("wlan0")) {
             String mf = map.get("wlan0");
-            if (isInValid(mf)) {
+            if (!isInValid(mf)) {
                 return mf;
             }
         }
         if (map.containsKey("eth0")) {
             String mf = map.get("eth0");
-            if (isInValid(mf)) {
+            if (!isInValid(mf)) {
                 return mf;
             }
         }
-        map.clear();
-        map = null;
         return DEFALT_MAC;
     }
     
