@@ -46,26 +46,26 @@ public class AnalysysTracker {
      */
     @Deprecated
     public static void setDebugMode(Context context, boolean isDebug) {
-        try {
-//            setContext(context);
-            if (BuildConfig.enableHotFix && CusHotTransform.getInstance(context).isCanWork(AnalysysTracker.class.getName(), "setDebugMode")) {
-                CusHotTransform.getInstance(context).transform(false, AnalysysTracker.class.getName(), "setDebugMode", context, isDebug);
-                return;
-            }
-//            EGContext.FLAG_DEBUG_USER = isDebug;
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
+//        try {
+////            setContext(context);
+//            if (BuildConfig.enableHotFix && CusHotTransform.getInstance(context).isCanWork(AnalysysTracker.class.getName(), "setDebugMode")) {
+//                CusHotTransform.getInstance(context).transform(false, AnalysysTracker.class.getName(), "setDebugMode", context, isDebug);
+//                return;
+//            }
+////            EGContext.FLAG_DEBUG_USER = isDebug;
+//        } catch (Throwable e) {
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(e);
+//            }
+//        }
     }
 
     @Deprecated
     public static void setDebugMode(boolean isDebug) {
-        if (BuildConfig.enableHotFix && CusHotTransform.getInstance(null).isCanWork(AnalysysTracker.class.getName(), "setDebugMode")) {
-            CusHotTransform.getInstance(null).transform(false, AnalysysTracker.class.getName(), "setDebugMode", isDebug);
-            return;
-        }
+//        if (BuildConfig.enableHotFix && CusHotTransform.getInstance(null).isCanWork(AnalysysTracker.class.getName(), "setDebugMode")) {
+//            CusHotTransform.getInstance(null).transform(false, AnalysysTracker.class.getName(), "setDebugMode", isDebug);
+//            return;
+//        }
     }
 
     public static void setContext(Context context) {
