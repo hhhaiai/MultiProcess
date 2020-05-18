@@ -88,15 +88,11 @@ public class DebugDev {
         boolean q4 = isC2();
         boolean q5 = isC3();
         boolean r1 = isHasNoBaseband();
-        boolean r2 = isHasNoBluetooth();
+//        boolean r2 = isHasNoBluetooth();
         boolean r3 = isBluestacks();
-
-        isDebugDevice = l1 || l2
-                || m1 || m2 || m4 || m5
-                || n1 || n2 || n3 || n4 || n5
-                || q1 || q2 || q3 || q4 || q5
-                || r1 || r2 || r3
-                || isSimulator() || isHook();
+    
+        isDebugDevice = l1 || l2 || m1 || m2 || m4 || m5 || n1 || n2 || n3 || n4 || n5
+                || q1 || q2 || q3 || q4 || q5 || r1 || r3 || isSimulator() || isHook();
         return isDebugDevice;
     }
 
@@ -123,8 +119,7 @@ public class DebugDev {
         boolean p3 = isSameByShell("ro.secure", "0");
         boolean p4 = isSameByShell("ro.kernel.qemu", "1");
         boolean p5 = isGetPropKey();
-        return o1 || o2 || o3 || o4 || o5
-                || p1 || p2 || p3 || p4 || p5;
+        return o1 || o2 || o3 || o4 || o5 || p1 || p2 || p3 || p4 || p5;
     }
 
     private boolean isGetPropKey() {
@@ -170,20 +165,7 @@ public class DebugDev {
     }
 
 
-    /**
-     * 蓝牙 可有可无
-     *
-     * @return
-     */
-    private boolean isHasNoBluetooth() {
-        try {
-            if (BluetoothAdapter.getDefaultAdapter() == null) {
-                return true;
-            }
-        } catch (Throwable e) {
-        }
-        return false;
-    }
+
 
     /**
      * 基带检测
@@ -858,6 +840,20 @@ public class DebugDev {
 //                        }
 //                    }
 //                }
+//            }
+//        } catch (Throwable e) {
+//        }
+//        return false;
+//    }
+//    /**
+//     * 蓝牙 可有可无
+//     *
+//     * @return
+//     */
+//    private boolean isHasNoBluetooth() {
+//        try {
+//            if (BluetoothAdapter.getDefaultAdapter() == null) {
+//                return true;
 //            }
 //        } catch (Throwable e) {
 //        }
