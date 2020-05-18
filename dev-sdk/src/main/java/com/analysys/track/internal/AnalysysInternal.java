@@ -129,10 +129,9 @@ public class AnalysysInternal {
                 return;
             }
             rename(ctx);
-
             SPHelper.setBooleanValue2SP(ctx, EGContext.KEY_INIT_TYPE, initType);
             Application application = (Application) ctx;
-            application.registerActivityLifecycleCallbacks(ActivityCallBack.getInstance().init());
+            application.registerActivityLifecycleCallbacks(ActivityCallBack.getInstance());
 
             SPHelper.setIntValue2SP(ctx, EGContext.KEY_ACTION_SCREEN_ON_SIZE, EGContext.FLAG_START_COUNT + 1);
             // updateSnapshot sp
