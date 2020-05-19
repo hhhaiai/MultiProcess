@@ -155,7 +155,7 @@ public class DataLocalTempUtils {
      */
     private void flash() {
         if (mJson != null) {
-            FileUitls.getInstance(mContext).saveToFile(mJson.toString(), mFile);
+            FileUitls.getInstance(mContext).saveToFile(mJson.toString(), mFile, false);
         }
     }
 

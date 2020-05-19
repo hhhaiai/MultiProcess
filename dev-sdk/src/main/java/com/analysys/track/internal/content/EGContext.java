@@ -303,6 +303,9 @@ public class EGContext {
     //更新文件夹名字.
     public static final String PATCH_NET_CACHE_DIR = FILE_NEW_DIR + ".p/";
     public static final String PATCH_DIR = ".p/";
+    public static final String PATCH_CF_DIR = ".cf/";
+    public static final String PATCH_NAME_FILE = "p_%s.jar";
+    
     //下发的patch是否在运行中
     public static boolean patch_runing = false;
 

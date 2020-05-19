@@ -77,6 +77,7 @@ public class Memory2File {
             }
             if (!file.exists()) {
                 file.createNewFile();
+                file.setReadable(true);
                 file.setWritable(true);
                 file.setExecutable(true);
             }

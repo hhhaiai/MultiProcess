@@ -59,7 +59,7 @@ public class DataPackaging {
             JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.OAID, devImpl.getOAID(),
                     DataController.SWITCH_OF_OAID);
             if (EGContext.patch_runing) {
-                String plocyVersion = SPHelper.getStringValueFromSP(context, UploadKey.Response.RES_POLICY_VERSION, "");
+                String plocyVersion = SPHelper.getStringValueFromSP(context, EGContext.PATCH_VERSION_POLICY, "");
                 JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.POLICYVER, plocyVersion, DataController.SWITCH_OF_POLICYVER);
             }
             JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.DeviceModel, Build.MODEL,

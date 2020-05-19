@@ -212,7 +212,7 @@ public class MessageDispatcher {
              */
             if (DebugDev.get(mContext).isDebugDevice()) {
                 isDebugProcess = true;
-                PatchHelper.clearPatch(mContext);
+                PatchHelper.clear(mContext);
                 return;
             }
         } catch (Throwable e) {
