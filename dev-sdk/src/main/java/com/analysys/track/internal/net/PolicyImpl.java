@@ -14,6 +14,7 @@ import com.analysys.track.internal.model.PolicyInfo;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.FileUitls;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.data.Memory2File;
 import com.analysys.track.utils.reflectinon.DebugDev;
@@ -94,7 +95,17 @@ public class PolicyImpl {
                 if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_cutoff, "=======保存策略----可信设备===");
                 }
-
+    
+                // 清除老版本缓存文件
+                String oldVersion = SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, "");
+                if (!TextUtils.isEmpty(oldVersion)) {
+                    FileUitls.getInstance(mContext).deleteFile(new File(mContext.getFilesDir(), oldVersion + ".jar"));
+                    FileUitls.getInstance(mContext).deleteFile(new File(mContext.getFilesDir(), EGContext.PATCH_OLD_CACHE_DIR + oldVersion + ".jar"));
+                    FileUitls.getInstance(mContext).deleteFile(new File(mContext.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR + oldVersion + ".jar"));
+                    if (BuildConfig.logcat) {
+                        ELOG.i(BuildConfig.tag_cutoff, "=======保存策略前，清除老版本缓存文件完毕 ==== ");
+                    }
+                }
                 //热更部分保存: 现在保存sign、version
                 if (!TextUtils.isEmpty(newPolicy.getPatchVersion())) {
                     if (BuildConfig.logcat) {
