@@ -4,12 +4,19 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.util.Log;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
+import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class USMImplTest {
     Context context;
@@ -42,7 +49,117 @@ public class USMImplTest {
 
     public void testGetEventType() {
     }
-
+    
+    public static String stampToDate(long lt) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        Date date = new Date(lt);
+        return simpleDateFormat.format(date);
+    }
+    
+    @Test
+    public void moreRun() {
+        long now = System.currentTimeMillis();
+        long lsa = now - 20 * EGContext.TIME_HOUR;
+        long dur = 3 * EGContext.TIME_HOUR;
+        Log.e("sanbo", "--------------------开始-----------------");
+        while (true) {
+            if (lsa + dur >= now) {
+                Log.i("sanbo", String.format("尾声了。。起时间:[%s], 止时间[%s]", stampToDate(lsa), stampToDate(now)));
+                break;
+            } else {
+                Log.i("sanbo", String.format("中间。。起时间:[%s], 止时间[%s]", stampToDate(lsa), stampToDate(lsa + dur)));
+                lsa = lsa + dur;
+            }
+        }
+        Log.e("sanbo", "--------------------结束-----------------");
+        
+    }
+    
+    @Test
+    public void compareOneAndMore() {
+        for (int i = 0; i < 100; i++) {
+            Log.i("sanbo", "--------------------" + i + "/" + 100 + "-----------------");
+            realWork();
+        }
+        
+    }
+    
+    private void realWork() {
+        long s1 = System.currentTimeMillis();
+        long lastRequestTime = s1 - 20 * EGContext.TIME_HOUR;
+        USMImpl.getUSMInfo(context, lastRequestTime, s1);
+        long e1 = System.currentTimeMillis();
+        Log.e("sanbo", "单次获取20小时耗时:" + (e1 - s1));
+        
+        
+        long tstart = System.currentTimeMillis();
+        
+        long now = s1;
+        long lsa = lastRequestTime;
+        long dur = 3 * EGContext.TIME_HOUR;
+//        Log.e("sanbo", "--------------------开始-----------------");
+        while (true) {
+            if (lsa + dur >= now) {
+//                Log.i("sanbo", String.format("尾声了。。起时间:[%s], 止时间[%s]", stampToDate(lsa), stampToDate(now)));
+                USMImpl.getUSMInfo(context, lsa, now);
+                break;
+            } else {
+//                Log.i("sanbo", String.format("中间。。起时间:[%s], 止时间[%s]", stampToDate(lsa), stampToDate(lsa + dur)));
+                USMImpl.getUSMInfo(context, lsa, lsa + dur);
+                lsa = lsa + dur;
+            }
+        }
+//        Log.e("sanbo", "--------------------结束-----------------");
+        
+        
+        long tsend = System.currentTimeMillis();
+        Log.e("sanbo", "多次获取20小时耗时:" + (tsend - tstart));
+    }
+    
+    
+    @Test
+    public void testZeroDurRequest() {
+        try {
+            //has a bug. app get last request time failed.
+            long lastReqTime = SPHelper.getLongValueFromSP(context, EGContext.LASTQUESTTIME, 0);
+            if (lastReqTime == 0) {
+                Log.i("sanbo", "未成功发送，没有上次发送时间");
+            } else {
+                Log.i("sanbo", "上次发送时间: " + stampToDate(lastReqTime));
+            }
+            long defTime = (long) ClazzUtils.g().getStaticFieldValue(BuildConfig.class, "TIME_USM_SPLIT");
+            Log.i("sanbo", "采集的间隔:" + defTime);
+            Log.i("sanbo", "-----------模拟首次请求------------");
+            if (lastReqTime != 0) {
+                SPHelper.setLongValue2SP(context, EGContext.LASTQUESTTIME, 0);
+            }
+            Log.i("sanbo", "----case1: 时间间隔 0---------------");
+            try {
+                if (defTime != 0) {
+                    ClazzUtils.g().setStaticFieldValue(BuildConfig.class, "TIME_USM_SPLIT", 0);
+                }
+            } catch (Exception e) {
+                Log.e("sanbo", Log.getStackTraceString(e));
+            }
+            long a = System.currentTimeMillis();
+            JSONArray info = USMImpl.getUSMInfo(context);
+            long b = System.currentTimeMillis();
+            Log.i("sanbo", "首次请求结果: " + info);
+            Log.w("sanbo", "时间间隔 0,耗时: " + (b - a));
+            if (lastReqTime != 0) {
+                SPHelper.setLongValue2SP(context, EGContext.LASTQUESTTIME, lastReqTime);
+            }
+            try {
+                if (defTime != 0) {
+                    ClazzUtils.g().setStaticFieldValue(BuildConfig.class, "TIME_USM_SPLIT", defTime);
+                }
+            } catch (Exception e) {
+                Log.e("sanbo", Log.getStackTraceString(e));
+            }
+        } catch (Throwable e) {
+            Log.e("sanbo", Log.getStackTraceString(e));
+        }
+    }
     @Test
     public void checkTime() {
 

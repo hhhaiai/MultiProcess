@@ -81,9 +81,58 @@ public class JsonUtils {
         }
 
         return result;
-
     }
-//
+    
+    /**
+     * merge two arrs to one array.
+     *
+     * @param arr1
+     * @param arr2
+     * @return
+     */
+    public static JSONArray mergeArrays(JSONArray arr1, JSONArray arr2) {
+        JSONArray arr = new JSONArray();
+        if (arr1 != null && arr1.length() > 0) {
+            for (int i = 0; i < arr1.length(); i++) {
+                String temp = arr1.optString(i, "");
+                if (!TextUtils.isEmpty(temp)) {
+                    arr1.put(temp);
+                }
+            }
+        }
+        if (arr2 != null && arr2.length() > 0) {
+            for (int i = 0; i < arr2.length(); i++) {
+                String temp = arr2.optString(i, "");
+                if (!TextUtils.isEmpty(temp)) {
+                    arr2.put(temp);
+                }
+            }
+        }
+        return arr;
+    }
+    
+    /**
+     * merge two arrs to one array.
+     *
+     * @param desk
+     * @param subSrc
+     * @return
+     */
+    public static JSONArray addAll(JSONArray desk, JSONArray subSrc) {
+        if (desk == null) {
+            desk = new JSONArray();
+        }
+        if (subSrc != null && subSrc.length() > 0) {
+            for (int i = 0; i < subSrc.length(); i++) {
+                String temp = subSrc.optString(i, "");
+                if (!TextUtils.isEmpty(temp)) {
+                    desk.put(temp);
+                }
+            }
+        }
+        return desk;
+    }
+
 //    public static void save(JSONObject json, String key, String value) {
 //        try {
 //            if (json != null && !TextUtils.isEmpty(key) && !TextUtils.isEmpty(value)) {

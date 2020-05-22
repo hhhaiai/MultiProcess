@@ -18,6 +18,7 @@ import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.DebugDev;
 import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
@@ -119,15 +120,6 @@ public class MessageDispatcher {
 
                             @Override
                             public void onProcessed() {
-
-//                                long time = LocationImpl.getInstance(mContext).getDurTime();
-//                                if (BuildConfig.logcat) {
-//                                    ELOG.i(BuildConfig.tag_loc, "收到定位信息回调。。" + SystemUtils.getTime(time) + "后继续发起请求。。。");
-//                                }
-//                                // 按照差距时间发送延迟工作消息
-//                                postDelay(MSG_INFO_WBG, time);
-
-
                                 if (BuildConfig.logcat) {
                                     ELOG.i(BuildConfig.tag_loc, "收到定位信息回调。。30秒后继续发起请求。。。");
                                 }
@@ -172,8 +164,7 @@ public class MessageDispatcher {
                         if (BuildConfig.ENABLE_NETINFO) {
                             ELOG.d(BuildConfig.tag_snap, " 收到 net 信息。。心跳。。");
                             //策略控制netinfo轮训取数时间默认30秒
-                            final int time = SPHelper.getIntValueFromSP(mContext, EGContext.SP_NET_CYCLE,
-                                    EGContext.TIME_SECOND * 30);
+                            final int time = SPHelper.getIntValueFromSP(mContext, EGContext.SP_NET_CYCLE, EGContext.TIME_SECOND * 30);
                             NetImpl.getInstance(mContext).dumpNet(new ECallBack() {
                                 @Override
                                 public void onProcessed() {

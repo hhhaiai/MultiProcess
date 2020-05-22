@@ -32,6 +32,10 @@ def isNativeDebug = false
 def isUseHttps = true
 // use netinfo module
 def isUseNetInfo = false
+// USM分割时间，单位毫秒。如不使用分割，设置成0即可
+// 默认规则: 首次->20小时前-现在  其他->上次发送成功-现在
+//def default_split_usm_time = 3 * 60 * 60 * 1000
+def default_split_usm_time = 0
 //********************子项目控制，只有在isReleases=false时才生效*********************
 // 宿主包类型，不需要修改，自动根据子版本强约束。
 // 宿主包(jar):true , 热修复包(dex):false
@@ -88,6 +92,7 @@ android {
 //        buildConfigField "String", "json_proguard", "\"${jp}\""
         buildConfigField "String", "DEMO_APPKEY", "\"${demoAppkey}\""
         buildConfigField "int", "DEF_REQ_HOUR", "${default_request_hours}"
+        buildConfigField "long", "TIME_USM_SPLIT", "${default_split_usm_time}"
         buildConfigField "String", "SDK_VERSION", "\"${sdkv}\""
         buildConfigField "String", "STRING_FOG_KEY", "\"${ver}\""
         buildConfigField "boolean", "IS_HOST", "${isPackageJar}"
