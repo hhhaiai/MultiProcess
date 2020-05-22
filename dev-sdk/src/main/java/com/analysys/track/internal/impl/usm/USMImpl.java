@@ -191,7 +191,7 @@ public class USMImpl {
                                 }
                             } catch (Throwable e) {
                             }
-                            arr.put(openEvent.toJsonForMatTime());
+                            arr.put(openEvent.toJson());
                         }
                     } catch (Throwable e) {
                         if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -263,7 +263,7 @@ public class USMImpl {
 
                             //大于3秒的才算做oc,一闪而过的不算
                             if (openEvent.getCloseTime() - openEvent.getOpenTime() >= EGContext.TIME_SECOND * 3) {
-                                jsonArray.put(openEvent.toJsonForMatTime());
+                                jsonArray.put(openEvent.toJson());
                             }
                             if (getEventType(event) == UsageEvents.Event.MOVE_TO_FOREGROUND
                                     || getEventType(event) == UsageEvents.Event.ACTIVITY_RESUMED) {
