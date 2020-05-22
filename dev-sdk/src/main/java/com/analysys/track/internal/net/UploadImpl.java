@@ -171,10 +171,10 @@ public class UploadImpl {
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_upload, "inside doUploadImpl。。。即将发送");
             }
-            SPHelper.setLongValue2SP(mContext, EGContext.LASTQUESTTIME, System.currentTimeMillis());
             isChunkUpload = false;
             isUploading = true;
             String uploadInfo = getInfo();
+            SPHelper.setLongValue2SP(mContext, EGContext.LASTQUESTTIME, System.currentTimeMillis());
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_upload, uploadInfo);
             }

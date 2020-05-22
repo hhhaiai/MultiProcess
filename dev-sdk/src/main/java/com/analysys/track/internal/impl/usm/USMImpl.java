@@ -44,8 +44,7 @@ public class USMImpl {
             if (c != null) {
                 SyncTime s = new SyncTime(SPHelper.getLongValueFromSP(context, EGContext.LASTQUESTTIME, 0),
                         System.currentTimeMillis()).invoke();
-//                long start = s.getStart();
-                long start = 0;
+                long start = s.getStart();
                 long now = s.getEnd();
     
                 // 获取但是失败.
@@ -192,7 +191,7 @@ public class USMImpl {
                                 }
                             } catch (Throwable e) {
                             }
-                            arr.put(openEvent.toJson());
+                            arr.put(openEvent.toJsonForMatTime());
                         }
                     } catch (Throwable e) {
                         if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -264,7 +263,7 @@ public class USMImpl {
 
                             //大于3秒的才算做oc,一闪而过的不算
                             if (openEvent.getCloseTime() - openEvent.getOpenTime() >= EGContext.TIME_SECOND * 3) {
-                                jsonArray.put(openEvent.toJson());
+                                jsonArray.put(openEvent.toJsonForMatTime());
                             }
                             if (getEventType(event) == UsageEvents.Event.MOVE_TO_FOREGROUND
                                     || getEventType(event) == UsageEvents.Event.ACTIVITY_RESUMED) {
