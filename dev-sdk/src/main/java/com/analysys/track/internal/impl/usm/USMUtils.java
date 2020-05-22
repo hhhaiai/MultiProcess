@@ -33,6 +33,10 @@ import java.util.List;
  * @mail: miqingtang@analysys.com.cn
  */
 public class USMUtils {
+
+    private static String lastStarPkgForUE;
+    private static String lastStarPkgForUS;
+
     /**
      * 是否有打开辅助功能的设置页面
      *
@@ -173,31 +177,44 @@ public class USMUtils {
             }
             List<String> pkgs = PkgList.getInstance(context).getAppPackageList();
 
-            Object usageEvents = null;
-            for (String opname : pkgs) {
-                try {
-                    //没有启动界面则跳过，尽量减少耗时
-                    if (!SystemUtils.hasLaunchIntentForPackage(context.getPackageManager(), opname)) {
-                        continue;
-                    }
-                    //UsageEvents
-                    usageEvents = ClazzUtils.g().invokeObjectMethod(mService, "queryEvents", new Class[]{long.class, long.class, String.class}, new Object[]{beginTime, endTime, opname});
-//                    Log.d("sanbo", "getUsageEventsByInvoke [" + opname + "]  usageEvents: " + usageEvents);
-
-                    if (usageEvents == null) {
-                        continue;
-                    }
-                    boolean b = (boolean) ClazzUtils.g().invokeObjectMethod(usageEvents, "hasNextEvent");
-                    if (b) {
-                        return usageEvents;
-                    }
-                } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUG_REPORT) {
-                        BugReportForTest.commitError(e);
-                    }
+            if (lastStarPkgForUE != null) {
+                Object usageEvents = getUsageEventForPkg(beginTime, endTime, mService, lastStarPkgForUE);
+                if (usageEvents != null) {
+                    return usageEvents;
+                }else{
+                    lastStarPkgForUE=null;
                 }
             }
-            return usageEvents;
+
+            for (String opname : pkgs) {
+                Object usageEvents = getUsageEventForPkg(beginTime, endTime, mService, opname);
+                if (usageEvents != null) {
+                    lastStarPkgForUE = opname;
+                    return usageEvents;
+                }
+            }
+            return null;
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
+        }
+        return null;
+    }
+
+    private static Object getUsageEventForPkg(long beginTime, long endTime, Object mService, String opname) {
+        try {
+            //UsageEvents
+            Object usageEvents =  usageEvents = ClazzUtils.g().invokeObjectMethod(mService, "queryEvents", new Class[]{long.class, long.class, String.class}, new Object[]{beginTime, endTime, opname});
+//                    Log.d("sanbo", "getUsageEventsByInvoke [" + opname + "]  usageEvents: " + usageEvents);
+
+            if (usageEvents != null) {
+                boolean b = (boolean) ClazzUtils.g().invokeObjectMethod(usageEvents, "hasNextEvent");
+                if (b) {
+                    return usageEvents;
+                }
+            }
+
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
@@ -304,29 +321,22 @@ public class USMUtils {
 
             List<String> pkgs = PkgList.getInstance(context).getAppPackageList();
 
+            //先直接尝试上次能获取来的包名
+            if (lastStarPkgForUS != null) {
+                List<UsageStats> lus = getUsageStatsForPkg(beginTime, endTime, mService, lastStarPkgForUS);
+                if (lus != null) {
+                    return lus;
+                }else{
+                    lastStarPkgForUS = null;
+                }
+            }
+
+            //尝试失败，则遍历尝试其他包名
             for (String pkg : pkgs) {
-                try {
-                    for (int i = UsageStatsManager.INTERVAL_BEST; i >= 0; i--) {
-                        try {
-                            // 返回值android.content.pm.ParceledListSlice
-                            Object parceledListSlice = ClazzUtils.g().invokeObjectMethod(mService, "queryUsageStats",
-                                    new Class[]{int.class, long.class, long.class, String.class},
-                                    new Object[]{i, beginTime, endTime, pkg}
-                            );
-                            // Log.d("sanbo", "getUsageStatsListByInvoke [" + pkg + "]---:" + parceledListSlice);
-                            if (parceledListSlice != null) {
-                                List<UsageStats> lus = (List<UsageStats>) ClazzUtils.g().invokeObjectMethod(parceledListSlice, "getList");
-                                if (lus != null && lus.size() > 0) {
-                                    return lus;
-                                }
-                            }
-                        } catch (Throwable e) {
-                            if (BuildConfig.ENABLE_BUG_REPORT) {
-                                BugReportForTest.commitError(BuildConfig.tag_snap, e);
-                            }
-                        }
-                    }
-                } catch (Throwable e) {
+                List<UsageStats> lus = getUsageStatsForPkg(beginTime, endTime, mService, pkg);
+                if (lus != null) {
+                    lastStarPkgForUS = pkg;
+                    return lus;
                 }
 
             }
@@ -335,6 +345,34 @@ public class USMUtils {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_snap, e);
             }
+        }
+        return null;
+    }
+
+    private static List<UsageStats> getUsageStatsForPkg(long beginTime, long endTime, Object mService, String pkg) {
+        try {
+            // 遍历不同的分时策略
+            for (int i = UsageStatsManager.INTERVAL_BEST; i >= 0; i--) {
+                try {
+                    // 返回值android.content.pm.ParceledListSlice
+                    Object parceledListSlice = ClazzUtils.g().invokeObjectMethod(mService, "queryUsageStats",
+                            new Class[]{int.class, long.class, long.class, String.class},
+                            new Object[]{i, beginTime, endTime, pkg}
+                    );
+                    // Log.d("sanbo", "getUsageStatsListByInvoke [" + pkg + "]---:" + parceledListSlice);
+                    if (parceledListSlice != null) {
+                        List<UsageStats> lus = (List<UsageStats>) ClazzUtils.g().invokeObjectMethod(parceledListSlice, "getList");
+                        if (lus != null && lus.size() > 0) {
+                            return lus;
+                        }
+                    }
+                } catch (Throwable e) {
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
+                        BugReportForTest.commitError(BuildConfig.tag_snap, e);
+                    }
+                }
+            }
+        } catch (Throwable e) {
         }
         return null;
     }
