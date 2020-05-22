@@ -279,8 +279,6 @@ public class AnalysysInternal {
                 SPHelper.setIntValue2SP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, size + 1);
             }
         } else {
-//            initEguan(null, null, false);
-            aliave();
             ReceiverImpl.getInstance().process(context, intent);
         }
     }
