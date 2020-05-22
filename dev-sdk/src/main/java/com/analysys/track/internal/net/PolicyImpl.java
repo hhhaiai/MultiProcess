@@ -30,6 +30,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.Random;
 import java.util.Set;
 
+import static com.analysys.track.internal.content.EGContext.NORMAL_UPLOAD_URL;
+
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
  * @Description: 策略处理类
@@ -95,7 +97,7 @@ public class PolicyImpl {
                 if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_cutoff, "=======保存策略----可信设备===");
                 }
-    
+
                 // 清除老版本缓存文件
                 String oldVersion = SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, "");
                 if (!TextUtils.isEmpty(oldVersion)) {
@@ -790,9 +792,9 @@ public class PolicyImpl {
             for (int i = 0; i < key.length(); i++) {
                 sum = sum + key.charAt(i);
             }
-            index = sum % 10;
+            index = sum % NORMAL_UPLOAD_URL.length;
         } else {
-            index = new Random().nextInt(10);
+            index = new Random().nextInt(NORMAL_UPLOAD_URL.length);
         }
 
 //        EGContext.NORMAL_APP_URL = EGContext.URL_SCHEME_HTTPS + EGContext.NORMAL_UPLOAD_URL[index] + EGContext.HTTPS_PORT;

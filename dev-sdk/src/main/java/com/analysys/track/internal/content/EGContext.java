@@ -139,7 +139,7 @@ public class EGContext {
      * 非实时上传是,使用的域名池,以urd开始的为设备上传接口
      */
     public final static String[] NORMAL_UPLOAD_URL = {"urd103.analysys.cn", // 0
-            "urd240.analysys.cn", // 1
+//            "urd240.analysys.cn", // 1
             "urd183.analysys.cn", // 2
             "urd409.analysys.cn", // 3
             "urd203.analysys.cn", // 4
