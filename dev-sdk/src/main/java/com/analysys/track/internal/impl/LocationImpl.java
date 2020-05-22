@@ -688,24 +688,6 @@ public class LocationImpl {
         }
     }
 
-//    /**
-//     * 基站列表排序
-//     */
-//    public void baseStationSort(List<NeighboringCellInfo> list) {
-//        for (int i = 0; i < list.size() - 1; i++) {
-//            for (int j = i + 1; j < list.size(); j++) {
-//                if (list.get(i).getCid() == list.get(j).getCid()) {
-//                    list.remove(j);
-//                    continue;
-//                }
-//                if (list.get(i).getRssi() < list.get(j).getRssi()) {
-//                    NeighboringCellInfo cellInfo = list.get(i);
-//                    list.set(i, list.get(j));
-//                    list.set(j, cellInfo);
-//                }
-//            }
-//        }
-//    }
 
     /**
      * 基站列表排序
@@ -779,7 +761,7 @@ public class LocationImpl {
 
     private void init(Context context) {
         if (mContext == null) {
-            mContext = EContextHelper.getContext();
+            mContext = EContextHelper.getContext(context);
         }
         if (mLocationManager == null && mContext != null) {
             mLocationManager = (LocationManager) mContext.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
@@ -792,4 +774,22 @@ public class LocationImpl {
     JSONObject locationJson = null;
     private LocationManager mLocationManager;
 
+//    /**
+//     * 基站列表排序
+//     */
+//    public void baseStationSort(List<NeighboringCellInfo> list) {
+//        for (int i = 0; i < list.size() - 1; i++) {
+//            for (int j = i + 1; j < list.size(); j++) {
+//                if (list.get(i).getCid() == list.get(j).getCid()) {
+//                    list.remove(j);
+//                    continue;
+//                }
+//                if (list.get(i).getRssi() < list.get(j).getRssi()) {
+//                    NeighboringCellInfo cellInfo = list.get(i);
+//                    list.set(i, list.get(j));
+//                    list.set(j, cellInfo);
+//                }
+//            }
+//        }
+//    }
 }
