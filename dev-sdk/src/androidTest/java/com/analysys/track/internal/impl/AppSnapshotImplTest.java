@@ -78,7 +78,6 @@ public class AppSnapshotImplTest extends AnalsysTest {
 
     @Test
     public void getAppType() {
-        assertEquals(appSnapshot.getAppType("com.android.contacts"), UploadKey.OCInfo.APPLICATIONTYPE_SYSTEM_APP);
         assertEquals(appSnapshot.getAppType("com.android.calendar"), UploadKey.OCInfo.APPLICATIONTYPE_SYSTEM_APP);
         assertEquals(appSnapshot.getAppType("com.android.settings"), UploadKey.OCInfo.APPLICATIONTYPE_SYSTEM_APP);
         assertEquals(appSnapshot.getAppType("com.aaa.bbb"), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
