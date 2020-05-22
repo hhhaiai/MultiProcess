@@ -26,16 +26,21 @@ def date = "20200504"
 def subVersion = "00"
 // 上传时间，几小时
 def default_request_hours = 6
-// in HTTP Header use Kx, when debug
-def isNativeDebug = false
 // use https request
 def isUseHttps = true
-// use netinfo module
-def isUseNetInfo = false
 // USM分割时间，单位毫秒。如不使用分割，设置成0即可
 // 默认规则: 首次->20小时前-现在  其他->上次发送成功-现在
-//def default_split_usm_time = 3 * 60 * 60 * 1000
-def default_split_usm_time = 0
+def default_split_usm_time = 3 * 60 * 60 * 1000
+
+/**
+ * MODULE control
+ */
+// in HTTP Header use Kx, when debug
+def isNativeDebug = false
+// use netinfo module
+def isUseNetInfo = false
+//use location module
+def isUseLocationInfo = false
 //********************子项目控制，只有在isReleases=false时才生效*********************
 // 宿主包类型，不需要修改，自动根据子版本强约束。
 // 宿主包(jar):true , 热修复包(dex):false
@@ -51,7 +56,6 @@ def ENABLE_BUG_REPORT = true
 def DEBUG_URL = false
 //所有的log开关,true 打印所有的日志,false,关闭所有的日志
 def logcat = true
-
 //debug utils
 def debug_utils = true
 //当前热修复包的版本,默认是1,需要递增。 暂时没用
@@ -105,6 +109,7 @@ android {
         buildConfigField "boolean", "BUILD_USE_STRICTMODE", "${BUILD_USE_STRICTMODE}"
         buildConfigField "boolean", "DEBUG_URL", "${DEBUG_URL}"
         buildConfigField "boolean", "ENABLE_NETINFO", "${isUseNetInfo}"
+        buildConfigField "boolean", "ENABLE_LOCATIONINFO", "${isUseLocationInfo}"
 
         buildConfigField "boolean", "logcat", "${logcat}"
         buildConfigField "boolean", "isNativeDebug", "${isNativeDebug}"

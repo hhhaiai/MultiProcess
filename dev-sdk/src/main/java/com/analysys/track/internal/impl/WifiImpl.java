@@ -47,36 +47,39 @@ public class WifiImpl {
      */
     public JSONArray getWifiInfo() {
         JSONArray jar = new JSONArray();
-        try {
-            if (!PermissionUtils.checkPermission(mContext, Manifest.permission.CHANGE_WIFI_STATE)) {
-                return null;
-            }
-            if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_WIFI_STATE)
-                    && PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                WifiManager wm = (WifiManager) mContext.getApplicationContext().getSystemService(WIFI_SERVICE);
-                if (wm != null && wm.getWifiState() == WifiManager.WIFI_STATE_ENABLED) {
-                    List<ScanResult> list = wm.getScanResults();
-                    wifiSort(list);
-                    ScanResult s = null;
-                    JSONObject jsonObject = null;
-                    for (int i = 0; i < list.size(); i++) {
-                        if (i < 5) {
-                            s = list.get(i);
-                            jsonObject = new JSONObject();
-                            jsonObject = getWifiInfoObj(jsonObject, s.SSID, s.BSSID, s.level, s.capabilities,
-                                    s.frequency);
-                            if (jsonObject != null && jsonObject.length() > 0) {
-                                jar.put(jsonObject);
+        if (BuildConfig.ENABLE_LOCATIONINFO) {
+            try {
+                if (!PermissionUtils.checkPermission(mContext, Manifest.permission.CHANGE_WIFI_STATE)) {
+                    return null;
+                }
+                if (PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_WIFI_STATE)
+                        && PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                    WifiManager wm = (WifiManager) mContext.getApplicationContext().getSystemService(WIFI_SERVICE);
+                    if (wm != null && wm.getWifiState() == WifiManager.WIFI_STATE_ENABLED) {
+                        List<ScanResult> list = wm.getScanResults();
+                        wifiSort(list);
+                        ScanResult s = null;
+                        JSONObject jsonObject = null;
+                        for (int i = 0; i < list.size(); i++) {
+                            if (i < 5) {
+                                s = list.get(i);
+                                jsonObject = new JSONObject();
+                                jsonObject = getWifiInfoObj(jsonObject, s.SSID, s.BSSID, s.level, s.capabilities,
+                                        s.frequency);
+                                if (jsonObject != null && jsonObject.length() > 0) {
+                                    jar.put(jsonObject);
+                                }
                             }
                         }
                     }
                 }
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
+                    BugReportForTest.commitError(e);
+                }
             }
         }
+    
         return jar;
     }
 
@@ -97,25 +100,28 @@ public class WifiImpl {
 
     public JSONObject getWifiInfoObj(JSONObject jsonObject, String ssid, String bssid, int level, String capabilities,
                                      int frequency) {
-        try {
-            if (jsonObject == null) {
-                jsonObject = new JSONObject();
-            }
-            JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.SSID, ssid,
-                    DataController.SWITCH_OF_SSID);
-            JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.BSSID, bssid,
-                    DataController.SWITCH_OF_BSSID);
-            JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.Level, level,
-                    DataController.SWITCH_OF_LEVEL);
-            JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.Capabilities,
-                    capabilities, DataController.SWITCH_OF_CAPABILITIES);
-            JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.Frequency, frequency,
-                    DataController.SWITCH_OF_FREQUENCY);
-        } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(t);
+        if (jsonObject == null) {
+            jsonObject = new JSONObject();
+        }
+        if (BuildConfig.ENABLE_LOCATIONINFO) {
+            try {
+                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.SSID, ssid,
+                        DataController.SWITCH_OF_SSID);
+                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.BSSID, bssid,
+                        DataController.SWITCH_OF_BSSID);
+                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.Level, level,
+                        DataController.SWITCH_OF_LEVEL);
+                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.Capabilities,
+                        capabilities, DataController.SWITCH_OF_CAPABILITIES);
+                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.Frequency, frequency,
+                        DataController.SWITCH_OF_FREQUENCY);
+            } catch (Throwable t) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
+                    BugReportForTest.commitError(t);
+                }
             }
         }
+        
         return jsonObject;
     }
 

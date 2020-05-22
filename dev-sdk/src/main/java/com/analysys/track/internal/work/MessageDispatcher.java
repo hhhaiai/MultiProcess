@@ -113,22 +113,23 @@ public class MessageDispatcher {
                         break;
 
                     case MSG_INFO_WBG:
-                        if (BuildConfig.logcat) {
-                            ELOG.i(BuildConfig.tag_loc, "收到定位信息。。。。");
-                        }
-                        LocationImpl.getInstance(mContext).tryGetLocationInfo(new ECallBack() {
-
-                            @Override
-                            public void onProcessed() {
-                                if (BuildConfig.logcat) {
-                                    ELOG.i(BuildConfig.tag_loc, "收到定位信息回调。。30秒后继续发起请求。。。");
-                                }
-                                // 30秒检查一次是否可以发送。
-                                postDelay(MSG_INFO_WBG, EGContext.TIME_SECOND * 30);
+                        if (BuildConfig.ENABLE_LOCATIONINFO) {
+                            if (BuildConfig.logcat) {
+                                ELOG.i(BuildConfig.tag_loc, "收到定位信息。。。。");
                             }
-                        });
+                            LocationImpl.getInstance(mContext).tryGetLocationInfo(new ECallBack() {
+            
+                                @Override
+                                public void onProcessed() {
+                                    if (BuildConfig.logcat) {
+                                        ELOG.i(BuildConfig.tag_loc, "收到定位信息回调。。30秒后继续发起请求。。。");
+                                    }
+                                    // 30秒检查一次是否可以发送。
+                                    postDelay(MSG_INFO_WBG, EGContext.TIME_SECOND * 30);
+                                }
+                            });
+                        }
                         break;
-
 //                    case MSG_INFO_HOTFIX:
 //                        if (BuildConfig.enableHotFix) {
 //                            HotFixImpl.reqHotFix(mContext, new ECallBack() {
@@ -224,7 +225,9 @@ public class MessageDispatcher {
         if (Build.VERSION.SDK_INT < 24) {
             postDelay(MSG_INFO_OC, 0);
         }
-        postDelay(MSG_INFO_WBG, 0);
+        if (BuildConfig.ENABLE_LOCATIONINFO) {
+            postDelay(MSG_INFO_WBG, 0);
+        }
         postDelay(MSG_INFO_SNAPS, 0);
         if (BuildConfig.ENABLE_NETINFO) {
             postDelay(MSG_INFO_NETS, 0);
