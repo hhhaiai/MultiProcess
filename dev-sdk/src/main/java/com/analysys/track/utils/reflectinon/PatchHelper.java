@@ -23,41 +23,49 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
- * @Description: 热更使用类
- * @Version: 1.0
+ * @Description: patch utils. update
+ * @Version: 2.0
  * @Create: 2019-07-27 16:13:28
  * @author: sanbo
- * @mail: xueyongfu@analysys.com.cn
  */
 public class PatchHelper {
 
     private static boolean isTryInit = false;
-
-
-    public static void loadsIfExit(final Context context) {
+    
+    public static void prepare(final Context ctx) {
         SystemUtils.runOnWorkThread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    if (BuildConfig.logcat) {
-                        ELOG.i(BuildConfig.tag_cutoff, "inside....loadsIfExit");
+                    Context context = EContextHelper.getContext(ctx);
+    
+                    // 1.delete old file
+                    FileUitls.getInstance(context).deleteFileAtFilesDir(EGContext.PATCH_OLD_CACHE_DIR);
+                    // 2.check policyv
+                    String patchPolicyV = SPHelper.getStringValueFromSP(context, EGContext.PATCH_VERSION_POLICY, "");
+                    if (TextUtils.isEmpty(patchPolicyV)) {
+                        clear(context);
+                        return;
                     }
-                    Context c = EContextHelper.getContext(context);
-                    /**
-                     *  if debug, will clear cache
-                     */
-                    if (DebugDev.get(c).isDebugDevice()) {
+                    // 3.check new dir
+                    File newDIr = new File(context.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR);
+                    if (!newDIr.exists()) {
+                        clear(context);
+                        return;
+                    }
+                    // 4. check debug device
+                    if (DebugDev.get(context).isDebugDevice()) {
                         if (BuildConfig.logcat) {
-                            ELOG.i(BuildConfig.tag_cutoff, "....loadsIfExit  will clearPatch");
+                            ELOG.i(BuildConfig.tag_cutoff, "....prepare  will clearPatch");
                         }
-                        PatchHelper.clearPatch(c);
+                        clear(context);
                         return;
                     }
                     if (!isTryInit) {
                         if (BuildConfig.logcat) {
                             ELOG.i(BuildConfig.tag_cutoff, "....loadsIfExit  will loads");
                         }
-                        loads(c);
+                        loads(context);
                     }
                 } catch (Throwable e) {
                     if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -66,8 +74,40 @@ public class PatchHelper {
                 }
             }
         });
+        
     }
-
+    
+    /**
+     * 清除SP中的策略号、数据及缓存目录
+     *
+     * @param ctx
+     */
+    public static void clear(Context ctx) {
+        try {
+            //清除新版本存储目录
+            FileUitls.getInstance(ctx).deleteFileAtFilesDir(EGContext.PATCH_NET_CACHE_DIR);
+            FileUitls.getInstance(ctx).deleteFileAtFilesDir(EGContext.PATCH_DIR);
+            FileUitls.getInstance(ctx).deleteFileAtFilesDir(EGContext.PATCH_CF_DIR);
+            // 清除patch部分缓存
+            SPHelper.removeKey(ctx, UploadKey.Response.PatchResp.PATCH_METHODS);
+            SPHelper.removeKey(ctx, UploadKey.Response.PatchResp.PATCH_SIGN);
+            SPHelper.removeKey(ctx, UploadKey.Response.PatchResp.PATCH_VERSION);
+            
+            String patchPolicyV = SPHelper.getStringValueFromSP(ctx, EGContext.PATCH_VERSION_POLICY, "");
+            String curPolicyV = SPHelper.getStringValueFromSP(ctx, UploadKey.Response.RES_POLICY_VERSION, "");
+            
+            if (!TextUtils.isEmpty(patchPolicyV) && patchPolicyV.equals(curPolicyV)) {
+                // not null. current policyversion same as patch version, then clean then
+                SPHelper.removeKey(ctx, UploadKey.Response.RES_POLICY_VERSION);
+                SPHelper.removeKey(ctx, EGContext.PATCH_VERSION_POLICY);
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
+        }
+    }
+    
     public static void loads(final Context context) {
         try {
             isTryInit = true;
@@ -76,35 +116,28 @@ public class PatchHelper {
             }
             Context ctx = EContextHelper.getContext(context);
             if (ctx != null) {
-                File old = new File(context.getFilesDir(), EGContext.PATCH_OLD_CACHE_DIR);
-                File dir = new File(context.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR);
-                // rename to newest
-                FileUitls.getInstance(context).rename(old, dir, true);
-                // make sure dir exit
-                if (!dir.exists()) {
-                    dir.mkdirs();
-                }
                 String version = SPHelper.getStringValueFromSP(ctx, UploadKey.Response.PatchResp.PATCH_VERSION, "");
                 if (BuildConfig.logcat) {
                     ELOG.w(BuildConfig.tag_cutoff, "------loads------version: " + version);
                 }
                 if (TextUtils.isEmpty(version)) {
+                    clear(ctx);
                     return;
                 }
-                // 保存文件到本地
-                File[] fs = new File[]{
-                        new File(dir, "patch_" + version + ".jar"),
-                        new File(dir, version + ".jar"),
-                        new File(dir, "null.jar"),
-                };
-                for (File f : fs) {
-                    if (f.exists() && f.isFile()) {
-                        if (BuildConfig.logcat) {
-                            ELOG.d(BuildConfig.tag_cutoff, "------loads-----file[ " + f.getAbsolutePath() + " ] is exists, will real loads");
-                        }
-                        loads(context, f);
-                    }
+                File dir = new File(context.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR);
+                if (!dir.exists()) {
+                    clear(ctx);
+                    return;
                 }
+                File file = new File(dir, String.format(EGContext.PATCH_NAME_FILE, version));
+                if (!file.exists() || !file.isFile()) {
+                    clear(ctx);
+                    return;
+                }
+                if (BuildConfig.logcat) {
+                    ELOG.d(BuildConfig.tag_cutoff, "------loads-----file[ " + file.getAbsolutePath() + " ] is exists, will real loads");
+                    }
+                loads(context, file);
                 if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_cutoff, "------loads--will---out  ");
                 }
@@ -114,71 +147,6 @@ public class PatchHelper {
                 BugReportForTest.commitError(e);
             }
         }
-
-    }
-
-    /**
-     * 清除缓存
-     *
-     * @param context
-     */
-    public static void clearPatch(final Context context) {
-
-//        // 先不广播里处理，广播里信息，先空置
-//        SystemUtils.notifyClearCache(context, EGContext.NotifyStatus.NOTIFY_DEBUG);
-        EThreadPool.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (BuildConfig.logcat) {
-                        ELOG.i(BuildConfig.tag_cutoff, "-------------inside clearPatch.-----");
-                    }
-                    Context cc = EContextHelper.getContext(context);
-                    // 清除老版本缓存文件
-                    String oldVersion = SPHelper.getStringValueFromSP(cc, UploadKey.Response.PatchResp.PATCH_VERSION, "");
-                    if (!TextUtils.isEmpty(oldVersion)) {
-                        new File(cc.getFilesDir(), oldVersion + ".jar").deleteOnExit();
-                    }
-                    if (BuildConfig.logcat) {
-                        ELOG.i(BuildConfig.tag_cutoff, "---------- clearPatch.---clearn oldversion:  " + oldVersion);
-                    }
-                    //清除新版本存储目录
-                    FileUitls.getInstance(cc).deleteFile(EGContext.PATCH_OLD_CACHE_DIR);
-                    FileUitls.getInstance(cc).deleteFile(EGContext.PATCH_NET_CACHE_DIR);
-                    FileUitls.getInstance(cc).deleteFile(EGContext.PATCH_DIR);
-                    // 清除patch部分缓存
-                    SPHelper.removeKey(context, UploadKey.Response.PatchResp.PATCH_METHODS);
-                    SPHelper.removeKey(context, UploadKey.Response.PatchResp.PATCH_SIGN);
-                    SPHelper.removeKey(context, UploadKey.Response.PatchResp.PATCH_VERSION);
-//                //  清除策略号
-//                SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
-
-                    if (BuildConfig.logcat) {
-                        ELOG.i(BuildConfig.tag_cutoff, "---------- clearPatch.---清除patch部分缓存");
-                    }
-                    cleanPatchPolicy(context, "---------- clearPatch.---patchPolicyV: ", 4, 5);
-                    EGContext.patch_runing = false;
-                } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUG_REPORT) {
-                        BugReportForTest.commitError(e);
-                    }
-                }
-            }
-        }, 5 * 1000);
-    }
-
-    private static void cleanPatchPolicy(Context context, String s, int i, int i2) {
-        String patchPolicyV = SPHelper.getStringValueFromSP(context, EGContext.PATCH_VERSION_POLICY, "");
-        String curPolicyV = SPHelper.getStringValueFromSP(context, UploadKey.Response.RES_POLICY_VERSION, "");
-
-        if (BuildConfig.logcat) {
-            ELOG.i(BuildConfig.tag_cutoff, s + patchPolicyV + "----curPolicyV: " + curPolicyV);
-        }
-        if (!TextUtils.isEmpty(patchPolicyV) && patchPolicyV.equals(curPolicyV)) {
-            // not null. current policyversion same as patch version, then clean then
-            SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
-            SPHelper.removeKey(context, EGContext.PATCH_VERSION_POLICY);
-        }
     }
 
 
@@ -186,30 +154,18 @@ public class PatchHelper {
         if (BuildConfig.logcat) {
             ELOG.w(BuildConfig.tag_cutoff, "-------inside--- real  loads.---");
         }
-
-        // @todo need test patch1-->patch2
-        new Thread(new Runnable() {
+        EThreadPool.postDelayed(new Runnable() {
             @Override
             public void run() {
-
-                try {
-                    if (BuildConfig.logcat) {
-                        ELOG.i(BuildConfig.tag_cutoff, "---------- will loadInThread.--- ");
-                    }
-                    Thread.sleep(5 * 1000);
-                    boolean re = loadInThread(context, file);
-                    if (BuildConfig.logcat) {
-                        ELOG.e(BuildConfig.tag_cutoff, "---------- out.--- loadInThread  result: " + re);
-                    }
-                } catch (Throwable e) {
-                    if (BuildConfig.logcat) {
-                        ELOG.e(BuildConfig.tag_cutoff, e);
-                    }
+                if (BuildConfig.logcat) {
+                    ELOG.i(BuildConfig.tag_cutoff, "---------- will loadInThread.--- ");
+                }
+                boolean re = loadInThread(context, file);
+                if (BuildConfig.logcat) {
+                    ELOG.e(BuildConfig.tag_cutoff, "---------- out.--- loadInThread  result: " + re);
                 }
             }
-        }
-        ).start();
-
+        }, 5 * EGContext.TIME_SECOND);
     }
 
     /**
@@ -222,7 +178,6 @@ public class PatchHelper {
      */
     private static boolean loadInThread(Context context, File file) {
         try {
-
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_cutoff, "  loadInThread() patch:" + file.getAbsolutePath());
             }
@@ -271,7 +226,7 @@ public class PatchHelper {
     public static void tryLoadMethod(Context context, String className, String methodName, String argsType, String argsBody, File file) {
         try {
             if (BuildConfig.logcat) {
-                ELOG.i(BuildConfig.tag_cutoff, " .  tryLoadMethod()  [" + className + " , " + methodName + " ," + argsType + " , " + argsBody + "]");
+                ELOG.i(BuildConfig.tag_cutoff, " tryLoadMethod()  [" + className + " , " + methodName + " ," + argsType + " , " + argsBody + "]");
             }
 
             Class<?>[] argsTypeClazzs = null;
@@ -317,6 +272,9 @@ public class PatchHelper {
             }
             loadStatic(context, file, className, methodName, argsTypeClazzs, argsValues);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
         }
     }
 
@@ -342,6 +300,7 @@ public class PatchHelper {
             if (c != null) {
                 // 2. invoke method
                 ClazzUtils.g().invokeStaticMethod(c, methodName, pareTyples, pareVaules);
+                EGContext.patch_runing = true;
             } else {
                 if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_cutoff, " loadStatic failed[get class load failed]......");
@@ -350,12 +309,13 @@ public class PatchHelper {
 //                SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
                 // 加载失败，可能下发有问题，为避免出问题，暂停删除，特殊场景会死循环
 //                cleanPatchPolicy(context, "---------- loadStatic.---patchPolicyV: ", 901, 902);
+                EGContext.patch_runing = false;
             }
-            EGContext.patch_runing = true;
+    
         } catch (Throwable igone) {
             EGContext.patch_runing = false;
-            if (BuildConfig.logcat) {
-                ELOG.e(igone);
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(igone);
             }
         }
         if (BuildConfig.logcat) {
@@ -399,6 +359,105 @@ public class PatchHelper {
 //            }
 //        }
 //    }
+//
+//    public static void loadsIfExit(final Context context) {
+//        SystemUtils.runOnWorkThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    if (BuildConfig.logcat) {
+//                        ELOG.i(BuildConfig.tag_cutoff, "inside....loadsIfExit");
+//                    }
+//                    Context c = EContextHelper.getContext(context);
+//                    /**
+//                     *  if debug, will clear cache
+//                     */
+//                    if (DebugDev.get(c).isDebugDevice()) {
+//                        if (BuildConfig.logcat) {
+//                            ELOG.i(BuildConfig.tag_cutoff, "....loadsIfExit  will clearPatch");
+//                        }
+//                        PatchHelper.clearPatch(c);
+//                        return;
+//                    }
+//                    if (!isTryInit) {
+//                        if (BuildConfig.logcat) {
+//                            ELOG.i(BuildConfig.tag_cutoff, "....loadsIfExit  will loads");
+//                        }
+//                        loads(c);
+//                    }
+//                } catch (Throwable e) {
+//                    if (BuildConfig.ENABLE_BUG_REPORT) {
+//                        BugReportForTest.commitError(e);
+//                    }
+//                }
+//            }
+//        });
+//    }
+//
+//    /**
+//     * 清除缓存
+//     *
+//     * @param context
+//     */
+//    public static void clearPatch(final Context context) {
+//
+////        // 先不广播里处理，广播里信息，先空置
+////        SystemUtils.notifyClearCache(context, EGContext.NotifyStatus.NOTIFY_DEBUG);
+//        EThreadPool.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    if (BuildConfig.logcat) {
+//                        ELOG.i(BuildConfig.tag_cutoff, "-------------inside clearPatch.-----");
+//                    }
+//                    Context cc = EContextHelper.getContext(context);
+//                    // 清除老版本缓存文件
+//                    String oldVersion = SPHelper.getStringValueFromSP(cc, UploadKey.Response.PatchResp.PATCH_VERSION, "");
+//                    if (!TextUtils.isEmpty(oldVersion)) {
+//                        new File(cc.getFilesDir(), oldVersion + ".jar").deleteOnExit();
+//                    }
+//                    if (BuildConfig.logcat) {
+//                        ELOG.i(BuildConfig.tag_cutoff, "---------- clearPatch.---clearn oldversion:  " + oldVersion);
+//                    }
+//                    //清除新版本存储目录
+//                    FileUitls.getInstance(cc).deleteFile(EGContext.PATCH_OLD_CACHE_DIR);
+//                    FileUitls.getInstance(cc).deleteFile(EGContext.PATCH_NET_CACHE_DIR);
+//                    FileUitls.getInstance(cc).deleteFile(EGContext.PATCH_DIR);
+//                    // 清除patch部分缓存
+//                    SPHelper.removeKey(context, UploadKey.Response.PatchResp.PATCH_METHODS);
+//                    SPHelper.removeKey(context, UploadKey.Response.PatchResp.PATCH_SIGN);
+//                    SPHelper.removeKey(context, UploadKey.Response.PatchResp.PATCH_VERSION);
+////                //  清除策略号
+////                SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
+//
+//                    if (BuildConfig.logcat) {
+//                        ELOG.i(BuildConfig.tag_cutoff, "---------- clearPatch.---清除patch部分缓存");
+//                    }
+//                    cleanPatchPolicy(context, "---------- clearPatch.---patchPolicyV: ", 4, 5);
+//                    EGContext.patch_runing = false;
+//                } catch (Throwable e) {
+//                    if (BuildConfig.ENABLE_BUG_REPORT) {
+//                        BugReportForTest.commitError(e);
+//                    }
+//                }
+//            }
+//        }, 5 * 1000);
+//    }
+//
+//    private static void cleanPatchPolicy(Context context, String s, int i, int i2) {
+//        String patchPolicyV = SPHelper.getStringValueFromSP(context, EGContext.PATCH_VERSION_POLICY, "");
+//        String curPolicyV = SPHelper.getStringValueFromSP(context, UploadKey.Response.RES_POLICY_VERSION, "");
+//
+//        if (BuildConfig.logcat) {
+//            ELOG.i(BuildConfig.tag_cutoff, s + patchPolicyV + "----curPolicyV: " + curPolicyV);
+//        }
+//        if (!TextUtils.isEmpty(patchPolicyV) && patchPolicyV.equals(curPolicyV)) {
+//            // not null. current policyversion same as patch version, then clean then
+//            SPHelper.removeKey(context, UploadKey.Response.RES_POLICY_VERSION);
+//            SPHelper.removeKey(context, EGContext.PATCH_VERSION_POLICY);
+//        }
+//    }
+
 }
 
 

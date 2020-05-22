@@ -49,7 +49,7 @@ public class FileUitls {
      * @param filePath 完整的文件路径
      */
     public void saveToFile(String info, String filePath) {
-        saveToFile(info, new File(filePath));
+        saveToFile(info, new File(filePath), false);
     }
 
     /**
@@ -57,8 +57,9 @@ public class FileUitls {
      *
      * @param info
      * @param file
+     * @param isAppend
      */
-    public void saveToFile(String info, File file) {
+    public void saveToFile(String info, File file, boolean isAppend) {
         FileOutputStream outputStream = null;
         BufferedWriter writer = null;
         try {
@@ -75,7 +76,7 @@ public class FileUitls {
             if (!file.exists()) {
                 return;
             }
-            outputStream = new FileOutputStream(file, false);
+            outputStream = new FileOutputStream(file, isAppend);
             writer = new BufferedWriter(new OutputStreamWriter(outputStream));
             writer.write(info);
             writer.flush();
@@ -211,8 +212,8 @@ public class FileUitls {
         }
         return data;
     }
-
-    public void deleteFile(String path) {
+    
+    public void deleteFileAtFilesDir(String path) {
         try {
             if (!TextUtils.isEmpty(path)) {
                 deleteFile(new File(mContext.getFilesDir(), path));
@@ -229,18 +230,14 @@ public class FileUitls {
             if (file == null || !file.exists()) {
                 return;
             }
-            if (file.isDirectory()) {
-                File[] files = file.listFiles();
-                if (files != null) {
-                    for (File item : files) {
-                        deleteFile(item);
-                    }
+            if (file.isFile()) {
+                file.delete();
+            } else {
+                for (File tm : file.listFiles()) {
+                    deleteFile(tm);
                 }
             }
-            boolean b = file.delete();
-            if (!b) {
-                file.deleteOnExit();
-            }
+            file.delete();
         } catch (Throwable e) {
         }
     }

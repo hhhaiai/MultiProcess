@@ -14,6 +14,7 @@ import com.analysys.track.internal.model.PolicyInfo;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.FileUitls;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.data.Memory2File;
 import com.analysys.track.utils.reflectinon.DebugDev;
@@ -82,7 +83,9 @@ public class PolicyImpl {
         SPHelper.setLongValue2SP(mContext, UploadKey.Response.RES_POLICY_TIMER_INTERVAL, timerInterval);
 
         String ctrlList = newPolicy.getCtrlList() == null ? "" : String.valueOf(newPolicy.getCtrlList());
-        SPHelper.setStringValue2SP(mContext, UploadKey.Response.RES_POLICY_CTRL_LIST, ctrlList);
+        if (!TextUtils.isEmpty(ctrlList)) {
+            SPHelper.setStringValue2SP(mContext, UploadKey.Response.RES_POLICY_CTRL_LIST, ctrlList);
+        }
         if (BuildConfig.logcat) {
             ELOG.i(BuildConfig.tag_cutoff, "=========保存策略 SP保存完毕 2222====");
         }
@@ -90,16 +93,17 @@ public class PolicyImpl {
             // 可信设备上再进行操作
             if (!DebugDev.get(mContext).isDebugDevice()) {
                 if (BuildConfig.logcat) {
-                    ELOG.i(BuildConfig.tag_cutoff, "=======保存策略 可信设备  3.1 ===");
+                    ELOG.i(BuildConfig.tag_cutoff, "=======保存策略----可信设备===");
                 }
-
+    
                 // 清除老版本缓存文件
                 String oldVersion = SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, "");
                 if (!TextUtils.isEmpty(oldVersion)) {
-                    new File(mContext.getFilesDir(), oldVersion + ".jar").deleteOnExit();
+                    FileUitls.getInstance(mContext).deleteFile(new File(mContext.getFilesDir(), oldVersion + ".jar"));
+                    FileUitls.getInstance(mContext).deleteFile(new File(mContext.getFilesDir(), EGContext.PATCH_OLD_CACHE_DIR + oldVersion + ".jar"));
+                    FileUitls.getInstance(mContext).deleteFile(new File(mContext.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR + oldVersion + ".jar"));
                     if (BuildConfig.logcat) {
-                        ELOG.i(BuildConfig.tag_cutoff, "=======清除老版本缓存文件 ====oldVersion: " + oldVersion + "--->"
-                                + new File(mContext.getFilesDir(), oldVersion + ".jar").exists());
+                        ELOG.i(BuildConfig.tag_cutoff, "=======保存策略前，清除老版本缓存文件完毕 ==== ");
                     }
                 }
                 //热更部分保存: 现在保存sign、version
@@ -145,16 +149,11 @@ public class PolicyImpl {
                 }
             } else {
                 if (BuildConfig.logcat) {
-                    ELOG.i(BuildConfig.tag_cutoff, "=========调试设备 清除本地缓存文件名  4.1====");
+                    ELOG.i(BuildConfig.tag_cutoff, "=========调试设备,清除本地策略===");
                 }
-                PatchHelper.clearPatch(mContext);
-
-                if (BuildConfig.logcat) {
-                    ELOG.i(BuildConfig.tag_cutoff, "=========调试设备  清除s本地文件  4.2 ====");
-                }
-
-                printInfo();
+                PatchHelper.clear(mContext);
             }
+//                printInfo();
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
@@ -176,22 +175,12 @@ public class PolicyImpl {
 
         File newDir = new File(mContext.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR);
 
-        // makesure dir
-        if (newDir.exists() && !newDir.isDirectory()) {
-            newDir.deleteOnExit();
-        }
-        // rename to new path
-        File old = new File(mContext.getFilesDir(), EGContext.PATCH_OLD_CACHE_DIR);
-        if (old.exists() && old.isDirectory()) {
-            old.renameTo(new File(mContext.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR));
-        }
         // makesure new dir exit
         if (!newDir.exists()) {
             newDir.mkdirs();
         }
         // 保存文件到本地
-        File file = new File(newDir, "patch_" + version + ".jar");
-
+        File file = new File(newDir, String.format(EGContext.PATCH_NAME_FILE, version));
         Memory2File.savePatch(data, file);
         if (BuildConfig.logcat) {
             ELOG.i(BuildConfig.tag_cutoff, " saveFileAndLoad 保存文件成功: " + file.getAbsolutePath());
@@ -446,7 +435,7 @@ public class PolicyImpl {
                          * 处理reset逻辑，处理完毕就停止处理
                          */
                         if (!TextUtils.isEmpty(reset) && UploadKey.Response.PatchResp.RESET.equals(reset)) {
-                            PatchHelper.clearPatch(mContext);
+                            PatchHelper.clear(mContext);
                             return;
                         }
                     }
@@ -472,8 +461,7 @@ public class PolicyImpl {
                     }
 
                     if (patch.has(UploadKey.Response.PatchResp.PATCH_VERSION)) {
-                        String version = patch
-                                .optString(UploadKey.Response.PatchResp.PATCH_VERSION, "");
+                        String version = patch.optString(UploadKey.Response.PatchResp.PATCH_VERSION, "");
                         // 确保有默认版本号
                         if (TextUtils.isEmpty(version)) {
                             version = EGContext.PATCH_VERSION;
@@ -821,36 +809,36 @@ public class PolicyImpl {
         SPHelper.reInit();
     }
 
-    public void printInfo() {
-        //最后打印对一下数据是不是对的
-        if (BuildConfig.logcat) {
-            ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========同步策略 打印对一下数据对不对 ");
-            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.
-                    Response.RES_POLICY_VERSION + ":" +
-                    SPHelper.getStringValueFromSP(mContext, UploadKey.Response.RES_POLICY_VERSION, ""));
-            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.
-                    Response.RES_POLICY_FAIL_COUNT + ":" +
-                    SPHelper.getIntValueFromSP(mContext, UploadKey.Response.RES_POLICY_FAIL_COUNT, -1));
-            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.
-                    Response.RES_POLICY_FAIL_TRY_DELAY + ":" +
-                    SPHelper.getLongValueFromSP(mContext, UploadKey.Response.RES_POLICY_FAIL_TRY_DELAY, -1));
-            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.
-                    Response.RES_POLICY_TIMER_INTERVAL + ":" +
-                    SPHelper.getLongValueFromSP(mContext, UploadKey.Response.RES_POLICY_TIMER_INTERVAL, -1));
-            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.
-                    Response.RES_POLICY_CTRL_LIST + ":" +
-                    SPHelper.getStringValueFromSP(mContext, UploadKey.Response.RES_POLICY_CTRL_LIST, ""));
-            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.Response.PatchResp.PATCH_VERSION + "_HotFix:" +
-                    SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, ""));
-            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.Response.PatchResp.PATCH_SIGN + "_HotFix:" +
-                    SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, ""));
-            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.Response.PatchResp.PATCH_VERSION + "_HotFix:" +
-                    SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, ""));
-            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.Response.PatchResp.PATCH_SIGN + "_HotFix:" +
-                    SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, ""));
-            ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========同步策略 打印对一下数据对不对结束 ");
-        }
-    }
+//    public void printInfo() {
+//        //最后打印对一下数据是不是对的
+//        if (BuildConfig.logcat) {
+//            ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========同步策略 打印对一下数据对不对 ");
+//            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.
+//                    Response.RES_POLICY_VERSION + ":" +
+//                    SPHelper.getStringValueFromSP(mContext, UploadKey.Response.RES_POLICY_VERSION, ""));
+//            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.
+//                    Response.RES_POLICY_FAIL_COUNT + ":" +
+//                    SPHelper.getIntValueFromSP(mContext, UploadKey.Response.RES_POLICY_FAIL_COUNT, -1));
+//            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.
+//                    Response.RES_POLICY_FAIL_TRY_DELAY + ":" +
+//                    SPHelper.getLongValueFromSP(mContext, UploadKey.Response.RES_POLICY_FAIL_TRY_DELAY, -1));
+//            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.
+//                    Response.RES_POLICY_TIMER_INTERVAL + ":" +
+//                    SPHelper.getLongValueFromSP(mContext, UploadKey.Response.RES_POLICY_TIMER_INTERVAL, -1));
+//            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.
+//                    Response.RES_POLICY_CTRL_LIST + ":" +
+//                    SPHelper.getStringValueFromSP(mContext, UploadKey.Response.RES_POLICY_CTRL_LIST, ""));
+//            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.Response.PatchResp.PATCH_VERSION + "_HotFix:" +
+//                    SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, ""));
+//            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.Response.PatchResp.PATCH_SIGN + "_HotFix:" +
+//                    SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, ""));
+//            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.Response.PatchResp.PATCH_VERSION + "_HotFix:" +
+//                    SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, ""));
+//            ELOG.i(BuildConfig.tag_upload + "[POLICY]", UploadKey.Response.PatchResp.PATCH_SIGN + "_HotFix:" +
+//                    SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, ""));
+//            ELOG.i(BuildConfig.tag_upload + "[POLICY]", "=========同步策略 打印对一下数据对不对结束 ");
+//        }
+//    }
 
     private static class Holder {
         private static final PolicyImpl INSTANCE = new PolicyImpl();

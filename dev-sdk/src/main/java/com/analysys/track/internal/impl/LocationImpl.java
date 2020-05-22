@@ -221,7 +221,7 @@ public class LocationImpl {
                         }
                         return true;
                     }
-                } catch (NumberFormatException e) {
+                } catch (Throwable e) {
                 }
             }
             // 3. 判断后台

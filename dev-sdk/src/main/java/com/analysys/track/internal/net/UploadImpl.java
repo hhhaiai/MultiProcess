@@ -555,8 +555,6 @@ public class UploadImpl {
             if (idList != null && idList.size() > 0) {
                 idList.clear();
             }
-
-            SPHelper.setLongValue2SP(mContext, USMImpl.LAST_UPLOAD_TIME, System.currentTimeMillis());
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_upload, t);

@@ -18,14 +18,14 @@ public class ActivityCallBack implements Application.ActivityLifecycleCallbacks 
     public static ActivityCallBack getInstance() {
         return HLODER.INSTANCE;
     }
-    
-    //初始化时，直接标记是前台
-    public Application.ActivityLifecycleCallbacks init() {
-        synchronized (lock) {
-            this.isFront = true;
-        }
-        return HLODER.INSTANCE;
-    }
+
+//    //初始化时，直接标记是前台. 部分case会导致问题。
+//    public Application.ActivityLifecycleCallbacks init() {
+//        synchronized (lock) {
+//            this.isFront = true;
+//        }
+//        return HLODER.INSTANCE;
+//    }
     
     private static class HLODER {
         private static final ActivityCallBack INSTANCE = new ActivityCallBack();

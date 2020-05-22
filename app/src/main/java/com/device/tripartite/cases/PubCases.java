@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.IBinder;
 import android.os.Process;
 
-import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.net.NetInfo;
 import com.analysys.track.internal.impl.oc.OCImpl;
@@ -36,16 +35,16 @@ import java.util.HashMap;
 
 public class PubCases {
     public static void runCaseTryGetLocation(Context context) {
-        LocationImpl.getInstance(context).tryGetLocationInfo(new ECallBack() {
-            @Override
-            public void onProcessed() {
-                EL.i("操作完毕。。");
-            }
-        });
+//        LocationImpl.getInstance(context).tryGetLocationInfo(new ECallBack() {
+//            @Override
+//            public void onProcessed() {
+//                EL.i("操作完毕。。");
+//            }
+//        });
     }
 
     public static void runCaseRealGetLocationInfo(Context context) {
-        LocationImpl.getInstance(context).getLocationInfoInThread();
+//        LocationImpl.getInstance(context).getLocationInfoInThread();
     }
 
     public static void runCaseCheckManifest(final Context context) {

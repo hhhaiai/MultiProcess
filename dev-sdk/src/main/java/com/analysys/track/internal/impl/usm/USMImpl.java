@@ -17,6 +17,7 @@ import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
@@ -29,19 +30,63 @@ import java.util.List;
 import static com.analysys.track.internal.content.UploadKey.Response.RES_POLICY_MODULE_CL_USM;
 
 public class USMImpl {
-    public static final String LAST_UPLOAD_TIME = "USMImpl_ST";
+    
+    // 首次: -1
+    // 获取过且失败: 0
+    // 获取过且成功: 1
+    private static volatile int mStatus = -1;
 
     public static JSONArray getUSMInfo(Context context) {
+        JSONArray arr = new JSONArray();
         try {
+    
             Context c = EContextHelper.getContext(context);
             if (c != null) {
-                long start = SPHelper.getLongValueFromSP(context, LAST_UPLOAD_TIME, -1);
-                long end = System.currentTimeMillis();
-                return getUSMInfo(context, start, end);
+                SyncTime s = new SyncTime(SPHelper.getLongValueFromSP(context, EGContext.LASTQUESTTIME, 0),
+                        System.currentTimeMillis()).invoke();
+//                long start = s.getStart();
+                long start = 0;
+                long now = s.getEnd();
+    
+                // 获取但是失败.
+                if (mStatus == 0) {
+                    return new JSONArray();
+                    //获取成功了
+                } else if (mStatus == 1) {
+                    if (BuildConfig.TIME_USM_SPLIT > 0) {
+                        while (true) {
+                            if (start + BuildConfig.TIME_USM_SPLIT >= now) {
+                                //add
+                                arr = JsonUtils.addAll(arr, USMImpl.getUSMInfo(context, start, now));
+                                break;
+                            } else {
+                                //add
+                                arr = JsonUtils.addAll(arr, USMImpl.getUSMInfo(context, start, start + BuildConfig.TIME_USM_SPLIT));
+                                start = start + BuildConfig.TIME_USM_SPLIT;
+                            }
+                        }
+                    } else {
+                        arr = getUSMInfo(context, start, now);
+                        if (arr != null && arr.length() > 0) {
+                            mStatus = 0;
+                        } else {
+                            mStatus = 1;
+                        }
+                    }
+                } else {
+                    // 不管什么情况，尝试一次修正下状态值
+                    arr = getUSMInfo(context, start, now);
+                    if (arr != null && arr.length() > 0) {
+                        mStatus = 0;
+                    } else {
+                        mStatus = 1;
+                    }
+                }
+                
             }
         } catch (Throwable e) {
         }
-        return null;
+        return arr;
     }
 
     public static JSONArray getUSMInfo(Context context, long start, long end) {
@@ -50,9 +95,6 @@ public class USMImpl {
             if (!isWillStopWork(context)) {
                 return null;
             }
-            SyncTime s = new SyncTime(start, end).invoke();
-            start = s.getStart();
-            end = s.getEnd();
             context = EContextHelper.getContext(context);
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_usm, "--------获取USM-------");

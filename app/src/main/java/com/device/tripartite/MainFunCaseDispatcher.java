@@ -5,16 +5,21 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 
-import com.analysys.track.internal.impl.LocationImpl;
+import com.analysys.track.BuildConfig;
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.net.NetInfo;
+import com.analysys.track.internal.impl.usm.USMImpl;
 import com.analysys.track.internal.work.ISayHello;
 import com.analysys.track.utils.PkgList;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.DebugDev;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
+import com.analysys.track.utils.sp.SPHelper;
 import com.device.tripartite.cases.PubCases;
 import com.device.tripartite.cases.traffic.planA.A;
 import com.device.tripartite.cases.traffic.planc.WtfTs;
@@ -22,13 +27,19 @@ import com.device.utils.EL;
 import com.device.tripartite.cases.traffic.planB.WtfNSManager;
 import com.device.utils.memot.M2Fmapping;
 
+import org.json.JSONArray;
+
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -182,9 +193,9 @@ public class MainFunCaseDispatcher {
     }
 
     private static void runCaseP15(final Context context) {
-        for (int i = 0; i < 1000; i++) {
-            LocationImpl.getInstance(context).getLocationInfoInThread();
-        }
+//        for (int i = 0; i < 1000; i++) {
+//            LocationImpl.getInstance(context).getLocationInfoInThread();
+//        }
     }
 
     private static void runCaseP16(final Context context) {
@@ -239,7 +250,64 @@ public class MainFunCaseDispatcher {
     }
 
     private static void runCaseP22(final Context context) {
+    
+        for (int i = 0; i < 100; i++) {
+            Log.i("sanbo", "--------------------" + i + "/" + 100 + "-----------------");
+            realWork(context);
+        }
+    }
+    
+    private static void realWork(final Context context) {
+        long s1 = System.currentTimeMillis();
+        long lastRequestTime = s1 - 20 * EGContext.TIME_HOUR;
+        USMImpl.getUSMInfo(context, lastRequestTime, s1);
+        long e1 = System.currentTimeMillis();
+        Log.e("sanbo", "单次获取20小时耗时:" + (e1 - s1));
+        
+        long dur = 3 * EGContext.TIME_HOUR;
+        more(context, s1, lastRequestTime, dur);
+        dur = 1 * EGContext.TIME_HOUR;
+        more(context, s1, lastRequestTime, dur);
+        dur = 30 * EGContext.TIME_MINUTE;
+        more(context, s1, lastRequestTime, dur);
+    }
+    
+    private static void more(Context context, long s1, long lastRequestTime, long dur) {
+        long tstart = System.currentTimeMillis();
+        long now = s1;
+        long lsa = lastRequestTime;
 
+//        Log.e("sanbo", "--------------------开始-----------------");
+        while (true) {
+            if (lsa + dur >= now) {
+//                Log.i("sanbo", String.format("尾声了。。起时间:[%s], 止时间[%s]", stampToDate(lsa), stampToDate(now)));
+                USMImpl.getUSMInfo(context, lsa, now);
+                break;
+            } else {
+//                Log.i("sanbo", String.format("中间。。起时间:[%s], 止时间[%s]", stampToDate(lsa), stampToDate(lsa + dur)));
+                USMImpl.getUSMInfo(context, lsa, lsa + dur);
+                lsa = lsa + dur;
+            }
+        }
+//        Log.e("sanbo", "--------------------结束-----------------");
+        
+        long tsend = System.currentTimeMillis();
+        Log.e("sanbo", "多次获取20小时 [" + dur + "] 耗时:" + (tsend - tstart));
+    }
+    
+    private static void runCaseP23(final Context context) {
+        JSONArray arr = USMImpl.getUSMInfo(context, 0, System.currentTimeMillis());
+        EL.i(arr);
+    }
+    
+    private static void runCaseP24(final Context context) {
+        long lastReqTime = SPHelper.getLongValueFromSP(context, EGContext.LASTQUESTTIME, 0);
+        EL.i("lastReqTime: " + lastReqTime);
+    }
+    
+    private static void runCaseP25(final Context context) {
+        JSONArray arr = USMImpl.getUSMInfo(context);
+        EL.i(arr);
     }
 
 

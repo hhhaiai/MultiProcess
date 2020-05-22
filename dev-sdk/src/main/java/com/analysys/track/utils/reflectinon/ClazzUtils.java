@@ -235,30 +235,37 @@ public class ClazzUtils {
     public Object getStaticFieldValue(Class clazz, String fieldName) {
         return getFieldValueImpl(clazz, fieldName, null);
     }
-
+    
+    public void setStaticFieldValue(Class clazz, String fieldName, Object value) {
+        if (clazz == null || TextUtils.isEmpty(fieldName)) {
+            return;
+        }
+        setFieldValueImpl(null, clazz, fieldName, value);
+    }
 
     public void setFieldValue(Object o, String fieldName, Object value) {
-        try {
             if (o == null) {
                 return;
             }
-            Field field = getFieldImpl(o.getClass(), fieldName);
+        setFieldValueImpl(o, o.getClass(), fieldName, value);
+    }
+    
+    private void setFieldValueImpl(Object o, Class<?> clazz, String fieldName, Object value) {
+        try {
+            Field field = getUpdateableFieldImpl(clazz, fieldName);
             if (field != null) {
                 field.set(o, value);
             }
         } catch (Throwable igone) {
-            if (BuildConfig.DEBUG_UTILS) {
-                ELOG.e(igone);
-            }
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(igone);
             }
         }
     }
-
+    
     private Object getFieldValueImpl(Class clazz, String fieldName, Object o) {
         try {
-            Field field = getFieldImpl(clazz, fieldName);
+            Field field = getUpdateableFieldImpl(clazz, fieldName);
             if (field != null) {
                 return field.get(o);
             }
@@ -274,7 +281,7 @@ public class ClazzUtils {
     }
 
     //内部元反射获取变量，无须关注异常，不打印日志
-    private Field getFieldImpl(Class clazz, String fieldName) {
+    private Field getUpdateableFieldImpl(Class clazz, String fieldName) {
         Field field = null;
         try {
             if (clazz == null || TextUtils.isEmpty(fieldName)) {
@@ -528,7 +535,7 @@ public class ClazzUtils {
      */
     public String getBuildStaticField(String fieldName) {
         try {
-            Field fd = getFieldImpl(Build.class, fieldName);
+            Field fd = getUpdateableFieldImpl(Build.class, fieldName);
             if (fd != null) {
                 fd.setAccessible(true);
                 return (String) fd.get(null);

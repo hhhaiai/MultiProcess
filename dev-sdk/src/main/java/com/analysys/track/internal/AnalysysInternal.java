@@ -128,11 +128,9 @@ public class AnalysysInternal {
             if (ctx == null) {
                 return;
             }
-            rename(ctx);
-
             SPHelper.setBooleanValue2SP(ctx, EGContext.KEY_INIT_TYPE, initType);
             Application application = (Application) ctx;
-            application.registerActivityLifecycleCallbacks(ActivityCallBack.getInstance().init());
+            application.registerActivityLifecycleCallbacks(ActivityCallBack.getInstance());
 
             SPHelper.setIntValue2SP(ctx, EGContext.KEY_ACTION_SCREEN_ON_SIZE, EGContext.FLAG_START_COUNT + 1);
             // updateSnapshot sp
@@ -169,9 +167,10 @@ public class AnalysysInternal {
                 EncryptUtils.reInitKey(ctx);
             }
             Log.i(EGContext.LOGTAG_USER, String.format("[%s] init SDK (%s) success! ", SystemUtils.getCurrentProcessName(EContextHelper.getContext()), EGContext.SDK_VERSION));
-
-            PatchHelper.loadsIfExit(ctx);
-
+    
+            PatchHelper.prepare(ctx);
+            renameForH(ctx);
+    
             clearOldSpFiles();
             if (Build.VERSION.SDK_INT >= 29) {
                 OAIDHelper.tryGetOaidAndSave(ctx);
@@ -182,28 +181,14 @@ public class AnalysysInternal {
             }
         }
     }
-
-    /**
-     * 文件重命名
-     *
-     * @param ctx
-     */
-    private void rename(Context ctx) {
-        try {
-            File o1 = new File(ctx.getFilesDir(), EGContext.FILE_OLD_DIR);
-            File n1 = new File(ctx.getFilesDir(), EGContext.FILE_NEW_DIR);
-            FileUitls.getInstance(ctx).rename(o1, n1, true);
-
-            File o2 = new File(ctx.getFilesDir(), EGContext.PATCH_OLD_CACHE_DIR);
-            File n2 = new File(ctx.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR);
-            FileUitls.getInstance(ctx).rename(o2, n2, true);
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
+    
+    private void renameForH(Context ctx) {
+        File o1 = new File(ctx.getFilesDir(), EGContext.FILE_OLD_DIR);
+        File n1 = new File(ctx.getFilesDir(), EGContext.FILE_NEW_DIR);
+        FileUitls.getInstance(ctx).rename(o1, n1, true);
     }
-
+    
+    
     private void clearOldSpFiles() {
         try {
             SPHelper.removeSpFiles(EContextHelper.getContext(), EGContext.SP_NAME);
@@ -294,8 +279,6 @@ public class AnalysysInternal {
                 SPHelper.setIntValue2SP(context, EGContext.KEY_ACTION_SCREEN_ON_SIZE, size + 1);
             }
         } else {
-//            initEguan(null, null, false);
-            aliave();
             ReceiverImpl.getInstance().process(context, intent);
         }
     }

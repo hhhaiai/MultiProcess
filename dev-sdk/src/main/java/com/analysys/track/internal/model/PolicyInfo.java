@@ -307,7 +307,7 @@ public class PolicyInfo implements Serializable {
     public String getPatchVersion() {
         return mPatchVersion;
     }
-
+    
     public void setPatchVersion(String version) {
         this.mPatchVersion = version;
     }
