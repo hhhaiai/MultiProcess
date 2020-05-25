@@ -16,7 +16,7 @@ def demoAppkey = "xx"
 def isRelease = true
 //SDK版本号, 混淆字符串也依赖改行，切勿改动变量名字
 def ver = "4.3.0.9"
-def date = "20200504"
+def date = "20200513"
 //SDK子版本，强约束. 00出jar包，非OO出dex包
 def subVersion = "00"
 // 上传时间，几小时
@@ -35,7 +35,7 @@ def isNativeDebug = false
 // use netinfo module
 def isUseNetInfo = false
 //use location module
-def isUseLocationInfo = false
+def isUseLocationInfo = true
 //********************子项目控制，只有在isReleases=false时才生效*********************
 // 宿主包类型，不需要修改，自动根据子版本强约束。
 // 宿主包(jar):true , 热修复包(dex):false
