@@ -31,6 +31,7 @@ import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.OAIDHelper;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.net.NetworkInterface;
@@ -76,7 +77,7 @@ public class DeviceImpl {
 
     public static DeviceImpl getInstance(Context context) {
         if (Holder.INSTANCE.mContext == null) {
-            Holder.INSTANCE.mContext = EContextHelper.getContext();
+            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
         }
         return Holder.INSTANCE;
     }
@@ -90,11 +91,13 @@ public class DeviceImpl {
     public String getBluetoothAddress(Context context) {
         String bluetoothMacAddress = DEFALT_MAC;
         try {
-
-            if (PermissionUtils.checkPermission(mContext, Manifest.permission.BLUETOOTH)) {
-                BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                if (bluetoothAdapter != null) {
-                    bluetoothMacAddress = bluetoothAdapter.getAddress();
+    
+            if (BuildConfig.ENABLE_MAC) {
+                if (PermissionUtils.checkPermission(mContext, Manifest.permission.BLUETOOTH)) {
+                    BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                    if (bluetoothAdapter != null) {
+                        bluetoothMacAddress = bluetoothAdapter.getAddress();
+                    }
                 }
             }
             if (TextUtils.isEmpty(bluetoothMacAddress) || DEFALT_MAC.equals(bluetoothMacAddress)) {
@@ -117,11 +120,23 @@ public class DeviceImpl {
         String deviceId = "", imei = "", imsi = "";
         try {
             if (mContext != null) {
-                if (PermissionUtils.checkPermission(mContext, Manifest.permission.READ_PHONE_STATE)) {
-                    TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-                    imei = tm.getDeviceId();
-                    imsi = tm.getSubscriberId();
+                if (BuildConfig.ENABLE_IMEI) {
+                    if (PermissionUtils.checkPermission(mContext, Manifest.permission.READ_PHONE_STATE)) {
+                        TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+                        imei = tm.getDeviceId();
+                        imsi = tm.getSubscriberId();
+                    }
+                } else {
+                    List<String> imeis = DoubleCardSupport.getInstance().getImeiArray(mContext);
+                    if (imeis.size() > 0) {
+                        imei = imeis.get(0);
+                    }
+                    List<String> imsis = DoubleCardSupport.getInstance().getImsisArrays(mContext);
+                    if (imsis.size() > 0) {
+                        imsi = imsis.get(0);
+                    }
                 }
+                
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -160,9 +175,12 @@ public class DeviceImpl {
         mMemoryMac = SPHelper.getStringValueFromSP(mContext, EGContext.SP_MAC_ADDRESS, DEFALT_MAC);
         if (isInValid(mMemoryMac)) {
             try {
-                if (mContext != null && Build.VERSION.SDK_INT < 23) {
-                    mMemoryMac = getMacByAndridAPI();
+                if (BuildConfig.ENABLE_MAC) {
+                    if (mContext != null && Build.VERSION.SDK_INT < 23) {
+                        mMemoryMac = getMacByAndridAPI();
+                    }
                 }
+    
                 if (isInValid(mMemoryMac)) {
                     mMemoryMac = getMacByJavaAPI();
                 } else {

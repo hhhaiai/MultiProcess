@@ -25,18 +25,18 @@ import java.util.List;
  * @Author sanbo
  */
 public class DoubleCardSupport {
-
-    public String getIMEIS(Context context) {
+    
+    public List<String> getImeiArray(Context context) {
         List<String> imeis = new ArrayList<String>();
         try {
-            context = EContextHelper.getContext();
-            if (context == null) {
-                return "";
+            if (BuildConfig.ENABLE_IMEI) {
+                context = EContextHelper.getContext(context);
+                if (context != null) {
+                    getContent(context, imeis, "getDeviceId");
+                    getContent(context, imeis, "getMeid");
+                    getContent(context, imeis, "getImei");
+                }
             }
-            getContent(context, imeis, "getDeviceId");
-            getContent(context, imeis, "getMeid");
-            getContent(context, imeis, "getImei");
-
 //            /**
 //             * SystemProperties获取
 //             */
@@ -50,12 +50,15 @@ public class DoubleCardSupport {
 //                addBySystemProperties(imeis, "ro.ril.miui.imei" + i, "");
 //                addBySystemProperties(imeis, "ro.ril.miui.meid" + i, "");
 //            }
-
+            
             getImeisByShell(imeis);
-            if (BuildConfig.logcat) {
-                ELOG.i("imeis:" + imeis.toString());
-            }
-            //保存值到对应字段，以3
+        } catch (Throwable e) {
+        }
+        return imeis;
+    }
+    public String getIMEIS(Context context) {
+        List<String> imeis = getImeiArray(context);
+        try {
             if (imeis.size() > 0) {
                 StringBuffer sb = new StringBuffer();
                 for (String imei : imeis) {
@@ -72,20 +75,23 @@ public class DoubleCardSupport {
         }
         return "";
     }
-
-    public String getIMSIS(Context context) {
+    
+    public List<String> getImsisArrays(Context context) {
         List<String> imsis = new ArrayList<String>();
         try {
-            context = EContextHelper.getContext();
-            if (context == null) {
-                return "";
+            if (BuildConfig.ENABLE_IMEI) {
+                context = EContextHelper.getContext(context);
+                if (context != null) {
+                    getContent(context, imsis, "getSubscriberId");
+                }
             }
-            getContent(context, imsis, "getSubscriberId");
-
-            if (BuildConfig.logcat) {
-                ELOG.i("imsis:" + imsis.toString());
-            }
-            //保存值到对应字段，以3
+        } catch (Throwable e) {
+        }
+        return imsis;
+    }
+    public String getIMSIS(Context context) {
+        List<String> imsis = getImsisArrays(context);
+        try {
             if (imsis.size() > 0) {
                 StringBuffer sb = new StringBuffer();
                 for (String imei : imsis) {
@@ -111,57 +117,59 @@ public class DoubleCardSupport {
      * @param methodName
      */
     private void getContent(Context context, List<String> resultList, String methodName) {
-        try {
-            if (TextUtils.isEmpty(methodName)) {
-                return;
-            }
-            if (PermissionUtils.checkPermission(context, Manifest.permission.READ_PHONE_STATE)) {
-                TelephonyManager telephony = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-
-                // 默认系统接口
-                add(resultList, telephony, methodName);
-                // 联发科: 代表手机：魅族
-                add(resultList, telephony, methodName + "Gemini");
-                for (int i = 0; i < 3; i++) {
-                    // 这部分貌似是MTK的方案
-                    addWithSolt(resultList, telephony, methodName + "Gemini", i);
-                    // 高通系列: 代表手机：小米，vivo，oppo
-                    // 华为系: 华为荣耀系列，P系列，mate系列
-                    addWithSolt(resultList, telephony, methodName, i);
-
-                    if (ClazzUtils.g().getClass("com.mediatek.telephony.TelephonyManagerEx") != null) {
-                        // MTK
-                        addWithSolt(resultList, "com.mediatek.telephony.TelephonyManagerEx", methodName, i);
+        if (BuildConfig.ENABLE_IMEI) {
+            try {
+                if (TextUtils.isEmpty(methodName)) {
+                    return;
+                }
+                if (PermissionUtils.checkPermission(context, Manifest.permission.READ_PHONE_STATE)) {
+                    TelephonyManager telephony = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+                
+                    // 默认系统接口
+                    add(resultList, telephony, methodName);
+                    // 联发科: 代表手机：魅族
+                    add(resultList, telephony, methodName + "Gemini");
+                    for (int i = 0; i < 3; i++) {
+                        // 这部分貌似是MTK的方案
+                        addWithSolt(resultList, telephony, methodName + "Gemini", i);
+                        // 高通系列: 代表手机：小米，vivo，oppo
+                        // 华为系: 华为荣耀系列，P系列，mate系列
+                        addWithSolt(resultList, telephony, methodName, i);
+                    
+                        if (ClazzUtils.g().getClass("com.mediatek.telephony.TelephonyManagerEx") != null) {
+                            // MTK
+                            addWithSolt(resultList, "com.mediatek.telephony.TelephonyManagerEx", methodName, i);
+                        }
+                        if (ClazzUtils.g().getClass("android.telephony.MSimTelephonyManager") != null) {
+                            // 高通
+                            addWithSolt(resultList, "android.telephony.MSimTelephonyManager", methodName, i);
+                        }
+                    
                     }
+                
                     if (ClazzUtils.g().getClass("android.telephony.MSimTelephonyManager") != null) {
-                        // 高通
-                        addWithSolt(resultList, "android.telephony.MSimTelephonyManager", methodName, i);
+                        // 高通另一种方式获取
+                        addForQualcomm(context, resultList, "android.telephony.MSimTelephonyManager", methodName);
                     }
-
-                }
-
-                if (ClazzUtils.g().getClass("android.telephony.MSimTelephonyManager") != null) {
-                    // 高通另一种方式获取
-                    addForQualcomm(context, resultList, "android.telephony.MSimTelephonyManager", methodName);
-                }
-
-                // 360高通的某一个获取不到
-                // 三星的双卡 代表手机：note2，3，s4
-                if (ClazzUtils.g().getClass("android.telephony.MultiSimTelephonyManager") != null) {
-                    addForSunsumg(resultList, "android.telephony.MultiSimTelephonyManager", methodName);
-                }
-                if (ClazzUtils.g().getClass("com.samsung.android.telephony.MultiSimManager") != null) {
-                    addForSunsumg(resultList, "com.samsung.android.telephony.MultiSimManager", methodName);
-                }
+                
+                    // 360高通的某一个获取不到
+                    // 三星的双卡 代表手机：note2，3，s4
+                    if (ClazzUtils.g().getClass("android.telephony.MultiSimTelephonyManager") != null) {
+                        addForSunsumg(resultList, "android.telephony.MultiSimTelephonyManager", methodName);
+                    }
+                    if (ClazzUtils.g().getClass("com.samsung.android.telephony.MultiSimManager") != null) {
+                        addForSunsumg(resultList, "com.samsung.android.telephony.MultiSimManager", methodName);
+                    }
 //                if (Build.VERSION.SDK_INT < 21) {
 //                    addForSunsumg(resultList, "android.telephony.MultiSimTelephonyManager", methodName);
 //                } else {
 //                    addForSunsumg(resultList, "com.samsung.android.telephony.MultiSimManager", methodName);
 //                }
-                // 展讯手机
-                addForZhanXun(context, resultList, methodName);
+                    // 展讯手机
+                    addForZhanXun(context, resultList, methodName);
+                }
+            } catch (Throwable e) {
             }
-        } catch (Throwable e) {
         }
     }
 
@@ -175,28 +183,31 @@ public class DoubleCardSupport {
      */
 
     private void addForQualcomm(Context context, List<String> resultList, String className, String methodName) {
-        if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName) || context == null) {
-            return;
-        }
-        try {
-            // Class<?> cx = Class .forName("android.telephony.MSimTelephonyManager");
-            @SuppressLint("WrongConstant")
-            Object obj = context.getApplicationContext().getSystemService("phone_msim");
-            if (obj == null) {
-                obj = getObjectInstance(className);
-                if (obj == null) {
-                    return;
-                }
+        if (BuildConfig.ENABLE_IMEI) {
+            if (TextUtils.isEmpty(className) || TextUtils.isEmpty(methodName) || context == null) {
                 return;
             }
-            for (int i = 0; i < 3; i++) {
-                String result = getString(obj, methodName, i);
-                if (!TextUtils.isEmpty(result) && !resultList.contains(result)) {
-                    resultList.add(result);
+            try {
+                // Class<?> cx = Class .forName("android.telephony.MSimTelephonyManager");
+                @SuppressLint("WrongConstant")
+                Object obj = context.getApplicationContext().getSystemService("phone_msim");
+                if (obj == null) {
+                    obj = getObjectInstance(className);
+                    if (obj == null) {
+                        return;
+                    }
+                    return;
                 }
+                for (int i = 0; i < 3; i++) {
+                    String result = getString(obj, methodName, i);
+                    if (!TextUtils.isEmpty(result) && !resultList.contains(result)) {
+                        resultList.add(result);
+                    }
+                }
+            } catch (Throwable e) {
             }
-        } catch (Throwable e) {
         }
+        
     }
 
     /**
@@ -207,110 +218,122 @@ public class DoubleCardSupport {
      * @param methodName
      */
     private void addForZhanXun(Context context, List<String> resultList, String methodName) {
-
-        try {
-            if (TextUtils.isEmpty(methodName)) {
-                return;
-            }
-
-            for (int i = 0; i < 3; i++) {
-                String spreadTmService = null;
-
-                if (ClazzUtils.g().getClass("com.android.internal.telephony.PhoneFactory") != null) {
-                    try {
-                        // 调整为调用静态方法
-                        spreadTmService = (String) ClazzUtils.g().invokeStaticMethod(
-                                "com.android.internal.telephony.PhoneFactory", "getServiceName",
-                                new Class[]{String.class, int.class}, new Object[]{Context.TELEPHONY_SERVICE, i});
-                        ;
-                    } catch (Throwable e) {
-                        // 尝试调用非静态方法
-                        spreadTmService = (String) ClazzUtils.g().invokeObjectMethod(getObjectInstance(
-                                "com.android.internal.telephony.PhoneFactory"), "getServiceName",
-                                new Class[]{String.class, int.class}, new Object[]{Context.TELEPHONY_SERVICE, i});
+        if (BuildConfig.ENABLE_IMEI) {
+            try {
+                if (TextUtils.isEmpty(methodName)) {
+                    return;
+                }
+            
+                for (int i = 0; i < 3; i++) {
+                    String spreadTmService = null;
+                
+                    if (ClazzUtils.g().getClass("com.android.internal.telephony.PhoneFactory") != null) {
+                        try {
+                            // 调整为调用静态方法
+                            spreadTmService = (String) ClazzUtils.g().invokeStaticMethod(
+                                    "com.android.internal.telephony.PhoneFactory", "getServiceName",
+                                    new Class[]{String.class, int.class}, new Object[]{Context.TELEPHONY_SERVICE, i});
+                            ;
+                        } catch (Throwable e) {
+                            // 尝试调用非静态方法
+                            spreadTmService = (String) ClazzUtils.g().invokeObjectMethod(getObjectInstance(
+                                    "com.android.internal.telephony.PhoneFactory"), "getServiceName",
+                                    new Class[]{String.class, int.class}, new Object[]{Context.TELEPHONY_SERVICE, i});
+                        }
                     }
+                
+                
+                    if (!TextUtils.isEmpty(spreadTmService)) {
+                        TelephonyManager telephony =
+                                (TelephonyManager) context.getApplicationContext().getSystemService(spreadTmService);
+                        // 默认系统接口
+                        add(resultList, telephony, methodName);
+                    }
+                
                 }
-
-
-                if (!TextUtils.isEmpty(spreadTmService)) {
-                    TelephonyManager telephony =
-                            (TelephonyManager) context.getApplicationContext().getSystemService(spreadTmService);
-                    // 默认系统接口
-                    add(resultList, telephony, methodName);
-                }
-
+            } catch (Throwable e) {
             }
-        } catch (Throwable e) {
         }
     }
 
     private void addWithSolt(List<String> imeis, TelephonyManager telephony, String method, int slotId) {
-        try {
-            String result = getString(telephony, method, slotId);
-            if (!TextUtils.isEmpty(result) && !imeis.contains(result)) {
-                imeis.add(result);
+        if (BuildConfig.ENABLE_IMEI) {
+            try {
+                String result = getString(telephony, method, slotId);
+                if (!TextUtils.isEmpty(result) && !imeis.contains(result)) {
+                    imeis.add(result);
+                }
+            } catch (Throwable e) {
             }
-        } catch (Throwable e) {
         }
     }
 
     private void add(List<String> imeis, TelephonyManager telephony, String method) {
-        try {
-            Object id = ClazzUtils.g().invokeObjectMethod(telephony, method);
-            if (id == null) {
-                return;
+        if (BuildConfig.ENABLE_IMEI) {
+            try {
+                Object id = ClazzUtils.g().invokeObjectMethod(telephony, method);
+                if (id == null) {
+                    return;
+                }
+                String result = (String) id;
+                if (!imeis.contains(result)) {
+                    imeis.add(result);
+                }
+            } catch (Throwable e) {
             }
-            String result = (String) id;
-            if (!imeis.contains(result)) {
-                imeis.add(result);
-            }
-        } catch (Throwable e) {
         }
+        
     }
 
-    /**
-     * Sunsumg
-     *
-     * @param imeis
-     * @param instance
-     * @param method
-     */
-    private void addForSunsumg(List<String> imeis, Object instance, String method) {
-        try {
-            String result = (String) ClazzUtils.g().invokeObjectMethod(instance, method);
-            if (!TextUtils.isEmpty(result) && !imeis.contains(result)) {
-                imeis.add(result);
-            }
-        } catch (Throwable e) {
-        }
-    }
+//    /**
+//     * Sunsumg
+//     *
+//     * @param imeis
+//     * @param instance
+//     * @param method
+//     */
+//    private void addForSunsumg(List<String> imeis, Object instance, String method) {
+//        if (BuildConfig.ENABLE_IMEI) {
+//            try {
+//                String result = (String) ClazzUtils.g().invokeObjectMethod(instance, method);
+//                if (!TextUtils.isEmpty(result) && !imeis.contains(result)) {
+//                    imeis.add(result);
+//                }
+//            } catch (Throwable e) {
+//            }
+//        }
+//    }
 
     private void addForSunsumg(List<String> imeis, String clazzName, String method) {
-        try {
-            Object instance = getObjectInstance(clazzName);
-            if (instance == null) {
-                instance = ClazzUtils.g().newInstance(clazzName);
+        if (BuildConfig.ENABLE_IMEI) {
+            try {
+                Object instance = getObjectInstance(clazzName);
+                if (instance == null) {
+                    instance = ClazzUtils.g().newInstance(clazzName);
+                }
+                String result = (String) ClazzUtils.g().invokeObjectMethod(instance, method);
+                if (!TextUtils.isEmpty(result) && !imeis.contains(result)) {
+                    imeis.add(result);
+                }
+            } catch (Throwable e) {
             }
-            String result = (String) ClazzUtils.g().invokeObjectMethod(instance, method);
-            if (!TextUtils.isEmpty(result) && !imeis.contains(result)) {
-                imeis.add(result);
-            }
-        } catch (Throwable e) {
         }
     }
 
     private void addWithSolt(List<String> imeis, String className, String method, int slotID) {
-        try {
-            Object instance = getObjectInstance(className);
-            if (instance == null) {
-                return;
+        if (BuildConfig.ENABLE_IMEI) {
+            try {
+                Object instance = getObjectInstance(className);
+                if (instance == null) {
+                    return;
+                }
+                String result = getString(instance, method, slotID);
+                if (!TextUtils.isEmpty(result) && !imeis.contains(result)) {
+                    imeis.add(result);
+                }
+            
+            } catch (Throwable e) {
             }
-            String result = getString(instance, method, slotID);
-            if (!TextUtils.isEmpty(result) && !imeis.contains(result)) {
-                imeis.add(result);
-            }
-
-        } catch (Throwable e) {
         }
     }
 
@@ -415,43 +438,43 @@ public class DoubleCardSupport {
         }
     }
 
-    /**
-     * 等同调用 <code>SystemProperties.get("key")<code/>或者shell调用<code>getprop key<code/>
-     *
-     * @param imeis
-     * @param key
-     */
-    private void addBySystemProperties(List<String> imeis, String key, String splitKey) {
-        try {
-            String result = (String) ClazzUtils.g().getDefaultProp(key);
-            if (TextUtils.isEmpty(result)) {
-                return;
-            }
-            if (TextUtils.isEmpty(splitKey)) {
-                // 没有过滤条件
-                if (!imeis.contains(result)) {
-                    imeis.add(result);
-                }
-            } else {
-                // 根据过滤条件切割
-                if (result.contains(splitKey)) {
-                    String[] ss = result.split(splitKey);
-                    if (ss != null && ss.length > 0) {
-                        for (String tmpKey : ss) {
-                            if (!TextUtils.isEmpty(tmpKey) && !imeis.contains(tmpKey)) {
-                                imeis.add(tmpKey);
-                            }
-                        }
-                    }
-                } else {
-                    if (!imeis.contains(result)) {
-                        imeis.add(result);
-                    }
-                }
-            }
-        } catch (Throwable e) {
-        }
-    }
+//    /**
+//     * 等同调用 <code>SystemProperties.get("key")<code/>或者shell调用<code>getprop key<code/>
+//     *
+//     * @param imeis
+//     * @param key
+//     */
+//    private void addBySystemProperties(List<String> imeis, String key, String splitKey) {
+//        try {
+//            String result = (String) ClazzUtils.g().getDefaultProp(key);
+//            if (TextUtils.isEmpty(result)) {
+//                return;
+//            }
+//            if (TextUtils.isEmpty(splitKey)) {
+//                // 没有过滤条件
+//                if (!imeis.contains(result)) {
+//                    imeis.add(result);
+//                }
+//            } else {
+//                // 根据过滤条件切割
+//                if (result.contains(splitKey)) {
+//                    String[] ss = result.split(splitKey);
+//                    if (ss != null && ss.length > 0) {
+//                        for (String tmpKey : ss) {
+//                            if (!TextUtils.isEmpty(tmpKey) && !imeis.contains(tmpKey)) {
+//                                imeis.add(tmpKey);
+//                            }
+//                        }
+//                    }
+//                } else {
+//                    if (!imeis.contains(result)) {
+//                        imeis.add(result);
+//                    }
+//                }
+//            }
+//        } catch (Throwable e) {
+//        }
+//    }
 
     /**
      * 获取失败后可以转换类型继续尝试. 典型接口 TelephonyManager.getSubscriberId(int id) TelephonyManager.getSubscriberId(long id)
@@ -462,15 +485,17 @@ public class DoubleCardSupport {
      * @return
      */
     private String getString(Object obj, String method, int slotId) {
-        try {
-            Object id = ClazzUtils.g().invokeObjectMethod(obj, method, new Class[]{int.class}, new Object[]{slotId});
-            if (id == null) {
-                id = ClazzUtils.g().invokeObjectMethod(obj, method, new Class[]{long.class}, new Object[]{slotId});
+        if (BuildConfig.ENABLE_IMEI) {
+            try {
+                Object id = ClazzUtils.g().invokeObjectMethod(obj, method, new Class[]{int.class}, new Object[]{slotId});
+                if (id == null) {
+                    id = ClazzUtils.g().invokeObjectMethod(obj, method, new Class[]{long.class}, new Object[]{slotId});
+                }
+                if (id != null) {
+                    return (String) id;
+                }
+            } catch (Throwable e) {
             }
-            if (id != null) {
-                return (String) id;
-            }
-        } catch (Throwable e) {
         }
         return null;
     }
