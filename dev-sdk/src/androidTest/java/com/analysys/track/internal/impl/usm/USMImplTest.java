@@ -17,6 +17,7 @@ import org.junit.Test;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class USMImplTest {
     Context context;
@@ -26,8 +27,20 @@ public class USMImplTest {
         context = InstrumentationRegistry.getTargetContext();
     }
 
-
+    @Test
     public void testGetUSMInfo() {
+        long end = System.currentTimeMillis();
+        long mid = end - TimeUnit.HOURS.toMillis(3);
+        long start = end - TimeUnit.HOURS.toMillis(6);
+        JSONArray jsonArray1 = USMImpl.getUSMInfo(context, start, end);
+
+        JSONArray jsonArray2 = USMImpl.getUSMInfo(context, start, mid);
+        JSONArray jsonArray3 = USMImpl.getUSMInfo(context, mid, end);
+
+        if (jsonArray1 == null || jsonArray2 == null || jsonArray3 == null) {
+            return;
+        }
+        Assert.assertTrue(jsonArray1.length() <= (jsonArray2.length() + jsonArray3.length()));
     }
 
     @Test
@@ -48,14 +61,15 @@ public class USMImplTest {
     }
 
     public void testGetEventType() {
+
     }
-    
+
     public static String stampToDate(long lt) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         Date date = new Date(lt);
         return simpleDateFormat.format(date);
     }
-    
+
     @Test
     public void moreRun() {
         long now = System.currentTimeMillis();
@@ -72,28 +86,28 @@ public class USMImplTest {
             }
         }
         Log.e("sanbo", "--------------------结束-----------------");
-        
+
     }
-    
+
     @Test
     public void compareOneAndMore() {
         for (int i = 0; i < 100; i++) {
             Log.i("sanbo", "--------------------" + i + "/" + 100 + "-----------------");
             realWork();
         }
-        
+
     }
-    
+
     private void realWork() {
         long s1 = System.currentTimeMillis();
         long lastRequestTime = s1 - 20 * EGContext.TIME_HOUR;
         USMImpl.getUSMInfo(context, lastRequestTime, s1);
         long e1 = System.currentTimeMillis();
         Log.e("sanbo", "单次获取20小时耗时:" + (e1 - s1));
-        
-        
+
+
         long tstart = System.currentTimeMillis();
-        
+
         long now = s1;
         long lsa = lastRequestTime;
         long dur = 3 * EGContext.TIME_HOUR;
@@ -110,13 +124,13 @@ public class USMImplTest {
             }
         }
 //        Log.e("sanbo", "--------------------结束-----------------");
-        
-        
+
+
         long tsend = System.currentTimeMillis();
         Log.e("sanbo", "多次获取20小时耗时:" + (tsend - tstart));
     }
-    
-    
+
+
     @Test
     public void testZeroDurRequest() {
         try {
@@ -160,6 +174,7 @@ public class USMImplTest {
             Log.e("sanbo", Log.getStackTraceString(e));
         }
     }
+
     @Test
     public void checkTime() {
 
