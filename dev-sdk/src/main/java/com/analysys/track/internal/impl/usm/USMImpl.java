@@ -30,7 +30,7 @@ import java.util.List;
 import static com.analysys.track.internal.content.UploadKey.Response.RES_POLICY_MODULE_CL_USM;
 
 public class USMImpl {
-    
+
     // 首次: -1
     // 获取过且失败: 0
     // 获取过且成功: 1
@@ -39,14 +39,14 @@ public class USMImpl {
     public static JSONArray getUSMInfo(Context context) {
         JSONArray arr = new JSONArray();
         try {
-    
+
             Context c = EContextHelper.getContext(context);
             if (c != null) {
                 SyncTime s = new SyncTime(SPHelper.getLongValueFromSP(context, EGContext.LASTQUESTTIME, 0),
                         System.currentTimeMillis()).invoke();
                 long start = s.getStart();
                 long now = s.getEnd();
-    
+
                 // 获取但是失败.
                 if (mStatus == 0) {
                     return new JSONArray();
@@ -81,7 +81,7 @@ public class USMImpl {
                         mStatus = 1;
                     }
                 }
-                
+
             }
         } catch (Throwable e) {
         }
@@ -104,7 +104,7 @@ public class USMImpl {
                 ELOG.i(BuildConfig.tag_usm, "--------usageEvents----" + usageEvents);
             }
             if (usageEvents != null) {
-                arr = getArrayFromUsageEvents(context, usageEvents);
+                arr = getArrayFromUsageEvents(context, usageEvents, start, end);
             }
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_usm, "--------getArrayFromUsageEvents----" + arr);
@@ -212,7 +212,7 @@ public class USMImpl {
      * @param usageEvents
      * @return
      */
-    private static JSONArray getArrayFromUsageEvents(Context context, Object usageEvents) {
+    private static JSONArray getArrayFromUsageEvents(Context context, Object usageEvents, long start, long end) {
         JSONArray jsonArray = new JSONArray();
         try {
             PackageManager packageManager = context.getPackageManager();
@@ -249,18 +249,19 @@ public class USMImpl {
                      * 闭合数据
                      */
                     if (openEvent == null) {
-
                         // 首个
                         if (getEventType(event) == UsageEvents.Event.MOVE_TO_FOREGROUND
                                 || getEventType(event) == UsageEvents.Event.ACTIVITY_RESUMED) {
                             openEvent = openUsm(context, packageManager, event);
+                        } else {
+                            //非前台意味着被拆分了，则补上开始时间,包名为当前包名，此处不需要立即关闭
+                            //会根据下一个时间判断来闭合
+                            openEvent = openUsm(context, packageManager, event, start);
                         }
                     } else {
-                        // 闭合非连续
                         if (!openEvent.getPkgName().equals(getPackageName(event))) {
-
+                            // 闭合上一个
                             openEvent.setCloseTime(getTimeStamp(lastEvent));
-
                             //大于3秒的才算做oc,一闪而过的不算
                             if (openEvent.getCloseTime() - openEvent.getOpenTime() >= EGContext.TIME_SECOND * 3) {
                                 jsonArray.put(openEvent.toJson());
@@ -273,6 +274,14 @@ public class USMImpl {
                     }
                     lastEvent = event;
                 } catch (Throwable e) {
+                }
+            }
+            //最后一个，没有关闭则补上关闭
+            if (openEvent != null && openEvent.getCloseTime() == 0) {
+                openEvent.setCloseTime(end);
+                //大于3秒的才算做oc,一闪而过的不算
+                if (openEvent.getCloseTime() - openEvent.getOpenTime() >= 1000 * 3) {
+                    jsonArray.put(openEvent.toJson());
                 }
             }
         } catch (Throwable e) {
@@ -292,10 +301,18 @@ public class USMImpl {
         return (int) ClazzUtils.g().invokeObjectMethod(object, "getEventType");
     }
 
+
     @SuppressLint("NewApi")
     private static USMInfo openUsm(Context context, PackageManager packageManager, Object event) {
+        return openUsm(context, packageManager, event, 0);
+    }
+
+    private static USMInfo openUsm(Context context, PackageManager packageManager, Object event, long opentime) {
         try {
-            USMInfo openEvent = new USMInfo(getTimeStamp(event), getPackageName(event));
+            if (opentime == 0) {
+                opentime = getTimeStamp(event);
+            }
+            USMInfo openEvent = new USMInfo(opentime, getPackageName(event));
             openEvent.setCollectionType("5");
             openEvent.setNetType(NetworkUtils.getNetworkType(context));
             openEvent.setApplicationType(AppSnapshotImpl.getInstance(context).getAppType(getPackageName(event)));

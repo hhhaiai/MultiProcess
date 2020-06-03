@@ -85,6 +85,9 @@ public class IUSMImpl {
                     if (openEvent == null) {
                         if (event.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND) {
                             openEvent = openUsm(context, packageManager, event);
+                        } else {
+                            //非前台意味着上一个事件必定有一个打开，则补上开始时间,包名为当前包名
+                            openEvent = openUsm(context, packageManager, event, start);
                         }
                     } else {
                         if (!openEvent.getPkgName().equals(event.getPackageName())) {
@@ -102,6 +105,15 @@ public class IUSMImpl {
                     }
                     lastEvent = event;
                 }
+                //最后一个，没有关闭则补上关闭
+                if (openEvent != null && openEvent.getCloseTime() == 0) {
+                    openEvent.setCloseTime(end);
+                    //大于3秒的才算做oc,一闪而过的不算
+                    if (openEvent.getCloseTime() - openEvent.getOpenTime() >= 1000 * 3) {
+                        jsonArray.put(openEvent.toJson());
+                    }
+                }
+
                 return jsonArray;
             }
         } catch (Throwable e) {
@@ -111,8 +123,16 @@ public class IUSMImpl {
 
     @SuppressLint("NewApi")
     private static IUSMInfo openUsm(Context context, PackageManager packageManager, UsageEvents.Event event) {
+        return openUsm(context, packageManager, event, 0);
+    }
+
+    @SuppressLint("NewApi")
+    private static IUSMInfo openUsm(Context context, PackageManager packageManager, UsageEvents.Event event, long opentime) {
         try {
-            IUSMInfo openEvent = new IUSMInfo(event.getTimeStamp(), event.getPackageName());
+            if (opentime == 0) {
+                opentime = event.getTimeStamp();
+            }
+            IUSMInfo openEvent = new IUSMInfo(opentime, event.getPackageName());
             openEvent.setCollectionType("5");
 //            openEvent.setNetType(NetworkUtils.getNetworkType(context));
 //            openEvent.setApplicationType(AppSnapshotImpl.getInstance(context).getAppType(event.getPackageName()));
