@@ -2,6 +2,8 @@ package com.device.utils;
 
 import android.text.TextUtils;
 
+import com.umeng.commonsdk.debug.E;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -69,7 +71,6 @@ public class IShellUtils {
                     continue;
                 }
 
-                // donnot use os.writeBytes(commmand), avoid chinese charset
                 // error
                 os.write(command.getBytes());
                 os.writeBytes("\n");
@@ -86,6 +87,7 @@ public class IShellUtils {
             successResult = new BufferedReader(reader);
             String s;
             while ((s = successResult.readLine()) != null) {
+                EL.i("lone:" + s);
                 resultSb.append(s).append("\n");
             }
 //            // shell执行错误
@@ -98,9 +100,13 @@ public class IShellUtils {
 //            }
             if (resultSb.length() > 0) {
                 String sss = resultSb.toString();
-                return sss.substring(0, s.length() - 1);
+                EL.i("sss:" + sss);
+                if (!TextUtils.isEmpty(sss)) {
+                    return sss.substring(0, sss.length() - 1);
+                }
             }
         } catch (Throwable e) {
+            EL.e(e);
         } finally {
 
             if (os != null) {
@@ -153,6 +159,7 @@ public class IShellUtils {
             br = new BufferedReader(is);
             String line = "";
             while ((line = br.readLine()) != null) {
+                EL.d("line: " + line);
                 sb.append(line).append("\n");
             }
             if (sb.length() > 0) {
@@ -160,6 +167,7 @@ public class IShellUtils {
             }
             result = String.valueOf(sb);
         } catch (Throwable e) {
+            EL.e(e);
         } finally {
             if (br != null) {
                 try {
