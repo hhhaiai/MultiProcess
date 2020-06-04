@@ -1,19 +1,12 @@
 apply plugin: 'com.android.library'
-
 //****************buildSrc依赖选项*****************
-apply plugin: 'costtime'
-costtime {
-    enable true
-    costAll false
-    timeout 10
-    enableLog true
-}
+apply plugin: 'analysys_dev_track_tool'
 
 //demo appkey
 def demoAppkey = "xx"
 //****************打包时配置参数*****************
 // 打正式包,正式包开关: bugly关闭，日志关闭，内网地址，严格模式
-def isRelease = true
+def isRelease = false
 //SDK版本号, 混淆字符串也依赖改行，切勿改动变量名字
 def ver = "4.3.0.9"
 def date = "20200515"
