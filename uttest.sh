@@ -5,7 +5,7 @@ source_common() {
         cd $(dirname $0)
         pwd
     )
-    source $pwd/common.sh
+    source $pwd/common.sh md
 }
 
 
@@ -25,7 +25,8 @@ mode_up()
 
 connectAdb(){
   # 连接自己机器
-  $iadb connect 192.168.6.79:5555
+  $iadb connect 192.168.6.79:5555 # 锤子坚果3
+  $iadb connect 192.168.4.236:5555 # 华为麦芒
   # todo 连接群控机器
 }
 

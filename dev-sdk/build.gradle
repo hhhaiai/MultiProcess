@@ -1,13 +1,6 @@
 apply plugin: 'com.android.library'
-
 //****************buildSrc依赖选项*****************
-apply plugin: 'costtime'
-costtime {
-    enable true
-    costAll false
-    timeout 10
-    enableLog true
-}
+apply plugin: 'analysys_dev_track_tool'
 
 //demo appkey
 def demoAppkey = "xx"
