@@ -196,7 +196,7 @@ test() {
 #logd $0
 #logd $1
 if [ -n "$1" ]; then
-     logi "has one args"
+    logi "has one args"
     chmod -R 777 tools/
     $mdout install
     git config core.filemode false
