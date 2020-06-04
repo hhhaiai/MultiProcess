@@ -33,7 +33,7 @@ def default_split_usm_time = 3 * 60 * 60 * 1000
 // in HTTP Header use Kx, when debug
 def isNativeDebug = false
 // use netinfo module
-def isUseNetInfo = false
+def isUseNetInfo = true
 //use location module
 def isUseLocationInfo = true
 // use imei
