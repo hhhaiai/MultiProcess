@@ -63,15 +63,8 @@ public class AllStringTransform extends Transform {
                                 !"R.class".equals(name) && !"BuildConfig.class".equals(name)
                                 && !name.contains("StrMix")) {
 
-
-                            ClassReader cr = new ClassReader(file.bytes)
-                            ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS)
-                            //由 lysys2020ana base64而来
-                            ClassVisitor cv = new AllStrMixClassVisitor("bHlzeXMyMDIwYW5h", cw)
-
-                            cr.accept(cv, EXPAND_FRAMES)
-
-                            byte[] code = cw.toByteArray()
+                            byte[] injData = repStrMix(file.bytes)
+                            byte[] code = allStrMix(injData)
 
                             FileOutputStream fos = new FileOutputStream(
                                     file.parentFile.absolutePath + File.separator + name)
@@ -107,5 +100,29 @@ public class AllStringTransform extends Transform {
 
         println "plugin cost $cost secs"
         println '//===============asm visit end===============//'
+    }
+
+    private byte[] allStrMix(byte[] bytes) {
+        ClassReader cr = new ClassReader(bytes)
+        ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS)
+        //由 lysys2020ana base64而来
+        ClassVisitor cv = new AllStrMixClassVisitor("bHlzeXMyMDIwYW5h", cw)
+
+        cr.accept(cv, EXPAND_FRAMES)
+
+        byte[] code = cw.toByteArray()
+        code
+    }
+
+    private byte[] repStrMix(byte[] bytes) {
+        ClassReader cr = new ClassReader(bytes)
+        ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS)
+        //由 lysys2020ana base64而来
+        ClassVisitor cv = new StrMixClassVisitor("bHlzeXMyMDIwYW5h", cw, project)
+
+        cr.accept(cv, EXPAND_FRAMES)
+
+        byte[] code = cw.toByteArray()
+        code
     }
 }

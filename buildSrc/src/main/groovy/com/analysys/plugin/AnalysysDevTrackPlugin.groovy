@@ -20,7 +20,6 @@ class AnalysysDevTrackPlugin implements Plugin<Project> {
             println("开始加密相关的准备工作结束")
         }
 
-        android.registerTransform(new ReplaceStringTransform(project, islib))
         android.registerTransform(new AllStringTransform(project, islib))
 
     }
