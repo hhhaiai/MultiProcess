@@ -3,10 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.device">
 
-    <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="23"
-        tools:ignore="OldTargetApi" />
+
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />

@@ -2,7 +2,6 @@ package com.analysys.plugin
 
 
 import groovy.json.JsonSlurper
-import groovy.json.internal.LazyMap
 import org.gradle.api.Project
 
 
@@ -29,7 +28,7 @@ public class ReplaceStrMix {
             def jsonSlu = new JsonSlurper()
             def jsonMap = jsonSlu.parseText(json)
 
-            assert jsonMap instanceof LazyMap
+            assert jsonMap instanceof Map
 
             jsonMap.each { Map.Entry<String, Object> item ->
                 hset.put(item.value, item.key)

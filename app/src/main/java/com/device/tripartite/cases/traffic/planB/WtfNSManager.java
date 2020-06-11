@@ -2,6 +2,7 @@ package com.device.tripartite.cases.traffic.planB;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AppOpsManager;
 import android.app.usage.NetworkStats;
@@ -14,9 +15,7 @@ import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.RemoteException;
 import android.provider.Settings;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+
 import android.telephony.TelephonyManager;
 
 import com.device.utils.EL;
@@ -35,7 +34,6 @@ public class WtfNSManager {
     /**
      * 本机使用的 wifi 总流量
      */
-    @RequiresApi(api = Build.VERSION_CODES.M)
     public long getAllBytesWifi() {
         NetworkStats.Bucket bucket;
         try {
@@ -53,7 +51,6 @@ public class WtfNSManager {
     /**
      * 本机使用的 mobile 总流量
      */
-    @RequiresApi(api = Build.VERSION_CODES.M)
     public long getAllBytesMobile() {
         NetworkStats.Bucket bucket;
         try {
@@ -83,7 +80,6 @@ public class WtfNSManager {
      * @param packageUid 应用的uid
      * @return
      */
-    @RequiresApi(api = Build.VERSION_CODES.M)
     public long getPackageTxDayBytesWifi(int packageUid) {
         NetworkStats networkStats = null;
         networkStats = networkStatsManager.queryDetailsForUid(
@@ -138,7 +134,6 @@ public class WtfNSManager {
         return uid;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     public void getStr() {
         PackageManager packageManager = mContext.getPackageManager();
         final List<PackageInfo> applicationInfoList = packageManager.getInstalledPackages(0);
@@ -180,26 +175,6 @@ public class WtfNSManager {
         }
     }
 
-    private boolean hasPermissionToReadNetworkStats() {
-        int permissionCheck = ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_PHONE_STATE);
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions((Activity) mContext,
-                    new String[]{Manifest.permission.READ_PHONE_STATE}, 99);
-        }
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true;
-        }
-        final AppOpsManager appOps = (AppOpsManager) mContext.getSystemService(Context.APP_OPS_SERVICE);
-        int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
-                android.os.Process.myUid(), mContext.getPackageName());
-        if (mode == AppOpsManager.MODE_ALLOWED) {
-            return true;
-        }
-
-        requestReadNetworkStats();
-        return false;
-    }
 
     // 打开“有权查看使用情况的应用”页面
     private void requestReadNetworkStats() {

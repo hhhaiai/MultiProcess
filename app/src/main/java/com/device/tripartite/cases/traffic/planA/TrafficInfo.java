@@ -1,7 +1,6 @@
 package com.device.tripartite.cases.traffic.planA;
 
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
 
 class TrafficInfo {
     private String pkgName = null;
@@ -25,7 +24,6 @@ class TrafficInfo {
         uidTxBytes = tx;
     }
 
-    @NonNull
     @Override
     public String toString() {
         return new StringBuffer().append(appname).append("[").append(pkgName).append("]")

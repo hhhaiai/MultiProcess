@@ -4,9 +4,6 @@ import android.app.usage.NetworkStats;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
 
 import java.util.List;
 
