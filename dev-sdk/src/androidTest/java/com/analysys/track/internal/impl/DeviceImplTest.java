@@ -1,10 +1,13 @@
 package com.analysys.track.internal.impl;
 
+import android.os.Build;
+
 import com.analysys.track.AnalsysTest;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class DeviceImplTest extends AnalsysTest {
 
@@ -16,7 +19,11 @@ public class DeviceImplTest extends AnalsysTest {
     public void getBluetoothAddress() {
         //10 取不到
         String s = DeviceImpl.getInstance(mContext).getBluetoothAddress(mContext);
-        assertNotNull(s);
+        if(Build.VERSION.SDK_INT>28){
+            assertNull("获取蓝牙mac地址，10可能取不到,这个手机是10但取到了",s);
+        }else{
+            assertNotNull("获取蓝牙mac地址，10可能取不到，这个手机不是10但没取到",s);
+        }
     }
 
     @Test
