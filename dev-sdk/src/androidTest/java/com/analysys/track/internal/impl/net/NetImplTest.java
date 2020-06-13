@@ -1,5 +1,7 @@
 package com.analysys.track.internal.impl.net;
 
+import android.os.Build;
+
 import com.analysys.track.AnalsysTest;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.utils.ShellUtils;
@@ -20,7 +22,11 @@ public class NetImplTest extends AnalsysTest {
     public void getUidFromNet() {
         for (int i = 0; i < 100; i++) {
             HashMap<String, NetInfo> infos = NetImpl.getInstance(mContext).getNetInfo();
-            Assert.assertTrue(infos.size() > 0);
+            if(Build.VERSION.SDK_INT>28){
+                Assert.assertNull("10的机型，但预料外的获取到了NetInfo", infos);
+                return;
+            }
+            Assert.assertTrue("10以下的机型，没获取到netinfo",infos.size() > 0);
         }
         JSONArray array = null;
         array = TableProcess.getInstance(mContext).selectNet(1 * 1024 * 1024);
