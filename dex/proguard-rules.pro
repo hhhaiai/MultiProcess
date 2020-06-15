@@ -41,7 +41,7 @@
 
 
 # 打通所有的包
--repackageclass com.analysys
+-repackageclasses com.analysys
 # 混淆到包名下
 -dontwarn com.analysys.**
 -keep class com.analysys.Ab{*;}

@@ -45,7 +45,7 @@
 #################################################################
 
 # 打通所有的包
--repackageclass com.analysys.track
+-repackageclasses com.analysys.track
 # 混淆到包名下
 -dontwarn com.analysys.track.**
 # 保证API不混淆

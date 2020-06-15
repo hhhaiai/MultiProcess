@@ -5,7 +5,7 @@ source_common() {
         cd $(dirname $0)
         pwd
     )
-    source $pwd/common.sh
+    source $pwd/common.sh md
 }
 
 

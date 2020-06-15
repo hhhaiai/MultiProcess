@@ -205,7 +205,7 @@ def zipName = "analysys_track_v${ver}_${date}.zip"
 def mapping = "v${ver}_${date}_${subVersion}_mapping.txt"
 
 task generateJar(type: Copy) {
-    from("build/intermediates/bundles/release")
+    from("build/intermediates/aar_main_jar/release")
     into "../releasebak"
     include("${defaultJar}")
     rename("${defaultJar}", "${jarname}")
@@ -228,7 +228,7 @@ task packageZip(type: Zip) {
 }
 
 task copyJar(type: Copy) {
-    from("build/intermediates/bundles/release")
+    from("build/intermediates/aar_main_jar/release")
     into "${zipPathDir}"
     include("${defaultJar}")
 }
