@@ -15,7 +15,7 @@ def subVersion = "00"
 // 上传时间，几小时
 def default_request_hours = 6
 // use https request
-def isUseHttps = true
+def isUseHttps = false
 // USM分割时间，单位毫秒。如不使用分割，设置成0即可
 // 默认规则: 首次->20小时前-现在  其他->上次发送成功-现在
 def default_split_usm_time = 3 * 60 * 60 * 1000
@@ -45,7 +45,7 @@ def BUILD_USE_STRICTMODE = false
 def enableHotFix = true
 // 往对应平台传输错误日志
 def ENABLE_BUG_REPORT = true
-def DEBUG_URL = false
+def DEBUG_URL = true
 //所有的log开关,true 打印所有的日志,false,关闭所有的日志
 def logcat = true
 //debug utils
@@ -86,6 +86,7 @@ android {
             logcat = false
             debug_utils = false
             BUILD_USE_STRICTMODE = true
+            isUseHttps = true
         }
 //        buildConfigField "String", "json_proguard", "\"${jp}\""
         buildConfigField "String", "DEMO_APPKEY", "\"${demoAppkey}\""
