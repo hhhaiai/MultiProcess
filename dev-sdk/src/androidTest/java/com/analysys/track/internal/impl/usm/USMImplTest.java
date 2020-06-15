@@ -128,6 +128,7 @@ public class USMImplTest {
 
         long tsend = System.currentTimeMillis();
         Log.e("sanbo", "多次获取20小时耗时:" + (tsend - tstart));
+        Assert.assertTrue("获取USM耗时异常：", tsend - tstart <= 10000);
     }
 
 
