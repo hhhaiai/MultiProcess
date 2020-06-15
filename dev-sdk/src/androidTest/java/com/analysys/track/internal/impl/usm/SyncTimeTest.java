@@ -54,7 +54,7 @@ public class SyncTimeTest {
 
         Log.i("sanbo", "case2 start:" + start);
         Log.i("sanbo", "case2 end:" + end);
-        Assert.assertTrue("case2", (end - start > 0));
+        Assert.assertTrue("USM时间校准", (end - start >= 0));
     }
 
     private void case1() {

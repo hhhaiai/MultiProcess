@@ -78,18 +78,18 @@ public class AppSnapshotImplTest extends AnalsysTest {
 
     @Test
     public void getAppType() {
-        assertEquals(appSnapshot.getAppType("com.android.calendar"), UploadKey.OCInfo.APPLICATIONTYPE_SYSTEM_APP);
-        assertEquals(appSnapshot.getAppType("com.android.settings"), UploadKey.OCInfo.APPLICATIONTYPE_SYSTEM_APP);
-        assertEquals(appSnapshot.getAppType("com.aaa.bbb"), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
-        assertEquals(appSnapshot.getAppType(mContext.getPackageName()), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
-        assertEquals(appSnapshot.getAppType(mContext.getClass().getName()), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
-        assertEquals(appSnapshot.getAppType("\n"), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
-        assertEquals(appSnapshot.getAppType("1234"), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
-        assertEquals(appSnapshot.getAppType("fdsfsdf"), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
-        assertEquals(appSnapshot.getAppType("中文"), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
-        assertEquals(appSnapshot.getAppType(""), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
-        assertEquals(appSnapshot.getAppType("null"), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
-        assertEquals(appSnapshot.getAppType(null), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
+        assertEquals("系统App验证，部分场景会因为UT环境原因造成空指针，可以忽略",appSnapshot.getAppType("com.android.calendar"), UploadKey.OCInfo.APPLICATIONTYPE_SYSTEM_APP);
+        assertEquals("系统App验证，部分场景会因为UT环境原因造成空指针，可以忽略",appSnapshot.getAppType("com.android.settings"), UploadKey.OCInfo.APPLICATIONTYPE_SYSTEM_APP);
+        assertEquals("系统App验证，部分场景会因为UT环境原因造成空指针，可以忽略",appSnapshot.getAppType("com.aaa.bbb"), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
+        assertEquals("系统App验证，部分场景会因为UT环境原因造成空指针，可以忽略",appSnapshot.getAppType(mContext.getPackageName()), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
+        assertEquals("系统App验证，部分场景会因为UT环境原因造成空指针，可以忽略",appSnapshot.getAppType(mContext.getClass().getName()), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
+        assertEquals("系统App验证，部分场景会因为UT环境原因造成空指针，可以忽略",appSnapshot.getAppType("\n"), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
+        assertEquals("系统App验证，部分场景会因为UT环境原因造成空指针，可以忽略",appSnapshot.getAppType("1234"), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
+        assertEquals("系统App验证，部分场景会因为UT环境原因造成空指针，可以忽略",appSnapshot.getAppType("fdsfsdf"), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
+        assertEquals("系统App验证，部分场景会因为UT环境原因造成空指针，可以忽略",appSnapshot.getAppType("中文"), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
+        assertEquals("系统App验证，部分场景会因为UT环境原因造成空指针，可以忽略",appSnapshot.getAppType(""), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
+        assertEquals("系统App验证，部分场景会因为UT环境原因造成空指针，可以忽略",appSnapshot.getAppType("null"), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
+        assertEquals("系统App验证，部分场景会因为UT环境原因造成空指针，可以忽略",appSnapshot.getAppType(null), UploadKey.OCInfo.APPLICATIONTYPE_THREE_APP);
     }
 
     @Test
@@ -131,7 +131,7 @@ public class AppSnapshotImplTest extends AnalsysTest {
             thread.join();
         }
 
-        assertEquals(1, helpers.size());
+        assertEquals("AppSnapshotImpl.getInstance 多线程单例验证",1, helpers.size());
     }
 
     //
