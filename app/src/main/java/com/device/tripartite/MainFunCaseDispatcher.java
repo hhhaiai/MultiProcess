@@ -1,45 +1,47 @@
 package com.device.tripartite;
 
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.impl.AppSnapshotImpl;
+import com.analysys.track.internal.impl.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.net.NetInfo;
+import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.impl.usm.USMImpl;
+import com.analysys.track.internal.model.BatteryModuleNameInfo;
+import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.internal.work.ISayHello;
 import com.analysys.track.utils.PkgList;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
-import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.DebugDev;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.analysys.track.utils.sp.SPHelper;
 import com.device.tripartite.cases.PubCases;
 import com.device.tripartite.cases.traffic.planA.A;
+import com.device.tripartite.cases.traffic.planB.WtfNSManager;
 import com.device.tripartite.cases.traffic.planc.WtfTs;
 import com.device.utils.EL;
-import com.device.tripartite.cases.traffic.planB.WtfNSManager;
 import com.device.utils.memot.M2Fmapping;
 
 import org.json.JSONArray;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 
 /**
@@ -193,9 +195,109 @@ public class MainFunCaseDispatcher {
     }
 
     private static void runCaseP15(final Context context) {
-//        for (int i = 0; i < 1000; i++) {
-//            LocationImpl.getInstance(context).getLocationInfoInThread();
-//        }
+        int test_size = 5000;
+
+        System.gc();
+
+        List<Throwable> throwables = new ArrayList<>();
+        //最大分配内存
+        float maxMemory = (float) (Runtime.getRuntime().maxMemory() * 1.0 / (1024 * 1024));
+        //当前分配的总内存
+        float totalMemory = (float) (Runtime.getRuntime().totalMemory() * 1.0 / (1024 * 1024));
+        //剩余内存
+        float freeMemory = (float) (Runtime.getRuntime().freeMemory() * 1.0 / (1024 * 1024));
+        StringBuilder builder = new StringBuilder();
+        builder
+                .append("执行次数:").append(test_size).append("\n")
+                .append("测试前总电量:")
+                .append(BatteryModuleNameInfo.getInstance().getBatteryScale()).append("\n")
+                .append("测试前剩余电量:")
+                .append(BatteryModuleNameInfo.getInstance().getBatteryLevel()).append("\n")
+                .append("测试前电池温度:")
+                .append(BatteryModuleNameInfo.getInstance().getBatteryTemperature()).append("\n")
+                .append("测试前最大分配内存:")
+                .append(maxMemory).append("\n")
+                .append("测试前当前分配的总内存:")
+                .append(totalMemory).append("\n")
+                .append("测试前剩余内存:")
+                .append(freeMemory).append("\n");
+
+        Log.e("runCaseP15[开始]", builder.toString());
+        long time = System.currentTimeMillis();
+
+
+        for (int i = 0; i < 100; i++) {
+            //模块执行
+            long timePrint = System.currentTimeMillis();
+            AppSnapshotImpl.getInstance(context).getSnapShotInfo();
+            Log.e("time_print_AppSna", "" + (System.currentTimeMillis() - timePrint));
+            timePrint = System.currentTimeMillis();
+            OCImpl.getInstance(context).processOC();
+            Log.e("time_print_OCImpl", "" + (System.currentTimeMillis() - timePrint));
+            timePrint = System.currentTimeMillis();
+            UploadImpl.getInstance(context).doUploadImpl();
+            Log.e("time_print_UploadImpl", "" + (System.currentTimeMillis() - timePrint));
+            timePrint = System.currentTimeMillis();
+            LocationImpl.getInstance(context).getLocationInfoInThread();
+            Log.e("time_print_LocationImpl", "" + (System.currentTimeMillis() - timePrint));
+            timePrint = System.currentTimeMillis();
+            NetImpl.getInstance(context).getNetInfo();
+            Log.e("time_print_NetImpl", "" + (System.currentTimeMillis() - timePrint));
+            timePrint = System.currentTimeMillis();
+            USMImpl.getUSMInfo(context);
+            Log.e("time_print_USMImpl", "" + (System.currentTimeMillis() - timePrint));
+            //模块执行
+        }
+
+
+        time = System.currentTimeMillis() - time;
+
+        System.gc();
+
+        //最大分配内存
+        maxMemory = (float) (Runtime.getRuntime().maxMemory() * 1.0 / (1024 * 1024));
+        //当前分配的总内存
+        totalMemory = (float) (Runtime.getRuntime().totalMemory() * 1.0 / (1024 * 1024));
+        //剩余内存
+        freeMemory = (float) (Runtime.getRuntime().freeMemory() * 1.0 / (1024 * 1024));
+        builder
+                .append("\n")
+                .append("总耗时:").append(time).append("\n")
+                .append("平均耗时:").append(time / (double) test_size).append("\n")
+                .append("测试后总电量:")
+                .append(BatteryModuleNameInfo.getInstance().getBatteryScale()).append("\n")
+                .append("测试后剩余电量:")
+                .append(BatteryModuleNameInfo.getInstance().getBatteryLevel()).append("\n")
+                .append("测试后电池温度:")
+                .append(BatteryModuleNameInfo.getInstance().getBatteryTemperature()).append("\n")
+                .append("测试后最大分配内存:")
+                .append(maxMemory).append("\n")
+                .append("测试后当前分配的总内存:")
+                .append(totalMemory).append("\n")
+                .append("测试后剩余内存:")
+                .append(freeMemory).append("\n");
+
+        for (Throwable throwable : throwables
+        ) {
+            builder.append(throwable.getMessage()).append("\n");
+        }
+
+        Log.e("runCaseP15[结束]", builder.toString());
+
+        try {
+            FileOutputStream outputStream = new FileOutputStream(context.getCacheDir().getAbsoluteFile() + "/netimpl.log");
+            OutputStreamWriter or = new OutputStreamWriter(outputStream);
+            BufferedWriter writer = new BufferedWriter(or);
+            writer.write(builder.toString());
+
+            writer.close();
+            or.close();
+            outputStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void runCaseP16(final Context context) {
@@ -250,20 +352,20 @@ public class MainFunCaseDispatcher {
     }
 
     private static void runCaseP22(final Context context) {
-    
+
         for (int i = 0; i < 100; i++) {
             Log.i("sanbo", "--------------------" + i + "/" + 100 + "-----------------");
             realWork(context);
         }
     }
-    
+
     private static void realWork(final Context context) {
         long s1 = System.currentTimeMillis();
         long lastRequestTime = s1 - 20 * EGContext.TIME_HOUR;
         USMImpl.getUSMInfo(context, lastRequestTime, s1);
         long e1 = System.currentTimeMillis();
         Log.e("sanbo", "单次获取20小时耗时:" + (e1 - s1));
-        
+
         long dur = 3 * EGContext.TIME_HOUR;
         more(context, s1, lastRequestTime, dur);
         dur = 1 * EGContext.TIME_HOUR;
@@ -271,7 +373,7 @@ public class MainFunCaseDispatcher {
         dur = 30 * EGContext.TIME_MINUTE;
         more(context, s1, lastRequestTime, dur);
     }
-    
+
     private static void more(Context context, long s1, long lastRequestTime, long dur) {
         long tstart = System.currentTimeMillis();
         long now = s1;
@@ -290,21 +392,21 @@ public class MainFunCaseDispatcher {
             }
         }
 //        Log.e("sanbo", "--------------------结束-----------------");
-        
+
         long tsend = System.currentTimeMillis();
         Log.e("sanbo", "多次获取20小时 [" + dur + "] 耗时:" + (tsend - tstart));
     }
-    
+
     private static void runCaseP23(final Context context) {
         JSONArray arr = USMImpl.getUSMInfo(context, 0, System.currentTimeMillis());
         EL.i(arr);
     }
-    
+
     private static void runCaseP24(final Context context) {
         long lastReqTime = SPHelper.getLongValueFromSP(context, EGContext.LASTQUESTTIME, 0);
         EL.i("lastReqTime: " + lastReqTime);
     }
-    
+
     private static void runCaseP25(final Context context) {
         JSONArray arr = USMImpl.getUSMInfo(context);
         EL.i(arr);
