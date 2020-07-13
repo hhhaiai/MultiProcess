@@ -166,9 +166,6 @@ public class NetImpl {
             }
             //本次扫描的时间戳
             long time = System.currentTimeMillis();
-            api_4 = getApi4(context);
-            proc_56 = getProc56(context);
-            usm = getUsm(context);
             //扫描
             for (String cmd : CMDS) {
                 try {
@@ -251,46 +248,7 @@ public class NetImpl {
         }
     }
 
-    @SuppressLint("WrongConstant")
-    private String getUsm(Context mContext) {
-        if (Build.VERSION.SDK_INT >= 21) {
-            class RecentUseComparator implements Comparator<UsageStats> {
-                @SuppressLint("NewApi")
-                @Override
-                public int compare(UsageStats lhs, UsageStats rhs) {
-                    return Long.compare(rhs.getLastTimeUsed(), lhs.getLastTimeUsed());
-                }
-            }
-            try {
-                UsageStatsManager usm = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP_MR1) {
-                    usm = (UsageStatsManager) mContext.getApplicationContext()
-                            .getSystemService(Context.USAGE_STATS_SERVICE);
-                } else {
-                    usm = (UsageStatsManager) mContext.getApplicationContext()
-                            .getSystemService("usagestats");
-                }
-                if (usm == null) {
-                    return null;
-                }
-                long ts = System.currentTimeMillis() - EGContext.TIME_HOUR;
-                List<UsageStats> usageStats = usm.queryUsageStats(UsageStatsManager.INTERVAL_BEST, ts, System.currentTimeMillis());
-                if (usageStats == null || usageStats.size() == 0) {
-                    return null;
-                }
-                Collections.sort(usageStats, new RecentUseComparator());
-                String usmPkg = usageStats.get(0).getPackageName();
-                if (!TextUtils.isEmpty(usmPkg)) {
-                    return usmPkg;
-                }
-            } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(BuildConfig.tag_netinfo, e);
-                }
-            }
-        }
-        return null;
-    }
+
 
     private void savePkgToDb(HashMap<String, NetInfo> pkgs) {
 
@@ -401,86 +359,6 @@ public class NetImpl {
             }
         }
     }
-
-    private JSONArray getProc56(Context context) {
-        try {
-            if ((Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24)) {
-                return (JSONArray) ProcUtils.getInstance(context).getRunningInfo().opt(RUNNING_OC_RESULT);
-            }
-        } catch (Throwable e) {
-        }
-        return null;
-    }
-
-    private String getApi4(Context mContext) {
-        if (Build.VERSION.SDK_INT >= 21) {
-            return null;
-        }
-        String pkgName = null;
-        ActivityManager am = null;
-        try {
-            if (mContext == null) {
-                mContext = EContextHelper.getContext();
-            }
-            if (mContext != null) {
-                am = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
-                List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
-                if (tasks == null || tasks.size() <= 0) {
-                    List<ActivityManager.RunningAppProcessInfo> processInfos = am.getRunningAppProcesses();
-                    for (ActivityManager.RunningAppProcessInfo appProcess : processInfos) {
-                        if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-                            pkgName = appProcess.processName;
-                        }
-                    }
-                } else {
-                    // 获取栈顶app的包名
-                    pkgName = tasks.get(0).topActivity.getPackageName();
-                }
-            }
-
-
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_netinfo, e);
-            }
-        }
-        return pkgName;
-    }
-
-
-//    public String runShell(String cmd) {
-//        BufferedReader bufferedReader = null;
-//        InputStreamReader reader = null;
-//        FileInputStream fileInputStream = null;
-//        try {
-//            File file = new File(cmd);
-//            if (!file.exists() || !file.isFile()) {
-//                return null;
-//            }
-//            fileInputStream = new FileInputStream(file);
-//            reader = new InputStreamReader(fileInputStream);
-//            bufferedReader = new BufferedReader(reader);
-//            StringBuilder builder = new StringBuilder();
-//            while (true) {
-//                String line = bufferedReader.readLine();
-//                if (line == null) {
-//                    break;
-//                }
-//                builder.append(line).append("\n");
-//            }
-//            return builder.toString();
-//        } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(BuildConfig.tag_netinfo, e);
-//            }
-//        } finally {
-//            StreamerUtils.safeClose(bufferedReader);
-//            StreamerUtils.safeClose(reader);
-//            StreamerUtils.safeClose(fileInputStream);
-//        }
-//        return null;
-//    }
-
 
     private String getSocketType(String s) {
         if (s == null) {
