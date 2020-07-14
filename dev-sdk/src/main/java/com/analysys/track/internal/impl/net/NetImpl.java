@@ -1,23 +1,16 @@
 package com.analysys.track.internal.impl.net;
 
-import android.annotation.SuppressLint;
-import android.app.ActivityManager;
-import android.app.usage.UsageStats;
-import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
-import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.SystemUtils;
@@ -27,12 +20,8 @@ import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-
-import static com.analysys.track.internal.impl.oc.ProcUtils.RUNNING_OC_RESULT;
 
 /**
  * @Copyright 2019 analysys Inc. All rights reserved.
@@ -138,7 +127,6 @@ public class NetImpl {
         }
         return map;
     }
-
 
 
     public HashMap<String, NetInfo> getNetInfo() {
@@ -247,7 +235,6 @@ public class NetImpl {
     }
 
 
-
     private void savePkgToDb(HashMap<String, NetInfo> pkgs) {
 
         if (BuildConfig.logcat) {
@@ -338,19 +325,34 @@ public class NetImpl {
                     if (scanningInfo.tcpInfos == null) {
                         scanningInfo.tcpInfos = new ArrayList<>();
                     }
-                    NetInfo.TcpInfo tcpInfo = new NetInfo.TcpInfo();
-                    scanningInfo.tcpInfos.add(tcpInfo);
-                    tcpInfo.local_addr = getIpAddr(parameter[2]);
-                    tcpInfo.remote_addr = getIpAddr(parameter[3]);
-                    tcpInfo.socket_type = getSocketType(parameter[4]);
-                    if (cmd.contains("/")) {
-                        String[] protocols = cmd.split("/");
-                        if (protocols.length > 0) {
-                            tcpInfo.protocol = protocols[protocols.length - 1];
+                    String socketType = getSocketType(parameter[4]);
+                    if (socketType != null && theTypeOfAttention(socketType)) {
+                        NetInfo.TcpInfo tcpInfo = new NetInfo.TcpInfo();
+                        scanningInfo.tcpInfos.add(tcpInfo);
+                        tcpInfo.local_addr = getIpAddr(parameter[2]);
+                        tcpInfo.remote_addr = getIpAddr(parameter[3]);
+                        tcpInfo.socket_type = getSocketType(parameter[4]);
+                        if (cmd.contains("/")) {
+                            String[] protocols = cmd.split("/");
+                            if (protocols.length > 0) {
+                                tcpInfo.protocol = protocols[protocols.length - 1];
+                            }
                         }
                     }
                 }
             }
+        }
+    }
+
+    private boolean theTypeOfAttention(String socket_type) {
+        switch (socket_type) {
+            case "LISTEN":
+            case "SYN_SENT":
+            case "SYN_RECV":
+            case "ESTABLISHED":
+                return true;
+            default:
+                return false;
         }
     }
 

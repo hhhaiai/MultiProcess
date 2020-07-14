@@ -4,6 +4,8 @@ import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.BugReportForTest;
+import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -138,15 +140,6 @@ public class NetInfo {
                     object.put("AN", appname);
                 }
                 object.put("ST", time);
-                if (!TextUtils.isEmpty(usm)) {
-                    object.put("USM", usm);
-                }
-                if (!TextUtils.isEmpty(api_4)) {
-                    object.put("API4", api_4);
-                }
-                if (proc_56 != null && proc_56.length() > 0) {
-                    object.put("PROC56", proc_56);
-                }
                 if (tcpInfos == null || tcpInfos.size() == 0) {
                     return object;
                 }
@@ -198,11 +191,18 @@ public class NetInfo {
         public JSONObject toJson() {
             JSONObject object = new JSONObject();
             try {
-
-                object.put("PTL", protocol);
-                object.put("CAD", local_addr);
-                object.put("RAD", remote_addr);
-                object.put("TP", socket_type);
+                if (SPHelper.getBooleanValueFromSP(EContextHelper.getContext(), "NETINFO_PTL", true)) {
+                    object.put("PTL", protocol);
+                }
+                if (SPHelper.getBooleanValueFromSP(EContextHelper.getContext(), "NETINFO_CAD", true)) {
+                    object.put("CAD", local_addr);
+                }
+                if (SPHelper.getBooleanValueFromSP(EContextHelper.getContext(), "NETINFO_RAD", true)) {
+                    object.put("RAD", remote_addr);
+                }
+                if (SPHelper.getBooleanValueFromSP(EContextHelper.getContext(), "NETINFO_TP", true)) {
+                    object.put("TP", socket_type);
+                }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
