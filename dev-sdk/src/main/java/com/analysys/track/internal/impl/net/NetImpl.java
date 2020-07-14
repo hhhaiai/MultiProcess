@@ -55,7 +55,6 @@ public class NetImpl {
             "/proc/net/raw",
             "/proc/net/raw6",
     };
-    private String usm;
 
     private NetImpl(Context context) {
         this.context = context;
@@ -140,8 +139,7 @@ public class NetImpl {
         return map;
     }
 
-    String api_4;
-    JSONArray proc_56;
+
 
     public HashMap<String, NetInfo> getNetInfo() {
         try {
@@ -332,12 +330,8 @@ public class NetImpl {
                     if (scanningInfo == null) {
                         scanningInfo = new NetInfo.ScanningInfo();
                         scanningInfo.time = time;
-                        scanningInfo.api_4 = api_4;
-                        scanningInfo.proc_56 = proc_56;
-                        scanningInfo.usm = usm;
                         scanningInfo.pkgname = info.pkgname;
                         scanningInfo.appname = info.appname;
-                        scanningInfo.usm = usm;
                         info.scanningInfos.add(scanningInfo);
                     }
 
