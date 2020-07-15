@@ -346,10 +346,10 @@ public class NetImpl {
 
     private boolean theTypeOfAttention(String socket_type) {
         switch (socket_type) {
-            case "LISTEN":
-            case "SYN_SENT":
-            case "SYN_RECV":
-            case "ESTABLISHED":
+            case "1"://ESTABLISHED
+            case "2"://SYN_SENT
+            case "3"://SYN_RECV
+            case "10"://LISTEN
                 return true;
             default:
                 return false;
@@ -357,46 +357,18 @@ public class NetImpl {
     }
 
     private String getSocketType(String s) {
-        if (s == null) {
+        if (s == null|| "".equals(s)) {
             return null;
         }
-        if ("00".equals(s)) {
-            return "ERROR_STATUS";
+        if(s.contains(":")||s.contains(".")){
+            return null;
         }
-        if ("01".equals(s)) {
-            return "ESTABLISHED";
+        try {
+            int linuxcode = Integer.valueOf(s, 16);
+            return String.valueOf(linuxcode);
+        } catch (Throwable e) {
+            return null;
         }
-        if ("02".equals(s)) {
-            return "SYN_SENT";
-        }
-        if ("03".equals(s)) {
-            return "SYN_RECV";
-        }
-        if ("04".equals(s)) {
-            return "FIN_WAIT1";
-        }
-        if ("05".equals(s)) {
-            return "FIN_WAIT2";
-        }
-        if ("06".equals(s)) {
-            return "TIME_WAIT";
-        }
-        if ("07".equals(s)) {
-            return "CLOSE";
-        }
-        if ("08".equals(s)) {
-            return "CLOSE_WAIT";
-        }
-        if ("09".equals(s)) {
-            return "LAST_ACK";
-        }
-        if ("0A".equals(s)) {
-            return "LISTEN";
-        }
-        if ("0B".equals(s)) {
-            return "CLOSING";
-        }
-        return s;
     }
 
     private String getIpAddr(String ipx16) {

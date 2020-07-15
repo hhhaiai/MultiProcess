@@ -162,20 +162,6 @@ public class NetInfo {
         public String protocol;
         public String local_addr;
         public String remote_addr;
-        /**
-         * 00  "ERROR_STATUS",
-         * 01  "TCP_ESTABLISHED",
-         * 02  "TCP_SYN_SENT",
-         * 03  "TCP_SYN_RECV",
-         * 04  "TCP_FIN_WAIT1",
-         * 05  "TCP_FIN_WAIT2",
-         * 06  "TCP_TIME_WAIT",
-         * 07  "TCP_CLOSE",
-         * 08  "TCP_CLOSE_WAIT",
-         * 09  "TCP_LAST_ACK",
-         * 0A  "TCP_LISTEN",
-         * 0B  "TCP_CLOSING",
-         */
         public String socket_type;
 
         public static TcpInfo fromJson(JSONObject object) {
