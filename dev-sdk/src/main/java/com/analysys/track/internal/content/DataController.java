@@ -113,6 +113,7 @@ public class DataController {
     public static boolean SWITCH_OF_BUILD_PREVIEW_SDK_INT = true;
     public static boolean SWITCH_OF_BUILD_CODE_NAME = true;
     public static boolean SWITCH_OF_BUILD_IDFA = true;
+    public static boolean SWITCH_OF_BUILD_UA = true;
     public static boolean SWITCH_OF_APPLICATION_OPEN_TIME = true;
     public static boolean SWITCH_OF_APPLICATION_CLOSE_TIME = true;
     public static boolean SWITCH_OF_ACTION_TYPE = true;

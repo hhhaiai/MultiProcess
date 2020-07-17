@@ -200,6 +200,8 @@ public class UploadKey {
         public static final String BuildCodename = "BC";
         // 谷歌广告ID.
         public static final String IDFA = "IDFA";
+        //UA
+        public static final String UA = "UA";
 
     }
 
