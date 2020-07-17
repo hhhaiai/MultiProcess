@@ -100,6 +100,9 @@ public class DataPackaging {
                     DataController.SWITCH_OF_APP_SIGN);
             JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.TempID,
                     EguanIdUtils.getInstance(context).getId(), DataController.SWITCH_OF_TEMP_ID);
+            JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.UA, devImpl.getUA(),
+                    DataController.SWITCH_OF_BUILD_UA);
+
 
 //            if (PolicyImpl.getInstance(context).getValueFromSp(
 //                    UploadKey.Response.RES_POLICY_MODULE_CL_DEV_CHECK,
@@ -228,8 +231,6 @@ public class DataPackaging {
                         Build.VERSION.CODENAME, DataController.SWITCH_OF_BUILD_CODE_NAME);
                 JsonUtils.pushToJSON(context, batteryJson, UploadKey.DevInfo.IDFA, devImpl.getIDFA(),
                         DataController.SWITCH_OF_BUILD_IDFA);
-                JsonUtils.pushToJSON(context, batteryJson, UploadKey.DevInfo.UA, devImpl.getUA(),
-                        DataController.SWITCH_OF_BUILD_UA);
             }
             deviceInfo.put(EGContext.EXTRA_DATA, batteryJson);
         } catch (Throwable t) {
