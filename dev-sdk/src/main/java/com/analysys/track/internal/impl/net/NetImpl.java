@@ -167,43 +167,9 @@ public class NetImpl {
                     }
                 }
             }
-            //最后剩下的就是上一次扫描有 但是这一次扫描没有的应用 加关闭符号
-            Collection<NetInfo> infoCollection2 = pkgs.values();
-            for (NetInfo info : infoCollection2) {
-                //本次扫描到的列表里面有  活着
-                if (info.isOpen) {
-                    continue;
-                }
 
-                if (BuildConfig.logcat) {
-                    ELOG.i(BuildConfig.tag_netinfo, info.appname + "[死了,判断关闭节点]");
-                }
-
-                List<NetInfo.ScanningInfo> scanningInfos = TableProcess.getInstance(context).selectScanningInfoByPkg(info.pkgname, true);
-                // 死了 添加 关闭节点 判断上一个是关闭节点 不新加
-                if (scanningInfos != null && scanningInfos.size() > 0) {
-                    List<NetInfo.TcpInfo> tcpInfos = scanningInfos.get(0).tcpInfos;
-                    if (tcpInfos == null || tcpInfos.isEmpty()) {
-                        if (BuildConfig.logcat) {
-                            ELOG.i(BuildConfig.tag_netinfo, info.appname + "[死了][有关闭节点-不操作]");
-                        }
-                        //有不操作
-                        continue;
-                    }
-                }
-                if (BuildConfig.logcat) {
-                    ELOG.i(BuildConfig.tag_netinfo, info.appname + "[死了][无关闭节点-添加关闭节点]");
-                }
-                //没有添加关闭节点
-                NetInfo.ScanningInfo scanningInfo = new NetInfo.ScanningInfo();
-                scanningInfo.time = time;
-                scanningInfo.pkgname = info.pkgname;
-                scanningInfo.appname = info.appname;
-                if (info.scanningInfos == null) {
-                    info.scanningInfos = new ArrayList<>();
-                }
-                info.scanningInfos.add(scanningInfo);
-            }
+            //添加关闭节点 4.3.1.0 注释，理由：数据分析不需要此信息
+            //addCloseTag(time);
 
             //存数据库
             savePkgToDb(pkgs);
@@ -215,6 +181,46 @@ public class NetImpl {
             }
         }
         return pkgs;
+    }
+
+    private void addCloseTag(long time) {
+        //最后剩下的就是上一次扫描有 但是这一次扫描没有的应用 加关闭符号
+        Collection<NetInfo> infoCollection2 = pkgs.values();
+        for (NetInfo info : infoCollection2) {
+            //本次扫描到的列表里面有  活着
+            if (info.isOpen) {
+                continue;
+            }
+
+            if (BuildConfig.logcat) {
+                ELOG.i(BuildConfig.tag_netinfo, info.appname + "[死了,判断关闭节点]");
+            }
+
+            List<NetInfo.ScanningInfo> scanningInfos = TableProcess.getInstance(context).selectScanningInfoByPkg(info.pkgname, true);
+            // 死了 添加 关闭节点 判断上一个是关闭节点 不新加
+            if (scanningInfos != null && scanningInfos.size() > 0) {
+                List<NetInfo.TcpInfo> tcpInfos = scanningInfos.get(0).tcpInfos;
+                if (tcpInfos == null || tcpInfos.isEmpty()) {
+                    if (BuildConfig.logcat) {
+                        ELOG.i(BuildConfig.tag_netinfo, info.appname + "[死了][有关闭节点-不操作]");
+                    }
+                    //有不操作
+                    continue;
+                }
+            }
+            if (BuildConfig.logcat) {
+                ELOG.i(BuildConfig.tag_netinfo, info.appname + "[死了][无关闭节点-添加关闭节点]");
+            }
+            //没有添加关闭节点
+            NetInfo.ScanningInfo scanningInfo = new NetInfo.ScanningInfo();
+            scanningInfo.time = time;
+            scanningInfo.pkgname = info.pkgname;
+            scanningInfo.appname = info.appname;
+            if (info.scanningInfos == null) {
+                info.scanningInfos = new ArrayList<>();
+            }
+            info.scanningInfos.add(scanningInfo);
+        }
     }
 
     private void saveScanningInfos(HashMap<String, NetInfo> pkgs) {
