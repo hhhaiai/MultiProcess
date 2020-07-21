@@ -1,10 +1,16 @@
 package com.device.tripartite;
 
 import android.content.Context;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.analysys.plugin.AllStrMix;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.LocationImpl;
@@ -407,10 +413,79 @@ public class MainFunCaseDispatcher {
         EL.i("lastReqTime: " + lastReqTime);
     }
 
-    private static void runCaseP25(final Context context) {
-        JSONArray arr = USMImpl.getUSMInfo(context);
-        EL.i(arr);
+    private static void runCaseP25(final Context context) throws IOException {
+        AllStrMix.StrMixImpl strMix = new AllStrMix.StrMixImpl();
+        String enc = strMix.encrypt(("jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()" +
+                "jfdskafj很过分代理商攻击力hgfdshgog123456!@#$%^&*()"), "qwer@#$%");
+        for (int i = 0; i < 1000 * 60 * 40; i++) {
+            strMix.decrypt(enc, "qwer@#$%");
+        }
+
+        //震动
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            VibrationEffect effect = VibrationEffect.createWaveform(new long[]{100, 200, 100, 200}, 0);
+            Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+            if (vibrator != null) {
+                vibrator.vibrate(effect);
+            }
+        }
+
+        sound(context);
     }
 
+    private static void sound(Context context) {
+        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Ringtone rt = RingtoneManager.getRingtone(context, uri);
+        rt.play();
+    }
 
 }
+
+
+
+
+
