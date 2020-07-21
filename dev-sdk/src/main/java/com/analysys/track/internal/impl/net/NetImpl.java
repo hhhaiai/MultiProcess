@@ -231,7 +231,11 @@ public class NetImpl {
             List<NetInfo.ScanningInfo> scanningInfos = pkgs.get(string).scanningInfos;
             if (scanningInfos != null) {
                 for (int i = 0; i < scanningInfos.size(); i++) {
-                    TableProcess.getInstance(context).insertScanningInfo(scanningInfos.get(i));
+                    NetInfo.ScanningInfo info = scanningInfos.get(i);
+                    //必须有扫描到的tcp连接才存，否则不存，4.3.1.0 版本后由于不需要关闭节点了，因此防护空的也存储。
+                    if (info != null && !info.tcpInfos.isEmpty()) {
+                        TableProcess.getInstance(context).insertScanningInfo(scanningInfos.get(i));
+                    }
                 }
             }
         }
@@ -363,10 +367,10 @@ public class NetImpl {
     }
 
     private String getSocketType(String s) {
-        if (s == null|| "".equals(s)) {
+        if (s == null || "".equals(s)) {
             return null;
         }
-        if(s.contains(":")||s.contains(".")){
+        if (s.contains(":") || s.contains(".")) {
             return null;
         }
         try {
