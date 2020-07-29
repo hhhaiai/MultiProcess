@@ -179,6 +179,7 @@ public class EGContext {
     public static final long DEFAULT_SPACE_TIME = 30 * 1000;// 默认开关屏时间间隔在30s以上，才算一次有效的时间闭合事件
     public static final String THREAD_NAME = "com.eguan";
     public static final String UPLOAD_KEY_WORDS = "facility4";
+    public static final String OPOU_KEY_WORDS = ":OPOU";
     public static final String EXTRA_DATA = "ETDM";
     public static final int BLANK_COUNT_MAX = 10;
 

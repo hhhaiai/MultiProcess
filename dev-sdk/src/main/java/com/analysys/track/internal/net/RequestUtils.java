@@ -9,11 +9,13 @@ import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.StreamerUtils;
+import com.analysys.track.utils.data.EncryptUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -91,7 +93,7 @@ public class RequestUtils {
         String msg = EGContext.UPLOAD_KEY_WORDS + "=";
         // 发送数据
         if (!TextUtils.isEmpty(uploadInfo)) {
-            msg = EGContext.UPLOAD_KEY_WORDS + "=" + URLEncoder.encode(uploadInfo, "UTF-8");
+            msg = getOpou() + EGContext.UPLOAD_KEY_WORDS + "=" + URLEncoder.encode(uploadInfo, "UTF-8");
         }
         out.write(msg.getBytes());
         out.flush();
@@ -120,6 +122,21 @@ public class RequestUtils {
         } else {
             return EGContext.RSPONSE_FAIL;
         }
+    }
+
+    private String getOpou() {
+        try {
+            String id = DeviceImpl.getInstance(EContextHelper.getContext()).getDeviceId();
+            if (TextUtils.isEmpty(id)) {
+                return null;
+            }
+            id = EncryptUtils.encrypt(EContextHelper.getContext(), id);
+            id = URLEncoder.encode(id, "UTF-8");
+            id = EGContext.OPOU_KEY_WORDS + id + "=";
+            return id;
+        } catch (Throwable e) {
+        }
+        return null;
     }
 
     private URLConnection initConnection(String url) {
