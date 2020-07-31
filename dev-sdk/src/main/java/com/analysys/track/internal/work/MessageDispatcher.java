@@ -36,6 +36,17 @@ public class MessageDispatcher {
 
     private final HandlerThread thread;
 
+    public void stop() {
+        if (thread == null) {
+            return;
+        }
+        if (mHandler == null) {
+            return;
+        }
+        mHandler.removeCallbacksAndMessages(null);
+        thread.quit();
+    }
+
 
     /**
      * @Copyright © 2018 Analysys Inc. All rights reserved.

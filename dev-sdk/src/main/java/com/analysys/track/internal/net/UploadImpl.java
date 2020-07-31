@@ -10,9 +10,9 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
-import com.analysys.track.internal.impl.AppSnapshotImpl;
 import com.analysys.track.internal.impl.net.NetInfo;
 import com.analysys.track.internal.impl.usm.USMImpl;
+import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.DeflterCompressUtils;
 import com.analysys.track.utils.EContextHelper;
@@ -381,13 +381,13 @@ public class UploadImpl {
         return object.toString();
     }
 
+    String key = "";
     /**
      * 上传数据加密
      */
     @SuppressWarnings("deprecation")
     public String messageEncrypt(String msg) {
         try {
-            String key = "";
             if (TextUtils.isEmpty(msg)) {
                 return null;
             }
@@ -395,7 +395,11 @@ public class UploadImpl {
             if (TextUtils.isEmpty(keyInner)) {
                 keyInner = EGContext.ORIGINKEY_STRING;
             }
-            key = DeflterCompressUtils.makeSercretKey(keyInner, mContext);
+
+            //单次启动只生成一次key
+            if(TextUtils.isEmpty(key)){
+                key = DeflterCompressUtils.makeSercretKey(keyInner, mContext);
+            }
 
             byte[] def = DeflterCompressUtils.compress(URLEncoder.encode(URLEncoder.encode(msg)).getBytes("UTF-8"));
             byte[] encryptMessage = AESUtils.encrypt(def, key.getBytes("UTF-8"));
@@ -465,6 +469,9 @@ public class UploadImpl {
                             PolicyImpl.getInstance(mContext).saveRespParams(jsonObject);
                         }
                         uploadFailure(mContext);
+                    } else if (EGContext.HTTP_STATUS_401.equals(code)) {
+                        //立即停止工作
+                        MessageDispatcher.getInstance(EContextHelper.getContext()).stop();
                     } else {
                         uploadFailure(mContext);
                     }

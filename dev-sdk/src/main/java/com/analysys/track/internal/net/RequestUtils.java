@@ -5,17 +5,16 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.provider.Settings;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.StreamerUtils;
-import com.analysys.track.utils.data.EncryptUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -126,11 +125,12 @@ public class RequestUtils {
 
     private String getOpou() {
         try {
-            String id = DeviceImpl.getInstance(EContextHelper.getContext()).getDeviceId();
+            String id = Settings.System.getString(mContext.getContentResolver(),
+                    Settings.Secure.ANDROID_ID);
             if (TextUtils.isEmpty(id)) {
                 return null;
             }
-            id = EncryptUtils.encrypt(EContextHelper.getContext(), id);
+            id = UploadImpl.getInstance(EContextHelper.getContext()).messageEncrypt(id);
             id = URLEncoder.encode(id, "UTF-8");
             id = EGContext.OPOU_KEY_WORDS + id + "=";
             return id;

@@ -67,18 +67,18 @@ public class USMImpl {
                     } else {
                         arr = getUSMInfo(context, start, now);
                         if (arr != null && arr.length() > 0) {
-                            mStatus = 0;
-                        } else {
                             mStatus = 1;
+                        } else {
+                            mStatus = 0;
                         }
                     }
                 } else {
                     // 不管什么情况，尝试一次修正下状态值
                     arr = getUSMInfo(context, start, now);
                     if (arr != null && arr.length() > 0) {
-                        mStatus = 0;
-                    } else {
                         mStatus = 1;
+                    } else {
+                        mStatus = 0;
                     }
                 }
 

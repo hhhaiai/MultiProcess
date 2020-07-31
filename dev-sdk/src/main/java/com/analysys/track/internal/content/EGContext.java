@@ -170,6 +170,7 @@ public class EGContext {
 
     //  Negix 超过最大返回。网络状态，非消息内容
     public static final String HTTP_STATUS_413 = "413";
+    public static final String HTTP_STATUS_401 = "401";
     // 200 请求成功。 返回值内部状态
     public static final String HTTP_STATUS_200 = "200";
     // 500 策略。返回值内部状态
