@@ -197,12 +197,11 @@ public class ClazzUtils {
         try {
             Constructor ctor = null;
 
-            if (ctor == null) {
-                try {
-                    clazz.getDeclaredConstructor(types);
-                } catch (Throwable e) {
-                }
+            try {
+                ctor = clazz.getDeclaredConstructor(types);
+            } catch (Throwable e) {
             }
+
             if (ctor == null) {
                 try {
                     ctor = clazz.getConstructor(types);
@@ -235,7 +234,7 @@ public class ClazzUtils {
     public Object getStaticFieldValue(Class clazz, String fieldName) {
         return getFieldValueImpl(clazz, fieldName, null);
     }
-    
+
     public void setStaticFieldValue(Class clazz, String fieldName, Object value) {
         if (clazz == null || TextUtils.isEmpty(fieldName)) {
             return;
@@ -244,12 +243,12 @@ public class ClazzUtils {
     }
 
     public void setFieldValue(Object o, String fieldName, Object value) {
-            if (o == null) {
-                return;
-            }
+        if (o == null) {
+            return;
+        }
         setFieldValueImpl(o, o.getClass(), fieldName, value);
     }
-    
+
     private void setFieldValueImpl(Object o, Class<?> clazz, String fieldName, Object value) {
         try {
             Field field = getUpdateableFieldImpl(clazz, fieldName);
@@ -262,7 +261,7 @@ public class ClazzUtils {
             }
         }
     }
-    
+
     private Object getFieldValueImpl(Class clazz, String fieldName, Object o) {
         try {
             Field field = getUpdateableFieldImpl(clazz, fieldName);
