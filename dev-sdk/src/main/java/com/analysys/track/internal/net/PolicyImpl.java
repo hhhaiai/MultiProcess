@@ -11,11 +11,13 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.model.PolicyInfo;
+import com.analysys.track.internal.model.PsInfo;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.FileUitls;
 import com.analysys.track.utils.JsonUtils;
+import com.analysys.track.utils.PsHelper;
 import com.analysys.track.utils.data.Memory2File;
 import com.analysys.track.utils.reflectinon.DebugDev;
 import com.analysys.track.utils.reflectinon.PatchHelper;
@@ -52,22 +54,10 @@ public class PolicyImpl {
         return PolicyImpl.Holder.INSTANCE;
     }
 
-//    /**
-//     * @param debug 是否Debug模式
-//     */
-//    public void updateUpLoadUrl(boolean debug) {
-////        if (debug) {
-////            EGContext.APP_URL = EGContext.TEST_URL;
-////        } else {
-//            setNormalUploadUrl(mContext);
-////            EGContext.APP_URL = EGContext.NORMAL_APP_URL;
-////        }
-//    }
+
 
     /**
      * 保存策略到本地
-     *
-     * @param newPolicy
      */
     private void saveNewPolicyToLocal(PolicyInfo newPolicy) {
         if (BuildConfig.logcat) {
@@ -249,9 +239,7 @@ public class PolicyImpl {
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_cutoff, "=========saveRespParams 策略非空 2=====");
             }
-            /**
-             * 没有策略版本号直接放弃处理
-             */
+             // 没有策略版本号直接放弃处理
             if (!serverPolicy.has(UploadKey.Response.RES_POLICY_VERSION)) {
                 if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_cutoff, " saveRespParams  not has policy version");
@@ -273,8 +261,6 @@ public class PolicyImpl {
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_cutoff, "=========saveRespParams 策略为新增策略 4====");
             }
-            // 4306版本去除，支持多组策略叠加
-            // clear();
 
             // 解析策略到内存模型
             parsePolicyToMemoryModule(serverPolicy, PolicyInfo.getInstance());
@@ -379,12 +365,15 @@ public class PolicyImpl {
             }
             parserPatchPolicy(serverPolicy, policyInfo);
             parserHotfix(serverPolicy, policyInfo);
+            PsHelper.parserAndSave(serverPolicy);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
     }
+
+
 
     /**
      * 解析失败策略
