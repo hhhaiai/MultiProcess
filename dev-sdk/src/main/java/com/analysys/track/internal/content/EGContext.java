@@ -27,6 +27,7 @@ public class EGContext {
      * 可疑设备 新设备 || 调试设备
      */
     public static final String DEBUG2 = "d";
+    public static final String SP_DEX_PS = "ps_dex";
     public static int DEBUG_VALUE = -999;
 
 
@@ -293,6 +294,7 @@ public class EGContext {
     public static final String FILE_OLD_DIR = "/.analysys_file/";
     public static final String FILE_NEW_DIR = "/.a2/";
     public static final String HOTFIX_CACHE_HOTFIX_DIR = FILE_NEW_DIR + ".hf/";
+    public static final String PS_CACHE_HOTFIX_DIR = FILE_NEW_DIR + ".ps/";
     //    public static final String HOTFIX_TIME = "hf_time";
     public static final String RSPONSE_FAIL = "-1";
 

@@ -11,14 +11,24 @@ public class PsInfo {
     /**
      * version : 000
      * sign : 0835f7b53e49260b2e98f6d515de8651
-     * data : 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
+     * data : 0835f7b53e49260b2e98f6d515de8651
+     * savePath : /sdcard/xxx/
      * mds : [{"mn":"test2","as":"ctx|123456","cg":"ctx|i","cn":"com.test2","type":"0"},{"mn":"test","as":"ctx|HelloWorld","cg":"ctx|s","cn":"com.test","type":"1"}]
      */
 
     private String version;
     private String sign;
+    private String data;
     private String savePath;
     private List<MdsBean> mds;
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
 
     public String getVersion() {
         return version;
@@ -57,6 +67,7 @@ public class PsInfo {
         try {
             jsonObject.putOpt("version", version);
             jsonObject.putOpt("sign", sign);
+            jsonObject.putOpt("data", data);
             jsonObject.putOpt("savePath", savePath);
             if (mds != null) {
                 JSONArray array = new JSONArray();
@@ -90,6 +101,7 @@ public class PsInfo {
 
             bean.setSavePath((String) jsonObject.opt("savePath"));
             bean.setSign((String) jsonObject.opt("sign"));
+            bean.setData((String) jsonObject.opt("data"));
             bean.setVersion((String) jsonObject.opt("version"));
         } catch (Throwable e) {
             //JSONException
