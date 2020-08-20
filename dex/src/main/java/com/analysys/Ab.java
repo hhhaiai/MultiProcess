@@ -17,7 +17,7 @@ public class Ab {
     private static final String appkey = "7752552892442721d";
     private static final String channel = "wandoujia";
     private static final String version = "1.0";
-    private static final int count = 10000;
+    private static final int count = 3;
     
     public static void main(String[] args) {
         init(getContext());
