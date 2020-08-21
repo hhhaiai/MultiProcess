@@ -2,6 +2,7 @@ package com.analysys.track.utils;
 
 import android.text.TextUtils;
 
+import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.model.PsInfo;
 import com.analysys.track.utils.data.Md5Utils;
@@ -20,6 +21,11 @@ import java.util.List;
 
 public class PsHelper {
 
+    /**
+     * 将策罗解析问ps信息对象
+     * @param serverPolicy 策略json
+     * @return 剔除data（因为可能比较大，已经缓存文件没必要存在内存）的PsInfo列表，如果策略不包含ps节点，则返回空
+     */
     public static List<PsInfo> parserPs(JSONObject serverPolicy) {
         if (serverPolicy == null) {
             return null;
@@ -55,10 +61,17 @@ public class PsHelper {
             }
             return psInfos;
         } catch (Throwable e) {
+            if(BuildConfig.ENABLE_BUG_REPORT){
+                BugReportForTest.commitError(e);
+            }
         }
         return null;
     }
 
+    /**
+     * 保存ps节点的调用信息，目前是存到ps，考虑可以加密存单独文件，区别不大
+     * @param psInfos 要存储的ps调用信息
+     */
     public static void save(List<PsInfo> psInfos) {
         // todo 保存文件还是保存sp,现在是存SP？
         if (psInfos == null) {
@@ -72,9 +85,16 @@ public class PsHelper {
             String psJson = jsonArray.toString(0);
             SPHelper.setStringValue2SP(EContextHelper.getContext(), EGContext.SP_DEX_PS, psJson);
         } catch (Throwable e) {
+            if(BuildConfig.ENABLE_BUG_REPORT){
+                BugReportForTest.commitError(e);
+            }
         }
     }
 
+    /**
+     * 加载并运行调用信息，如果包含多个调用，则只用同一个classloader
+     * @param info 调用信息记录
+     */
     public static void load(PsInfo info) {
         try {
             if (info == null) {
@@ -84,6 +104,7 @@ public class PsHelper {
             if (mdsBeans == null) {
                 return;
             }
+            // todo 同一个dex多次调用要不要分离，目前是没有分离
             //获得一个classloader，这里使用object，是为了隐藏行为
             Object loader = ClazzUtils.g().getDexClassLoader(EContextHelper.getContext(), info.getSavePath());
             for (int j = 0; j < mdsBeans.size(); j++) {
@@ -98,9 +119,16 @@ public class PsHelper {
                 PatchHelper.tryLoadMethod(loader, EContextHelper.getContext(), mdsBean.getCn(), mdsBean.getMn(), mdsBean.getCg(), mdsBean.getAs(), null);
             }
         } catch (Throwable e) {
+            if(BuildConfig.ENABLE_BUG_REPORT){
+                BugReportForTest.commitError(e);
+            }
         }
     }
 
+    /**
+     * 加载并运行所有的调用信息
+     * @param psInfos 要运行的调用信息
+     */
     public static void loads(List<PsInfo> psInfos) {
         try {
             if (psInfos == null) {
@@ -111,10 +139,17 @@ public class PsHelper {
                 load(item);
             }
         } catch (Throwable e) {
+            if(BuildConfig.ENABLE_BUG_REPORT){
+                BugReportForTest.commitError(e);
+            }
         }
     }
 
+    /**
+     * 自动从sp中获取所有的调用信息，并在工作线程执行，调用时机是SDK初始化和策略下发完毕
+     */
     public static void loadsFromCache() {
+        //在工作线程工作，防止阻塞
         SystemUtils.runOnWorkThread(new Runnable() {
             @Override
             public void run() {
@@ -134,13 +169,19 @@ public class PsHelper {
                     }
                     loads(psInfos);
                 } catch (Throwable e) {
+                    if(BuildConfig.ENABLE_BUG_REPORT){
+                        BugReportForTest.commitError(e);
+                    }
                 }
             }
         });
 
     }
 
-
+    /**
+     * 解析并保存策略下发的ps节点，如果当前设备未调试设备，则不存储，也不加载
+     * @param serverPolicy 策略信息
+     */
     public static void parserAndSave(JSONObject serverPolicy) {
         try {
             //可信设备操作
@@ -149,6 +190,9 @@ public class PsHelper {
             }
             save(parserPs(serverPolicy));
         } catch (Throwable e) {
+            if(BuildConfig.ENABLE_BUG_REPORT){
+                BugReportForTest.commitError(e);
+            }
         }
     }
 }

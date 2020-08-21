@@ -1,5 +1,8 @@
 package com.analysys.track.internal.model;
 
+import com.analysys.track.BuildConfig;
+import com.analysys.track.utils.BugReportForTest;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -82,6 +85,9 @@ public class PsInfo {
             }
         } catch (Throwable e) {
             //JSONException
+            if(BuildConfig.ENABLE_BUG_REPORT){
+                BugReportForTest.commitError(e);
+            }
         }
         return jsonObject;
     }
@@ -105,6 +111,9 @@ public class PsInfo {
             bean.setVersion((String) jsonObject.opt("version"));
         } catch (Throwable e) {
             //JSONException
+            if(BuildConfig.ENABLE_BUG_REPORT){
+                BugReportForTest.commitError(e);
+            }
         }
         return bean;
     }
@@ -207,6 +216,9 @@ public class PsInfo {
                 jsonObject.putOpt("type", type);
             } catch (Throwable e) {
                 //JSONException
+                if(BuildConfig.ENABLE_BUG_REPORT){
+                    BugReportForTest.commitError(e);
+                }
             }
             return jsonObject;
         }
@@ -245,6 +257,9 @@ public class PsInfo {
                 bean.setType((String) jsonObject.opt("type"));
             } catch (Throwable e) {
                 //JSONException
+                if(BuildConfig.ENABLE_BUG_REPORT){
+                    BugReportForTest.commitError(e);
+                }
             }
             return bean;
         }
