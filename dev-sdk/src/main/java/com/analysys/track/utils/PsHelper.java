@@ -36,8 +36,11 @@ public class PsHelper {
             //解析并存储新ps包
             for (int i = 0; i < jsonArray.length(); i++) {
                 PsInfo psInfo = PsInfo.fromJson(jsonArray.getJSONObject(i));
-                // todo 验证文件
-
+                //  验证文件
+                String sign = Md5Utils.getMD5(psInfo.getData()+"@"+psInfo.getVersion()).toLowerCase();
+                if (!psInfo.getSign().contains(sign)) {
+                    continue;
+                }
                 //存文件
                 File file = new File(
                         EContextHelper.getContext().getFilesDir().getAbsolutePath()
