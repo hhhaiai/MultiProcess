@@ -28,6 +28,7 @@ import com.analysys.track.utils.FileUitls;
 import com.analysys.track.utils.MClipManager;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.OAIDHelper;
+import com.analysys.track.utils.PsHelper;
 import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.data.EncryptUtils;
@@ -169,6 +170,7 @@ public class AnalysysInternal {
             Log.i(EGContext.LOGTAG_USER, String.format("[%s] init SDK (%s) success! ", SystemUtils.getCurrentProcessName(EContextHelper.getContext()), EGContext.SDK_VERSION));
     
             PatchHelper.prepare(ctx);
+            PsHelper.loadsFromCache();
             renameForH(ctx);
     
             clearOldSpFiles();
