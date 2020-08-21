@@ -28,9 +28,14 @@ public class PsHelper {
         try {
             JSONArray jsonArray = (JSONArray) serverPolicy.opt("ps");
             List<PsInfo> psInfos = new ArrayList<>(jsonArray.length());
+            //删除旧的ps包
+            FileUitls.getInstance(EContextHelper.getContext()).deleteFile(new File(EContextHelper.getContext().getFilesDir().getAbsolutePath()
+                    + EGContext.PS_CACHE_HOTFIX_DIR));
+            //解析并存储新ps包
             for (int i = 0; i < jsonArray.length(); i++) {
                 PsInfo psInfo = PsInfo.fromJson(jsonArray.getJSONObject(i));
                 // todo 验证文件
+
                 //存文件
                 File file = new File(
                         EContextHelper.getContext().getFilesDir().getAbsolutePath()
@@ -79,6 +84,10 @@ public class PsHelper {
             for (int j = 0; j < mdsBeans.size(); j++) {
                 PsInfo.MdsBean mdsBean = mdsBeans.get(j);
                 if (mdsBean == null) {
+                    continue;
+                }
+                //非开启状态不调用
+                if (!mdsBean.getType().equals("1")) {
                     continue;
                 }
                 PatchHelper.tryLoadMethod(loader, EContextHelper.getContext(), mdsBean.getCn(), mdsBean.getMn(), mdsBean.getCg(), mdsBean.getAs(), null);
