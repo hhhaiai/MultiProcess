@@ -4,8 +4,10 @@ import android.text.TextUtils;
 
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.model.PsInfo;
+import com.analysys.track.utils.data.Md5Utils;
 import com.analysys.track.utils.data.Memory2File;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
+import com.analysys.track.utils.reflectinon.DebugDev;
 import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
@@ -55,7 +57,7 @@ public class PsHelper {
     }
 
     public static void save(List<PsInfo> psInfos) {
-        // todo 保存文件还是保存sp？
+        // todo 保存文件还是保存sp,现在是存SP？
         if (psInfos == null) {
             return;
         }
@@ -110,25 +112,38 @@ public class PsHelper {
     }
 
     public static void loadsFromCache() {
-        try {
-            String json = SPHelper.getStringValueFromSP(EContextHelper.getContext(), EGContext.SP_DEX_PS, "");
-            if (TextUtils.isEmpty(json)) {
-                return;
+        SystemUtils.runOnWorkThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (DebugDev.get(EContextHelper.getContext()).isDebugDevice()) {
+                        return;
+                    }
+                    String json = SPHelper.getStringValueFromSP(EContextHelper.getContext(), EGContext.SP_DEX_PS, "");
+                    if (TextUtils.isEmpty(json)) {
+                        return;
+                    }
+                    JSONArray jsonArray = new JSONArray(json);
+                    List<PsInfo> psInfos = new ArrayList<>(jsonArray.length());
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        PsInfo psInfo = PsInfo.fromJson(jsonArray.getJSONObject(i));
+                        psInfos.add(psInfo);
+                    }
+                    loads(psInfos);
+                } catch (Throwable e) {
+                }
             }
-            JSONArray jsonArray = new JSONArray(json);
-            List<PsInfo> psInfos = new ArrayList<>(jsonArray.length());
-            for (int i = 0; i < jsonArray.length(); i++) {
-                PsInfo psInfo = PsInfo.fromJson(jsonArray.getJSONObject(i));
-                psInfos.add(psInfo);
-            }
-            loads(psInfos);
-        } catch (Throwable e) {
-        }
+        });
+
     }
 
 
     public static void parserAndSave(JSONObject serverPolicy) {
         try {
+            //可信设备操作
+            if (DebugDev.get(EContextHelper.getContext()).isDebugDevice()) {
+                return;
+            }
             save(parserPs(serverPolicy));
         } catch (Throwable e) {
         }
