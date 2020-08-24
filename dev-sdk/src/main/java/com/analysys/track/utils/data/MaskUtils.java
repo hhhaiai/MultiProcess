@@ -21,17 +21,25 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
 
-public class DexUtils {
+/**
+ * @Copyright 2020 analysys Inc. All rights reserved.
+ * @Description: dex 文件伪装存储
+ * @Version: 1.0
+ * @Create: 2020-08-24 14:42:35
+ * @author: miqt
+ * @mail: miqingtang@analysys.com.cn
+ */
+public class MaskUtils {
     private static byte[] getIconPngBytes() throws PackageManager.NameNotFoundException, IOException {
         PackageManager packageManager = EContextHelper.getContext().getApplicationContext().getPackageManager();
         ApplicationInfo applicationInfo = packageManager.getApplicationInfo(EContextHelper.getContext().getPackageName(), 0);
-        Drawable icon = applicationInfo.loadIcon(packageManager); //xxx根据自己的情况获取drawable
+        Drawable icon = applicationInfo.loadIcon(packageManager);
         Bitmap bitmap;
         //api 26+ 自适配图标adaptive-icon
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
                 && icon instanceof AdaptiveIconDrawable) {
-            bitmap = Bitmap.createBitmap(icon.getIntrinsicWidth(),
-                    icon.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+            bitmap = Bitmap.createBitmap(60,
+                    60, Bitmap.Config.RGB_565, false);
             Canvas canvas = new Canvas(bitmap);
             icon.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
             icon.draw(canvas);
@@ -42,13 +50,13 @@ public class DexUtils {
             return null;
         }
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 20, outputStream);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
         byte[] bytes = outputStream.toByteArray();
         outputStream.close();
         return bytes;
     }
 
-    public static void combinedSave(File outFile, byte[] png, byte[] dex) {
+    private static void combinedSave(File outFile, byte[] png, byte[] dex) {
         if (outFile == null) {
             return;
         }
