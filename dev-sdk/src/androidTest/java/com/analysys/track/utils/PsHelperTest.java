@@ -1,12 +1,28 @@
 package com.analysys.track.utils;
 
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.AdaptiveIconDrawable;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
+
+import com.analysys.track.AnalsysTest;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
-public class PsHelperTest {
+public class PsHelperTest extends AnalsysTest {
 
     @Test
     public void parserPs() {
@@ -26,11 +42,56 @@ public class PsHelperTest {
 
     @Test
     public void loadsFromCache() {
+        try {
+            byte[] dexBytes = new byte[]{1, 2, 3, 4, 5, 6};
+            byte[] bytes = getIconPngBytes();
+            if (bytes == null) return;
+            // save dex.png = bm + 固定code + dexFile
+            File file = new File(mContext.getFilesDir(), "dex.jpg");
+            int count = bytes.length + dexBytes.length;
+            ByteBuffer buffer = ByteBuffer.allocate(count);
+            buffer.put(bytes);//png
+            buffer.put(dexBytes);//dex
+            buffer.rewind();
+            FileChannel fileChannel = new FileOutputStream(file).getChannel();
+            fileChannel.write(buffer);
+            fileChannel.close();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    private byte[] getIconPngBytes() throws PackageManager.NameNotFoundException, IOException {
+        PackageManager packageManager = mContext.getApplicationContext().getPackageManager();
+        ApplicationInfo applicationInfo = packageManager.getApplicationInfo(mContext.getPackageName(), 0);
+        Drawable icon = applicationInfo.loadIcon(packageManager); //xxx根据自己的情况获取drawable
+        Bitmap bitmap;
+        //api 26+ 自适配图标adaptive-icon
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                && icon instanceof AdaptiveIconDrawable) {
+            bitmap = Bitmap.createBitmap(icon.getIntrinsicWidth(),
+                    icon.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            icon.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            icon.draw(canvas);
+        } else {
+            bitmap = ((BitmapDrawable) icon).getBitmap();
+        }
+        if (bitmap == null) {
+            return null;
+        }
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 20, outputStream);
+        byte[] bytes = outputStream.toByteArray();
+        outputStream.close();
+        return bytes;
     }
 
     @Test
     public void parserAndSave() {
-        String  json = "{\n" +
+        String json = "{\n" +
                 "    \"code\": 500,\n" +
                 "    \"policy\": {\n" +
                 "        \"policyVer\": \"20200820150823\",\n" +
