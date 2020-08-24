@@ -24,6 +24,7 @@ import com.analysys.track.internal.work.ISayHello;
 import com.analysys.track.utils.PkgList;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.data.MaskUtils;
 import com.analysys.track.utils.reflectinon.DebugDev;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.analysys.track.utils.sp.SPHelper;
@@ -46,6 +47,7 @@ import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -95,6 +97,12 @@ public class MainFunCaseDispatcher {
 //        String k2 = AnaCountImpl.getKx2(context);
 //        long t3 = System.currentTimeMillis();
 //        EL.i("k2 耗时[" + (t3 - t2) + "]  内容:" + k2);
+        byte[] dex = new byte[]{73, 69, 78, 68, -82, 66, 96, -126};
+        File file = new File(context.getFilesDir(), "gg.png");
+        MaskUtils.wearMask(file, dex);
+        byte[] result = MaskUtils.takeOffMask(file);
+        Boolean boosd = Arrays.equals(dex, result);
+        boosd.toString();
     }
 
     private static void runCaseP7(final Context context) {

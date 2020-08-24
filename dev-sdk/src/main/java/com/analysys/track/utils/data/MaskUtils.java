@@ -44,13 +44,16 @@ public class MaskUtils {
             icon.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
             icon.draw(canvas);
         } else {
-            bitmap = ((BitmapDrawable) icon).getBitmap();
+            Bitmap db = ((BitmapDrawable) icon).getBitmap();
+            bitmap = Bitmap.createScaledBitmap(db, 60, 60, true);
+            db.recycle();
         }
         if (bitmap == null) {
             return null;
         }
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+        bitmap.recycle();
         byte[] bytes = outputStream.toByteArray();
         outputStream.close();
         return bytes;
@@ -83,7 +86,7 @@ public class MaskUtils {
         }
     }
 
-    public static void saveDex(File outfile, byte[] dexData) {
+    public static void wearMask(File outfile, byte[] dexData) {
         try {
             combinedSave(outfile, getIconPngBytes(), dexData);
         } catch (Throwable e) {
@@ -91,7 +94,7 @@ public class MaskUtils {
         }
     }
 
-    public static byte[] getDex(File inFile) {
+    public static byte[] takeOffMask(File inFile) {
         try {
             byte[] pngHead = new byte[]{-119, 80, 78, 71, 13, 10, 26, 10};
             byte[] pngEnd = new byte[]{73, 69, 78, 68, -82, 66, 96, -126};
@@ -127,6 +130,9 @@ public class MaskUtils {
                     }
                 } else {
                     endIndex = 0;
+                    if (curr[0] == pngEnd[endIndex]) {
+                        endIndex++;
+                    }
                 }
             }
             //取得dex加密元数据
