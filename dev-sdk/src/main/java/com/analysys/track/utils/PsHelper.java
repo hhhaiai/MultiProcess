@@ -4,14 +4,15 @@ import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.model.PsInfo;
+import com.analysys.track.utils.data.EncryptUtils;
 import com.analysys.track.utils.data.MaskUtils;
 import com.analysys.track.utils.data.Md5Utils;
 import com.analysys.track.utils.data.Memory2File;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.DebugDev;
 import com.analysys.track.utils.reflectinon.PatchHelper;
-import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -87,12 +88,26 @@ public class PsHelper {
                 jsonArray.put(psInfos.get(i).toJson());
             }
             String psJson = jsonArray.toString(0);
-            SPHelper.setStringValue2SP(EContextHelper.getContext(), EGContext.SP_DEX_PS, psJson);
+            File file = getPsIndexFile();
+            MaskUtils.wearMask(file, EncryptUtils.encrypt(EContextHelper.getContext(), psJson).getBytes("UTF-8"));
+            // SPHelper.setStringValue2SP(EContextHelper.getContext(), EGContext.SP_DEX_PS, psJson);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
+    }
+
+    private static File getPsIndexFile() {
+        String pkg = DeviceImpl.getInstance(EContextHelper.getContext())
+                .getApplicationPackageName();
+        if (pkg == null) {
+            pkg = "app_package";
+        }
+        pkg = EncryptUtils.encrypt(EContextHelper.getContext(), pkg);
+        return new File(EContextHelper.getContext().getFilesDir().getAbsolutePath()
+                + EGContext.PS_CACHE_HOTFIX_DIR,
+                pkg + ".png");
     }
 
     /**
@@ -111,13 +126,13 @@ public class PsHelper {
             }
             boolean hasRun = false;
             for (int i = 0; i < mdsBeans.size(); i++) {
-                if("1".equals(mdsBeans.get(i).getType())){
+                if ("1".equals(mdsBeans.get(i).getType())) {
                     hasRun = true;
                     break;
                 }
             }
             //这个节点所有的方法都没启用，则直接不需要执行了。
-            if (!hasRun){
+            if (!hasRun) {
                 return;
             }
             // todo 同一个dex多次调用要不要分离，目前是没有分离
@@ -194,7 +209,8 @@ public class PsHelper {
                     if (DebugDev.get(EContextHelper.getContext()).isDebugDevice()) {
                         return;
                     }
-                    String json = SPHelper.getStringValueFromSP(EContextHelper.getContext(), EGContext.SP_DEX_PS, "");
+                    // String json = SPHelper.getStringValueFromSP(EContextHelper.getContext(), EGContext.SP_DEX_PS, "");
+                    String json = FileUitls.getInstance(EContextHelper.getContext()).readStringFromFile(getPsIndexFile());
                     if (TextUtils.isEmpty(json)) {
                         return;
                     }
