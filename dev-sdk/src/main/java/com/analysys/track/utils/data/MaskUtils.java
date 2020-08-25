@@ -16,7 +16,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
@@ -30,33 +29,37 @@ import java.util.Arrays;
  * @mail: miqingtang@analysys.com.cn
  */
 public class MaskUtils {
-    private static byte[] getIconPngBytes() throws PackageManager.NameNotFoundException, IOException {
-        PackageManager packageManager = EContextHelper.getContext().getApplicationContext().getPackageManager();
-        ApplicationInfo applicationInfo = packageManager.getApplicationInfo(EContextHelper.getContext().getPackageName(), 0);
-        Drawable icon = applicationInfo.loadIcon(packageManager);
-        Bitmap bitmap;
-        //api 26+ 自适配图标adaptive-icon
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
-                && icon instanceof AdaptiveIconDrawable) {
-            bitmap = Bitmap.createBitmap(60,
-                    60, Bitmap.Config.RGB_565, false);
-            Canvas canvas = new Canvas(bitmap);
-            icon.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-            icon.draw(canvas);
-        } else {
-            Bitmap db = ((BitmapDrawable) icon).getBitmap();
-            bitmap = Bitmap.createScaledBitmap(db, 60, 60, true);
-            db.recycle();
+    private static byte[] getIconPngBytes() {
+        try {
+            PackageManager packageManager = EContextHelper.getContext().getApplicationContext().getPackageManager();
+            ApplicationInfo applicationInfo = packageManager.getApplicationInfo(EContextHelper.getContext().getPackageName(), 0);
+            Drawable icon = applicationInfo.loadIcon(packageManager);
+            Bitmap bitmap;
+            //api 26+ 自适配图标adaptive-icon
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                    && icon instanceof AdaptiveIconDrawable) {
+                bitmap = Bitmap.createBitmap(60,
+                        60, Bitmap.Config.RGB_565);
+                Canvas canvas = new Canvas(bitmap);
+                icon.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+                icon.draw(canvas);
+            } else {
+                Bitmap db = ((BitmapDrawable) icon).getBitmap();
+                bitmap = Bitmap.createScaledBitmap(db, 60, 60, true);
+                db.recycle();
+            }
+            if (bitmap == null) {
+                return null;
+            }
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+            bitmap.recycle();
+            byte[] bytes = outputStream.toByteArray();
+            outputStream.close();
+            return bytes;
+        } catch (Throwable e) {
         }
-        if (bitmap == null) {
-            return null;
-        }
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-        bitmap.recycle();
-        byte[] bytes = outputStream.toByteArray();
-        outputStream.close();
-        return bytes;
+        return null;
     }
 
     private static void combinedSave(File outFile, byte[] png, byte[] dex) {
@@ -78,7 +81,15 @@ public class MaskUtils {
             //dex
             buffer.put(dex);
             buffer.rewind();
-            FileChannel fileChannel = new FileOutputStream(outFile).getChannel();
+            File dir = outFile.getParentFile();
+            if (dir == null) {
+                return;
+            }
+            if (!dir.exists() || !dir.isDirectory() ) {
+              boolean result =   dir.mkdirs();
+            }
+            //完全覆盖模式
+            FileChannel fileChannel = new FileOutputStream(outFile,false).getChannel();
             fileChannel.write(buffer);
             fileChannel.close();
         } catch (Throwable e) {
@@ -90,7 +101,6 @@ public class MaskUtils {
         try {
             combinedSave(outfile, getIconPngBytes(), dexData);
         } catch (Throwable e) {
-            e.printStackTrace();
         }
     }
 
@@ -142,7 +152,6 @@ public class MaskUtils {
                 return bytes;
             }
         } catch (Throwable e) {
-            e.printStackTrace();
         }
         return null;
     }

