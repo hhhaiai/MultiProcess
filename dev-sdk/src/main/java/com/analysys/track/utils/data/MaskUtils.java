@@ -29,6 +29,9 @@ import java.util.Arrays;
  * @mail: miqingtang@analysys.com.cn
  */
 public class MaskUtils {
+    /**
+     * 获取当前运行app的图标png数据，非png会转为png
+     */
     private static byte[] getIconPngBytes() {
         try {
             PackageManager packageManager = EContextHelper.getContext().getApplicationContext().getPackageManager();
@@ -93,10 +96,14 @@ public class MaskUtils {
             fileChannel.write(buffer);
             fileChannel.close();
         } catch (Throwable e) {
-            e.printStackTrace();
         }
     }
 
+    /**
+     * 给一个文件带上app icon 的面具
+     * @param outfile
+     * @param dexData
+     */
     public static void wearMask(File outfile, byte[] dexData) {
         try {
             combinedSave(outfile, getIconPngBytes(), dexData);
@@ -104,6 +111,11 @@ public class MaskUtils {
         }
     }
 
+    /**
+     * 帮一个文件摘下面具
+     * @param inFile
+     * @return
+     */
     public static byte[] takeOffMask(File inFile) {
         try {
             byte[] pngHead = new byte[]{-119, 80, 78, 71, 13, 10, 26, 10};

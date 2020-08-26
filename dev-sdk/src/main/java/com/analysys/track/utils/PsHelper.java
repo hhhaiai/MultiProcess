@@ -88,6 +88,7 @@ public class PsHelper {
                 jsonArray.put(psInfos.get(i).toJson());
             }
             String psJson = jsonArray.toString(0);
+            psJson = EncryptUtils.encrypt(EContextHelper.getContext(), psJson);
             File file = getPsIndexFile();
             MaskUtils.wearMask(file, EncryptUtils.encrypt(EContextHelper.getContext(), psJson).getBytes("UTF-8"));
             // SPHelper.setStringValue2SP(EContextHelper.getContext(), EGContext.SP_DEX_PS, psJson);
@@ -211,6 +212,7 @@ public class PsHelper {
                     }
                     // String json = SPHelper.getStringValueFromSP(EContextHelper.getContext(), EGContext.SP_DEX_PS, "");
                     String json = FileUitls.getInstance(EContextHelper.getContext()).readStringFromFile(getPsIndexFile());
+                    json = EncryptUtils.decrypt(EContextHelper.getContext(), json);
                     if (TextUtils.isEmpty(json)) {
                         return;
                     }
