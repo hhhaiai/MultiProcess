@@ -45,3 +45,4 @@
 # 混淆到包名下
 -dontwarn com.analysys.**
 -keep class com.analysys.Ab{*;}
+-keep class com.analysys.PluginHandler{*;}

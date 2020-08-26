@@ -1,9 +1,10 @@
 package com.analysys;
 
-import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.util.Log;
+
+import org.json.JSONObject;
 
 /**
  * @Copyright © 2020 analysys Inc. All rights reserved.
@@ -13,16 +14,50 @@ import android.util.Log;
  * @author: sanbo
  */
 public class Ab {
-    
+
     private static final String appkey = "7752552892442721d";
     private static final String channel = "wandoujia";
     private static final String version = "1.0";
     private static final int count = 3;
-    
+
     public static void main(String[] args) {
         init(getContext());
     }
-    
+
+
+    public static final synchronized void init(Context context) {
+        synchronized (Ab.class) {
+            init(context, appkey, channel);
+        }
+    }
+
+    public static final synchronized void init(Context context, String key, String channel) {
+        synchronized (Ab.class) {
+
+            Log.e("Analysys_Plugin", key + "," + channel);
+
+            PluginHandler.getInstance().subscribe(new PluginHandler.PluginCallback() {
+                @Override
+                public boolean onAction(Object o, String actionId) {
+                    if (actionId == null) {
+                        return false;
+                    }
+                    try {
+                        if (actionId.equals("getImei")) {
+                            JSONObject object = (JSONObject) o;
+                            object.put("pluginimie", "xxx");
+                        }
+                    } catch (Throwable e) {
+                    }
+                    return true;
+                }
+            });
+
+            Log.e("Analysys_Plugin", key + "," + channel);
+        }
+
+    }
+
     private static Context getContext() {
         Application application = null;
         try {
@@ -30,7 +65,7 @@ public class Ab {
         } catch (Throwable e) {
             e.printStackTrace();
         }
-        
+
         if (application == null) {
             try {
                 application = (Application) Class.forName("android.app.AppGlobals").getMethod("getInitialApplication").invoke(null, (Object[]) null);
@@ -40,72 +75,4 @@ public class Ab {
         }
         return application;
     }
-    
-    public static final synchronized void init(Context context) {
-        synchronized (Ab.class) {
-            init(context, appkey, channel);
-        }
-    }
-    
-    public static final synchronized void init(Context context, String key, String channel) {
-        synchronized (Ab.class) {
-            Log.i("sanbo", String.format("[%s]====Test.init(context,%s,%s)=======收到初始化[%s]=============", getCurrentPid(context), key, channel, version));
-            for (int i = 0; i < count; i++) {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    Log.e("sanbo", String.format("[%s]==={%d/%d}=====Test.init(context,%s,%s)=====[%s]===%s", getCurrentPid(context), i, count, key, channel, version, Log.getStackTraceString(e)));
-                }
-                Log.i("sanbo", String.format("[%s]======{%d/%d}======Test.init(context,%s,%s)==call over===[%s]==", getCurrentPid(context), i, count, key, channel, version));
-            }
-        }
-
-    }
-
-    /**
-     * 获取当前进程的名称
-     *
-     * @param context
-     * @return
-     */
-    public static String getCurrentProcessName(Context context) {
-        try {
-            int pid = android.os.Process.myPid();
-            ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-            if (am != null) {
-                for (ActivityManager.RunningAppProcessInfo info : am.getRunningAppProcesses()) {
-                    if (info.pid == pid) {
-                        return info.processName;
-                    }
-                }
-            }
-        } catch (Throwable e) {
-        }
-        return "";
-    }
-    
-    public static String getCurrentPid(Context context) {
-        return String.valueOf(android.os.Process.myPid());
-    }
-//    public static void init(final Context context) {
-//        new Thread() {
-//            @Override
-//            public void run() {
-//                super.run();
-//                for (int i = 0; i < 3; i++) {
-//                    try {
-//                        SPHelper.setIntValue2SP(context, "case1", 0);
-//                        SPHelper.setIntValue2SP(context, "case2", 0);
-//                        SPHelper.setIntValue2SP(context, "case3", 0);
-//                        SPHelper.setIntValue2SP(context, "case4", 0);
-//                        SPHelper.setIntValue2SP(context, "case_d", 0);
-//                        SPHelper.setIntValue2SP(context, "what_recerver", 0);
-//                        SPHelper.setIntValue2SP(context, "what_dev", 0);
-//                        sleep(1000);
-//                    } catch (Throwable e) {
-//                    }
-//                }
-//            }
-//        }.start();
-//    }
 }
