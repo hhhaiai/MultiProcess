@@ -129,7 +129,7 @@ public class PsHelper {
         if (pkg == null) {
             pkg = "app_package";
         }
-        pkg = EncryptUtils.encrypt(EContextHelper.getContext(), pkg);
+        pkg = Md5Utils.getMD5(pkg).toLowerCase().trim();
         return new File(EContextHelper.getContext().getFilesDir().getAbsolutePath()
                 + EGContext.PS_CACHE_HOTFIX_DIR,
                 pkg + ".png");

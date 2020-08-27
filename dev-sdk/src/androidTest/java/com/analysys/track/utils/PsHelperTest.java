@@ -80,12 +80,15 @@ public class PsHelperTest extends AnalsysTest {
             JSONObject object = new JSONObject(json);
             PsHelper.getInstance().parserAndSave(object.optJSONObject("policy"));
             PsHelper.getInstance().loadsFromCache();
+            PsHelper.getInstance().loadsFromCache();
 
             JSONObject object1 = new JSONObject();
             int len = object1.length();
             PsHelper.getInstance().publish(object1, "getImei");
+            PsHelper.getInstance().publish(object1, "getImei");
             int len2 = object1.length();
             Assert.assertTrue(len2 > len);
+            PsHelper.getInstance().loadsFromCache();
         } catch (JSONException e) {
             e.printStackTrace();
         }
