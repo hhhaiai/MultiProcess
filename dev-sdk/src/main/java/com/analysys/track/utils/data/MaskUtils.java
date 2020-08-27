@@ -49,7 +49,6 @@ public class MaskUtils {
             } else {
                 Bitmap db = ((BitmapDrawable) icon).getBitmap();
                 bitmap = Bitmap.createScaledBitmap(db, 60, 60, true);
-                db.recycle();
             }
             if (bitmap == null) {
                 return null;
