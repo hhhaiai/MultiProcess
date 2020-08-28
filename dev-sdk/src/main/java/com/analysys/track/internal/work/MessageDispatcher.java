@@ -18,7 +18,6 @@ import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.DebugDev;
 import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
@@ -118,7 +117,7 @@ public class MessageDispatcher {
                                 ELOG.i(BuildConfig.tag_loc, "收到定位信息。。。。");
                             }
                             LocationImpl.getInstance(mContext).tryGetLocationInfo(new ECallBack() {
-            
+
                                 @Override
                                 public void onProcessed() {
                                     if (BuildConfig.logcat) {
@@ -269,7 +268,7 @@ public class MessageDispatcher {
     /************************************* 单例: 初始化************************************************/
 
     private MessageDispatcher() {
-        thread = new HandlerThread(EGContext.THREAD_NAME,
+        thread = new HandlerThread("thread",
                 android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE);
         thread.start();
         mHandler = new AnalysyHandler(thread.getLooper());
