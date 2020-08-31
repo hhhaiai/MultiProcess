@@ -24,18 +24,26 @@ public class BugReportForTest {
 
     public static void commitError(String tag, Throwable throwable) {
         try {
-//            if (BuildConfig.logcat) {
-//                if (!TextUtils.isEmpty(tag)) {
-//                    //使用log的原因是防止 ELOG 内部异常出现循环打印
-//                    Log.e(tag, Log.getStackTraceString(throwable));
-//                } else {
-//                    Log.e("analysys", Log.getStackTraceString(throwable));
-//                }
-//            }
-            if (BuildConfig.ENABLE_BUG_REPORT) {
+            if (!BuildConfig.ENABLE_BUG_REPORT) {
+                return;
+            }
+            //Log
+            if ((BuildConfig.BUG_REPORT_TYPE & 1) != 0) {
+                if (!TextUtils.isEmpty(tag)) {
+                    //使用log的原因是防止 ELOG 内部异常出现循环打印
+                    Log.e(tag, Log.getStackTraceString(throwable));
+                } else {
+                    Log.e("analysys", Log.getStackTraceString(throwable));
+                }
+            }
+            if ((BuildConfig.BUG_REPORT_TYPE & 1 << 1) != 0) {
                 reportToBugly(throwable);
+            }
+            if ((BuildConfig.BUG_REPORT_TYPE & 1 << 2) != 0) {
                 reportToUmeng(throwable);
             }
+
+
         } catch (Throwable e) {
 
         }
