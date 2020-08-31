@@ -9,6 +9,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 
+import com.analysys.track.BuildConfig;
+import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 
 import java.io.BufferedInputStream;
@@ -163,6 +166,9 @@ public class MaskUtils {
                 return bytes;
             }
         } catch (Throwable e) {
+            if(BuildConfig.ENABLE_BUG_REPORT){
+                BugReportForTest.commitError(e);
+            }
         }
         return null;
     }

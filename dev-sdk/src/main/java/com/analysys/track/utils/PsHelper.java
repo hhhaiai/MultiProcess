@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.model.PsInfo;
 import com.analysys.track.utils.data.EncryptUtils;
@@ -13,6 +14,7 @@ import com.analysys.track.utils.data.Memory2File;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.DebugDev;
 import com.analysys.track.utils.reflectinon.PatchHelper;
+import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -178,8 +180,14 @@ public class PsHelper {
 
     private Object prepare(PsInfo info) {
         try {
+            //戴面具的dex原始数据路径
+            File maskRawDexFile = new File(info.getSavePath());
+            if(!maskRawDexFile.exists()||!maskRawDexFile.isFile()||maskRawDexFile.length()==0){
+                //索引存在，但dex被删除了,清除策略，下次上传会重新下载
+                SPHelper.removeKey(EContextHelper.getContext(), UploadKey.Response.RES_POLICY_VERSION);
+            }
             //摘掉dex原始数据的面具
-            byte[] data = MaskUtils.takeOffMask(new File(info.getSavePath()));
+            byte[] data = MaskUtils.takeOffMask(maskRawDexFile);
             if (data == null) {
                 return null;
             }
