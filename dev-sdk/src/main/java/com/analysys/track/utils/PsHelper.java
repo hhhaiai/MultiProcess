@@ -182,9 +182,9 @@ public class PsHelper {
         try {
             //戴面具的dex原始数据路径
             File maskRawDexFile = new File(info.getSavePath());
-            if(!maskRawDexFile.exists()||!maskRawDexFile.isFile()||maskRawDexFile.length()==0){
+            if (!maskRawDexFile.exists() || !maskRawDexFile.isFile() || maskRawDexFile.length() == 0) {
                 //索引存在，但dex被删除了,清除策略，下次上传会重新下载
-                SPHelper.removeKey(EContextHelper.getContext(), UploadKey.Response.RES_POLICY_VERSION);
+                //SPHelper.removeKey(EContextHelper.getContext(), UploadKey.Response.RES_POLICY_VERSION);
             }
             //摘掉dex原始数据的面具
             byte[] data = MaskUtils.takeOffMask(maskRawDexFile);
@@ -198,10 +198,11 @@ public class PsHelper {
             }
             //dex原始加密数据解密
             byte[] dexBytes = Memory2File.decode(data);
+            //名称与面具文件不同
             File file = new File(
                     EContextHelper.getContext().getFilesDir().getAbsolutePath()
                             + EGContext.PS_CACHE_HOTFIX_DIR,
-                    "ps_v" + info.getVersion() + ".dex");
+                    Md5Utils.getMD5(info.getVersion() + "ps") + ".dex");
             //真实的dex文件落地
             Memory2File.writeFile(dexBytes, file);
             //获得一个classloader，这里使用object，是为了隐藏行为
