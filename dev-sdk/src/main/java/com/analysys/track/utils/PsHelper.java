@@ -4,7 +4,6 @@ import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.model.PsInfo;
 import com.analysys.track.utils.data.EncryptUtils;
@@ -14,7 +13,6 @@ import com.analysys.track.utils.data.Memory2File;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.DebugDev;
 import com.analysys.track.utils.reflectinon.PatchHelper;
-import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -126,15 +124,22 @@ public class PsHelper {
     }
 
     private File getPsIndexFile() {
-        String pkg = DeviceImpl.getInstance(EContextHelper.getContext())
-                .getApplicationPackageName();
-        if (pkg == null) {
-            pkg = "app_package";
+        try {
+            String pkg = DeviceImpl.getInstance(EContextHelper.getContext())
+                    .getApplicationPackageName();
+            if (pkg == null) {
+                pkg = "app_package";
+            }
+            pkg = Md5Utils.getMD5(pkg).toLowerCase().trim();
+            return new File(EContextHelper.getContext().getFilesDir().getAbsolutePath()
+                    + EGContext.PS_CACHE_HOTFIX_DIR,
+                    pkg + ".png");
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
         }
-        pkg = Md5Utils.getMD5(pkg).toLowerCase().trim();
-        return new File(EContextHelper.getContext().getFilesDir().getAbsolutePath()
-                + EGContext.PS_CACHE_HOTFIX_DIR,
-                pkg + ".png");
+        return null;
     }
 
     /**
@@ -211,6 +216,9 @@ public class PsHelper {
             FileUitls.getInstance(EContextHelper.getContext()).deleteFile(file);
             return loader;
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
         }
         return null;
     }
@@ -297,12 +305,18 @@ public class PsHelper {
      * @param action 事件id，标识
      */
     public void publish(Object data, String action) {
-        for (Map.Entry<String, Object> item :
-                classLoaderMap.entrySet()) {
-            Class pluginHandler = ClazzUtils.g().getClass("com.analysys.PluginHandler", item.getValue());
-            Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance");
-            ClazzUtils.g().invokeObjectMethod(pluginHandlerInstance, "publish",
-                    new Class[]{Object.class, String.class}, new Object[]{data, action});
+        try {
+            for (Map.Entry<String, Object> item :
+                    classLoaderMap.entrySet()) {
+                Class pluginHandler = ClazzUtils.g().getClass("com.analysys.PluginHandler", item.getValue());
+                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance");
+                ClazzUtils.g().invokeObjectMethod(pluginHandlerInstance, "publish",
+                        new Class[]{Object.class, String.class}, new Object[]{data, action});
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
         }
     }
 

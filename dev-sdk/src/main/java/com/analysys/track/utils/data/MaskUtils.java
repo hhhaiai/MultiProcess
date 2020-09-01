@@ -63,6 +63,9 @@ public class MaskUtils {
             outputStream.close();
             return bytes;
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
         }
         return null;
     }
@@ -98,6 +101,9 @@ public class MaskUtils {
             fileChannel.write(buffer);
             fileChannel.close();
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
         }
     }
 
@@ -110,6 +116,9 @@ public class MaskUtils {
         try {
             combinedSave(outfile, getIconPngBytes(), dexData);
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
         }
     }
 
