@@ -46,6 +46,11 @@ public class Ab {
                         if (actionId.equals("getImei")) {
                             JSONObject object = (JSONObject) o;
                             object.put("pluginimie", "xxx");
+                        }else if(actionId.equals("DEVINFO")){
+
+                        }else if(){
+
+
                         }
                     } catch (Throwable e) {
                     }
