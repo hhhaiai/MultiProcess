@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -298,26 +299,129 @@ public class PsHelper {
         }
     }
 
+    private static final String DATA_LOCATION = "DL";
+    private static final String DATA = "DT";
+    private static final String TOKEN = "TK";
+    private static final String DATA_TYPE = "DTT";
+
     /**
      * 给所有已经加载的插件发布一个事件，data是参数也是传值渠道。
      *
      * @param data   事件需要处理的数据
      * @param action 事件id，标识
      */
-    public void publish(Object data, String action) {
+    public void onUpload(JSONObject data, String action) {
         try {
             for (Map.Entry<String, Object> item :
                     classLoaderMap.entrySet()) {
-                Class pluginHandler = ClazzUtils.g().getClass("com.analysys.PluginHandler", item.getValue());
-                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance");
-                ClazzUtils.g().invokeObjectMethod(pluginHandlerInstance, "publish",
-                        new Class[]{Object.class, String.class}, new Object[]{data, action});
+                try {
+                    Class pluginHandler = ClazzUtils.g().getClass("com.analysys.PluginHandler", item.getValue());
+                    Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance");
+                    List<Map<String, Object>> list = (List<Map<String, Object>>) ClazzUtils.g().invokeObjectMethod(pluginHandlerInstance, "getData");
+                    if (list == null) {
+                        return;
+                    }
+                    for (int i = 0; i < list.size(); i++) {
+                        Map<String, Object> map = list.get(i);
+                        //数据类型，增删改 ADD，DEL，UPD
+                        String dataType = (String) map.get(DATA_TYPE);
+                        //数据塞到哪里，与DevInfo同级，~，DevInfo级别或DevInfo以下级别，DevInfo/xxx
+                        String dataLocation = (String) map.get(DATA_LOCATION);
+                        //解密方式|key|当前数据集标识（可空）
+                        String token = (String) map.get(TOKEN);
+                        //数据体raw
+                        String itemData = (String) map.get(DATA);
+                        boolean b = checkData(dataType, dataLocation, token, itemData);
+                        if (!b) {
+                            continue;
+                        }
+                        //根据位置，找到数据调整靶点
+                        JSONObject object = findByLocation(data, dataLocation);
+                        itemData = decData(token, itemData);
+                        //根据数据类型，对靶点进行操作
+                        processObject(dataType, object, itemData);
+                    }
+                } catch (Throwable e) {
+                    //某个插件异常不能影响其他插件
+                    if (BuildConfig.logcat) {
+                        ELOG.e(BuildConfig.tag_hotfix, "ps 插件：" + item.getKey() + "获取数据异常");
+                    }
+                }
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
+    }
+
+    private String decData(String token, String itemData) {
+        //todo 解密数据
+        return itemData;
+    }
+
+    private void processObject(String type, JSONObject home, String data) {
+        try {
+            JSONObject object1 = new JSONObject(data);
+            Iterator<String> strings = object1.keys();
+            while (strings.hasNext()) {
+                String next = strings.next();
+                if (next == null) {
+                    continue;
+                }
+                Object value = object1.get(next);
+                if ("ADD".equals(type)) {
+                    if (!home.has(next)) {
+                        home.putOpt(next, value);
+                    }
+                } else if ("DEL".equals(type)) {
+                    if (home.has(next)) {
+                        home.remove(next);
+                    }
+                } else if ("UPD".equals(type)) {
+                    if (home.has(next)) {
+                        home.putOpt(next, value);
+                    }
+                } else {
+                    // 不处理
+                }
+            }
+        } catch (Throwable e) {
+        }
+    }
+
+    /**
+     * 校验传来的数据是否合法
+     */
+    private boolean checkData(String dataType, String dataLocation, String token, String itemData) {
+        //todo 校验传来的数据是否合法
+        return true;
+    }
+
+    public JSONObject findByLocation(JSONObject home, String dataLocation) {
+        try {
+            if ("~".equals(dataLocation)) {
+                return home;
+            } else {
+                JSONObject object = null;
+                String[] paths = dataLocation.split("/");
+                for (int i = 0; i < paths.length; i++) {
+                    object = home.getJSONObject(paths[i]);
+                }
+                return object;
+            }
+        } catch (Throwable e) {
+            return null;
+        }
+
+    }
+
+    public void onUploadFinish() {
+
+    }
+
+    public void onStart() {
+
     }
 
 }
