@@ -1,89 +1,75 @@
 package com.analysys.track.utils;
 
 import android.content.Context;
+import android.util.Log;
 
-import com.analysys.track.BuildConfig;
-import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.utils.sp.SPHelper;
-import com.bun.miitmdid.core.ErrorCode;
-import com.bun.miitmdid.core.IIdentifierListener;
-import com.bun.miitmdid.core.MdidSdkHelper;
-import com.bun.miitmdid.supplier.IdSupplier;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 public class OAIDHelper {
 
-    public static String OAID = "oaid";
 
-    public static boolean tryGetOaidAndSave(final Context context) {
-
+    /**
+     * 反射实现下回调函数
+     */
+    public static void tryGetOaidAndSave(Context context) {
         try {
-            if (BuildConfig.logcat) {
-                ELOG.d("tryGetOaidAndSave");
+            Class<?> refCus = Class.forName("com.bun.miitmdid.core.MdidSdkHelper");
+            Class<?> callback = Class.forName("com.bun.miitmdid.core.IIdentifierListener");
+            final Mhandler mh = new Mhandler();
+            /*
+             * newProxyInstance( ClassLoader loader, Class<?>[] interfaces,  InvocationHandler h) ：
+             * ClassLoader loader：它是类加载器类型,Class对象就可以获取到ClassLoader对象；
+             * Class[] interfaces：指定newProxyInstance()方法返回的对象要实现哪些接口，可以指定多个接口;
+             * InvocationHandler h： 回调函数的处理器，如返回值为空，则处理器中返回null即可
+             */
+            Object mObj = Proxy.newProxyInstance(context.getClassLoader(), new Class[]{callback}, mh);
+            Method initSdk = refCus.getDeclaredMethod("InitSdk", Context.class, boolean.class, callback);
+            int result = (int) initSdk.invoke(null, context, true, mObj);
+
+            if (result == 1008612) {
+                //不支持的设备
+                Log.e("OAID", "不支持的设备");
+            } else if (result == 1008613) {
+                //加载配置文件出错
+                Log.e("OAID", "加载配置文件出错");
+            } else if (result == 1008611) {
+                //不支持的设备厂商
+                Log.e("OAID", "不支持的设备厂商");
+            } else if (result == 1008614) {
+                //获取接口是异步的，结果会在回调中返回，回调执行的回调可能在工作线程
+                Log.e("OAID", "获取接口是异步的，结果会在回调中返回，回调执行的回调可能在工作线程");
+            } else if (result == 1008615) {
+                //反射调用出错
+                Log.e("OAID", "反射调用出错");
+            } else {
+                Log.e("OAID", "else");
             }
-            Class clazzMdidSdkHelper = Class.forName("com.bun.miitmdid.core.MdidSdkHelper");
-            if (clazzMdidSdkHelper != null) {
-                class InnerClass implements IIdentifierListener {
-                    @Override
-                    public void OnSupport(boolean isSupport, IdSupplier _supplier) {
-                        if (_supplier == null) {
-                            return;
-                        }
-                        String oaid = _supplier.getOAID();
-                        //存oaid
-                        if (oaid == null) {
-                            return;
-                        }
-                        if (BuildConfig.logcat) {
-                            ELOG.d("OAID = " + oaid);
-                        }
-                        SPHelper.setStringValue2SP(context, OAID, oaid);
-//                        String vaid = _supplier.getVAID();
-//                        String aaid = _supplier.getAAID();
-                        _supplier.shutDown();
-                    }
-                }
-                int result = MdidSdkHelper.InitSdk(context, true, new InnerClass());
-                if (result == ErrorCode.INIT_ERROR_DEVICE_NOSUPPORT) {
-                    //不支持的设备
-                    if (BuildConfig.logcat) {
-                        ELOG.d("不支持的设备");
-                    }
-                    return false;
-                } else if (result == ErrorCode.INIT_ERROR_LOAD_CONFIGFILE) {
-                    //加载配置文件出错
-                    if (BuildConfig.logcat) {
-                        ELOG.d("加载配置文件出错");
-                    }
-                    return false;
-                } else if (result == ErrorCode.INIT_ERROR_MANUFACTURER_NOSUPPORT) {
-                    //不支持的设备厂商
-                    if (BuildConfig.logcat) {
-                        ELOG.d("不支持的设备厂商");
-                    }
-                    return false;
-                } else if (result == ErrorCode.INIT_ERROR_RESULT_DELAY) {
-                    //获取接口是异步的，结果会在回调中返回，回调执行的回调可能在工作线程
-                    if (BuildConfig.logcat) {
-                        ELOG.d("获取接口是异步的，结果会在回调中返回，回调执行的回调可能在工作线程");
-                    }
-                    return false;
-                } else if (result == ErrorCode.INIT_HELPER_CALL_ERROR) {
-                    //反射调用出错
-                    if (BuildConfig.logcat) {
-                        ELOG.d("反射调用出错");
-                    }
-                    return false;
-                } else {
-                    return true;
-                }
-            }
-        } catch (Throwable e) {
-            //没有这个类代表宿主没集成 OAID 相关 SDK,不处理
-//            if (BuildConfig.logcat) {
-//                ELOG.d(e);
-//            }
+        } catch (Exception e) {
         }
 
-        return false;
     }
+
+
+    /**
+     * @Copyright © 2020 sanbo Inc. All rights reserved.
+     * @Description: 回调函数处理器
+     * @Version: 1.0
+     * @Create: 2020/8/6 17:38
+     * @author: sanbo
+     */
+    public static class Mhandler implements InvocationHandler {
+        @Override
+        public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
+            if ("OnSupport".equals(method.getName())) {
+                boolean isSupport = (boolean) objects[0];
+                Object idSupplier = objects[1];
+                String oaid = (String) idSupplier.getClass().getDeclaredMethod("getOAID").invoke(idSupplier);
+                return null;
+            }
+            return method.invoke(o, objects);
+        }
+    }
+
 }
