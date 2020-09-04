@@ -1,6 +1,7 @@
 package com.analysys.track.utils;
 
 import android.text.TextUtils;
+import android.util.Pair;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
@@ -161,6 +162,8 @@ public class PsHelper {
                 boolean b = PluginHandlerHelper.compatible(loader, BuildConfig.SDK_VERSION);
                 if (b) {
                     classLoaderMap.put(info.getVersion(), loader);
+                } else {
+                    //todo DEX不兼容处理
                 }
             }
         } catch (Throwable e) {
@@ -353,7 +356,7 @@ public class PsHelper {
     /**
      * 给所有已经加载的插件发布一个事件，data是参数也是传值渠道。
      *
-     * @param data   事件需要处理的数据
+     * @param data 事件需要处理的数据
      */
     public void getPluginData(JSONObject data) {
         try {
@@ -402,8 +405,7 @@ public class PsHelper {
     }
 
     private String decData(String token, String itemData) {
-        //todo 解密数据
-        return itemData;
+        return EncUtils.dec(new Pair<String, String>(token, itemData));
     }
 
     private void processObject(String type, JSONObject home, String data) {
