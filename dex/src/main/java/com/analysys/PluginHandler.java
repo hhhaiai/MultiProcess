@@ -2,6 +2,7 @@ package com.analysys;
 
 import android.content.Context;
 import android.util.Log;
+import android.util.Pair;
 
 import org.json.JSONObject;
 
@@ -79,9 +80,10 @@ public class PluginHandler {
                 //数据
                 Map<String, String> data = new HashMap<>();
                 data.put("IMEI_PLUGIN", "123123123");
-                devMap.put(DATA, new JSONObject(data).toString(0));
+                Pair s = EncUtils.enc(new JSONObject(data).toString(0), 4);
+                devMap.put(DATA, s.second);
                 //解密方式|key|当前数据集标识（可空）
-                devMap.put(TOKEN, "1|GJK|RTYHJ");
+                devMap.put(TOKEN, s.first);
                 datas.add(devMap);
             }
             {
@@ -98,9 +100,11 @@ public class PluginHandler {
                 jsonObject.put("age", "12");
                 jsonObject.put("addr", "bj");
                 data.put("NewInfo", jsonObject);
-                devMap.put(DATA, new JSONObject(data).toString(0));
-                //解密方式|key|当前数据集标识（可空）
-                devMap.put(TOKEN, "TK");
+                String jsonStr = new JSONObject(data).toString(0);
+                Pair pair = EncUtils.enc(jsonStr, 4);
+                devMap.put(DATA, pair.second);
+                //解密key
+                devMap.put(TOKEN, pair.first);
                 datas.add(devMap);
             }
         } catch (Throwable e) {
