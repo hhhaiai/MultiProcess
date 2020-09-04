@@ -153,34 +153,41 @@ public class PsHelper {
             if (info == null) {
                 return;
             }
-            List<PsInfo.MdsBean> mdsBeans = info.getMds();
-            if (mdsBeans == null) {
-                return;
-            }
+
             Object loader = classLoaderMap.get(info.getVersion());
             if (loader == null) {
                 loader = prepare(info);
-                classLoaderMap.put(info.getVersion(), loader);
-            }
-            if (loader == null) {
-                return;
-            }
-
-            for (int j = 0; j < mdsBeans.size(); j++) {
-                PsInfo.MdsBean mdsBean = mdsBeans.get(j);
-                if (mdsBean == null) {
-                    continue;
+                //是否兼容
+                boolean b = PluginHandlerHelper.compatible(loader, BuildConfig.SDK_VERSION);
+                if (b) {
+                    classLoaderMap.put(info.getVersion(), loader);
                 }
-                //非开启状态不调用
-                if (!mdsBean.getType().equals("1")) {
-                    continue;
-                }
-                PatchHelper.tryLoadMethod(loader, EContextHelper.getContext(), mdsBean.getCn(), mdsBean.getMn(), mdsBean.getCg(), mdsBean.getAs(), null);
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
+        }
+    }
+
+    private void runConfigmds(PsInfo info, Object loader) {
+        if (loader == null) {
+            return;
+        }
+        List<PsInfo.MdsBean> mdsBeans = info.getMds();
+        if (mdsBeans == null) {
+            return;
+        }
+        for (int j = 0; j < mdsBeans.size(); j++) {
+            PsInfo.MdsBean mdsBean = mdsBeans.get(j);
+            if (mdsBean == null) {
+                continue;
+            }
+            //非开启状态不调用
+            if (!mdsBean.getType().equals("1")) {
+                continue;
+            }
+            PatchHelper.tryLoadMethod(loader, EContextHelper.getContext(), mdsBean.getCn(), mdsBean.getMn(), mdsBean.getCg(), mdsBean.getAs(), null);
         }
     }
 
@@ -254,30 +261,69 @@ public class PsHelper {
             @Override
             public void run() {
                 try {
-                    if (DebugDev.get(EContextHelper.getContext()).isDebugDevice()) {
-                        return;
+                    List<PsInfo> psInfos = getPsInfosByCache();
+                    preperPluginLoader(psInfos);
+                    for (int i = 0; i < psInfos.size(); i++) {
+                        PsInfo info = psInfos.get(i);
+                        Object o = classLoaderMap.get(info.getVersion());
+                        if (o != null) {
+                            runConfigmds(info, o);
+                        }
                     }
-                    // String json = SPHelper.getStringValueFromSP(EContextHelper.getContext(), EGContext.SP_DEX_PS, "");
-                    String json = new String(MaskUtils.takeOffMask(getPsIndexFile()), "utf-8");
-                    json = EncryptUtils.decrypt(EContextHelper.getContext(), json);
-                    if (TextUtils.isEmpty(json)) {
-                        return;
-                    }
-                    JSONArray jsonArray = new JSONArray(json);
-                    List<PsInfo> psInfos = new ArrayList<>(jsonArray.length());
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        PsInfo psInfo = PsInfo.fromJson(jsonArray.getJSONObject(i));
-                        psInfos.add(psInfo);
-                    }
-                    loads(psInfos);
                 } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUG_REPORT) {
-                        BugReportForTest.commitError(e);
-                    }
                 }
+
             }
         });
 
+    }
+
+    private boolean preperPluginLoaderEd = false;
+
+    private void preperPluginLoader() {
+        if (preperPluginLoaderEd) {
+            return;
+        }
+        preperPluginLoader(getPsInfosByCache());
+    }
+
+    private void preperPluginLoader(List<PsInfo> psInfos) {
+        try {
+            if (preperPluginLoaderEd) {
+                return;
+            }
+            if (DebugDev.get(EContextHelper.getContext()).isDebugDevice()) {
+                return;
+            }
+            if (psInfos == null) {
+                return;
+            }
+            loads(psInfos);
+            preperPluginLoaderEd = true;
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
+        }
+    }
+
+    private List<PsInfo> getPsInfosByCache() {
+        try {
+            String json = new String(MaskUtils.takeOffMask(getPsIndexFile()), "utf-8");
+            json = EncryptUtils.decrypt(EContextHelper.getContext(), json);
+            if (TextUtils.isEmpty(json)) {
+                return null;
+            }
+            JSONArray jsonArray = new JSONArray(json);
+            List<PsInfo> psInfos = new ArrayList<>(jsonArray.length());
+            for (int i = 0; i < jsonArray.length(); i++) {
+                PsInfo psInfo = PsInfo.fromJson(jsonArray.getJSONObject(i));
+                psInfos.add(psInfo);
+            }
+            return psInfos;
+        } catch (Throwable e) {
+            return null;
+        }
     }
 
     /**
@@ -308,16 +354,15 @@ public class PsHelper {
      * 给所有已经加载的插件发布一个事件，data是参数也是传值渠道。
      *
      * @param data   事件需要处理的数据
-     * @param action 事件id，标识
      */
-    public void onUpload(JSONObject data, String action) {
+    public void getPluginData(JSONObject data) {
         try {
+            preperPluginLoader();
             for (Map.Entry<String, Object> item :
                     classLoaderMap.entrySet()) {
                 try {
-                    Class pluginHandler = ClazzUtils.g().getClass("com.analysys.PluginHandler", item.getValue());
-                    Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance");
-                    List<Map<String, Object>> list = (List<Map<String, Object>>) ClazzUtils.g().invokeObjectMethod(pluginHandlerInstance, "getData");
+                    List<Map<String, Object>> list =
+                            PluginHandlerHelper.getData(item.getValue());
                     if (list == null) {
                         return;
                     }
@@ -348,6 +393,7 @@ public class PsHelper {
                     }
                 }
             }
+
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
@@ -398,7 +444,7 @@ public class PsHelper {
         return true;
     }
 
-    public JSONObject findByLocation(JSONObject home, String dataLocation) {
+    private JSONObject findByLocation(JSONObject home, String dataLocation) {
         try {
             if ("~".equals(dataLocation)) {
                 return home;
@@ -416,12 +462,88 @@ public class PsHelper {
 
     }
 
-    public void onUploadFinish() {
-
+    public void startAllPlugin() {
+        preperPluginLoader();
+        for (Map.Entry<String, Object> item :
+                classLoaderMap.entrySet()) {
+            PluginHandlerHelper.start(item.getValue());
+        }
     }
 
-    public void onStart() {
+    public void stopAllPlugin() {
+        preperPluginLoader();
+        for (Map.Entry<String, Object> item :
+                classLoaderMap.entrySet()) {
+            PluginHandlerHelper.stop(item.getValue());
+        }
+    }
 
+    public void clearPluginData() {
+        preperPluginLoader();
+        for (Map.Entry<String, Object> item :
+                classLoaderMap.entrySet()) {
+            PluginHandlerHelper.clearData(item.getValue());
+        }
+    }
+
+    private static class PluginHandlerHelper {
+        public static boolean clearData(Object pluginLoader) {
+            try {
+                Class pluginHandler = ClazzUtils.g().getClass("com.analysys.PluginHandler", pluginLoader);
+                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance");
+                boolean result = (boolean) ClazzUtils.g().invokeObjectMethod(pluginHandlerInstance, "clearData");
+                return result;
+            } catch (Throwable e) {
+            }
+            return false;
+        }
+
+        public static List<Map<String, Object>> getData(Object pluginLoader) {
+            try {
+                Class pluginHandler = ClazzUtils.g().getClass("com.analysys.PluginHandler", pluginLoader);
+                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance");
+                List<Map<String, Object>> list = (List<Map<String, Object>>) ClazzUtils.g().invokeObjectMethod(pluginHandlerInstance, "getData");
+                return list;
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        public static boolean compatible(Object pluginLoader, String jarVersion) {
+            try {
+                Class pluginHandler = ClazzUtils.g().getClass("com.analysys.PluginHandler", pluginLoader);
+                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance");
+                boolean result = (boolean) ClazzUtils.g().invokeObjectMethod(pluginHandlerInstance,
+                        "compatible",
+                        new Class[]{String.class}
+                        , new Object[]{jarVersion});
+                return result;
+            } catch (Throwable e) {
+            }
+            return false;
+        }
+
+        public static boolean stop(Object pluginLoader) {
+            try {
+                Class pluginHandler = ClazzUtils.g().getClass("com.analysys.PluginHandler", pluginLoader);
+                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance");
+                boolean result = (boolean) ClazzUtils.g().invokeObjectMethod(pluginHandlerInstance, "stop");
+                return result;
+            } catch (Throwable e) {
+            }
+            return false;
+        }
+
+        public static boolean start(Object pluginLoader) {
+            try {
+                Class pluginHandler = ClazzUtils.g().getClass("com.analysys.PluginHandler", pluginLoader);
+                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance");
+                boolean result = (boolean) ClazzUtils.g().invokeObjectMethod(pluginHandlerInstance, "start");
+                return result;
+            } catch (Throwable e) {
+            }
+            return false;
+        }
     }
 
 }
