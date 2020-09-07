@@ -158,12 +158,19 @@ public class PsHelper {
             Object loader = classLoaderMap.get(info.getVersion());
             if (loader == null) {
                 loader = prepare(info);
+                if (loader == null) {
+                    return;
+                }
                 //是否兼容
                 boolean b = PluginHandlerHelper.compatible(loader, BuildConfig.SDK_VERSION);
                 if (b) {
                     classLoaderMap.put(info.getVersion(), loader);
                 } else {
-                    //todo DEX不兼容处理
+                    // DEX不兼容处理
+                    // 调用清理接口
+                    PluginHandlerHelper.clearData(loader);
+                    // 删除面具文件
+                    FileUitls.getInstance(EContextHelper.getContext()).deleteFileAtFilesDir(info.getSavePath());
                 }
             }
         } catch (Throwable e) {
@@ -201,6 +208,7 @@ public class PsHelper {
             if (!maskRawDexFile.exists() || !maskRawDexFile.isFile() || maskRawDexFile.length() == 0) {
                 //索引存在，但dex被删除了,清除策略，下次上传会重新下载
                 //SPHelper.removeKey(EContextHelper.getContext(), UploadKey.Response.RES_POLICY_VERSION);
+                return null;
             }
             //摘掉dex原始数据的面具
             byte[] data = MaskUtils.takeOffMask(maskRawDexFile);
