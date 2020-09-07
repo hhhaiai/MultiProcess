@@ -14,7 +14,14 @@ public class OAIDHelper {
     public static boolean tryGetOaidAndSave(Context context) {
         try {
             Class<?> refCus = Class.forName("com.bun.miitmdid.core.MdidSdkHelper");
-            Class<?> callback = Class.forName("com.bun.miitmdid.core.IIdentifierListener");
+            Class<?> callback;
+            try {
+                // 1.0.10 版本
+                callback = Class.forName("com.bun.miitmdid.core.IIdentifierListener");
+            } catch (ClassNotFoundException e) {
+                // 1.0.23 版本
+                callback = Class.forName("com.bun.miitmdid.interfaces.IIdentifierListener");
+            }
             final InnerIdSupplier mh = new InnerIdSupplier();
             Object mObj = Proxy.newProxyInstance(context.getClassLoader(), new Class[]{callback}, mh);
             Method initSdk = refCus.getDeclaredMethod("InitSdk", Context.class, boolean.class, callback);

@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.Context;
 import android.os.StrictMode;
 
-import com.bun.miitmdid.core.JLibrary;
 import com.device.services.MultiProcessFramework;
 import com.device.tripartite.Abu;
 import com.device.utils.EL;
@@ -56,6 +55,7 @@ public class AnalysysApplication extends Application {
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
-        JLibrary.InitEntry(base);
+        // 低版本OAID获取必须调用
+//        JLibrary.InitEntry(base);
     }
 }
