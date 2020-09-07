@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.os.StrictMode;
 
+import com.bun.miitmdid.core.JLibrary;
 import com.device.services.MultiProcessFramework;
 import com.device.tripartite.Abu;
 import com.device.utils.EL;
@@ -50,5 +51,11 @@ public class AnalysysApplication extends Application {
                     .build());
             MultiProcessFramework.runServices(context);
         }
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        JLibrary.InitEntry(base);
     }
 }
