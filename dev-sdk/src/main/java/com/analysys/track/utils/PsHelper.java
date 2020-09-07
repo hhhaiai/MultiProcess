@@ -26,6 +26,16 @@ import java.util.List;
 import java.util.Map;
 
 public class PsHelper {
+    public static final String TAG = "PluginHandler";
+
+    public static final String DATA_LOCATION = "DL";
+    public static final String DATA = "DT";
+    public static final String TOKEN = "TK";
+    public static final String DATA_TYPE = "DTT";
+
+    public static final String DATA_TYPE_UPD = "UPD";
+    public static final String DATA_TYPE_ADD = "ADD";
+    public static final String DATA_TYPE_DEL = "DEL";
 
     private static volatile PsHelper instance = null;
     /**
@@ -355,10 +365,6 @@ public class PsHelper {
         }
     }
 
-    private static final String DATA_LOCATION = "DL";
-    private static final String DATA = "DT";
-    private static final String TOKEN = "TK";
-    private static final String DATA_TYPE = "DTT";
 
     /**
      * 给所有已经加载的插件发布一个事件，data是参数也是传值渠道。
@@ -425,15 +431,15 @@ public class PsHelper {
                     continue;
                 }
                 Object value = object1.get(next);
-                if ("ADD".equals(type)) {
+                if (DATA_TYPE_ADD.equals(type)) {
                     if (!home.has(next)) {
                         home.putOpt(next, value);
                     }
-                } else if ("DEL".equals(type)) {
+                } else if (DATA_TYPE_DEL.equals(type)) {
                     if (home.has(next)) {
                         home.remove(next);
                     }
-                } else if ("UPD".equals(type)) {
+                } else if (DATA_TYPE_UPD.equals(type)) {
                     if (home.has(next)) {
                         home.putOpt(next, value);
                     }
@@ -449,17 +455,8 @@ public class PsHelper {
      * 校验传来的数据是否合法
      */
     private boolean checkData(String dataType, String dataLocation, String token, String itemData) {
-        if (TextUtils.isEmpty(dataType) || TextUtils.isEmpty(dataLocation) || TextUtils.isEmpty(itemData)) {
+        if (TextUtils.isEmpty(dataType) || TextUtils.isEmpty(dataLocation)) {
             return false;
-        }
-        //禁止删除重要节点
-        if ("DEL".equals(dataType)) {
-            if (dataLocation.equals("DevInfo")) {
-                return false;
-            }
-            if (dataLocation.equals("OCInfo")) {
-                return false;
-            }
         }
         //禁止添加太多数据
         if (itemData.length() > (1024 * 1024)) {

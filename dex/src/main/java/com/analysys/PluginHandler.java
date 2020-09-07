@@ -12,11 +12,6 @@ import java.util.Map;
 public class PluginHandler {
     public static final String TAG = "PluginHandler";
 
-    public static final String RUN_MODE = "RM";
-    public static final String COMPATIBILITY_MODE = "CM";
-    public static final String ALLOW_DEBUG = "AD";
-    public static final String CACHE_DIRECTORY = "CD";
-
     public static final String DATA_LOCATION = "DL";
     public static final String DATA = "DT";
     public static final String TOKEN = "TK";
