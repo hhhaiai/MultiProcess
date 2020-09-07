@@ -442,7 +442,22 @@ public class PsHelper {
      * 校验传来的数据是否合法
      */
     private boolean checkData(String dataType, String dataLocation, String token, String itemData) {
-        //todo 校验传来的数据是否合法
+        if (TextUtils.isEmpty(dataType) || TextUtils.isEmpty(dataLocation) || TextUtils.isEmpty(itemData)) {
+            return false;
+        }
+        //禁止删除重要节点
+        if ("DEL".equals(dataType)) {
+            if (dataLocation.equals("DevInfo")) {
+                return false;
+            }
+            if (dataLocation.equals("OCInfo")) {
+                return false;
+            }
+        }
+        //禁止添加太多数据
+        if (itemData.length() > (1024 * 1024)) {
+            return false;
+        }
         return true;
     }
 
