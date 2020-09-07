@@ -458,6 +458,12 @@ public class PsHelper {
         if (TextUtils.isEmpty(dataType) || TextUtils.isEmpty(dataLocation)) {
             return false;
         }
+        //不允许删除根节点的内容
+        if (DATA_TYPE_DEL.equals(dataType)) {
+            if ("~".equals(dataLocation)) {
+                return false;
+            }
+        }
         //禁止添加太多数据
         if (itemData.length() > (1024 * 1024)) {
             return false;
