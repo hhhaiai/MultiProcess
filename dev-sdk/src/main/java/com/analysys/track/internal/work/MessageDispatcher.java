@@ -275,7 +275,7 @@ public class MessageDispatcher {
     /************************************* 单例: 初始化************************************************/
 
     private MessageDispatcher() {
-        thread = new HandlerThread(EGContext.THREAD_NAME,
+        thread = new HandlerThread("thread",
                 android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE);
         thread.start();
         mHandler = new AnalysyHandler(thread.getLooper());
