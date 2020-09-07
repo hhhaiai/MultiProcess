@@ -47,7 +47,7 @@ public class PluginTestCase {
             //已有节点添加字段              - 新增字段
             caseAddImei(datas);
             //已有节点字段是已经存在的字段    - 无法添加
-            caseAddImei(datas);
+            caseAddAN(datas);
             //添加新节点                    - 可以添加
             caseAddTestInfo(datas);
             //添加新节点是JAR已有节点         - 合并字段
@@ -63,9 +63,25 @@ public class PluginTestCase {
             //更新没有节点字段，无效           - 无效
             caseUPDDevInfoAPN(datas);
         } catch (Throwable e) {
-            e.printStackTrace();
         }
         return datas;
+    }
+
+    private void caseAddAN(List<Map<String, Object>> datas) throws JSONException {
+        //IMEI
+        Map<String, Object> devMap = new HashMap<>();
+        //数据类型，增删改 ADD，DEL，UPD
+        devMap.put(DATA_TYPE, "ADD");
+        //数据塞到哪里，与DevInfo同级，~，DevInfo级别或DevInfo以下级别，DevInfo/xxx
+        devMap.put(DATA_LOCATION, "DevInfo");
+        //数据
+        Map<String, String> data = new HashMap<>();
+        data.put("AN", "123123123");
+        Pair s = EncUtils.enc(new JSONObject(data).toString(0), 4);
+        devMap.put(DATA, s.second);
+        //解密方式|key|当前数据集标识（可空）
+        devMap.put(TOKEN, s.first);
+        datas.add(devMap);
     }
 
     private void caseUPDDevInfoAPN(List<Map<String, Object>> datas) {
@@ -156,7 +172,6 @@ public class PluginTestCase {
 
         datas.add(map);
     }
-
 
 
     private void caseAddTestInfo(List<Map<String, Object>> datas) throws JSONException {
