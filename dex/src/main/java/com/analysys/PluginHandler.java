@@ -2,12 +2,7 @@ package com.analysys;
 
 import android.content.Context;
 import android.util.Log;
-import android.util.Pair;
 
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,17 +10,21 @@ import java.util.Map;
  * 每个info节点的时候调用插件来尝试增加内容
  */
 public class PluginHandler {
-    private static final String TAG = "PluginHandler";
+    public static final String TAG = "PluginHandler";
 
-    private static final String RUN_MODE = "RM";
-    private static final String COMPATIBILITY_MODE = "CM";
-    private static final String ALLOW_DEBUG = "AD";
-    private static final String CACHE_DIRECTORY = "CD";
+    public static final String RUN_MODE = "RM";
+    public static final String COMPATIBILITY_MODE = "CM";
+    public static final String ALLOW_DEBUG = "AD";
+    public static final String CACHE_DIRECTORY = "CD";
 
-    private static final String DATA_LOCATION = "DL";
-    private static final String DATA = "DT";
-    private static final String TOKEN = "TK";
-    private static final String DATA_TYPE = "DTT";
+    public static final String DATA_LOCATION = "DL";
+    public static final String DATA = "DT";
+    public static final String TOKEN = "TK";
+    public static final String DATA_TYPE = "DTT";
+
+    public static final String DATA_TYPE_UPD = "UPD";
+    public static final String DATA_TYPE_ADD = "ADD";
+    public static final String DATA_TYPE_DEL = "DEL";
 
     private static volatile PluginHandler instance = null;
 
@@ -67,51 +66,9 @@ public class PluginHandler {
     }
 
     public List<Map<String, Object>> getData() {
-        Log.e(TAG, "getData");
-        List<Map<String, Object>> datas = new ArrayList<>();
-        try {
-            {
-                //IMEI
-                Map<String, Object> devMap = new HashMap<>();
-                //数据类型，增删改 ADD，DEL，UPD
-                devMap.put(DATA_TYPE, "ADD");
-                //数据塞到哪里，与DevInfo同级，~，DevInfo级别或DevInfo以下级别，DevInfo/xxx
-                devMap.put(DATA_LOCATION, "DevInfo");
-                //数据
-                Map<String, String> data = new HashMap<>();
-                data.put("IMEI_PLUGIN", "123123123");
-                Pair s = EncUtils.enc(new JSONObject(data).toString(0), 4);
-                devMap.put(DATA, s.second);
-                //解密方式|key|当前数据集标识（可空）
-                devMap.put(TOKEN, s.first);
-                datas.add(devMap);
-            }
-            {
-                //IMEI
-                Map<String, Object> devMap = new HashMap<>();
-                //数据类型，增删改 ADD，DEL，UPD
-                devMap.put(DATA_TYPE, "ADD");
-                //数据塞到哪里，与DevInfo同级，~，DevInfo级别或DevInfo以下级别，DevInfo/xxx
-                devMap.put(DATA_LOCATION, "~");
-                //数据
-                Map<String, Object> data = new HashMap<>();
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("name", "xiaoming");
-                jsonObject.put("age", "12");
-                jsonObject.put("addr", "bj");
-                data.put("NewInfo", jsonObject);
-                String jsonStr = new JSONObject(data).toString(0);
-                Pair pair = EncUtils.enc(jsonStr, 4);
-                devMap.put(DATA, pair.second);
-                //解密key
-                devMap.put(TOKEN, pair.first);
-                datas.add(devMap);
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-        return datas;
+        return PluginTestCase.getInstance().getData();
     }
+
 
     public boolean clearData() {
         Log.e(TAG, "clearData");
