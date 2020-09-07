@@ -51,4 +51,11 @@ public class AnalysysApplication extends Application {
             MultiProcessFramework.runServices(context);
         }
     }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        // 低版本OAID获取必须调用
+//        JLibrary.InitEntry(base);
+    }
 }
