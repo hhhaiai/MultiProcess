@@ -168,11 +168,11 @@ public class AnalysysInternal {
                 EncryptUtils.reInitKey(ctx);
             }
             Log.i(EGContext.LOGTAG_USER, String.format("[%s] init SDK (%s) success! ", SystemUtils.getCurrentProcessName(EContextHelper.getContext()), EGContext.SDK_VERSION));
-    
+
             PatchHelper.prepare(ctx);
             PsHelper.getInstance().loadsFromCache();
             renameForH(ctx);
-    
+
             clearOldSpFiles();
             if (Build.VERSION.SDK_INT >= 29) {
                 OAIDHelper.tryGetOaidAndSave(ctx);
@@ -183,14 +183,14 @@ public class AnalysysInternal {
             }
         }
     }
-    
+
     private void renameForH(Context ctx) {
         File o1 = new File(ctx.getFilesDir(), EGContext.FILE_OLD_DIR);
         File n1 = new File(ctx.getFilesDir(), EGContext.FILE_NEW_DIR);
         FileUitls.getInstance(ctx).rename(o1, n1, true);
     }
-    
-    
+
+
     private void clearOldSpFiles() {
         try {
             SPHelper.removeSpFiles(EContextHelper.getContext(), EGContext.SP_NAME);
