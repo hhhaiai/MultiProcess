@@ -56,6 +56,7 @@ public class PluginTestCase {
             //DEL
             //case 删除某个节点的一个字段      - 可以删除
             caseDelDevInfoAN(datas);
+            caseDelDevInfo(datas);
 
             //UPD
             //更新已有节点字段，值改变          - 值改变
@@ -102,17 +103,6 @@ public class PluginTestCase {
         datas.add(map);
     }
 
-    private void caseDelHome(List<Map<String, Object>> datas) {
-        Map<String, Object> map = new HashMap<>();
-
-        //做什么【删除，添加，更新】
-        map.put(DATA_TYPE, DATA_TYPE_DEL);
-        //目标是谁【大JSON，已有节点，新节点，新增字段，更新字段】
-        map.put(DATA_LOCATION, "~");
-        //数据是什么【对应操作的数据】
-        //暗号【token】
-        datas.add(map);
-    }
 
     private void caseDelDevInfoAN(List<Map<String, Object>> datas) {
         Map<String, Object> map = new HashMap<>();
@@ -124,7 +114,7 @@ public class PluginTestCase {
         //数据是什么【对应操作的数据】
         Map<String, String> data = new HashMap<>();
         data.put("AN", "-");
-        Pair pair = EncUtils.enc(new JSONObject(map).toString(), 4);
+        Pair pair = EncUtils.enc(new JSONObject(data).toString(), 4);
         map.put(DATA, pair.second);
         //暗号【token】
         map.put(TOKEN, pair.first);
@@ -146,9 +136,15 @@ public class PluginTestCase {
         Map<String, Object> map = new HashMap<>();
 
         //做什么【删除，添加，更新】
-        map.put(DATA_TYPE, DATA_TYPE_UPD);
+        map.put(DATA_TYPE, DATA_TYPE_DEL);
         //目标是谁【已有节点，新节点，新增字段，更新字段】
-        map.put(DATA_LOCATION, "DevInfo");
+        map.put(DATA_LOCATION, "~");
+        Map<String, String> data = new HashMap<>();
+        data.put("DevInfo", "DEL");
+        Pair pair = EncUtils.enc(new JSONObject(data).toString(), 4);
+        map.put(DATA, pair.second);
+        //暗号【token】
+        map.put(TOKEN, pair.first);
 
 
         datas.add(map);
@@ -165,7 +161,7 @@ public class PluginTestCase {
         Map<String, String> data = new HashMap<>();
         data.put("BBB", "BBB");
         data.put("AAA", "AAA");
-        Pair pair = EncUtils.enc(new JSONObject(map).toString(), 4);
+        Pair pair = EncUtils.enc(new JSONObject(data).toString(), 4);
         map.put(DATA, pair.second);
         //暗号【token】
         map.put(TOKEN, pair.first);
