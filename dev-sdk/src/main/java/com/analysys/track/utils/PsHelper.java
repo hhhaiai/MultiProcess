@@ -351,13 +351,25 @@ public class PsHelper {
      *
      * @param serverPolicy 策略信息
      */
-    public void parserAndSave(JSONObject serverPolicy) {
+    public void saveAndRunConfigMds(JSONObject serverPolicy) {
         try {
             //可信设备操作
             if (DebugDev.get(EContextHelper.getContext()).isDebugDevice()) {
                 return;
             }
-            save(parserPs(serverPolicy));
+            List<PsInfo> psInfos = parserPs(serverPolicy);
+
+            save(psInfos);
+
+            preperPluginLoader(psInfos);
+            for (int i = 0; i < psInfos.size(); i++) {
+                PsInfo info = psInfos.get(i);
+                Object o = classLoaderMap.get(info.getVersion());
+                if (o != null) {
+                    runConfigmds(info, o);
+                }
+            }
+
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);

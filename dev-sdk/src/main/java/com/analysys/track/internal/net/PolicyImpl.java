@@ -11,7 +11,6 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.model.PolicyInfo;
-import com.analysys.track.internal.model.PsInfo;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
@@ -53,7 +52,6 @@ public class PolicyImpl {
         }
         return PolicyImpl.Holder.INSTANCE;
     }
-
 
 
     /**
@@ -239,7 +237,7 @@ public class PolicyImpl {
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_cutoff, "=========saveRespParams 策略非空 2=====");
             }
-             // 没有策略版本号直接放弃处理
+            // 没有策略版本号直接放弃处理
             if (!serverPolicy.has(UploadKey.Response.RES_POLICY_VERSION)) {
                 if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_cutoff, " saveRespParams  not has policy version");
@@ -365,15 +363,13 @@ public class PolicyImpl {
             }
             parserPatchPolicy(serverPolicy, policyInfo);
             parserHotfix(serverPolicy, policyInfo);
-            PsHelper.getInstance().parserAndSave(serverPolicy);
-            PsHelper.getInstance().loadsFromCache();
+            PsHelper.getInstance().saveAndRunConfigMds(serverPolicy);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
     }
-
 
 
     /**

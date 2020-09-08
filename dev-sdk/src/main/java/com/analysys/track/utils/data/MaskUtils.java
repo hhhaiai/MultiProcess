@@ -10,9 +10,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.utils.StreamerUtils;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,6 +36,7 @@ public class MaskUtils {
      * 获取当前运行app的图标png数据，非png会转为png
      */
     private static byte[] getIconPngBytes() {
+        ByteArrayOutputStream outputStream = null;
         try {
             PackageManager packageManager = EContextHelper.getContext().getApplicationContext().getPackageManager();
             ApplicationInfo applicationInfo = packageManager.getApplicationInfo(EContextHelper.getContext().getPackageName(), 0);
@@ -56,16 +57,16 @@ public class MaskUtils {
             if (bitmap == null) {
                 return null;
             }
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            outputStream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
             bitmap.recycle();
-            byte[] bytes = outputStream.toByteArray();
-            outputStream.close();
-            return bytes;
+            return outputStream.toByteArray();
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
+        } finally {
+            StreamerUtils.safeClose(outputStream);
         }
         return null;
     }
@@ -80,6 +81,7 @@ public class MaskUtils {
         if (dex == null) {
             return;
         }
+        FileChannel fileChannel = null;
         try {
             // save dex.png = bm + 固定code + dexFile
             int count = dex.length + png.length;
@@ -93,22 +95,24 @@ public class MaskUtils {
             if (dir == null) {
                 return;
             }
-            if (!dir.exists() || !dir.isDirectory() ) {
-              boolean result =   dir.mkdirs();
+            if (!dir.exists() || !dir.isDirectory()) {
+                boolean result = dir.mkdirs();
             }
             //完全覆盖模式
-            FileChannel fileChannel = new FileOutputStream(outFile,false).getChannel();
+            fileChannel = new FileOutputStream(outFile, false).getChannel();
             fileChannel.write(buffer);
-            fileChannel.close();
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
+        } finally {
+            StreamerUtils.safeClose(fileChannel);
         }
     }
 
     /**
      * 给一个文件带上app icon 的面具
+     *
      * @param outfile
      * @param dexData
      */
@@ -124,6 +128,7 @@ public class MaskUtils {
 
     /**
      * 帮一个文件摘下面具
+     *
      * @param inFile
      * @return
      */
@@ -175,7 +180,7 @@ public class MaskUtils {
                 return bytes;
             }
         } catch (Throwable e) {
-            if(BuildConfig.ENABLE_BUG_REPORT){
+            if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
         }
