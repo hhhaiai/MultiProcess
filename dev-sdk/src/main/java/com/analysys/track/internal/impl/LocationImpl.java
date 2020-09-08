@@ -192,7 +192,9 @@ public class LocationImpl {
             try {
                 // 1. ro.miui.ui.version.name==>Vx
                 if (!Build.MANUFACTURER.equalsIgnoreCase("xiaomi")
-                        || !SystemUtils.containsKeyInProp("ro.miui.ui.version.name")) {
+//                        // 概率会失败
+//                        || !SystemUtils.containsKeyInProp("ro.miui.ui.version.name")
+                ) {
                     if (BuildConfig.logcat) {
                         ELOG.e(BuildConfig.tag_loc, "非小米设备");
                     }
