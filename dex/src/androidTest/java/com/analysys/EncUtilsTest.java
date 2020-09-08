@@ -11,7 +11,7 @@ public class EncUtilsTest {
     public void enc() {
         String[] str = new String[]{"", "hgfdhfdgh", "q", "fdskafhdsakfhsafhkdsafh", "\n"};
         for (int i = 0; i < str.length; i++) {
-            Pair pair = EncUtils.enc(str[i], 10);
+            Pair pair = EncUtils.enc(str[i], 10000);
             String data = EncUtils.dec(pair);
             Assert.assertEquals(str[i], data);
         }

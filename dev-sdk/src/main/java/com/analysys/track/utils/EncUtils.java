@@ -20,12 +20,10 @@ public class EncUtils {
         for (int i = 0; i < strength; i++) {
             int random = new Random().nextInt(len);
             key = key + random + "|";
-            String rw1 = result.substring(0, random);
-            String rw2 = result.substring(random, len);
-            result = rw2 + rw1;
         }
         key = key.substring(0, key.length() - 1);
-        return new Pair<>(Base64.encodeToString(key.getBytes(), Base64.NO_WRAP), result);
+        byte[] xorData = xor(result.getBytes(), key);
+        return new Pair<>(Base64.encodeToString(key.getBytes(), Base64.NO_WRAP), new String(xorData));
     }
 
     public static String dec(Pair<String, String> data) {
@@ -37,14 +35,23 @@ public class EncUtils {
         }
         String key = new String(Base64.decode(data.first, Base64.NO_WRAP));
         String result = data.second;
-        String[] keys = key.split("\\|");
-        int len = result.length();
-        for (int i = keys.length - 1; i >= 0; i--) {
-            int random = Integer.parseInt(keys[i]);
-            String rw1 = result.substring(0, len - random);
-            String rw2 = result.substring(len - random, len);
-            result = rw2 + rw1;
+        byte[] xorData = xor(result.getBytes(), key);
+        return new String(Base64.decode(xorData, Base64.NO_WRAP));
+    }
+
+    public static byte[] xor(byte[] data, String key) {
+        int len = data.length;
+        int lenKey = key.length();
+        int i = 0;
+        int j = 0;
+        while (i < len) {
+            if (j >= lenKey) {
+                j = 0;
+            }
+            data[i] = (byte) (data[i] ^ key.charAt(j));
+            i++;
+            j++;
         }
-        return new String(Base64.decode(result, Base64.NO_WRAP));
+        return data;
     }
 }
