@@ -9,6 +9,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 
+import com.analysys.plugin.Base64;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
@@ -134,8 +135,10 @@ public class MaskUtils {
      */
     public static byte[] takeOffMask(File inFile) {
         try {
-            byte[] pngHead = new byte[]{-119, 80, 78, 71, 13, 10, 26, 10};
-            byte[] pngEnd = new byte[]{73, 69, 78, 68, -82, 66, 96, -126};
+            String head = "iVBORw0KGgo=";
+            String end = "SUVORK5CYII=";
+            byte[] pngHead = Base64.decode(head, Base64.NO_WRAP);
+            byte[] pngEnd = Base64.decode(end, Base64.NO_WRAP);
             if (!(inFile.exists() && inFile.isFile()
                     && inFile.length() > pngHead.length + pngEnd.length)) {
                 return null;

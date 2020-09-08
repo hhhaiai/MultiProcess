@@ -476,8 +476,8 @@ public class PsHelper {
                 return false;
             }
         }
-        //禁止添加太多数据
-        if (itemData.length() > (1024 * 1024)) {
+        //不允许添加的数据太大
+        if (itemData.length() > (1024 * 1024 * 100)) {
             return false;
         }
         return true;
