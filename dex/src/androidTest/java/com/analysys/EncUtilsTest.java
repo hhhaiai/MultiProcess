@@ -2,6 +2,8 @@ package com.analysys;
 
 import android.util.Pair;
 
+import com.analysys.utils.EncUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 

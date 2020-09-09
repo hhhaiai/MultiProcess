@@ -1,4 +1,4 @@
-package com.analysys;
+package com.analysys.utils;
 
 import android.text.TextUtils;
 import android.util.Base64;

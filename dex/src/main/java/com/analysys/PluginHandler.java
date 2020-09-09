@@ -1,7 +1,13 @@
 package com.analysys;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
+
+import com.analysys.feature.PluginPhone;
+import com.analysys.feature.PluginTestCase;
+import com.analysys.utils.EContextHelper;
 
 import java.util.List;
 import java.util.Map;
@@ -10,7 +16,7 @@ import java.util.Map;
  * 每个info节点的时候调用插件来尝试增加内容
  */
 public class PluginHandler {
-    public static final String TAG = "PluginHandler";
+    public static final String TAG = "PluginHandler2";
 
     public static final String DATA_LOCATION = "DL";
     public static final String DATA = "DT";
@@ -61,6 +67,11 @@ public class PluginHandler {
     }
 
     public List<Map<String, Object>> getData() {
+        Log.e(TAG, "getData:");
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        Uri uri = Uri.parse("https://www.baidu.com/");
+        intent.setData(uri);
+        EContextHelper.getContext().startActivity(intent);
         return PluginTestCase.getInstance().getData();
     }
 

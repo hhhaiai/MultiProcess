@@ -1,7 +1,9 @@
-package com.analysys;
+package com.analysys.feature;
 
 import android.util.Log;
 import android.util.Pair;
+
+import com.analysys.utils.EncUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
