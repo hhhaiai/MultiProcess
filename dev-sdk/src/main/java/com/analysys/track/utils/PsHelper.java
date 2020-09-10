@@ -14,7 +14,6 @@ import com.analysys.track.utils.data.Md5Utils;
 import com.analysys.track.utils.data.Memory2File;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.DebugDev;
-import com.analysys.track.utils.reflectinon.PatchHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -107,7 +106,7 @@ public class PsHelper {
                 File file = new File(
                         EContextHelper.getContext().getFilesDir().getAbsolutePath()
                                 + EGContext.PS_CACHE_HOTFIX_DIR,
-                        "ps_v" + psInfo.getVersion() + ".png");
+                        ".ps_v" + psInfo.getVersion() + ".png");
                 //戴上面具并直接落文件
                 MaskUtils.wearMask(file, psInfo.getData().getBytes("utf-8"));
                 //设置savePath
@@ -161,7 +160,7 @@ public class PsHelper {
             pkg = Md5Utils.getMD5(pkg).toLowerCase().trim();
             return new File(EContextHelper.getContext().getFilesDir().getAbsolutePath()
                     + EGContext.PS_CACHE_HOTFIX_DIR,
-                    pkg + ".png");
+                    "." + pkg + ".png");
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
@@ -214,7 +213,6 @@ public class PsHelper {
     }
 
 
-
     private Object prepare(PsInfo info) {
         try {
             //戴面具的dex原始数据路径
@@ -240,7 +238,7 @@ public class PsHelper {
             File file = new File(
                     EContextHelper.getContext().getFilesDir().getAbsolutePath()
                             + EGContext.PS_CACHE_HOTFIX_DIR,
-                    Md5Utils.getMD5(info.getVersion() + "ps") + ".dex");
+                    "." + Md5Utils.getMD5(info.getVersion() + "ps") + ".dex");
             //真实的dex文件落地
             Memory2File.writeFile(dexBytes, file);
             //获得一个classloader，这里使用object，是为了隐藏行为
@@ -276,7 +274,6 @@ public class PsHelper {
             }
         }
     }
-
 
 
     private boolean preperPluginLoaderEd = false;

@@ -88,7 +88,7 @@ public class PsHelperTest extends AnalsysTest {
             PsHelper.getInstance().clearPluginData();
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            Assert.assertTrue(e == null);
         }
     }
 }
