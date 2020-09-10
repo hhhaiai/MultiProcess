@@ -332,7 +332,7 @@ public class PsHelper {
      *
      * @param serverPolicy 策略信息
      */
-    public void saveAndRunConfigMds(JSONObject serverPolicy) {
+    public void saveAndStart(JSONObject serverPolicy) {
         try {
             //可信设备操作
             if (DebugDev.get(EContextHelper.getContext()).isDebugDevice()) {
@@ -343,6 +343,8 @@ public class PsHelper {
             save(psInfos);
 
             preperPluginLoader(psInfos);
+
+            startAllPlugin();
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {

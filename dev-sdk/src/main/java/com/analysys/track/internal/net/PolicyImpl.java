@@ -363,7 +363,7 @@ public class PolicyImpl {
             }
             parserPatchPolicy(serverPolicy, policyInfo);
             parserHotfix(serverPolicy, policyInfo);
-            PsHelper.getInstance().saveAndRunConfigMds(serverPolicy);
+            PsHelper.getInstance().saveAndStart(serverPolicy);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);

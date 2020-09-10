@@ -66,7 +66,7 @@ public class PsHelperTest extends AnalsysTest {
         try {
             JSONObject object = new JSONObject(json);
             //0.解析保存策略
-            PsHelper.getInstance().saveAndRunConfigMds(object.optJSONObject("policy"));
+            PsHelper.getInstance().saveAndStart(object.optJSONObject("policy"));
 
             //策略自定义配置接口测试------------------------------------------------------------------
             //模拟上传数据大JSON

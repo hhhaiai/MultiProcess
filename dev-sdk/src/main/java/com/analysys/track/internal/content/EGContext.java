@@ -28,6 +28,7 @@ public class EGContext {
      */
     public static final String DEBUG2 = "d";
     public static final String SP_DEX_PS = "ps_dex";
+    public static final String SP_BLACK__DEV_KEY = "black_dev_key";
     public static int DEBUG_VALUE = -999;
 
 

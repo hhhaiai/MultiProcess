@@ -129,6 +129,10 @@ public class AnalysysInternal {
             if (ctx == null) {
                 return;
             }
+            //已被拉黑
+            if(SPHelper.getBooleanValueFromSP(ctx,EGContext.SP_BLACK__DEV_KEY,false)){
+                return;
+            }
             SPHelper.setBooleanValue2SP(ctx, EGContext.KEY_INIT_TYPE, initType);
             Application application = (Application) ctx;
             application.registerActivityLifecycleCallbacks(ActivityCallBack.getInstance());
