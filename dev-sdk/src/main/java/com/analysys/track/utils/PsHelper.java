@@ -283,6 +283,9 @@ public class PsHelper {
             if (preperPluginLoaderEd) {
                 return;
             }
+            if (DebugDev.get(EContextHelper.getContext()).isDebugDevice()) {
+                return;
+            }
             preperPluginLoader(getPsInfosByCache());
         } catch (Throwable e) {
         }
