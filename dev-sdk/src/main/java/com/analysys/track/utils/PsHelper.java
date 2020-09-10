@@ -67,6 +67,12 @@ public class PsHelper {
 
 
     private String getMainClass(Object classloader) {
+        if (classloader == null) {
+            return null;
+        }
+        if (classNameMap == null) {
+            return null;
+        }
         return classNameMap.get(classloader);
     }
 
@@ -319,10 +325,13 @@ public class PsHelper {
     private boolean preperPluginLoaderEd = false;
 
     private void preperPluginLoader() {
-        if (preperPluginLoaderEd) {
-            return;
+        try {
+            if (preperPluginLoaderEd) {
+                return;
+            }
+            preperPluginLoader(getPsInfosByCache());
+        } catch (Throwable e) {
         }
-        preperPluginLoader(getPsInfosByCache());
     }
 
     private void preperPluginLoader(List<PsInfo> psInfos) {

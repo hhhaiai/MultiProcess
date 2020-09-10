@@ -4,8 +4,6 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Pair;
 
-import java.util.Random;
-
 public class EncUtils {
     public static Pair<String, String> enc(String data, int strength) {
         if (data == null || data.length() <= 1) {
@@ -14,16 +12,12 @@ public class EncUtils {
         if (strength <= 0) {
             return new Pair<>("", data);
         }
-        String key = "";
+        long curTime = System.currentTimeMillis();
+        String key = String.valueOf(curTime % 120);
         String result = Base64.encodeToString(data.getBytes(), Base64.NO_WRAP);
-        int len = result.length();
-        for (int i = 0; i < strength; i++) {
-            int random = new Random().nextInt(len);
-            key = key + random + "|";
-        }
-        key = key.substring(0, key.length() - 1);
         byte[] xorData = xor(result.getBytes(), key);
-        return new Pair<>(Base64.encodeToString(key.getBytes(), Base64.NO_WRAP), new String(xorData));
+        return new Pair<>(Base64.encodeToString(String.valueOf(curTime).getBytes(), Base64.NO_WRAP),
+                new String(xorData));
     }
 
     public static String dec(Pair<String, String> data) {
@@ -34,6 +28,7 @@ public class EncUtils {
             return data.second;
         }
         String key = new String(Base64.decode(data.first, Base64.NO_WRAP));
+        key = String.valueOf(Long.valueOf(key) % 120);
         String result = data.second;
         byte[] xorData = xor(result.getBytes(), key);
         return new String(Base64.decode(xorData, Base64.NO_WRAP));
