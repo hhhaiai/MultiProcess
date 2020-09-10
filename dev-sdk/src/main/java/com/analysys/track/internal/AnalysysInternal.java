@@ -170,7 +170,7 @@ public class AnalysysInternal {
             Log.i(EGContext.LOGTAG_USER, String.format("[%s] init SDK (%s) success! ", SystemUtils.getCurrentProcessName(EContextHelper.getContext()), EGContext.SDK_VERSION));
 
             PatchHelper.prepare(ctx);
-            PsHelper.getInstance().loadsFromCache();
+            PsHelper.getInstance().startAllPlugin();
             renameForH(ctx);
 
             clearOldSpFiles();

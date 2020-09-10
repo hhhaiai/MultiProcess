@@ -188,7 +188,7 @@ public class PsHelper {
                     return;
                 }
                 try {
-                    classNameMap.put(loader, info.getMds().get(0).getCn());
+                    classNameMap.put(loader, info.getCn());
                 } catch (Throwable e) {
                     //没有配置主类.给一个默认的
                     classNameMap.put(loader, "com.analysys.PluginHandler");
@@ -213,26 +213,7 @@ public class PsHelper {
         }
     }
 
-    private void runConfigmds(PsInfo info, Object loader) {
-        if (loader == null) {
-            return;
-        }
-        List<PsInfo.MdsBean> mdsBeans = info.getMds();
-        if (mdsBeans == null) {
-            return;
-        }
-        for (int j = 0; j < mdsBeans.size(); j++) {
-            PsInfo.MdsBean mdsBean = mdsBeans.get(j);
-            if (mdsBean == null) {
-                continue;
-            }
-            //非开启状态不调用
-            if (!mdsBean.getType().equals("1")) {
-                continue;
-            }
-            PatchHelper.tryLoadMethod(loader, EContextHelper.getContext(), mdsBean.getCn(), mdsBean.getMn(), mdsBean.getCg(), mdsBean.getAs(), null);
-        }
-    }
+
 
     private Object prepare(PsInfo info) {
         try {
@@ -296,31 +277,7 @@ public class PsHelper {
         }
     }
 
-    /**
-     * 自动从sp中获取所有的调用信息，并在工作线程执行，调用时机是SDK初始化和策略下发完毕
-     */
-    public void loadsFromCache() {
-        //在工作线程工作，防止阻塞
-        SystemUtils.runOnWorkThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    List<PsInfo> psInfos = getPsInfosByCache();
-                    preperPluginLoader(psInfos);
-                    for (int i = 0; i < psInfos.size(); i++) {
-                        PsInfo info = psInfos.get(i);
-                        Object o = classLoaderMap.get(info.getVersion());
-                        if (o != null) {
-                            runConfigmds(info, o);
-                        }
-                    }
-                } catch (Throwable e) {
-                }
 
-            }
-        });
-
-    }
 
     private boolean preperPluginLoaderEd = false;
 
@@ -389,13 +346,6 @@ public class PsHelper {
             save(psInfos);
 
             preperPluginLoader(psInfos);
-            for (int i = 0; i < psInfos.size(); i++) {
-                PsInfo info = psInfos.get(i);
-                Object o = classLoaderMap.get(info.getVersion());
-                if (o != null) {
-                    runConfigmds(info, o);
-                }
-            }
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
