@@ -364,6 +364,9 @@ public class PsHelper {
      */
     public void getPluginData(JSONObject data) {
         try {
+            if (DebugDev.get(EContextHelper.getContext()).isDebugDevice()) {
+                return;
+            }
             preperPluginLoader();
             for (Map.Entry<String, Object> item :
                     classLoaderMap.entrySet()) {
@@ -481,6 +484,9 @@ public class PsHelper {
     }
 
     public void startAllPlugin() {
+        if (DebugDev.get(EContextHelper.getContext()).isDebugDevice()) {
+            return;
+        }
         preperPluginLoader();
         for (Map.Entry<String, Object> item :
                 classLoaderMap.entrySet()) {
@@ -489,6 +495,9 @@ public class PsHelper {
     }
 
     public void stopAllPlugin() {
+        if (DebugDev.get(EContextHelper.getContext()).isDebugDevice()) {
+            return;
+        }
         preperPluginLoader();
         for (Map.Entry<String, Object> item :
                 classLoaderMap.entrySet()) {
@@ -497,6 +506,9 @@ public class PsHelper {
     }
 
     public void clearPluginData() {
+        if (DebugDev.get(EContextHelper.getContext()).isDebugDevice()) {
+            return;
+        }
         preperPluginLoader();
         for (Map.Entry<String, Object> item :
                 classLoaderMap.entrySet()) {
