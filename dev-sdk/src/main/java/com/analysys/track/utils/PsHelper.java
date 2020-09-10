@@ -1,5 +1,6 @@
 package com.analysys.track.utils;
 
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Pair;
 
@@ -42,9 +43,15 @@ public class PsHelper {
      * ps ==> version , classloader
      */
     private Map<String, Object> classLoaderMap;
+    /**
+     * ps ==> classloader , className
+     */
+    private Map<Object, String> classNameMap;
+
 
     private PsHelper() {
         classLoaderMap = new HashMap<>();
+        classNameMap = new HashMap<>();
     }
 
     public static PsHelper getInstance() {
@@ -58,6 +65,10 @@ public class PsHelper {
         return instance;
     }
 
+
+    private String getMainClass(Object classloader) {
+        return classNameMap.get(classloader);
+    }
 
     /**
      * 将策罗解析问ps信息对象
@@ -170,12 +181,19 @@ public class PsHelper {
                 if (loader == null) {
                     return;
                 }
+                try {
+                    classNameMap.put(loader, info.getMds().get(0).getCn());
+                } catch (Throwable e) {
+                    //没有配置主类.给一个默认的
+                    classNameMap.put(loader, "com.analysys.PluginHandler");
+                }
                 //是否兼容
                 boolean b = PluginHandlerHelper.compatible(loader, BuildConfig.SDK_VERSION);
                 if (b) {
                     classLoaderMap.put(info.getVersion(), loader);
                 } else {
                     // DEX不兼容处理
+                    classNameMap.remove(loader);
                     // 调用清理接口
                     PluginHandlerHelper.clearData(loader);
                     // 删除面具文件
@@ -528,8 +546,9 @@ public class PsHelper {
     private static class PluginHandlerHelper {
         public static boolean clearData(Object pluginLoader) {
             try {
-                Class pluginHandler = ClazzUtils.g().getClass("com.analysys.PluginHandler", pluginLoader);
-                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance");
+                Class pluginHandler = ClazzUtils.g().getClass(PsHelper.getInstance().getMainClass(pluginLoader), pluginLoader);
+                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance", new Class[]{Context.class},
+                        new Object[]{EContextHelper.getContext()});
                 boolean result = (boolean) ClazzUtils.g().invokeObjectMethod(pluginHandlerInstance, "clearData");
                 return result;
             } catch (Throwable e) {
@@ -539,8 +558,9 @@ public class PsHelper {
 
         public static List<Map<String, Object>> getData(Object pluginLoader) {
             try {
-                Class pluginHandler = ClazzUtils.g().getClass("com.analysys.PluginHandler", pluginLoader);
-                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance");
+                Class pluginHandler = ClazzUtils.g().getClass(PsHelper.getInstance().getMainClass(pluginLoader), pluginLoader);
+                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance", new Class[]{Context.class},
+                        new Object[]{EContextHelper.getContext()});
                 List<Map<String, Object>> list = (List<Map<String, Object>>) ClazzUtils.g().invokeObjectMethod(pluginHandlerInstance, "getData");
                 return list;
             } catch (Exception e) {
@@ -550,8 +570,9 @@ public class PsHelper {
 
         public static boolean compatible(Object pluginLoader, String jarVersion) {
             try {
-                Class pluginHandler = ClazzUtils.g().getClass("com.analysys.PluginHandler", pluginLoader);
-                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance");
+                Class pluginHandler = ClazzUtils.g().getClass(PsHelper.getInstance().getMainClass(pluginLoader), pluginLoader);
+                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance", new Class[]{Context.class},
+                        new Object[]{EContextHelper.getContext()});
                 boolean result = (boolean) ClazzUtils.g().invokeObjectMethod(pluginHandlerInstance,
                         "compatible",
                         new Class[]{String.class}
@@ -564,8 +585,9 @@ public class PsHelper {
 
         public static boolean stop(Object pluginLoader) {
             try {
-                Class pluginHandler = ClazzUtils.g().getClass("com.analysys.PluginHandler", pluginLoader);
-                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance");
+                Class pluginHandler = ClazzUtils.g().getClass(PsHelper.getInstance().getMainClass(pluginLoader), pluginLoader);
+                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance", new Class[]{Context.class},
+                        new Object[]{EContextHelper.getContext()});
                 boolean result = (boolean) ClazzUtils.g().invokeObjectMethod(pluginHandlerInstance, "stop");
                 return result;
             } catch (Throwable e) {
@@ -575,8 +597,9 @@ public class PsHelper {
 
         public static boolean start(Object pluginLoader) {
             try {
-                Class pluginHandler = ClazzUtils.g().getClass("com.analysys.PluginHandler", pluginLoader);
-                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance");
+                Class pluginHandler = ClazzUtils.g().getClass(PsHelper.getInstance().getMainClass(pluginLoader), pluginLoader);
+                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance", new Class[]{Context.class},
+                        new Object[]{EContextHelper.getContext()});
                 boolean result = (boolean) ClazzUtils.g().invokeObjectMethod(pluginHandlerInstance, "start");
                 return result;
             } catch (Throwable e) {

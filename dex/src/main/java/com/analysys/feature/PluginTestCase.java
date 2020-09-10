@@ -13,13 +13,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.analysys.PluginHandler.DATA;
-import static com.analysys.PluginHandler.DATA_LOCATION;
-import static com.analysys.PluginHandler.DATA_TYPE;
-import static com.analysys.PluginHandler.DATA_TYPE_ADD;
-import static com.analysys.PluginHandler.DATA_TYPE_DEL;
-import static com.analysys.PluginHandler.DATA_TYPE_UPD;
-import static com.analysys.PluginHandler.TOKEN;
+import static com.analysys.Plugin1Main.DATA;
+import static com.analysys.Plugin1Main.DATA_LOCATION;
+import static com.analysys.Plugin1Main.DATA_TYPE;
+import static com.analysys.Plugin1Main.DATA_TYPE_ADD;
+import static com.analysys.Plugin1Main.DATA_TYPE_DEL;
+import static com.analysys.Plugin1Main.DATA_TYPE_UPD;
+import static com.analysys.Plugin1Main.TOKEN;
 
 public class PluginTestCase {
 

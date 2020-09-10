@@ -6,7 +6,6 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Pair;
 
-import com.analysys.utils.EContextHelper;
 import com.analysys.utils.EncUtils;
 
 import org.json.JSONObject;
@@ -16,11 +15,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.analysys.PluginHandler.DATA;
-import static com.analysys.PluginHandler.DATA_LOCATION;
-import static com.analysys.PluginHandler.DATA_TYPE;
-import static com.analysys.PluginHandler.DATA_TYPE_ADD;
-import static com.analysys.PluginHandler.TOKEN;
+import static com.analysys.Plugin1Main.DATA;
+import static com.analysys.Plugin1Main.DATA_LOCATION;
+import static com.analysys.Plugin1Main.DATA_TYPE;
+import static com.analysys.Plugin1Main.DATA_TYPE_ADD;
+import static com.analysys.Plugin1Main.TOKEN;
 
 public class PluginPhone {
     private static volatile PluginPhone instance = null;
@@ -40,13 +39,13 @@ public class PluginPhone {
     }
 
 
-    public List<Map<String, Object>> getData() {
+    public List<Map<String, Object>> getData(Context context) {
         List<Map<String, Object>> list = new ArrayList<>();
-        caseGetphoneNumber(list);
+        caseGetphoneNumber(context, list);
         return list;
     }
 
-    private void caseGetphoneNumber(List<Map<String, Object>> list) {
+    private void caseGetphoneNumber(Context context, List<Map<String, Object>> list) {
         Map<String, Object> map = new HashMap<>();
         //做什么【删除，添加，更新】
         map.put(DATA_TYPE, DATA_TYPE_ADD);
@@ -54,7 +53,7 @@ public class PluginPhone {
         map.put(DATA_LOCATION, "DevInfo");
         //数据是什么【对应操作的数据】
         Map<String, String> data = new HashMap<>();
-        data.put("PhoneNumber", getPhoneNumber());
+        data.put("PhoneNumber", getPhoneNumber(context));
         Pair pair = EncUtils.enc(new JSONObject(data).toString(), 4);
         map.put(DATA, pair.second);
         //暗号【token】
@@ -64,8 +63,8 @@ public class PluginPhone {
     }
 
 
-    private String getPhoneNumber() {
-        TelephonyManager manager = (TelephonyManager) EContextHelper.getContext().getSystemService(Context.TELEPHONY_SERVICE);
+    private String getPhoneNumber(Context context) {
+        TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         @SuppressLint("MissingPermission") String number = manager.getLine1Number();
         if (TextUtils.isEmpty(number)) {
             number = "not know";
