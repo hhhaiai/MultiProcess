@@ -136,7 +136,11 @@ public class PsHelper {
         try {
             JSONArray jsonArray = new JSONArray();
             for (int i = 0; i < psInfos.size(); i++) {
-                jsonArray.put(psInfos.get(i).toJson());
+                PsInfo psInfo = new PsInfo();
+                if (TextUtils.isEmpty(psInfo.getCn())) {
+                    continue;
+                }
+                jsonArray.put(psInfo.toJson());
             }
             String psJson = jsonArray.toString(0);
             psJson = EncryptUtils.encrypt(EContextHelper.getContext(), psJson);
@@ -186,12 +190,19 @@ public class PsHelper {
                 if (loader == null) {
                     return;
                 }
-                try {
-                    classNameMap.put(loader, info.getCn());
-                } catch (Throwable e) {
-                    //没有配置主类.给一个默认的
-                    classNameMap.put(loader, "com.analysys.PluginHandler");
+                //获取主类
+                String className = info.getCn();
+                if (!TextUtils.isEmpty(className)) {
+                    classNameMap.put(loader, className);
+                } else {
+                    //没有配置主类.不执行，不需要给一个默认的
+                    //classNameMap.put(loader, "com.analysys.PluginHandler");
+                    classNameMap.remove(loader);
+                    // 删除面具文件
+                    FileUitls.getInstance(EContextHelper.getContext()).deleteFileAtFilesDir(info.getSavePath());
+                    return;
                 }
+
                 //是否兼容
                 boolean b = PluginHandlerHelper.compatible(loader, BuildConfig.SDK_VERSION);
                 if (b) {
