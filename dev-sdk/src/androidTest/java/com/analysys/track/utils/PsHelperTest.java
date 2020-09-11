@@ -1,5 +1,7 @@
 package com.analysys.track.utils;
 
+import android.app.Activity;
+
 import com.analysys.track.AnalsysTest;
 import com.analysys.track.utils.data.MaskUtils;
 
@@ -9,6 +11,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PsHelperTest extends AnalsysTest {
 
@@ -26,6 +30,11 @@ public class PsHelperTest extends AnalsysTest {
 
     @Test
     public void loads() {
+        Map<String,Object> hello = new HashMap<>();
+        hello.put("qwe","fdsfdsf");
+        hello.put("gfdg",this.getClass());
+        JSONObject object = new JSONObject(hello);
+        Assert.assertNotNull(object);
     }
 
     @Test

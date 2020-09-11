@@ -136,7 +136,7 @@ public class PsHelper {
         try {
             JSONArray jsonArray = new JSONArray();
             for (int i = 0; i < psInfos.size(); i++) {
-                PsInfo psInfo = new PsInfo();
+                PsInfo psInfo = psInfos.get(i);
                 if (TextUtils.isEmpty(psInfo.getCn())) {
                     continue;
                 }

@@ -68,7 +68,7 @@ public class PsInfo {
             jsonObject.putOpt("sign", sign);
             jsonObject.putOpt("data", data);
             jsonObject.putOpt("savePath", savePath);
-            jsonObject.putOpt("cn", savePath);
+            jsonObject.putOpt("cn", cn);
         } catch (Throwable e) {
             //JSONException
             if (BuildConfig.ENABLE_BUG_REPORT) {
