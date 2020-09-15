@@ -24,18 +24,26 @@ public class BugReportForTest {
 
     public static void commitError(String tag, Throwable throwable) {
         try {
-//            if (BuildConfig.logcat) {
-//                if (!TextUtils.isEmpty(tag)) {
-//                    //使用log的原因是防止 ELOG 内部异常出现循环打印
-//                    Log.e(tag, Log.getStackTraceString(throwable));
-//                } else {
-//                    Log.e("analysys", Log.getStackTraceString(throwable));
-//                }
-//            }
-            if (BuildConfig.ENABLE_BUG_REPORT) {
+            if (!BuildConfig.ENABLE_BUG_REPORT) {
+                return;
+            }
+            //Log
+            if ((BuildConfig.BUG_REPORT_TYPE & 1) != 0) {
+                if (!TextUtils.isEmpty(tag)) {
+                    //使用log的原因是防止 ELOG 内部异常出现循环打印
+                    Log.e(tag, Log.getStackTraceString(throwable));
+                } else {
+                    Log.e("analysys", Log.getStackTraceString(throwable));
+                }
+            }
+            if ((BuildConfig.BUG_REPORT_TYPE & (1 << 1)) != 0) {
                 reportToBugly(throwable);
+            }
+            if ((BuildConfig.BUG_REPORT_TYPE & (1 << 2)) != 0) {
                 reportToUmeng(throwable);
             }
+
+
         } catch (Throwable e) {
 
         }
@@ -48,33 +56,6 @@ public class BugReportForTest {
             postExToServer(c, throwable);
         }
     }
-//
-//    private static void initUmeng(Context context) {
-//        try {
-//            Class c = Class.forName("com.umeng.analytics.MobclickAgent");
-//            Method m = c.getDeclaredMethod("setSessionContinueMillis", new Class[]{long.class});
-//            m.invoke(null, new Object[]{10});
-//        } catch (Throwable e) {
-//        }
-//        try {
-//            Class c = Class.forName("com.umeng.analytics.MobclickAgent");
-//            Method m = c.getDeclaredMethod("setCatchUncaughtExceptions", new Class[]{boolean.class});
-//            m.invoke(null, new Object[]{true});
-//        } catch (Throwable e) {
-//        }
-////        try {
-////            Class c = Class.forName("com.umeng.commonsdk.UMConfigure");
-////            Method m = c.getDeclaredMethod("setLogEnabled", new Class[]{boolean.class});
-////            m.invoke(null, new Object[]{true});
-////        } catch (Throwable e) {
-////        }
-//        try {
-//            Class c = Class.forName("com.umeng.commonsdk.UMConfigure");
-//            Method m = c.getDeclaredMethod("init", new Class[]{Context.class, String.class, String.class, int.class, String.class});
-//            m.invoke(null, new Object[]{context, "5b4c140cf43e4822b3000077", "track-demo-dev", 1, "99108ea07f30c2afcafc1c5248576bc5"});
-//        } catch (Throwable e) {
-//        }
-//    }
 
     private static void postExToServer(Context context, Throwable throwable) {
         try {
@@ -104,14 +85,6 @@ public class BugReportForTest {
             m.invoke(null, new Object[]{context, "8b5379e3bc", false});
         } catch (Throwable e) {
         }
-
-//        try {
-//            Class c = Class.forName("com.tencent.bugly.Bugly");
-//            Method m = c.getDeclaredMethod("init", new Class[]{Context.class, String.class, boolean.class});
-//            m.invoke(null, new Object[]{context, "8b5379e3bc", false});
-//        } catch (Throwable e) {
-//        }
-
     }
 
     private static void postException(Throwable throwable) {

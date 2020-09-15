@@ -66,7 +66,9 @@ public class FileUitls {
             if (TextUtils.isEmpty(info)) {
                 return;
             }
-
+            if (!file.getParentFile().exists()||!file.getParentFile().isDirectory()) {
+                file.getParentFile().mkdirs();
+            }
             if (!file.exists()) {
                 file.createNewFile();
                 file.setReadable(true);
@@ -212,7 +214,7 @@ public class FileUitls {
         }
         return data;
     }
-    
+
     public void deleteFileAtFilesDir(String path) {
         try {
             if (!TextUtils.isEmpty(path)) {

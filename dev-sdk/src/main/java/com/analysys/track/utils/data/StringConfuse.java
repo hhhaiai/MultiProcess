@@ -60,8 +60,7 @@ public class StringConfuse {
         } finally {
             try {
                 dos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
             }
         }
     }
@@ -98,15 +97,13 @@ public class StringConfuse {
                 strData[i] = newValue;
             }
             return new String(strData);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
             // 极端情况解析失败返回空值
             return null;
         } finally {
             try {
                 dis.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
             }
         }
     }

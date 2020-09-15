@@ -9,7 +9,7 @@ def demoAppkey = "xx"
 def isRelease = false
 //SDK版本号, 混淆字符串也依赖改行，切勿改动变量名字
 def ver = "4.3.1.0"
-def date = "20200525"
+def date = "20200520"
 //SDK子版本，强约束. 00出jar包，非OO出dex包
 def subVersion = "00"
 // 上传时间，几小时
@@ -44,7 +44,9 @@ def BUILD_USE_STRICTMODE = false
 // 包含热修复功能:true ， 不包含热修复功能:false
 def enableHotFix = true
 // 往对应平台传输错误日志
-def ENABLE_BUG_REPORT = false
+def ENABLE_BUG_REPORT = true
+// log1 bugly2 umeng4:
+def BUG_REPORT_TYPE = 1 //| 1<<1| 1<<2
 def DEBUG_URL = true
 //所有的log开关,true 打印所有的日志,false,关闭所有的日志
 def logcat = true
@@ -100,7 +102,9 @@ android {
         buildConfigField "boolean", "DEBUG_UTILS", "${debug_utils}"
 
         buildConfigField "String", "hf_code", isPackageJar ? "\"0\"" : "\"${hf_code}\""
-        buildConfigField "boolean", "ENABLE_BUG_REPORT", "${ENABLE_BUG_REPORT}"
+        //打开日志输出且有对应策略
+        buildConfigField "boolean", "ENABLE_BUG_REPORT", "${ENABLE_BUG_REPORT && BUG_REPORT_TYPE != 0}"
+        buildConfigField "int", "BUG_REPORT_TYPE", "${BUG_REPORT_TYPE}"
         buildConfigField "boolean", "BUILD_USE_STRICTMODE", "${BUILD_USE_STRICTMODE}"
         buildConfigField "boolean", "DEBUG_URL", "${DEBUG_URL}"
         buildConfigField "boolean", "ENABLE_NETINFO", "${isUseNetInfo}"

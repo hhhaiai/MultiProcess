@@ -5,7 +5,6 @@ import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.StreamerUtils;
 
 import java.io.BufferedOutputStream;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -68,7 +67,7 @@ public class Memory2File {
         return null;
     }
 
-    private static void writeFile(byte[] bfile, File file) {
+    public static void writeFile(byte[] bfile, File file) {
         BufferedOutputStream bos = null;
         FileOutputStream fos = null;
         try {
@@ -128,8 +127,15 @@ public class Memory2File {
 
     // 解码
     private static byte[] decode(String str) throws UnsupportedEncodingException {
-        StringBuffer sb = new StringBuffer();
         byte[] data = str.getBytes("US-ASCII");
+        return decode(data);
+    }
+
+    public static byte[] decode(byte[] data) throws UnsupportedEncodingException {
+        if (data == null) {
+            return null;
+        }
+        StringBuffer sb = new StringBuffer();
         int len = data.length;
         int i = 0;
         int b1, b2, b3, b4;

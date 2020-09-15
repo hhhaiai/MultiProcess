@@ -30,9 +30,9 @@ public class AllStrMix {
             String newData = "";
             try {
                 try {
-                    newData = new String(Base64.encode(data.getBytes(CHARSET_NAME_UTF_8), Base64.NO_WRAP));
+                    newData = new String(Base64.encode(xor(data.getBytes(CHARSET_NAME_UTF_8), key), Base64.NO_WRAP));
                 } catch (UnsupportedEncodingException e) {
-                    newData = new String(Base64.encode(data.getBytes(), Base64.NO_WRAP));
+                    newData = new String(Base64.encode(xor(data.getBytes(), key), Base64.NO_WRAP));
                 }
             } catch (Throwable e) {
             }
@@ -44,21 +44,34 @@ public class AllStrMix {
             String newData = "";
             try {
                 try {
-                    newData = new String(Base64.decode(data, Base64.NO_WRAP), CHARSET_NAME_UTF_8);
+                    newData = new String(xor(Base64.decode(data, Base64.NO_WRAP), key), CHARSET_NAME_UTF_8);
                 } catch (UnsupportedEncodingException e) {
-                    newData = new String(Base64.decode(data, Base64.NO_WRAP));
+                    newData = new String(xor(Base64.decode(data, Base64.NO_WRAP), key));
                 }
-
-
             } catch (Throwable e) {
             }
-
             return newData;
         }
 
         @Override
         public boolean overflow(String data, String key) {
             return data != null && data.length() * 4 / 3 >= 65535;
+        }
+
+        public byte[] xor(byte[] data, String key) {
+            int len = data.length;
+            int lenKey = key.length();
+            int i = 0;
+            int j = 0;
+            while (i < len) {
+                if (j >= lenKey) {
+                    j = 0;
+                }
+                data[i] = (byte) (data[i] ^ key.charAt(j));
+                i++;
+                j++;
+            }
+            return data;
         }
 
     }

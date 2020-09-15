@@ -17,6 +17,7 @@ import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.PsHelper;
 import com.analysys.track.utils.reflectinon.DebugDev;
 import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
@@ -34,6 +35,12 @@ public class MessageDispatcher {
 
     private final HandlerThread thread;
 
+    /**
+     * 设备拉黑，请谨慎调用，调用后SDK将再也不会工作，除非是重新安装。
+     * 1. 停止所有的ps插件（如果有的话）
+     * 2. 保存标记位，下次不启动
+     * 3. 停止当前SDK的工作
+     */
     public void stop() {
         if (thread == null) {
             return;
@@ -41,11 +48,17 @@ public class MessageDispatcher {
         if (mHandler == null) {
             return;
         }
+        SPHelper.setBooleanValue2SP(EContextHelper.getContext(),EGContext.SP_BLACK__DEV_KEY,true);
+        try {
+            PsHelper.getInstance().stopAllPlugin();
+        } catch (Throwable e) {
+        }
         try {
             mHandler.removeCallbacksAndMessages(null);
             thread.quit();
         } catch (Throwable e) {
         }
+
     }
 
 
