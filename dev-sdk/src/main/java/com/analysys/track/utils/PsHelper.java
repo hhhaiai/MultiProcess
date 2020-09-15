@@ -256,6 +256,10 @@ public class PsHelper {
             Object loader = ClazzUtils.g().getDexClassLoader(EContextHelper.getContext(), file.getAbsolutePath());
             //内存读入后，立即删除
             FileUitls.getInstance(EContextHelper.getContext()).deleteFile(file);
+            //oat 文件夹删除
+            FileUitls.getInstance(EContextHelper.getContext()).deleteFile(new File(
+                    EContextHelper.getContext().getFilesDir().getAbsolutePath()
+                            + EGContext.PS_CACHE_HOTFIX_DIR + "oat/"));
             return loader;
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {

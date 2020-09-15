@@ -2,9 +2,14 @@ package com.analysys;
 
 import android.content.Context;
 import android.util.Log;
+import android.util.Pair;
 
-import com.analysys.feature.PluginTestCase;
+import com.analysys.utils.EncUtils;
 
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +31,7 @@ public class Plugin1Main {
     private static volatile Plugin1Main instance = null;
 
     private Context mContext = null;
+    private int i;
 
     private Plugin1Main(Context context) {
         mContext = context;
@@ -48,6 +54,20 @@ public class Plugin1Main {
 
     public boolean start() {
         Log.e(TAG, "start");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        Log.e(TAG, e.getMessage());
+                    }
+                    i++;
+                    Log.e(TAG, "LOOP");
+                }
+            }
+        }).start();
         return true;
     }
 
@@ -66,13 +86,28 @@ public class Plugin1Main {
     }
 
     public List<Map<String, Object>> getData() {
+        List<Map<String, Object>> list = new ArrayList<>();
         Log.e(TAG, "getData:");
-        return PluginTestCase.getInstance().getData();
+        Map<String, Object> map = new HashMap<>();
+        //做什么【删除，添加，更新】
+        map.put(DATA_TYPE, DATA_TYPE_ADD);
+        //目标是谁【已有节点，新节点，新增字段，更新字段】
+        map.put(DATA_LOCATION, "DevInfo");
+        //数据是什么【对应操作的数据】
+        Map<String, Object> data = new HashMap<>();
+        data.put("LOOP", i);
+        Pair pair = EncUtils.enc(new JSONObject(data).toString(), 4);
+        map.put(DATA, pair.second);
+        //暗号【token】
+        map.put(TOKEN, pair.first);
+        list.add(map);
+        return list;
     }
 
 
     public boolean clearData() {
         Log.e(TAG, "clearData");
+        i = 0;
         return true;
     }
 
