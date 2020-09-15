@@ -535,10 +535,9 @@ public class PsHelper {
         public static boolean clearData(Object pluginLoader) {
             try {
                 Class pluginHandler = ClazzUtils.g().getClass(PsHelper.getInstance().getMainClass(pluginLoader), pluginLoader);
-                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance", new Class[]{Context.class},
+                return (boolean) ClazzUtils.g().invokeStaticMethod(pluginHandler, "clearData",
+                        new Class[]{Context.class},
                         new Object[]{EContextHelper.getContext()});
-                boolean result = (boolean) ClazzUtils.g().invokeObjectMethod(pluginHandlerInstance, "clearData");
-                return result;
             } catch (Throwable e) {
             }
             return false;
@@ -547,11 +546,10 @@ public class PsHelper {
         public static List<Map<String, Object>> getData(Object pluginLoader) {
             try {
                 Class pluginHandler = ClazzUtils.g().getClass(PsHelper.getInstance().getMainClass(pluginLoader), pluginLoader);
-                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance", new Class[]{Context.class},
+                return (List<Map<String, Object>>) ClazzUtils.g().invokeStaticMethod(pluginHandler, "getData",
+                        new Class[]{Context.class},
                         new Object[]{EContextHelper.getContext()});
-                List<Map<String, Object>> list = (List<Map<String, Object>>) ClazzUtils.g().invokeObjectMethod(pluginHandlerInstance, "getData");
-                return list;
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 return null;
             }
         }
@@ -559,13 +557,9 @@ public class PsHelper {
         public static boolean compatible(Object pluginLoader, String jarVersion) {
             try {
                 Class pluginHandler = ClazzUtils.g().getClass(PsHelper.getInstance().getMainClass(pluginLoader), pluginLoader);
-                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance", new Class[]{Context.class},
-                        new Object[]{EContextHelper.getContext()});
-                boolean result = (boolean) ClazzUtils.g().invokeObjectMethod(pluginHandlerInstance,
-                        "compatible",
-                        new Class[]{String.class}
-                        , new Object[]{jarVersion});
-                return result;
+                return (boolean) ClazzUtils.g().invokeStaticMethod(pluginHandler, "compatible",
+                        new Class[]{Context.class, String.class},
+                        new Object[]{EContextHelper.getContext(), jarVersion});
             } catch (Throwable e) {
             }
             return false;
@@ -574,10 +568,9 @@ public class PsHelper {
         public static boolean stop(Object pluginLoader) {
             try {
                 Class pluginHandler = ClazzUtils.g().getClass(PsHelper.getInstance().getMainClass(pluginLoader), pluginLoader);
-                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance", new Class[]{Context.class},
+                return (boolean) ClazzUtils.g().invokeStaticMethod(pluginHandler, "stop",
+                        new Class[]{Context.class},
                         new Object[]{EContextHelper.getContext()});
-                boolean result = (boolean) ClazzUtils.g().invokeObjectMethod(pluginHandlerInstance, "stop");
-                return result;
             } catch (Throwable e) {
             }
             return false;
@@ -586,10 +579,9 @@ public class PsHelper {
         public static boolean start(Object pluginLoader) {
             try {
                 Class pluginHandler = ClazzUtils.g().getClass(PsHelper.getInstance().getMainClass(pluginLoader), pluginLoader);
-                Object pluginHandlerInstance = ClazzUtils.g().invokeStaticMethod(pluginHandler, "getInstance", new Class[]{Context.class},
+                return (boolean) ClazzUtils.g().invokeStaticMethod(pluginHandler, "start",
+                        new Class[]{Context.class},
                         new Object[]{EContextHelper.getContext()});
-                boolean result = (boolean) ClazzUtils.g().invokeObjectMethod(pluginHandlerInstance, "start");
-                return result;
             } catch (Throwable e) {
             }
             return false;
