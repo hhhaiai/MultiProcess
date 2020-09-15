@@ -38,11 +38,7 @@
 -keepclassmembers class * {
    public <init>(org.json.JSONObject);
 }
-
-
-# 打通所有的包
--repackageclasses com.analysys
-# 混淆到包名下
--dontwarn com.analysys.**
--keep class com.analysys.Ab{*;}
--keep class com.analysys.Plugin1Main{*;}
+-keep @com.analysys.PluginApi class *
+-keepclassmembers class * {
+    @com.analysys.PluginApi <methods>;
+}
