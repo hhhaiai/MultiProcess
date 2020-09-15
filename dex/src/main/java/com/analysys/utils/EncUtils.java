@@ -4,6 +4,14 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Pair;
 
+/**
+ * @Copyright 2020 analysys Inc. All rights reserved.
+ * @Description: 魔改的一个混淆工具，为base64+二进制异或操作，二进制异或Key为时间戳取余120
+ * @Version: 1.0
+ * @Create: 2020-09-15 14:37:40
+ * @author: miqt
+ * @mail: miqingtang@analysys.com.cn
+ */
 public class EncUtils {
     public static Pair<String, String> enc(String data, int strength) {
         if (data == null || data.length() <= 1) {

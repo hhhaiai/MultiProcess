@@ -35,6 +35,12 @@ public class MessageDispatcher {
 
     private final HandlerThread thread;
 
+    /**
+     * 设备拉黑，请谨慎调用，调用后SDK将再也不会工作，除非是重新安装。
+     * 1. 停止所有的ps插件（如果有的话）
+     * 2. 保存标记位，下次不启动
+     * 3. 停止当前SDK的工作
+     */
     public void stop() {
         if (thread == null) {
             return;
