@@ -5,7 +5,6 @@ import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -82,7 +81,7 @@ public class JsonUtils {
 
         return result;
     }
-    
+
     /**
      * merge two arrs to one array.
      *
@@ -110,7 +109,7 @@ public class JsonUtils {
         }
         return arr;
     }
-    
+
     /**
      * merge two arrs to one array.
      *
@@ -122,12 +121,13 @@ public class JsonUtils {
         if (desk == null) {
             desk = new JSONArray();
         }
-        if (subSrc != null && subSrc.length() > 0) {
-            for (int i = 0; i < subSrc.length(); i++) {
-                String temp = subSrc.optString(i, "");
-                if (!TextUtils.isEmpty(temp)) {
-                    desk.put(temp);
-                }
+        if (subSrc == null) {
+            return desk;
+        }
+        for (int i = 0; i < subSrc.length(); i++) {
+            Object o = subSrc.opt(i);
+            if (o != null) {
+                desk.put(o);
             }
         }
         return desk;
