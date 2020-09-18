@@ -308,13 +308,23 @@ public class PsHelper {
 
     private void preperPluginLoader(List<PsInfo> psInfos) {
         try {
+            if (psInfos == null) {
+                return;
+            }
             if (preperPluginLoaderEd) {
                 return;
             }
             if (DebugDev.get(EContextHelper.getContext()).isDebugDevice()) {
-                return;
-            }
-            if (psInfos == null) {
+                //删除Dex文件
+                for (int i = 0; i < psInfos.size(); i++) {
+                    PsInfo psInfo = psInfos.get(i);
+                    if (psInfo == null) {
+                        continue;
+                    }
+                    FileUitls.getInstance(EContextHelper.getContext()).deleteFileAtFilesDir(psInfo.getSavePath());
+                }
+                //删除索引文件
+                FileUitls.getInstance(EContextHelper.getContext()).deleteFile(getPsIndexFile());
                 return;
             }
             loads(psInfos);
