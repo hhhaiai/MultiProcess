@@ -31,14 +31,14 @@ import java.lang.reflect.InvocationTargetException;
 public class PatchHelper {
 
     private static boolean isTryInit = false;
-    
+
     public static void prepare(final Context ctx) {
         SystemUtils.runOnWorkThread(new Runnable() {
             @Override
             public void run() {
                 try {
                     Context context = EContextHelper.getContext(ctx);
-    
+
                     // 1.delete old file
                     FileUitls.getInstance(context).deleteFileAtFilesDir(EGContext.PATCH_OLD_CACHE_DIR);
                     // 2.check policyv
@@ -74,9 +74,9 @@ public class PatchHelper {
                 }
             }
         });
-        
+
     }
-    
+
     /**
      * 清除SP中的策略号、数据及缓存目录
      *
@@ -92,10 +92,10 @@ public class PatchHelper {
             SPHelper.removeKey(ctx, UploadKey.Response.PatchResp.PATCH_METHODS);
             SPHelper.removeKey(ctx, UploadKey.Response.PatchResp.PATCH_SIGN);
             SPHelper.removeKey(ctx, UploadKey.Response.PatchResp.PATCH_VERSION);
-            
+
             String patchPolicyV = SPHelper.getStringValueFromSP(ctx, EGContext.PATCH_VERSION_POLICY, "");
             String curPolicyV = SPHelper.getStringValueFromSP(ctx, UploadKey.Response.RES_POLICY_VERSION, "");
-            
+
             if (!TextUtils.isEmpty(patchPolicyV) && patchPolicyV.equals(curPolicyV)) {
                 // not null. current policyversion same as patch version, then clean then
                 SPHelper.removeKey(ctx, UploadKey.Response.RES_POLICY_VERSION);
@@ -107,7 +107,7 @@ public class PatchHelper {
             }
         }
     }
-    
+
     public static void loads(final Context context) {
         try {
             isTryInit = true;
@@ -136,7 +136,7 @@ public class PatchHelper {
                 }
                 if (BuildConfig.logcat) {
                     ELOG.d(BuildConfig.tag_cutoff, "------loads-----file[ " + file.getAbsolutePath() + " ] is exists, will real loads");
-                    }
+                }
                 loads(context, file);
                 if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_cutoff, "------loads--will---out  ");
@@ -224,6 +224,10 @@ public class PatchHelper {
     }
 
     public static void tryLoadMethod(Context context, String className, String methodName, String argsType, String argsBody, File file) {
+        tryLoadMethod(null, context, className, methodName, argsType, argsBody, file);
+    }
+
+    public static void tryLoadMethod(Object clazzLoader, Context context, String className, String methodName, String argsType, String argsBody, File file) {
         try {
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_cutoff, " tryLoadMethod()  [" + className + " , " + methodName + " ," + argsType + " , " + argsBody + "]");
@@ -270,7 +274,7 @@ public class PatchHelper {
                     }
                 }
             }
-            loadStatic(context, file, className, methodName, argsTypeClazzs, argsValues);
+            loadStatic(clazzLoader, context, file, className, methodName, argsTypeClazzs, argsValues);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
@@ -279,7 +283,7 @@ public class PatchHelper {
     }
 
 
-    public static void loadStatic(Context context, File file, String className, String methodName, Class[] pareTyples,
+    public static void loadStatic(Object clazzLoader, Context context, File file, String className, String methodName, Class[] pareTyples,
                                   Object[] pareVaules) throws InvocationTargetException, IllegalAccessException, ClassNotFoundException {
         if (BuildConfig.logcat) {
             ELOG.i(BuildConfig.tag_cutoff, "inside loadStatic. will load [" + className + "." + methodName + "]");
@@ -291,7 +295,10 @@ public class PatchHelper {
         try {
             //1. get DexClassLoader
             // need hide ClassLoader
-            Object ca = ClazzUtils.g().getDexClassLoader(context, file.getPath());
+            Object ca = clazzLoader;
+            if (ca == null) {
+                ca = ClazzUtils.g().getDexClassLoader(context, file.getPath());
+            }
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_cutoff, " loadStatic DexClassLoader over. result: " + ca);
             }
@@ -311,7 +318,7 @@ public class PatchHelper {
 //                cleanPatchPolicy(context, "---------- loadStatic.---patchPolicyV: ", 901, 902);
                 EGContext.patch_runing = false;
             }
-    
+
         } catch (Throwable igone) {
             EGContext.patch_runing = false;
             if (BuildConfig.ENABLE_BUG_REPORT) {

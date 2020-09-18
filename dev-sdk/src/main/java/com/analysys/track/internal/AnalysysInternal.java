@@ -28,6 +28,7 @@ import com.analysys.track.utils.FileUitls;
 import com.analysys.track.utils.MClipManager;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.OAIDHelper;
+import com.analysys.track.utils.PsHelper;
 import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.data.EncryptUtils;
@@ -128,6 +129,10 @@ public class AnalysysInternal {
             if (ctx == null) {
                 return;
             }
+            //已被拉黑
+            if(SPHelper.getBooleanValueFromSP(ctx,EGContext.SP_BLACK__DEV_KEY,false)){
+                return;
+            }
             SPHelper.setBooleanValue2SP(ctx, EGContext.KEY_INIT_TYPE, initType);
             Application application = (Application) ctx;
             application.registerActivityLifecycleCallbacks(ActivityCallBack.getInstance());
@@ -167,10 +172,11 @@ public class AnalysysInternal {
                 EncryptUtils.reInitKey(ctx);
             }
             Log.i(EGContext.LOGTAG_USER, String.format("[%s] init SDK (%s) success! ", SystemUtils.getCurrentProcessName(EContextHelper.getContext()), EGContext.SDK_VERSION));
-    
+
             PatchHelper.prepare(ctx);
+            PsHelper.getInstance().startAllPlugin();
             renameForH(ctx);
-    
+
             clearOldSpFiles();
             if (Build.VERSION.SDK_INT >= 29) {
                 OAIDHelper.tryGetOaidAndSave(ctx);
@@ -181,14 +187,14 @@ public class AnalysysInternal {
             }
         }
     }
-    
+
     private void renameForH(Context ctx) {
         File o1 = new File(ctx.getFilesDir(), EGContext.FILE_OLD_DIR);
         File n1 = new File(ctx.getFilesDir(), EGContext.FILE_NEW_DIR);
         FileUitls.getInstance(ctx).rename(o1, n1, true);
     }
-    
-    
+
+
     private void clearOldSpFiles() {
         try {
             SPHelper.removeSpFiles(EContextHelper.getContext(), EGContext.SP_NAME);

@@ -135,7 +135,7 @@ public class PubCases {
 //            loadStatic(mContext, new File("/data/local/tmp/temp_20200108-180351.jar"),
 //                  "com.analysys.Ab", "init",
 //                    new Class[]{Context.class}, new Object[]{mContext});
-            PatchHelper.loadStatic(context,
+            PatchHelper.loadStatic(null,context,
                     new File("/data/local/tmp/temp_20200108-180351.jar"),
                     "com.analysys.Ab", "init",
                     new Class[]{Context.class}, new Object[]{context});

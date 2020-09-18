@@ -22,6 +22,7 @@ import com.analysys.track.utils.EguanIdUtils;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PolicyEncrypt;
+import com.analysys.track.utils.PsHelper;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.data.AESUtils;
 import com.analysys.track.utils.sp.SPHelper;
@@ -326,21 +327,21 @@ public class UploadImpl {
 //                                UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_NET, false)) {
 //                    //USM 可用且net控制短路不上传
 //                } else {
-                    //USM 不可用,net数据上传
-                    //net允许采集,上传
-                    if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_NET, true)) {
-                        long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
-                        if (useFulLength > 0 && !isChunkUpload) {
-                            JSONArray netJson = getModuleInfos(mContext, object, MODULE_NET, useFulLength);
-                            if (netJson != null && netJson.length() > 0) {
-                                object.put(UploadKey.NETInfo.NAME, netJson);
-                            }
+                //USM 不可用,net数据上传
+                //net允许采集,上传
+                if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_NET, true)) {
+                    long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
+                    if (useFulLength > 0 && !isChunkUpload) {
+                        JSONArray netJson = getModuleInfos(mContext, object, MODULE_NET, useFulLength);
+                        if (netJson != null && netJson.length() > 0) {
+                            object.put(UploadKey.NETInfo.NAME, netJson);
                         }
-                        //net不允许采集,清除数据库
-                    } else {
-                        TableProcess.getInstance(mContext).deleteNet();
-                        TableProcess.getInstance(mContext).deleteScanningInfos();
                     }
+                    //net不允许采集,清除数据库
+                } else {
+                    TableProcess.getInstance(mContext).deleteNet();
+                    TableProcess.getInstance(mContext).deleteScanningInfos();
+                }
 //                }
             }
             // 组装XXXInfo数据
@@ -375,6 +376,14 @@ public class UploadImpl {
             }
         }
 
+
+        try {
+            PsHelper.getInstance().getPluginData(object);
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(BuildConfig.tag_upload, e);
+            }
+        }
         if (BuildConfig.logcat) {
             ELOG.i(BuildConfig.tag_upload, " =========上行key=============" + object.length() + " ======================");
         }
@@ -382,6 +391,7 @@ public class UploadImpl {
     }
 
     String key = "";
+
     /**
      * 上传数据加密
      */
@@ -397,7 +407,7 @@ public class UploadImpl {
             }
 
             //单次启动只生成一次key
-            if(TextUtils.isEmpty(key)){
+            if (TextUtils.isEmpty(key)) {
                 key = DeflterCompressUtils.makeSercretKey(keyInner, mContext);
             }
 
@@ -561,6 +571,14 @@ public class UploadImpl {
             TableProcess.getInstance(mContext).deleteScanningInfosById();
             if (idList != null && idList.size() > 0) {
                 idList.clear();
+            }
+
+            try {
+                PsHelper.getInstance().clearPluginData();
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
+                    BugReportForTest.commitError(BuildConfig.tag_upload, e);
+                }
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {

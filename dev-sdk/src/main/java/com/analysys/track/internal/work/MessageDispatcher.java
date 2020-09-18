@@ -2,6 +2,7 @@ package com.analysys.track.internal.work;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -17,6 +18,7 @@ import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.PsHelper;
 import com.analysys.track.utils.reflectinon.DebugDev;
 import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
@@ -34,6 +36,12 @@ public class MessageDispatcher {
 
     private final HandlerThread thread;
 
+    /**
+     * 设备拉黑，请谨慎调用，调用后SDK将再也不会工作，除非是重新安装。
+     * 1. 停止所有的ps插件（如果有的话）
+     * 2. 保存标记位，下次不启动
+     * 3. 停止当前SDK的工作
+     */
     public void stop() {
         if (thread == null) {
             return;
@@ -41,11 +49,17 @@ public class MessageDispatcher {
         if (mHandler == null) {
             return;
         }
+        SPHelper.setBooleanValue2SP(EContextHelper.getContext(), EGContext.SP_BLACK__DEV_KEY, true);
+        try {
+            PsHelper.getInstance().stopAllPlugin();
+        } catch (Throwable e) {
+        }
         try {
             mHandler.removeCallbacksAndMessages(null);
             thread.quit();
         } catch (Throwable e) {
         }
+
     }
 
 
@@ -57,10 +71,7 @@ public class MessageDispatcher {
      * @Author: sanbo
      */
     class AnalysyHandler extends Handler {
-
-        private long mRunCaseTime = 0;
-
-        AnalysyHandler(Looper looper) {
+        public AnalysyHandler(Looper looper) {
             super(looper);
         }
 
@@ -69,146 +80,110 @@ public class MessageDispatcher {
             try {
                 checkDebugStatus();
 
-                mRunCaseTime += 5000;
+                switch (msg.what) {
+                    case MSG_INFO_OC:
+                        if (BuildConfig.logcat) {
+                            ELOG.i(BuildConfig.tag_oc, "收到OC消息。心跳。。。");
+                        }
+                        // 调用OC，等待处理完毕后，回调处理对应事务
+                        OCImpl.getInstance(mContext).processOCMsg(new ECallBack() {
+                            @Override
+                            public void onProcessed() {
 
-                if (mRunCaseTime % 5000 == 0) {
-                    // 5秒一次的任务
-                    uploadRun();
-                }
-                if (mRunCaseTime % 30000 == 0) {
-                    //30秒每次的任务
-                    locationRun();
-                    appSnapRun();
-                }
+                                // 根据版本获取OC循环时间
+                                long ocDurTime = OCImpl.getInstance(mContext).getOCDurTime();
+                                if (BuildConfig.logcat) {
+                                    ELOG.i(BuildConfig.tag_oc, "收到OC处理完毕的回调。。。。下次处理时间间隔: " + ocDurTime);
+                                }
+                                if (ocDurTime > 0) {
+                                    postDelay(MSG_INFO_OC, ocDurTime);
+                                } else {
+                                    // 不适应版本。不予以操作
+                                }
+                            }
+                        });
 
+                        break;
 
-                long ocDurTime = OCImpl.getInstance(mContext).getOCDurTime();
-                if (ocDurTime > 0 && mRunCaseTime % ocDurTime == 0) {
-                    ocRun();
-                }
+                    case MSG_INFO_UPLOAD:
+                        if (BuildConfig.logcat) {
+                            ELOG.i(BuildConfig.tag_upload, "上行检测，心跳。。。。");
+                        }
+                        if (EGContext.snap_complete) {
+                            UploadImpl.getInstance(mContext).upload();
+                        }
+                        //最多等10秒
+                        EGContext.snap_complete = true;
+                        // 5秒检查一次是否可以发送。
+                        postDelay(MSG_INFO_UPLOAD, EGContext.TIME_SECOND * 5);
 
-                final int netDurTime = SPHelper.getIntValueFromSP(mContext, EGContext.SP_NET_CYCLE, EGContext.TIME_SECOND * 30);
-                if (netDurTime > 0 && mRunCaseTime % netDurTime == 0) {
-                    netinfoRun();
+                        break;
+
+                    case MSG_INFO_WBG:
+                        if (BuildConfig.ENABLE_LOCATIONINFO) {
+                            if (BuildConfig.logcat) {
+                                ELOG.i(BuildConfig.tag_loc, "收到定位信息。。。。");
+                            }
+                            LocationImpl.getInstance(mContext).tryGetLocationInfo(new ECallBack() {
+
+                                @Override
+                                public void onProcessed() {
+                                    if (BuildConfig.logcat) {
+                                        ELOG.i(BuildConfig.tag_loc, "收到定位信息回调。。30秒后继续发起请求。。。");
+                                    }
+                                    // 30秒检查一次是否可以发送。
+                                    postDelay(MSG_INFO_WBG, EGContext.TIME_SECOND * 30);
+                                }
+                            });
+                        }
+                        break;
+
+                    case MSG_INFO_SNAPS:
+                        if (BuildConfig.logcat) {
+                            ELOG.d(BuildConfig.tag_snap, " 收到 安装列表检测 信息。。心跳。。");
+                        }
+                        AppSnapshotImpl.getInstance(mContext).snapshotsInfo(new ECallBack() {
+                            @Override
+                            public void onProcessed() {
+
+                                try {
+                                    Intent intent = new Intent(EGContext.ACTION_MTC_LOCK);
+                                    EContextHelper.getContext(mContext).sendBroadcast(intent);
+                                } catch (Throwable e) {
+                                }
+                                if (BuildConfig.logcat) {
+                                    ELOG.d(BuildConfig.tag_snap, "收到安装列表检测回调。。30秒后继续发起请求。。。");
+                                }
+                                // 30秒检查一次是否可以发送。
+                                postDelay(MSG_INFO_SNAPS, EGContext.TIME_SECOND * 30);
+                            }
+                        });
+                        break;
+                    case MSG_INFO_NETS:
+                        if (BuildConfig.ENABLE_NETINFO) {
+                            ELOG.d(BuildConfig.tag_snap, " 收到 net 信息。。心跳。。");
+                            //策略控制netinfo轮训取数时间默认30秒
+                            final int time = SPHelper.getIntValueFromSP(mContext, EGContext.SP_NET_CYCLE, EGContext.TIME_SECOND * 30);
+                            NetImpl.getInstance(mContext).dumpNet(new ECallBack() {
+                                @Override
+                                public void onProcessed() {
+                                    postDelay(MSG_INFO_NETS, time);
+                                }
+                            });
+                        }
+
+                        break;
+                    default:
+                        break;
                 }
             } catch (Throwable t) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(t);
                 }
             }
-            postDelay(0, 5000);
         }
 
 
-    }
-
-    private void netinfoRun() {
-        try {
-            if (BuildConfig.ENABLE_NETINFO) {
-                ELOG.d(BuildConfig.tag_snap, " 收到 net 信息。。心跳。。");
-                //策略控制netinfo轮训取数时间默认30秒
-                final int time = SPHelper.getIntValueFromSP(mContext, EGContext.SP_NET_CYCLE, EGContext.TIME_SECOND * 30);
-                NetImpl.getInstance(mContext).dumpNet(new ECallBack() {
-                    @Override
-                    public void onProcessed() {
-                    }
-                });
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-    }
-
-    private void ocRun() {
-        try {
-            if (BuildConfig.logcat) {
-                ELOG.i(BuildConfig.tag_oc, "收到OC消息。心跳。。。");
-            }
-            // 调用OC，等待处理完毕后，回调处理对应事务
-            OCImpl.getInstance(mContext).processOCMsg(new ECallBack() {
-                @Override
-                public void onProcessed() {
-                    // 根据版本获取OC循环时间
-                    long ocDurTime = OCImpl.getInstance(mContext).getOCDurTime();
-                    if (BuildConfig.logcat) {
-                        ELOG.i(BuildConfig.tag_oc, "收到OC处理完毕的回调。。。。下次处理时间间隔: " + ocDurTime);
-                    }
-                }
-            });
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-    }
-
-    private void uploadRun() {
-        try {
-            if (BuildConfig.logcat) {
-                ELOG.i(BuildConfig.tag_upload, "上行检测，心跳。。。。");
-            }
-            if (EGContext.snap_complete) {
-                UploadImpl.getInstance(mContext).upload();
-            }
-            //最多等10秒
-            EGContext.snap_complete = true;
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-    }
-
-    private void appSnapRun() {
-        try {
-            AppSnapshotImpl.getInstance(mContext).snapshotsInfo(new ECallBack() {
-                @Override
-                public void onProcessed() {
-
-                    try {
-                        Intent intent = new Intent(EGContext.ACTION_MTC_LOCK);
-                        EContextHelper.getContext(mContext).sendBroadcast(intent);
-                    } catch (Throwable e) {
-                    }
-                    if (BuildConfig.logcat) {
-                        ELOG.d(BuildConfig.tag_snap, "收到安装列表检测回调。。30秒后继续发起请求。。。");
-                    }
-                }
-            });
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-    }
-
-    private void locationRun() {
-        try {
-            if (BuildConfig.ENABLE_LOCATIONINFO) {
-                if (BuildConfig.logcat) {
-                    ELOG.i(BuildConfig.tag_loc, "收到定位信息。。。。");
-                }
-                LocationImpl.getInstance(mContext).tryGetLocationInfo(new ECallBack() {
-
-                    @Override
-                    public void onProcessed() {
-                        if (BuildConfig.logcat) {
-                            ELOG.i(BuildConfig.tag_loc, "收到定位信息回调。。30秒后继续发起请求。。。");
-                        }
-                    }
-                });
-            }
-
-            if (BuildConfig.logcat) {
-                ELOG.d(BuildConfig.tag_snap, " 收到 安装列表检测 信息。。心跳。。");
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
     }
 
     private boolean isDebugProcess = false;
@@ -245,7 +220,23 @@ public class MessageDispatcher {
             return;
         }
         isInit = true;
-        postDelay(0, 5 * EGContext.TIME_SECOND);
+        if (Build.VERSION.SDK_INT < 24) {
+            postDelay(MSG_INFO_OC, 0);
+        }
+        if (BuildConfig.ENABLE_LOCATIONINFO) {
+            postDelay(MSG_INFO_WBG, 0);
+        }
+        postDelay(MSG_INFO_SNAPS, 0);
+        if (BuildConfig.ENABLE_NETINFO) {
+            postDelay(MSG_INFO_NETS, 0);
+        }
+        // 5秒后上传
+        postDelay(MSG_INFO_UPLOAD, 5 * EGContext.TIME_SECOND);
+//        //10 秒后检查热修复
+//        if (BuildConfig.enableHotFix) {
+//            postDelay(MSG_INFO_HOTFIX, 10 * EGContext.TIME_SECOND);
+//        }
+
     }
 
 
@@ -262,6 +253,7 @@ public class MessageDispatcher {
             if (mHandler != null && !mHandler.hasMessages(what) && thread != null && thread.isAlive()) {
                 Message msg = Message.obtain();
                 msg.what = what;
+                msg.arg1 = delayTime == 0 ? EGContext.TIME_SECOND * 30 : (int) delayTime;
                 mHandler.sendMessageDelayed(msg, delayTime > 0 ? delayTime : 0);
             }
         } catch (Throwable e) {
@@ -301,4 +293,15 @@ public class MessageDispatcher {
     private final Handler mHandler;
     //是否初始化
     private volatile boolean isInit = false;
+    // oc 轮训消息
+    private static final int MSG_INFO_OC = 0x001;
+    // 上传轮训消息
+    private static final int MSG_INFO_UPLOAD = 0x002;
+    // 定位信息轮训
+    private static final int MSG_INFO_WBG = 0x003;
+    // 安装列表.每三个小时轮训一次
+    private static final int MSG_INFO_SNAPS = 0x004;
+    // net 信息
+    private static final int MSG_INFO_NETS = 0x005;
+
 }

@@ -25,7 +25,7 @@ build()
         logi "[******* graddew build 成功 *****]"
         logi "[********************************]"
         # need delay .wait for build over
-        $dx --dex --output=classes.dex  ./dex/build/intermediates/bundles/release/classes.jar
+        $dx --dex --output=classes.dex  ./dex/build/intermediates/aar_main_jar/release/classes.jar
         if [ $? -ne 0 ]; then
             loge "[********************************]"
             loge "[*********** dx打包失败 **********]"
