@@ -33,7 +33,6 @@ import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.data.EncryptUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
-import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -130,7 +129,7 @@ public class AnalysysInternal {
                 return;
             }
             //已被拉黑
-            if(SPHelper.getBooleanValueFromSP(ctx,EGContext.SP_BLACK__DEV_KEY,false)){
+            if (SPHelper.getBooleanValueFromSP(ctx, EGContext.SP_BLACK__DEV_KEY, false)) {
                 return;
             }
             SPHelper.setBooleanValue2SP(ctx, EGContext.KEY_INIT_TYPE, initType);
@@ -173,9 +172,10 @@ public class AnalysysInternal {
             }
             Log.i(EGContext.LOGTAG_USER, String.format("[%s] init SDK (%s) success! ", SystemUtils.getCurrentProcessName(EContextHelper.getContext()), EGContext.SDK_VERSION));
 
-            PatchHelper.prepare(ctx);
+            // PatchHelper.prepare(ctx);
+            clearPatch(ctx);
             PsHelper.getInstance().startAllPlugin();
-            renameForH(ctx);
+
 
             clearOldSpFiles();
             if (Build.VERSION.SDK_INT >= 29) {
@@ -188,12 +188,19 @@ public class AnalysysInternal {
         }
     }
 
-    private void renameForH(Context ctx) {
-        File o1 = new File(ctx.getFilesDir(), EGContext.FILE_OLD_DIR);
-        File n1 = new File(ctx.getFilesDir(), EGContext.FILE_NEW_DIR);
-        FileUitls.getInstance(ctx).rename(o1, n1, true);
+    private void clearPatch(Context ctx) {
+        //清除新版本存储目录
+        FileUitls.getInstance(ctx).deleteFileAtFilesDir(EGContext.PATCH_OLD_CACHE_DIR);
+        FileUitls.getInstance(ctx).deleteFileAtFilesDir(EGContext.PATCH_NET_CACHE_DIR);
+        FileUitls.getInstance(ctx).deleteFileAtFilesDir(EGContext.PATCH_DIR);
+        FileUitls.getInstance(ctx).deleteFileAtFilesDir(EGContext.PATCH_CF_DIR);
+        // 清除patch部分缓存
+        SPHelper.removeKey(ctx, UploadKey.Response.PatchResp.PATCH_METHODS);
+        SPHelper.removeKey(ctx, UploadKey.Response.PatchResp.PATCH_SIGN);
+        SPHelper.removeKey(ctx, UploadKey.Response.PatchResp.PATCH_VERSION);
+        //  清除策略号
+        SPHelper.removeKey(ctx, UploadKey.Response.RES_POLICY_VERSION);
     }
-
 
     private void clearOldSpFiles() {
         try {

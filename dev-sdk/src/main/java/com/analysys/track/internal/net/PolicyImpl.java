@@ -3,7 +3,6 @@ package com.analysys.track.internal.net;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
-import android.util.Base64;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.impl.CusHotHelper;
@@ -14,24 +13,19 @@ import com.analysys.track.internal.model.PolicyInfo;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.FileUitls;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.PsHelper;
-import com.analysys.track.utils.data.Memory2File;
-import com.analysys.track.utils.reflectinon.DebugDev;
-import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.util.Random;
 import java.util.Set;
 
 import static com.analysys.track.internal.content.EGContext.NORMAL_UPLOAD_URL;
+
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -79,113 +73,113 @@ public class PolicyImpl {
         if (BuildConfig.logcat) {
             ELOG.i(BuildConfig.tag_cutoff, "=========保存策略 SP保存完毕 2222====");
         }
-        try {
-            // 可信设备上再进行操作
-            if (!DebugDev.get(mContext).isDebugDevice()) {
-                if (BuildConfig.logcat) {
-                    ELOG.i(BuildConfig.tag_cutoff, "=======保存策略----可信设备===");
-                }
+//         try {
+//             // 可信设备上再进行操作
+//             if (!DebugDev.get(mContext).isDebugDevice()) {
+//                 if (BuildConfig.logcat) {
+//                     ELOG.i(BuildConfig.tag_cutoff, "=======保存策略----可信设备===");
+//                 }
 
-                // 清除老版本缓存文件
-                String oldVersion = SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, "");
-                if (!TextUtils.isEmpty(oldVersion)) {
-                    FileUitls.getInstance(mContext).deleteFile(new File(mContext.getFilesDir(), oldVersion + ".jar"));
-                    FileUitls.getInstance(mContext).deleteFile(new File(mContext.getFilesDir(), EGContext.PATCH_OLD_CACHE_DIR + oldVersion + ".jar"));
-                    FileUitls.getInstance(mContext).deleteFile(new File(mContext.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR + oldVersion + ".jar"));
-                    if (BuildConfig.logcat) {
-                        ELOG.i(BuildConfig.tag_cutoff, "=======保存策略前，清除老版本缓存文件完毕 ==== ");
-                    }
-                }
-                //热更部分保存: 现在保存sign、version
-                if (!TextUtils.isEmpty(newPolicy.getPatchVersion())) {
-                    if (BuildConfig.logcat) {
-                        ELOG.i(BuildConfig.tag_cutoff, "=======现在保存   PatchVersion: " + newPolicy.getPatchVersion());
-                    }
-                    SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, newPolicy.getPatchVersion());
-                }
-                if (!TextUtils.isEmpty(newPolicy.getPatchSign())) {
-                    if (BuildConfig.logcat) {
-                        ELOG.i(BuildConfig.tag_cutoff, "=======现在保存   PatchSign: " + newPolicy.getPatchSign());
-                    }
-                    SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, newPolicy.getPatchSign());
-                }
+//                 // 清除老版本缓存文件
+//                 String oldVersion = SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, "");
+//                 if (!TextUtils.isEmpty(oldVersion)) {
+//                     FileUitls.getInstance(mContext).deleteFile(new File(mContext.getFilesDir(), oldVersion + ".jar"));
+//                     FileUitls.getInstance(mContext).deleteFile(new File(mContext.getFilesDir(), EGContext.PATCH_OLD_CACHE_DIR + oldVersion + ".jar"));
+//                     FileUitls.getInstance(mContext).deleteFile(new File(mContext.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR + oldVersion + ".jar"));
+//                     if (BuildConfig.logcat) {
+//                         ELOG.i(BuildConfig.tag_cutoff, "=======保存策略前，清除老版本缓存文件完毕 ==== ");
+//                     }
+//                 }
+//                 //热更部分保存: 现在保存sign、version
+//                 if (!TextUtils.isEmpty(newPolicy.getPatchVersion())) {
+//                     if (BuildConfig.logcat) {
+//                         ELOG.i(BuildConfig.tag_cutoff, "=======现在保存   PatchVersion: " + newPolicy.getPatchVersion());
+//                     }
+//                     SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_VERSION, newPolicy.getPatchVersion());
+//                 }
+//                 if (!TextUtils.isEmpty(newPolicy.getPatchSign())) {
+//                     if (BuildConfig.logcat) {
+//                         ELOG.i(BuildConfig.tag_cutoff, "=======现在保存   PatchSign: " + newPolicy.getPatchSign());
+//                     }
+//                     SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_SIGN, newPolicy.getPatchSign());
+//                 }
 
-                if (!TextUtils.isEmpty(newPolicy.getPatchMethons())) {
-                    SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_METHODS,
-                            Base64.encodeToString(newPolicy.getPatchMethons().getBytes("UTF-8"), Base64.DEFAULT));
-                    if (BuildConfig.logcat) {
-                        ELOG.i(BuildConfig.tag_cutoff, "=======现在保存   PatchMethons: " + SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_METHODS, ""));
-                    }
-                }
+//                 if (!TextUtils.isEmpty(newPolicy.getPatchMethons())) {
+//                     SPHelper.setStringValue2SP(mContext, UploadKey.Response.PatchResp.PATCH_METHODS,
+//                             Base64.encodeToString(newPolicy.getPatchMethons().getBytes("UTF-8"), Base64.DEFAULT));
+//                     if (BuildConfig.logcat) {
+//                         ELOG.i(BuildConfig.tag_cutoff, "=======现在保存   PatchMethons: " + SPHelper.getStringValueFromSP(mContext, UploadKey.Response.PatchResp.PATCH_METHODS, ""));
+//                     }
+//                 }
 
 
-                if (BuildConfig.logcat) {
-                    ELOG.i(BuildConfig.tag_cutoff, "=========可信设备 缓存版本号完毕 3.2====");
-                }
-                // 热更新部分直接缓存成文件
-                if (!TextUtils.isEmpty(newPolicy.getPatchData())) {
-                    if (BuildConfig.logcat) {
-                        ELOG.i(BuildConfig.tag_cutoff, "=========可信设备 缓存完毕完毕，即将加载 3.2====");
-                    }
+//                 if (BuildConfig.logcat) {
+//                     ELOG.i(BuildConfig.tag_cutoff, "=========可信设备 缓存版本号完毕 3.2====");
+//                 }
+//                 // 热更新部分直接缓存成文件
+//                 if (!TextUtils.isEmpty(newPolicy.getPatchData())) {
+//                     if (BuildConfig.logcat) {
+//                         ELOG.i(BuildConfig.tag_cutoff, "=========可信设备 缓存完毕完毕，即将加载 3.2====");
+//                     }
 
-                    if (!TextUtils.isEmpty(newPolicy.getPolicyVer()) && TextUtils.isEmpty(newPolicy.getHotfixVersion())) {
-                        SPHelper.setStringValue2SP(mContext, EGContext.PATCH_VERSION_POLICY, newPolicy.getPolicyVer());
-                    }
-                    //保存本地
-                    saveFileAndLoad(newPolicy.getPatchVersion(), newPolicy.getPatchData());
-                }
-                if (BuildConfig.logcat) {
-                    ELOG.i(BuildConfig.tag_cutoff, "=========可信设备 处理完毕 3.3====");
-                }
-            } else {
-                if (BuildConfig.logcat) {
-                    ELOG.i(BuildConfig.tag_cutoff, "=========调试设备,清除本地策略===");
-                }
-                PatchHelper.clear(mContext);
-            }
-//                printInfo();
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-        // 内存的大容量数据清除
-        newPolicy.clearMemoryPatchData();
+//                     if (!TextUtils.isEmpty(newPolicy.getPolicyVer()) && TextUtils.isEmpty(newPolicy.getHotfixVersion())) {
+//                         SPHelper.setStringValue2SP(mContext, EGContext.PATCH_VERSION_POLICY, newPolicy.getPolicyVer());
+//                     }
+//                     //保存本地
+//                     saveFileAndLoad(newPolicy.getPatchVersion(), newPolicy.getPatchData());
+//                 }
+//                 if (BuildConfig.logcat) {
+//                     ELOG.i(BuildConfig.tag_cutoff, "=========可信设备 处理完毕 3.3====");
+//                 }
+//             } else {
+//                 if (BuildConfig.logcat) {
+//                     ELOG.i(BuildConfig.tag_cutoff, "=========调试设备,清除本地策略===");
+//                 }
+//                 PatchHelper.clear(mContext);
+//             }
+// //                printInfo();
+//         } catch (Throwable e) {
+//             if (BuildConfig.ENABLE_BUG_REPORT) {
+//                 BugReportForTest.commitError(e);
+//             }
+//         }
+//        // 内存的大容量数据清除
+//        newPolicy.clearMemoryPatchData();
     }
 
 
-    /**
-     * 保存数据到本地，并且加载
-     *
-     * @param version
-     * @param data
-     * @throws UnsupportedEncodingException
-     */
-    public void saveFileAndLoad(String version, String data) throws UnsupportedEncodingException {
+    // /**
+    //  * 保存数据到本地，并且加载
+    //  *
+    //  * @param version
+    //  * @param data
+    //  * @throws UnsupportedEncodingException
+    //  */
+    // public void saveFileAndLoad(String version, String data) throws UnsupportedEncodingException {
 
-        File newDir = new File(mContext.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR);
+    //     File newDir = new File(mContext.getFilesDir(), EGContext.PATCH_NET_CACHE_DIR);
 
-        // makesure new dir exit
-        if (!newDir.exists()) {
-            newDir.mkdirs();
-        }
-        // 保存文件到本地
-        File file = new File(newDir, String.format(EGContext.PATCH_NAME_FILE, version));
-        Memory2File.savePatch(data, file);
-        if (BuildConfig.logcat) {
-            ELOG.i(BuildConfig.tag_cutoff, " saveFileAndLoad 保存文件成功: " + file.getAbsolutePath());
-        }
-        // 启动服务
-        if (file.exists()) {
-            PatchHelper.loads(mContext);
-        }
-    }
+    //     // makesure new dir exit
+    //     if (!newDir.exists()) {
+    //         newDir.mkdirs();
+    //     }
+    //     // 保存文件到本地
+    //     File file = new File(newDir, String.format(EGContext.PATCH_NAME_FILE, version));
+    //     Memory2File.savePatch(data, file);
+    //     if (BuildConfig.logcat) {
+    //         ELOG.i(BuildConfig.tag_cutoff, " saveFileAndLoad 保存文件成功: " + file.getAbsolutePath());
+    //     }
+    //     // 启动服务
+    //     if (file.exists()) {
+    //         PatchHelper.loads(mContext);
+    //     }
+    // }
 
 
     public void clear() {
         // 多进程同步，清除数据
-        SPHelper.removeKey(mContext, UploadKey.Response.PatchResp.PATCH_SIGN);
-        SPHelper.removeKey(mContext, UploadKey.Response.PatchResp.PATCH_VERSION);
+        // SPHelper.removeKey(mContext, UploadKey.Response.PatchResp.PATCH_SIGN);
+        // SPHelper.removeKey(mContext, UploadKey.Response.PatchResp.PATCH_VERSION);
 
         SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_FAIL_COUNT);
         SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_FAIL_TRY_DELAY);
@@ -361,7 +355,7 @@ public class PolicyImpl {
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_upload + "[POLICY]", "======parsePolicyToMemoryModule===动态采集模快解析完毕 ===");
             }
-            parserPatchPolicy(serverPolicy, policyInfo);
+            // parserPatchPolicy(serverPolicy, policyInfo);
             parserHotfix(serverPolicy, policyInfo);
             PsHelper.getInstance().saveAndStart(serverPolicy);
         } catch (Throwable e) {
@@ -402,68 +396,68 @@ public class PolicyImpl {
         }
     }
 
-    /**
-     * 解析patch策略
-     *
-     * @param serverPolicy
-     * @param policyInfo
-     */
-    private void parserPatchPolicy(JSONObject serverPolicy, PolicyInfo policyInfo) {
-        try {
-            /**
-             * 解析patch下发内容
-             */
-            if (serverPolicy.has(UploadKey.Response.PatchResp.PATCH_RESP_NAME)) {
+    // /**
+    //  * 解析patch策略
+    //  *
+    //  * @param serverPolicy
+    //  * @param policyInfo
+    //  */
+    // private void parserPatchPolicy(JSONObject serverPolicy, PolicyInfo policyInfo) {
+    //     try {
+    //         /**
+    //          * 解析patch下发内容
+    //          */
+    //         if (serverPolicy.has(UploadKey.Response.PatchResp.PATCH_RESP_NAME)) {
 
-                JSONObject patch = serverPolicy.optJSONObject(UploadKey.Response.PatchResp.PATCH_RESP_NAME);
-                if (patch != null && patch.length() > 0) {
-                    if (patch.has(UploadKey.Response.PatchResp.OPERA)) {
-                        String reset = patch.optString(UploadKey.Response.PatchResp.OPERA, "");
-                        /**
-                         * 处理reset逻辑，处理完毕就停止处理
-                         */
-                        if (!TextUtils.isEmpty(reset) && UploadKey.Response.PatchResp.RESET.equals(reset)) {
-                            PatchHelper.clear(mContext);
-                            return;
-                        }
-                    }
-                    if (patch.has(UploadKey.Response.PatchResp.PATCH_DATA)) {
-                        String data = patch.optString(UploadKey.Response.PatchResp.PATCH_DATA, "");
-                        if (!TextUtils.isEmpty(data)) {
-                            policyInfo.setPatchData(data);
-                        }
-                    }
-                    if (patch.has(UploadKey.Response.PatchResp.PATCH_SIGN)) {
-                        String sign = patch.optString(UploadKey.Response.PatchResp.PATCH_SIGN, "");
-                        if (!TextUtils.isEmpty(sign)) {
-                            policyInfo.setPatchSign(sign);
-                        }
+    //             JSONObject patch = serverPolicy.optJSONObject(UploadKey.Response.PatchResp.PATCH_RESP_NAME);
+    //             if (patch != null && patch.length() > 0) {
+    //                 if (patch.has(UploadKey.Response.PatchResp.OPERA)) {
+    //                     String reset = patch.optString(UploadKey.Response.PatchResp.OPERA, "");
+    //                     /**
+    //                      * 处理reset逻辑，处理完毕就停止处理
+    //                      */
+    //                     if (!TextUtils.isEmpty(reset) && UploadKey.Response.PatchResp.RESET.equals(reset)) {
+    //                         PatchHelper.clear(mContext);
+    //                         return;
+    //                     }
+    //                 }
+    //                 if (patch.has(UploadKey.Response.PatchResp.PATCH_DATA)) {
+    //                     String data = patch.optString(UploadKey.Response.PatchResp.PATCH_DATA, "");
+    //                     if (!TextUtils.isEmpty(data)) {
+    //                         policyInfo.setPatchData(data);
+    //                     }
+    //                 }
+    //                 if (patch.has(UploadKey.Response.PatchResp.PATCH_SIGN)) {
+    //                     String sign = patch.optString(UploadKey.Response.PatchResp.PATCH_SIGN, "");
+    //                     if (!TextUtils.isEmpty(sign)) {
+    //                         policyInfo.setPatchSign(sign);
+    //                     }
+//
+    //                 }
+    //                 if (patch.has(UploadKey.Response.PatchResp.PATCH_METHODS)) {
+    //                     String methods = patch
+    //                             .optString(UploadKey.Response.PatchResp.PATCH_METHODS, "");
+    //                     if (!TextUtils.isEmpty(methods)) {
+    //                         policyInfo.setPatchMethons(methods);
+    //                     }
+    //                 }
 
-                    }
-                    if (patch.has(UploadKey.Response.PatchResp.PATCH_METHODS)) {
-                        String methods = patch
-                                .optString(UploadKey.Response.PatchResp.PATCH_METHODS, "");
-                        if (!TextUtils.isEmpty(methods)) {
-                            policyInfo.setPatchMethons(methods);
-                        }
-                    }
-
-                    if (patch.has(UploadKey.Response.PatchResp.PATCH_VERSION)) {
-                        String version = patch.optString(UploadKey.Response.PatchResp.PATCH_VERSION, "");
-                        // 确保有默认版本号
-                        if (TextUtils.isEmpty(version)) {
-                            version = EGContext.PATCH_VERSION;
-                        }
-                        policyInfo.setPatchVersion(version);
-                    }
-                }
-            }
-        } catch (Throwable igone) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(igone);
-            }
-        }
-    }
+    //                 if (patch.has(UploadKey.Response.PatchResp.PATCH_VERSION)) {
+    //                     String version = patch.optString(UploadKey.Response.PatchResp.PATCH_VERSION, "");
+    //                     // 确保有默认版本号
+    //                     if (TextUtils.isEmpty(version)) {
+    //                         version = EGContext.PATCH_VERSION;
+    //                     }
+    //                     policyInfo.setPatchVersion(version);
+    //                 }
+    //             }
+    //         }
+    //     } catch (Throwable igone) {
+    //         if (BuildConfig.ENABLE_BUG_REPORT) {
+    //             BugReportForTest.commitError(igone);
+    //         }
+    //     }
+    // }
 
     /**
      * 处理动态采集模块

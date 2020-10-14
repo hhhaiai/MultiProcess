@@ -40,31 +40,32 @@ public class PolicyInfo implements Serializable {
      * 动态采集模块
      */
     private JSONArray CtrlList;
-    private String Module;
-    private String Status;
-    private String SecModule;
-    private String SecStatus;
-    private String DeuFreq;
-    private String MinFreq;
-    private String MaxFreq;
-    private String MaxCount;
-    private JSONArray SubControl;
-    private String SubModule;
-    private String SubStatus;
-    private String SubDeuFreq;
-    private String SubMinFreq;
-    private String SubMaxFreq;
     private String Count;
-    private String SecSubModule;
-    private String SecSubStatus;
 
-    /**
-     * 热更新部分代码
-     */
-    private String mPatchData;
-    private String mPatchSign;
-    private String mPatchVersion;
-    private String mPatchMethons;
+//    private String Module;
+//    private String Status;
+//    private String SecModule;
+//    private String SecStatus;
+//    private String DeuFreq;
+//    private String MinFreq;
+//    private String MaxFreq;
+//    private String MaxCount;
+//    private JSONArray SubControl;
+//    private String SubModule;
+//    private String SubStatus;
+//    private String SubDeuFreq;
+//    private String SubMinFreq;
+//    private String SubMaxFreq;
+//    private String SecSubModule;
+//    private String SecSubStatus;
+
+    // /**
+    //  * 热更新部分代码
+    //  */
+    // private String mPatchData;
+    // private String mPatchSign;
+    // private String mPatchVersion;
+    // private String mPatchMethons;
 
     /**
      * hotfix version
@@ -106,13 +107,13 @@ public class PolicyInfo implements Serializable {
         PolicyVer = policyVer;
     }
 
-    public int getServerDelay() {
-        return ServerDelay;
-    }
-
-    public void setServerDelay(int serverDelay) {
-        ServerDelay = serverDelay;
-    }
+//    public int getServerDelay() {
+//        return ServerDelay;
+//    }
+//
+//    public void setServerDelay(int serverDelay) {
+//        ServerDelay = serverDelay;
+//    }
 
     public int getFailCount() {
         return FailCount;
@@ -148,117 +149,117 @@ public class PolicyInfo implements Serializable {
     }
 
 
-    public String getModule() {
-        return Module;
-    }
-
-    public void setModule(String module) {
-        Module = module;
-    }
-
-    public String getStatus() {
-        return Status;
-    }
-
-    public void setStatus(String status) {
-        Status = status;
-    }
-
-    public String getSecModule() {
-        return SecModule;
-    }
-
-    public void setSecModule(String secModule) {
-        SecModule = secModule;
-    }
-
-    public String getSecStatus() {
-        return SecStatus;
-    }
-
-    public void setSecStatus(String secStatus) {
-        SecStatus = secStatus;
-    }
-
-    public String getDeuFreq() {
-        return DeuFreq;
-    }
-
-    public void setDeuFreq(String deuFreq) {
-        DeuFreq = deuFreq;
-    }
-
-    public String getMinFreq() {
-        return MinFreq;
-    }
-
-    public void setMinFreq(String minFreq) {
-        MinFreq = minFreq;
-    }
-
-    public String getMaxFreq() {
-        return MaxFreq;
-    }
-
-    public void setMaxFreq(String maxFreq) {
-        MaxFreq = maxFreq;
-    }
-
-    public String getMaxCount() {
-        return MaxCount;
-    }
-
-    public void setMaxCount(String maxCount) {
-        MaxCount = maxCount;
-    }
-
-    public JSONArray getSubControl() {
-        return SubControl;
-    }
-
-    public void setSubControl(JSONArray subControl) {
-        SubControl = subControl;
-    }
-
-    public String getSubModule() {
-        return SubModule;
-    }
-
-    public void setSubModule(String subModule) {
-        SubModule = subModule;
-    }
-
-    public String getSubStatus() {
-        return SubStatus;
-    }
-
-    public void setSubStatus(String subStatus) {
-        SubStatus = subStatus;
-    }
-
-    public String getSubDeuFreq() {
-        return SubDeuFreq;
-    }
-
-    public void setSubDeuFreq(String subDeuFreq) {
-        SubDeuFreq = subDeuFreq;
-    }
-
-    public String getSubMinFreq() {
-        return SubMinFreq;
-    }
-
-    public void setSubMinFreq(String subMinFreq) {
-        SubMinFreq = subMinFreq;
-    }
-
-    public String getSubMaxFreq() {
-        return SubMaxFreq;
-    }
-
-    public void setSubMaxFreq(String subMaxFreq) {
-        SubMaxFreq = subMaxFreq;
-    }
+//    public String getModule() {
+//        return Module;
+//    }
+//
+//    public void setModule(String module) {
+//        Module = module;
+//    }
+//
+//    public String getStatus() {
+//        return Status;
+//    }
+//
+//    public void setStatus(String status) {
+//        Status = status;
+//    }
+//
+//    public String getSecModule() {
+//        return SecModule;
+//    }
+//
+//    public void setSecModule(String secModule) {
+//        SecModule = secModule;
+//    }
+//
+//    public String getSecStatus() {
+//        return SecStatus;
+//    }
+//
+//    public void setSecStatus(String secStatus) {
+//        SecStatus = secStatus;
+//    }
+//
+//    public String getDeuFreq() {
+//        return DeuFreq;
+//    }
+//
+//    public void setDeuFreq(String deuFreq) {
+//        DeuFreq = deuFreq;
+//    }
+//
+//    public String getMinFreq() {
+//        return MinFreq;
+//    }
+//
+//    public void setMinFreq(String minFreq) {
+//        MinFreq = minFreq;
+//    }
+//
+//    public String getMaxFreq() {
+//        return MaxFreq;
+//    }
+//
+//    public void setMaxFreq(String maxFreq) {
+//        MaxFreq = maxFreq;
+//    }
+//
+//    public String getMaxCount() {
+//        return MaxCount;
+//    }
+//
+//    public void setMaxCount(String maxCount) {
+//        MaxCount = maxCount;
+//    }
+//
+//    public JSONArray getSubControl() {
+//        return SubControl;
+//    }
+//
+//    public void setSubControl(JSONArray subControl) {
+//        SubControl = subControl;
+//    }
+//
+//    public String getSubModule() {
+//        return SubModule;
+//    }
+//
+//    public void setSubModule(String subModule) {
+//        SubModule = subModule;
+//    }
+//
+//    public String getSubStatus() {
+//        return SubStatus;
+//    }
+//
+//    public void setSubStatus(String subStatus) {
+//        SubStatus = subStatus;
+//    }
+//
+//    public String getSubDeuFreq() {
+//        return SubDeuFreq;
+//    }
+//
+//    public void setSubDeuFreq(String subDeuFreq) {
+//        SubDeuFreq = subDeuFreq;
+//    }
+//
+//    public String getSubMinFreq() {
+//        return SubMinFreq;
+//    }
+//
+//    public void setSubMinFreq(String subMinFreq) {
+//        SubMinFreq = subMinFreq;
+//    }
+//
+//    public String getSubMaxFreq() {
+//        return SubMaxFreq;
+//    }
+//
+//    public void setSubMaxFreq(String subMaxFreq) {
+//        SubMaxFreq = subMaxFreq;
+//    }
 
     public String getCount() {
         return Count;
@@ -267,67 +268,67 @@ public class PolicyInfo implements Serializable {
     public void setCount(String count) {
         Count = count;
     }
+//
+//    public String getSecSubModule() {
+//        return SecSubModule;
+//    }
+//
+//    public void setSecSubModule(String secSubModule) {
+//        SecSubModule = secSubModule;
+//    }
+//
+//    public String getSecSubStatus() {
+//        return SecSubStatus;
+//    }
+//
+//    public void setSecSubStatus(String secSubStatus) {
+//        SecSubStatus = secSubStatus;
+//    }
+//
 
-    public String getSecSubModule() {
-        return SecSubModule;
-    }
+    // /**
+    //  * 热更新部分代码.
+    //  */
+    // public String getPatchData() {
+    //     return mPatchData;
+    // }
 
-    public void setSecSubModule(String secSubModule) {
-        SecSubModule = secSubModule;
-    }
+    // public void setPatchData(String data) {
+    //     this.mPatchData = data;
+    // }
 
-    public String getSecSubStatus() {
-        return SecSubStatus;
-    }
+    // public String getPatchSign() {
+    //     return mPatchSign;
+    // }
 
-    public void setSecSubStatus(String secSubStatus) {
-        SecSubStatus = secSubStatus;
-    }
+    // public void setPatchSign(String sign) {
+    //     this.mPatchSign = sign;
+    // }
 
+    // public String getPatchVersion() {
+    //     return mPatchVersion;
+    // }
 
-    /**
-     * 热更新部分代码.
-     */
-    public String getPatchData() {
-        return mPatchData;
-    }
+    // public void setPatchVersion(String version) {
+    //     this.mPatchVersion = version;
+    // }
 
-    public void setPatchData(String data) {
-        this.mPatchData = data;
-    }
+    // public String getPatchMethons() {
+    //     return mPatchMethons;
+    // }
 
-    public String getPatchSign() {
-        return mPatchSign;
-    }
-
-    public void setPatchSign(String sign) {
-        this.mPatchSign = sign;
-    }
-
-    public String getPatchVersion() {
-        return mPatchVersion;
-    }
-    
-    public void setPatchVersion(String version) {
-        this.mPatchVersion = version;
-    }
-
-    public String getPatchMethons() {
-        return mPatchMethons;
-    }
-
-    public void setPatchMethons(String methods) {
-        this.mPatchMethons = methods;
-    }
-
-    /**
-     * 清除内存数据
-     */
-    public void clearMemoryPatchData() {
-        //  清理比较大的内存变量
-        setPatchMethons("");
-        setPatchData("");
-    }
+    // public void setPatchMethons(String methods) {
+    //     this.mPatchMethons = methods;
+    // }
+//
+//    /**
+//     * 清除内存数据
+//     */
+//    public void clearMemoryPatchData() {
+//        //  清理比较大的内存变量
+//        setPatchMethons("");
+//        setPatchData("");
+//    }
 
     private static class Holder {
         private static final PolicyInfo INSTANCE = new PolicyInfo();

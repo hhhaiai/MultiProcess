@@ -58,10 +58,10 @@ public class DataPackaging {
                     DataController.SWITCH_OF_DEVICE_ID);
             JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.OAID, devImpl.getOAID(),
                     DataController.SWITCH_OF_OAID);
-            if (EGContext.patch_runing) {
-                String plocyVersion = SPHelper.getStringValueFromSP(context, EGContext.PATCH_VERSION_POLICY, "");
-                JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.POLICYVER, plocyVersion, DataController.SWITCH_OF_POLICYVER);
-            }
+            // if (EGContext.patch_runing) {
+                // String plocyVersion = SPHelper.getStringValueFromSP(context, EGContext.PATCH_VERSION_POLICY, "");
+                // JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.POLICYVER, plocyVersion, DataController.SWITCH_OF_POLICYVER);
+            // }
             JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.DeviceModel, Build.MODEL,
                     DataController.SWITCH_OF_DEVICE_MODEL);
             JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.MAC, devImpl.getMac(),

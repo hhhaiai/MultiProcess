@@ -291,7 +291,7 @@ public class EGContext {
     //dex文件损坏,默认是没有dex文件的,所以默认为true
     public static boolean DEX_ERROR = false;
     public static final String HOTFIX_VERSION = "HF";
-    public static final String FILE_OLD_DIR = "/.analysys_file/";
+//    public static final String FILE_OLD_DIR = "/.analysys_file/";
     public static final String FILE_NEW_DIR = "/.a2/";
     public static final String HOTFIX_CACHE_HOTFIX_DIR = FILE_NEW_DIR + ".hf/";
     public static final String PS_CACHE_HOTFIX_DIR = FILE_NEW_DIR + ".ps/";
@@ -301,17 +301,17 @@ public class EGContext {
     /**
      * pathch default version
      */
-    public static String PATCH_VERSION = "_ptv";
-    public static String PATCH_VERSION_POLICY = "pa_vp";
+//    public static String PATCH_VERSION = "_ptv";
+//    public static String PATCH_VERSION_POLICY = "pa_vp";
     public static final String PATCH_OLD_CACHE_DIR = FILE_NEW_DIR + ".patch/";
     //更新文件夹名字.
     public static final String PATCH_NET_CACHE_DIR = FILE_NEW_DIR + ".p/";
     public static final String PATCH_DIR = ".p/";
     public static final String PATCH_CF_DIR = ".cf/";
-    public static final String PATCH_NAME_FILE = "p_%s.jar";
-    
-    //下发的patch是否在运行中
-    public static boolean patch_runing = false;
+//    public static final String PATCH_NAME_FILE = "p_%s.jar";
+//
+    // //下发的patch是否在运行中
+    // public static boolean patch_runing = false;
 
     /**
      * 调试使用/data/local/tmp/kvs文件使用

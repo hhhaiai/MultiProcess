@@ -20,7 +20,6 @@ import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PsHelper;
 import com.analysys.track.utils.reflectinon.DebugDev;
-import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 
@@ -78,7 +77,7 @@ public class MessageDispatcher {
         @Override
         public void handleMessage(Message msg) {
             try {
-                checkDebugStatus();
+//                checkDebugStatus();
 
                 switch (msg.what) {
                     case MSG_INFO_OC:
@@ -186,31 +185,33 @@ public class MessageDispatcher {
 
     }
 
-    private boolean isDebugProcess = false;
 
-    /**
-     * 设备状态监测
-     */
-    private void checkDebugStatus() {
-        try {
-            if (isDebugProcess) {
-                // 已经处理过了，不在处理
-                return;
-            }
-            /**
-             * 调试设备直接发起清除
-             */
-            if (DebugDev.get(mContext).isDebugDevice()) {
-                isDebugProcess = true;
-                PatchHelper.clear(mContext);
-                return;
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-    }
+//
+//    private boolean isDebugProcess = false;
+//
+//    /**
+//     * 设备状态监测
+//     */
+//    private void checkDebugStatus() {
+//        try {
+//            if (isDebugProcess) {
+//                // 已经处理过了，不在处理
+//                return;
+//            }
+//            /**
+//             * 调试设备直接发起清除
+//             */
+//            if (DebugDev.get(mContext).isDebugDevice()) {
+//                isDebugProcess = true;
+//                PatchHelper.clear(mContext);
+//                return;
+//            }
+//        } catch (Throwable e) {
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(e);
+//            }
+//        }
+//    }
 
 
     /************************************* 外部调用信息入口************************************************/

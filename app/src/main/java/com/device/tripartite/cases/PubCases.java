@@ -13,14 +13,12 @@ import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.impl.usm.USMImpl;
 import com.analysys.track.internal.impl.usm.USMUtils;
 import com.analysys.track.internal.net.UploadImpl;
-import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.service.AnalysysJobService;
 import com.analysys.track.service.AnalysysService;
 import com.analysys.track.utils.AccessibilityHelper;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
-import com.analysys.track.utils.reflectinon.PatchHelper;
 import com.device.tripartite.cases.models.RefModelA;
 import com.device.tripartite.cases.usmcase.USMCase;
 import com.device.utils.DemoClazzUtils;
@@ -28,7 +26,6 @@ import com.device.utils.EL;
 
 import org.json.JSONArray;
 
-import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -75,6 +72,7 @@ public class PubCases {
         rt.play();
         rt.stop();
     }
+
     private static void runCaseUSM1(final Context context) {
         JSONArray arr = USMImpl.getUSMInfo(context, 0, System.currentTimeMillis());
         EL.i("arr: " + arr);
@@ -130,18 +128,17 @@ public class PubCases {
     }
 
     public static void runCasePatch(Context context) {
-        try {
-
+//        try {
 //            loadStatic(mContext, new File("/data/local/tmp/temp_20200108-180351.jar"),
 //                  "com.analysys.Ab", "init",
 //                    new Class[]{Context.class}, new Object[]{mContext});
-            PatchHelper.loadStatic(null,context,
-                    new File("/data/local/tmp/temp_20200108-180351.jar"),
-                    "com.analysys.Ab", "init",
-                    new Class[]{Context.class}, new Object[]{context});
-        } catch (Throwable e) {
-            EL.e(e);
-        }
+//            PatchHelper.loadStatic(null,context,
+//                    new File("/data/local/tmp/temp_20200108-180351.jar"),
+//                    "com.analysys.Ab", "init",
+//                    new Class[]{Context.class}, new Object[]{context});
+//        } catch (Throwable e) {
+//            EL.e(e);
+//        }
     }
 
     public static void runCaseRef1(final Context context) {

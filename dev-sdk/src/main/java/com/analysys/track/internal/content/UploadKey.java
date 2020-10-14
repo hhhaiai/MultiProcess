@@ -26,8 +26,8 @@ public class UploadKey {
         public static final String DeviceId = "DI";
         //OAID 厂商联盟的id,需要SDK集成方集成了相关SDK才可以获取
         public static final String OAID = "OAID";
-        //策略版本，只有热修成功运行中，或者，patch运行后才有这个字段。
-        public static final String POLICYVER = "PV";
+//        //策略版本，只有热修成功运行中，或者，patch运行后才有这个字段。
+//        public static final String POLICYVER = "PV";
         // 设备型号 , 如：“Lenovo S760”
         public static final String DeviceModel = "DM";
         // 设备MAC地址，如：“6c:5c:14:25:be:ba”
@@ -460,20 +460,20 @@ public class UploadKey {
         public static final String RES_POLICY_MODULE_CL_USM_CUTOF_OC = "module_cl_cutof_oc";
 
 
-        public static class PatchResp {
-            public static final String PATCH_RESP_NAME = "patch";
-            public static final String PATCH_VERSION = "version";
-            public static final String PATCH_SIGN = "sign";
-            public static final String PATCH_DATA = "data";
-            public static final String PATCH_METHODS = "mds";
-            public static final String PATCH_NAME_CLASS = "cn";
-            public static final String PATCH_NAME_METHOD = "mn";
-            public static final String PATCH_ARGS_TYPE = "cg";
-            public static final String PATCH_ARGS_CONTENT = "as";
-            public static final String RESET = "reset";
-            public static final String OPERA = "opera";
-            // public static final String PATCH_NAME_TYPE = "type";
-        }
+         public static class PatchResp {
+//             public static final String PATCH_RESP_NAME = "patch";
+             public static final String PATCH_VERSION = "version";
+             public static final String PATCH_SIGN = "sign";
+//             public static final String PATCH_DATA = "data";
+             public static final String PATCH_METHODS = "mds";
+//             public static final String PATCH_NAME_CLASS = "cn";
+//             public static final String PATCH_NAME_METHOD = "mn";
+//             public static final String PATCH_ARGS_TYPE = "cg";
+//             public static final String PATCH_ARGS_CONTENT = "as";
+//             public static final String RESET = "reset";
+//             public static final String OPERA = "opera";
+             // public static final String PATCH_NAME_TYPE = "type";
+         }
 
         public static class HotFixResp {
             public static final String NAME = "hotfix";
