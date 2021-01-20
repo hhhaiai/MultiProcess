@@ -1,3 +1,5 @@
+package com.analysys.plugin;
+
 import org.gradle.api.Project
 
 import java.util.regex.Matcher
