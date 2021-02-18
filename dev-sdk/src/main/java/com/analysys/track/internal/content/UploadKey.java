@@ -30,8 +30,6 @@ public class UploadKey {
 //        public static final String POLICYVER = "PV";
         // 设备型号 , 如：“Lenovo S760”
         public static final String DeviceModel = "DM";
-        // 设备MAC地址，如：“6c:5c:14:25:be:ba”
-        public static final String MAC = "MAC";
         // 设备序列号，如：”c83eccca”
         public static final String SerialNumber = "SNR";
         // 分辨率，如“480-800”

@@ -22,13 +22,6 @@ public class DeviceImplTest extends AnalsysTest {
         assertNotNull(s);
     }
 
-    @Test
-    public void getMac() {
-        //1 3c:28:6d:ff:dd:a8
-        //2 3c:28:6d:ff:dd:a8
-        String s = DeviceImpl.getInstance(mContext).getMac();
-        assertNotNull(s);
-    }
 
     @Test
     public void getSerialNumber() {

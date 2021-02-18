@@ -41,7 +41,6 @@
 |  android.permission.INTERNET  |  访问互联网的权限  |
 |  android.permission.READ_PHONE_STATE  |  访问电话相关信息  |
 |  android.permission.WRITE_EXTERNAL_STORAGE  |  获取外部存储卡写权限  |
-|  android.permission.ACCESS_WIFI_STATE  |  获取MAC地址的权限  |
 |  android.permission.ACCESS_COARSE_LOCATION  |  允许获取大概位置信息  |
 |  android.permission.ACCESS_FINE_LOCATION  |  允许获取精准定位信息  |
 |  android.permission.GET_TASKS  |  允许程序获取当前或最近运行的应用  |

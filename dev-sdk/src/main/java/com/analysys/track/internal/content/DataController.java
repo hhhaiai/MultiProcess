@@ -38,7 +38,6 @@ public class DataController {
     public static boolean SWITCH_OF_OAID = true;
     public static boolean SWITCH_OF_POLICYVER = true;
     public static boolean SWITCH_OF_DEVICE_MODEL = true;
-    public static boolean SWITCH_OF_MAC = true;
     public static boolean SWITCH_OF_SERIALNUMBER = true;
     public static boolean SWITCH_OF_RESOLUTION = true;
     public static boolean SWITCH_OF_DOTPERINCH = true;
@@ -69,8 +68,6 @@ public class DataController {
     public static boolean SWITCH_OF_DEBUG = true;
     public static boolean SWITCH_OF_HIJACK = true;
     public static boolean SWITCH_OF_IS_ROOT = true;
-    public static boolean SWITCH_OF_BLUETOOTH_MAC = true;
-    public static boolean SWITCH_OF_BLUETOOTH_NAME = true;
     public static boolean SWITCH_OF_BATTERY_STATUS = true;
     public static boolean SWITCH_OF_BATTERY_HEALTH = true;
     public static boolean SWITCH_OF_BATTERY_LEVEL = true;

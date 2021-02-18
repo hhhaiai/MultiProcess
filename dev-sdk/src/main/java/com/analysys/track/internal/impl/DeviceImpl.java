@@ -57,12 +57,6 @@ public class DeviceImpl {
 
     private static final String UNKNOW = "";
     public List<String> minEffectiveValue = new ArrayList<String>();
-    private final String DEFALT_MAC = "02:00:00:00:00:00";
-    private final String[] FILE_LIST = {
-            Base64.encodeToString("/sys/class/net/wlan1/address".getBytes(), Base64.DEFAULT),
-            Base64.encodeToString("/sys/class/net/wlan0/address".getBytes(), Base64.DEFAULT),
-            Base64.encodeToString("/sys/class/net/eth0/address".getBytes(), Base64.DEFAULT),
-            Base64.encodeToString("/sys/devices/virtual/net/wlan0/address".getBytes(), Base64.DEFAULT)};
     private Context mContext;
 
     private DeviceImpl() {
@@ -73,7 +67,7 @@ public class DeviceImpl {
                 minEffectiveValue.add(sb.toString());
             }
         }
-       
+
     }
 
     public static DeviceImpl getInstance(Context context) {
@@ -108,7 +102,7 @@ public class DeviceImpl {
                         imsi = imsis.get(0);
                     }
                 }
-                
+
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -135,156 +129,8 @@ public class DeviceImpl {
         }
         return null;
     }
-    
-    private String mMemoryMac = "";
-    /**
-     * MAC 地址
-     */
-    public String getMac() {
-        if (!isInValid(mMemoryMac)) {
-            return mMemoryMac;
-        }
-        mMemoryMac = SPHelper.getStringValueFromSP(mContext, EGContext.SP_MAC_ADDRESS, DEFALT_MAC);
-        if (isInValid(mMemoryMac)) {
-            try {
-                if (BuildConfig.ENABLE_MAC) {
-                    if (mContext != null && Build.VERSION.SDK_INT < 23) {
-                        mMemoryMac = getMacByAndridAPI();
-                    }
-                }
-    
-                if (isInValid(mMemoryMac)) {
-                    mMemoryMac = getMacByJavaAPI();
-                } else {
-                    if (isInValid(mMemoryMac)) {
-                        mMemoryMac = getMacByFile();
-    
-                    }
-                }
-            
-            } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(e);
-                }
-            }
-    
-            if (isInValid(mMemoryMac)) {
-                SPHelper.setStringValue2SP(mContext, EGContext.SP_MAC_ADDRESS, mMemoryMac);
-            }
-        }
-    
-        return mMemoryMac;
-    }
 
-    /**
-     * android api获取MAC
-     */
-    private String getMacByAndridAPI() {
-        try {
-            WifiManager wifi = (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            if (PermissionUtils.checkPermission(mContext, permission.ACCESS_WIFI_STATE)) {
-                WifiInfo info = null;
-                if (wifi != null) {
-                    info = wifi.getConnectionInfo();
-                }
-                if (info != null) {
-                    return info.getMacAddress();
-                }
-            }
-        } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(t);
-            }
-        }
-        return DEFALT_MAC;
-    }
 
-    @TargetApi(9)
-    private String getMacByJavaAPI() {
-        String mac = "";
-        Map<String, String> map = new HashMap<String, String>();
-        try {
-            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-            while (interfaces.hasMoreElements()) {
-                mac = "";
-                NetworkInterface netInterface = interfaces.nextElement();
-                String name = netInterface.getName();
-                if ("wlan0".equalsIgnoreCase(name)
-                        || "wlan1".equalsIgnoreCase(name)
-                        || "eth0".equalsIgnoreCase(name)
-                ) {
-                    byte[] addr = netInterface.getHardwareAddress();
-                    if (addr == null || addr.length == 0) {
-                        continue;
-                    }
-                    StringBuilder buf = new StringBuilder();
-                    for (byte b : addr) {
-                        buf.append(String.format("%02X:", b));
-                    }
-                    if (buf.length() > 0) {
-                        buf.deleteCharAt(buf.length() - 1);
-                    }
-                    mac = String.valueOf(buf).toLowerCase(Locale.getDefault());
-                    map.put(name, mac);
-                }
-            }
-        } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(t);
-            }
-        }
-    
-        if (map.containsKey("wlan1")) {
-            String mf = map.get("wlan1");
-            if (!isInValid(mf)) {
-                return mf;
-            }
-        }
-        if (map.containsKey("wlan0")) {
-            String mf = map.get("wlan0");
-            if (!isInValid(mf)) {
-                return mf;
-            }
-        }
-        if (map.containsKey("eth0")) {
-            String mf = map.get("eth0");
-            if (!isInValid(mf)) {
-                return mf;
-            }
-        }
-        return DEFALT_MAC;
-    }
-    
- 
-    private String getMacByFile() {
-        for (int i = 0; i < FILE_LIST.length; i++) {
-            String mac = SystemUtils.getContent(new String(Base64.decode(FILE_LIST[i], Base64.DEFAULT)));
-            if (isInValid(mac)) {
-                return mac;
-            }
-        }
-        return DEFALT_MAC;
-    }
-    
-    /**
-     * mac是否无效
-     *
-     * @param mac
-     * @return true: 无效
-     * fasle: 有效
-     */
-    private boolean isInValid(String mac) {
-        if (TextUtils.isEmpty(mac)) {
-            return true;
-        }
-        if (DEFALT_MAC.equalsIgnoreCase(mac)) {
-            return true;
-        }
-        return false;
-    }
-    
-    
-    
     private DisplayMetrics getDisplayMetrics() {
         DisplayMetrics displayMetrics;
         try {

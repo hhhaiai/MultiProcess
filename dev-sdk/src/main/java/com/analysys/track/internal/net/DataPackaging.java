@@ -64,8 +64,6 @@ public class DataPackaging {
             // }
             JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.DeviceModel, Build.MODEL,
                     DataController.SWITCH_OF_DEVICE_MODEL);
-            JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.MAC, devImpl.getMac(),
-                    DataController.SWITCH_OF_MAC);
             JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.SerialNumber,
                     SystemUtils.getSerialNumber(), DataController.SWITCH_OF_SERIALNUMBER);
             JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.Resolution, devImpl.getResolution(), DataController.SWITCH_OF_RESOLUTION);
