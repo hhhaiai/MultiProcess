@@ -1,4 +1,4 @@
-package com.analysys.plugin;
+//package com.analysys.plugin;
 
 import org.gradle.api.Project
 
