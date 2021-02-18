@@ -204,7 +204,7 @@ public class PolicyImpl {
         SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_WIFI);
         SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_BASE);
         SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_DEV);
-        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_BLUETOOTH);
+//        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_BLUETOOTH);
         SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_BATTERY);
         SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_SENSOR);
         SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_MORE_INFO);
@@ -670,14 +670,7 @@ public class PolicyImpl {
                 if (!TextUtils.isEmpty(sub_module)) {
                     unWantedKeysHandle(sub_unWanted);
                     if ("dev".equals(tag)) {
-                        if (EGContext.BLUETOOTH.equals(sub_module)) {
-                            // 0不收集，跳过
-                            if (unCollected.equals(sub_status)) {
-                                SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_BLUETOOTH, false);
-                                continue;
-                            }
-                            SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_BLUETOOTH, true);
-                        } else if (EGContext.BATTERY.equals(sub_module)) {
+                        if (EGContext.BATTERY.equals(sub_module)) {
                             // 0不收集，跳过
                             if (unCollected.equals(sub_status)) {
                                 SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_BATTERY, false);

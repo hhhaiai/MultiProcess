@@ -41,3 +41,6 @@ sh.exe.stackdump
 */Key.java
 .vs/
 .vscode/
+
+dev-sdk/src/main/java/com/analysys/plugin/Key.java
+dev-sdk/src/androidTest/java/com/miqt/costtime/ProguardJson.java

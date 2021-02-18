@@ -122,12 +122,6 @@ public class DataPackaging {
 //                    UploadKey.Response.RES_POLICY_MODULE_CL_BLUETOOTH,
 //                    DataController.SWITCH_OF_MODULE_CL_BLUETOOTH)) {
 
-            if (SPHelper.getBooleanValueFromSP(context, UploadKey.Response.RES_POLICY_MODULE_CL_BLUETOOTH, DataController.SWITCH_OF_MODULE_CL_BLUETOOTH)) {
-                JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.BluetoothMac,
-                        devImpl.getBluetoothAddress(context), DataController.SWITCH_OF_BLUETOOTH_MAC);
-                JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.BluetoothName,
-                        devImpl.getBluetoothName(), DataController.SWITCH_OF_BLUETOOTH_NAME);
-            }
 //            if (PolicyImpl.getInstance(context).getValueFromSp(
 //                    UploadKey.Response.RES_POLICY_MODULE_CL_KEEP_INFO,
 //                    DataController.SWITCH_OF_MODULE_CL_KEEP_INFO)) {

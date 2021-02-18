@@ -83,35 +83,6 @@ public class DeviceImpl {
         return Holder.INSTANCE;
     }
 
-    /**
-     * 蓝牙的mac地址获取
-     *
-     * @param context
-     * @return
-     */
-    public String getBluetoothAddress(Context context) {
-        String bluetoothMacAddress = DEFALT_MAC;
-        try {
-    
-            if (BuildConfig.ENABLE_MAC) {
-                if (PermissionUtils.checkPermission(mContext, Manifest.permission.BLUETOOTH)) {
-                    BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                    if (bluetoothAdapter != null) {
-                        bluetoothMacAddress = bluetoothAdapter.getAddress();
-                    }
-                }
-            }
-            if (TextUtils.isEmpty(bluetoothMacAddress) || DEFALT_MAC.equals(bluetoothMacAddress)) {
-                bluetoothMacAddress = Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-        return bluetoothMacAddress;
-    }
-
 
     /**
      * 设备Id 由IMEI-IMSI-AndroidId组成
@@ -558,22 +529,6 @@ public class DeviceImpl {
         return null;
     }
 
-    /**
-     * 蓝牙信息
-     */
-    public String getBluetoothName() {
-        try {
-            BluetoothAdapter mAdapther = BluetoothAdapter.getDefaultAdapter();
-            if (mAdapther != null) {
-                return mAdapther.getName();
-            }
-        } catch (Throwable t) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(t);
-            }
-        }
-        return "";
-    }
 
     public void processBattery(final Intent intent) {
         try {

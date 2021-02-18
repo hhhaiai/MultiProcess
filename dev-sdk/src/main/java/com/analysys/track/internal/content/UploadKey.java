@@ -96,15 +96,6 @@ public class UploadKey {
         // 是否root，值为1表示获取root权限；值为0表示没获取root权限
         public static final String IsRoot = "IR";
         /*
-         * 蓝牙信息,默认不上传,需要根据服务器控制
-         */
-        // 蓝牙模块名字
-        public static final String BluetoothModuleName = "BTTMN";
-        // 蓝牙MAC，如“6c:5c:14:25:be:ba”
-        public static final String BluetoothMac = "BMAC";
-        // 蓝牙信息
-        public static final String BluetoothName = "BName";
-        /*
          * 电量信息,默认不上传,需要根据服务器控制
          */
         // 电量模块名字
@@ -395,7 +386,7 @@ public class UploadKey {
         public static final String RES_POLICY_CTRL_EXCLUDE = "exclude";
         //
         public static final String RES_POLICY_CTRL_SUB_CONTROL = "subControl";
-        // 子模块名称(需要SDK内置):0(蓝牙),1(电量),2(语言、时区、输入法),3(VPN),4(账号)，5(传感器)
+        // 子模块名称(需要SDK内置):0,1(电量),2(语言、时区、输入法),3(VPN),4(账号)，5(传感器)
         public static final String RES_POLICY_CTRL_SUB_MODULE = "submodule";
         // 子模块状态值
         public static final String RES_POLICY_CTRL_SUB_STATUS = "sub_status";
@@ -420,8 +411,6 @@ public class UploadKey {
          * 模块的采集控制
 //         */
 //        public static final String RES_POLICY_MODULE_CL = "module_cl";
-        // 蓝牙采集.默认不上传，可控制上传
-        public static final String RES_POLICY_MODULE_CL_BLUETOOTH = "module_cl_bluetooth";
         // 电量采集.默认不上传，可控制上传
         public static final String RES_POLICY_MODULE_CL_BATTERY = "module_cl_battery";
         // 传感器控制

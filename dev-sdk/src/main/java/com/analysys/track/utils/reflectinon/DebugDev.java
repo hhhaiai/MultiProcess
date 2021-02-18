@@ -1,6 +1,5 @@
 package com.analysys.track.utils.reflectinon;
 
-import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
@@ -840,20 +839,6 @@ public class DebugDev {
 //                        }
 //                    }
 //                }
-//            }
-//        } catch (Throwable e) {
-//        }
-//        return false;
-//    }
-//    /**
-//     * 蓝牙 可有可无
-//     *
-//     * @return
-//     */
-//    private boolean isHasNoBluetooth() {
-//        try {
-//            if (BluetoothAdapter.getDefaultAdapter() == null) {
-//                return true;
 //            }
 //        } catch (Throwable e) {
 //        }

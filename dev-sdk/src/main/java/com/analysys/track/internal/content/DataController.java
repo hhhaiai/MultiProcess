@@ -12,8 +12,6 @@ public class DataController {
     /*
      * 模块的采集控制
      */
-    // 蓝牙采集.默认不上传，可控制上传
-    public static boolean SWITCH_OF_MODULE_CL_BLUETOOTH = true;
     // 电量采集.默认不上传，可控制上传
     public static boolean SWITCH_OF_MODULE_CL_BATTERY = true;
     // 传感器采集控制

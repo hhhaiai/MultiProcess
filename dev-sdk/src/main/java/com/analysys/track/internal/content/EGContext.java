@@ -84,8 +84,6 @@ public class EGContext {
 
     public static final String SP_MAC_ADDRESS = "MACAddress";
     public static final String SP_APP_IDFA = "appIDFA";
-    // 蓝牙
-    public static final String BLUETOOTH = "0";
     // 电量
     public static final String BATTERY = "1";
     // 传感器

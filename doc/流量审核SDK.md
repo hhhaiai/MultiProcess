@@ -30,7 +30,6 @@
 <uses-permission android:name="android.permission.GET_TASKS"/>
 <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-<uses-permission android:name="android.permission.BLUETOOTH"/>
 <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
 <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS">
 ```
@@ -48,7 +47,6 @@
 |  android.permission.GET_TASKS  |  允许程序获取当前或最近运行的应用  |
 |  android.permission.RECEIVE_BOOT_COMPLETED  |  允许程序开机自动运行  |
 |  android.permission.ACCESS_NETWORK_STATE  |  访问网络连接情况  |
-|  android.permission.BLUETOOTH       |  允许应用程序读取蓝牙MAC  |
 |  android.permission.WRITE_SETTINGS      |  允许应用程序读取或写入系统设置  |
 |  android.permission.PACKAGE_USAGE_STATS      |  数据统计服务  |
 
