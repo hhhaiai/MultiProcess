@@ -11,7 +11,6 @@ import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.impl.SenSorModuleNameImpl;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.EguanIdUtils;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.DebugDev;
@@ -96,8 +95,8 @@ public class DataPackaging {
                     DataController.SWITCH_OF_APP_MD5);
             JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.AppSign, devImpl.getAppSign(),
                     DataController.SWITCH_OF_APP_SIGN);
-            JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.TempID,
-                    EguanIdUtils.getInstance(context).getId(), DataController.SWITCH_OF_TEMP_ID);
+//            JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.TempID,
+//                    EguanIdUtils.getInstance(context).getId(), DataController.SWITCH_OF_TEMP_ID);
             JsonUtils.pushToJSON(context, deviceInfo, UploadKey.DevInfo.UA, devImpl.getUA(),
                     DataController.SWITCH_OF_BUILD_UA);
 

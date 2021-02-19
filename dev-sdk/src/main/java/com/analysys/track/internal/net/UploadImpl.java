@@ -18,7 +18,6 @@ import com.analysys.track.utils.DeflterCompressUtils;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
-import com.analysys.track.utils.EguanIdUtils;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PolicyEncrypt;
@@ -448,7 +447,7 @@ public class UploadImpl {
                         ELOG.i(BuildConfig.tag_cutoff, "========收到code-----" + code);
                     }
                     if (EGContext.HTTP_STATUS_200.equals(code)) {
-                        EguanIdUtils.getInstance(mContext).setId(json);
+//                        EguanIdUtils.getInstance(mContext).setId(json);
                         // 清除本地数据
                         uploadSuccess(EGContext.SHORT_TIME);
                     } else if (EGContext.HTTP_STATUS_500.equals(code)) {
