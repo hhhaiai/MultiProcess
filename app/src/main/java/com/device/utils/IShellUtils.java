@@ -2,7 +2,6 @@ package com.device.utils;
 
 import android.text.TextUtils;
 
-import com.umeng.commonsdk.debug.E;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;

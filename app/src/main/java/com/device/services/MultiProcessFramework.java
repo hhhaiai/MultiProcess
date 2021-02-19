@@ -8,7 +8,6 @@ import android.os.Looper;
 import com.device.tripartite.MultiProcessCaseDispatcher;
 import com.device.utils.EL;
 import com.device.utils.MyLooper;
-import com.umeng.analytics.MobclickAgent;
 
 import java.lang.reflect.Method;
 
@@ -113,7 +112,6 @@ public class MultiProcessFramework {
                 }
             }
         } catch (Throwable e) {
-            MobclickAgent.reportError(context, e);
         }
 
     }
