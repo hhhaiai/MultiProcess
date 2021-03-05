@@ -1,4 +1,4 @@
-package com.analysys.track.internal.impl;
+package com.analysys.track.internal.impl.sensors;
 
 import android.content.Context;
 import android.hardware.Sensor;

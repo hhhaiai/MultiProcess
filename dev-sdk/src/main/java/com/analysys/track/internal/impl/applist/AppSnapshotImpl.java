@@ -1,4 +1,4 @@
-package com.analysys.track.internal.impl;
+package com.analysys.track.internal.impl.applist;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;

@@ -1,4 +1,4 @@
-package com.analysys.track.internal.impl;
+package com.analysys.track.internal.impl.locations;
 
 import android.Manifest;
 import android.content.Context;

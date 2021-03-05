@@ -11,7 +11,7 @@ import android.os.Message;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.AppSnapshotImpl;
-import com.analysys.track.internal.impl.LocationImpl;
+import com.analysys.track.internal.impl.locations.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.UploadImpl;
@@ -19,7 +19,6 @@ import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PsHelper;
-import com.analysys.track.utils.reflectinon.DebugDev;
 import com.analysys.track.utils.sp.SPHelper;
 
 

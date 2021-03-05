@@ -8,7 +8,7 @@ import com.analysys.track.internal.content.DataController;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.DeviceImpl;
-import com.analysys.track.internal.impl.SenSorModuleNameImpl;
+import com.analysys.track.internal.impl.sensors.SenSorModuleNameImpl;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.JsonUtils;

@@ -1,4 +1,4 @@
-package com.analysys.track.internal.impl;
+package com.analysys.track.internal.impl.locations;
 
 import android.Manifest;
 import android.content.Context;
@@ -278,6 +278,7 @@ public class LocationImpl {
             try {
                 Location location = null;
                 for (String provider : pStrings) {
+                    //RequiresPermission(anyOf = {ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION})
                     location = mLocationManager.getLastKnownLocation(provider);
 //                if (BuildConfig.logcat) {
 //                    ELOG.i(BuildConfig.tag_loc, "获取渠道: " + provider + "========>" + location);
