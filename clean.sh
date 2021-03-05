@@ -17,6 +17,8 @@ clean_task() {
     rm -rf $element/bin/
     rm -rf $element/gen/
     rm -rf $element/.externalNativeBuild
+    rm -rf $element/.DS_Store
+    rm -rf $element/__MACOSX
     logd "[$filename]clean $element over."
   done
 
@@ -27,6 +29,8 @@ clean_task() {
   rm -rf classes.dex
   rm -rf .vs/
   rm -rf .vscode/
+  rm -rf .DS_Store
+  rm -rf __MACOSX
 
   if [ $# == 0 ]; then
     logi "[$filename]clean project success. "

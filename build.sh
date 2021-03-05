@@ -24,6 +24,9 @@ clean() {
   rm -rf release/
   rm -rf releasebak/
   rm -rf classes.dex
+  rm -rf .DS_Store
+  rm -rf __MACOSX
+  #  find . -name '.DS_Store' -delete
 }
 
 mdout_build() {
@@ -48,6 +51,9 @@ build_check() {
     loge "gradlew build failed"
   fi
 }
+remove_temp_file() {
+  rm -rf doc/*.html
+}
 mode_up() {
   chmod -R 777 *
   git config core.filemode false
@@ -59,6 +65,7 @@ main() {
   clean
   mdout_build
   build_check
+  remove_temp_file
 }
 
 main

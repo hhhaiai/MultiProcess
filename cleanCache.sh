@@ -22,6 +22,8 @@ clean_caches() {
     rm -rf $element/.externalNativeBuild
     rm -rf $element/$element.iml
     rm -rf $element/.gradle
+    rm -rf $element/.DS_Store
+    rm -rf $element/__MACOSX
     logd "[$filename]clean $element over."
   done
 
@@ -36,7 +38,9 @@ clean_caches() {
   rm -rf local.properties
   rm -rf .vs/
   rm -rf .vscode/
-
+  rm -rf .DS_Store
+  rm -rf __MACOSX
+  
   if [ $# == 0 ]; then
     logw "[$filename]clean project success."
     loge "[$filename]>>>>you must close android studio<<<<"
