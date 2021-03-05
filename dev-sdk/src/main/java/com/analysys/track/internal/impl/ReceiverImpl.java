@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.AnalysysInternal;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.internal.impl.applist.AppSnapshotImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.MessageDispatcher;

@@ -18,7 +18,7 @@ import com.analysys.track.db.DBConfig;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
-import com.analysys.track.internal.impl.AppSnapshotImpl;
+import com.analysys.track.internal.impl.applist.AppSnapshotImpl;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.utils.AccessibilityHelper;

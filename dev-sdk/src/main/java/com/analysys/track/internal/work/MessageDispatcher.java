@@ -10,7 +10,7 @@ import android.os.Message;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.internal.impl.AppSnapshotImpl;
+import com.analysys.track.internal.impl.applist.AppSnapshotImpl;
 import com.analysys.track.internal.impl.locations.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
