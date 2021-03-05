@@ -2,22 +2,24 @@
 
 ## **版本变动**
 
-* **版本号**: `4.4.0.1`
+* **版本号**: `默认版本`
 * **版本变动**:
     1. 代码优化
 
-### **1. 拷贝jar到对应项目中**
+## 集成步骤
 
-#### **Eclipse SDK 集成**
+### 1. 拷贝jar到对应项目中
+
+#### Eclipse SDK 集成
 将需要的`jar`包拷贝到本地工程`libs`子目录下；在`Eclipse`中右键工程根目录，选择 `property`—> `Java Build Path` —> `Libraries` ，然后点击 `Add External JARs...` 选择指向 `jar` 的路径，点击 `OK`，即导入成功。（`ADT17` 及以上不需要手动导入）
 
-#### **AndroidStudio SDK 集成**
+#### AndroidStudio SDK 集成
 选择`SDK`功能组件并下载，解压`*.zip` 文件得到相应`jar` 包（例如：`x.x.x.jar`等），在 `Android Studio` 的项目工程 `libs` 目录中拷入相关组件 `jar` 包。
 右键 `Android Studio` 的项目工程; 选择 `Open Module Settings` → 在 `Project Structure` 弹出框中 → 选择 `Dependencies` 选项卡 → 点击左下"＋" → 选择 `jar`包类型 → 引入相应的 `jar` 包。
 
-### **2. 配置Manifest**
+### 2. 配置Manifest
 
-#### **2.1. 权限配置**
+#### 2.1. 权限配置
 
 
 ``` xml
@@ -34,7 +36,7 @@
 <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS">
 ```
 
-**权限说明：**
+* **权限说明：**
 
 | 权限 | 用途 |
 | ------------- |-------------:|
@@ -49,7 +51,7 @@
 |  android.permission.WRITE_SETTINGS      |  允许应用程序读取或写入系统设置  |
 |  android.permission.PACKAGE_USAGE_STATS      |  数据统计服务  |
 
-#### **2.2. 组件声明**
+#### 2.2. 组件声明
 
 ``` xml
 <receiver android:name="com.analysys.track.receiver.AnalysysReceiver">
@@ -62,7 +64,7 @@
 </receiver>
 ```
 
-### **3. 初始化接口**
+### 3. 初始化接口
 
 ``` java
 AnalysysTracker.init(Context context, String appkey,  String channel);
@@ -85,7 +87,7 @@ AnalysysTracker.init(context,"appkey","channel");
 需要在应用的自定义的Application类的onCreate函数里面调用
 
 
-### **4. 混淆保护**
+### 4. 混淆保护
 
 如果您启用了混淆，请在你的proguard-rules.pro中加入防止混淆的配置.示例如下：
 
@@ -103,7 +105,7 @@ AnalysysTracker.init(context,"appkey","channel");
 -keep class com.bun.miitmdid.core.** {*;}
 ```
 
-### **5. 适配Android P及以上版本网络**
+### 5. 适配Android P及以上版本网络
 
 android P之后版本默认不支持HTTP通讯,为保证正常使用，建议在AndroidMainfest.xml中增加`usesCleartextTraffic`配置。 示例如下:
 
@@ -134,7 +136,7 @@ android P之后版本默认不支持HTTP通讯,为保证正常使用，建议在
   />
 ```
 
-### **6. 分包支持**
+### 6. 分包支持
 
 如果您使用了谷歌的混淆, 请进行如下设置, 将sdk的代码都生成到主dex。 示例如下:
 
