@@ -12,7 +12,7 @@ import android.util.Log;
 
 import com.analysys.plugin.AllStrMix;
 import com.analysys.track.internal.content.EGContext;
-import com.analysys.track.internal.impl.AppSnapshotImpl;
+import com.analysys.track.internal.impl.applist.AppSnapshotImpl;
 import com.analysys.track.internal.impl.locations.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.net.NetInfo;
