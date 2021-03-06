@@ -11,13 +11,15 @@ source_common() {
 
 # clean cache
 clean() {
-  dir=("app" "dev-sdk" "buildSrc" "dex" "check_demo")
+  dir=("appdemo" "casedemo" "dexdemo" "kotlindemo" "dev-sdk" "buildSrc")
   for element in "${dir[@]}"; do
     # clean sub dir
     rm -rf $element/build/
     rm -rf $element/bin/
     rm -rf $element/gen/
     rm -rf $element/.externalNativeBuild
+    rm -rf $element/.DS_Store
+    rm -rf $element/__MACOSX
   done
   # clean root dir
   rm -rf build/

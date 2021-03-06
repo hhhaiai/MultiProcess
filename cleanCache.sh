@@ -11,7 +11,7 @@ source_common() {
 clean_caches() {
 
   logw "[$filename]clean android studio cache!"
-  dir=("app" "dev-sdk" "buildSrc" "dex" "check_demo")
+  dir=("appdemo" "casedemo" "dexdemo" "kotlindemo" "dev-sdk" "buildSrc")
 
   for element in "${dir[@]}"; do
     #clean task
@@ -40,7 +40,7 @@ clean_caches() {
   rm -rf .vscode/
   rm -rf .DS_Store
   rm -rf __MACOSX
-  
+
   if [ $# == 0 ]; then
     logw "[$filename]clean project success."
     loge "[$filename]>>>>you must close android studio<<<<"
