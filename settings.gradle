@@ -1,2 +1,3 @@
+include ':casedemo'
 include ':app', ':dev-sdk', ':dex',':check_demo'
 
