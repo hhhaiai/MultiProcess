@@ -1,7 +1,5 @@
 package com.analysys.track.internal.impl.net;
 
-import android.text.TextUtils;
-
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;

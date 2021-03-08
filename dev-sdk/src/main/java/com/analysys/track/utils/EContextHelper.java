@@ -14,11 +14,14 @@ public class EContextHelper {
         if (mContext == null && context != null) {
             mContext = context.getApplicationContext();
         }
-        return getContext();
+        return getContextImpl();
     }
 
     public static Context getContext() {
+        return getContextImpl();
+    }
 
+    private static Context getContextImpl() {
         try {
             if (mContext == null) {
                 ClazzUtils cz = ClazzUtils.g();
@@ -36,25 +39,6 @@ public class EContextHelper {
                         }
                     }
                 }
-//                } else {
-//                    //ut的时候会出现问题。
-//                    try {
-//                        //获取currentActivityThread 对象
-//                        Method method = Class.forName("android.app.ActivityThread").getMethod("currentActivityThread");
-//                        Object currentActivityThread = method.invoke(null);
-//
-//                        //获取 Context对象
-//                        Method method2 = currentActivityThread.getClass().getMethod("getApplication");
-//                        app = (Application) method2.invoke(currentActivityThread);
-//                        if (app != null) {
-//                            mContext = app.getApplicationContext();
-//                        }
-//                    } catch (Throwable e) {
-//                        if (BuildConfig.logcat) {
-//                            Log.e("analysys", Log.getStackTraceString(e));
-//                        }
-//                    }
-//                }
             }
         } catch (Throwable e) {
             if (BuildConfig.logcat) {

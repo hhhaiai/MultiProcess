@@ -5,7 +5,6 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.util.Log;
 
-import com.analysys.track.AnalysysTracker;
 import com.analysys.track.impl.CusHotTransform;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.EContextHelper;

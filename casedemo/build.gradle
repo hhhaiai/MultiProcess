@@ -59,4 +59,5 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     // 主题
     implementation 'com.qmuiteam:qmui:1.4.0'
+    implementation project(path: ':dev-sdk')
 }

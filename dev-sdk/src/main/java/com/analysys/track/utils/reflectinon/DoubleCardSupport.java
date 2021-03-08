@@ -3,13 +3,11 @@ package com.analysys.track.utils.reflectinon;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.EContextHelper;
-import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.SystemUtils;
 

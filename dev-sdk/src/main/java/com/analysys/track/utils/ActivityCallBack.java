@@ -4,10 +4,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
-import com.analysys.track.AnalysysTracker;
-
-import java.util.concurrent.atomic.AtomicInteger;
-
 public class ActivityCallBack implements Application.ActivityLifecycleCallbacks {
     
     

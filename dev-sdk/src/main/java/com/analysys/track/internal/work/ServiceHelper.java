@@ -21,8 +21,6 @@ import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 
-import java.lang.reflect.Method;
-
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.

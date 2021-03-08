@@ -1,6 +1,5 @@
 package com.analysys.track.utils;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
@@ -8,7 +7,6 @@ import android.os.Build;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
-
 
 
 /**
