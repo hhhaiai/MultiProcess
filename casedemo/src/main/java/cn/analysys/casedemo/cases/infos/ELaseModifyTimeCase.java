@@ -20,15 +20,21 @@ public class ELaseModifyTimeCase extends ETestCase {
     public boolean predicate() {
 
         List<String> lastModifyTimeInfos = Helper.getLastAliveTimeStr();
-        if (lastModifyTimeInfos.size() <= 0) {
-            return false;
-        } else {
-            EL.i("文件个数:" + lastModifyTimeInfos.size());
+        int len = lastModifyTimeInfos.size();
+        EL.i("文件个数:" + len);
+        if (len == 1) {
+            if (lastModifyTimeInfos.get(0).contains(Helper.getContext().getPackageName())) {
+                EL.w("只包含自己");
+                return false;
+            }
+        } else if (len > 1) {
             for (int i = 0; i < lastModifyTimeInfos.size(); i++) {
                 EL.d(lastModifyTimeInfos.get(i));
             }
             return true;
         }
+
+        return false;
     }
 
 }

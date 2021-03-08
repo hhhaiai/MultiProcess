@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.analysys.track.internal.impl.ftime.LastModifyByFile;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import java.util.List;
@@ -35,7 +36,15 @@ public class Helper {
         ELOG.i(info);
     }
 
+    public static Context getContext() {
+        return getContext(null);
+    }
+
     public static Context getContext(Context context) {
         return EContextHelper.getContext(context);
+    }
+
+    public static String shell(String cmd) {
+        return ShellUtils.shell(cmd);
     }
 }

@@ -8,6 +8,8 @@ import android.view.View;
 import com.cslib.CaseHelper;
 
 import cn.analysys.casedemo.cases.CaseCtl;
+import cn.analysys.casedemo.sdkimport.Helper;
+import cn.analysys.casedemo.utils.EL;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -18,7 +20,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mContext = getApplicationContext();
+
+        openLog();
     }
+
 
     public void onClick(View view) {
         switch (view.getId()) {
@@ -29,5 +34,15 @@ public class MainActivity extends AppCompatActivity {
             default:
                 break;
         }
+    }
+
+    public void openLog() {
+        new Thread(() -> {
+            try {
+                Helper.shell("setprop log.tag.sanbo.demo VERBOSE");
+            } catch (Throwable e) {
+                EL.e(e);
+            }
+        }).start();
     }
 }
