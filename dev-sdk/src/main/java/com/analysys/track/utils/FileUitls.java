@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONException;
 

@@ -11,7 +11,7 @@ import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.model.PolicyInfo;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.PsHelper;

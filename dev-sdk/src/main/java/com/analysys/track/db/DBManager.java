@@ -3,7 +3,7 @@ package com.analysys.track.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.StreamerUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;

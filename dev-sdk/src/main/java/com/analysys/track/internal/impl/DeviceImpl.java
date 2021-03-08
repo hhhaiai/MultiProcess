@@ -21,7 +21,7 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.OAIDHelper;
 import com.analysys.track.utils.PermissionUtils;

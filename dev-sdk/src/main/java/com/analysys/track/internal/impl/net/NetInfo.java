@@ -2,7 +2,7 @@ package com.analysys.track.internal.impl.net;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;

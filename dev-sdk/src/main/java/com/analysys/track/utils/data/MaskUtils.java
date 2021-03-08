@@ -12,7 +12,7 @@ import android.os.Build;
 import com.analysys.plugin.Base64;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.StreamerUtils;
 
 import java.io.BufferedInputStream;

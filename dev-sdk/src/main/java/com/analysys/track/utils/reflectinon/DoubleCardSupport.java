@@ -7,7 +7,6 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.SystemUtils;
 

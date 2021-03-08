@@ -14,6 +14,7 @@ import com.analysys.track.utils.data.Md5Utils;
 import com.analysys.track.utils.data.Memory2File;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.DebugDev;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

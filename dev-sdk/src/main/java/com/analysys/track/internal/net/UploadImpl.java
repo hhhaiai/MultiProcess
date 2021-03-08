@@ -15,7 +15,7 @@ import com.analysys.track.internal.impl.usm.USMImpl;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.DeflterCompressUtils;
-import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MultiProcessChecker;

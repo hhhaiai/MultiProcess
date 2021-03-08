@@ -2,7 +2,7 @@ package cn.analysys.casedemo.utils.memot;
 
 import android.content.Context;
 
-import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import java.io.File;
 import java.io.RandomAccessFile;

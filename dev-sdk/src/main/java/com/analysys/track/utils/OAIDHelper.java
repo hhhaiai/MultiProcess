@@ -2,6 +2,7 @@ package com.analysys.track.utils;
 
 import android.content.Context;
 
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.lang.reflect.InvocationHandler;

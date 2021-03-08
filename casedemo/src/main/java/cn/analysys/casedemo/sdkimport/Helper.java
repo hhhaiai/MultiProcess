@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.analysys.track.internal.impl.ftime.LastModifyByFile;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

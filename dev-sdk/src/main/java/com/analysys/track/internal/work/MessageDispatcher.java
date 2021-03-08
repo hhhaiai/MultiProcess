@@ -16,7 +16,7 @@ import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PsHelper;
 import com.analysys.track.utils.sp.SPHelper;

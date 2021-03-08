@@ -22,7 +22,7 @@ import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.ActivityCallBack;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.MultiProcessChecker;

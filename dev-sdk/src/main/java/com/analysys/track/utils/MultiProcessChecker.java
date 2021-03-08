@@ -3,6 +3,7 @@ package com.analysys.track.utils;
 import android.content.Context;
 
 import com.analysys.track.BuildConfig;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import java.io.File;
 import java.io.RandomAccessFile;

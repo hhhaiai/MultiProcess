@@ -7,6 +7,8 @@ import android.content.Context;
 import android.os.Looper;
 import android.text.TextUtils;
 
+import com.analysys.track.utils.reflectinon.EContextHelper;
+
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
  * @Description: 粘贴版

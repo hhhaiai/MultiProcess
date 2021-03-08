@@ -9,7 +9,7 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.DataController;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.PermissionUtils;
 

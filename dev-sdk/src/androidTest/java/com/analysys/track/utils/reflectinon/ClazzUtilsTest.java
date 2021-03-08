@@ -11,7 +11,6 @@ import android.util.Log;
 
 import com.analysys.track.AnalsysTest;
 import com.analysys.track.internal.impl.usm.USMUtils;
-import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.SystemUtils;
 

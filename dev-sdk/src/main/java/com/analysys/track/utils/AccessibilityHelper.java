@@ -8,6 +8,7 @@ import android.provider.Settings;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import java.util.Arrays;
 

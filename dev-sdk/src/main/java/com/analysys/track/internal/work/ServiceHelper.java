@@ -16,7 +16,7 @@ import com.analysys.track.service.AnalysysJobService;
 import com.analysys.track.service.AnalysysService;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
