@@ -5,7 +5,7 @@ import android.content.Context;
 import com.cslib.CaseHelper;
 import com.cslib.defcase.ETestSuite;
 
-import cn.analysys.casedemo.cases.devinfo.ImeiCase;
+import cn.analysys.casedemo.cases.devinfo.DICase;
 import cn.analysys.casedemo.cases.devinfo.ImsiCase;
 import cn.analysys.casedemo.cases.devinfo.MacCase;
 import cn.analysys.casedemo.cases.devinfo.PhoneNumberCase;
@@ -27,7 +27,7 @@ public class CaseCtl {
         CaseHelper.addSuite(infosCases);
 
         ETestSuite dev = new ETestSuite("设备信息获取测试");
-        dev.addCase(new ImeiCase());
+        dev.addCase(new DICase());
         dev.addCase(new ImsiCase());
         dev.addCase(new MacCase());
         dev.addCase(new PhoneNumberCase());
