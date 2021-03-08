@@ -11,7 +11,7 @@ import android.util.Log;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.DataLocalTempUtils;
-import com.analysys.track.utils.PkgList;
+import com.analysys.track.utils.pkg.PkgList;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.SystemUtils;

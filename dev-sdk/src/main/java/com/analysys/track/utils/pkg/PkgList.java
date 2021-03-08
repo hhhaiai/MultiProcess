@@ -1,4 +1,4 @@
-package com.analysys.track.utils;
+package com.analysys.track.utils.pkg;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -7,6 +7,9 @@ import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.work.ISayHello;
+import com.analysys.track.utils.BugReportForTest;
+import com.analysys.track.utils.ShellUtils;
+import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import java.util.List;

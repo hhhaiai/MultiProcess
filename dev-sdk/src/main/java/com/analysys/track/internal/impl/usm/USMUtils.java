@@ -16,7 +16,7 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.PkgList;
+import com.analysys.track.utils.pkg.PkgList;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 
 import java.lang.reflect.Method;

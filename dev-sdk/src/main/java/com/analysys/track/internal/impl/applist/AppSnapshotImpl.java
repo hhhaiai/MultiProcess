@@ -16,7 +16,7 @@ import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.MultiProcessChecker;
-import com.analysys.track.utils.PkgList;
+import com.analysys.track.utils.pkg.PkgList;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.sp.SPHelper;
 

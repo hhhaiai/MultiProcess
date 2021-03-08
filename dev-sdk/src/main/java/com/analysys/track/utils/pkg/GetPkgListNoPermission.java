@@ -1,4 +1,4 @@
-package com.analysys.track.internal.impl.ftime;
+package com.analysys.track.utils.pkg;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -11,6 +11,13 @@ import com.analysys.track.utils.reflectinon.EContextHelper;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * @Copyright © 2021 sanbo Inc. All rights reserved.
+ * @Description: 不要权限获取包名
+ * @Version: 1.0
+ * @Create: 2021/03/67 14:55:08
+ * @author: sanbo
+ */
 public class GetPkgListNoPermission {
 
     public static class PkgInfo {
