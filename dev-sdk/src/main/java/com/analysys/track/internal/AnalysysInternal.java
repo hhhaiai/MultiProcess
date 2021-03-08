@@ -21,6 +21,7 @@ import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.internal.work.ServiceHelper;
 import com.analysys.track.utils.ActivityCallBack;
 import com.analysys.track.utils.BugReportForTest;
+import com.analysys.track.utils.ProcessUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
@@ -83,7 +84,7 @@ public class AnalysysInternal {
     }
 
     private void tryEnableUsm() {
-        SystemUtils.runOnWorkThread(new Runnable() {
+        EThreadPool.runOnWorkThread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -170,7 +171,7 @@ public class AnalysysInternal {
             if (!EncryptUtils.checkEncryptKey(ctx)) {
                 EncryptUtils.reInitKey(ctx);
             }
-            Log.i(EGContext.LOGTAG_USER, String.format("[%s] init SDK (%s) success! ", SystemUtils.getCurrentProcessName(EContextHelper.getContext()), EGContext.SDK_VERSION));
+            Log.i(EGContext.LOGTAG_USER, String.format("[%s] init SDK (%s) success! ", ProcessUtils.getCurrentProcessName(EContextHelper.getContext()), EGContext.SDK_VERSION));
 
             // PatchHelper.prepare(ctx);
             clearPatch(ctx);
@@ -261,7 +262,7 @@ public class AnalysysInternal {
 
     /************************************************* 解析Intent ********************************************************************/
     public void parseIntent(final Intent intent) {
-        SystemUtils.runOnWorkThread(new Runnable() {
+        EThreadPool.runOnWorkThread(new Runnable() {
             @Override
             public void run() {
                 parserIntent(intent);
@@ -314,7 +315,7 @@ public class AnalysysInternal {
     public void accessibilityEvent(final AccessibilityEvent event) {
         try {
             aliave();
-            SystemUtils.runOnWorkThread(new Runnable() {
+            EThreadPool.runOnWorkThread(new Runnable() {
                 @Override
                 public void run() {
                     CharSequence pkgName = event.getPackageName();

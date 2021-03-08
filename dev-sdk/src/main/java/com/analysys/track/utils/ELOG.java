@@ -290,7 +290,7 @@ public class ELOG {
                             .append("[SDKV]:").append(EGContext.SDK_VERSION)
 //                            .append("[CHANNEL]:").append(EGContext.HOT_FIX_CHANNEL)
 //                            .append("[HF_CODE]:").append(EGContext.HOT_FIX_CODE_DEBUG)
-                            ;
+                    ;
                 }
 
                 // 开始
@@ -533,7 +533,7 @@ public class ELOG {
                             }
                             if (mContext != null) {
                                 sb.append("\n").append(content_title_begin).append("\n").append(CONTENT_LINE)
-                                        .append(String.format(content_simple_callstack, SystemUtils.getCurrentProcessName(mContext), ste.getClassName(),
+                                        .append(String.format(content_simple_callstack, ProcessUtils.getCurrentProcessName(mContext), ste.getClassName(),
                                                 ste.getMethodName(), ste.getLineNumber()));
                             } else {
                                 sb.append("\n").append(content_title_begin).append("\n").append(CONTENT_LINE)
@@ -558,7 +558,7 @@ public class ELOG {
                             } catch (Throwable e) {
                             }
                             if (mContext != null) {
-                                sb.append(String.format(content_simple_callstack, SystemUtils.getCurrentProcessName(mContext), ste.getClassName(),
+                                sb.append(String.format(content_simple_callstack, ProcessUtils.getCurrentProcessName(mContext), ste.getClassName(),
                                         ste.getMethodName(), ste.getLineNumber()));
                             } else {
                                 sb.append(String.format(content_simple_callstack, "", ste.getClassName(),

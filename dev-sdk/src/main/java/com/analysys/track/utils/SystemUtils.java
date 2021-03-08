@@ -401,74 +401,6 @@ public class SystemUtils {
 //        return closeTime;
 //    }
 
-    /**
-     * 是否是主线程
-     *
-     * @return
-     */
-    public static boolean isMainThread() {
-        return Looper.getMainLooper().getThread() == Thread.currentThread();
-    }
-
-    /**
-     * 非主线程调用
-     */
-    public static void runOnWorkThread(final Runnable runnable) {
-        if (runnable == null) {
-            return;
-        }
-        if (isMainThread()) {
-            EThreadPool.execute(new Runnable() {
-                @Override
-                public void run() {
-                    runnable.run();
-                }
-            });
-        } else {
-            runnable.run();
-        }
-    }
-
-    /**
-     * 非主线程调用
-     */
-    public static void runOnPosthread(final Runnable runnable) {
-        if (runnable == null) {
-            return;
-        }
-        if (isMainThread()) {
-            EThreadPool.execute(new Runnable() {
-                @Override
-                public void run() {
-                    runnable.run();
-                }
-            });
-        } else {
-            runnable.run();
-        }
-    }
-
-    /**
-     * 获取当前进程的名称
-     *
-     * @param context
-     * @return
-     */
-    public static String getCurrentProcessName(Context context) {
-        try {
-            int pid = android.os.Process.myPid();
-            ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-            if (am != null) {
-                for (ActivityManager.RunningAppProcessInfo info : am.getRunningAppProcesses()) {
-                    if (info.pid == pid) {
-                        return info.processName;
-                    }
-                }
-            }
-        } catch (Throwable e) {
-        }
-        return "";
-    }
 
     /**
      * 获取APP版本，HTTP请求头中使用。墨迹版本时使用
@@ -487,26 +419,6 @@ public class SystemUtils {
         }
     }
 
-//    /**
-//     * nodify clear cache
-//     *
-//     * @param context
-//     * @param type
-//     */
-//    public static void notifyClearCache(final Context context, final int type) {
-//        runOnWorkThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                // make sure receiver msg , send 4 times
-//                for (int i = 0; i < 4; i++) {
-//                    Intent intent = new Intent(EGContext.ACTION_NOTIFY_CLEAR);
-//                    intent.putExtra(EGContext.NOTIFY_PKG, context.getPackageName());
-//                    intent.putExtra(EGContext.NOTIFY_TYPE, type);
-//                    context.sendBroadcast(intent);
-//                }
-//            }
-//        });
-//    }
 
     /**
      * 设备序列号,SerialNumber
@@ -525,7 +437,6 @@ public class SystemUtils {
             serialNo = checkAndGetOne(serialNo, "gsm.serial");
             serialNo = checkAndGetOne(serialNo, "ro.serialno");
             serialNo = checkAndGetOne(serialNo, "ro.boot.serialno");
-            ;
             serialNo = checkAndGetOne(serialNo, "cdma.serial");
             serialNo = checkAndGetOne(serialNo, "ro.serialnocustom");
 

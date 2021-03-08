@@ -25,6 +25,7 @@ public class EThreadPool {
     private static List<WeakReference<ScheduledFuture<?>>> queue = new ArrayList<WeakReference<ScheduledFuture<?>>>();
     private static long MAX_WAIT_SECONDS = 5;
 
+
     /**
      * 上行数据相关的放该线程池
      */
@@ -94,5 +95,44 @@ public class EThreadPool {
 //        } catch (Exception ignore) {
 //        }
 //    }
+
+
+    /**
+     * 非主线程调用
+     */
+    public static void runOnWorkThread(final Runnable runnable) {
+        if (runnable == null) {
+            return;
+        }
+        if (ProcessUtils.isMainThread()) {
+            EThreadPool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    runnable.run();
+                }
+            });
+        } else {
+            runnable.run();
+        }
+    }
+
+    /**
+     * 非主线程调用
+     */
+    public static void runOnPosthread(final Runnable runnable) {
+        if (runnable == null) {
+            return;
+        }
+        if (ProcessUtils.isMainThread()) {
+            EThreadPool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    runnable.run();
+                }
+            });
+        } else {
+            runnable.run();
+        }
+    }
 
 }

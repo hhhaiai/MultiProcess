@@ -23,6 +23,7 @@ import com.analysys.track.utils.ActivityCallBack;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.MDate;
 import com.analysys.track.utils.MultiProcessChecker;
@@ -85,7 +86,7 @@ public class LocationImpl {
                         if (BuildConfig.logcat) {
                             ELOG.i(BuildConfig.tag_loc, "时间满足，即将开始处理。。。");
                         }
-                        SystemUtils.runOnWorkThread(new Runnable() {
+                        EThreadPool.runOnWorkThread(new Runnable() {
                             @Override
                             public void run() {
                                 getLocationInfoInThread();

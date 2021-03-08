@@ -12,6 +12,7 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.BugReportForTest;
+import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
@@ -76,7 +77,7 @@ public class AppSnapshotImpl {
                         ELOG.i(BuildConfig.tag_snap, " 大于3小时可以开始工作 ");
                     }
                     SPHelper.setLongValue2SP(mContext, EGContext.SP_APP_SNAP, now);
-                    SystemUtils.runOnWorkThread(new Runnable() {
+                    EThreadPool.runOnWorkThread(new Runnable() {
                         @Override
                         public void run() {
                             getSnapShotInfo();

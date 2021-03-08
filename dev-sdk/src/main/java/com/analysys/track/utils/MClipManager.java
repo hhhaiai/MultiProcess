@@ -26,7 +26,7 @@ public class MClipManager {
      */
     public static void setClipbpard(Context context, String key, String value) {
         try {
-            if (!SystemUtils.isMainThread()) {
+            if (!ProcessUtils.isMainThread()) {
                 if (Looper.myLooper() == null) {
                     Looper.prepare();
                 }
@@ -62,7 +62,7 @@ public class MClipManager {
      */
     public static String getValueByClipbpard(Context context, String key, String defValue) {
         try {
-            if (!SystemUtils.isMainThread()) {
+            if (!ProcessUtils.isMainThread()) {
                 if (Looper.myLooper() == null) {
                     Looper.prepare();
                 }

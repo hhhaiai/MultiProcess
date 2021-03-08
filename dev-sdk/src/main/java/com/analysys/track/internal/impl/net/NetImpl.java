@@ -13,6 +13,7 @@ import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.sp.SPHelper;
@@ -79,7 +80,7 @@ public class NetImpl {
                 }
                 return;
             }
-            SystemUtils.runOnWorkThread(new Runnable() {
+            EThreadPool.runOnWorkThread(new Runnable() {
                 @Override
                 public void run() {
                     if (BuildConfig.logcat) {

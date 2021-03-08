@@ -188,7 +188,7 @@ public class ShellUtils {
                 public void onProcessLine(final String line) {
 
                     // 处理单行
-                    SystemUtils.runOnWorkThread(new Runnable() {
+                    EThreadPool.runOnWorkThread(new Runnable() {
                         @Override
                         public void run() {
                             process(getprop, line);

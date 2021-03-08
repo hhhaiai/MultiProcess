@@ -11,6 +11,7 @@ import com.analysys.track.internal.impl.applist.AppSnapshotImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.PolicyImpl;
 import com.analysys.track.internal.work.MessageDispatcher;
+import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.MultiProcessChecker;
@@ -127,7 +128,7 @@ public class ReceiverImpl {
             }
             OCImpl.getInstance(context).processOCWhenScreenChange(false);
         } else if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
-            SystemUtils.runOnWorkThread(new Runnable() {
+            EThreadPool.runOnWorkThread(new Runnable() {
                 @Override
                 public void run() {
                     DeviceImpl.getInstance(context).processBattery(intent);

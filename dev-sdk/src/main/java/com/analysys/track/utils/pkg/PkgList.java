@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.work.ISayHello;
 import com.analysys.track.utils.BugReportForTest;
+import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
@@ -65,7 +66,7 @@ public class PkgList {
             ShellUtils.getArrays("pm list packages", new ISayHello() {
                 @Override
                 public void onProcessLine(final String line) {
-                    SystemUtils.runOnWorkThread(new Runnable() {
+                    EThreadPool.runOnWorkThread(new Runnable() {
                         @Override
                         public void run() {
                             parseLine(apps, line);

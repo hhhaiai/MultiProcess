@@ -23,6 +23,7 @@ import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.utils.AccessibilityHelper;
 import com.analysys.track.utils.BugReportForTest;
+import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MDate;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
@@ -65,7 +66,7 @@ public class OCImpl {
             if (durTime > 0) {
                 // 多进程锁定文件工作。
                 if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_OC, EGContext.TIME_SECOND * 2, System.currentTimeMillis())) {
-                    SystemUtils.runOnWorkThread(new Runnable() {
+                    EThreadPool.runOnWorkThread(new Runnable() {
                         @Override
                         public void run() {
                             processOC();
@@ -630,7 +631,7 @@ public class OCImpl {
             if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext,
                     EGContext.FILES_SYNC_SCREEN_OFF_BROADCAST,
                     EGContext.TIME_SECOND, System.currentTimeMillis())) {
-                SystemUtils.runOnWorkThread(new Runnable() {
+                EThreadPool.runOnWorkThread(new Runnable() {
                     @Override
                     public void run() {
                         processScreenOff();
