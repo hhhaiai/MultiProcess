@@ -27,7 +27,7 @@ import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.FileUitls;
 import com.analysys.track.utils.MClipManager;
 import com.analysys.track.utils.MultiProcessChecker;
-import com.analysys.track.utils.OAIDHelper;
+import com.analysys.track.utils.id.OAIDHelper;
 import com.analysys.track.utils.PsHelper;
 import com.analysys.track.utils.ReceiverUtils;
 import com.analysys.track.utils.SystemUtils;

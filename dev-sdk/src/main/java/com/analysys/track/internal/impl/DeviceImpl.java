@@ -23,7 +23,7 @@ import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.EThreadPool;
-import com.analysys.track.utils.OAIDHelper;
+import com.analysys.track.utils.id.OAIDHelper;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.analysys.track.utils.sp.SPHelper;
