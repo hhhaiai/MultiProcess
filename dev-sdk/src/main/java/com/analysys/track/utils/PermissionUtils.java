@@ -1,9 +1,14 @@
 package com.analysys.track.utils;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
@@ -61,5 +66,60 @@ public class PermissionUtils {
             }
         }
         return result;
+    }
+
+
+    /**
+     * 是否可以使用UsageStatsManager。 判断思路: 0. xml中是否声明权限 1. 是否授权
+     *
+     * @param context
+     * @return
+     */
+    @TargetApi(21)
+    public static boolean canUseUsageStatsManager(Context context) {
+        if (context == null) {
+            return false;
+        }
+        if (!AndroidManifestHelper.isPermissionDefineInManifest(context, "android.permission.PACKAGE_USAGE_STATS")) {
+            return false;
+        }
+        // AppOpsManager.OPSTR_GET_USAGE_STATS 对应页面是 "有权查看使用情况的应用"
+        if (!hasPermission(context, AppOpsManager.OPSTR_GET_USAGE_STATS)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 是否授权
+     *
+     * @param context
+     * @param op
+     * @return
+     */
+    @SuppressLint("WrongConstant")
+    private static boolean hasPermission(Context context, String op) {
+        try {
+            if (context == null || TextUtils.isEmpty(op)) {
+                return false;
+            }
+            ApplicationInfo applicationInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(),
+                    0);
+            AppOpsManager appOpsManager = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                appOpsManager = (AppOpsManager) context.getApplicationContext().getSystemService("appops");
+                if (appOpsManager != null) {
+                    int mode = appOpsManager.checkOpNoThrow(op, applicationInfo.uid, applicationInfo.packageName);
+                    // return mode == AppOpsManager.MODE_ALLOWED;
+                    return mode == 0;
+                }
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
+        }
+        return false;
     }
 }

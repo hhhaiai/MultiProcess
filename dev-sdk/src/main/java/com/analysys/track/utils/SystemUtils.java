@@ -1,13 +1,9 @@
 package com.analysys.track.utils;
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.ActivityManager;
-import android.app.AppOpsManager;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,8 +25,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
@@ -45,63 +39,7 @@ import java.util.Random;
  * @Author: sanbo
  */
 public class SystemUtils {
-    /**
-     * 获取日期
-     */
-    public static String getDay() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        Date date = new Date(System.currentTimeMillis());
-        String time = simpleDateFormat.format(date);
-        return time;
-    }
 
-    public static String getTime(long time) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:sss", Locale.getDefault());
-        Date date = new Date(System.currentTimeMillis());
-        return simpleDateFormat.format(date);
-    }
-
-
-    public static boolean hasPackageNameInstalled(Context context, String packageName) {
-        PackageManager packageManager = context.getPackageManager();
-        try {
-            packageManager.getInstallerPackageName(packageName);
-            return true;
-        } catch (IllegalArgumentException e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * 检查指定包名的app是否为调试模式
-     *
-     * @param context
-     * @param packageName
-     * @return
-     */
-    public static boolean isApkDebugable(Context context, String packageName) {
-        try {
-            context = EContextHelper.getContext(context);
-            if (context == null) {
-                return false;
-            }
-            @SuppressLint("WrongConstant")
-            PackageInfo pkginfo = context.getPackageManager().getPackageInfo(packageName, 1);
-            if (pkginfo != null) {
-                return (pkginfo.applicationInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-
-        }
-        return false;
-    }
 
     private static HashSet<String> catchPackage = new HashSet<>();
 
@@ -135,20 +73,6 @@ public class SystemUtils {
         return false;
     }
 
-    /**
-     * 获取日期
-     */
-    public static String getDate() {
-        try {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            Date date = new Date(System.currentTimeMillis());
-            String time = simpleDateFormat.format(date);
-            return time;
-        } catch (Throwable e) {
-
-        }
-        return "";
-    }
 
     /**
      * 是否点亮屏幕
@@ -236,10 +160,6 @@ public class SystemUtils {
         return isRoot;
     }
 
-    public static String getString(String data, String json) throws JSONException {
-        JSONObject jsonObject = new JSONObject(json);
-        return jsonObject.optString(data, "");
-    }
 
     /**
      * 是否锁屏
@@ -264,59 +184,11 @@ public class SystemUtils {
         return true;
     }
 
-    /**
-     * 是否可以使用UsageStatsManager。 判断思路: 0. xml中是否声明权限 1. 是否授权
-     *
-     * @param context
-     * @return
-     */
-    @TargetApi(21)
-    public static boolean canUseUsageStatsManager(Context context) {
-        if (context == null) {
-            return false;
-        }
-        if (!AndroidManifestHelper.isPermissionDefineInManifest(context, "android.permission.PACKAGE_USAGE_STATS")) {
-            return false;
-        }
-        // AppOpsManager.OPSTR_GET_USAGE_STATS 对应页面是 "有权查看使用情况的应用"
-        if (!hasPermission(context, AppOpsManager.OPSTR_GET_USAGE_STATS)) {
-            return false;
-        }
-
-        return true;
+    public static String getString(String data, String json) throws JSONException {
+        JSONObject jsonObject = new JSONObject(json);
+        return jsonObject.optString(data, "");
     }
 
-    /**
-     * 是否授权
-     *
-     * @param context
-     * @param op
-     * @return
-     */
-    @SuppressLint("WrongConstant")
-    private static boolean hasPermission(Context context, String op) {
-        try {
-            if (context == null || TextUtils.isEmpty(op)) {
-                return false;
-            }
-            ApplicationInfo applicationInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(),
-                    0);
-            AppOpsManager appOpsManager = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-                appOpsManager = (AppOpsManager) context.getApplicationContext().getSystemService("appops");
-                if (appOpsManager != null) {
-                    int mode = appOpsManager.checkOpNoThrow(op, applicationInfo.uid, applicationInfo.packageName);
-                    // return mode == AppOpsManager.MODE_ALLOWED;
-                    return mode == 0;
-                }
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-        return false;
-    }
 
     /**
      * 获取上传间隔时间，调整为5分-30分钟，如服务器下发则按照服务器下发时间执行
@@ -365,25 +237,6 @@ public class SystemUtils {
         return getContentFromFile(new File(filePath.trim()));
     }
 
-//    public static String getContentFromFile(File f) {
-//        if (!f.exists()) {
-//            return "";
-//        }
-//        byte[] data = new byte[1024];
-//        InputStream is = null;
-//        try {
-//            is = new FileInputStream(f);
-//            is.read(data);
-//        } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(e);
-//            }
-//        } finally {
-//            StreamerUtils.safeClose(is);
-//        }
-//
-//        return new String(data);
-//    }
 
     public static String getContentFromFile(File f) {
         if (!f.exists()) {
@@ -417,6 +270,7 @@ public class SystemUtils {
 
         return "";
     }
+
     /**
      * @param key     优先级 传入==>metaData==>XML
      * @param channel 多渠道打包==>代码==>XML
@@ -432,74 +286,29 @@ public class SystemUtils {
             EGContext.VALUE_APPKEY = key;
             SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_KEY, key);
         }
-//        // 此处需要进行channel优先级处理,优先处理多渠道打包过来的channel,配置文件次之,接口传入的channel优先级最低
-//        String channelFromApk = getChannelFromApk(mContext);
-//        if (TextUtils.isEmpty(channelFromApk)) {
-            try {
-                ApplicationInfo appInfo = mContext.getApplicationContext().getPackageManager()
-                        .getApplicationInfo(mContext.getPackageName(), PackageManager.GET_META_DATA);
-                String xmlChannel = appInfo.metaData.getString(EGContext.XML_METADATA_CHANNEL);
-                if (!TextUtils.isEmpty(xmlChannel)) {
-                    // 赋值为空
-                    EGContext.VALUE_APP_CHANNEL = xmlChannel;
-                    SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_CHANNEL, xmlChannel);
-                    return;
-                }
-            } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(e);
-                }
+        // 此处需要进行channel优先级处理,优先处理多渠道打包过来的channel,配置文件次之,接口传入的channel优先级最低
+        try {
+            ApplicationInfo appInfo = mContext.getApplicationContext().getPackageManager()
+                    .getApplicationInfo(mContext.getPackageName(), PackageManager.GET_META_DATA);
+            String xmlChannel = appInfo.metaData.getString(EGContext.XML_METADATA_CHANNEL);
+            if (!TextUtils.isEmpty(xmlChannel)) {
+                // 赋值为空
+                EGContext.VALUE_APP_CHANNEL = xmlChannel;
+                SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_CHANNEL, xmlChannel);
+                return;
             }
-            if (!TextUtils.isEmpty(channel)) {
-                // 赋值接口传入的channel
-                EGContext.VALUE_APP_CHANNEL = channel;
-                SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_CHANNEL, channel);
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
             }
-//        } else {
-//            // 赋值多渠道打包的channel
-//            EGContext.VALUE_APP_CHANNEL = channelFromApk;
-//            SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_CHANNEL, channelFromApk);
-//        }
+        }
+        if (!TextUtils.isEmpty(channel)) {
+            // 赋值接口传入的channel
+            EGContext.VALUE_APP_CHANNEL = channel;
+            SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_CHANNEL, channel);
+        }
     }
 
-//    /**
-//     * 仅用作多渠道打包,获取apk文件中的渠道信息
-//     *
-//     * @param context
-//     * @return
-//     */
-//    public static String getChannelFromApk(Context context) {
-//        ApplicationInfo appinfo = context.getApplicationInfo();
-//        String sourceDir = appinfo.sourceDir;
-//        // 注意这里：默认放在meta-inf/里， 所以需要再拼接一下
-//        String channel_pre = "META-INF/" + EGContext.EGUAN_CHANNEL_PREFIX;
-//        String channelName = "";
-//        ZipFile apkZip = null;
-//        try {
-//            apkZip = new ZipFile(sourceDir);
-//            Enumeration<?> entries = apkZip.entries();
-//            while (entries.hasMoreElements()) {
-//                ZipEntry entry = ((ZipEntry) entries.nextElement());
-//                String entryName = entry.getName();
-//                if (entryName.startsWith(channel_pre)) {
-//                    channelName = entryName;
-//                    break;
-//                }
-//            }
-//            // 假如没有在apk文件中找到相关渠道信息,则返回空串,表示没有调用易观多渠道打包方式
-//            if (TextUtils.isEmpty(channelName)) {
-//                return "";
-//            }
-//        } catch (IOException e) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(e);
-//            }
-//        } finally {
-//            StreamerUtils.safeClose(apkZip);
-//        }
-//        // Eg的渠道文件以EGUAN_CHANNEL_XXX为例,其XXX为最终的渠道信息
-//        return channelName.substring(23);
-//    }
 
     /**
      * 获取Appkey. 优先级：内存==>SP==>XML
@@ -570,27 +379,27 @@ public class SystemUtils {
     }
 
 
-    /**
-     * 计算闭合时间
-     *
-     * @param openTime
-     * @return
-     */
-    public static long getCloseTime(long openTime) {
-        long currentTime = System.currentTimeMillis();
-        long closeTime = -1;
-        if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {
-            if (currentTime - openTime > EGContext.DEFAULT_SPACE_TIME) {
-                closeTime = (long) (Math.random() * (currentTime - openTime) + openTime);
-            }
-        } else if (Build.VERSION.SDK_INT < 21) {
-            if (currentTime - openTime > EGContext.TIME_SECOND * 5) {
-                closeTime = (long) (Math.random() * (currentTime - openTime) + openTime);
-            }
-        }
-
-        return closeTime;
-    }
+//    /**
+//     * 计算闭合时间
+//     *
+//     * @param openTime
+//     * @return
+//     */
+//    public static long getCloseTime(long openTime) {
+//        long currentTime = System.currentTimeMillis();
+//        long closeTime = -1;
+//        if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {
+//            if (currentTime - openTime > EGContext.DEFAULT_SPACE_TIME) {
+//                closeTime = (long) (Math.random() * (currentTime - openTime) + openTime);
+//            }
+//        } else if (Build.VERSION.SDK_INT < 21) {
+//            if (currentTime - openTime > EGContext.TIME_SECOND * 5) {
+//                closeTime = (long) (Math.random() * (currentTime - openTime) + openTime);
+//            }
+//        }
+//
+//        return closeTime;
+//    }
 
     /**
      * 是否是主线程
@@ -764,9 +573,9 @@ public class SystemUtils {
 //        Log.i("sanbo", key + "----------->" + result);
         return result;
     }
-    
+
     private static Map<String, String> getprops = null;
-    
+
     private static String getProp(String key) {
         if (TextUtils.isEmpty(key)) {
             return "";
@@ -777,9 +586,9 @@ public class SystemUtils {
         }
         return "";
     }
-    
+
     public static boolean containsInProp(String text) {
-        
+
         if (initProp()) {
             if (getprops.size() > 0) {
                 if (TextUtils.isEmpty(text)) {
@@ -791,7 +600,7 @@ public class SystemUtils {
         }
         return false;
     }
-    
+
     public static boolean containsKeyInProp(String key) {
         if (initProp()) {
             if (getprops.size() > 0) {
@@ -804,7 +613,7 @@ public class SystemUtils {
         }
         return false;
     }
-    
+
     public static boolean containsValuesInProp(String value) {
         if (initProp()) {
             if (getprops.size() > 0) {
@@ -817,7 +626,7 @@ public class SystemUtils {
         }
         return false;
     }
-    
+
     private static boolean initProp() {
         if (getprops == null) {
             getprops = ShellUtils.getProp();

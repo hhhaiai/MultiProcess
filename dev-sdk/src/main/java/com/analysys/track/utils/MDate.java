@@ -2,6 +2,7 @@ package com.analysys.track.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * @Copyright © 2020 analysys Inc. All rights reserved.
@@ -13,16 +14,24 @@ import java.util.Date;
 public class MDate {
 
 
+    public static String getTime() {
+        return new SimpleDateFormat("HH:mm:sss").format(new Date(System.currentTimeMillis()));
+    }
+
+    public static String getTime(long time) {
+        return new SimpleDateFormat("HH:mm:sss").format(new Date(time));
+    }
+
     public static final String getToday() {
-        return new SimpleDateFormat("YYYY-MM-dd").format(new Date());
+        return new SimpleDateFormat("YYYY-MM-dd").format(new Date(System.currentTimeMillis()));
     }
 
     public static final String getNow() {
-        return new SimpleDateFormat("YYYY-MM-dd HH:mm:ss").format(new Date());
+        return new SimpleDateFormat("YYYY-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
     }
 
     public static final int getHour() {
-        return Integer.valueOf(new SimpleDateFormat("HH").format(new Date()));
+        return Integer.valueOf(new SimpleDateFormat("HH").format(new Date(System.currentTimeMillis())));
     }
 
     public static final String formatLongTimeToHms(long interval) {

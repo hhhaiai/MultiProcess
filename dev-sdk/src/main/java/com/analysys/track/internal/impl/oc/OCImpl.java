@@ -23,6 +23,7 @@ import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.utils.AccessibilityHelper;
 import com.analysys.track.utils.BugReportForTest;
+import com.analysys.track.utils.MDate;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
@@ -89,7 +90,7 @@ public class OCImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_oc,t);
+                BugReportForTest.commitError(BuildConfig.tag_oc, t);
             }
         }
 
@@ -143,7 +144,7 @@ public class OCImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_oc,t);
+                BugReportForTest.commitError(BuildConfig.tag_oc, t);
             }
         }
     }
@@ -197,7 +198,7 @@ public class OCImpl {
                     } else if (Build.VERSION.SDK_INT > 20 && Build.VERSION.SDK_INT < 24) {// 5 6
 
                         // 如果开了USM则使用USM
-                        if (SystemUtils.canUseUsageStatsManager(mContext)) {
+                        if (PermissionUtils.canUseUsageStatsManager(mContext)) {
                             processOCByUsageStatsManager(aliveList);
                         } else {
                             getAliveAppByProc(aliveList);
@@ -221,7 +222,6 @@ public class OCImpl {
         } catch (Throwable e) {
         }
     }
-
 
 
     /**
@@ -399,7 +399,7 @@ public class OCImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_oc,e);
+                BugReportForTest.commitError(BuildConfig.tag_oc, e);
             }
             getAliveAppByProc(aliveList);
         }
@@ -459,7 +459,7 @@ public class OCImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_oc,t);
+                BugReportForTest.commitError(BuildConfig.tag_oc, t);
             }
 
         }
@@ -509,7 +509,7 @@ public class OCImpl {
             //AVC 加密
             String avc = EncryptUtils.encrypt(mContext, ii.versionName + "|" + ii.versionCode);
             info.put(DBConfig.OC.Column.AVC, avc);
-            info.put(DBConfig.OC.Column.DY, SystemUtils.getDay());
+            info.put(DBConfig.OC.Column.DY, MDate.getToday());
             // IT不加密
             info.put(DBConfig.OC.Column.IT, String.valueOf(insertTime));
             //  OC 切换的类型，1-正常使用，2-开关屏幕切换，3-服务重启
@@ -530,7 +530,7 @@ public class OCImpl {
             }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_oc,t);
+                BugReportForTest.commitError(BuildConfig.tag_oc, t);
             }
         }
         return info;
@@ -589,7 +589,7 @@ public class OCImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_oc,e);
+                BugReportForTest.commitError(BuildConfig.tag_oc, e);
             }
             getAliveAppByProc(aliveList);
         }
@@ -710,6 +710,7 @@ public class OCImpl {
 //
 //        }
 //    }
+
     /************************************** 单例和对象声明 ********************************************/
 
     private static class Holder {

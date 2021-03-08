@@ -22,13 +22,14 @@ import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.ActivityCallBack;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
+import com.analysys.track.utils.MDate;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -67,14 +68,14 @@ public class LocationImpl {
                     }
                     return;
                 }
-            
+
                 long now = System.currentTimeMillis();
                 long durByPolicy = SPHelper.getIntValueFromSP(mContext, EGContext.SP_LOCATION_CYCLE, EGContext.TIME_MINUTE * 30);
                 // 3秒内只能处理一次
                 if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_LOCATION, EGContext.TIME_SECOND * 3, now)) {
                     long time = SPHelper.getLongValueFromSP(mContext, EGContext.SP_APP_LOCATION, 0);
                     long dur = now - time;
-                
+
                     if (BuildConfig.logcat) {
                         ELOG.i(BuildConfig.tag_loc, "间隔时间: " + dur + "----------durByPolicy---->" + durByPolicy);
                     }
@@ -105,19 +106,19 @@ public class LocationImpl {
                             callback.onProcessed();
                         }
                     }
-                
+
                 } else {
-                
+
                     if (callback != null) {
                         callback.onProcessed();
                     }
-                
+
                     if (BuildConfig.logcat) {
                         ELOG.d(BuildConfig.tag_loc, "多进程并发，停止处理");
                     }
                     return;
                 }
-            
+
             } catch (Throwable t) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(BuildConfig.tag_loc, t);
@@ -126,7 +127,7 @@ public class LocationImpl {
         }
     }
 
-    
+
     public void getLocationInfoInThread() {
         if (BuildConfig.ENABLE_LOCATIONINFO) {
             try {
@@ -157,7 +158,7 @@ public class LocationImpl {
                     ELOG.i(BuildConfig.tag_loc, "Loction检测 GL:" + location.has(UploadKey.LocationInfo.GeographyLocation)
                             + "  ; WifiInfo:" + location.has(UploadKey.LocationInfo.WifiInfo.NAME)
                             + "  ;BaseStationInfo:" + location.has(UploadKey.LocationInfo.BaseStationInfo.NAME)
-                
+
                     );
                 }
                 if (location.has(UploadKey.LocationInfo.GeographyLocation)
@@ -178,9 +179,9 @@ public class LocationImpl {
                 }
             }
         }
-      
+
     }
-    
+
     /**
      * 修复小米手机后台定位(miui11版本开始监控的)
      *
@@ -225,15 +226,15 @@ public class LocationImpl {
                 if (ActivityCallBack.getInstance().isAppAliaveInFront()) {
                     return false;
                 }
-            
+
             } catch (Throwable e) {
             }
         }
-      
+
         return false;
     }
-    
-    
+
+
     /**
      * 允许工作： 声明权限、允许申请权限、移动距离长度大于1000米
      *
@@ -241,8 +242,8 @@ public class LocationImpl {
      */
     public boolean isWillWork() {
         if (BuildConfig.ENABLE_LOCATIONINFO) {
-        
-        
+
+
             /**
              * 1. Manifest未声明权限，退出
              */
@@ -254,7 +255,7 @@ public class LocationImpl {
 //            }
                 return false;
             }
-        
+
             // 2. 没权限再进行判断。是否申请超过五次
             if (!PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
                     && !PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -265,7 +266,7 @@ public class LocationImpl {
                     return false;
                 }
             }
-        
+
             // 3. 距离不超过1000米
             List<String> pStrings = mLocationManager.getProviders(true);
 //        if (BuildConfig.logcat) {
@@ -321,7 +322,7 @@ public class LocationImpl {
                 if (context == null) {
                     return false;
                 }
-                String day = SystemUtils.getDate();
+                String day = MDate.getToday();
                 String spDay = SPHelper.getStringValueFromSP(context, EGContext.PERMISSION_TIME, "-1");
                 if (permissionAskCount == 0) {
                     permissionAskCount = SPHelper.getIntValueFromSP(context, EGContext.PERMISSION_COUNT, 0);
@@ -334,7 +335,7 @@ public class LocationImpl {
                         permissionAskCount += 1;
                         SPHelper.setIntValue2SP(context, EGContext.PERMISSION_COUNT, permissionAskCount);
                     }
-                
+
                 } else {
                     permissionAskCount += 1;
                     SPHelper.setStringValue2SP(context, EGContext.PERMISSION_TIME, day);
@@ -357,7 +358,7 @@ public class LocationImpl {
      */
     public void resetLocaiton(Location location) {
         if (BuildConfig.ENABLE_LOCATIONINFO) {
-        
+
             if (location != null) {
                 String gl = location.getLongitude() + "-" + location.getLatitude();
                 if (TextUtils.isEmpty(gl)) {
@@ -410,7 +411,7 @@ public class LocationImpl {
 //                }
                     return true;
                 }
-            
+
                 if (lastLocation.contains("-")) {
                     String[] ary = lastLocation.split("-");
                     if (ary.length != 2) {
@@ -438,7 +439,7 @@ public class LocationImpl {
         }
         return false;
     }
-    
+
     public JSONObject getLocation() {
         if (BuildConfig.ENABLE_LOCATIONINFO) {
             try {
@@ -493,7 +494,7 @@ public class LocationImpl {
                             BugReportForTest.commitError(BuildConfig.tag_loc, t);
                         }
                     }
-                
+
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -532,7 +533,7 @@ public class LocationImpl {
                         List<CellInfo> infos = null;
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                             infos = mTelephonyManager.getAllCellInfo();
-                        
+
                             if (infos != null && infos.size() > 0) {
                                 int tempCid = -1;// cid
                                 int tempLac = -1;// lac
@@ -591,7 +592,7 @@ public class LocationImpl {
                                             tempLac = lte.getCellIdentity().getTac();
                                             key = tempCid + "|" + tempLac;
                                             if (tempCid > 0 && tempLac > 0 && (!cid.contains(key))) {
-                                            
+
                                                 cid.add(key);
                                                 obj = new JSONObject();
                                                 strength = lte.getCellSignalStrength().getDbm();
@@ -607,7 +608,7 @@ public class LocationImpl {
                                                 tempJsonObj.put("stren", strength);
                                                 tempJsonObj.put("mapKey", strength + "|" + key);
                                                 cdmaList.add(tempJsonObj);
-                                            
+
                                             }
                                         } catch (Throwable e) {
                                         }
@@ -636,7 +637,7 @@ public class LocationImpl {
                                         } catch (Throwable e) {
                                         }
                                     }
-                                
+
                                 }
                             }
                         }

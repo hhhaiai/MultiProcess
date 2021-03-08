@@ -24,6 +24,36 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class PkgList {
 
+
+    public boolean hasPackageNameInstalled(Context context, String packageName) {
+        try {
+            if (apps != null && apps.size() > 5) {
+                return apps.contains(packageName);
+            }
+//
+//            PackageManager packageManager = context.getPackageManager();
+//            packageManager.getInstallerPackageName(packageName);
+//            return true;
+        } catch (Exception e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
+        }
+        return false;
+    }
+
+    public String getInstalledMarket(Context context, String packageName) {
+        try {
+            PackageManager packageManager = context.getPackageManager();
+            return packageManager.getInstallerPackageName(packageName);
+        } catch (Exception e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
+        }
+        return "";
+    }
+
     public synchronized List<String> getAppPackageList() {
 
 
@@ -107,6 +137,7 @@ public class PkgList {
             apps.remove(pkgName);
         }
     }
+
     /********************* get instance begin **************************/
     public static PkgList getInstance(Context context) {
         return HLODER.INSTANCE.initContext(context);
