@@ -76,10 +76,20 @@ public class DeviceImpl {
         try {
             if (mContext != null) {
                 if (BuildConfig.ENABLE_IMEI) {
-                    if (PermissionUtils.checkPermission(mContext, Manifest.permission.READ_PHONE_STATE)) {
-                        TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-                        imei = tm.getDeviceId();
-                        imsi = tm.getSubscriberId();
+
+                    if (Build.VERSION.SDK_INT < 29) {
+                        if (PermissionUtils.checkPermission(mContext, Manifest.permission.READ_PHONE_STATE)) {
+                            TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+                            imei = tm.getDeviceId();
+                            imsi = tm.getSubscriberId();
+                        }
+                    } else {
+                        //RequiresPermission(android.Manifest.permission.READ_PRIVILEGED_PHONE_STATE)
+                        if (PermissionUtils.checkPermission(mContext, "android.permission. READ_PRIVILEGED_PHONE_STATE")) {
+                            TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+                            imei = tm.getDeviceId();
+                            imsi = tm.getSubscriberId();
+                        }
                     }
                 } else {
                     List<String> imeis = DoubleCardSupport.getInstance().getImeiArray(mContext);
@@ -99,14 +109,18 @@ public class DeviceImpl {
             }
         }
         try {
-            String androidId = Settings.System.getString(mContext.getContentResolver(),
-                    Settings.Secure.ANDROID_ID);
+            String androidId = getValueFromSettingSystem(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
             deviceId = (TextUtils.isEmpty(imei) ? "null" : imei) + "-" + (TextUtils.isEmpty(imsi) ? "null" : imsi)
                     + "-" + (TextUtils.isEmpty(androidId) ? "null" : androidId);
         } catch (Throwable e) {
         }
 
         return deviceId;
+    }
+
+    public String getValueFromSettingSystem(ContentResolver cr, String key) {
+        return Settings.System.getString(cr,
+                key);
     }
 
     public String getOAID() {
@@ -435,7 +449,7 @@ public class DeviceImpl {
 
     public String getSystemHour() {
         ContentResolver cv = mContext.getContentResolver();
-        String timeFormat = android.provider.Settings.System.getString(cv, Settings.System.TIME_12_24);
+        String timeFormat = getValueFromSettingSystem(cv, Settings.System.TIME_12_24);
         return timeFormat;
     }
 

@@ -1,16 +1,22 @@
 package cn.analysys.casedemo.sdkimport;
 
 import android.content.Context;
+import android.provider.Settings;
+import android.widget.Toast;
 
+import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.impl.ftime.LastModifyByFile;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
+import com.cslib.CaseHelper;
 
+import java.awt.font.TextAttribute;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import cn.analysys.casedemo.cases.CaseCtl;
+import cn.analysys.casedemo.utils.EL;
 
 /**
  * @Copyright © 2021 analsys Inc. All rights reserved.
@@ -47,4 +53,9 @@ public class Helper {
     public static String shell(String cmd) {
         return ShellUtils.shell(cmd);
     }
+
+    public static String getAndroid() {
+        return DeviceImpl.getInstance(getContext()).getValueFromSettingSystem(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+    }
+
 }

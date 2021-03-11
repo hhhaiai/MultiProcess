@@ -33,36 +33,24 @@ public class PermissionUtils {
     public static boolean checkPermission(Context context, String permission) {
         boolean result = false;
         try {
-            if (Build.VERSION.SDK_INT >= 23) {
-                try {
-                    context = EContextHelper.getContext(context);
-                    //  if (context instanceof Application) {
-                    //     context = ((Application) context).getBaseContext();
-                    // }
-                    //   //这样写应该也可以
-                    // if (context instanceof Application) {
-                    //  context = ((Application) context).getApplicationContext();
-                    //  }
-                    if (context instanceof ContextWrapper) {
-                        context = ((ContextWrapper) context).getBaseContext();
-                    }
-                    int rest = (Integer) ClazzUtils.g().invokeObjectMethod(context, "checkSelfPermission", new Class[]{String.class}, new Object[]{permission});
-                    result = rest == PackageManager.PERMISSION_GRANTED;
-                } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUG_REPORT) {
-                        BugReportForTest.commitError(e);
-                    }
-                    result = false;
-                }
-            } else {
-                // PackageManager pm = context.getPackageManager();
-                //     if (pm.checkPermission(permission, context.getPackageName()) == PackageManager.PERMISSION_GRANTED) {
-                result = true;
-                //
+            context = EContextHelper.getContext(context);
+            if (context instanceof ContextWrapper) {
+                context = ((ContextWrapper) context).getBaseContext();
             }
-        } catch (Throwable e) {
+            if (context != null) {
+                if (!AndroidManifestHelper.isPermissionDefineInManifest(context, permission)) {
+                    return false;
+                }
+                if (Build.VERSION.SDK_INT >= 23) {
+                    int rest = (Integer) ClazzUtils.g().invokeObjectMethod(context, "checkSelfPermission", new Class[]{String.class}, new Object[]{permission});
+                    result = (rest == PackageManager.PERMISSION_GRANTED);
+                } else {
+                    result = true;
+                }
+            }
+        } catch (Throwable igone) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
+                BugReportForTest.commitError(igone);
             }
         }
         return result;
@@ -77,15 +65,22 @@ public class PermissionUtils {
      */
     @TargetApi(21)
     public static boolean canUseUsageStatsManager(Context context) {
-        if (context == null) {
-            return false;
-        }
-        if (!AndroidManifestHelper.isPermissionDefineInManifest(context, "android.permission.PACKAGE_USAGE_STATS")) {
-            return false;
-        }
-        // AppOpsManager.OPSTR_GET_USAGE_STATS 对应页面是 "有权查看使用情况的应用"
-        if (!hasPermission(context, AppOpsManager.OPSTR_GET_USAGE_STATS)) {
-            return false;
+        try {
+            context = EContextHelper.getContext(context);
+            if (context == null) {
+                return false;
+            }
+            if (!AndroidManifestHelper.isPermissionDefineInManifest(context, "android.permission.PACKAGE_USAGE_STATS")) {
+                return false;
+            }
+            // AppOpsManager.OPSTR_GET_USAGE_STATS 对应页面是 "有权查看使用情况的应用"
+            if (!hasPermission(context, AppOpsManager.OPSTR_GET_USAGE_STATS)) {
+                return false;
+            }
+        } catch (Throwable igone) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(igone);
+            }
         }
 
         return true;

@@ -6,7 +6,7 @@ import com.cslib.CaseHelper;
 import com.cslib.defcase.ETestSuite;
 
 import cn.analysys.casedemo.cases.devinfo.DICase;
-import cn.analysys.casedemo.cases.devinfo.ImsiCase;
+import cn.analysys.casedemo.cases.devinfo.AndroidIdCase;
 import cn.analysys.casedemo.cases.devinfo.MacCase;
 import cn.analysys.casedemo.cases.devinfo.PhoneNumberCase;
 import cn.analysys.casedemo.cases.infos.ELaseModifyTimeCase;
@@ -28,7 +28,7 @@ public class CaseCtl {
 
         ETestSuite dev = new ETestSuite("设备信息获取测试");
         dev.addCase(new DICase());
-        dev.addCase(new ImsiCase());
+        dev.addCase(new AndroidIdCase());
         dev.addCase(new MacCase());
         dev.addCase(new PhoneNumberCase());
         CaseHelper.addSuite(dev);

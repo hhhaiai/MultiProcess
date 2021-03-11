@@ -5,6 +5,8 @@ import com.cslib.CaseHelper;
 import com.cslib.defcase.ETestCase;
 
 import cn.analysys.casedemo.cases.CaseCtl;
+import cn.analysys.casedemo.cases.utils.Woo;
+import cn.analysys.casedemo.sdkimport.Helper;
 import cn.analysys.casedemo.utils.EL;
 
 public class DICase extends ETestCase {
@@ -19,7 +21,7 @@ public class DICase extends ETestCase {
     @Override
     public boolean predicate() {
         String di = DeviceImpl.getInstance(CaseCtl.getContext()).getDeviceId();
-        EL.i("di: " + di);
+        Woo.logFormCase("di: " + di);
         return true;
     }
 

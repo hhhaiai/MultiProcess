@@ -245,19 +245,7 @@ public class LocationImpl {
         if (BuildConfig.ENABLE_LOCATIONINFO) {
 
 
-            /**
-             * 1. Manifest未声明权限，退出
-             */
-            if (!AndroidManifestHelper.isPermissionDefineInManifest(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
-                    && !AndroidManifestHelper.isPermissionDefineInManifest(mContext,
-                    Manifest.permission.ACCESS_COARSE_LOCATION)) {
-//            if (BuildConfig.logcat) {
-//                ELOG.d(BuildConfig.tag_loc, "XML没有声明权限。。。。");
-//            }
-                return false;
-            }
-
-            // 2. 没权限再进行判断。是否申请超过五次
+            // 1. 没权限再进行判断。是否申请超过五次
             if (!PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)
                     && !PermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
                 if (!makesureRequestPermissionLessThanFive(mContext)) {
@@ -268,7 +256,7 @@ public class LocationImpl {
                 }
             }
 
-            // 3. 距离不超过1000米
+            // 2. 距离不超过1000米
             List<String> pStrings = mLocationManager.getProviders(true);
 //        if (BuildConfig.logcat) {
 //            ELOG.i(BuildConfig.tag_loc, "获取provider: " + pStrings.toString());
