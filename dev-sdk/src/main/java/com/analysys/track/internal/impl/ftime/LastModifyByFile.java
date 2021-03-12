@@ -1,10 +1,9 @@
 package com.analysys.track.internal.impl.ftime;
 
 import android.content.Context;
-import android.text.TextUtils;
 
 import com.analysys.track.utils.MDate;
-import com.analysys.track.utils.pkg.GetPkgListNoPermission;
+import com.analysys.track.utils.pkg.PkgList;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -25,43 +24,24 @@ public class LastModifyByFile {
     public static class AppTime {
         private String packageName;
         private long time;
-        private String appName;
-        private int uid;
 
-        public AppTime(String pkg, long time) {
-            this.packageName = pkg;
-            this.time = time;
-        }
 
-        public AppTime(String __pkg, long __time, String __appName, int __uid) {
+        public AppTime(String __pkg, long __time) {
             this.packageName = __pkg;
             this.time = __time;
-            this.appName = __appName;
-            this.uid = __uid;
         }
 
         @Override
         public String toString() {
-
-            if (TextUtils.isEmpty(appName)) {
-                return String.format("[%s]---->%s ", packageName, MDate.formatLongTimeToDate(time));
-            } else {
-                return String.format("%s [%s]---[%d] ---->%s ", appName, packageName, uid, MDate.formatLongTimeToDate(time));
-            }
+            return String.format("[%s]---->%s ", packageName, MDate.formatLongTimeToDate(time));
         }
     }
 
     public static List<AppTime> getLatestApp(Context context) {
 
-        List<GetPkgListNoPermission.PkgInfo> pkgs = GetPkgListNoPermission.getInstance().getPackageList(context);
-
-//        EL.i("==============================文件访问末次修改时间======================");
-        List<AppTime> list = new ArrayList<>();
-        for (GetPkgListNoPermission.PkgInfo pkgInfo : pkgs) {
-            String pkg = pkgInfo.getPackageName();
-            String app = pkgInfo.getAppName();
-            int uid = pkgInfo.getUid();
-
+        List<String> pkgs = PkgList.getInstance(context).getAppPackageList();
+        List<AppTime> list = new ArrayList<AppTime>();
+        for (String pkg : pkgs) {
             long filesTime = new File("/sdcard/Android/data/" + pkg + "/files").lastModified();
             long cacheTime = new File("/sdcard/Android/data/" + pkg + "/cache").lastModified();
             long time = Math.max(filesTime, cacheTime);
@@ -73,8 +53,7 @@ public class LastModifyByFile {
             if (time == 0) {
                 continue;
             }
-//            EL.i(pkg.toString() + "--------->" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(time)));
-            list.add(new AppTime(pkg, time, app, uid));
+            list.add(new AppTime(pkg, time));
         }
 
         Collections.sort(list, new Comparator<AppTime>() {

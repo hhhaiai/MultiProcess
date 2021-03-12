@@ -8,9 +8,11 @@ import cn.analysys.casedemo.cases.utils.Woo;
 import cn.analysys.casedemo.sdkimport.Helper;
 import cn.analysys.casedemo.utils.EL;
 
-public class ELaseModifyTimeCase extends ETestCase {
-    public ELaseModifyTimeCase() {
-        super("文件末次修改");
+public class LMFSizeCase extends ETestCase {
+    String log = "安装app: %d\n有缓存记录app: %d\n是否为自己: %s";
+
+    public LMFSizeCase() {
+        super("[文件]末次修改个数对比");
     }
 
     @Override
@@ -23,20 +25,21 @@ public class ELaseModifyTimeCase extends ETestCase {
         List<String> lastModifyTimeInfos = Helper.getLastAliveTimeStr();
         int len = lastModifyTimeInfos.size();
 
+        int allAppsize = Helper.getInstallAppSize();
+
         if (len == 1) {
             if (lastModifyTimeInfos.get(0).contains(Helper.getContext().getPackageName())) {
-                EL.w("");
-                Woo.logFormCase("只有一个文件，且是自己");
+                Woo.logFormCase(String.format(log, allAppsize, len, "是"));
                 return false;
             }
         } else if (len > 1) {
             for (int i = 0; i < lastModifyTimeInfos.size(); i++) {
                 EL.d(lastModifyTimeInfos.get(i));
             }
-            Woo.logFormCase("文件个数: " + len);
+            Woo.logFormCase(String.format(log, allAppsize, len, "否"));
             return true;
         }
-        Woo.logFormCase("文件个数: " + len);
+        Woo.logFormCase(String.format(log, allAppsize, len, "否"));
         return false;
     }
 

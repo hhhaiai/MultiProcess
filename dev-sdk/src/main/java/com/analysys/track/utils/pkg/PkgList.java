@@ -10,11 +10,11 @@ import com.analysys.track.internal.work.ISayHello;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.ShellUtils;
-import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * @Copyright © 2020 sanbo Inc. All rights reserved.
@@ -56,43 +56,30 @@ public class PkgList {
     }
 
     public synchronized List<String> getAppPackageList() {
-
-
         if (apps != null) {
             return apps;
         }
         apps = new CopyOnWriteArrayList<String>();
         try {
-            ShellUtils.getArrays("pm list packages", new ISayHello() {
-                @Override
-                public void onProcessLine(final String line) {
-                    EThreadPool.runOnWorkThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            parseLine(apps, line);
-                        }
-                    });
-                }
-            }, false);
+            getByShell();
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
+                BugReportForTest.commitError(BuildConfig.tag_filetime, e);
+            }
+        }
+        try {
+            getByUid();
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(BuildConfig.tag_filetime, e);
             }
         }
         if (apps.size() < 5) {
             try {
-                PackageManager packageManager = mContext.getPackageManager();
-                if (packageManager != null) {
-                    List<PackageInfo> packageInfos = packageManager.getInstalledPackages(0);
-                    if (packageInfos.size() > 0) {
-                        for (final PackageInfo info : packageInfos) {
-                            addToMemory(info);
-                        }
-                    }
-                }
+                getByApi();
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(e);
+                    BugReportForTest.commitError(BuildConfig.tag_filetime, e);
                 }
             }
         }
@@ -102,34 +89,82 @@ public class PkgList {
         return apps;
     }
 
-    private void addToMemory(PackageInfo info) {
-        try {
-            String pkg = info.packageName;
-            if (!TextUtils.isEmpty(pkg) && !apps.contains(pkg)) {
-                apps.add(pkg);
-            }
-        } catch (Throwable e) {
+    public void getByUid() {
+        final PackageManager pkgManager = EContextHelper.getContext(mContext).getPackageManager();
+        int uid = 1000;
+        while (uid <= 19999) {
+            final int x = uid;
+            EThreadPool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    work(pkgManager, x);
+                }
+            });
+            uid++;
         }
     }
 
+    private void work(PackageManager pkgManager, int uid) {
+        String[] v2 = pkgManager.getPackagesForUid(uid);
+        if (v2 != null && v2.length > 0) {
+            for (String pkgName : v2) {
+                addToMemory(pkgName);
+            }
+        }
+    }
 
-    private void parseLine(List<String> apps, String line) {
-        // 单行条件: 非空&&有点&&有冒号
-        if (!TextUtils.isEmpty(line) && line.contains(".") && line.contains(":")) {
-            // 分割. 样例数据:<code>package:com.android.launcher3</code>
-            String[] ss = line.split(":");
-            if (ss.length > 1) {
-                String packageName = ss[1];
-                if (!TextUtils.isEmpty(packageName) && !apps.contains(packageName)) {
-                    apps.add(packageName);
+    /**
+     * API获取安装列表，部分国产手机会弹框
+     */
+    public void getByApi() {
+        PackageManager packageManager = mContext.getPackageManager();
+        if (packageManager != null) {
+            List<PackageInfo> packageInfos = packageManager.getInstalledPackages(0);
+            if (packageInfos.size() > 0) {
+                for (final PackageInfo info : packageInfos) {
+                    addToMemory(info.packageName);
                 }
             }
         }
     }
 
-    public void add(String pkgName) {
-        if (!TextUtils.isEmpty(pkgName) && apps != null && !apps.contains(pkgName)) {
-            apps.add(pkgName);
+    public void getByShell() {
+        ShellUtils.getArrays("pm list packages", new ISayHello() {
+            @Override
+            public void onProcessLine(final String line) {
+                EThreadPool.runOnWorkThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        parseLine(line);
+                    }
+                });
+            }
+        }, false);
+    }
+
+
+    /**
+     * 解析shell的每一行
+     *
+     * @param line
+     */
+    private void parseLine(String line) {
+        // 单行条件: 非空&&有点&&有冒号
+        if (!TextUtils.isEmpty(line) && line.contains(".") && line.contains(":")) {
+            // 分割. 样例数据:package:com.android.launcher3
+            String[] ss = line.split(":");
+            if (ss.length > 1) {
+                addToMemory(ss[1]);
+            }
+        }
+    }
+
+    private void addToMemory(String pkg) {
+        try {
+            if (!TextUtils.isEmpty(pkg) && !apps.contains(pkg)) {
+                apps.add(pkg);
+            }
+        } catch (Throwable e) {
         }
     }
 
@@ -160,5 +195,5 @@ public class PkgList {
     /********************* get instance end **************************/
     //若不考虑内存占用，可使用CopyOnWriteArrayList(线程安全)
 //    private static List<String> apps = new CopyOnWriteArrayList<String>();
-    private List<String> apps = null;
+    private CopyOnWriteArrayList<String> apps = null;
 }

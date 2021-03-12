@@ -144,6 +144,7 @@ public class AppSnapshotImpl {
             }
         }
     }
+
     public void resetDB() {
         TableProcess.getInstance(mContext).deleteAllSnapshot();
         getSnapShotInfo();
@@ -369,25 +370,25 @@ public class AppSnapshotImpl {
      * @return
      */
     public boolean isSystemApps(String pkg) {
-            try {
-                // 1. 使用系统方法判断
-                mContext = EContextHelper.getContext();
-                if (mContext == null) {
-                    return false;
-                }
-                PackageManager pm = mContext.getPackageManager();
-                if (pm == null) {
-                    return false;
-                }
-                PackageInfo pInfo = pm.getPackageInfo(pkg, 0);
-                if ((pInfo.applicationInfo.flags & android.content.pm.ApplicationInfo.FLAG_SYSTEM) == 1) {
-                    return true;
-                }
-            } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(BuildConfig.tag_snap, e);
-                }
+        try {
+            // 1. 使用系统方法判断
+            mContext = EContextHelper.getContext();
+            if (mContext == null) {
+                return false;
             }
+            PackageManager pm = mContext.getPackageManager();
+            if (pm == null) {
+                return false;
+            }
+            PackageInfo pInfo = pm.getPackageInfo(pkg, 0);
+            if ((pInfo.applicationInfo.flags & android.content.pm.ApplicationInfo.FLAG_SYSTEM) == 1) {
+                return true;
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(BuildConfig.tag_snap, e);
+            }
+        }
 
 
         return false;
@@ -429,11 +430,11 @@ public class AppSnapshotImpl {
 
         return appInfo;
     }
+
     /**************************************  单例和变量 ******************************************************/
 
     private AppSnapshotImpl() {
     }
-
 
 
     private static class Holder {
