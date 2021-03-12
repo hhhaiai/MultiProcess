@@ -151,13 +151,6 @@ public class USMUtils {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static Object getUsageEventsByInvoke(long beginTime, long endTime, Context context) {
         try {
-//            if (context.getApplicationInfo().targetSdkVersion > 27 || Build.VERSION.SDK_INT > 27) {
-//                return null;
-//            }
-//            if (Build.VERSION.SDK_INT > 29) {
-//                //未来 android 11 防止
-//                return null;
-//            }
             context = EContextHelper.getContext(context);
             if (context == null) {
                 return null;
@@ -180,8 +173,8 @@ public class USMUtils {
                 Object usageEvents = getUsageEventForPkg(beginTime, endTime, mService, lastStarPkgForUE);
                 if (usageEvents != null) {
                     return usageEvents;
-                }else{
-                    lastStarPkgForUE=null;
+                } else {
+                    lastStarPkgForUE = null;
                 }
             }
 
@@ -204,7 +197,7 @@ public class USMUtils {
     private static Object getUsageEventForPkg(long beginTime, long endTime, Object mService, String opname) {
         try {
             //UsageEvents
-            Object usageEvents =  usageEvents = ClazzUtils.g().invokeObjectMethod(mService, "queryEvents", new Class[]{long.class, long.class, String.class}, new Object[]{beginTime, endTime, opname});
+            Object usageEvents = usageEvents = ClazzUtils.g().invokeObjectMethod(mService, "queryEvents", new Class[]{long.class, long.class, String.class}, new Object[]{beginTime, endTime, opname});
 //                    Log.d("sanbo", "getUsageEventsByInvoke [" + opname + "]  usageEvents: " + usageEvents);
 
             if (usageEvents != null) {
@@ -325,7 +318,7 @@ public class USMUtils {
                 List<UsageStats> lus = getUsageStatsForPkg(beginTime, endTime, mService, lastStarPkgForUS);
                 if (lus != null) {
                     return lus;
-                }else{
+                } else {
                     lastStarPkgForUS = null;
                 }
             }
