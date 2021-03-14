@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.StreamerUtils;
 
 import java.io.File;

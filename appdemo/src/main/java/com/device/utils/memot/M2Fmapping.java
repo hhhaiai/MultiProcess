@@ -2,7 +2,7 @@ package com.device.utils.memot;
 
 import android.content.Context;
 
-import com.analysys.track.utils.EContextHelper;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.device.utils.EL;
 
 import java.io.File;

@@ -4,9 +4,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
-
-import com.analysys.track.utils.EContextHelper;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
