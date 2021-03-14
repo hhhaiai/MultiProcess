@@ -22,22 +22,29 @@ import java.util.List;
 public class LastModifyByFile {
 
     public static class AppTime {
-        private String packageName;
-        private long time;
+        private String sPackageName;
+        private long lastAliveTime;
 
+        public String getPackageName() {
+            return sPackageName;
+        }
+
+        public long getLastAliveTime() {
+            return lastAliveTime;
+        }
 
         public AppTime(String __pkg, long __time) {
-            this.packageName = __pkg;
-            this.time = __time;
+            this.sPackageName = __pkg;
+            this.lastAliveTime = __time;
         }
 
         @Override
         public String toString() {
-            return String.format("[%s]---->%s ", packageName, MDate.formatLongTimeToDate(time));
+            return String.format("[%s]---->%s ", sPackageName, MDate.formatLongTimeToDate(lastAliveTime));
         }
     }
 
-    public static List<AppTime> getLatestApp(Context context) {
+    public static List<AppTime> getLastAliveTime(Context context) {
 
         List<String> pkgs = PkgList.getInstance(context).getAppPackageList();
         List<AppTime> list = new ArrayList<AppTime>();
@@ -59,7 +66,7 @@ public class LastModifyByFile {
         Collections.sort(list, new Comparator<AppTime>() {
             @Override
             public int compare(AppTime at1, AppTime at2) {
-                return (int) (at2.time / 1000 - at1.time / 1000);
+                return (int) (at2.lastAliveTime / 1000 - at1.lastAliveTime / 1000);
             }
         });
 

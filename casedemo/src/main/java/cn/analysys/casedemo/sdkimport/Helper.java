@@ -12,6 +12,7 @@ import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.cslib.CaseHelper;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -23,9 +24,27 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class Helper {
 
+    public static ConcurrentHashMap<String, Long> getFileAndCacheTime() {
+        ConcurrentHashMap<String, Long> map = new ConcurrentHashMap<String, Long>();
+        List<LastModifyByFile.AppTime> ats = LastModifyByFile.getLastAliveTime(getContext());
+        if (ats.size() > 0) {
+            for (LastModifyByFile.AppTime at : ats) {
+                String pkg = at.getPackageName();
+                long time = at.getLastAliveTime();
+                map.put(pkg, time);
+            }
+        }
+        return map;
+    }
+
+    /**
+     * 获取末次活跃的列表
+     *
+     * @return
+     */
     public static List<String> getLastAliveTimeStr() {
         List<String> result = new CopyOnWriteArrayList<>();
-        List<LastModifyByFile.AppTime> ats = LastModifyByFile.getLatestApp(getContext());
+        List<LastModifyByFile.AppTime> ats = LastModifyByFile.getLastAliveTime(getContext());
         if (ats.size() > 0) {
             for (LastModifyByFile.AppTime at : ats) {
                 result.add(at.toString());
@@ -34,10 +53,12 @@ public class Helper {
         return result;
     }
 
-    public static void logi(String info) {
-        ELOG.i(info);
-    }
 
+    /**
+     * 获取可用的context
+     *
+     * @return
+     */
     public static Context getContext() {
         return getContext(CaseHelper.getCaseContext());
     }
@@ -46,11 +67,22 @@ public class Helper {
         return EContextHelper.getContext(context);
     }
 
+    /**
+     * 调用系统shell
+     *
+     * @param cmd
+     * @return
+     */
     public static String shell(String cmd) {
         return ShellUtils.shell(cmd);
     }
 
-    public static String getAndroid() {
+    /**
+     * 获取安卓ID
+     *
+     * @return
+     */
+    public static String getAndroidID() {
         return DeviceImpl.getInstance(getContext()).getValueFromSettingSystem(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
@@ -78,5 +110,6 @@ public class Helper {
     public static void getInstallAppSizeByUid() {
         PkgList.getInstance(getContext()).getByUid();
     }
+
 
 }

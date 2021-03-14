@@ -8,11 +8,11 @@ import cn.analysys.casedemo.cases.utils.Woo;
 import cn.analysys.casedemo.sdkimport.Helper;
 import cn.analysys.casedemo.utils.EL;
 
-public class LMFSizeCase extends ETestCase {
+public class FileLastModifySizeCmpCase extends ETestCase {
     String log = "安装app: %d\n有缓存记录app: %d\n是否为自己: %s";
 
-    public LMFSizeCase() {
-        super("[文件]末次修改个数对比");
+    public FileLastModifySizeCmpCase() {
+        super("[应用]末次修改个数对比");
     }
 
     @Override
@@ -27,19 +27,25 @@ public class LMFSizeCase extends ETestCase {
 
         int allAppsize = Helper.getInstallAppSize();
 
+        StringBuffer sb = new StringBuffer();
+        sb.append("安装文件数量对比 \n");
+
         if (len == 1) {
             if (lastModifyTimeInfos.get(0).contains(Helper.getContext().getPackageName())) {
-                Woo.logFormCase(String.format(log, allAppsize, len, "是"));
+                sb.append(String.format(log, allAppsize, len, "是")).append("\n");
+                Woo.logFormCase(sb.toString());
                 return false;
             }
         } else if (len > 1) {
             for (int i = 0; i < lastModifyTimeInfos.size(); i++) {
-                EL.d(lastModifyTimeInfos.get(i));
+                sb.append(lastModifyTimeInfos.get(i)).append("\n");
             }
-            Woo.logFormCase(String.format(log, allAppsize, len, "否"));
+            sb.append(String.format(log, allAppsize, len, "否")).append("\n");
+            Woo.logFormCase(sb.toString());
             return true;
         }
-        Woo.logFormCase(String.format(log, allAppsize, len, "否"));
+        sb.append(String.format(log, allAppsize, len, "否")).append("\n");
+        Woo.logFormCase(sb.toString());
         return false;
     }
 

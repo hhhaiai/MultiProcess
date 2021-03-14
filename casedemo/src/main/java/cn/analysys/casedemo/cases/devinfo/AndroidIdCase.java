@@ -18,7 +18,7 @@ public class AndroidIdCase extends ETestCase {
 
     @Override
     public boolean predicate() {
-        String androidId = Helper.getAndroid();
+        String androidId = Helper.getAndroidID();
         Woo.logFormCase("android id:" + androidId);
         if (TextUtils.isEmpty(androidId)) {
             return false;

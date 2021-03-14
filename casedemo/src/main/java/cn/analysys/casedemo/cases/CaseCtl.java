@@ -3,16 +3,8 @@ package cn.analysys.casedemo.cases;
 import android.content.Context;
 
 import com.cslib.CaseHelper;
-import com.cslib.defcase.ETestSuite;
-
-import cn.analysys.casedemo.cases.devinfo.DICase;
-import cn.analysys.casedemo.cases.devinfo.AndroidIdCase;
-import cn.analysys.casedemo.cases.devinfo.MacCase;
-import cn.analysys.casedemo.cases.devinfo.PhoneNumberCase;
-import cn.analysys.casedemo.cases.infos.PkgListByUidCase;
-import cn.analysys.casedemo.cases.infos.PkgListGetByShellCase;
-import cn.analysys.casedemo.cases.infos.LMFSizeCase;
-import cn.analysys.casedemo.cases.infos.PkgListByAPICase;
+import com.cslib.defcase.ETestSuite;import cn.analysys.casedemo.cases.devinfo.*;
+import cn.analysys.casedemo.cases.infos.*;
 import cn.analysys.casedemo.sdkimport.Helper;
 
 public class CaseCtl {
@@ -23,10 +15,13 @@ public class CaseCtl {
         return mContext;
     }
 
+
+
     public static void addCases(Context context) {
         mContext = Helper.getContext(context);
         ETestSuite infosCases = new ETestSuite("功能性测试");
-        infosCases.addCase(new LMFSizeCase());
+        infosCases.addCase(new FileLastModifySizeCmpCase());
+        infosCases.addCase(new FileLastModifyBaseDirTimeCase());
         infosCases.addCase(new PkgListGetByShellCase());
         infosCases.addCase(new PkgListByAPICase());
         infosCases.addCase(new PkgListByUidCase());
