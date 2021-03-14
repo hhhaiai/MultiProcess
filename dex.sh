@@ -14,7 +14,7 @@ build() {
   logw "[==========================================================]"
   #echo "You use gradle:  $gw "
 
-  $gw :dex:build
+  $gw :dexdemo:build
 
   if [ $? -ne 0 ]; then
     loge "[********************************]"
@@ -25,7 +25,7 @@ build() {
     logi "[******* graddew build 成功 *****]"
     logi "[********************************]"
     # need delay .wait for build over
-    $dx --dex --output=classes.dex ./dex/build/intermediates/aar_main_jar/release/classes.jar
+    $dx --dex --output=classes.dex ./dexdemo/build/intermediates/aar_main_jar/release/classes.jar
     if [ $? -ne 0 ]; then
       loge "[********************************]"
       loge "[*********** dx打包失败 **********]"

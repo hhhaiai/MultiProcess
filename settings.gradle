@@ -1,3 +1,2 @@
-include ':casedemo'
-include ':app', ':dev-sdk', ':dex',':check_demo'
+include ':appdemo',':casedemo', ':dev-sdk', ':dexdemo',':kotlindemo'
 
