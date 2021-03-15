@@ -34,21 +34,20 @@ public class MDate {
         return Integer.valueOf(new SimpleDateFormat("HH").format(new Date(System.currentTimeMillis())));
     }
 
-    public static final String formatLongTimeToHms(long interval) {
-        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss.SSS");
-        return formatter.format(interval);
+    public static final String convertLongTimeToHms(long interval) {
+        return  new SimpleDateFormat("HH:mm:ss.SSS").format(interval);
     }
 
-    public static final String formatLongTimeToDate(long interval) {
+    public static final String getDateFromTimestamp(long timestamp) {
         SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
-        return formatter.format(interval);
+        return formatter.format(timestamp);
     }
 
-    public static final int getHourFromTime(long timestamp) {
+    public static final int getHourFromTimestamp(long timestamp) {
         return Integer.valueOf(new SimpleDateFormat("HH").format(timestamp));
     }
 
-    public static final int getDaysFromTime(long timestamp) {
+    public static final int getDaysFromTimestamp(long timestamp) {
         return Integer.valueOf(new SimpleDateFormat("dd").format(timestamp));
     }
 

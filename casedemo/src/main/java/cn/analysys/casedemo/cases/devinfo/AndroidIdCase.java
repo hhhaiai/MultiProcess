@@ -4,8 +4,8 @@ import android.text.TextUtils;
 
 import com.cslib.defcase.ETestCase;
 
-import cn.analysys.casedemo.cases.utils.Woo;
-import cn.analysys.casedemo.sdkimport.Helper;
+import cn.analysys.casedemo.utils.SDKHelper;
+import cn.analysys.casedemo.utils.Woo;
 
 public class AndroidIdCase extends ETestCase {
     public AndroidIdCase() {
@@ -18,7 +18,7 @@ public class AndroidIdCase extends ETestCase {
 
     @Override
     public boolean predicate() {
-        String androidId = Helper.getAndroidID();
+        String androidId = SDKHelper.getAndroidID();
         Woo.logFormCase("android id:" + androidId);
         if (TextUtils.isEmpty(androidId)) {
             return false;

@@ -2,8 +2,8 @@ package cn.analysys.casedemo.cases.infos;
 
 import com.cslib.defcase.ETestCase;
 
-import cn.analysys.casedemo.cases.utils.Woo;
-import cn.analysys.casedemo.sdkimport.Helper;
+import cn.analysys.casedemo.utils.SDKHelper;
+import cn.analysys.casedemo.utils.Woo;
 
 public class PkgListByAPICase extends ETestCase {
     String log = "API方式取安装列表耗时: %d";
@@ -20,7 +20,7 @@ public class PkgListByAPICase extends ETestCase {
     public boolean predicate() {
         try {
             long begin = System.currentTimeMillis();
-            Helper.getInstallAppSizeByApi();
+            SDKHelper.getInstallAppSizeByApi();
             long end = System.currentTimeMillis();
             Woo.logFormCase(String.format(log, (end - begin)));
         } catch (Throwable e) {

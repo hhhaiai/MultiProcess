@@ -1,15 +1,18 @@
-package cn.analysys.casedemo.sdkimport;
+package cn.analysys.casedemo.utils;
 
 import android.content.Context;
 import android.provider.Settings;
+import android.text.TextUtils;
 
 import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.impl.ftime.LastModifyByFile;
-import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.pkg.PkgList;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.cslib.CaseHelper;
+import com.cslib.defcase.ETestCase;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,7 +25,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @Create: 2021/03/67 11:26:31
  * @author: sanbo
  */
-public class Helper {
+public class SDKHelper {
 
     public static ConcurrentHashMap<String, Long> getFileAndCacheTime() {
         ConcurrentHashMap<String, Long> map = new ConcurrentHashMap<String, Long>();
@@ -112,4 +115,25 @@ public class Helper {
     }
 
 
+    /**
+     * @param cls
+     * @return
+     */
+    public static ETestCase newInstance(String cls) {
+        if (!TextUtils.isEmpty(cls)) {
+            return (ETestCase) ClazzUtils.g().newInstance(cls);
+        }
+        return null;
+    }
+
+    /**
+     * 判断是否两个类是否是有祖、父类关系
+     *
+     * @param subClass
+     * @param fatherClass
+     * @return
+     */
+    public static boolean isSubClass(Class<?> subClass, Class<?> fatherClass) {
+        return AndroidManifestHelper.isSubClass(subClass, fatherClass);
+    }
 }

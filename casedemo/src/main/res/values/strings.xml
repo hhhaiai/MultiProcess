@@ -2,4 +2,5 @@
     <string name="app_name">ECase</string>
     <string name="welcome">Eguan ECase</string>
     <string name="tocasepage">goto case page</string>
+    <string name="s_btn_test">test sth</string>
 </resources>

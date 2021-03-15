@@ -2,5 +2,6 @@
     <string name="app_name">易测</string>
     <string name="welcome">易 观 易 测</string>
     <string name="tocasepage">跳转测试页面</string>
+    <string name="s_btn_test">测试部分功能</string>
 
 </resources>

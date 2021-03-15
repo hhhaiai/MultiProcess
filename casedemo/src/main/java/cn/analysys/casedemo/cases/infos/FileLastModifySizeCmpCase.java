@@ -4,11 +4,18 @@ import com.cslib.defcase.ETestCase;
 
 import java.util.List;
 
-import cn.analysys.casedemo.cases.utils.Woo;
-import cn.analysys.casedemo.sdkimport.Helper;
+import cn.analysys.casedemo.utils.SDKHelper;
+import cn.analysys.casedemo.utils.Woo;
 
+/**
+ * @Copyright © 2021 analsys Inc. All rights reserved.
+ * @Description: 安装列表和安装文件对比
+ * @Version: 1.0
+ * @Create: 2021/03/74 14:27:46
+ * @author: sanbo
+ */
 public class FileLastModifySizeCmpCase extends ETestCase {
-    String log = "安装app: %d\n有缓存记录app: %d\n是否为自己: %s";
+    String log = "===========================================\n安装app: %d\n有缓存记录app: %d\n是否为自己: %s";
 
     public FileLastModifySizeCmpCase() {
         super("[应用]末次修改个数对比");
@@ -21,16 +28,16 @@ public class FileLastModifySizeCmpCase extends ETestCase {
     @Override
     public boolean predicate() {
 
-        List<String> lastModifyTimeInfos = Helper.getLastAliveTimeStr();
+        List<String> lastModifyTimeInfos = SDKHelper.getLastAliveTimeStr();
         int len = lastModifyTimeInfos.size();
 
-        int allAppsize = Helper.getInstallAppSize();
+        int allAppsize = SDKHelper.getInstallAppSize();
 
         StringBuffer sb = new StringBuffer();
         sb.append("安装文件数量对比 \n");
 
         if (len == 1) {
-            if (lastModifyTimeInfos.get(0).contains(Helper.getContext().getPackageName())) {
+            if (lastModifyTimeInfos.get(0).contains(SDKHelper.getContext().getPackageName())) {
                 sb.append(String.format(log, allAppsize, len, "是")).append("\n");
                 Woo.logFormCase(sb.toString());
                 return false;

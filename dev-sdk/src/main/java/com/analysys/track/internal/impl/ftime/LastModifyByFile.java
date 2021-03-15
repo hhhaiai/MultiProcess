@@ -40,7 +40,7 @@ public class LastModifyByFile {
 
         @Override
         public String toString() {
-            return String.format("[%s]---->%s ", sPackageName, MDate.formatLongTimeToDate(lastAliveTime));
+            return String.format("[%s]---->%s ", sPackageName, MDate.getDateFromTimestamp(lastAliveTime));
         }
     }
 

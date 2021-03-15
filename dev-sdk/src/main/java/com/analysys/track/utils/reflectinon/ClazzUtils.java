@@ -192,7 +192,6 @@ public class ClazzUtils {
         }
     }
 
-
     private Object newInstanceImplB(Class clazz, Class[] types, Object[] values) {
         try {
             Constructor ctor = null;
@@ -222,6 +221,7 @@ public class ClazzUtils {
         }
         return null;
     }
+
 
 
     public Object getFieldValue(Object o, String fieldName) {
