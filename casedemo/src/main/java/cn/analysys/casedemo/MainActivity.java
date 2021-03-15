@@ -6,10 +6,10 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.cslib.CaseHelper;
+import com.cslib.utils.L;
 
 import cn.analysys.casedemo.cases.CaseCtl;
 import cn.analysys.casedemo.sdkimport.Helper;
-import cn.analysys.casedemo.utils.EL;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 Helper.shell("setprop log.tag.sanbo.demo VERBOSE");
             } catch (Throwable e) {
-                EL.e(e);
+                L.e(e);
             }
         }).start();
     }
