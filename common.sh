@@ -89,7 +89,7 @@ checkEnvArgs() {
     gw="./gradlew"
     support_printf_os="macos"
     mdout="${ipwd}/tools/macos/mdout"
-    sed="${ipwd}/tools/macos/sed"
+    sed="sed"
     if [ -z $ANDROID_HOME ]; then
       iadb=$macadb
     else
@@ -106,7 +106,7 @@ checkEnvArgs() {
     dx="dx"
     gw="./gradlew"
     mdout="${ipwd}/tools/linux/mdout"
-    sed="${ipwd}/tools/linux/sed"
+    sed="sed"
     support_printf_os="$linux"
     if [ -z $ANDROID_HOME ]; then
       iadb=$linuxadb
@@ -124,7 +124,7 @@ checkEnvArgs() {
     gw="./gradlew"
     support_printf_os=""
     mdout="${ipwd}/tools/linux/mdout"
-    sed="${ipwd}/tools/linux/sed"
+    sed="sed"
     if [ -z $ANDROID_HOME ]; then
       iadb=$macadb
     else
@@ -197,6 +197,6 @@ test() {
 if [ -n "$1" ]; then
   logi "has one args"
   chmod -R 777 tools/
-  $mdout install
+#  $mdout install
   git config core.filemode false
 fi
