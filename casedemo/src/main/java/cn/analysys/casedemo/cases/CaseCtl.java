@@ -3,7 +3,9 @@ package cn.analysys.casedemo.cases;
 import android.content.Context;
 
 import com.cslib.CaseHelper;
-import com.cslib.defcase.ETestSuite;import cn.analysys.casedemo.cases.devinfo.*;
+import com.cslib.defcase.ETestSuite;
+
+import cn.analysys.casedemo.cases.devinfo.*;
 import cn.analysys.casedemo.cases.infos.*;
 import cn.analysys.casedemo.sdkimport.Helper;
 
@@ -14,7 +16,6 @@ public class CaseCtl {
     public static Context getContext() {
         return mContext;
     }
-
 
 
     public static void addCases(Context context) {

@@ -5,9 +5,9 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
-import java.util.List;
+import com.cslib.utils.L;
 
-import cn.analysys.casedemo.utils.EL;
+import java.util.List;
 
 public class Aha {
     /**
@@ -32,7 +32,7 @@ public class Aha {
     public static void getUid(Context context, IdCaller caller) {
         PackageManager packageManager = context.getPackageManager();
         final List<PackageInfo> applicationInfoList = packageManager.getInstalledPackages(0);
-        EL.i("applicationInfoList:" + applicationInfoList.size());
+        L.i("applicationInfoList:" + applicationInfoList.size());
         NetworkStats networkStats = null;
         for (PackageInfo info : applicationInfoList) {
             try {
@@ -49,7 +49,7 @@ public class Aha {
                 }
 
             } catch (Throwable exception) {
-                EL.e(exception);
+                L.e(exception);
             }
         }
     }

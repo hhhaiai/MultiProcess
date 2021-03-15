@@ -3,6 +3,7 @@ package cn.analysys.casedemo.utils.memot;
 import android.content.Context;
 
 import com.analysys.track.utils.reflectinon.EContextHelper;
+import com.cslib.utils.L;
 
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -10,7 +11,6 @@ import java.lang.reflect.Method;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
-import cn.analysys.casedemo.utils.EL;
 
 /**
  * @Copyright © 2020 sanbo Inc. All rights reserved.
@@ -35,7 +35,7 @@ public class M2Fmapping {
             }
 
         } catch (Throwable e) {
-            EL.e(e);
+            L.e(e);
         }
     }
 
@@ -64,7 +64,7 @@ public class M2Fmapping {
 
             return true;
         } catch (Throwable e) {
-            EL.e(e);
+            L.e(e);
         } finally {
             safeClose(mBuffer);
         }
@@ -160,6 +160,7 @@ public class M2Fmapping {
 
     private M2Fmapping() {
     }
+
     /********************* get instance end **************************/
     private Context mContext = null;
     private File mFile;

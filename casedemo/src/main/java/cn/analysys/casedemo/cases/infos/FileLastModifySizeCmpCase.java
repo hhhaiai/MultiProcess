@@ -6,7 +6,6 @@ import java.util.List;
 
 import cn.analysys.casedemo.cases.utils.Woo;
 import cn.analysys.casedemo.sdkimport.Helper;
-import cn.analysys.casedemo.utils.EL;
 
 public class FileLastModifySizeCmpCase extends ETestCase {
     String log = "安装app: %d\n有缓存记录app: %d\n是否为自己: %s";

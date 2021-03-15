@@ -2,6 +2,8 @@ package cn.analysys.casedemo.utils;
 
 import android.content.Context;
 
+import com.cslib.utils.L;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -66,7 +68,7 @@ public class CaseAssetsHelper {
                 stringBuilder.append(line);
             }
         } catch (Throwable e) {
-            EL.e(e);
+            L.e(e);
         } finally {
             if (is != null) {
                 try {
@@ -105,7 +107,7 @@ public class CaseAssetsHelper {
                 stringBuilder.append(line).append("\n");
             }
         } catch (Throwable e) {
-            EL.e(e);
+            L.e(e);
         } finally {
             if (is != null) {
                 try {

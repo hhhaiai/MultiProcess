@@ -1,13 +1,10 @@
 package cn.analysys.casedemo.cases.devinfo;
 
 import com.analysys.track.internal.impl.DeviceImpl;
-import com.cslib.CaseHelper;
 import com.cslib.defcase.ETestCase;
 
 import cn.analysys.casedemo.cases.CaseCtl;
 import cn.analysys.casedemo.cases.utils.Woo;
-import cn.analysys.casedemo.sdkimport.Helper;
-import cn.analysys.casedemo.utils.EL;
 
 public class DICase extends ETestCase {
     public DICase() {

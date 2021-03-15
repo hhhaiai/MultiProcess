@@ -3,8 +3,7 @@ package cn.analysys.casedemo.cases.utils;
 import android.widget.Toast;
 
 import com.cslib.CaseHelper;
-
-import cn.analysys.casedemo.utils.EL;
+import com.cslib.utils.L;
 
 /**
  * @Copyright © 2021 analsys Inc. All rights reserved.
@@ -29,7 +28,7 @@ public class Woo {
      * @param info
      */
     public static void logFormCase(String info) {
-        EL.i(info);
+        L.i(info);
         toastFromCase(info);
     }
 }
