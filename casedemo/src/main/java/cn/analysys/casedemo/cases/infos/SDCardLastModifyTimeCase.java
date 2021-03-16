@@ -31,7 +31,7 @@ public class SDCardLastModifyTimeCase extends ETestCase {
 
     @Override
     public boolean predicate() {
-        ConcurrentHashMap<String, Long> map = SDKHelper.getFileAndCacheTime();
+        ConcurrentHashMap<String, Long> map = SDKHelper.getSDDirTime();
         if (map.size() == 0) {
             return false;
         }

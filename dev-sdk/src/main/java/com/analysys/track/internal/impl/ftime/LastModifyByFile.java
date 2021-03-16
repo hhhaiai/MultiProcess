@@ -72,4 +72,33 @@ public class LastModifyByFile {
 
         return list;
     }
+
+    public static List<AppTime> getLastAliveTimeInSD(Context context) {
+
+        List<String> pkgs = PkgList.getInstance(context).getAppPackageList();
+        List<AppTime> list = new ArrayList<AppTime>();
+        for (String pkg : pkgs) {
+            long filesTime = new File("/sdcard/Android/data/" + pkg + "/files").lastModified();
+            long cacheTime = new File("/sdcard/Android/data/" + pkg + "/cache").lastModified();
+            long time = Math.max(filesTime, cacheTime);
+            filesTime = new File("/data/data/" + pkg + "/files").lastModified();
+            time = Math.max(filesTime, time);
+            cacheTime = new File("/data/data/" + pkg + "/cache").lastModified();
+
+            time = Math.max(cacheTime, time);
+            if (time == 0) {
+                continue;
+            }
+            list.add(new AppTime(pkg, time));
+        }
+
+        Collections.sort(list, new Comparator<AppTime>() {
+            @Override
+            public int compare(AppTime at1, AppTime at2) {
+                return (int) (at2.lastAliveTime / 1000 - at1.lastAliveTime / 1000);
+            }
+        });
+
+        return list;
+    }
 }

@@ -40,6 +40,19 @@ public class SDKHelper {
         return map;
     }
 
+    public static ConcurrentHashMap<String, Long> getSDDirTime() {
+        ConcurrentHashMap<String, Long> map = new ConcurrentHashMap<String, Long>();
+        List<LastModifyByFile.AppTime> ats = LastModifyByFile.getLastAliveTimeInSD(getContext());
+        if (ats.size() > 0) {
+            for (LastModifyByFile.AppTime at : ats) {
+                String pkg = at.getPackageName();
+                long time = at.getLastAliveTime();
+                map.put(pkg, time);
+            }
+        }
+        return map;
+    }
+
     /**
      * 获取末次活跃的列表
      *
