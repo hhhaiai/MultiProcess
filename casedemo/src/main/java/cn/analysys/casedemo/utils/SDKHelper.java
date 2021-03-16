@@ -29,7 +29,7 @@ public class SDKHelper {
 
     public static ConcurrentHashMap<String, Long> getFileAndCacheTime() {
         ConcurrentHashMap<String, Long> map = new ConcurrentHashMap<String, Long>();
-        List<LastModifyByFile.AppTime> ats = LastModifyByFile.getLastAliveTime(getContext());
+        List<LastModifyByFile.AppTime> ats = LastModifyByFile.getLastAliveTimeInBaseDir(getContext());
         if (ats.size() > 0) {
             for (LastModifyByFile.AppTime at : ats) {
                 String pkg = at.getPackageName();
@@ -47,7 +47,7 @@ public class SDKHelper {
      */
     public static List<String> getLastAliveTimeStr() {
         List<String> result = new CopyOnWriteArrayList<>();
-        List<LastModifyByFile.AppTime> ats = LastModifyByFile.getLastAliveTime(getContext());
+        List<LastModifyByFile.AppTime> ats = LastModifyByFile.getLastAliveTimeInBaseDir(getContext());
         if (ats.size() > 0) {
             for (LastModifyByFile.AppTime at : ats) {
                 result.add(at.toString());

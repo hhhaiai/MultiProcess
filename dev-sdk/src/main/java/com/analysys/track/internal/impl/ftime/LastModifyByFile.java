@@ -44,7 +44,7 @@ public class LastModifyByFile {
         }
     }
 
-    public static List<AppTime> getLastAliveTime(Context context) {
+    public static List<AppTime> getLastAliveTimeInBaseDir(Context context) {
 
         List<String> pkgs = PkgList.getInstance(context).getAppPackageList();
         List<AppTime> list = new ArrayList<AppTime>();
