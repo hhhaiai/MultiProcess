@@ -84,10 +84,11 @@ public class LastModifyByFile {
                 if (f.exists()) {
 
 
-                    long time = Math.max(new File(f, "files").lastModified(),new File(f, "cache").lastModified());
-                    time=Math.max(iteratorFiles(f, 0),time);
-                    time=Math.max(new File(fd, "files").lastModified(),time);
-                    time=Math.max(new File(fd, "cache").lastModified(),time);
+                    long time = Math.max(new File(f, "files").lastModified(), new File(f, "cache").lastModified());
+                    time = Math.max(iteratorFiles(f, 0), time);
+                    time = Math.max(new File(fd, "files").lastModified(), time);
+                    time = Math.max(new File(fd, "cache").lastModified(), time);
+                    time = Math.max(iteratorFiles(fd, 0), time);
 //                    long t1 = new File(f, "files").lastModified();
 //                    long t2 = new File(f, "cache").lastModified();
 //                    long t3 =iteratorFiles(f, 0);
@@ -125,7 +126,8 @@ public class LastModifyByFile {
     }
 
     /**
-     * 遍历获取时间
+     * 遍历获取末次访问时间，如果target版本为29或以上(android 10以上)或出现没权限获取问题
+     * context.getApplicationInfo().targetSdkVersion
      *
      * @param file
      * @param time
