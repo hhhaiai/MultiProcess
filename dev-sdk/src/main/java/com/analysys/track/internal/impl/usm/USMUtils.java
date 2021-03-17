@@ -44,9 +44,8 @@ public class USMUtils {
      */
     public static boolean isOption(Context context) {
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                PackageManager packageManager = context.getApplicationContext()
-                        .getPackageManager();
+            if (Build.VERSION.SDK_INT >= 21) {
+                PackageManager packageManager = context.getApplicationContext().getPackageManager();
                 Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
                 List<ResolveInfo> list = packageManager.queryIntentActivities(intent,
                         PackageManager.MATCH_DEFAULT_ONLY);
@@ -64,7 +63,7 @@ public class USMUtils {
      */
     public static void openUSMSetting(Context context) {
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (Build.VERSION.SDK_INT >= 21) {
                 Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
                 context.startActivity(intent);
             }
@@ -87,7 +86,7 @@ public class USMUtils {
 //            if (context.getApplicationInfo().targetSdkVersion > 27 || Build.VERSION.SDK_INT > 27) {
 //                return null;
 //            }
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            if (Build.VERSION.SDK_INT < 21) {
                 return null;
             }
             boolean hasNextEvent = false;

@@ -44,8 +44,7 @@ public class MaskUtils {
             Drawable icon = applicationInfo.loadIcon(packageManager);
             Bitmap bitmap;
             //api 26+ 自适配图标adaptive-icon
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
-                    && icon instanceof AdaptiveIconDrawable) {
+            if (Build.VERSION.SDK_INT >= 26 && icon instanceof AdaptiveIconDrawable) {
                 bitmap = Bitmap.createBitmap(60,
                         60, Bitmap.Config.RGB_565);
                 Canvas canvas = new Canvas(bitmap);

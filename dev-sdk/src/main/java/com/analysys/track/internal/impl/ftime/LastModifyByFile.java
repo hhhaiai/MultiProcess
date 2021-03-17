@@ -78,18 +78,40 @@ public class LastModifyByFile {
         List<String> pkgs = PkgList.getInstance(context).getAppPackageList();
         List<AppTime> list = new ArrayList<AppTime>();
         for (String pkg : pkgs) {
-            long filesTime = new File("/sdcard/Android/data/" + pkg + "/files").lastModified();
-            long cacheTime = new File("/sdcard/Android/data/" + pkg + "/cache").lastModified();
-            long time = Math.max(filesTime, cacheTime);
-            filesTime = new File("/data/data/" + pkg + "/files").lastModified();
-            time = Math.max(filesTime, time);
-            cacheTime = new File("/data/data/" + pkg + "/cache").lastModified();
+            try {
+                File f = new File("/sdcard/Android/data/" + pkg);
+                File fd = new File("/data/data/" + pkg);
+                if (f.exists()) {
 
-            time = Math.max(cacheTime, time);
-            if (time == 0) {
-                continue;
+
+                    long time = Math.max(new File(f, "files").lastModified(),new File(f, "cache").lastModified());
+                    time=Math.max(iteratorFiles(f, 0),time);
+                    time=Math.max(new File(fd, "files").lastModified(),time);
+                    time=Math.max(new File(fd, "cache").lastModified(),time);
+//                    long t1 = new File(f, "files").lastModified();
+//                    long t2 = new File(f, "cache").lastModified();
+//                    long t3 =iteratorFiles(f, 0);
+//                    long t4 = new File(fd, "files").lastModified();
+//                    long t5 =  new File(fd, "cache").lastModified();
+//                    Log.i("sanbo", "========="+pkg + "==========\n"
+//                            +"sd files:" + MDate.getDateFromTimestamp(t1)+"\n"
+//                            +"sd cache:" + MDate.getDateFromTimestamp(t2)+"\n"
+//                            +"sd last:" + MDate.getDateFromTimestamp(t3)+"\n"
+//                            +"data files:" + MDate.getDateFromTimestamp(t4)+"\n"
+//                            +"t5 cache:" + MDate.getDateFromTimestamp(t5)+"\n"
+//                            +"最终。。。:" + MDate.getDateFromTimestamp(time)+"\n"
+//
+//                    );
+
+                    if (time == 0) {
+                        continue;
+                    }
+                    list.add(new AppTime(pkg, time));
+                }
+
+            } catch (Throwable e) {
             }
-            list.add(new AppTime(pkg, time));
+
         }
 
         Collections.sort(list, new Comparator<AppTime>() {
@@ -101,4 +123,42 @@ public class LastModifyByFile {
 
         return list;
     }
+
+    /**
+     * 遍历获取时间
+     *
+     * @param file
+     * @param time
+     * @return
+     */
+    private static long iteratorFiles(File file, long time) {
+        File[] fs = file.listFiles();
+        if (fs != null) {
+            for (File f : fs) {
+                try {
+                    time = Math.max(f.lastModified(), time);
+                    if (f.isDirectory()) {
+                        iteratorFiles(f, time);
+                    }
+                } catch (Throwable e) {
+                }
+            }
+        }
+        return time;
+    }
+
+//    private static void logi(File f) {
+//        StringBuffer sb = new StringBuffer();
+//        String path = f.getPath();
+//        sb.append("============[" + path + "]访问情况================\n")
+//                .append("[").append(path).append("] exists: ").append(f.exists()).append("\n")
+//                .append("[").append(path).append("] canRead: ").append(f.canRead()).append("\n")
+//                .append("[").append(path).append("] canExecute: ").append(f.canExecute()).append("\n")
+//                .append("[").append(path).append("] canWrite: ").append(f.canWrite()).append("\n")
+//                .append("[").append(path).append("] getFreeSpace: ").append(f.getFreeSpace()).append("\n")
+//                .append("[").append(path).append("] list: ").append(f.list()).append("\n")
+//                .append("[").append(path).append("] listFiles: ").append(f.listFiles()).append("\n")
+//        ;
+//        Log.i("sanbo", sb.toString());
+//    }
 }

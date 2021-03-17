@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private void openLog() {
         new Thread(() -> {
             try {
-                SDKHelper.shell("setprop log.tag.sanbo.demo VERBOSE");
+                SDKHelper.shell("setprop log.tag.sanbo VERBOSE");
             } catch (Throwable e) {
                 L.e(e);
             }
