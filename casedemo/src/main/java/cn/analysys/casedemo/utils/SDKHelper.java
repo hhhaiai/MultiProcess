@@ -1,12 +1,16 @@
 package cn.analysys.casedemo.utils;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.impl.ftime.LastModifyByFile;
 import com.analysys.track.utils.AndroidManifestHelper;
+import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.pkg.PkgList;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
@@ -26,6 +30,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author: sanbo
  */
 public class SDKHelper {
+
+    @TargetApi(23)
+    public static void reqPermission(@NonNull Activity activity, @NonNull String[] permissionList, int requestCode) {
+        PermissionUtils.reqPermission(activity, permissionList, requestCode);
+    }
 
     public static ConcurrentHashMap<String, Long> getFileAndCacheTime() {
         ConcurrentHashMap<String, Long> map = new ConcurrentHashMap<String, Long>();

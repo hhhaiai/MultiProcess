@@ -2,6 +2,7 @@ package com.analysys.track.utils;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -14,6 +15,9 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 
 /**
  * @Copyright 2019 sanbo Inc. All rights reserved.
@@ -23,6 +27,32 @@ import com.analysys.track.utils.reflectinon.EContextHelper;
  * @author: sanbo
  */
 public class PermissionUtils {
+
+    /**
+     * 申请权限
+     *
+     * @param activity
+     * @param permissionList
+     * @param requestCode
+     */
+    @TargetApi(23)
+    public static void reqPermission(Activity activity, String[] permissionList, int requestCode) {
+
+        if (activity == null || permissionList == null || permissionList.length <= 0) {
+            return;
+        }
+        List<String> reqs = new CopyOnWriteArrayList<String>();
+        for (String permission : permissionList) {
+            if (!checkPermission(activity, permission)) {
+                reqs.add(permission);
+            }
+        }
+        if (reqs.size() > 0) {
+//            reqs.stream().toArray(String[]::new);
+            activity.requestPermissions(reqs.toArray(new String[reqs.size()]), requestCode);
+        }
+    }
+
     /**
      * 检查权限 权限申请被拒绝检测返回false，权限申请通过检测返回true
      *
