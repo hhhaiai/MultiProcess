@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
             default:
                 break;
         }
-
     }
 
     private void prepare() {
@@ -69,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
                         new String[]{
                                 Manifest.permission.READ_PHONE_STATE
                                 , "android.permission.READ_PRIVILEGED_PHONE_STATE"
+                                , "android.permission.ACCESS_BACKGROUND_LOCATION"
                                 , Manifest.permission.ACCESS_FINE_LOCATION
                                 , Manifest.permission.ACCESS_COARSE_LOCATION
                                 , Manifest.permission.WRITE_EXTERNAL_STORAGE
