@@ -63,8 +63,8 @@ android {
         javaMaxHeapSize "4g"
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     aaptOptions {
         cruncherEnabled = false
@@ -74,10 +74,10 @@ android {
         checkReleaseBuilds false
         abortOnError false
         warningsAsErrors false
-        disable "UnusedResources"
+        disable "UnusedResources", 'RestrictedApi'
         textOutput "stdout"
         textReport false
-        disable 'RestrictedApi'
+        check 'NewApi', 'InlinedApi'
     }
 }
 

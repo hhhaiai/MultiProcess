@@ -69,9 +69,11 @@ def tag_recerver = "analysys_recerver"//广播接收的tag
 def tag_cutoff = "analysys_cutoff"//短路的tag
 def tag_StrMix = "analysys_StrMix"//字符串混淆的tag
 //endregion
+
 android {
     compileSdkVersion 29
     buildToolsVersion '29.0.3'
+    ndkVersion '16.1.4479499'
 
     defaultConfig {
         minSdkVersion 14
@@ -154,8 +156,8 @@ android {
         javaMaxHeapSize "4g"
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     aaptOptions {
         cruncherEnabled = false
@@ -168,10 +170,10 @@ android {
         checkReleaseBuilds false
         abortOnError false
         warningsAsErrors false
-        disable "UnusedResources"
+        disable "UnusedResources", 'RestrictedApi'
         textOutput "stdout"
         textReport false
-        disable 'RestrictedApi'
+        check 'NewApi', 'InlinedApi'
     }
 
 
