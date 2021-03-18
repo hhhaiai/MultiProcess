@@ -191,6 +191,9 @@ public class UploadKey {
         public static final String IDFA = "IDFA";
         //UA
         public static final String UA = "UA";
+        // 用于指定应用的目标 API 级别的整数，如果未设置，其默认值与为 minSdkVersion 指定的值相等
+        //add targetSdkVersion in v4.4.0.2   by sanbo
+        public static final String TargetSdkVersion = "TSV";
 
     }
 

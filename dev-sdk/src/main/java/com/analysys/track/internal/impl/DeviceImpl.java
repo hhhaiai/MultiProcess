@@ -577,11 +577,11 @@ public class DeviceImpl {
         return result;
     }
 
-    public String getUA() {
+    public String getUA(Context context) {
         String userAgent = "";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             try {
-                userAgent = WebSettings.getDefaultUserAgent(EContextHelper.getContext());
+                userAgent = WebSettings.getDefaultUserAgent(EContextHelper.getContext(context));
             } catch (Throwable e) {
                 userAgent = System.getProperty("http.agent");
             }

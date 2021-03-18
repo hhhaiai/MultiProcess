@@ -86,6 +86,8 @@ public class DataController {
     public static boolean SWITCH_OF_SYSTEM_LANGUAGE = true;
     public static boolean SWITCH_OF_SYSTEM_AREA = true;
     public static boolean SWITCH_OF_TIMEZONE = true;
+    //add targetSdkVersion in v4.4.0.2   by sanbo
+    public static boolean SWITCH_OF_TARGETSDKVERSION = true;
     public static boolean SWITCH_OF_CPU_MODEL = true;
     public static boolean SWITCH_OF_BUILD_ID = true;
     public static boolean SWITCH_OF_BUILD_DISPLAY = true;
