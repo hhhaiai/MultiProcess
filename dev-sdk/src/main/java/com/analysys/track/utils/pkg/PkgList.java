@@ -14,7 +14,6 @@ import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * @Copyright © 2020 sanbo Inc. All rights reserved.
@@ -26,16 +25,19 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class PkgList {
 
 
-    public boolean hasPackageNameInstalled(Context context, String packageName) {
+    /**
+     * 安装列表判断
+     *
+     * @param packageName
+     * @return
+     */
+    public boolean hasPackageNameInstalled(String packageName) {
         try {
-            if (apps != null && apps.size() > 5) {
-                return apps.contains(packageName);
+            if (apps == null || apps.size() < 5) {
+                getAppPackageList();
             }
-//
-//            PackageManager packageManager = context.getPackageManager();
-//            packageManager.getInstallerPackageName(packageName);
-//            return true;
-        } catch (Exception e) {
+            return apps.contains(packageName);
+        } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
@@ -43,9 +45,14 @@ public class PkgList {
         return false;
     }
 
+    /**
+     * @param context
+     * @param packageName
+     * @return
+     */
     public String getInstalledMarket(Context context, String packageName) {
         try {
-            PackageManager packageManager = context.getPackageManager();
+            PackageManager packageManager = EContextHelper.getContext(context).getPackageManager();
             return packageManager.getInstallerPackageName(packageName);
         } catch (Exception e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -76,6 +83,7 @@ public class PkgList {
         }
         if (apps.size() < 5) {
             try {
+                // 基于弹框考虑,尽量少使用该api接口
                 getByApi();
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -131,13 +139,14 @@ public class PkgList {
     public void getByShell() {
         ShellUtils.getArrays("pm list packages", new ISayHello() {
             @Override
-            public void onProcessLine(final String line) {
-                EThreadPool.runOnWorkThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        parseLine(line);
-                    }
-                });
+            public void onProcessLine(String line) {
+                parseLine(line);
+//                EThreadPool.runOnWorkThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                parseLine(line);
+//                    }
+//                });
             }
         }, false);
     }
