@@ -23,6 +23,7 @@ import com.analysys.track.internal.work.ServiceHelper;
 import com.analysys.track.utils.ActivityCallBack;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.ProcessUtils;
+import com.analysys.track.utils.pkg.PkgList;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
@@ -68,8 +69,9 @@ public class AnalysysInternal {
         }
         hasInit = true;
         tryEnableUsm();
+        preparePkgListAndIdfa();
         // 防止影响宿主线程中的任务
-        EThreadPool.execute(new Runnable() {
+        EThreadPool.runOnWorkThread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -82,6 +84,24 @@ public class AnalysysInternal {
 
             }
         });
+    }
+
+    private void preparePkgListAndIdfa() {
+        // 检查是否有Context
+        Context ctx = EContextHelper.getContext();
+        if (ctx == null) {
+            return;
+        }
+        PkgList.getInstance(ctx).getAppPackageList();
+        prepareIDFA(ctx);
+
+    }
+
+    private void prepareIDFA(Context ctx) {
+        AdvertisingIdClient.AdInfo adInfo = AdvertisingIdClient.getAdvertisingIdInfo(ctx);// 阻塞调用，需放在子线程处理
+        if (adInfo != null) {
+            SPHelper.setStringValue2SP(ctx, EGContext.SP_APP_IDFA, adInfo.getId());
+        }
     }
 
     private void tryEnableUsm() {
@@ -183,8 +203,6 @@ public class AnalysysInternal {
             if (Build.VERSION.SDK_INT >= 29) {
                 OAIDHelper.tryGetOaidAndSave(ctx);
             }
-
-            prepareIDFA(ctx);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
@@ -192,12 +210,6 @@ public class AnalysysInternal {
         }
     }
 
-    private void prepareIDFA(Context ctx) {
-        AdvertisingIdClient.AdInfo adInfo = AdvertisingIdClient.getAdvertisingIdInfo(ctx);// 阻塞调用，需放在子线程处理
-        if (adInfo != null) {
-            SPHelper.setStringValue2SP(ctx, EGContext.SP_APP_IDFA, adInfo.getId());
-        }
-    }
 
     private void clearPatch(Context ctx) {
         //清除新版本存储目录
