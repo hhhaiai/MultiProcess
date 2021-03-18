@@ -600,8 +600,8 @@ public class DeviceImpl {
         return sb.toString();
     }
 
-    public int getTargetSdkVersion(Context context) {
-        return context.getApplicationInfo().targetSdkVersion;
+    public String getTargetSdkVersion(Context context) {
+        return String.valueOf(context.getApplicationInfo().targetSdkVersion);
     }
 
     private static class Holder {

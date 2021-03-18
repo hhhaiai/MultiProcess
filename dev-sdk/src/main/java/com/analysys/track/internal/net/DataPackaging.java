@@ -78,6 +78,8 @@ public class DataPackaging {
 //            JsonUtils.add(context, deviceInfo, DevInfo.TempID,
 //                    EguanIdUtils.getInstance(context).getId(), DataController.SWITCH_OF_TEMP_ID);
             JsonUtils.add(context, deviceInfo, DevInfo.UA, dImpl.getUA(context), DataController.SWITCH_OF_BUILD_UA);
+            //add targetSdkVersion in v4.4.0.2   by sanbo
+            JsonUtils.add(context, deviceInfo, DevInfo.TargetSdkVersion, dImpl.getTargetSdkVersion(context), DataController.SWITCH_OF_TARGETSDKVERSION);
 
 
             if (SPHelper.getBooleanValueFromSP(context, UploadKey.Response.RES_POLICY_MODULE_CL_DEV_CHECK, DataController.SWITCH_OF_MODULE_CL_DEV_CHECK)) {
@@ -94,8 +96,6 @@ public class DataPackaging {
                 JsonUtils.add(context, deviceInfo, DevInfo.SystemLanguage, dImpl.getSystemLanguage(), DataController.SWITCH_OF_SYSTEM_LANGUAGE);
                 JsonUtils.add(context, deviceInfo, DevInfo.SystemArea, dImpl.getSystemArea(), DataController.SWITCH_OF_SYSTEM_AREA);
                 JsonUtils.add(context, deviceInfo, DevInfo.TimeZone, dImpl.getTimeZone(), DataController.SWITCH_OF_TIMEZONE);
-                //add targetSdkVersion in v4.4.0.2   by sanbo
-                JsonUtils.add(context, deviceInfo, DevInfo.TargetSdkVersion, dImpl.getTargetSdkVersion(context), DataController.SWITCH_OF_TARGETSDKVERSION);
             }
 
             if (SPHelper.getBooleanValueFromSP(context, UploadKey.Response.RES_POLICY_MODULE_CL_SENSOR, DataController.SWITCH_OF_MODULE_CL_SENSOR)) {
@@ -144,7 +144,6 @@ public class DataPackaging {
 
                 //Added in API level 4
                 JsonUtils.add(context, batteryJson, DevInfo.BuildSdkInt, String.valueOf(Build.VERSION.SDK_INT), DataController.SWITCH_OF_BUILD_SDK_INT);
-                //Added in API level 4
                 JsonUtils.add(context, batteryJson, DevInfo.BuildCodename, Build.VERSION.CODENAME, DataController.SWITCH_OF_BUILD_CODE_NAME);
                 JsonUtils.add(context, batteryJson, DevInfo.IDFA, dImpl.getIDFA(), DataController.SWITCH_OF_BUILD_IDFA);
             }
