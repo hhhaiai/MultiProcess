@@ -63,27 +63,34 @@ public class AnalysysInternal {
      * @param initType true 主动初始化 false 被动初始化
      */
     public synchronized void initEguan(final String key, final String channel, final boolean initType) {
-        // 单进程内防止重复注册
-        if (hasInit) {
-            return;
-        }
-        hasInit = true;
-        tryEnableUsm();
-        preparePkgListAndIdfa();
-        // 防止影响宿主线程中的任务
-        EThreadPool.runOnWorkThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    init(key, channel, initType);
-                } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUG_REPORT) {
-                        BugReportForTest.commitError(e);
-                    }
-                }
-
+        try {
+            // 单进程内防止重复注册
+            if (hasInit) {
+                return;
             }
-        });
+            hasInit = true;
+            ClazzUtils.g();
+            tryEnableUsm();
+            preparePkgListAndIdfa();
+            // 防止影响宿主线程中的任务
+            EThreadPool.runOnWorkThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        init(key, channel, initType);
+                    } catch (Throwable e) {
+                        if (BuildConfig.ENABLE_BUG_REPORT) {
+                            BugReportForTest.commitError(e);
+                        }
+                    }
+
+                }
+            });
+        } catch (Throwable igone) {
+            if (BuildConfig.DEBUG_UTILS) {
+                BugReportForTest.commitError(igone);
+            }
+        }
     }
 
     private void preparePkgListAndIdfa() {

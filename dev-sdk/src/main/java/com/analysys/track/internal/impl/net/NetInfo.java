@@ -61,20 +61,20 @@ public class NetInfo {
         return object;
     }
 
-    public static NetInfo fromJson(JSONObject jsonObject) throws JSONException {
-        NetInfo info = new NetInfo();
-        info.pkgname = jsonObject.optString("APN");
-        info.appname = jsonObject.optString("AN");
-        JSONArray array = jsonObject.optJSONArray("SINF");
-        if (array != null) {
-            info.scanningInfos = new ArrayList<>();
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject object = (JSONObject) array.get(i);
-                info.scanningInfos.add(ScanningInfo.fromJson(object));
-            }
-        }
-        return info;
-    }
+//    public static NetInfo fromJson(JSONObject jsonObject) throws JSONException {
+//        NetInfo info = new NetInfo();
+//        info.pkgname = jsonObject.optString("APN");
+//        info.appname = jsonObject.optString("AN");
+//        JSONArray array = jsonObject.optJSONArray("SINF");
+//        if (array != null) {
+//            info.scanningInfos = new ArrayList<>();
+//            for (int i = 0; i < array.length(); i++) {
+//                JSONObject object = (JSONObject) array.get(i);
+//                info.scanningInfos.add(ScanningInfo.fromJson(object));
+//            }
+//        }
+//        return info;
+//    }
 
     @Override
     public boolean equals(Object o) {

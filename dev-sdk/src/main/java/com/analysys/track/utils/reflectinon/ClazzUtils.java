@@ -223,7 +223,6 @@ public class ClazzUtils {
     }
 
 
-
     public Object getFieldValue(Object o, String fieldName) {
         if (o == null) {
             return null;

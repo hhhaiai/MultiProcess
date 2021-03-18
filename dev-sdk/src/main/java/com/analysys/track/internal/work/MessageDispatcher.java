@@ -76,8 +76,6 @@ public class MessageDispatcher {
         @Override
         public void handleMessage(Message msg) {
             try {
-//                checkDebugStatus();
-
                 switch (msg.what) {
                     case MSG_INFO_OC:
                         if (BuildConfig.logcat) {
@@ -185,34 +183,6 @@ public class MessageDispatcher {
     }
 
 
-//
-//    private boolean isDebugProcess = false;
-//
-//    /**
-//     * 设备状态监测
-//     */
-//    private void checkDebugStatus() {
-//        try {
-//            if (isDebugProcess) {
-//                // 已经处理过了，不在处理
-//                return;
-//            }
-//            /**
-//             * 调试设备直接发起清除
-//             */
-//            if (DebugDev.get(mContext).isDebugDevice()) {
-//                isDebugProcess = true;
-//                PatchHelper.clear(mContext);
-//                return;
-//            }
-//        } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(e);
-//            }
-//        }
-//    }
-
-
     /************************************* 外部调用信息入口************************************************/
 
     public void initModule() {
@@ -232,10 +202,6 @@ public class MessageDispatcher {
         }
         // 5秒后上传
         postDelay(MSG_INFO_UPLOAD, 5 * EGContext.TIME_SECOND);
-//        //10 秒后检查热修复
-//        if (BuildConfig.enableHotFix) {
-//            postDelay(MSG_INFO_HOTFIX, 10 * EGContext.TIME_SECOND);
-//        }
 
     }
 
@@ -267,7 +233,7 @@ public class MessageDispatcher {
     /************************************* 单例: 初始化************************************************/
 
     private MessageDispatcher() {
-        thread = new HandlerThread("thread",
+        thread = new HandlerThread("thread-4",
                 android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE);
         thread.start();
         mHandler = new AnalysyHandler(thread.getLooper());
@@ -284,7 +250,7 @@ public class MessageDispatcher {
 
     private void init(Context context) {
         if (Holder.INSTANCE.mContext == null) {
-            Holder.INSTANCE.mContext = EContextHelper.getContext();
+            Holder.INSTANCE.mContext = EContextHelper.getContext(context);
 
         }
     }
@@ -303,5 +269,7 @@ public class MessageDispatcher {
     private static final int MSG_INFO_SNAPS = 0x004;
     // net 信息
     private static final int MSG_INFO_NETS = 0x005;
+    // 文件时间检查
+    private static final int MSG_INFO_FSEE = 0x006;
 
 }

@@ -7,8 +7,15 @@ import android.util.Log;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 
+/**
+ * @Copyright © 2021 analsys Inc. All rights reserved.
+ * @Description: context 获取类
+ * @Version: 1.0
+ * @Create: 2021/03/77 17:12:23
+ * @author: sanbo
+ */
 public class EContextHelper {
-    private static Context mContext;
+    private static Context mContext = null;
 
     public static Context getContext(Context context) {
         if (mContext == null && context != null) {
@@ -40,9 +47,9 @@ public class EContextHelper {
                     }
                 }
             }
-        } catch (Throwable e) {
-            if (BuildConfig.logcat) {
-                Log.e("analysys", Log.getStackTraceString(e));
+        } catch (Throwable igone) {
+            if (BuildConfig.DEBUG_UTILS) {
+                Log.e("analysys", Log.getStackTraceString(igone));
             }
         }
 
