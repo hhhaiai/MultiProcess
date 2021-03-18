@@ -410,19 +410,19 @@ public class AppSnapshotImpl {
             String pkg = pkgInfo.packageName;
 //            if (!TextUtils.isEmpty(pkg) && pkg.contains(".") && SystemUtils.hasLaunchIntentForPackage(packageManager, pkg)) {
             if (!TextUtils.isEmpty(pkg) && pkg.contains(".")) {
-                JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationPackageName,
+                JsonUtils.add(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationPackageName,
                         pkgInfo.packageName, DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
                 try {
-                    JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationName,
+                    JsonUtils.add(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationName,
                             String.valueOf(pkgInfo.applicationInfo.loadLabel(packageManager)),
                             DataController.SWITCH_OF_APPLICATION_NAME);
                 } catch (Throwable e) {
                 }
-                JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationVersionCode,
+                JsonUtils.add(mContext, appInfo, UploadKey.AppSnapshotInfo.ApplicationVersionCode,
                         pkgInfo.versionName + "|" + pkgInfo.versionCode, DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
-                JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ActionType, tag,
+                JsonUtils.add(mContext, appInfo, UploadKey.AppSnapshotInfo.ActionType, tag,
                         DataController.SWITCH_OF_ACTION_TYPE);
-                JsonUtils.pushToJSON(mContext, appInfo, UploadKey.AppSnapshotInfo.ActionHappenTime,
+                JsonUtils.add(mContext, appInfo, UploadKey.AppSnapshotInfo.ActionHappenTime,
                         String.valueOf(System.currentTimeMillis()), DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
             }
         } catch (Throwable e) {

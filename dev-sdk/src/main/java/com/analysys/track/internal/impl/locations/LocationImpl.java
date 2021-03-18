@@ -20,7 +20,6 @@ import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.ActivityCallBack;
-import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
@@ -434,7 +433,7 @@ public class LocationImpl {
             try {
                 locationJson = new JSONObject();
                 try {
-                    JsonUtils.pushToJSON(mContext, locationJson, UploadKey.LocationInfo.CollectionTime,
+                    JsonUtils.add(mContext, locationJson, UploadKey.LocationInfo.CollectionTime,
                             String.valueOf(System.currentTimeMillis()), DataController.SWITCH_OF_COLLECTION_TIME);
                 } catch (Throwable t) {
                     if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -443,7 +442,7 @@ public class LocationImpl {
                 }
                 try {
                     String locationInfo = SPHelper.getStringValueFromSP(mContext, EGContext.LAST_LOCATION, "");
-                    JsonUtils.pushToJSON(mContext, locationJson, UploadKey.LocationInfo.GeographyLocation,
+                    JsonUtils.add(mContext, locationJson, UploadKey.LocationInfo.GeographyLocation,
                             locationInfo, DataController.SWITCH_OF_GEOGRAPHY_LOCATION);
                 } catch (Throwable t) {
                     if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -457,7 +456,7 @@ public class LocationImpl {
                     try {
                         JSONArray wifiInfo = WifiImpl.getInstance(mContext).getWifiInfo();
                         if (wifiInfo != null && wifiInfo.length() > 0) {
-                            JsonUtils.pushToJSON(mContext, locationJson, UploadKey.LocationInfo.WifiInfo.NAME,
+                            JsonUtils.add(mContext, locationJson, UploadKey.LocationInfo.WifiInfo.NAME,
                                     wifiInfo, DataController.SWITCH_OF_WIFI_NAME);
                         }
                     } catch (Throwable t) {
@@ -474,7 +473,7 @@ public class LocationImpl {
                     try {
                         JSONArray baseStation = getBaseStationInfo();
                         if (baseStation != null && baseStation.length() > 0) {
-                            JsonUtils.pushToJSON(mContext, locationJson,
+                            JsonUtils.add(mContext, locationJson,
                                     UploadKey.LocationInfo.BaseStationInfo.NAME, baseStation,
                                     DataController.SWITCH_OF_BS_NAME);
                         }
@@ -704,28 +703,28 @@ public class LocationImpl {
                                             int ecio, int rsrq) {
         if (BuildConfig.ENABLE_LOCATIONINFO) {
             try {
-                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.BaseStationInfo.LocationAreaCode,
+                JsonUtils.add(mContext, jsonObject, UploadKey.LocationInfo.BaseStationInfo.LocationAreaCode,
                         lac, DataController.SWITCH_OF_LOCATION_AREA_CODE);
-                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.BaseStationInfo.CellId, cid,
+                JsonUtils.add(mContext, jsonObject, UploadKey.LocationInfo.BaseStationInfo.CellId, cid,
                         DataController.SWITCH_OF_CELL_ID);
-                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.BaseStationInfo.Level, stren,
+                JsonUtils.add(mContext, jsonObject, UploadKey.LocationInfo.BaseStationInfo.Level, stren,
                         DataController.SWITCH_OF_BS_LEVEL);
                 if (!TextUtils.isEmpty(psc) && !"0".equals(psc)) {
                     String key = psc.substring(0, psc.indexOf("&"));
                     String value = psc.substring(psc.lastIndexOf("&") + 1, psc.length());
-                    JsonUtils.pushToJSON(mContext, jsonObject, key, value, DataController.SWITCH_OF_BS_PCI);
+                    JsonUtils.add(mContext, jsonObject, key, value, DataController.SWITCH_OF_BS_PCI);
                 }
                 if (rsrp != 0) {
-                    JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.BaseStationInfo.RSRP, rsrp,
+                    JsonUtils.add(mContext, jsonObject, UploadKey.LocationInfo.BaseStationInfo.RSRP, rsrp,
                             DataController.SWITCH_OF_BS_RSRP);
                 }
                 if (ecio != 0) {
-                    JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.BaseStationInfo.ECIO, ecio,
+                    JsonUtils.add(mContext, jsonObject, UploadKey.LocationInfo.BaseStationInfo.ECIO, ecio,
                             DataController.SWITCH_OF_BS_ECIO);
                 }
                 // 仅当DYNAMIC_NETWORK_TYPE字段为4G时需要填写
                 if (rsrq != 0 && NetworkUtils.getNetworkType(mContext) == EGContext.NETWORK_TYPE_4G) {
-                    JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.BaseStationInfo.RSRQ, rsrq,
+                    JsonUtils.add(mContext, jsonObject, UploadKey.LocationInfo.BaseStationInfo.RSRQ, rsrq,
                             DataController.SWITCH_OF_BS_RSRQ);
                 }
             } catch (Throwable t) {

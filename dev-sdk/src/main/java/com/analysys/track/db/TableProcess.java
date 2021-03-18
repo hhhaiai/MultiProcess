@@ -312,14 +312,14 @@ public class TableProcess {
                 proc = EncryptUtils.decrypt(mContext,
                         cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PROC)));
                 if (!TextUtils.isEmpty(proc) && !"null".equalsIgnoreCase(proc)) {
-                    JsonUtils.pushToJSON(mContext, jsonObject, ProcUtils.RUNNING_RESULT, new JSONArray(proc),
+                    JsonUtils.add(mContext, jsonObject, ProcUtils.RUNNING_RESULT, new JSONArray(proc),
                             DataController.SWITCH_OF_CL_MODULE_PROC);
                     if (jsonObject == null || jsonObject.length() < 1) {
                         return array;
                     } else {
                         // time 不加密
                         String time = cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TIME));
-                        JsonUtils.pushToJSON(mContext, jsonObject, ProcUtils.RUNNING_TIME, time,
+                        JsonUtils.add(mContext, jsonObject, ProcUtils.RUNNING_TIME, time,
                                 DataController.SWITCH_OF_RUNNING_TIME);
                         if (countNum / 300 > 0) {
                             countNum = countNum % 300;
@@ -441,7 +441,7 @@ public class TableProcess {
                 }
                 jsonObject = new JSONObject();
 
-                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.OCInfo.ApplicationCloseTime, act,
+                JsonUtils.add(mContext, jsonObject, UploadKey.OCInfo.ApplicationCloseTime, act,
                         DataController.SWITCH_OF_APPLICATION_CLOSE_TIME);
 
 
@@ -451,7 +451,7 @@ public class TableProcess {
 
 
                 //AOT 不加密
-                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.OCInfo.ApplicationOpenTime,
+                JsonUtils.add(mContext, jsonObject, UploadKey.OCInfo.ApplicationOpenTime,
                         cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AOT)),
                         DataController.SWITCH_OF_APPLICATION_OPEN_TIME);
 
@@ -461,36 +461,36 @@ public class TableProcess {
                 if (TextUtils.isEmpty(pkgName)) {
                     blankCount += 1;
                 }
-                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.OCInfo.ApplicationPackageName, pkgName,
+                JsonUtils.add(mContext, jsonObject, UploadKey.OCInfo.ApplicationPackageName, pkgName,
                         DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
 
                 // AN 加密
                 String an = EncryptUtils.decrypt(mContext,
                         cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AN)));
-                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.OCInfo.ApplicationName, an,
+                JsonUtils.add(mContext, jsonObject, UploadKey.OCInfo.ApplicationName, an,
                         DataController.SWITCH_OF_APPLICATION_NAME);
 
                 //AVC 加密
                 String avc = EncryptUtils.decrypt(mContext,
                         cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AVC)));
-                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.OCInfo.ApplicationVersionCode, avc,
+                JsonUtils.add(mContext, jsonObject, UploadKey.OCInfo.ApplicationVersionCode, avc,
                         DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
                 //NT不加密
-                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.OCInfo.NetworkType,
+                JsonUtils.add(mContext, jsonObject, UploadKey.OCInfo.NetworkType,
                         cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.NT)),
                         DataController.SWITCH_OF_NETWORK_TYPE);
 
                 etdm = new JSONObject();
                 // AST 不加密
-                JsonUtils.pushToJSON(mContext, etdm, UploadKey.OCInfo.SwitchType,
+                JsonUtils.add(mContext, etdm, UploadKey.OCInfo.SwitchType,
                         cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AST)),
                         DataController.SWITCH_OF_SWITCH_TYPE);
                 // AT 不加密
-                JsonUtils.pushToJSON(mContext, etdm, UploadKey.OCInfo.ApplicationType,
+                JsonUtils.add(mContext, etdm, UploadKey.OCInfo.ApplicationType,
                         cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.AT)),
                         DataController.SWITCH_OF_APPLICATION_TYPE);
                 // CT 不加密
-                JsonUtils.pushToJSON(mContext, etdm, UploadKey.OCInfo.CollectionType,
+                JsonUtils.add(mContext, etdm, UploadKey.OCInfo.CollectionType,
                         cursor.getString(cursor.getColumnIndex(DBConfig.OC.Column.CT)),
                         DataController.SWITCH_OF_COLLECTION_TYPE);
                 jsonObject.put(EGContext.EXTRA_DATA, etdm);
@@ -1000,27 +1000,27 @@ public class TableProcess {
             //APN 加密
             pkgName = EncryptUtils.decrypt(mContext,
                     cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN)));
-            JsonUtils.pushToJSON(mContext, jsonObj, UploadKey.AppSnapshotInfo.ApplicationPackageName, pkgName,
+            JsonUtils.add(mContext, jsonObj, UploadKey.AppSnapshotInfo.ApplicationPackageName, pkgName,
                     DataController.SWITCH_OF_APPLICATION_PACKAGE_NAME);
             //AN 加密
             String an = EncryptUtils.decrypt(mContext,
                     cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AN)));
-            JsonUtils.pushToJSON(mContext, jsonObj, UploadKey.AppSnapshotInfo.ApplicationName, an,
+            JsonUtils.add(mContext, jsonObj, UploadKey.AppSnapshotInfo.ApplicationName, an,
                     DataController.SWITCH_OF_APPLICATION_NAME);
 
             //AVC 加密
-            JsonUtils.pushToJSON(mContext, jsonObj, UploadKey.AppSnapshotInfo.ApplicationVersionCode,
+            JsonUtils.add(mContext, jsonObj, UploadKey.AppSnapshotInfo.ApplicationVersionCode,
                     EncryptUtils.decrypt(mContext,
                             cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AVC))),
                     DataController.SWITCH_OF_APPLICATION_VERSION_CODE);
 
             //AT 不加密
-            JsonUtils.pushToJSON(mContext, jsonObj, UploadKey.AppSnapshotInfo.ActionType,
+            JsonUtils.add(mContext, jsonObj, UploadKey.AppSnapshotInfo.ActionType,
                     cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AT)),
                     DataController.SWITCH_OF_ACTION_TYPE);
 
             //AHT 不加密
-            JsonUtils.pushToJSON(mContext, jsonObj, UploadKey.AppSnapshotInfo.ActionHappenTime,
+            JsonUtils.add(mContext, jsonObj, UploadKey.AppSnapshotInfo.ActionHappenTime,
                     cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.AHT)),
                     DataController.SWITCH_OF_ACTION_HAPPEN_TIME);
         } catch (Throwable e) {

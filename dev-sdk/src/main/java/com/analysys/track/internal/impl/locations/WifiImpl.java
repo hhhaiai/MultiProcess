@@ -105,15 +105,15 @@ public class WifiImpl {
         }
         if (BuildConfig.ENABLE_LOCATIONINFO) {
             try {
-                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.SSID, ssid,
+                JsonUtils.add(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.SSID, ssid,
                         DataController.SWITCH_OF_SSID);
-                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.BSSID, bssid,
+                JsonUtils.add(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.BSSID, bssid,
                         DataController.SWITCH_OF_BSSID);
-                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.Level, level,
+                JsonUtils.add(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.Level, level,
                         DataController.SWITCH_OF_LEVEL);
-                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.Capabilities,
+                JsonUtils.add(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.Capabilities,
                         capabilities, DataController.SWITCH_OF_CAPABILITIES);
-                JsonUtils.pushToJSON(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.Frequency, frequency,
+                JsonUtils.add(mContext, jsonObject, UploadKey.LocationInfo.WifiInfo.Frequency, frequency,
                         DataController.SWITCH_OF_FREQUENCY);
             } catch (Throwable t) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
