@@ -40,7 +40,7 @@ public class SDCardLastModifyTimeCase extends ETestCase {
         }
         Iterator<Map.Entry<String, Long>> iterator = map.entrySet().iterator();
         StringBuffer sb = new StringBuffer();
-        sb.append("==================访问SDcard 根目录末次访问时间%s===================").append("\n");
+        sb.append("==================访问SDcard 根目录末次访问时间%s[%d]===================").append("\n");
         int index = 0;
         while (iterator.hasNext()) {
             index += 1;
@@ -48,7 +48,7 @@ public class SDCardLastModifyTimeCase extends ETestCase {
             sb.append("[").append(index).append("]").append(entry.getKey()).append(" : [").append(entry.getValue()).append("] ---->").append(MDate.getDateFromTimestamp((Long) entry.getValue())).append("\n");
         }
         long end = System.currentTimeMillis();
-        Woo.logFormCase(String.format(sb.toString(), SDKHelper.convertLongTimeToHms(end - begin)));
+        Woo.logFormCase(String.format(sb.toString(), SDKHelper.convertLongTimeToHms(end - begin),map.toString().getBytes().length));
 
         return true;
     }
