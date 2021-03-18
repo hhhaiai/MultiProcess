@@ -2,6 +2,7 @@ package cn.analysys.casedemo.cases.infos;
 
 import com.analysys.track.utils.MDate;
 import com.cslib.defcase.ETestCase;
+import com.cslib.utils.L;
 
 import java.io.File;
 import java.util.Iterator;
@@ -32,20 +33,22 @@ public class SDCardLastModifyTimeCase extends ETestCase {
 
     @Override
     public boolean predicate() {
+        long begin = System.currentTimeMillis();
         ConcurrentHashMap<String, Long> map = SDKHelper.getSDDirTime();
         if (map.size() == 0) {
             return false;
         }
         Iterator<Map.Entry<String, Long>> iterator = map.entrySet().iterator();
         StringBuffer sb = new StringBuffer();
-        sb.append("访问SDcard 根目录末次访问时间:").append("\n");
+        sb.append("==================访问SDcard 根目录末次访问时间%s===================").append("\n");
         int index = 0;
         while (iterator.hasNext()) {
             index += 1;
             Map.Entry entry = iterator.next();
             sb.append("[").append(index).append("]").append(entry.getKey()).append(" : [").append(entry.getValue()).append("] ---->").append(MDate.getDateFromTimestamp((Long) entry.getValue())).append("\n");
         }
-        Woo.logFormCase(sb.toString());
+        long end = System.currentTimeMillis();
+        Woo.logFormCase(String.format(sb.toString(), SDKHelper.convertLongTimeToHms(end - begin)));
 
         return true;
     }

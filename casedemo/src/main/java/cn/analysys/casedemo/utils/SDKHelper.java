@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.impl.ftime.LastModifyByFile;
 import com.analysys.track.utils.AndroidManifestHelper;
+import com.analysys.track.utils.MDate;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.pkg.PkgList;
@@ -109,6 +110,10 @@ public class SDKHelper {
      */
     public static String getAndroidID() {
         return DeviceImpl.getInstance(getContext()).getValueFromSettingSystem(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+    }
+
+    public static String convertLongTimeToHms(long time) {
+        return MDate.convertLongTimeToHms(time);
     }
 
     /**
