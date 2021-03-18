@@ -15,14 +15,19 @@ public class AdvertisingIdClientTest {
 
     @Test
     public void getAdvertisingIdInfo() {
-        try {
-            AdvertisingIdClient.AdInfo info1 = AdvertisingIdClient.getAdvertisingIdInfo(mContext);
-            AdvertisingIdClient.AdInfo info2 = AdvertisingIdClient.getAdvertisingIdInfo(mContext);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    AdvertisingIdClient.AdInfo info1 = AdvertisingIdClient.getAdvertisingIdInfo(mContext);
+                    AdvertisingIdClient.AdInfo info2 = AdvertisingIdClient.getAdvertisingIdInfo(mContext);
 
-            assertNotNull("谷歌广告id，部分机型无法获取是已知的",info1);
-            assertEquals("谷歌广告id两次获取不一致",info1.getId(), info2.getId());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                    assertNotNull("谷歌广告id，部分机型无法获取是已知的", info1);
+                    assertEquals("谷歌广告id两次获取不一致", info1.getId(), info2.getId());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 }

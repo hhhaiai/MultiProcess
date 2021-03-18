@@ -26,17 +26,28 @@ public class PkgList {
 
 
     /**
-     * 安装列表判断
+     * 确定应用是否安装
      *
      * @param packageName
      * @return
      */
-    public boolean hasPackageNameInstalled(String packageName) {
+    public boolean isInstall(String packageName) {
         try {
             if (apps == null || apps.size() < 5) {
                 getAppPackageList();
             }
-            return apps.contains(packageName);
+
+            boolean result = apps.contains(packageName);
+            if (!result) {
+                try {
+                    PackageManager pm = EContextHelper.getContext(mContext).getPackageManager();
+                    pm.getPackageInfo(packageName, 0);
+                    result = true;
+                } catch (Throwable e) {
+                    result = false;
+                }
+            }
+            return result;
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
