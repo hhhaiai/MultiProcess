@@ -3,6 +3,7 @@ package com.analysys.track.utils;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * @Copyright © 2020 analysys Inc. All rights reserved.
@@ -35,7 +36,9 @@ public class MDate {
     }
 
     public static final String convertLongTimeToHms(long interval) {
-        return  new SimpleDateFormat("HH:mm:ss.SSS").format(interval);
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss:SSS");
+        formatter.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
+        return formatter.format(interval);
     }
 
     public static final String getDateFromTimestamp(long timestamp) {
