@@ -7,5 +7,6 @@
     <issue id="MissingTranslation" severity="ignore" />
     <issue id="NewApi" severity="ignore" />
     <issue id="Deprecated" severity="ignore" />
+    <issue id="MissingPermission" severity="ignore" />
     <issue id="ExtraTranslation" severity="ignore" />
 </lint>
