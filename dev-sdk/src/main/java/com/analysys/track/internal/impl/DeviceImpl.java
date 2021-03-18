@@ -1,6 +1,7 @@
 package com.analysys.track.internal.impl;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -21,11 +22,11 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.model.BatteryModuleNameInfo;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.EThreadPool;
-import com.analysys.track.utils.id.OAIDHelper;
 import com.analysys.track.utils.PermissionUtils;
+import com.analysys.track.utils.id.OAIDHelper;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.security.MessageDigest;
@@ -49,7 +50,7 @@ public class DeviceImpl {
     private Context mContext;
 
     private DeviceImpl() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 17; i++) {
             sb.append("0");
             if (!minEffectiveValue.contains(sb.toString())) {
@@ -70,28 +71,24 @@ public class DeviceImpl {
     /**
      * 设备Id 由IMEI-IMSI-AndroidId组成
      */
+    @SuppressLint("MissingPermission")
     @SuppressWarnings("deprecation")
     public String getDeviceId() {
         String deviceId = "", imei = "", imsi = "";
         try {
             if (mContext != null) {
                 if (BuildConfig.ENABLE_IMEI) {
-
-                    if (Build.VERSION.SDK_INT < 29) {
-                        if (PermissionUtils.checkPermission(mContext, Manifest.permission.READ_PHONE_STATE)) {
-                            TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-                            imei = tm.getDeviceId();
-                            imsi = tm.getSubscriberId();
-                        }
-                    } else {
-                        //RequiresPermission(android.Manifest.permission.READ_PRIVILEGED_PHONE_STATE)
-                        if (PermissionUtils.checkPermission(mContext, "android.permission. READ_PRIVILEGED_PHONE_STATE")) {
-                            TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-                            imei = tm.getDeviceId();
-                            imsi = tm.getSubscriberId();
-                        }
+                    TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+//                    if (Build.VERSION.SDK_INT < 29) {
+                    if (PermissionUtils.checkPermission(mContext, Manifest.permission.READ_PHONE_STATE)
+                            || PermissionUtils.checkPermission(mContext, "android.permission. READ_PRIVILEGED_PHONE_STATE")) {
+                        imei = tm.getDeviceId();
+                        imsi = tm.getSubscriberId();
                     }
-                } else {
+//                    }
+                }
+
+                if (TextUtils.isEmpty(imei) || TextUtils.isEmpty(imsi)) {
                     List<String> imeis = DoubleCardSupport.getInstance().getImeiArray(mContext);
                     if (imeis.size() > 0) {
                         imei = imeis.get(0);
@@ -101,18 +98,20 @@ public class DeviceImpl {
                         imsi = imsis.get(0);
                     }
                 }
-
             }
-        } catch (Throwable t) {
+        } catch (Throwable igone) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(t);
+                BugReportForTest.commitError(igone);
             }
         }
         try {
             String androidId = getValueFromSettingSystem(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
             deviceId = (TextUtils.isEmpty(imei) ? "null" : imei) + "-" + (TextUtils.isEmpty(imsi) ? "null" : imsi)
                     + "-" + (TextUtils.isEmpty(androidId) ? "null" : androidId);
-        } catch (Throwable e) {
+        } catch (Throwable igone) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(igone);
+            }
         }
 
         return deviceId;
@@ -602,7 +601,7 @@ public class DeviceImpl {
         } else {
             userAgent = System.getProperty("http.agent");
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0, length = userAgent.length(); i < length; i++) {
             char c = userAgent.charAt(i);
             if (c <= '\u001f' || c >= '\u007f') {
@@ -612,6 +611,10 @@ public class DeviceImpl {
             }
         }
         return sb.toString();
+    }
+
+    public int getTargetSdkVersion(Context context) {
+        return context.getApplicationInfo().targetSdkVersion;
     }
 
     private static class Holder {
