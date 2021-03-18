@@ -145,10 +145,10 @@ public class AppSnapshotImpl {
         }
     }
 
-    public void resetDB() {
-        TableProcess.getInstance(mContext).deleteAllSnapshot();
-        getSnapShotInfo();
-    }
+//    public void resetDB() {
+//        TableProcess.getInstance(mContext).deleteAllSnapshot();
+//        getSnapShotInfo();
+//    }
 
 
     /**

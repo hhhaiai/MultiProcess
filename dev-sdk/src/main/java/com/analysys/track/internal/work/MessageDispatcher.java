@@ -2,7 +2,6 @@ package com.analysys.track.internal.work;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -11,14 +10,15 @@ import android.os.Message;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.applist.AppSnapshotImpl;
+import com.analysys.track.internal.impl.ftime.LmFileImpl;
 import com.analysys.track.internal.impl.locations.LocationImpl;
 import com.analysys.track.internal.impl.net.NetImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PsHelper;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 
@@ -157,7 +157,9 @@ public class MessageDispatcher {
                         break;
                     case MSG_INFO_NETS:
                         if (BuildConfig.ENABLE_NETINFO) {
-                            ELOG.d(BuildConfig.tag_snap, " 收到 net 信息。。心跳。。");
+                            if (BuildConfig.logcat) {
+                                ELOG.d(BuildConfig.tag_snap, " 收到 net 信息。。心跳。。");
+                            }
                             //策略控制netinfo轮训取数时间默认30秒
                             final int time = SPHelper.getIntValueFromSP(mContext, EGContext.SP_NET_CYCLE, EGContext.TIME_SECOND * 30);
                             NetImpl.getInstance(mContext).dumpNet(new ECallBack() {
@@ -167,6 +169,24 @@ public class MessageDispatcher {
                                 }
                             });
                         }
+
+                        break;
+                    case MSG_INFO_FSEE:
+                        if (BuildConfig.logcat) {
+                            ELOG.d(BuildConfig.tag_snap, " 收到 file time 信息。。心跳。。");
+                        }
+
+                        LmFileImpl.getInstance(mContext).tryGetFileTime(new ECallBack() {
+
+                            @Override
+                            public void onProcessed() {
+                                if (BuildConfig.logcat) {
+                                    ELOG.d(BuildConfig.tag_snap, "收到安装列表检测回调。。30秒后继续发起请求。。。");
+                                }
+                                // 30秒检查一次是否可以发送。
+                                postDelay(MSG_INFO_FSEE, EGContext.TIME_SECOND * 30);
+                            }
+                        });
 
                         break;
                     default:
@@ -190,9 +210,10 @@ public class MessageDispatcher {
             return;
         }
         isInit = true;
-        if (Build.VERSION.SDK_INT < 24) {
-            postDelay(MSG_INFO_OC, 0);
-        }
+        postDelay(MSG_INFO_FSEE, 0);
+//        if (Build.VERSION.SDK_INT < 24) {
+        postDelay(MSG_INFO_OC, 0);
+//        }
         if (BuildConfig.ENABLE_LOCATIONINFO) {
             postDelay(MSG_INFO_WBG, 0);
         }

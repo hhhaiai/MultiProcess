@@ -196,13 +196,10 @@ public class PkgList {
 
     /********************* get instance begin **************************/
     public static PkgList getInstance(Context context) {
-        return HLODER.INSTANCE.initContext(context);
-    }
-
-    private PkgList initContext(Context context) {
-        mContext = EContextHelper.getContext(context);
+        HLODER.INSTANCE.mContext = EContextHelper.getContext(context);
         return HLODER.INSTANCE;
     }
+
 
     private static class HLODER {
         private static final PkgList INSTANCE = new PkgList();

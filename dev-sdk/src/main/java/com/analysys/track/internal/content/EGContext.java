@@ -207,7 +207,7 @@ public class EGContext {
     public static final String FILES_SYNC_SNAP_ADD_BROADCAST = "T-SADD";
     public static final String FILES_SYNC_SNAP_DELETE_BROADCAST = "T-SDEL";
     public static final String FILES_SYNC_SNAP_UPDATE_BROADCAST = "T-SUPDATE";
-    public static final String FILES_SYNC_BATTERY_BROADCAST = "T-BATTERY";
+//    public static final String FILES_SYNC_BATTERY_BROADCAST = "T-BATTERY";
 
 //    // 多进程同步. 同步版本号
 //    public static final String MULTIPROCESS_SP = "T-SP";

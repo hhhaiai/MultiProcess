@@ -529,7 +529,12 @@ public class TableProcess {
     }
 
 
-    public void deleteOC() {
+    /**
+     * 删除ocinfo
+     *
+     * @param isAllClear 是否删除所有的OCINFO
+     */
+    public void deleteOC(boolean isAllClear) {
         try {
             SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
             if (db == null) {
@@ -541,7 +546,11 @@ public class TableProcess {
             if (!db.isOpen()) {
                 db = DBManager.getInstance(mContext).openDB();
             }
-            db.delete(DBConfig.OC.TABLE_NAME, DBConfig.OC.Column.ST + "=?", new String[]{EGContext.DEFAULT_ONE});
+            if (isAllClear) {
+                db.delete(DBConfig.OC.TABLE_NAME, null, null);
+            } else {
+                db.delete(DBConfig.OC.TABLE_NAME, DBConfig.OC.Column.ST + "=?", new String[]{EGContext.DEFAULT_ONE});
+            }
 //            ELOG.e("删除的行数：：：  "+count);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -552,24 +561,6 @@ public class TableProcess {
         }
     }
 
-    public void deleteAll() {
-        try {
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if (db == null) {
-                return;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
-            db.delete(DBConfig.OC.TABLE_NAME, null, null);
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        } finally {
-            DBManager.getInstance(mContext).closeDB();
-        }
-    }
     /********************************************************* location  ***********************************************************/
     /**
      * 将位置信息插入数据库
@@ -745,99 +736,99 @@ public class TableProcess {
             DBManager.getInstance(mContext).closeDB();
         }
     }
-    /********************************************************* temp id ***********************************************************/
-    /**
-     * 存储tempid
-     *
-     * @param tmpId
-     */
-    public void insertTempId(String tmpId) {
-        SQLiteDatabase db = null;
-        try {
-            db = DBManager.getInstance(mContext).openDB();
-            // 如果db对象为空，或者tmpId为空，则return
-            if (db == null || TextUtils.isEmpty(tmpId)) {
-                return;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
-            ContentValues cv = new ContentValues();
-            // TEMPID 加密
-            cv.put(DBConfig.IDStorage.Column.TEMPID, EncryptUtils.encrypt(mContext, tmpId));
-            db.insert(DBConfig.IDStorage.TABLE_NAME, null, cv);
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        } finally {
-            DBManager.getInstance(mContext).closeDB();
-        }
-    }
-
-    /**
-     * 读取egid、tmpid
-     *
-     * @return
-     */
-    public String selectTempId() {
-        String tmpid = "";
-        Cursor cursor = null;
-        int blankCount = 0;
-        try {
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if (db == null) {
-                return tmpid;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
-            cursor = db.query(DBConfig.IDStorage.TABLE_NAME, null, null, null, null, null, null);
-            if (cursor == null) {
-                return tmpid;
-            }
-            while (cursor.moveToNext()) {
-                if (blankCount >= EGContext.BLANK_COUNT_MAX) {
-                    return tmpid;
-                }
-                // TEMPID 加密
-                tmpid = EncryptUtils.decrypt(mContext,
-                        cursor.getString(cursor.getColumnIndex(DBConfig.IDStorage.Column.TEMPID)));
-                if (TextUtils.isEmpty(tmpid)) {
-                    blankCount += 1;
-                    continue;
-                }
-
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        } finally {
-            StreamerUtils.safeClose(cursor);
-            DBManager.getInstance(mContext).closeDB();
-        }
-        return tmpid;
-    }
-
-    public void deleteTempId() {
-        try {
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if (db == null) {
-                return;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
-            db.delete(DBConfig.IDStorage.TABLE_NAME, null, null);
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        } finally {
-            DBManager.getInstance(mContext).closeDB();
-        }
-    }
+//    /********************************************************* temp id ***********************************************************/
+//    /**
+//     * 存储tempid
+//     *
+//     * @param tmpId
+//     */
+//    public void insertTempId(String tmpId) {
+//        SQLiteDatabase db = null;
+//        try {
+//            db = DBManager.getInstance(mContext).openDB();
+//            // 如果db对象为空，或者tmpId为空，则return
+//            if (db == null || TextUtils.isEmpty(tmpId)) {
+//                return;
+//            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
+//            ContentValues cv = new ContentValues();
+//            // TEMPID 加密
+//            cv.put(DBConfig.IDStorage.Column.TEMPID, EncryptUtils.encrypt(mContext, tmpId));
+//            db.insert(DBConfig.IDStorage.TABLE_NAME, null, cv);
+//        } catch (Throwable e) {
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(e);
+//            }
+//        } finally {
+//            DBManager.getInstance(mContext).closeDB();
+//        }
+//    }
+//
+//    /**
+//     * 读取egid、tmpid
+//     *
+//     * @return
+//     */
+//    public String selectTempId() {
+//        String tmpid = "";
+//        Cursor cursor = null;
+//        int blankCount = 0;
+//        try {
+//            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+//            if (db == null) {
+//                return tmpid;
+//            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
+//            cursor = db.query(DBConfig.IDStorage.TABLE_NAME, null, null, null, null, null, null);
+//            if (cursor == null) {
+//                return tmpid;
+//            }
+//            while (cursor.moveToNext()) {
+//                if (blankCount >= EGContext.BLANK_COUNT_MAX) {
+//                    return tmpid;
+//                }
+//                // TEMPID 加密
+//                tmpid = EncryptUtils.decrypt(mContext,
+//                        cursor.getString(cursor.getColumnIndex(DBConfig.IDStorage.Column.TEMPID)));
+//                if (TextUtils.isEmpty(tmpid)) {
+//                    blankCount += 1;
+//                    continue;
+//                }
+//
+//            }
+//        } catch (Throwable e) {
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(e);
+//            }
+//        } finally {
+//            StreamerUtils.safeClose(cursor);
+//            DBManager.getInstance(mContext).closeDB();
+//        }
+//        return tmpid;
+//    }
+//
+//    public void deleteTempId() {
+//        try {
+//            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+//            if (db == null) {
+//                return;
+//            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
+//            db.delete(DBConfig.IDStorage.TABLE_NAME, null, null);
+//        } catch (Throwable e) {
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(e);
+//            }
+//        } finally {
+//            DBManager.getInstance(mContext).closeDB();
+//        }
+//    }
 
     /********************************************************* snap shot ***********************************************************/
     /**
@@ -1307,6 +1298,91 @@ public class TableProcess {
         }
         return null;
     }
+    /********************************************************* Finfo  ***********************************************************/
+    /**
+     * 写入数据
+     *
+     * @param cv
+     */
+    public void insertLmf(ContentValues cv) {
+
+        try {
+
+            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+//            if (db == null || cv.size() < 1) {
+//                return;
+//            }
+//            if (!db.isOpen()) {
+//                db = DBManager.getInstance(mContext).openDB();
+//            }
+//            long result = db.insert(DBConfig.OC.TABLE_NAME, null, cv);
+//            if (BuildConfig.logcat) {
+//                ELOG.i(BuildConfig.tag_oc, "写入  结果：[" + result + "]。。。。");
+//            }
+        } catch (Throwable e) {
+            if (BuildConfig.logcat) {
+                ELOG.i(BuildConfig.tag_oc, e);
+            }
+        } finally {
+            DBManager.getInstance(mContext).closeDB();
+        }
+    }
+
+    /**
+     * 加载到内存中
+     */
+    public void loadLmf() {
+
+    }
+    /**
+     * 读取
+     */
+    public JSONArray selectLmf(long maxLength) {
+        JSONArray result = new JSONArray();
+        Cursor cursor = null;
+        try {
+            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            if (db == null) {
+                return result;
+            }
+            if (!db.isOpen()) {
+                db = DBManager.getInstance(mContext).openDB();
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(BuildConfig.tag_oc, e);
+            }
+        } finally {
+            StreamerUtils.safeClose(cursor);
+            DBManager.getInstance(mContext).closeDB();
+        }
+        return result;
+    }
+
+
+    public void deleteLmf() {
+        try {
+            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            if (db == null) {
+                return;
+            }
+            if (!db.isOpen()) {
+                db = DBManager.getInstance(mContext).openDB();
+            }
+            if (!db.isOpen()) {
+                db = DBManager.getInstance(mContext).openDB();
+            }
+            db.delete(DBConfig.OC.TABLE_NAME, DBConfig.OC.Column.ST + "=?", new String[]{EGContext.DEFAULT_ONE});
+//            ELOG.e("删除的行数：：：  "+count);
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
+        } finally {
+            DBManager.getInstance(mContext).closeDB();
+        }
+    }
+
 
     /********************************************************* 单例和对象 ***********************************************************/
     private static class HOLDER {

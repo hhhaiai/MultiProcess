@@ -67,6 +67,7 @@ def tag_loc = "analysys_loc"//位置信息的tag
 def tag_ft = "analysys_ft"//位置信息的tag
 def tag_recerver = "analysys_recerver"//广播接收的tag
 def tag_cutoff = "analysys_cutoff"//短路的tag
+def tag_finfo = "analysys_finfo"//短路的tag
 def tag_StrMix = "analysys_StrMix"//字符串混淆的tag
 //endregion
 
@@ -125,6 +126,7 @@ android {
         buildConfigField "String", "tag_cutoff", "\"${tag_cutoff}\""
         buildConfigField "String", "tag_StrMix", "\"${tag_StrMix}\""
         buildConfigField "String", "tag_filetime", "\"${tag_ft}\""
+        buildConfigField "String", "tag_finfo", "\"${tag_finfo}\""
 
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

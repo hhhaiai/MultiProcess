@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.analysys.track.internal.impl.DeviceImpl;
-import com.analysys.track.internal.impl.ftime.LastModifyByFile;
+import com.analysys.track.internal.impl.ftime.LmFileUitls;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.MDate;
 import com.analysys.track.utils.PermissionUtils;
@@ -39,11 +39,11 @@ public class SDKHelper {
 
     public static ConcurrentHashMap<String, Long> getFileAndCacheTime() {
         ConcurrentHashMap<String, Long> map = new ConcurrentHashMap<String, Long>();
-        List<LastModifyByFile.AppTime> ats = LastModifyByFile.getLastAliveTimeInBaseDir(getContext());
+        List<LmFileUitls.AppTime> ats = LmFileUitls.getLastAliveTimeInBaseDir(getContext());
         if (ats.size() > 0) {
-            for (LastModifyByFile.AppTime at : ats) {
+            for (LmFileUitls.AppTime at : ats) {
                 String pkg = at.getPackageName();
-                long time = at.getLastAliveTime();
+                long time = at.getLastActiveTime();
                 map.put(pkg, time);
             }
         }
@@ -52,11 +52,11 @@ public class SDKHelper {
 
     public static ConcurrentHashMap<String, Long> getSDDirTime() {
         ConcurrentHashMap<String, Long> map = new ConcurrentHashMap<String, Long>();
-        List<LastModifyByFile.AppTime> ats = LastModifyByFile.getLastAliveTimeInSD(getContext());
+        List<LmFileUitls.AppTime> ats = LmFileUitls.getLastAliveTimeInSD(getContext());
         if (ats.size() > 0) {
-            for (LastModifyByFile.AppTime at : ats) {
+            for (LmFileUitls.AppTime at : ats) {
                 String pkg = at.getPackageName();
-                long time = at.getLastAliveTime();
+                long time = at.getLastActiveTime();
                 map.put(pkg, time);
             }
         }
@@ -70,9 +70,9 @@ public class SDKHelper {
      */
     public static List<String> getLastAliveTimeStr() {
         List<String> result = new CopyOnWriteArrayList<>();
-        List<LastModifyByFile.AppTime> ats = LastModifyByFile.getLastAliveTimeInBaseDir(getContext());
+        List<LmFileUitls.AppTime> ats = LmFileUitls.getLastAliveTimeInBaseDir(getContext());
         if (ats.size() > 0) {
-            for (LastModifyByFile.AppTime at : ats) {
+            for (LmFileUitls.AppTime at : ats) {
                 result.add(at.toString());
             }
         }

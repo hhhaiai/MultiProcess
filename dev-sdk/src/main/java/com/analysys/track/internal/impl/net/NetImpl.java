@@ -94,6 +94,9 @@ public class NetImpl {
                 }
             });
         } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(BuildConfig.tag_netinfo, e);
+            }
         }
 
     }

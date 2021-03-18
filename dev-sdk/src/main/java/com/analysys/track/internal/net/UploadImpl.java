@@ -316,7 +316,7 @@ public class UploadImpl {
                     }
                 }
             } else {
-                TableProcess.getInstance(mContext).deleteAll();
+                TableProcess.getInstance(mContext).deleteOC(true);
             }
             //组装net数据
             if (BuildConfig.ENABLE_NETINFO) {
@@ -553,7 +553,7 @@ public class UploadImpl {
             SPHelper.setIntValue2SP(mContext, EGContext.FAILEDNUMBER, 0);
             SPHelper.setLongValue2SP(mContext, EGContext.FAILEDTIME, 0);
             SPHelper.setLongValue2SP(mContext, EGContext.RETRYTIME, 0);
-            TableProcess.getInstance(mContext).deleteOC();
+            TableProcess.getInstance(mContext).deleteOC(false);
             // 上传完成回来清理数据的时候，snapshot删除卸载的，其余的统一恢复成正常值
             TableProcess.getInstance(mContext).resetSnapshot();
 //            AppSnapshotImpl.getInstance(mContext).resetDB();

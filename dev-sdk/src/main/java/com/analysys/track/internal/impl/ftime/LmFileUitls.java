@@ -14,33 +14,33 @@ import java.util.List;
 
 /**
  * @Copyright © 2020 analsys Inc. All rights reserved.
- * @Description: read file
+ * @Description: last modify by file utils
  * @Version: 1.0
  * @Create: 2020-11-17 11:58:02
  * @author: Administrator
  */
-public class LastModifyByFile {
+public class LmFileUitls {
 
     public static class AppTime {
         private String sPackageName;
-        private long lastAliveTime;
+        private long lastActiveTime;
 
         public String getPackageName() {
             return sPackageName;
         }
 
-        public long getLastAliveTime() {
-            return lastAliveTime;
+        public long getLastActiveTime() {
+            return lastActiveTime;
         }
 
         public AppTime(String __pkg, long __time) {
             this.sPackageName = __pkg;
-            this.lastAliveTime = __time;
+            this.lastActiveTime = __time;
         }
 
         @Override
         public String toString() {
-            return String.format("[%s]---->%s ", sPackageName, MDate.getDateFromTimestamp(lastAliveTime));
+            return String.format("[%s]---->%s ", sPackageName, MDate.getDateFromTimestamp(lastActiveTime));
         }
     }
 
@@ -66,7 +66,7 @@ public class LastModifyByFile {
         Collections.sort(list, new Comparator<AppTime>() {
             @Override
             public int compare(AppTime at1, AppTime at2) {
-                return (int) (at2.lastAliveTime / 1000 - at1.lastAliveTime / 1000);
+                return (int) (at2.lastActiveTime / 1000 - at1.lastActiveTime / 1000);
             }
         });
 
@@ -118,7 +118,7 @@ public class LastModifyByFile {
         Collections.sort(list, new Comparator<AppTime>() {
             @Override
             public int compare(AppTime at1, AppTime at2) {
-                return (int) (at2.lastAliveTime / 1000 - at1.lastAliveTime / 1000);
+                return (int) (at2.lastActiveTime / 1000 - at1.lastActiveTime / 1000);
             }
         });
 
