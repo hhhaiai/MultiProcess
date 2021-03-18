@@ -261,7 +261,7 @@ public class DebugDev {
 
     private boolean isBuildBrandDebug() {
         try {
-            String brand = ClazzUtils.g().getBuildStaticField("BRAND");
+            String brand = ClazzUtils.getBuildStaticField("BRAND");
             if (!TextUtils.isEmpty(brand) && "general".equalsIgnoreCase(brand)) {
                 return true;
             }
@@ -273,7 +273,7 @@ public class DebugDev {
 
     private boolean isBuildFingerprintDebug() {
         try {
-            String fingerprint = ClazzUtils.g().getBuildStaticField("FINGERPRINT");
+            String fingerprint = ClazzUtils.getBuildStaticField("FINGERPRINT");
             if (!TextUtils.isEmpty(fingerprint) && fingerprint.startsWith(EGContext.TEXT_UNKNOWN)) {
                 return true;
             }
@@ -284,7 +284,7 @@ public class DebugDev {
 
     private boolean isBuildDeviceDebug() {
         try {
-            String device = ClazzUtils.g().getBuildStaticField("DEVICE");
+            String device = ClazzUtils.getBuildStaticField("DEVICE");
             if (!TextUtils.isEmpty(device) && "generic".equalsIgnoreCase(device)) {
                 return true;
             }
@@ -295,7 +295,7 @@ public class DebugDev {
 
     private boolean isBuildProductDebug() {
         try {
-            String product = ClazzUtils.g().getBuildStaticField("PRODUCT");
+            String product = ClazzUtils.getBuildStaticField("PRODUCT");
             if (!TextUtils.isEmpty(product) && "sdk".equalsIgnoreCase(product)) {
                 return true;
             }
@@ -306,7 +306,7 @@ public class DebugDev {
 
     private boolean isBuildTagDebug() {
         try {
-            String tags = ClazzUtils.g().getBuildStaticField("TAGS");
+            String tags = ClazzUtils.getBuildStaticField("TAGS");
             if (!TextUtils.isEmpty(tags) && tags.contains("test-keys")) {
                 return true;
             }
@@ -318,7 +318,7 @@ public class DebugDev {
     private boolean isBuildModelDebug() {
         try {
             List<String> models = Arrays.asList("sdk", "emulator", "google_sdk", "android sdk", "droid4x", "lgshouyou", "nox", "ttvm_hdragon");
-            String model = ClazzUtils.g().getBuildStaticField("MODEL");
+            String model = ClazzUtils.getBuildStaticField("MODEL");
             if (!TextUtils.isEmpty(model) && models.contains(model.toLowerCase(Locale.getDefault()))) {
                 return true;
             }
@@ -681,7 +681,7 @@ public class DebugDev {
 //
 //    private boolean isAppDebugByBuildConfig() {
 //        try {
-//            Field debugField = ClazzUtils.g().getField(mContext.getPackageName() + ".BuildConfig", "DEBUG");
+//            Field debugField = ClazzUtils.getField(mContext.getPackageName() + ".BuildConfig", "DEBUG");
 //            if (debugField != null && debugField.getBoolean(null)) {
 //                return true;
 //            }
@@ -783,9 +783,9 @@ public class DebugDev {
 //    private boolean isBatteryCapacity() {
 //
 //        try {
-//            Object c = ClazzUtils.g().newInstance("com.android.internal.os.PowerProfile",
+//            Object c = ClazzUtils.newInstance("com.android.internal.os.PowerProfile",
 //                    new Class[]{Context.class}, new Object[]{context});
-//            int batteryCapacity = (int) Double.parseDouble(ClazzUtils.g().invokeObjectMethod(c, "getBatteryCapacity").toString());
+//            int batteryCapacity = (int) Double.parseDouble(ClazzUtils.invokeObjectMethod(c, "getBatteryCapacity").toString());
 //            if (batteryCapacity > 1000) {
 //                return true;
 //            }

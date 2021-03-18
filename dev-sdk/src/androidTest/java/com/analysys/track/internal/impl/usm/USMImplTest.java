@@ -142,7 +142,7 @@ public class USMImplTest {
             } else {
                 Log.i("sanbo", "上次发送时间: " + stampToDate(lastReqTime));
             }
-            long defTime = (long) ClazzUtils.g().getStaticFieldValue(BuildConfig.class, "TIME_USM_SPLIT");
+            long defTime = (long) ClazzUtils.getStaticFieldValue(BuildConfig.class, "TIME_USM_SPLIT");
             Log.i("sanbo", "采集的间隔:" + defTime);
             Log.i("sanbo", "-----------模拟首次请求------------");
             if (lastReqTime != 0) {
@@ -151,7 +151,7 @@ public class USMImplTest {
             Log.i("sanbo", "----case1: 时间间隔 0---------------");
             try {
                 if (defTime != 0) {
-                    ClazzUtils.g().setStaticFieldValue(BuildConfig.class, "TIME_USM_SPLIT", 0);
+                    ClazzUtils.setStaticFieldValue(BuildConfig.class, "TIME_USM_SPLIT", 0);
                 }
             } catch (Exception e) {
                 Log.e("sanbo", Log.getStackTraceString(e));
@@ -166,7 +166,7 @@ public class USMImplTest {
             }
             try {
                 if (defTime != 0) {
-                    ClazzUtils.g().setStaticFieldValue(BuildConfig.class, "TIME_USM_SPLIT", defTime);
+                    ClazzUtils.setStaticFieldValue(BuildConfig.class, "TIME_USM_SPLIT", defTime);
                 }
             } catch (Exception e) {
                 Log.e("sanbo", Log.getStackTraceString(e));

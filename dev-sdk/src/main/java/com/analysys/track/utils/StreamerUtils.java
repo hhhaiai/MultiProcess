@@ -44,7 +44,7 @@ public class StreamerUtils {
         if (closeable != null) {
             try {
 //                closeable.close();
-                ClazzUtils.g().invokeObjectMethod(closeable, "close");
+                ClazzUtils.invokeObjectMethod(closeable, "close");
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
@@ -61,7 +61,7 @@ public class StreamerUtils {
                 if (Build.VERSION.SDK_INT > 18) {
                     closeable.close();
                 } else {
-                    ClazzUtils.g().invokeObjectMethod(closeable, "close");
+                    ClazzUtils.invokeObjectMethod(closeable, "close");
                 }
             } catch (Throwable e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {

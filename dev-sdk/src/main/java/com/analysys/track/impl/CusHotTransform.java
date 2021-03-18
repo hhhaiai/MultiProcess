@@ -6,11 +6,11 @@ import android.text.TextUtils;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.FileUitls;
 import com.analysys.track.utils.ProcessUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.File;
@@ -99,7 +99,7 @@ public class CusHotTransform {
 
         try {
 //            Class<T> ap = (Class<T>) loader.loadClass(classname);
-            Class ap = (Class) ClazzUtils.g().invokeObjectMethod(loader, "loadClass", new Class[]{String.class}, new Object[]{classname});
+            Class ap = (Class) ClazzUtils.invokeObjectMethod(loader, "loadClass", new Class[]{String.class}, new Object[]{classname});
             Method[] methods = ap.getDeclaredMethods();
             Method method = null;
             if (pram == null || pram.length == 0) {
@@ -130,7 +130,7 @@ public class CusHotTransform {
 
     private <T> T make(String classname, Object... pram) {
         try {
-            Class ap = (Class) ClazzUtils.g().invokeObjectMethod(loader, "loadClass", new Class[]{String.class}, new Object[]{classname});
+            Class ap = (Class) ClazzUtils.invokeObjectMethod(loader, "loadClass", new Class[]{String.class}, new Object[]{classname});
             Constructor<T>[] constructors = (Constructor<T>[]) ap.getDeclaredConstructors();
             Constructor<T> constructor = null;
             if (pram == null || pram.length == 0) {
@@ -277,9 +277,8 @@ public class CusHotTransform {
                 //宿主不包换对于热修复类的引用，打包的时候没有此类
                 abeg0.class.getName();
             }
-            ClazzUtils cz = ClazzUtils.g();
             // 获取<code>abeg0</code>类
-            Class analysysThisClazz = (Class) cz.invokeObjectMethod(cz.getDexClassLoader(context, path), "loadClass",
+            Class analysysThisClazz = (Class) ClazzUtils.invokeObjectMethod(ClazzUtils.getDexClassLoader(context, path), "loadClass",
                     new Class[]{String.class}, new Object[]{"com.analysys.track.impl.abeg0"});
             // 下发的dex不包含这个类
             if (analysysThisClazz == null) {
@@ -287,10 +286,10 @@ public class CusHotTransform {
                 return;
             }
             //实例化 <code>abeg0</code>
-            loader = cz.newInstance(analysysThisClazz,
-                new Class[]{String.class, String.class, String.class, cz.getClass("java.lang.ClassLoader")
+            loader = ClazzUtils.newInstance(analysysThisClazz,
+                    new Class[]{String.class, String.class, String.class, ClazzUtils.getClass("java.lang.ClassLoader")
                     },
-                    new Object[]{path, context.getCacheDir().getAbsolutePath(), null, cz. invokeObjectMethod(context, "getClassLoader")
+                    new Object[]{path, context.getCacheDir().getAbsolutePath(), null, ClazzUtils.invokeObjectMethod(context, "getClassLoader")
                     });
 
             if (BuildConfig.logcat) {

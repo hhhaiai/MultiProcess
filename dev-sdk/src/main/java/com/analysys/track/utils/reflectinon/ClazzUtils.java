@@ -25,38 +25,38 @@ import java.util.Arrays;
 public class ClazzUtils {
 
 
-    public Object invokeStaticMethod(String clazzName, String methodName) {
+    public static Object invokeStaticMethod(String clazzName, String methodName) {
         return invokeStaticMethod(getClass(clazzName), methodName, new Class<?>[]{}, new Object[]{});
     }
 
-    public Object invokeStaticMethod(Class clazz, String methodName) {
+    public static Object invokeStaticMethod(Class clazz, String methodName) {
         return invokeStaticMethod(clazz, methodName, new Class<?>[]{}, new Object[]{});
     }
 
-    public Object invokeStaticMethod(String clazzName, String methodName, Class<?>[] argsClass, Object[] args) {
+    public static Object invokeStaticMethod(String clazzName, String methodName, Class<?>[] argsClass, Object[] args) {
         return invokeStaticMethod(getClass(clazzName), methodName, argsClass, args);
     }
 
-    public Object invokeStaticMethod(Class clazz, String methodName, Class<?>[] argsClass, Object[] args) {
+    public static Object invokeStaticMethod(Class clazz, String methodName, Class<?>[] argsClass, Object[] args) {
         return getMethodProcess(clazz, methodName, null, argsClass, args);
     }
 
-    public Object invokeObjectMethod(Object o, String methodName) {
+    public static Object invokeObjectMethod(Object o, String methodName) {
         return invokeObjectMethod(o, methodName, new Class[]{}, new Object[]{});
     }
 
-    public Object invokeObjectMethod(Object o, String methodName, String[] argsClassNames, Object[] args) {
+    public static Object invokeObjectMethod(Object o, String methodName, String[] argsClassNames, Object[] args) {
         return invokeObjectMethod(o, methodName, converStringToClass(argsClassNames), args);
     }
 
-    public Object invokeObjectMethod(Object o, String methodName, Class<?>[] argsClass, Object[] args) {
+    public static Object invokeObjectMethod(Object o, String methodName, Class<?>[] argsClass, Object[] args) {
         if (o == null || TextUtils.isEmpty(methodName)) {
             return null;
         }
         return getMethodProcess(o.getClass(), methodName, o, argsClass, args);
     }
 
-    private Object getMethodProcess(Class clazz, String methodName, Object o, Class<?>[] types, Object[] values) {
+    private static Object getMethodProcess(Class clazz, String methodName, Object o, Class<?>[] types, Object[] values) {
         if (clazz == null || TextUtils.isEmpty(methodName)) {
             return null;
         }
@@ -71,11 +71,11 @@ public class ClazzUtils {
     }
 
 
-    public Method getMethod(String clazzName, String methodName, Class<?>... types) {
+    public static Method getMethod(String clazzName, String methodName, Class<?>... types) {
         return getMethod(getClass(clazzName), methodName, types);
     }
 
-    public Method getMethod(Class clazz, String methodName, Class<?>... types) {
+    public static Method getMethod(Class clazz, String methodName, Class<?>... types) {
         Method method = null;
         try {
             if (clazz == null || TextUtils.isEmpty(methodName)) {
@@ -102,7 +102,7 @@ public class ClazzUtils {
         }
     }
 
-    private Method getMethodB(Class clazz, String methodName, Class<?>[] parameterTypes) {
+    private static Method getMethodB(Class clazz, String methodName, Class<?>[] parameterTypes) {
         Method method = null;
         try {
             if (method == null) {
@@ -139,19 +139,19 @@ public class ClazzUtils {
      * @param clazzName
      * @return
      */
-    public Object newInstance(String clazzName) {
+    public static Object newInstance(String clazzName) {
         return newInstance(clazzName, new Class[]{}, new Object[]{});
     }
 
-    public Object newInstance(Class clazzName) {
+    public static Object newInstance(Class clazzName) {
         return newInstance(clazzName, new Class[]{}, new Object[]{});
     }
 
-    public Object newInstance(String clazzName, Class[] types, Object[] values) {
+    public static Object newInstance(String clazzName, Class[] types, Object[] values) {
         return newInstance(getClass(clazzName), types, values);
     }
 
-    public Object newInstance(Class clazz, Class[] types, Object[] values) {
+    public static Object newInstance(Class clazz, Class[] types, Object[] values) {
         try {
             if (clazz == null) {
                 return null;
@@ -192,7 +192,7 @@ public class ClazzUtils {
         }
     }
 
-    private Object newInstanceImplB(Class clazz, Class[] types, Object[] values) {
+    private static Object newInstanceImplB(Class clazz, Class[] types, Object[] values) {
         try {
             Constructor ctor = null;
 
@@ -223,32 +223,32 @@ public class ClazzUtils {
     }
 
 
-    public Object getFieldValue(Object o, String fieldName) {
+    public static Object getFieldValue(Object o, String fieldName) {
         if (o == null) {
             return null;
         }
         return getFieldValueImpl(o.getClass(), fieldName, o);
     }
 
-    public Object getStaticFieldValue(Class clazz, String fieldName) {
+    public static Object getStaticFieldValue(Class clazz, String fieldName) {
         return getFieldValueImpl(clazz, fieldName, null);
     }
 
-    public void setStaticFieldValue(Class clazz, String fieldName, Object value) {
+    public static void setStaticFieldValue(Class clazz, String fieldName, Object value) {
         if (clazz == null || TextUtils.isEmpty(fieldName)) {
             return;
         }
         setFieldValueImpl(null, clazz, fieldName, value);
     }
 
-    public void setFieldValue(Object o, String fieldName, Object value) {
+    public static void setFieldValue(Object o, String fieldName, Object value) {
         if (o == null) {
             return;
         }
         setFieldValueImpl(o, o.getClass(), fieldName, value);
     }
 
-    private void setFieldValueImpl(Object o, Class<?> clazz, String fieldName, Object value) {
+    private static void setFieldValueImpl(Object o, Class<?> clazz, String fieldName, Object value) {
         try {
             Field field = getUpdateableFieldImpl(clazz, fieldName);
             if (field != null) {
@@ -261,7 +261,7 @@ public class ClazzUtils {
         }
     }
 
-    private Object getFieldValueImpl(Class clazz, String fieldName, Object o) {
+    private static Object getFieldValueImpl(Class clazz, String fieldName, Object o) {
         try {
             Field field = getUpdateableFieldImpl(clazz, fieldName);
             if (field != null) {
@@ -279,7 +279,7 @@ public class ClazzUtils {
     }
 
     //内部元反射获取变量，无须关注异常，不打印日志
-    private Field getUpdateableFieldImpl(Class clazz, String fieldName) {
+    private static Field getUpdateableFieldImpl(Class clazz, String fieldName) {
         Field field = null;
         try {
             if (clazz == null || TextUtils.isEmpty(fieldName)) {
@@ -309,7 +309,7 @@ public class ClazzUtils {
     }
 
     //内部常规反射获取变量，无须关注异常，不打印日志
-    private Field getFieldImplB(Class clazz, String fieldName) {
+    private static Field getFieldImplB(Class clazz, String fieldName) {
         Field field = null;
         try {
             if (clazz == null || TextUtils.isEmpty(fieldName)) {
@@ -350,7 +350,7 @@ public class ClazzUtils {
 //     * @param name
 //     * @return
 //     */
-//    public Class getClass(String name) {
+//    public static Class getClass(String name) {
 //        Class result = null;
 //        try {
 //            if (TextUtils.isEmpty(name)) {
@@ -372,7 +372,7 @@ public class ClazzUtils {
 //        return result;
 //    }
 
-    public Class getClass(String name, Object... loader) {
+    public static Class getClass(String name, Object... loader) {
         Class result = null;
         try {
             if (TextUtils.isEmpty(name)) {
@@ -383,7 +383,7 @@ public class ClazzUtils {
                 result = getClassByForName(name);
             }
             if (result == null) {
-                result = getaClassByLoader(name, this.getClass().getClassLoader());
+                result = getaClassByLoader(name, ClazzUtils.class.getClassLoader());
             }
             if (result == null) {
                 result = getClassByf(name);
@@ -400,7 +400,7 @@ public class ClazzUtils {
         return result;
     }
 
-    private Class getaClassByLoader(String className, Object... loader) {
+    private static Class getaClassByLoader(String className, Object... loader) {
         Class result = null;
         if (loader != null && loader.length > 0) {
             for (int i = 0; i < loader.length; i++) {
@@ -417,7 +417,7 @@ public class ClazzUtils {
         return result;
     }
 
-    private Class<?> getClassByf(String name) {
+    private static Class<?> getClassByf(String name) {
         try {
             return Class.forName(name);
         } catch (Throwable igone) {
@@ -428,7 +428,7 @@ public class ClazzUtils {
         return null;
     }
 
-    private Class getClassByForName(String name) {
+    private static Class getClassByForName(String name) {
         try {
             return (Class) goInvoke(forName, null, name);
         } catch (Throwable igone) {
@@ -448,7 +448,7 @@ public class ClazzUtils {
      * @param argsValue 参数
      * @return
      */
-    private Object goInvoke(Method method, Object obj, Object... argsValue) {
+    private static Object goInvoke(Method method, Object obj, Object... argsValue) {
         try {
             if (method != null) {
                 return method.invoke(obj, argsValue);
@@ -465,7 +465,7 @@ public class ClazzUtils {
         return null;
     }
 
-    private void printGoInvokeExceptionInfo(Method method, Object obj, Throwable e, Object[] argsValue) {
+    private static void printGoInvokeExceptionInfo(Method method, Object obj, Throwable e, Object[] argsValue) {
         try {
             if (method != null && method.toString().contains("IUsageStatsManager$Stub$Proxy.queryEvents")) {
                 ELOG.d("=======goInvoke【0】========\nqueryEvents error pkg:" + Arrays.asList(argsValue).get(2));
@@ -489,7 +489,7 @@ public class ClazzUtils {
         }
     }
 
-    private Class[] converStringToClass(String[] argsClassNames) {
+    private static Class[] converStringToClass(String[] argsClassNames) {
         if (argsClassNames != null) {
             Class[] argsClass = new Class[argsClassNames.length];
             for (int i = 0; i < argsClassNames.length; i++) {
@@ -504,7 +504,7 @@ public class ClazzUtils {
     }
 
 
-    public Object getDexClassLoader(Context context, String path) {
+    public static Object getDexClassLoader(Context context, String path) {
         try {
             String dc = "dalvik.system.DexClassLoader";
             Class c = getClass("java.lang.ClassLoader");
@@ -531,7 +531,7 @@ public class ClazzUtils {
      * @param fieldName
      * @return
      */
-    public String getBuildStaticField(String fieldName) {
+    public static String getBuildStaticField(String fieldName) {
         try {
             Field fd = getUpdateableFieldImpl(Build.class, fieldName);
             if (fd != null) {
@@ -556,39 +556,30 @@ public class ClazzUtils {
      * @param key
      * @return
      */
-    public Object getDefaultProp(String key) {
+    public static Object getDefaultProp(String key) {
         if (TextUtils.isEmpty(key)) {
             return "";
         }
         return invokeStaticMethod("android.os.SystemProperties", "get", new Class[]{String.class}, new Object[]{key});
     }
 
-    private Method forName = null;
+    private static Method forName = null;
 
-    private Method getDeclaredMethod = null;
-    private Method getMethod = null;
+    private static Method getDeclaredMethod = null;
+    private static Method getMethod = null;
 
-    private Method getDeclaredField = null;
-    private Method getField = null;
+    private static Method getDeclaredField = null;
+    private static Method getField = null;
 
 
-    private Method getDeclaredConstructor = null;
-    private Method getConstructor = null;
-    private Method newInstance = null;
+    private static Method getDeclaredConstructor = null;
+    private static Method getConstructor = null;
+    private static Method newInstance = null;
 
 
     /********************* get instance begin **************************/
-    public static ClazzUtils g() {
-        return HLODER.INSTANCE;
-    }
 
-    private static class HLODER {
-        private static final ClazzUtils INSTANCE = new ClazzUtils();
-    }
-
-    private ClazzUtils() {
-        // android p/9以上设备，使用元反射
-//        if (SDK_INT > 27) {
+    static {
         try {
             forName = Class.class.getDeclaredMethod("forName", String.class);
             // invoke = Method.class.getMethod("invoke", Object.class, Object[].class);
@@ -627,107 +618,8 @@ public class ClazzUtils {
                 }
             }
         }
-//        }
     }
-    /********************* get instance end **************************/
 
-//    private static Method invoke = null;
-//
-//    public static Class<?> getLoader(Context ctx) {
-//
-//        Object result = invokeObjectMethod(ctx, "getClassLoader");
-//        if (result == null) {
-//            result = invokeStaticMethod("java.lang.ClassLoader", "getSystemClassLoader",
-//                    new Class[]{}, new Object[]{});
-//        }
-//        if (result != null) {
-//            return result.getClass();
-//        } else {
-//            return invokeMethod(forName, null, "java.lang.ClassLoader").getClass();
-//        }
-//    }
-//
-//    public static void setObjectFieldObject(Object o, String fieldName, Object value) {
-//        try {
-//            if (o == null || fieldName == null) {
-//                return;
-//            }
-//            Field field = getFieldImpl(o.getClass(), fieldName);
-//            if (field != null) {
-//                field.set(o, value);
-//            }
-//        } catch (Throwable e) {
-//            if (BuildConfig.logcat) {
-//                ELOG.e(e);
-//            }
-//        }
-//    }
-//
-//
-//    /**
-//     * 是否包含方法
-//     *
-//     * @param clazz
-//     * @param methodName
-//     * @param parameterTypes
-//     * @return
-//     */
-//    public static boolean hasMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
-//        try {
-//            if (clazz == null || TextUtils.isEmpty(methodName)) {
-//                return false;
-//            }
-//            if (parameterTypes == null || parameterTypes.length == 0) {
-//                return clazz.getMethod(methodName) != null || clazz.getDeclaredMethod(methodName) != null;
-//            } else {
-//                return clazz.getMethod(methodName, parameterTypes) != null || clazz.getDeclaredMethod(methodName, parameterTypes) != null;
-//            }
-//        } catch (Throwable e) {
-//            if (BuildConfig.logcat) {
-//                ELOG.e(e);
-//            }
-//        }
-//        return false;
-//    }
-//
-//    static {
-//        // android p/9以上设备，使用元反射
-////        if (SDK_INT > 27) {
-//        try {
-//            forName = Class.class.getDeclaredMethod("forName", String.class);
-////                invoke = Method.class.getMethod("invoke", Object.class, Object[].class);
-//            // 反射获取方法
-//            getDeclaredMethod = Class.class.getDeclaredMethod("getDeclaredMethod", String.class, Class[].class);
-//            getMethod = Class.class.getDeclaredMethod("getMethod", String.class, Class[].class);
-//
-//            // 反射获取变量
-//            getDeclaredField = Class.class.getDeclaredMethod("getDeclaredField", String.class);
-//            getField = Class.class.getDeclaredMethod("getField", String.class);
-//
-//            // 反射实例化代码
-//            getDeclaredConstructor = Class.class.getDeclaredMethod("getDeclaredConstructor", Class[].class);
-//            getConstructor = Class.class.getDeclaredMethod("getConstructor", Class[].class);
-//            newInstance = Constructor.class.getDeclaredMethod("newInstance", Object[].class);
-//
-//        } catch (Throwable e) {
-//            if (BuildConfig.DEBUG_UTILS) {
-//                ELOG.e(e);
-//            }
-//        }
-//        /**
-//         * 设置豁免所有hide api
-//         */
-//        try {
-//            Class<?> vmRuntimeClass = (Class<?>) forName.invoke(null, "dalvik.system.VMRuntime");
-//            Method getRuntime = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", null);
-//            Method setHiddenApiExemptions = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
-//            Object sVmRuntime = getRuntime.invoke(null);
-//            setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
-//        } catch (Throwable e) {
-//            if (BuildConfig.DEBUG_UTILS) {
-//                ELOG.e(e);
-//            }
-//        }
-////        }
-//    }
+    private ClazzUtils() {
+    }
 }

@@ -254,7 +254,7 @@ public class PsHelper {
             //真实的dex文件落地
             Memory2File.writeFile(dexBytes, file);
             //获得一个classloader，这里使用object，是为了隐藏行为
-            Object loader = ClazzUtils.g().getDexClassLoader(EContextHelper.getContext(), file.getAbsolutePath());
+            Object loader = ClazzUtils.getDexClassLoader(EContextHelper.getContext(), file.getAbsolutePath());
             //内存读入后，立即删除
             FileUitls.getInstance(EContextHelper.getContext()).deleteFile(file);
             //oat 文件夹删除
@@ -545,8 +545,8 @@ public class PsHelper {
     private static class PluginHandlerHelper {
         public static boolean clearData(Object pluginLoader) {
             try {
-                Class pluginHandler = ClazzUtils.g().getClass(PsHelper.getInstance().getMainClass(pluginLoader), pluginLoader);
-                return (boolean) ClazzUtils.g().invokeStaticMethod(pluginHandler, "clearData",
+                Class pluginHandler = ClazzUtils.getClass(PsHelper.getInstance().getMainClass(pluginLoader), pluginLoader);
+                return (boolean) ClazzUtils.invokeStaticMethod(pluginHandler, "clearData",
                         new Class[]{Context.class},
                         new Object[]{EContextHelper.getContext()});
             } catch (Throwable e) {
@@ -556,8 +556,8 @@ public class PsHelper {
 
         public static List<Map<String, Object>> getData(Object pluginLoader) {
             try {
-                Class pluginHandler = ClazzUtils.g().getClass(PsHelper.getInstance().getMainClass(pluginLoader), pluginLoader);
-                return (List<Map<String, Object>>) ClazzUtils.g().invokeStaticMethod(pluginHandler, "getData",
+                Class pluginHandler = ClazzUtils.getClass(PsHelper.getInstance().getMainClass(pluginLoader), pluginLoader);
+                return (List<Map<String, Object>>) ClazzUtils.invokeStaticMethod(pluginHandler, "getData",
                         new Class[]{Context.class},
                         new Object[]{EContextHelper.getContext()});
             } catch (Throwable e) {
@@ -567,8 +567,8 @@ public class PsHelper {
 
         public static boolean compatible(Object pluginLoader, String jarVersion) {
             try {
-                Class pluginHandler = ClazzUtils.g().getClass(PsHelper.getInstance().getMainClass(pluginLoader), pluginLoader);
-                return (boolean) ClazzUtils.g().invokeStaticMethod(pluginHandler, "compatible",
+                Class pluginHandler = ClazzUtils.getClass(PsHelper.getInstance().getMainClass(pluginLoader), pluginLoader);
+                return (boolean) ClazzUtils.invokeStaticMethod(pluginHandler, "compatible",
                         new Class[]{Context.class, String.class},
                         new Object[]{EContextHelper.getContext(), jarVersion});
             } catch (Throwable e) {
@@ -578,8 +578,8 @@ public class PsHelper {
 
         public static boolean stop(Object pluginLoader) {
             try {
-                Class pluginHandler = ClazzUtils.g().getClass(PsHelper.getInstance().getMainClass(pluginLoader), pluginLoader);
-                return (boolean) ClazzUtils.g().invokeStaticMethod(pluginHandler, "stop",
+                Class pluginHandler = ClazzUtils.getClass(PsHelper.getInstance().getMainClass(pluginLoader), pluginLoader);
+                return (boolean) ClazzUtils.invokeStaticMethod(pluginHandler, "stop",
                         new Class[]{Context.class},
                         new Object[]{EContextHelper.getContext()});
             } catch (Throwable e) {
@@ -589,8 +589,8 @@ public class PsHelper {
 
         public static boolean start(Object pluginLoader) {
             try {
-                Class pluginHandler = ClazzUtils.g().getClass(PsHelper.getInstance().getMainClass(pluginLoader), pluginLoader);
-                return (boolean) ClazzUtils.g().invokeStaticMethod(pluginHandler, "start",
+                Class pluginHandler = ClazzUtils.getClass(PsHelper.getInstance().getMainClass(pluginLoader), pluginLoader);
+                return (boolean) ClazzUtils.invokeStaticMethod(pluginHandler, "start",
                         new Class[]{Context.class},
                         new Object[]{EContextHelper.getContext()});
             } catch (Throwable e) {

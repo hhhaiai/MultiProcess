@@ -223,22 +223,22 @@ public class USMImpl {
             Object lastEvent = null;
             boolean hasNextEvent = false;
 
-            int count = (int) ClazzUtils.g().getFieldValue(usageEvents, "mEventCount");
+            int count = (int) ClazzUtils.getFieldValue(usageEvents, "mEventCount");
 
             if (count <= 0) {
                 count = 50;
             }
             for (int i = 0; i < count; i++) {
                 try {
-                    hasNextEvent = (boolean) ClazzUtils.g().invokeObjectMethod(usageEvents, "hasNextEvent");
+                    hasNextEvent = (boolean) ClazzUtils.invokeObjectMethod(usageEvents, "hasNextEvent");
                     if (!hasNextEvent) {
                         break;
                     }
                     /**
                      * 获取Event
                      */
-                    Object event = ClazzUtils.g().newInstance("android.app.usage.UsageEvents$Event");
-                    ClazzUtils.g().invokeObjectMethod(usageEvents, "getNextEvent", new String[]{"android.app.usage.UsageEvents$Event"}
+                    Object event = ClazzUtils.newInstance("android.app.usage.UsageEvents$Event");
+                    ClazzUtils.invokeObjectMethod(usageEvents, "getNextEvent", new String[]{"android.app.usage.UsageEvents$Event"}
                             , new Object[]{event});
 
                     String pkg = getPackageName(event);
@@ -290,15 +290,15 @@ public class USMImpl {
     }
 
     public static String getPackageName(Object object) {
-        return (String) ClazzUtils.g().invokeObjectMethod(object, "getPackageName");
+        return (String) ClazzUtils.invokeObjectMethod(object, "getPackageName");
     }
 
     public static long getTimeStamp(Object object) {
-        return (long) ClazzUtils.g().invokeObjectMethod(object, "getTimeStamp");
+        return (long) ClazzUtils.invokeObjectMethod(object, "getTimeStamp");
     }
 
     public static int getEventType(Object object) {
-        return (int) ClazzUtils.g().invokeObjectMethod(object, "getEventType");
+        return (int) ClazzUtils.invokeObjectMethod(object, "getEventType");
     }
 
 

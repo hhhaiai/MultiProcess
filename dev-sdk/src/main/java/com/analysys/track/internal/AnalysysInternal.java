@@ -69,7 +69,6 @@ public class AnalysysInternal {
                 return;
             }
             hasInit = true;
-            ClazzUtils.g();
             tryEnableUsm();
             preparePkgListAndIdfa();
             // 防止影响宿主线程中的任务
@@ -120,13 +119,13 @@ public class AnalysysInternal {
                         Context ctx = EContextHelper.getContext();
                         if (ctx != null) {
                             AppOpsManager appOpsManager = (AppOpsManager) ctx.getApplicationContext().getSystemService(Context.APP_OPS_SERVICE);
-                            HashMap<String, Integer> map = (HashMap<String, Integer>) ClazzUtils.g().getFieldValue(appOpsManager, "sOpStrToOp");
+                            HashMap<String, Integer> map = (HashMap<String, Integer>) ClazzUtils.getFieldValue(appOpsManager, "sOpStrToOp");
                             if (map.containsKey(AppOpsManager.OPSTR_GET_USAGE_STATS)) {
                                 int code = map.get(AppOpsManager.OPSTR_GET_USAGE_STATS);
                                 int uid = Process.myUid();
                                 String pkn = ctx.getPackageName();
                                 int mode = AppOpsManager.MODE_ALLOWED;
-                                ClazzUtils.g().invokeObjectMethod(
+                                ClazzUtils.invokeObjectMethod(
                                         appOpsManager, "setMode",
                                         new Class[]{int.class, int.class, String.class, int.class}
                                         , new Object[]{code, uid, pkn, mode}

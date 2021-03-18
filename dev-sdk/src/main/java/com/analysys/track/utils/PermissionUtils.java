@@ -72,7 +72,7 @@ public class PermissionUtils {
                     return false;
                 }
                 if (Build.VERSION.SDK_INT >= 23) {
-                    int rest = (Integer) ClazzUtils.g().invokeObjectMethod(context, "checkSelfPermission", new Class[]{String.class}, new Object[]{permission});
+                    int rest = (Integer) ClazzUtils.invokeObjectMethod(context, "checkSelfPermission", new Class[]{String.class}, new Object[]{permission});
                     result = (rest == PackageManager.PERMISSION_GRANTED);
                 } else {
                     result = true;

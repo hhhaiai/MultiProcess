@@ -148,7 +148,7 @@ public class SDKHelper {
      */
     public static ETestCase newInstance(String cls) {
         if (!TextUtils.isEmpty(cls)) {
-            return (ETestCase) ClazzUtils.g().newInstance(cls);
+            return (ETestCase) ClazzUtils.newInstance(cls);
         }
         return null;
     }

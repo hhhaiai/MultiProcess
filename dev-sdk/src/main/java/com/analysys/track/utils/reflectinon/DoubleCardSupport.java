@@ -133,28 +133,28 @@ public class DoubleCardSupport {
                         // 华为系: 华为荣耀系列，P系列，mate系列
                         addWithSolt(resultList, telephony, methodName, i);
                     
-                        if (ClazzUtils.g().getClass("com.mediatek.telephony.TelephonyManagerEx") != null) {
+                        if (ClazzUtils.getClass("com.mediatek.telephony.TelephonyManagerEx") != null) {
                             // MTK
                             addWithSolt(resultList, "com.mediatek.telephony.TelephonyManagerEx", methodName, i);
                         }
-                        if (ClazzUtils.g().getClass("android.telephony.MSimTelephonyManager") != null) {
+                        if (ClazzUtils.getClass("android.telephony.MSimTelephonyManager") != null) {
                             // 高通
                             addWithSolt(resultList, "android.telephony.MSimTelephonyManager", methodName, i);
                         }
                     
                     }
                 
-                    if (ClazzUtils.g().getClass("android.telephony.MSimTelephonyManager") != null) {
+                    if (ClazzUtils.getClass("android.telephony.MSimTelephonyManager") != null) {
                         // 高通另一种方式获取
                         addForQualcomm(context, resultList, "android.telephony.MSimTelephonyManager", methodName);
                     }
                 
                     // 360高通的某一个获取不到
                     // 三星的双卡 代表手机：note2，3，s4
-                    if (ClazzUtils.g().getClass("android.telephony.MultiSimTelephonyManager") != null) {
+                    if (ClazzUtils.getClass("android.telephony.MultiSimTelephonyManager") != null) {
                         addForSunsumg(resultList, "android.telephony.MultiSimTelephonyManager", methodName);
                     }
-                    if (ClazzUtils.g().getClass("com.samsung.android.telephony.MultiSimManager") != null) {
+                    if (ClazzUtils.getClass("com.samsung.android.telephony.MultiSimManager") != null) {
                         addForSunsumg(resultList, "com.samsung.android.telephony.MultiSimManager", methodName);
                     }
 //                if (Build.VERSION.SDK_INT < 21) {
@@ -224,16 +224,16 @@ public class DoubleCardSupport {
                 for (int i = 0; i < 3; i++) {
                     String spreadTmService = null;
                 
-                    if (ClazzUtils.g().getClass("com.android.internal.telephony.PhoneFactory") != null) {
+                    if (ClazzUtils.getClass("com.android.internal.telephony.PhoneFactory") != null) {
                         try {
                             // 调整为调用静态方法
-                            spreadTmService = (String) ClazzUtils.g().invokeStaticMethod(
+                            spreadTmService = (String) ClazzUtils.invokeStaticMethod(
                                     "com.android.internal.telephony.PhoneFactory", "getServiceName",
                                     new Class[]{String.class, int.class}, new Object[]{Context.TELEPHONY_SERVICE, i});
                             ;
                         } catch (Throwable e) {
                             // 尝试调用非静态方法
-                            spreadTmService = (String) ClazzUtils.g().invokeObjectMethod(getObjectInstance(
+                            spreadTmService = (String) ClazzUtils.invokeObjectMethod(getObjectInstance(
                                     "com.android.internal.telephony.PhoneFactory"), "getServiceName",
                                     new Class[]{String.class, int.class}, new Object[]{Context.TELEPHONY_SERVICE, i});
                         }
@@ -268,7 +268,7 @@ public class DoubleCardSupport {
     private void add(List<String> imeis, TelephonyManager telephony, String method) {
         if (BuildConfig.ENABLE_IMEI) {
             try {
-                Object id = ClazzUtils.g().invokeObjectMethod(telephony, method);
+                Object id = ClazzUtils.invokeObjectMethod(telephony, method);
                 if (id == null) {
                     return;
                 }
@@ -292,7 +292,7 @@ public class DoubleCardSupport {
 //    private void addForSunsumg(List<String> imeis, Object instance, String method) {
 //        if (BuildConfig.ENABLE_IMEI) {
 //            try {
-//                String result = (String) ClazzUtils.g().invokeObjectMethod(instance, method);
+//                String result = (String) ClazzUtils.invokeObjectMethod(instance, method);
 //                if (!TextUtils.isEmpty(result) && !imeis.contains(result)) {
 //                    imeis.add(result);
 //                }
@@ -306,9 +306,9 @@ public class DoubleCardSupport {
             try {
                 Object instance = getObjectInstance(clazzName);
                 if (instance == null) {
-                    instance = ClazzUtils.g().newInstance(clazzName);
+                    instance = ClazzUtils.newInstance(clazzName);
                 }
-                String result = (String) ClazzUtils.g().invokeObjectMethod(instance, method);
+                String result = (String) ClazzUtils.invokeObjectMethod(instance, method);
                 if (!TextUtils.isEmpty(result) && !imeis.contains(result)) {
                     imeis.add(result);
                 }
@@ -443,7 +443,7 @@ public class DoubleCardSupport {
 //     */
 //    private void addBySystemProperties(List<String> imeis, String key, String splitKey) {
 //        try {
-//            String result = (String) ClazzUtils.g().getDefaultProp(key);
+//            String result = (String) ClazzUtils.getDefaultProp(key);
 //            if (TextUtils.isEmpty(result)) {
 //                return;
 //            }
@@ -484,9 +484,9 @@ public class DoubleCardSupport {
     private String getString(Object obj, String method, int slotId) {
         if (BuildConfig.ENABLE_IMEI) {
             try {
-                Object id = ClazzUtils.g().invokeObjectMethod(obj, method, new Class[]{int.class}, new Object[]{slotId});
+                Object id = ClazzUtils.invokeObjectMethod(obj, method, new Class[]{int.class}, new Object[]{slotId});
                 if (id == null) {
-                    id = ClazzUtils.g().invokeObjectMethod(obj, method, new Class[]{long.class}, new Object[]{slotId});
+                    id = ClazzUtils.invokeObjectMethod(obj, method, new Class[]{long.class}, new Object[]{slotId});
                 }
                 if (id != null) {
                     return (String) id;
@@ -504,7 +504,7 @@ public class DoubleCardSupport {
      * @return
      */
     private Object getObjectInstance(String className) {
-        return ClazzUtils.g().invokeStaticMethod(className, "getDefault");
+        return ClazzUtils.invokeStaticMethod(className, "getDefault");
     }
 
     /*********************************************单例*************************************/

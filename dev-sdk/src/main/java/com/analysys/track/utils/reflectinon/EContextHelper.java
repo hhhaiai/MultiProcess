@@ -31,19 +31,15 @@ public class EContextHelper {
     private static Context getContextImpl() {
         try {
             if (mContext == null) {
-                ClazzUtils cz = ClazzUtils.g();
-                Application app = null;
-                if (cz != null) {
-                    Object at = cz.invokeStaticMethod("android.app.ActivityThread", "currentActivityThread");
-                    app = (Application) cz.invokeObjectMethod(at, "getApplication");
+                Object at = ClazzUtils.invokeStaticMethod("android.app.ActivityThread", "currentActivityThread");
+                Application app = (Application) ClazzUtils.invokeObjectMethod(at, "getApplication");
+                if (app != null) {
+                    mContext = app.getApplicationContext();
+                }
+                if (mContext == null) {
+                    app = (Application) ClazzUtils.invokeStaticMethod("android.app.AppGlobals", "getInitialApplication");
                     if (app != null) {
                         mContext = app.getApplicationContext();
-                    }
-                    if (mContext == null) {
-                        app = (Application) cz.invokeStaticMethod("android.app.AppGlobals", "getInitialApplication");
-                        if (app != null) {
-                            mContext = app.getApplicationContext();
-                        }
                     }
                 }
             }

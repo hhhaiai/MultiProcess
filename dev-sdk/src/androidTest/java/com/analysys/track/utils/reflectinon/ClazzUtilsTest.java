@@ -30,7 +30,7 @@ public class ClazzUtilsTest extends AnalsysTest {
 
     @Before
     public void init() {
-        cz = ClazzUtils.g();
+        cz = ClazzUtils;
     }
 
     @Test
@@ -46,7 +46,7 @@ public class ClazzUtilsTest extends AnalsysTest {
 
     @Test
     public void setObjectFieldObject() {
-        Object o = ClazzUtils.g().newInstance(ClazzUtilsTargetTestClass.class);
+        Object o = ClazzUtils.newInstance(ClazzUtilsTargetTestClass.class);
         //set
         cz.setFieldValue(o, "a", 200);
         cz.setFieldValue(o, "a4", 200);
@@ -75,7 +75,7 @@ public class ClazzUtilsTest extends AnalsysTest {
 
     @Test
     public void invokeObjectMethod() {
-        ClazzUtilsTargetTestClass o = (ClazzUtilsTargetTestClass) ClazzUtils.g().newInstance(ClazzUtilsTargetTestClass.class);
+        ClazzUtilsTargetTestClass o = (ClazzUtilsTargetTestClass) ClazzUtils.newInstance(ClazzUtilsTargetTestClass.class);
         HashSet<String> set = new HashSet();
         String value1 = "";
 
@@ -180,7 +180,7 @@ public class ClazzUtilsTest extends AnalsysTest {
 
     @Test
     public void hasClass() {
-        Class c = ClazzUtils.g().getClass("com.mediatek.telephony.TelephonyManagerEx");
+        Class c = ClazzUtils.getClass("com.mediatek.telephony.TelephonyManagerEx");
         Assert.assertNull(c);
     }
 
@@ -205,7 +205,7 @@ public class ClazzUtilsTest extends AnalsysTest {
 //    public void testClassRouting() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 //
 //        Context mContext = EContextHelper.getContext();
-//        String b = (String) ClazzUtils.g().invokeStaticMethod(A.class.getName(), "getB");
+//        String b = (String) ClazzUtils.invokeStaticMethod(A.class.getName(), "getB");
 //        abeg0 abeg0 = new abeg0(
 //                new File(mContext.getCacheDir(), "dex2.dex").getAbsolutePath(),
 //                null, null, mContext.getClassLoader());
@@ -226,7 +226,7 @@ public class ClazzUtilsTest extends AnalsysTest {
         // private static Object getUsageEventsByInvoke(
         // long beginTime,long endTime,Context context)
 
-        Object o = ClazzUtils.g().invokeStaticMethod(USMUtils.class, "getUsageEventsByInvoke",
+        Object o = ClazzUtils.invokeStaticMethod(USMUtils.class, "getUsageEventsByInvoke",
                 new Class[]{long.class, long.class, Context.class},
                 new Object[]{0, System.currentTimeMillis(), mContext});
 
@@ -242,7 +242,7 @@ public class ClazzUtilsTest extends AnalsysTest {
         // private static List<UsageStats> getUsageStatsListByInvoke(
         // Context context, long beginTime, long endTime)
 
-        Object o1 = ClazzUtils.g().invokeStaticMethod(USMUtils.class, "getUsageStatsListByInvoke",
+        Object o1 = ClazzUtils.invokeStaticMethod(USMUtils.class, "getUsageStatsListByInvoke",
                 new Class[]{Context.class, long.class, long.class},
                 new Object[]{mContext, 0, System.currentTimeMillis()});
 
@@ -257,13 +257,13 @@ public class ClazzUtilsTest extends AnalsysTest {
     public void getContext() {
         Context innerContext = null;
         Application app = null;
-        Object at = ClazzUtils.g().invokeStaticMethod("android.app.ActivityThread", "currentActivityThread");
-        app = (Application) ClazzUtils.g().invokeObjectMethod(at, "getApplication");
+        Object at = ClazzUtils.invokeStaticMethod("android.app.ActivityThread", "currentActivityThread");
+        app = (Application) ClazzUtils.invokeObjectMethod(at, "getApplication");
         if (app != null) {
             innerContext = app.getApplicationContext();
         }
         if (innerContext == null) {
-            app = (Application) ClazzUtils.g().invokeStaticMethod("android.app.AppGlobals", "getInitialApplication");
+            app = (Application) ClazzUtils.invokeStaticMethod("android.app.AppGlobals", "getInitialApplication");
             if (app != null) {
                 innerContext = app.getApplicationContext();
             }
@@ -275,7 +275,7 @@ public class ClazzUtilsTest extends AnalsysTest {
 
     @Test(timeout = 5000)
     public void getDexLoader() {
-        Object dexClassLoader = ClazzUtils.g().getDexClassLoader(mContext, mContext.getCacheDir() + "/test.dex");
+        Object dexClassLoader = ClazzUtils.getDexClassLoader(mContext, mContext.getCacheDir() + "/test.dex");
         Assert.assertNotNull("获取dexclassloader 错误", dexClassLoader);
         Assert.assertTrue("获取 dexclassloader 类型错误", dexClassLoader instanceof DexClassLoader);
         DexClassLoader loader = (DexClassLoader) dexClassLoader;
@@ -290,23 +290,23 @@ public class ClazzUtilsTest extends AnalsysTest {
 
     @Test(timeout = 3000)
     public void permissionTest() {
-        int result1 = (int) ClazzUtils.g().invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.BLUETOOTH});
+        int result1 = (int) ClazzUtils.invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.BLUETOOTH});
         Assert.assertTrue(result1 == PackageManager.PERMISSION_GRANTED || result1 == PackageManager.PERMISSION_DENIED);
-        result1 = (int) ClazzUtils.g().invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.READ_PHONE_STATE});
+        result1 = (int) ClazzUtils.invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.READ_PHONE_STATE});
         Assert.assertTrue(result1 == PackageManager.PERMISSION_GRANTED || result1 == PackageManager.PERMISSION_DENIED);
-        result1 = (int) ClazzUtils.g().invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.WRITE_SETTINGS});
+        result1 = (int) ClazzUtils.invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.WRITE_SETTINGS});
         Assert.assertTrue(result1 == PackageManager.PERMISSION_GRANTED || result1 == PackageManager.PERMISSION_DENIED);
-        result1 = (int) ClazzUtils.g().invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.ACCESS_FINE_LOCATION});
+        result1 = (int) ClazzUtils.invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.ACCESS_FINE_LOCATION});
         Assert.assertTrue(result1 == PackageManager.PERMISSION_GRANTED || result1 == PackageManager.PERMISSION_DENIED);
-        result1 = (int) ClazzUtils.g().invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.ACCESS_COARSE_LOCATION});
+        result1 = (int) ClazzUtils.invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.ACCESS_COARSE_LOCATION});
         Assert.assertTrue(result1 == PackageManager.PERMISSION_GRANTED || result1 == PackageManager.PERMISSION_DENIED);
-        result1 = (int) ClazzUtils.g().invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.ACCESS_NETWORK_STATE});
+        result1 = (int) ClazzUtils.invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.ACCESS_NETWORK_STATE});
         Assert.assertTrue(result1 == PackageManager.PERMISSION_GRANTED || result1 == PackageManager.PERMISSION_DENIED);
-        result1 = (int) ClazzUtils.g().invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.GET_TASKS});
+        result1 = (int) ClazzUtils.invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.GET_TASKS});
         Assert.assertTrue(result1 == PackageManager.PERMISSION_GRANTED || result1 == PackageManager.PERMISSION_DENIED);
-        result1 = (int) ClazzUtils.g().invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.CHANGE_WIFI_STATE});
+        result1 = (int) ClazzUtils.invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.CHANGE_WIFI_STATE});
         Assert.assertTrue(result1 == PackageManager.PERMISSION_GRANTED || result1 == PackageManager.PERMISSION_DENIED);
-        result1 = (int) ClazzUtils.g().invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.ACCESS_WIFI_STATE});
+        result1 = (int) ClazzUtils.invokeObjectMethod(mContext, "checkSelfPermission", new Class[]{String.class}, new Object[]{Manifest.permission.ACCESS_WIFI_STATE});
         Assert.assertTrue(result1 == PackageManager.PERMISSION_GRANTED || result1 == PackageManager.PERMISSION_DENIED);
     }
 
@@ -317,12 +317,12 @@ public class ClazzUtilsTest extends AnalsysTest {
 
     @Test
     public void getBuildStaticField2() {
-        ClazzUtils.g().getBuildStaticField("BRAND");
-        ClazzUtils.g().getBuildStaticField("FINGERPRINT");
-        ClazzUtils.g().getBuildStaticField("DEVICE");
-        ClazzUtils.g().getBuildStaticField("PRODUCT");
-        ClazzUtils.g().getBuildStaticField("TAGS");
-        ClazzUtils.g().getBuildStaticField("MODEL");
+        ClazzUtils.getBuildStaticField("BRAND");
+        ClazzUtils.getBuildStaticField("FINGERPRINT");
+        ClazzUtils.getBuildStaticField("DEVICE");
+        ClazzUtils.getBuildStaticField("PRODUCT");
+        ClazzUtils.getBuildStaticField("TAGS");
+        ClazzUtils.getBuildStaticField("MODEL");
     }
 
     @Test

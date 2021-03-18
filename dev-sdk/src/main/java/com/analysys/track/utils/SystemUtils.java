@@ -428,7 +428,7 @@ public class SystemUtils {
         String serialNo = "";
         try {
             if (Build.VERSION.SDK_INT > 26) {
-                serialNo = (String) ClazzUtils.g().invokeStaticMethod("android.os.Build", "getSerial");
+                serialNo = (String) ClazzUtils.invokeStaticMethod("android.os.Build", "getSerial");
             } else {
                 if (android.os.Build.VERSION.SDK_INT >= 9) {
                     serialNo = android.os.Build.SERIAL;
@@ -474,7 +474,7 @@ public class SystemUtils {
             }
             result = getProp(key);
             if (TextUtils.isEmpty(result)) {
-                result = (String) ClazzUtils.g().getDefaultProp(key);
+                result = (String) ClazzUtils.getDefaultProp(key);
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
