@@ -25,7 +25,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class AdvertisingIdClient {
 
-    public static AdInfo getAdvertisingIdInfo(Context context) throws Exception {
+    public static AdInfo getAdvertisingIdInfo(Context context) {
 
         try {
             if (Looper.myLooper() == Looper.getMainLooper()) {

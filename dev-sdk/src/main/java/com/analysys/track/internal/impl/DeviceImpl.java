@@ -527,25 +527,12 @@ public class DeviceImpl {
             if (!idfa.isEmpty()) {
                 return idfa;
             }
-            EThreadPool.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        AdvertisingIdClient.AdInfo adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);// 阻塞调用，需放在子线程处理
-                        if (adInfo != null) {
-                            SPHelper.setStringValue2SP(mContext, EGContext.SP_APP_IDFA, adInfo.getId());
-                        }
 
-                    } catch (Throwable e) {
-                    }
-                }
-            });
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(t);
             }
         }
-
         return idfa;
     }
 

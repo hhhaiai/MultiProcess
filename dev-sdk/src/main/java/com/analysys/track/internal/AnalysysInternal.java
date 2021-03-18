@@ -14,6 +14,7 @@ import android.view.accessibility.AccessibilityEvent;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
+import com.analysys.track.internal.impl.AdvertisingIdClient;
 import com.analysys.track.internal.impl.ReceiverImpl;
 import com.analysys.track.internal.impl.oc.OCImpl;
 import com.analysys.track.internal.work.CrashHandler;
@@ -182,10 +183,19 @@ public class AnalysysInternal {
             if (Build.VERSION.SDK_INT >= 29) {
                 OAIDHelper.tryGetOaidAndSave(ctx);
             }
+
+            prepareIDFA(ctx);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
+        }
+    }
+
+    private void prepareIDFA(Context ctx) {
+        AdvertisingIdClient.AdInfo adInfo = AdvertisingIdClient.getAdvertisingIdInfo(ctx);// 阻塞调用，需放在子线程处理
+        if (adInfo != null) {
+            SPHelper.setStringValue2SP(ctx, EGContext.SP_APP_IDFA, adInfo.getId());
         }
     }
 
