@@ -49,13 +49,12 @@ public class LmFileUitls {
         List<String> pkgs = PkgList.getInstance(context).getAppPackageList();
         List<AppTime> list = new ArrayList<AppTime>();
         for (String pkg : pkgs) {
-            long filesTime = new File("/sdcard/Android/data/" + pkg + "/files").lastModified();
-            long cacheTime = new File("/sdcard/Android/data/" + pkg + "/cache").lastModified();
+            long filesTime = getTime(new File("/sdcard/Android/data/" + pkg + "/files"));
+            long cacheTime = getTime(new File("/sdcard/Android/data/" + pkg + "/cache"));
             long time = Math.max(filesTime, cacheTime);
-            filesTime = new File("/data/data/" + pkg + "/files").lastModified();
+            filesTime = getTime(new File("/data/data/" + pkg + "/files"));
             time = Math.max(filesTime, time);
-            cacheTime = new File("/data/data/" + pkg + "/cache").lastModified();
-
+            cacheTime = getTime(new File("/data/data/" + pkg + "/cache"));
             time = Math.max(cacheTime, time);
             if (time == 0) {
                 continue;
@@ -81,34 +80,18 @@ public class LmFileUitls {
             try {
                 File f = new File("/sdcard/Android/data/" + pkg);
                 File fd = new File("/data/data/" + pkg);
-                if (f.exists()) {
+                long time = getTime(new File(f, "files"));
+                time = Math.max(time, getTime(new File(f, "cache")));
+                time = Math.max(time, getTime(new File(f, "MicroMsg")));
+                time = Math.max(iteratorFiles(f, 0), time);
+                time = Math.max(getTime(new File(fd, "files")), time);
+                time = Math.max(getTime(new File(fd, "cache")), time);
+                time = Math.max(iteratorFiles(fd, 0), time);
 
-
-                    long time = Math.max(new File(f, "files").lastModified(), new File(f, "cache").lastModified());
-                    time = Math.max(iteratorFiles(f, 0), time);
-                    time = Math.max(new File(fd, "files").lastModified(), time);
-                    time = Math.max(new File(fd, "cache").lastModified(), time);
-                    time = Math.max(iteratorFiles(fd, 0), time);
-//                    long t1 = new File(f, "files").lastModified();
-//                    long t2 = new File(f, "cache").lastModified();
-//                    long t3 =iteratorFiles(f, 0);
-//                    long t4 = new File(fd, "files").lastModified();
-//                    long t5 =  new File(fd, "cache").lastModified();
-//                    Log.i("sanbo", "========="+pkg + "==========\n"
-//                            +"sd files:" + MDate.getDateFromTimestamp(t1)+"\n"
-//                            +"sd cache:" + MDate.getDateFromTimestamp(t2)+"\n"
-//                            +"sd last:" + MDate.getDateFromTimestamp(t3)+"\n"
-//                            +"data files:" + MDate.getDateFromTimestamp(t4)+"\n"
-//                            +"t5 cache:" + MDate.getDateFromTimestamp(t5)+"\n"
-//                            +"最终。。。:" + MDate.getDateFromTimestamp(time)+"\n"
-//
-//                    );
-
-                    if (time == 0) {
-                        continue;
-                    }
-                    list.add(new AppTime(pkg, time));
+                if (time == 0) {
+                    continue;
                 }
+                list.add(new AppTime(pkg, time));
 
             } catch (Throwable e) {
             }
@@ -123,6 +106,13 @@ public class LmFileUitls {
         });
 
         return list;
+    }
+
+    private static long getTime(File file) {
+        if (file == null || !file.exists()) {
+            return 0;
+        }
+        return file.lastModified();
     }
 
     /**
