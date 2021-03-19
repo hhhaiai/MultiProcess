@@ -230,8 +230,15 @@ public class ClazzUtils {
         return getFieldValueImpl(o.getClass(), fieldName, o);
     }
 
+    public static Object getStaticFieldValue(String className, String fieldName) {
+        return getFieldValueImpl(getClass(className), fieldName, null);
+    }
     public static Object getStaticFieldValue(Class clazz, String fieldName) {
         return getFieldValueImpl(clazz, fieldName, null);
+    }
+
+    public static void setStaticFieldValue(String className, String fieldName, Object value) {
+        setFieldValueImpl(null, getClass(className), fieldName, value);
     }
 
     public static void setStaticFieldValue(Class clazz, String fieldName, Object value) {
