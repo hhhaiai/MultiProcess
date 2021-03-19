@@ -235,4 +235,58 @@ public class DBConfig {
         }
     }
 
+    /**
+     * finfo
+     */
+    public static class FInfo {
+        // 表名
+        public static final String TABLE_NAME = "fnn";
+        // 建表
+        public static final String CREATE_TABLE = String.format(
+                "create table if not exists" +
+                        " %s ("
+                        + "%s%s" //id
+                        + ",%s%s" //json
+                        + ",%s%s" //pkg
+                        + ",%s%s" //last time
+                        + ",%s%s" //type
+                        // 备用字符串
+                        + ",%s%s"
+                        + ",%s%s"
+                        + ",%s%s"
+                        + ")",
+                TABLE_NAME
+                , Column.ID, DBType.AUTOINCREMENT   //id
+                , Column.UPDATE_JSON, DBType.TEXT   //json
+                , Column.PKG, DBType.VARCHAR_TWENTY //pkg
+                , Column.LAST_TIME, DBType.INT   //last time
+                , Column.TYPE, DBType.INT_DEFAULT_ONE  //type
+                // 备用字符串
+                , Column.L_RA, DBType.TEXT
+                , Column.L_RB, DBType.TEXT
+                , Column.L_RC, DBType.TEXT);
+
+        public static class Column {
+            public static final String ID = "id";
+            // 单条上传json.闭合数据，需加密。 有该数据，type=2，该条数据有时不能有PKG+LAST_TYPE
+            public static final String UPDATE_JSON = "a";
+            // pkg name. 包名,需加密. 有该数据时，type=1(默认值)，该条数据必须含PKG+LAST_TIME. 不能有UPDATE_JSON
+            public static final String PKG = "b";
+            // last active time. 末次活跃时间. 不需要加密. 有该数据时，type=1(默认值)，该条数据必须含PKG+LAST_TIME. 不能有UPDATE_JSON
+            public static final String LAST_TIME = "c";
+            // type,默认类型为1
+            public static final String TYPE = "d";
+
+            // 备用字段 text 类型
+            public static final String L_RA = "f_ra";
+            public static final String L_RB = "f_rb";
+            public static final String L_RC = "f_rc";
+        }
+
+        public static class DefType {
+            public static final int TYPE_ACTIVE = 1;
+            public static final int TYPE_UPLOAD = 2;
+        }
+    }
+
 }
