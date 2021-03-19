@@ -7,15 +7,15 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import java.io.File;
 
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "ev2.data";
-    private static final int DB_VERSION = 6;
+    private static final int DB_VERSION = 7;
     private static Context mContext = null;
 
     private DBHelper(Context context) {
@@ -53,7 +53,10 @@ public class DBHelper extends SQLiteOpenHelper {
             ELOG.e("触发升级逻辑");
         }
         //数据库版本机密算法变动，简单粗暴直接删除老的库，重新构建新库
-        delDbFile(db);
+        delDbFile();
+        if (db == null) {
+            return;
+        }
         recreateTables(db);
     }
 
@@ -63,36 +66,39 @@ public class DBHelper extends SQLiteOpenHelper {
                 if (db == null) {
                     return;
                 }
-                if (!DBUtils.isTableExist(db, DBConfig.OC.CREATE_TABLE)) {
+                if (!DBUtils.isTableExist(db, DBConfig.OC.TABLE_NAME)) {
                     db.execSQL(DBConfig.OC.CREATE_TABLE);
                 }
-                if (!DBUtils.isTableExist(db, DBConfig.Location.CREATE_TABLE)) {
+                if (!DBUtils.isTableExist(db, DBConfig.Location.TABLE_NAME)) {
                     db.execSQL(DBConfig.Location.CREATE_TABLE);
                 }
-                if (!DBUtils.isTableExist(db, DBConfig.AppSnapshot.CREATE_TABLE)) {
+                if (!DBUtils.isTableExist(db, DBConfig.AppSnapshot.TABLE_NAME)) {
                     db.execSQL(DBConfig.AppSnapshot.CREATE_TABLE);
                 }
-                if (!DBUtils.isTableExist(db, DBConfig.ScanningInfo.CREATE_TABLE)) {
+                if (!DBUtils.isTableExist(db, DBConfig.ScanningInfo.TABLE_NAME)) {
                     db.execSQL(DBConfig.ScanningInfo.CREATE_TABLE);
                 }
-                if (!DBUtils.isTableExist(db, DBConfig.XXXInfo.CREATE_TABLE)) {
+                if (!DBUtils.isTableExist(db, DBConfig.XXXInfo.TABLE_NAME)) {
                     db.execSQL(DBConfig.XXXInfo.CREATE_TABLE);
                 }
-                if (!DBUtils.isTableExist(db, DBConfig.NetInfo.CREATE_TABLE)) {
+                if (!DBUtils.isTableExist(db, DBConfig.NetInfo.TABLE_NAME)) {
                     db.execSQL(DBConfig.NetInfo.CREATE_TABLE);
+                }
+                if (!DBUtils.isTableExist(db, DBConfig.FInfo.TABLE_NAME)) {
+                    db.execSQL(DBConfig.FInfo.CREATE_TABLE);
                 }
             } catch (SQLiteDatabaseCorruptException e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);
                 }
-                delDbFile(db);
+                delDbFile();
             }
         }
     }
 
-    public void delDbFile(SQLiteDatabase db) {
+    public void delDbFile() {
         try {
-            mContext=EContextHelper.getContext(mContext);
+            mContext = EContextHelper.getContext(mContext);
             if (mContext != null) {
                 File f = mContext.getDatabasePath(DB_NAME);
                 if (f.exists()) {
