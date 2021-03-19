@@ -43,15 +43,13 @@ public class TableProcess {
      * 存储数据
      */
     public void insertXXX(JSONObject xxxInfo) {
-        SQLiteDatabase db = null;
         try {
-            db = DBManager.getInstance(mContext).openDB();
-            if (db == null || xxxInfo == null || xxxInfo.length() < 1) {
+            if (xxxInfo == null || xxxInfo.length() < 1) {
                 return;
             }
-
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
+            if (db == null) {
+                return;
             }
             ContentValues cv = getContentValuesXXX(xxxInfo);
             // 防止因为传递控制导致的写入异常
@@ -73,15 +71,13 @@ public class TableProcess {
      * 存储数据
      */
     public void insertNet(String netInfo) {
-        SQLiteDatabase db = null;
         try {
-            db = DBManager.getInstance(mContext).openDB();
-            if (db == null || netInfo == null || netInfo.length() < 1) {
+            if (TextUtils.isEmpty(netInfo)) {
                 return;
             }
-
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
+            if (db == null) {
+                return;
             }
             ContentValues cv = new ContentValues();
             cv.put(DBConfig.NetInfo.Column.TIME, System.currentTimeMillis());
@@ -103,18 +99,14 @@ public class TableProcess {
 
     // 连表查询
     public JSONArray selectNet(long maxLength) {
-        JSONArray array = null;
+        JSONArray array = new JSONArray();
         Cursor cursor = null;
         int blankCount = 0, countNum = 0;
         try {
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return array;
             }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
-            array = new JSONArray();
             cursor = db.query(DBConfig.NetInfo.TABLE_NAME, null, null, null, null, null, null, "2000");
             JSONArray jsonArray = null;
             String proc = null;
@@ -172,14 +164,10 @@ public class TableProcess {
     }
 
     public void deleteNet() {
-        SQLiteDatabase db = null;
         try {
-            db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
             }
             db.delete(DBConfig.NetInfo.TABLE_NAME, null, null);
         } catch (Throwable e) {
@@ -189,14 +177,10 @@ public class TableProcess {
     }
 
     public void deleteScanningInfos() {
-        SQLiteDatabase db = null;
         try {
-            db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
             }
             db.delete(DBConfig.ScanningInfo.TABLE_NAME, null, null);
         } catch (Throwable e) {
@@ -229,14 +213,10 @@ public class TableProcess {
     }
 
     public void deleteXXX() {
-        SQLiteDatabase db = null;
         try {
-            db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
             }
             db.delete(DBConfig.XXXInfo.TABLE_NAME, null, null);
         } catch (Throwable e) {
@@ -254,17 +234,13 @@ public class TableProcess {
      * @param idList
      */
     public void deleteByIDXXX(List<String> idList) {
-        SQLiteDatabase db = null;
         try {
             if (idList == null || idList.size() < 1) {
                 return;
             }
-            db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
             }
             for (int i = 0; i < idList.size(); i++) {
                 String id = idList.get(i);
@@ -288,12 +264,9 @@ public class TableProcess {
         Cursor cursor = null;
         int blankCount = 0, countNum = 0;
         try {
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return array;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
             }
             array = new JSONArray();
             cursor = db.query(DBConfig.XXXInfo.TABLE_NAME, null, null, null, null, null, null, "2000");
@@ -362,9 +335,12 @@ public class TableProcess {
      * @param cv
      */
     public void insertOC(ContentValues cv) {
-
         try {
             if (cv == null || cv.size() < 1) {
+                return;
+            }
+            SQLiteDatabase db = prepareGetDB();
+            if (db == null) {
                 return;
             }
             if (cv.containsKey(DBConfig.OC.Column.ACT) && cv.containsKey(DBConfig.OC.Column.AOT)) {
@@ -380,28 +356,14 @@ public class TableProcess {
                 // 没有开始关闭时间，丢弃
                 return;
             }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-        try {
-
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if (db == null || cv.size() < 1) {
-                return;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
             cv.put(DBConfig.OC.Column.CU, 1);
             long result = db.insert(DBConfig.OC.TABLE_NAME, null, cv);
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_oc, "写入  结果：[" + result + "]。。。。");
             }
         } catch (Throwable e) {
-            if (BuildConfig.logcat) {
-                ELOG.i(BuildConfig.tag_oc, e);
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -419,12 +381,9 @@ public class TableProcess {
         String pkgName = "", act = "";
         JSONObject jsonObject, etdm;
         try {
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return ocJar;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
             }
             int id = -1;
             cursor = db.query(DBConfig.OC.TABLE_NAME, null, null, null, null, null, null, "6000");
@@ -536,15 +495,9 @@ public class TableProcess {
      */
     public void deleteOC(boolean isAllClear) {
         try {
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
             }
             if (isAllClear) {
                 db.delete(DBConfig.OC.TABLE_NAME, null, null);
@@ -572,6 +525,13 @@ public class TableProcess {
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_loc, " 位置信息即将插入DB insertLocation().....");
             }
+            if (locationInfo == null || locationInfo.length() < 1) {
+                return;
+            }
+            SQLiteDatabase db = prepareGetDB();
+            if (db == null) {
+                return;
+            }
             ContentValues cv = null;
             String locationTime = null;
             long time = -1;
@@ -589,13 +549,6 @@ public class TableProcess {
                     cv.put(DBConfig.Location.Column.LI, EncryptUtils.encrypt(mContext, encryptLocation));
                     cv.put(DBConfig.Location.Column.IT, locationTime);
                     cv.put(DBConfig.Location.Column.ST, EGContext.DEFAULT_ZERO);
-                    SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-                    if (db == null) {
-                        return;
-                    }
-                    if (!db.isOpen()) {
-                        db = DBManager.getInstance(mContext).openDB();
-                    }
                     long result = db.insert(DBConfig.Location.TABLE_NAME, null, cv);
                     if (BuildConfig.logcat) {
                         ELOG.i(BuildConfig.tag_loc, " 位置信息插入DB 完毕 time[" + locationTime + "]，结果: " + result);
@@ -612,23 +565,20 @@ public class TableProcess {
     }
 
     public JSONArray selectLocation(long maxLength) {
-        JSONArray array = null;
+        JSONArray array = new JSONArray();
         int blankCount = 0, countNum = 0;
-        ;
         Cursor cursor = null;
-        SQLiteDatabase db = null;
         try {
 
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_loc, " 查询位置信息 selectLocation().....");
             }
-            array = new JSONArray();
-            db = DBManager.getInstance(mContext).openDB();
-            if (db == null) {
+            if (maxLength <= 0) {
                 return array;
             }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
+            if (db == null) {
+                return array;
             }
             cursor = db.query(DBConfig.Location.TABLE_NAME, null, null, null, null, null, null, "2000");
             String encryptLocation = "", time = "";
@@ -693,14 +643,9 @@ public class TableProcess {
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_loc, " 清除状态为1的位置信息  deleteLocation().....");
             }
-
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return;
-            }
-
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
             }
             db.delete(DBConfig.Location.TABLE_NAME, DBConfig.Location.Column.ST + "=?",
                     new String[]{EGContext.DEFAULT_ONE});
@@ -719,12 +664,9 @@ public class TableProcess {
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_loc, " 清除所有的位置信息 deleteLocation().....");
             }
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
             }
             db.delete(DBConfig.Location.TABLE_NAME, null, null);
         } catch (Throwable e) {
@@ -736,99 +678,6 @@ public class TableProcess {
             DBManager.getInstance(mContext).closeDB();
         }
     }
-//    /********************************************************* temp id ***********************************************************/
-//    /**
-//     * 存储tempid
-//     *
-//     * @param tmpId
-//     */
-//    public void insertTempId(String tmpId) {
-//        SQLiteDatabase db = null;
-//        try {
-//            db = DBManager.getInstance(mContext).openDB();
-//            // 如果db对象为空，或者tmpId为空，则return
-//            if (db == null || TextUtils.isEmpty(tmpId)) {
-//                return;
-//            }
-//            if (!db.isOpen()) {
-//                db = DBManager.getInstance(mContext).openDB();
-//            }
-//            ContentValues cv = new ContentValues();
-//            // TEMPID 加密
-//            cv.put(DBConfig.IDStorage.Column.TEMPID, EncryptUtils.encrypt(mContext, tmpId));
-//            db.insert(DBConfig.IDStorage.TABLE_NAME, null, cv);
-//        } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(e);
-//            }
-//        } finally {
-//            DBManager.getInstance(mContext).closeDB();
-//        }
-//    }
-//
-//    /**
-//     * 读取egid、tmpid
-//     *
-//     * @return
-//     */
-//    public String selectTempId() {
-//        String tmpid = "";
-//        Cursor cursor = null;
-//        int blankCount = 0;
-//        try {
-//            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-//            if (db == null) {
-//                return tmpid;
-//            }
-//            if (!db.isOpen()) {
-//                db = DBManager.getInstance(mContext).openDB();
-//            }
-//            cursor = db.query(DBConfig.IDStorage.TABLE_NAME, null, null, null, null, null, null);
-//            if (cursor == null) {
-//                return tmpid;
-//            }
-//            while (cursor.moveToNext()) {
-//                if (blankCount >= EGContext.BLANK_COUNT_MAX) {
-//                    return tmpid;
-//                }
-//                // TEMPID 加密
-//                tmpid = EncryptUtils.decrypt(mContext,
-//                        cursor.getString(cursor.getColumnIndex(DBConfig.IDStorage.Column.TEMPID)));
-//                if (TextUtils.isEmpty(tmpid)) {
-//                    blankCount += 1;
-//                    continue;
-//                }
-//
-//            }
-//        } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(e);
-//            }
-//        } finally {
-//            StreamerUtils.safeClose(cursor);
-//            DBManager.getInstance(mContext).closeDB();
-//        }
-//        return tmpid;
-//    }
-//
-//    public void deleteTempId() {
-//        try {
-//            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-//            if (db == null) {
-//                return;
-//            }
-//            if (!db.isOpen()) {
-//                db = DBManager.getInstance(mContext).openDB();
-//            }
-//            db.delete(DBConfig.IDStorage.TABLE_NAME, null, null);
-//        } catch (Throwable e) {
-//            if (BuildConfig.ENABLE_BUG_REPORT) {
-//                BugReportForTest.commitError(e);
-//            }
-//        } finally {
-//            DBManager.getInstance(mContext).closeDB();
-//        }
-//    }
 
     /********************************************************* snap shot ***********************************************************/
     /**
@@ -839,14 +688,14 @@ public class TableProcess {
     public void insertSnapshot(List<JSONObject> snapshotsList) {
 
         try {
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if (db == null || snapshotsList == null || snapshotsList.size() < 1) {
+            if (snapshotsList == null || snapshotsList.size() < 1) {
+                return;
+            }
+            SQLiteDatabase db = prepareGetDB();
+            if (db == null) {
                 return;
             }
 
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
             if (snapshotsList != null && snapshotsList.size() > 0) {
                 for (int i = 0; i < snapshotsList.size(); i++) {
                     JSONObject obj = snapshotsList.get(i);
@@ -875,14 +724,14 @@ public class TableProcess {
      */
     public void insertSnapshot(JSONObject obj) {
         try {
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-            if (db == null || obj == null || obj.length() < 1) {
+            if (obj == null || obj.length() < 1) {
+                return;
+            }
+            SQLiteDatabase db = prepareGetDB();
+            if (db == null) {
                 return;
             }
 
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_snap, "。。。obj:" + obj.toString());
             }
@@ -917,12 +766,9 @@ public class TableProcess {
      */
     public void updateSnapshot(String pkgName, String appTag, String avc) {
         try {
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
             }
             ContentValues cv = new ContentValues();
             // AT 不加密
@@ -987,7 +833,6 @@ public class TableProcess {
         String pkgName = "";
         try {
             jsonObj = new JSONObject();
-
             //APN 加密
             pkgName = EncryptUtils.decrypt(mContext,
                     cursor.getString(cursor.getColumnIndex(DBConfig.AppSnapshot.Column.APN)));
@@ -1032,12 +877,9 @@ public class TableProcess {
         int blankCount = 0, countNum = 0;
         JSONObject jsonObject = null;
         try {
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return array;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
             }
             cursor = db.query(DBConfig.AppSnapshot.TABLE_NAME, null, null, null, null, null, null, "4000");
             if (cursor == null) {
@@ -1085,14 +927,10 @@ public class TableProcess {
 
     public void resetSnapshot() {
         try {
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return;
             }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
-
             /**
              * 删除标志已经删除的
              */
@@ -1125,12 +963,9 @@ public class TableProcess {
 
     public void deleteAllSnapshot() {
         try {
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
             }
             db.delete(DBConfig.AppSnapshot.TABLE_NAME, null, null);
         } catch (Throwable e) {
@@ -1147,12 +982,9 @@ public class TableProcess {
             if (scanningInfo == null) {
                 return;
             }
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
             }
             ContentValues cv = new ContentValues();
 
@@ -1177,12 +1009,9 @@ public class TableProcess {
     public List<NetInfo.ScanningInfo> selectScanningInfoByPkg(String pkgname, boolean onlyNew) {
         Cursor cursor = null;
         try {
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return null;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
             }
             //SELECT * FROM sss where id=( SELECT MAX(id) FROM sss where pkg=123 )
 
@@ -1228,12 +1057,9 @@ public class TableProcess {
             return;
         }
         try {
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
             }
             for (int i = 0; i < waitRemoveScanningInfoIds.size(); i++) {
                 String id = waitRemoveScanningInfoIds.get(i);
@@ -1255,12 +1081,9 @@ public class TableProcess {
     public List<NetInfo.ScanningInfo> selectAllScanningInfos(long maxSize) {
         Cursor cursor = null;
         try {
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return null;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
             }
             cursor = db.query(DBConfig.ScanningInfo.TABLE_NAME, null,
                     null, null,
@@ -1307,14 +1130,13 @@ public class TableProcess {
     public void insertLmf(ContentValues cv) {
 
         try {
-
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
-//            if (db == null || cv.size() < 1) {
-//                return;
-//            }
-//            if (!db.isOpen()) {
-//                db = DBManager.getInstance(mContext).openDB();
-//            }
+            if (cv.size() < 1) {
+                return;
+            }
+            SQLiteDatabase db = prepareGetDB();
+            if (db == null) {
+                return;
+            }
 //            long result = db.insert(DBConfig.OC.TABLE_NAME, null, cv);
 //            if (BuildConfig.logcat) {
 //                ELOG.i(BuildConfig.tag_oc, "写入  结果：[" + result + "]。。。。");
@@ -1327,6 +1149,7 @@ public class TableProcess {
             DBManager.getInstance(mContext).closeDB();
         }
     }
+
 
     /**
      * 加载到内存中
@@ -1342,12 +1165,10 @@ public class TableProcess {
         JSONArray result = new JSONArray();
         Cursor cursor = null;
         try {
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+
+            SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return result;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -1363,15 +1184,9 @@ public class TableProcess {
 
     public void deleteLmf() {
         try {
-            SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+            SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return;
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
-            }
-            if (!db.isOpen()) {
-                db = DBManager.getInstance(mContext).openDB();
             }
             db.delete(DBConfig.OC.TABLE_NAME, DBConfig.OC.Column.ST + "=?", new String[]{EGContext.DEFAULT_ONE});
 //            ELOG.e("删除的行数：：：  "+count);
@@ -1384,6 +1199,15 @@ public class TableProcess {
         }
     }
 
+    /********************************************************* 工具方法 ***********************************************************/
+
+    private SQLiteDatabase prepareGetDB() {
+        SQLiteDatabase db = DBManager.getInstance(mContext).openDB();
+        if (!db.isOpen()) {
+            return DBManager.getInstance(mContext).openDB();
+        }
+        return null;
+    }
 
     /********************************************************* 单例和对象 ***********************************************************/
     private static class HOLDER {
