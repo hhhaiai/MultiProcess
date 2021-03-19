@@ -33,10 +33,11 @@ public class Woo {
         try {
             StackTraceElement[] stackElement = Thread.currentThread().getStackTrace();
             boolean isSelf = false;
+            String selfMethodName = Thread.currentThread().getStackTrace()[1].getMethodName();
             for (int i = 0; i < stackElement.length; i++) {
                 StackTraceElement ele = stackElement[i];
 
-                if (!isSelf && "logFormCase".equals(ele.getMethodName())) {
+                if (!isSelf && selfMethodName.equals(ele.getMethodName())) {
                     isSelf = true;
                 }
 
@@ -44,7 +45,6 @@ public class Woo {
                 if (SDKHelper.isSubClass(Class.forName(clsName), ETestCase.class)
                         || SDKHelper.isSubClass(Class.forName(clsName), ECase.class)) {
                     L.i(info);
-                    SDKHelper.logi(info);
                     toastFromCase(info);
                     return;
                 }
