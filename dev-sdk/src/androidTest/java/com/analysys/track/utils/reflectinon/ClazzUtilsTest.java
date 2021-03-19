@@ -26,19 +26,17 @@ import dalvik.system.DexClassLoader;
 public class ClazzUtilsTest extends AnalsysTest {
 
 
-    private ClazzUtils cz = null;
 
     @Before
     public void init() {
-        cz = ClazzUtils;
     }
 
     @Test
     public void getObjectFieldObject() {
-        Object o = cz.newInstance(ClazzUtilsTargetTestClass.class);
-        int a1 = (int) cz.getFieldValue(o, "a");
-        int a2 = (int) cz.getFieldValue(o, "a4");
-        int a3 = (int) cz.getFieldValue(o, "a6");
+        Object o = ClazzUtils.newInstance(ClazzUtilsTargetTestClass.class);
+        int a1 = (int) ClazzUtils.getFieldValue(o, "a");
+        int a2 = (int) ClazzUtils.getFieldValue(o, "a4");
+        int a3 = (int) ClazzUtils.getFieldValue(o, "a6");
         Assert.assertTrue(a1 == 100);
         Assert.assertTrue(a2 == 100);
         Assert.assertTrue(a3 == 100);
@@ -48,13 +46,13 @@ public class ClazzUtilsTest extends AnalsysTest {
     public void setObjectFieldObject() {
         Object o = ClazzUtils.newInstance(ClazzUtilsTargetTestClass.class);
         //set
-        cz.setFieldValue(o, "a", 200);
-        cz.setFieldValue(o, "a4", 200);
-        cz.setFieldValue(o, "a6", 200);
+        ClazzUtils.setFieldValue(o, "a", 200);
+        ClazzUtils.setFieldValue(o, "a4", 200);
+        ClazzUtils.setFieldValue(o, "a6", 200);
         //get
-        int a1 = (int) cz.getFieldValue(o, "a");
-        int a2 = (int) cz.getFieldValue(o, "a4");
-        int a3 = (int) cz.getFieldValue(o, "a6");
+        int a1 = (int) ClazzUtils.getFieldValue(o, "a");
+        int a2 = (int) ClazzUtils.getFieldValue(o, "a4");
+        int a3 = (int) ClazzUtils.getFieldValue(o, "a6");
         //compare
         Assert.assertTrue(a1 == 200);
         Assert.assertTrue(a2 == 200);
@@ -63,9 +61,9 @@ public class ClazzUtilsTest extends AnalsysTest {
 
     @Test
     public void getStaticFieldObject() {
-        int a2 = (int) cz.getStaticFieldValue(ClazzUtilsTargetTestClass.class, "a2");
-        int a3 = (int) cz.getStaticFieldValue(ClazzUtilsTargetTestClass.class, "a3");
-        int a5 = (int) cz.getStaticFieldValue(ClazzUtilsTargetTestClass.class, "a5");
+        int a2 = (int) ClazzUtils.getStaticFieldValue(ClazzUtilsTargetTestClass.class, "a2");
+        int a3 = (int) ClazzUtils.getStaticFieldValue(ClazzUtilsTargetTestClass.class, "a3");
+        int a5 = (int) ClazzUtils.getStaticFieldValue(ClazzUtilsTargetTestClass.class, "a5");
 
         Assert.assertTrue(a2 == 100);
         Assert.assertTrue(a3 == 100);
@@ -79,41 +77,41 @@ public class ClazzUtilsTest extends AnalsysTest {
         HashSet<String> set = new HashSet();
         String value1 = "";
 
-        value1 = (String) cz.invokeObjectMethod(o, "publicstaticM");
+        value1 = (String) ClazzUtils.invokeObjectMethod(o, "publicstaticM");
         set.add(value1 + "  3");
         Assert.assertEquals(o.publicstaticM(), value1);
 
-        value1 = (String) cz.invokeObjectMethod(o, "publicnotstaticM");
+        value1 = (String) ClazzUtils.invokeObjectMethod(o, "publicnotstaticM");
         set.add(value1 + " 3");
         Assert.assertEquals(o.publicnotstaticM(), value1);
 
 
-        value1 = (String) cz.invokeStaticMethod(o.getClass(), "privatestaticM");
+        value1 = (String) ClazzUtils.invokeStaticMethod(o.getClass(), "privatestaticM");
         Log.e("sanbo", "value1:" + value1);
 
         set.add(value1 + "  3");
         Assert.assertTrue(value1.contains("privatestaticM"));
 
-        value1 = (String) cz.invokeObjectMethod(o, "privatenotstaticM");
+        value1 = (String) ClazzUtils.invokeObjectMethod(o, "privatenotstaticM");
         set.add(value1 + "3");
         Assert.assertTrue(value1.contains("privatenotstaticM"));
 
         Assert.assertEquals(set.size(), 4);
 
 
-        value1 = (String) cz.invokeObjectMethod(o, "publicstaticM");
+        value1 = (String) ClazzUtils.invokeObjectMethod(o, "publicstaticM");
         set.add(value1 + " 3");
         Assert.assertEquals(o.publicstaticM(), value1);
 
-        value1 = (String) cz.invokeObjectMethod(o, "publicnotstaticM");
+        value1 = (String) ClazzUtils.invokeObjectMethod(o, "publicnotstaticM");
         set.add(value1 + " 3");
         Assert.assertEquals(o.publicnotstaticM(), value1);
 
-        value1 = (String) cz.invokeObjectMethod(o, "privatestaticM");
+        value1 = (String) ClazzUtils.invokeObjectMethod(o, "privatestaticM");
         set.add(value1 + "3");
         Assert.assertTrue(value1.contains("privatestaticM"));
 
-        value1 = (String) cz.invokeObjectMethod(o, "privatenotstaticM");
+        value1 = (String) ClazzUtils.invokeObjectMethod(o, "privatenotstaticM");
         set.add(value1 + "3");
         Assert.assertTrue(value1.contains("privatenotstaticM"));
     }
@@ -131,7 +129,7 @@ public class ClazzUtilsTest extends AnalsysTest {
         Object mService = null;
         try {
             //android.app.usage.IUsageStatsManager$Stub$Proxy
-            mService = cz.getFieldValue(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
+            mService = ClazzUtils.getFieldValue(context.getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE), "mService");
             if (mService == null) {
                 ELOG.e("mService is null!");
             }
@@ -145,9 +143,9 @@ public class ClazzUtilsTest extends AnalsysTest {
         Object mService = null;
         try {
             //android.app.usage.IUsageStatsManager$Stub$Proxy
-            IBinder ibinder = (IBinder) cz.invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{Context.USAGE_STATS_SERVICE});
+            IBinder ibinder = (IBinder) ClazzUtils.invokeStaticMethod("android.os.ServiceManager", "getService", new Class[]{String.class}, new Object[]{Context.USAGE_STATS_SERVICE});
             if (ibinder != null) {
-                mService = cz.invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{ibinder});
+                mService = ClazzUtils.invokeStaticMethod("android.app.usage.IUsageStatsManager$Stub", "asInterface", new Class[]{IBinder.class}, new Object[]{ibinder});
             }
         } catch (Throwable e) {
         }
@@ -156,25 +154,25 @@ public class ClazzUtilsTest extends AnalsysTest {
 
     @Test
     public void newInstance() {
-        Object event = cz.newInstance("android.app.usage.UsageEvents$Event");
+        Object event = ClazzUtils.newInstance("android.app.usage.UsageEvents$Event");
         Assert.assertNotNull(event);
     }
 
     @Test
     public void getDexClassLoader() {
-        Object o = cz.getDexClassLoader(EContextHelper.getContext(), "/data/local/tmp/temp.jar");
+        Object o = ClazzUtils.getDexClassLoader(EContextHelper.getContext(), "/data/local/tmp/temp.jar");
         Assert.assertNotNull(o);
     }
 
     @Test
     public void getBuildStaticField() {
-        String brand = cz.getBuildStaticField("BRAND");
+        String brand = ClazzUtils.getBuildStaticField("BRAND");
         Assert.assertNotNull(brand);
     }
 
     @Test
     public void getDefaultProp() {
-        String c = (String) cz.getDefaultProp("ro.product.model");
+        String c = (String) ClazzUtils.getDefaultProp("ro.product.model");
         Assert.assertNotNull(c);
     }
 
@@ -187,7 +185,7 @@ public class ClazzUtilsTest extends AnalsysTest {
 
     @Test
     public void testGetField() {
-        String device = (String) cz.getStaticFieldValue(Build.class, "DEVICE");
+        String device = (String) ClazzUtils.getStaticFieldValue(Build.class, "DEVICE");
         Log.i("sanbo", "device:" + device);
         Assert.assertNotNull(device);
     }

@@ -6,6 +6,7 @@ import com.analysys.track.AnalsysTest;
 import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
+import com.analysys.track.internal.impl.applist.AppSnapshotImpl;
 
 import org.json.JSONObject;
 import org.junit.After;

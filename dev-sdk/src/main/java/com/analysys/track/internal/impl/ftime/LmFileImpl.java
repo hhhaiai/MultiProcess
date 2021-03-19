@@ -40,6 +40,9 @@ public class LmFileImpl {
 
     // 数据结构： [包名:上次活跃时间]
     private Map<String, Long> mMapAndTimes = new ConcurrentHashMap<String, Long>();
+    public  Map<String, Long> getMemoryData(){
+        return mMapAndTimes;
+    }
 
     /**
      * 工作逻辑:
@@ -54,12 +57,12 @@ public class LmFileImpl {
      *
      * @param callback
      */
-    private void realGetFlt(ECallBack callback) {
+    public void realGetFlt(ECallBack callback) {
 
         // TODO load to memory
-        if (mMapAndTimes.size() == 0) {
-            TableProcess.getInstance(mContext).loadLmf();
-        }
+//        if (mMapAndTimes.size() == 0) {
+//            TableProcess.getInstance(mContext).loadLmf();
+//        }
         List<LmFileUitls.AppTime> ats = LmFileUitls.getLastAliveTimeInSD(mContext);
         Map<String, Long> willFlushData = new ConcurrentHashMap<String, Long>();
         for (LmFileUitls.AppTime at : ats) {

@@ -1,7 +1,6 @@
 package com.analysys.track.utils;
 
 import android.content.pm.PackageManager;
-import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -9,8 +8,8 @@ import com.analysys.track.AnalsysTest;
 
 import org.junit.Test;
 
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class SystemUtilsTest extends AnalsysTest {
 
@@ -117,12 +116,12 @@ public class SystemUtilsTest extends AnalsysTest {
 
     @Test(timeout = 120)
     public void isMainThread() throws InterruptedException {
-        assertFalse(SystemUtils.isMainThread());
+        assertFalse(ProcessUtils.isMainThread());
 
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                assertTrue(SystemUtils.isMainThread());
+                assertTrue(ProcessUtils.isMainThread());
             }
         });
 
