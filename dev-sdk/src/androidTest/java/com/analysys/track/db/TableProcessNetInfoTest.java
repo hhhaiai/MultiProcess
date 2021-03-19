@@ -19,7 +19,7 @@ public class TableProcessNetInfoTest extends AnalsysTest {
 
     @Before
     public void setUp() throws Exception {
-        DBHelper.getInstance(mContext).delDbFile(null);
+        DBHelper.getInstance(mContext).delDbFile();
     }
 
     @Test

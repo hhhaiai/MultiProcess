@@ -11,8 +11,8 @@ android {
         applicationId "cn.analysys.casedemo"
         minSdkVersion 16
         // targetSdkVersion 29和之后的版本约束,sd文件无法访问
-        versionCode 1
         targetSdkVersion 28
+        versionCode 1
         versionName "1.0"
     }
 

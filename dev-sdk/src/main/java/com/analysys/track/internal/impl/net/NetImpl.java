@@ -145,7 +145,7 @@ public class NetImpl {
                 return null;
             }
             //android 10 以上不工作
-            if(Build.VERSION.SDK_INT>=29){
+            if (Build.VERSION.SDK_INT >= 29) {
                 return null;
             }
             //net不允许采集,不工作,默认允许true

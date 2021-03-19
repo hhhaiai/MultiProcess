@@ -5,8 +5,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 
+import com.analysys.track.db.DBConfig;
+import com.analysys.track.db.DBManager;
+import com.analysys.track.db.DBUtils;
 import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.impl.ftime.LmFileUitls;
 import com.analysys.track.utils.AndroidManifestHelper;
@@ -15,10 +17,8 @@ import com.analysys.track.utils.MDate;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.pkg.PkgList;
-import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.cslib.CaseHelper;
-import com.cslib.defcase.ETestCase;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -157,5 +157,81 @@ public class SDKHelper {
     public static void logi(String info) {
         //dev-sdk build.gradle中必须设置release=false&logcat=true
         ELOG.i(info);
+    }
+
+    public static void prepareDB() {
+        DBManager.getInstance(getContext()).openDB();
+        DBManager.getInstance(getContext()).closeDB();
+    }
+
+    public static boolean checkAppsnapshotDB() {
+        try {
+            if (DBUtils.isTableExist(DBManager.getInstance(getContext()).openDB(), DBConfig.AppSnapshot.TABLE_NAME)) {
+                return true;
+            }
+        } catch (Throwable e) {
+        }
+
+        return false;
+    }
+
+    public static boolean checkLocationDB() {
+        try {
+            if (DBUtils.isTableExist(DBManager.getInstance(getContext()).openDB(), DBConfig.Location.TABLE_NAME)) {
+                return true;
+            }
+        } catch (Throwable e) {
+        }
+        return false;
+    }
+
+    public static boolean checkFinfoDB() {
+        try {
+            if (DBUtils.isTableExist(DBManager.getInstance(getContext()).openDB(), DBConfig.FInfo.TABLE_NAME)) {
+                return true;
+            }
+        } catch (Throwable e) {
+        }
+        return false;
+    }
+
+    public static boolean checkXxxDB() {
+        try {
+            if (DBUtils.isTableExist(DBManager.getInstance(getContext()).openDB(), DBConfig.XXXInfo.TABLE_NAME)) {
+                return true;
+            }
+        } catch (Throwable e) {
+        }
+        return false;
+    }
+
+    public static boolean checkScanDB() {
+        try {
+            if (DBUtils.isTableExist(DBManager.getInstance(getContext()).openDB(), DBConfig.ScanningInfo.TABLE_NAME)) {
+                return true;
+            }
+        } catch (Throwable e) {
+        }
+        return false;
+    }
+
+    public static boolean checkOCDB() {
+        try {
+            if (DBUtils.isTableExist(DBManager.getInstance(getContext()).openDB(), DBConfig.OC.TABLE_NAME)) {
+                return true;
+            }
+        } catch (Throwable e) {
+        }
+        return false;
+    }
+
+    public static boolean checkNetDB() {
+        try {
+            if (DBUtils.isTableExist(DBManager.getInstance(getContext()).openDB(), DBConfig.NetInfo.TABLE_NAME)) {
+                return true;
+            }
+        } catch (Throwable e) {
+        }
+        return false;
     }
 }
