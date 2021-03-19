@@ -283,9 +283,20 @@ public class DBConfig {
             public static final String L_RC = "f_rc";
         }
 
+        /**
+         * @Copyright © 2021 analsys Inc. All rights reserved.
+         * @Description: 数据库存储数据类型
+         * @Version: 1.0
+         * @Create: 2021/03/78 22:16:00
+         * @author: sanbo
+         */
         public static class DefType {
-            public static final int TYPE_ACTIVE = 1;
-            public static final int TYPE_UPLOAD = 2;
+            //临时加载数据
+            public static final int TYPE_active = 1;
+            //待上传数据
+            public static final int TYPE_prepare_upload = 2;
+            // 已经使用数据
+            public static final int TYPE_already_uploaded = 3;
         }
     }
 

@@ -185,16 +185,16 @@ public class UploadImpl {
             // 重置url
             PolicyImpl.getInstance(mContext).setNormalUploadUrl(mContext);
             String url = EGContext.NORMAL_APP_URL;
-            if (TextUtils.isEmpty(url)) {
-                isUploading = false;
-                return;
-            }
             if (BuildConfig.DEBUG_URL) {
                 if (BuildConfig.isUseHttps) {
                     url = EGContext.URL_SCHEME_HTTPS + "192.168.220.167" + EGContext.HTTPS_PORT;
                 } else {
                     url = EGContext.URL_SCHEME_HTTP + "192.168.220.167" + EGContext.HTTP_PORT;
                 }
+            }
+            if (TextUtils.isEmpty(url)) {
+                isUploading = false;
+                return;
             }
             if (BuildConfig.logcat) {
                 ELOG.i("上传的URL：" + url);
@@ -210,10 +210,6 @@ public class UploadImpl {
                 }
                 isChunkUpload = false;
                 uploadInfo = getInfo();
-                if (TextUtils.isEmpty(url)) {
-                    isUploading = false;
-                    return;
-                }
                 handleUpload(url, messageEncrypt(uploadInfo));
             }
             isUploading = false;
@@ -245,7 +241,6 @@ public class UploadImpl {
             }
 
             // 组装位置数据
-//            if (PolicyImpl.getInstance(mContext) .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
             if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_LOCATION, true)) {
 
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
@@ -268,7 +263,6 @@ public class UploadImpl {
                 TableProcess.getInstance(mContext).deleteAllLocation();
             }
             //  组装安装列表数据
-//            if (PolicyImpl.getInstance(mContext) .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
             if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, true)) {
                 long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
                 if (BuildConfig.logcat) {
@@ -292,7 +286,6 @@ public class UploadImpl {
             }
             //USM 可用,允许上传
             if (
-//                    USMImpl.isUSMAvailable(mContext) &&
                     SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM, true)) {
                 JSONArray usmJson = USMImpl.getUSMInfo(mContext);
                 if (usmJson != null && usmJson.length() > 0) {
@@ -300,10 +293,8 @@ public class UploadImpl {
                 }
             }
             //  组装OC数据
-//            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_OC, true)) {
             if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_OC, true)) {
                 if (
-//                        USMImpl.isUSMAvailable(mContext) &&
                         SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_OC, false)) {
                     //可用且短路,不传
                 } else {
@@ -320,13 +311,6 @@ public class UploadImpl {
             }
             //组装net数据
             if (BuildConfig.ENABLE_NETINFO) {
-//                if (
-////                        USMImpl.isUSMAvailable(mContext) &&
-//                        SPHelper.getBooleanValueFromSP(mContext,
-//                                UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_NET, false)) {
-//                    //USM 可用且net控制短路不上传
-//                } else {
-                //USM 不可用,net数据上传
                 //net允许采集,上传
                 if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_NET, true)) {
                     long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
@@ -341,14 +325,11 @@ public class UploadImpl {
                     TableProcess.getInstance(mContext).deleteNet();
                     TableProcess.getInstance(mContext).deleteScanningInfos();
                 }
-//                }
             }
             // 组装XXXInfo数据
-//            if (PolicyImpl.getInstance(mContext).getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true)) {
             if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true)) {
 
                 if (
-//                        USMImpl.isUSMAvailable(mContext) &&
                         SPHelper.getBooleanValueFromSP(mContext,
                                 UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_XXX, false)) {
                     //USM 可用并且控制短路打开,不上传
@@ -447,7 +428,6 @@ public class UploadImpl {
                         ELOG.i(BuildConfig.tag_cutoff, "========收到code-----" + code);
                     }
                     if (EGContext.HTTP_STATUS_200.equals(code)) {
-//                        EguanIdUtils.getInstance(mContext).setId(json);
                         // 清除本地数据
                         uploadSuccess(EGContext.SHORT_TIME);
                     } else if (EGContext.HTTP_STATUS_500.equals(code)) {
@@ -478,6 +458,9 @@ public class UploadImpl {
                             PolicyImpl.getInstance(mContext).saveRespParams(jsonObject);
                         }
                         uploadFailure(mContext);
+                        //多进程收到策略后同步，只有500才是策略，迁移至此处
+                        Intent intent = new Intent(EGContext.ACTION_UPDATE_POLICY);
+                        EContextHelper.getContext(mContext).sendBroadcast(intent);
                     } else if (EGContext.HTTP_STATUS_401.equals(code)) {
                         //立即停止工作
                         MessageDispatcher.getInstance(EContextHelper.getContext()).stop();
@@ -487,16 +470,11 @@ public class UploadImpl {
                 } else {
                     // 接收消息中没有code值
                     uploadFailure(mContext);
-//                    return;
                 }
             } else {
                 // 返回值为空
                 uploadFailure(mContext);
-//                return;
             }
-
-            Intent intent = new Intent(EGContext.ACTION_UPDATE_POLICY);
-            EContextHelper.getContext(mContext).sendBroadcast(intent);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_upload, e);
@@ -518,15 +496,7 @@ public class UploadImpl {
 
         if (BuildConfig.logcat) {
             ELOG.i(" result: " + result);
-//            saveDataToFile(result);
         }
-//        if (TextUtils.isEmpty(result)) {
-//            isUploading = false;
-//            return;
-//        } else if (EGContext.RSPONSE_FAIL.equals(result)) {
-//            isUploading = false;
-//            return;
-//        }
         if (TextUtils.isEmpty(result) || EGContext.RSPONSE_FAIL.equals(result)) {
             isUploading = false;
             return;
@@ -542,7 +512,6 @@ public class UploadImpl {
         try {
             isUploading = false;
 
-//            SPHelper.setIntValue2SP(mContext, EGContext.REQUEST_STATE, EGContext.sPrepare);
             if (time != SPHelper.getLongValueFromSP(mContext, EGContext.INTERVALTIME, 0)) {
                 SPHelper.setLongValue2SP(mContext, EGContext.INTERVALTIME, time);
             }
@@ -556,14 +525,10 @@ public class UploadImpl {
             TableProcess.getInstance(mContext).deleteOC(false);
             // 上传完成回来清理数据的时候，snapshot删除卸载的，其余的统一恢复成正常值
             TableProcess.getInstance(mContext).resetSnapshot();
-//            AppSnapshotImpl.getInstance(mContext).resetDB();
-
             // location全部删除已读的数据，最后一条无需保留，sp里有
             TableProcess.getInstance(mContext).deleteLocation();
-
             // 按time值delete xxxinfo表和proc表
             TableProcess.getInstance(mContext).deleteByIDXXX(idList);
-
             //删除上次扫描的包名
             TableProcess.getInstance(mContext).deleteNet();
             //删除上次上传的id
@@ -697,7 +662,7 @@ public class UploadImpl {
     }
 
     /**
-     * 是否分包上传
+     * 是否分包上传. 上传数据会将空余大小发给组装数据的db操作器，若超过，则分包
      */
     public static boolean isChunkUpload = false;
     public volatile static boolean isUploading = false;

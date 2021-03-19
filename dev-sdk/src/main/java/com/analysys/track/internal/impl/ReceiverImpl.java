@@ -82,8 +82,8 @@ public class ReceiverImpl {
                     ELOG.d(BuildConfig.tag_snap, " 处理广播接收到的信息 包:" + packageName + "----type: " + EGContext.SNAP_SHOT_UNINSTALL);
                 }
                 // 数据库操作修改包名和类型
-                        AppSnapshotImpl.getInstance(context).realProcessInThread(EGContext.SNAP_SHOT_UNINSTALL,
-                                packageName, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST);
+                AppSnapshotImpl.getInstance(context).realProcessInThread(EGContext.SNAP_SHOT_UNINSTALL,
+                        packageName, EGContext.FILES_SYNC_SNAP_DELETE_BROADCAST);
 
             } else {
 //                if (BuildConfig.logcat) {
@@ -139,7 +139,7 @@ public class ReceiverImpl {
         } else if (EGContext.ACTION_MTC_LOCK.equals(intent.getAction())) {
             EGContext.snap_complete = true;
         } else if (EGContext.ACTION_UPDATE_POLICY.equals(intent.getAction())) {
-            PolicyImpl.getInstance(EContextHelper.getContext(context)).updatePolicyForReceiver(intent);
+            PolicyImpl.getInstance(EContextHelper.getContext(context)).updatePolicyForReceiver();
         } else if (EGContext.ACTION_NOTIFY_CLEAR.equals(intent.getAction())) {
 //            makesureRunOnce(context, intent);
         }

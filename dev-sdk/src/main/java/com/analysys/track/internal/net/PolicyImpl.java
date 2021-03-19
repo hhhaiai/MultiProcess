@@ -779,7 +779,7 @@ public class PolicyImpl {
         }
     }
 
-    public void updatePolicyForReceiver(Intent intent) {
+    public void updatePolicyForReceiver() {
         // reload sp
         SPHelper.reInit();
     }

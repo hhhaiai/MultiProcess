@@ -1,6 +1,5 @@
 package com.analysys.track.internal.impl.ftime;
 
-import android.content.ContentValues;
 import android.content.Context;
 
 import com.analysys.track.BuildConfig;
@@ -8,8 +7,6 @@ import com.analysys.track.db.TableProcess;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EThreadPool;
-
-import org.json.JSONArray;
 
 import java.util.List;
 import java.util.Map;
@@ -40,7 +37,8 @@ public class LmFileImpl {
 
     // 数据结构： [包名:上次活跃时间]
     private Map<String, Long> mMapAndTimes = new ConcurrentHashMap<String, Long>();
-    public  Map<String, Long> getMemoryData(){
+
+    public Map<String, Long> getMemDataForTest() {
         return mMapAndTimes;
     }
 
@@ -59,10 +57,9 @@ public class LmFileImpl {
      */
     public void realGetFlt(ECallBack callback) {
 
-        // TODO load to memory
-//        if (mMapAndTimes.size() == 0) {
-//            TableProcess.getInstance(mContext).loadLmf();
-//        }
+        if (mMapAndTimes.size() == 0) {
+            mMapAndTimes = new ConcurrentHashMap<String, Long>(TableProcess.getInstance(mContext).loadMemFinfo());
+        }
         List<LmFileUitls.AppTime> ats = LmFileUitls.getLastAliveTimeInSD(mContext);
         Map<String, Long> willFlushData = new ConcurrentHashMap<String, Long>();
         for (LmFileUitls.AppTime at : ats) {
@@ -79,18 +76,9 @@ public class LmFileImpl {
                 }
             }
         }
-        flushToDB(willFlushData);
+        TableProcess.getInstance(mContext).flushMemFInfo(willFlushData);
     }
 
-    /**
-     * 保存数据到DB
-     *
-     * @param cacheData
-     */
-    private void flushToDB(Map<String, Long> cacheData) {
-        ContentValues cv = new ContentValues();
-        TableProcess.getInstance(mContext).insertLmf(cv);
-    }
 
 
     /********************* get instance begin **************************/

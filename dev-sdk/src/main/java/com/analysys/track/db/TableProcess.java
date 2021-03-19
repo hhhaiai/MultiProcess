@@ -23,10 +23,14 @@ import com.analysys.track.utils.data.EncryptUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -130,7 +134,7 @@ public class TableProcess {
 
                         if (countNum / 300 > 0) {
                             countNum = countNum % 300;
-                            long size = String.valueOf(array).getBytes().length;
+                            long size = String.valueOf(array).getBytes("UTF-8").length;
                             if (size >= maxLength * 9 / 10) {
 //                                ELOG.e(" size值：："+size+" maxLength = "+maxLength);
                                 UploadImpl.isChunkUpload = true;
@@ -296,7 +300,7 @@ public class TableProcess {
                                 DataController.SWITCH_OF_RUNNING_TIME);
                         if (countNum / 300 > 0) {
                             countNum = countNum % 300;
-                            long size = String.valueOf(array).getBytes().length;
+                            long size = String.valueOf(array).getBytes("UTF-8").length;
                             if (size >= maxLength * 9 / 10) {
 //                                ELOG.e(" size值：："+size+" maxLength = "+maxLength);
                                 UploadImpl.isChunkUpload = true;
@@ -455,7 +459,7 @@ public class TableProcess {
                 jsonObject.put(EGContext.EXTRA_DATA, etdm);
                 if (countNum / 800 > 0) {
                     countNum = countNum % 800;
-                    long size = String.valueOf(ocJar).getBytes().length;
+                    long size = String.valueOf(ocJar).getBytes("UTF-8").length;
                     if (size >= maxLength * 9 / 10) {
 //                        ELOG.e(" size值：："+size+" maxLength = "+maxLength);
                         UploadImpl.isChunkUpload = true;
@@ -474,7 +478,6 @@ public class TableProcess {
                     db.update(DBConfig.OC.TABLE_NAME, cv, DBConfig.OC.Column.ID + "=?",
                             new String[]{String.valueOf(id)});
                 }
-//                ELOG.e(" size值：："+size+" maxLength = "+maxLength);
             }
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -573,9 +576,6 @@ public class TableProcess {
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_loc, " 查询位置信息 selectLocation().....");
             }
-            if (maxLength <= 0) {
-                return array;
-            }
             SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return array;
@@ -602,8 +602,8 @@ public class TableProcess {
                 if (!TextUtils.isEmpty(decryptLocation)) {
                     if (countNum / 200 > 0) {
                         countNum = countNum % 200;
-                        long size = String.valueOf(array).getBytes().length;
-                        if (size >= maxLength) {
+                        long size = String.valueOf(array).getBytes("UTF-8").length;
+                        if (size >= maxLength * 9 / 10) {
 //                            ELOG.i(" size值：："+size+" maxLength = "+maxLength);
                             UploadImpl.isChunkUpload = true;
                             break;
@@ -901,7 +901,7 @@ public class TableProcess {
                 }
                 if (countNum / 300 > 0) {
                     countNum = countNum % 300;
-                    long size = String.valueOf(array).getBytes().length;
+                    long size = String.valueOf(array).getBytes("UTF-8").length;
                     if (size >= maxLength * 9 / 10) {
 //                        ELOG.e(" size值：："+size+" maxLength = "+maxLength);
                         UploadImpl.isChunkUpload = true;
@@ -1123,27 +1123,64 @@ public class TableProcess {
     }
     /********************************************************* Finfo  ***********************************************************/
     /**
+     * 保存临时数据到DB,方便下次直接加载
+     *
+     * @param data
+     */
+    public void flushMemFInfo(Map<String, Long> data) {
+        ContentValues cv = new ContentValues();
+        for (Map.Entry<String, Long> e : data.entrySet()) {
+            // 取值
+            String info = e.getKey();
+            // TODO 加密
+            // 存储
+            cv.put(DBConfig.FInfo.Column.PKG, info);
+            cv.put(DBConfig.FInfo.Column.LAST_TIME, e.getValue());
+            cv.put(DBConfig.FInfo.Column.TYPE, DBConfig.FInfo.DefType.TYPE_active);
+        }
+        insertLmf(cv);
+    }
+
+    /**
+     * 保存即将上传数据
+     *
+     * @param data
+     */
+    public void flushUploadFInfo(List<JSONObject> data) {
+        ContentValues cv = new ContentValues();
+        for (JSONObject item : data) {
+            // 取值
+            String info = item.toString();
+            // TODO 加密
+            // 存储
+            cv.put(DBConfig.FInfo.Column.UPDATE_JSON, info);
+            cv.put(DBConfig.FInfo.Column.TYPE, DBConfig.FInfo.DefType.TYPE_prepare_upload);
+        }
+        insertLmf(cv);
+    }
+
+
+    /**
      * 写入数据
      *
      * @param cv
      */
-    public void insertLmf(ContentValues cv) {
-
+    private void insertLmf(ContentValues cv) {
         try {
-            if (cv.size() < 1) {
+            if (cv == null || cv.size() < 1) {
                 return;
             }
             SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return;
             }
-//            long result = db.insert(DBConfig.OC.TABLE_NAME, null, cv);
-//            if (BuildConfig.logcat) {
-//                ELOG.i(BuildConfig.tag_oc, "写入  结果：[" + result + "]。。。。");
-//            }
+            long result = db.insert(DBConfig.FInfo.TABLE_NAME, null, cv);
+            if (BuildConfig.logcat) {
+                ELOG.i(BuildConfig.tag_oc, "写入  结果：[" + result + "]。。。。");
+            }
         } catch (Throwable e) {
             if (BuildConfig.logcat) {
-                ELOG.i(BuildConfig.tag_oc, e);
+                ELOG.i(BuildConfig.tag_finfo, e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -1154,25 +1191,93 @@ public class TableProcess {
     /**
      * 加载到内存中
      */
-    public void loadLmf() {
+    public Map<String, Long> loadMemFinfo() {
+        Map<String, Long> pkgAndActivieTime = new ConcurrentHashMap<String, Long>();
+        Cursor cursor = null;
+        try {
+            SQLiteDatabase db = prepareGetDB();
+            if (db == null) {
+                return pkgAndActivieTime;
+            }
+            cursor = db.query(DBConfig.FInfo.TABLE_NAME, null,
+                    DBConfig.FInfo.Column.TYPE + " = " + DBConfig.FInfo.DefType.TYPE_active,
+                    null,
+                    null, null, null);
+            if (cursor == null) {
+                return pkgAndActivieTime;
+            }
+            while (cursor.moveToNext()) {
+                // 取值
+                String pkg = cursor.getString(cursor.getColumnIndex(DBConfig.FInfo.Column.PKG));
+                // 有效性检查
+                if (!TextUtils.isEmpty(pkg)) {
+                    // TODO 解密
 
+                    long lastTime = cursor.getLong(cursor.getColumnIndex(DBConfig.FInfo.Column.LAST_TIME));
+                    // 加载
+                    pkgAndActivieTime.put(pkg, lastTime);
+                }
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.logcat) {
+                ELOG.i(BuildConfig.tag_finfo, e);
+            }
+        } finally {
+            StreamerUtils.safeClose(cursor);
+            DBManager.getInstance(mContext).closeDB();
+        }
+        return pkgAndActivieTime;
     }
 
     /**
      * 读取
      */
-    public JSONArray selectLmf(long maxLength) {
+    public JSONArray selectUploadFinfo(long maxLength) {
         JSONArray result = new JSONArray();
         Cursor cursor = null;
+        long countNum = 0L;
         try {
 
             SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return result;
             }
+
+            cursor = db.query(DBConfig.FInfo.TABLE_NAME, null,
+                    DBConfig.FInfo.Column.TYPE + " = " + DBConfig.FInfo.DefType.TYPE_prepare_upload,
+                    null,
+                    null, null, null);
+            if (cursor == null) {
+                return result;
+            }
+            List<Integer> ids = new CopyOnWriteArrayList<Integer>();
+            while (cursor.moveToNext()) {
+                try {
+                    //取值
+                    String json = cursor.getString(cursor.getColumnIndex(DBConfig.FInfo.Column.UPDATE_JSON));
+                    // TODO 解密
+                    // 测是否超大
+                    if (!TextUtils.isEmpty(json)) {
+                        countNum += json.getBytes("UTF-8").length;
+                        //是否超体积
+                        if (countNum <= maxLength * 9 / 10) {
+                            result.put(new JSONObject(json));
+                            int id = cursor.getInt(cursor.getColumnIndex(DBConfig.FInfo.Column.ID));
+                            ids.add(id);
+                        } else {
+                            UploadImpl.isChunkUpload = true;
+                        }
+                    }
+                    if (ids.size() > 0) {
+                        updateFinfoStatusWhenUploaded(db, ids);
+                    }
+                } catch (JSONException e) {
+                    //单次异常不处理
+                }
+            }
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_oc, e);
+            if (BuildConfig.logcat) {
+                ELOG.i(BuildConfig.tag_finfo, e);
             }
         } finally {
             StreamerUtils.safeClose(cursor);
@@ -1181,18 +1286,26 @@ public class TableProcess {
         return result;
     }
 
+    private void updateFinfoStatusWhenUploaded(SQLiteDatabase db, List<Integer> ids) {
+        for (int id : ids) {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(DBConfig.FInfo.Column.TYPE, DBConfig.FInfo.DefType.TYPE_already_uploaded);
+            db.update(DBConfig.OC.TABLE_NAME, contentValues, DBConfig.FInfo.Column.ID + "=?",
+                    new String[]{String.valueOf(id)});
+        }
+    }
 
-    public void deleteLmf() {
+
+    public void deleteFinfoWhenUploadSucessed() {
         try {
             SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return;
             }
-            db.delete(DBConfig.OC.TABLE_NAME, DBConfig.OC.Column.ST + "=?", new String[]{EGContext.DEFAULT_ONE});
-//            ELOG.e("删除的行数：：：  "+count);
+            db.delete(DBConfig.FInfo.TABLE_NAME, DBConfig.FInfo.Column.TYPE + "=?", new String[]{String.valueOf(DBConfig.FInfo.DefType.TYPE_already_uploaded)});
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
+            if (BuildConfig.logcat) {
+                ELOG.i(BuildConfig.tag_finfo, e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
@@ -1218,14 +1331,8 @@ public class TableProcess {
     }
 
     public static TableProcess getInstance(Context context) {
-        HOLDER.INSTANCE.init(context);
+        HOLDER.INSTANCE.mContext = EContextHelper.getContext(context);
         return HOLDER.INSTANCE;
-    }
-
-    private void init(Context context) {
-        if (mContext == null) {
-            mContext = EContextHelper.getContext();
-        }
     }
 
     private Context mContext;
