@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.impl.ftime.LmFileUitls;
 import com.analysys.track.utils.AndroidManifestHelper;
+import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.MDate;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.ShellUtils;
@@ -143,17 +144,6 @@ public class SDKHelper {
 
 
     /**
-     * @param cls
-     * @return
-     */
-    public static ETestCase newInstance(String cls) {
-        if (!TextUtils.isEmpty(cls)) {
-            return (ETestCase) ClazzUtils.newInstance(cls);
-        }
-        return null;
-    }
-
-    /**
      * 判断是否两个类是否是有祖、父类关系
      *
      * @param subClass
@@ -162,5 +152,10 @@ public class SDKHelper {
      */
     public static boolean isSubClass(Class<?> subClass, Class<?> fatherClass) {
         return AndroidManifestHelper.isSubClass(subClass, fatherClass);
+    }
+
+    public static void logi(String info) {
+        //dev-sdk build.gradle中必须设置release=false&logcat=true
+        ELOG.i(info);
     }
 }

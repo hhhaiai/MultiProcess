@@ -44,6 +44,7 @@ public class Woo {
                 if (SDKHelper.isSubClass(Class.forName(clsName), ETestCase.class)
                         || SDKHelper.isSubClass(Class.forName(clsName), ECase.class)) {
                     L.i(info);
+                    SDKHelper.logi(info);
                     toastFromCase(info);
                     return;
                 }
