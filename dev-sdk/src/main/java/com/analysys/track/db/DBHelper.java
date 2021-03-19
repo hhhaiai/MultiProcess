@@ -81,9 +81,6 @@ public class DBHelper extends SQLiteOpenHelper {
                 if (!DBUtils.isTableExist(db, DBConfig.NetInfo.CREATE_TABLE)) {
                     db.execSQL(DBConfig.NetInfo.CREATE_TABLE);
                 }
-                if (!DBUtils.isTableExist(db, DBConfig.IDStorage.CREATE_TABLE)) {
-                    db.execSQL(DBConfig.IDStorage.CREATE_TABLE);
-                }
             } catch (SQLiteDatabaseCorruptException e) {
                 if (BuildConfig.ENABLE_BUG_REPORT) {
                     BugReportForTest.commitError(e);

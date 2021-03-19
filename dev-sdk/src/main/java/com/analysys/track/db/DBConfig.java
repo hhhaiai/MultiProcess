@@ -235,27 +235,4 @@ public class DBConfig {
         }
     }
 
-    public static class IDStorage {
-        // 表名
-        public static final String TABLE_NAME = "e_stor";
-        // 建表
-        public static final String CREATE_TABLE = String.format(
-                "create table if not exists %s (%s%s,%s%s,%s%s,%s%s,%s%s,%s%s)", TABLE_NAME, Column.ID,
-                DBType.AUTOINCREMENT, Column.TEMPID, DBType.VARCHAR_TWENTY, Column.ST, DBType.VARCHAR_TEN, Column.L_RA,
-                DBType.TEXT, Column.L_RB, DBType.TEXT, Column.L_RC, DBType.TEXT);
-
-        public static class Column {
-            public static final String ID = "id";
-            // tempid
-            public static final String TEMPID = "stor_a";
-            // 存储标记，默认为0，读取成功设置1
-            public static final String ST = "stor_b";
-
-            // 备用字段 text 类型
-            public static final String L_RA = "stor_ra";
-            public static final String L_RB = "stor_rb";
-            public static final String L_RC = "stor_rc";
-        }
-    }
-
 }
