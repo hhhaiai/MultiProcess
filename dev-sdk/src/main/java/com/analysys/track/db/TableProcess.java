@@ -1154,6 +1154,9 @@ public class TableProcess {
      */
     public void flushUploadFInfo(List<JSONObject> data) {
 
+        if (data == null || data.size() < 1) {
+            return;
+        }
         for (JSONObject item : data) {
             ContentValues cv = new ContentValues();
             //  取值-加密
@@ -1228,6 +1231,7 @@ public class TableProcess {
                     }
                 }
             }
+            ELOG.i(BuildConfig.tag_finfo, "Finfo 数据库写入完毕。 Result[" + result + "]  写入数据:" + cv);
             if (BuildConfig.logcat && result < 0) {
                 ELOG.i(BuildConfig.tag_finfo, "Finfo 数据库写入完毕。 Result[" + result + "]  写入数据:" + cv);
             }
@@ -1345,7 +1349,7 @@ public class TableProcess {
         for (int id : ids) {
             ContentValues contentValues = new ContentValues();
             contentValues.put(DBConfig.FInfo.Column.TYPE, status);
-            db.update(DBConfig.OC.TABLE_NAME, contentValues, DBConfig.FInfo.Column.ID + "=?",
+            db.update(DBConfig.FInfo.TABLE_NAME, contentValues, DBConfig.FInfo.Column.ID + "=?",
                     new String[]{String.valueOf(id)});
         }
     }

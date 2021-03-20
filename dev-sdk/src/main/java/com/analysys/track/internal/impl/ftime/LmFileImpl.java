@@ -121,10 +121,11 @@ public class LmFileImpl {
                 if (obj != null && obj.length() > 0) {
                     data.add(obj);
                 }
-
             } catch (Exception e) {
             }
-
+        }
+        if (data.size() > 0) {
+            TableProcess.getInstance(mContext).flushUploadFInfo(data);
         }
 
     }

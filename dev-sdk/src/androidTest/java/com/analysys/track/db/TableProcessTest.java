@@ -1,17 +1,23 @@
 package com.analysys.track.db;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.analysys.track.AnalsysTest;
+import com.analysys.track.internal.impl.ftime.LmFileImpl;
 import com.analysys.track.utils.ELOG;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.junit.Assert.*;
 
@@ -134,16 +140,33 @@ public class TableProcessTest extends AnalsysTest {
         ELOG.i("Query data:" + m.toString());
     }
 
+
     @Test
     public void testFlushUploadFInfo() {
+        List<JSONObject> ljs = new CopyOnWriteArrayList<JSONObject>();
+        PackageManager pm = mContext.getPackageManager();
+        ljs.add(LmFileImpl.getInstance(mContext).getAppInfo(pm, "com.taobao.taobao", 22222L));
+        ljs.add(LmFileImpl.getInstance(mContext).getAppInfo(pm, "com.ss.android.ugc.aweme", 22222L));
+        ljs.add(LmFileImpl.getInstance(mContext).getAppInfo(pm, "com.tencent.mm", 22222L));
+        ljs.add(LmFileImpl.getInstance(mContext).getAppInfo(pm, "com.eg.android.AlipayGphone", 22222L));
+        TableProcess.getInstance(mContext).flushUploadFInfo(ljs);
+
+//        JSONArray arr = TableProcess.getInstance(mContext).selectFinfo(2 * 1024 * 1024);
+//        ELOG.i("arr[" + arr.length() + "]:" + arr.toString());
+//        Assert.assertTrue(arr != null && arr.length() > 4);
+
     }
 
 
     @Test
     public void testSelectFinfo() {
+        JSONArray arr = TableProcess.getInstance(mContext).selectFinfo(2 * 1024 * 1024);
+        ELOG.i("===========[" + arr.length() + "]==========================\n" + arr.toString());
+        Assert.assertTrue(arr != null && arr.length() > 0);
     }
 
     @Test
     public void testDeleteFinfo() {
+        TableProcess.getInstance(mContext).deleteFinfo(false);
     }
 }
