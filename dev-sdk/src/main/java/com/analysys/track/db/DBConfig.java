@@ -240,7 +240,7 @@ public class DBConfig {
      */
     public static class FInfo {
         // 表名
-        public static final String TABLE_NAME = "fnn";
+        public static final String TABLE_NAME = "e_f";
         // 建表
         public static final String CREATE_TABLE = String.format(
                 "create table if not exists" +
@@ -264,7 +264,8 @@ public class DBConfig {
                 // 备用字符串
                 , Column.L_RA, DBType.TEXT
                 , Column.L_RB, DBType.TEXT
-                , Column.L_RC, DBType.TEXT);
+                , Column.L_RC, DBType.TEXT
+        );
 
         public static class Column {
             public static final String ID = "id";
