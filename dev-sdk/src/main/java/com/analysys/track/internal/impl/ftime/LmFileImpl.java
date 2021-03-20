@@ -138,7 +138,7 @@ public class LmFileImpl {
      * @return
      */
     @SuppressWarnings("deprecation")
-    private JSONObject getAppInfo(PackageManager packageManager, String pkgName, long lastActiveTime) {
+    public JSONObject getAppInfo(PackageManager packageManager, String pkgName, long lastActiveTime) {
         JSONObject appInfo = new JSONObject();
 
         try {

@@ -1,15 +1,15 @@
-package cn.analysys.casedemo.cases.infos;
+package cn.analysys.casedemo.cases.logics;
 
 import com.cslib.defcase.ETestCase;
 
 import cn.analysys.casedemo.utils.SDKHelper;
 import cn.analysys.casedemo.utils.Woo;
 
-public class PkgListByUidCase extends ETestCase {
-    String log = "UID方式取安装列表耗时: %d";
+public class PkgListByAPICase extends ETestCase {
+    String log = "API方式取安装列表耗时: %d";
 
-    public PkgListByUidCase() {
-        super("[弹窗]UID方式取安装列表");
+    public PkgListByAPICase() {
+        super("[弹窗]API方式取安装列表");
     }
 
     @Override
@@ -20,7 +20,7 @@ public class PkgListByUidCase extends ETestCase {
     public boolean predicate() {
         try {
             long begin = System.currentTimeMillis();
-            SDKHelper.getInstallAppSizeByUid();
+            SDKHelper.getInstallAppSizeByApi();
             long end = System.currentTimeMillis();
             Woo.logFormCase(String.format(log, (end - begin)));
         } catch (Throwable e) {

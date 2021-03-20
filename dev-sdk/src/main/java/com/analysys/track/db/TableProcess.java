@@ -1228,7 +1228,7 @@ public class TableProcess {
                     }
                 }
             }
-            if (BuildConfig.logcat) {
+            if (BuildConfig.logcat && result < 0) {
                 ELOG.i(BuildConfig.tag_finfo, "Finfo 数据库写入完毕。 Result[" + result + "]  写入数据:" + cv);
             }
         } catch (Throwable e) {
@@ -1265,7 +1265,6 @@ public class TableProcess {
                 String pkg = cursor.getString(cursor.getColumnIndex(DBConfig.FInfo.Column.PKG));
                 //  解密
                 pkg = EncryptUtils.decrypt(mContext, pkg);
-                ELOG.i("渠道包名：" + pkg);
                 // 有效性检查
                 if (!TextUtils.isEmpty(pkg)) {
                     long lastTime = cursor.getLong(cursor.getColumnIndex(DBConfig.FInfo.Column.LAST_TIME));

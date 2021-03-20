@@ -1,4 +1,4 @@
-package cn.analysys.casedemo.cases.infos;
+package cn.analysys.casedemo.cases.logics;
 
 import android.content.Context;
 import android.os.Environment;
@@ -16,7 +16,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import cn.analysys.casedemo.utils.SDKHelper;

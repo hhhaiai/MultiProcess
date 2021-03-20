@@ -3,13 +3,16 @@ package cn.analysys.casedemo.utils;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.provider.Settings;
+
 import androidx.annotation.NonNull;
 
 import com.analysys.track.db.DBConfig;
 import com.analysys.track.db.DBManager;
 import com.analysys.track.db.DBUtils;
 import com.analysys.track.internal.impl.DeviceImpl;
+import com.analysys.track.internal.impl.ftime.LmFileImpl;
 import com.analysys.track.internal.impl.ftime.LmFileUitls;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.ELOG;
@@ -20,7 +23,10 @@ import com.analysys.track.utils.pkg.PkgList;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.cslib.CaseHelper;
 
+import org.json.JSONObject;
+
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -233,5 +239,17 @@ public class SDKHelper {
         } catch (Throwable e) {
         }
         return false;
+    }
+
+    public static void realGetFlt() {
+        LmFileImpl.getInstance(getContext()).realGetFlt(null);
+    }
+
+    public static Map<String, Long> getMemDataForTest() {
+        return LmFileImpl.getInstance(getContext()).getMemDataForTest();
+    }
+
+    public static JSONObject getJson(PackageManager pm, String pkg, Long value) {
+       return LmFileImpl.getInstance(getContext()).getAppInfo(pm, pkg, value);
     }
 }

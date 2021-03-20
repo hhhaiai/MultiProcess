@@ -1,4 +1,4 @@
-package cn.analysys.casedemo.cases.infos;
+package cn.analysys.casedemo.cases.logics;
 
 import com.cslib.defcase.ETestCase;
 
