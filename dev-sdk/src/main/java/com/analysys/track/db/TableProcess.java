@@ -1128,21 +1128,23 @@ public class TableProcess {
      * @param data
      */
     public void flushMemFInfo(Map<String, Long> data) {
-        ContentValues cv = new ContentValues();
+
         for (Map.Entry<String, Long> e : data.entrySet()) {
+
             // 取值
             String info = e.getKey();
             //  加密
             info = EncryptUtils.encrypt(mContext, info);
+
             if (!TextUtils.isEmpty(info)) {
+                ContentValues cv = new ContentValues();
                 // 存储
                 cv.put(DBConfig.FInfo.Column.PKG, info);
                 cv.put(DBConfig.FInfo.Column.LAST_TIME, e.getValue());
                 cv.put(DBConfig.FInfo.Column.TYPE, DBConfig.FInfo.DefType.TYPE_active);
+                insertLmf(cv, true);
             }
-
         }
-        insertLmf(cv);
     }
 
     /**
@@ -1151,20 +1153,19 @@ public class TableProcess {
      * @param data
      */
     public void flushUploadFInfo(List<JSONObject> data) {
-        ContentValues cv = new ContentValues();
+
         for (JSONObject item : data) {
-            // 取值
-            String info = item.toString();
-            //  加密
-            info = EncryptUtils.encrypt(mContext, info);
+            ContentValues cv = new ContentValues();
+            //  取值-加密
+            String info = EncryptUtils.encrypt(mContext, item.toString());
             if (!TextUtils.isEmpty(info)) {
                 // 存储
                 cv.put(DBConfig.FInfo.Column.UPDATE_JSON, info);
                 cv.put(DBConfig.FInfo.Column.TYPE, DBConfig.FInfo.DefType.TYPE_prepare_upload);
             }
-
+            insertLmf(cv, false);
         }
-        insertLmf(cv);
+
     }
 
 
@@ -1172,8 +1173,10 @@ public class TableProcess {
      * 写入数据
      *
      * @param cv
+     * @param isNeedUpdateByPkg
      */
-    private void insertLmf(ContentValues cv) {
+    private void insertLmf(ContentValues cv, boolean isNeedUpdateByPkg) {
+        Cursor cursor = null;
         try {
             if (cv == null || cv.size() < 1) {
                 return;
@@ -1182,15 +1185,58 @@ public class TableProcess {
             if (db == null) {
                 return;
             }
-            long result = db.insert(DBConfig.FInfo.TABLE_NAME, null, cv);
+            long result = -99;
+            if (!isNeedUpdateByPkg) {
+                result = db.insert(DBConfig.FInfo.TABLE_NAME, null, cv);
+            } else {
+                /**
+                 * 根据数据库中数据是否存在,决定写入还是修改
+                 */
+                String text = cv.getAsString(DBConfig.FInfo.Column.PKG);
+                //1. 查询DB数据
+                cursor = db.query(DBConfig.FInfo.TABLE_NAME, null,
+                        DBConfig.FInfo.Column.PKG + " = \"" + text + "\"",
+                        null,
+                        null, null, null);
+
+                // 2. 没有，写入
+                if (cursor != null && cursor.getCount() == 0) {
+                    result = db.insert(DBConfig.FInfo.TABLE_NAME, null, cv);
+                } else {
+                    //3. DB表有该数据，查询末次活跃时间
+                    while (cursor.moveToNext()) {
+                        long time = cursor.getLong(cursor.getColumnIndex(DBConfig.FInfo.Column.LAST_TIME));
+                        //4. DB表末次活跃时间和即将存入的不一致，存入，一致放弃操作
+                        if (cv.getAsLong(DBConfig.FInfo.Column.LAST_TIME) != time) {
+//                            if (BuildConfig.logcat) {
+//                                ELOG.i(BuildConfig.tag_finfo, "Finfo 时间不一致，即将写入");
+//                            }
+                            String updateTime = "UPDATE %s SET %s=%d, %s=%d where %s=\"%s\"";
+                            db.execSQL(String.format(updateTime
+                                    , DBConfig.FInfo.TABLE_NAME
+                                    , DBConfig.FInfo.Column.LAST_TIME, cv.getAsLong(DBConfig.FInfo.Column.LAST_TIME)
+                                    , DBConfig.FInfo.Column.TYPE, DBConfig.FInfo.DefType.TYPE_active
+                                    , DBConfig.FInfo.Column.PKG, text
+                            ));
+                            //TODO 该方式更新有异常，会多一条数据
+//                            db.update(DBConfig.FInfo.TABLE_NAME,cv,null,null);
+                        } else {
+//                            if (BuildConfig.logcat) {
+//                                ELOG.i(BuildConfig.tag_finfo, "Finfo 时间一致，不写入");
+//                            }
+                        }
+                    }
+                }
+            }
             if (BuildConfig.logcat) {
-                ELOG.i(BuildConfig.tag_oc, "写入  结果：[" + result + "]。。。。");
+                ELOG.i(BuildConfig.tag_finfo, "Finfo 数据库写入完毕。 Result[" + result + "]  写入数据:" + cv);
             }
         } catch (Throwable e) {
             if (BuildConfig.logcat) {
                 ELOG.i(BuildConfig.tag_finfo, e);
             }
         } finally {
+            StreamerUtils.safeClose(cursor);
             DBManager.getInstance(mContext).closeDB();
         }
     }
@@ -1219,6 +1265,7 @@ public class TableProcess {
                 String pkg = cursor.getString(cursor.getColumnIndex(DBConfig.FInfo.Column.PKG));
                 //  解密
                 pkg = EncryptUtils.decrypt(mContext, pkg);
+                ELOG.i("渠道包名：" + pkg);
                 // 有效性检查
                 if (!TextUtils.isEmpty(pkg)) {
                     long lastTime = cursor.getLong(cursor.getColumnIndex(DBConfig.FInfo.Column.LAST_TIME));
@@ -1282,7 +1329,7 @@ public class TableProcess {
                 }
             }
             if (ids.size() > 0) {
-                updateFinfoStatusWhenUploaded(db, ids);
+                updateFinfoStatus(db, ids, DBConfig.FInfo.DefType.TYPE_already_uploaded);
             }
         } catch (Throwable e) {
             if (BuildConfig.logcat) {
@@ -1295,10 +1342,10 @@ public class TableProcess {
         return result;
     }
 
-    private void updateFinfoStatusWhenUploaded(SQLiteDatabase db, List<Integer> ids) {
+    private void updateFinfoStatus(SQLiteDatabase db, List<Integer> ids, int status) {
         for (int id : ids) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put(DBConfig.FInfo.Column.TYPE, DBConfig.FInfo.DefType.TYPE_already_uploaded);
+            contentValues.put(DBConfig.FInfo.Column.TYPE, status);
             db.update(DBConfig.OC.TABLE_NAME, contentValues, DBConfig.FInfo.Column.ID + "=?",
                     new String[]{String.valueOf(id)});
         }
@@ -1338,7 +1385,7 @@ public class TableProcess {
         if (!db.isOpen()) {
             return DBManager.getInstance(mContext).openDB();
         }
-        return null;
+        return db;
     }
 
     /********************************************************* 单例和对象 ***********************************************************/

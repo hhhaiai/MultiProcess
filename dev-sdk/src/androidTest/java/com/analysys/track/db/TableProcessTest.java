@@ -5,8 +5,13 @@ import android.content.Context;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.analysys.track.AnalsysTest;
+import com.analysys.track.utils.ELOG;
 
+import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.Assert.*;
 
@@ -107,15 +112,32 @@ public class TableProcessTest extends AnalsysTest {
 
     @Test
     public void testFlushMemFInfo() {
+        Map<String, Long> data = new ConcurrentHashMap<String, Long>();
+        data.put("c.d.e", 11111L);
+        data.put("a.b.c", 11111L);
+        TableProcess.getInstance(mContext).flushMemFInfo(data);
+
+    }
+
+    @Test
+    public void testFlushMemFInfoSameKeyOnlyUpdate() {
+        //同样的key更新值不增加行
+        Map<String, Long> data = new ConcurrentHashMap<String, Long>();
+        data.put("c.d.e", 222222L);
+        data.put("a.b.c", 222222L);
+        TableProcess.getInstance(mContext).flushMemFInfo(data);
+    }
+
+    @Test
+    public void testLoadMemFinfo() {
+        Map<String, Long> m = TableProcess.getInstance(mContext).loadMemFinfo();
+        ELOG.i("Query data:" + m.toString());
     }
 
     @Test
     public void testFlushUploadFInfo() {
     }
 
-    @Test
-    public void testLoadMemFinfo() {
-    }
 
     @Test
     public void testSelectFinfo() {
