@@ -244,6 +244,22 @@ public class UploadKey {
         public static final String APPLICATIONTYPE_THREE_APP = "OA";
     }
 
+    public static class FInfo {
+        public static final String NAME = "FInfo";
+        // 应用打开时间，转换成时间戳，如：“1296035591”
+        public static final String ApplicationOpenTime = "AOT";
+        // 应用关闭时间，转换成时间戳，如：“1296035599”
+        public static final String ApplicationCloseTime = "ACT";
+        // 应用包名，如：“com.qzone”
+        public static final String ApplicationPackageName = "APN";
+        // 应用程序名，如：“QQ空间”
+        public static final String ApplicationName = "AN";
+        // 应用版本名|应用版本号，如“5.4.1|89”
+        public static final String ApplicationVersionCode = "AVC";
+        // 网络类型， 选项: WIFI/2G/3G/4G/无网络
+        public static final String NetworkType = "NT";
+    }
+
     public static class NETInfo {
         public static final String NAME = "NETInfo";
     }
@@ -441,6 +457,8 @@ public class UploadKey {
         public static final String RES_POLICY_MODULE_CL_DEV = "module_cl_dev";
         // XXX
         public static final String RES_POLICY_MODULE_CL_XXX = "module_cl_xxx";
+        //Finfo
+        public static final String RES_POLICY_MODULE_CL_FINFO = "module_cl_finfo";
 
         //控制是否短路xxx
         public static final String RES_POLICY_MODULE_CL_USM_CUTOF_XXX = "module_cl_cutof_xxx";
@@ -448,7 +466,6 @@ public class UploadKey {
         public static final String RES_POLICY_MODULE_CL_USM_CUTOF_NET = "module_cl_cutof_net";
         //控制是否短路ocinfo
         public static final String RES_POLICY_MODULE_CL_USM_CUTOF_OC = "module_cl_cutof_oc";
-
 
         public static class PatchResp {
             //             public static final String PATCH_RESP_NAME = "patch";

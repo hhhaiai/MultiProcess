@@ -11,10 +11,10 @@ import android.util.Log;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.DataLocalTempUtils;
-import com.analysys.track.utils.pkg.PkgList;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.StreamerUtils;
 import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.pkg.PkgList;
 import com.analysys.track.utils.sp.SPHelper;
 
 import java.io.BufferedReader;
@@ -89,7 +89,7 @@ public class DebugDev {
         boolean r1 = isHasNoBaseband();
 //        boolean r2 = isHasNoBluetooth();
         boolean r3 = isBluestacks();
-    
+
         isDebugDevice = l1 || l2 || m1 || m2 || m4 || m5 || n1 || n2 || n3 || n4 || n5
                 || q1 || q2 || q3 || q4 || q5 || r1 || r3 || isSimulator() || isHook();
         return isDebugDevice;
@@ -162,8 +162,6 @@ public class DebugDev {
 
         return false;
     }
-
-
 
 
     /**
@@ -274,7 +272,7 @@ public class DebugDev {
     private boolean isBuildFingerprintDebug() {
         try {
             String fingerprint = ClazzUtils.getBuildStaticField("FINGERPRINT");
-            if (!TextUtils.isEmpty(fingerprint) && fingerprint.startsWith(EGContext.TEXT_UNKNOWN)) {
+            if (!TextUtils.isEmpty(fingerprint) && fingerprint.startsWith(Build.UNKNOWN)) {
                 return true;
             }
         } catch (Throwable e) {
@@ -411,9 +409,9 @@ public class DebugDev {
 
     private boolean hasHookPackageName() {
         try {
-    
+
             List<String> applicationInfoList = PkgList.getInstance(mContext).getAppPackageList();
-    
+
             if (applicationInfoList.contains("de.robv.android.xposed.installer") || applicationInfoList.contains("com.saurik.substrate")) {
                 return true;
             }

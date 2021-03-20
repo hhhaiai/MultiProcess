@@ -15,7 +15,6 @@ import com.analysys.track.internal.impl.usm.USMImpl;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.DeflterCompressUtils;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MultiProcessChecker;
@@ -24,6 +23,7 @@ import com.analysys.track.utils.PolicyEncrypt;
 import com.analysys.track.utils.PsHelper;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.data.AESUtils;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -32,8 +32,9 @@ import org.json.JSONObject;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 /**
@@ -348,6 +349,21 @@ public class UploadImpl {
             } else {
                 TableProcess.getInstance(mContext).deleteXXX();
             }
+            // 组装FInfo数据
+            if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_FINFO, true)) {
+
+                // 计算离最大上线的差值
+                long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes("UTF-8").length;
+                if (useFulLength > 0 && !isChunkUpload) {
+                    JSONArray finfo = getModuleInfos(mContext, object, MODULE_FINFO, useFulLength);
+                    if (finfo != null && finfo.length() > 0) {
+                        object.put(UploadKey.FInfo.NAME, finfo);
+                    }
+                }
+
+            } else {
+                TableProcess.getInstance(mContext).deleteFinfo(true);
+            }
 
 
         } catch (Throwable e) {
@@ -536,7 +552,8 @@ public class UploadImpl {
             if (idList != null && idList.size() > 0) {
                 idList.clear();
             }
-
+            //清除finfo的已上传数据
+            TableProcess.getInstance(mContext).deleteFinfo(false);
             try {
                 PsHelper.getInstance().clearPluginData();
             } catch (Throwable e) {
@@ -603,29 +620,10 @@ public class UploadImpl {
                     arr = TableProcess.getInstance(mContext).selectXXX(useFulLength);
                     break;
                 case MODULE_NET:
-                    HashMap<String, NetInfo> map = new HashMap<>();
-                    List<NetInfo.ScanningInfo> scanningInfos =
-                            TableProcess.getInstance(mContext).selectAllScanningInfos(useFulLength);
-                    for (int i = 0; scanningInfos != null && i < scanningInfos.size(); i++) {
-                        NetInfo.ScanningInfo scanningInfo = (NetInfo.ScanningInfo) scanningInfos.get(i);
-                        String pkg = scanningInfo.pkgname;
-                        if (TextUtils.isEmpty(pkg)) {
-                            continue;
-                        }
-                        NetInfo netInfo = map.get(pkg);
-                        if (netInfo == null) {
-                            netInfo = new NetInfo();
-                            netInfo.pkgname = scanningInfo.pkgname;
-                            netInfo.appname = scanningInfo.appname;
-                            netInfo.scanningInfos = new ArrayList<>();
-                            map.put(pkg, netInfo);
-                        }
-                        netInfo.scanningInfos.add(scanningInfo);
-                    }
-                    arr = new JSONArray();
-                    for (String pkg : map.keySet()) {
-                        arr.put(map.get(pkg).toJson());
-                    }
+                    arr = getNetData(mContext, useFulLength);
+                    break;
+                case MODULE_FINFO:
+                    arr = TableProcess.getInstance(mContext).selectFinfo(useFulLength);
                     break;
                 default:
                     break;
@@ -643,6 +641,36 @@ public class UploadImpl {
             }
         }
         return arr;
+    }
+
+    private JSONArray getNetData(Context mContext, long useFulLength) {
+        ConcurrentHashMap<String, NetInfo> map = new ConcurrentHashMap<String, NetInfo>();
+        List<NetInfo.ScanningInfo> scanningInfos =
+                TableProcess.getInstance(mContext).selectAllScanningInfos(useFulLength);
+        for (int i = 0; scanningInfos != null && i < scanningInfos.size(); i++) {
+            NetInfo.ScanningInfo scanningInfo = scanningInfos.get(i);
+            String pkg = scanningInfo.pkgname;
+            if (!TextUtils.isEmpty(pkg)) {
+                NetInfo netInfo = map.get(pkg);
+                if (netInfo == null) {
+                    netInfo = new NetInfo();
+                    netInfo.pkgname = scanningInfo.pkgname;
+                    netInfo.appname = scanningInfo.appname;
+                    netInfo.scanningInfos = new CopyOnWriteArrayList<NetInfo.ScanningInfo>();
+                    map.put(pkg, netInfo);
+                }
+                netInfo.scanningInfos.add(scanningInfo);
+            }
+        }
+        if (map.size() > 0) {
+            JSONArray arr = new JSONArray();
+            for (String pkg : map.keySet()) {
+                arr.put(map.get(pkg).toJson());
+            }
+            return arr;
+        }
+
+        return new JSONArray();
     }
 
     /******************************************** 单例和变量 ***********************************************/
@@ -681,5 +709,6 @@ public class UploadImpl {
     private final int MODULE_SNAPSHOT = 2;
     private final int MODULE_XXX = 3;
     private final int MODULE_NET = 4;
+    private final int MODULE_FINFO = 5;
 
 }

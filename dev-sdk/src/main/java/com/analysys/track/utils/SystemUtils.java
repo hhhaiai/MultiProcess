@@ -1,13 +1,11 @@
 package com.analysys.track.utils;
 
-import android.app.ActivityManager;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Looper;
 import android.os.PowerManager;
 import android.text.TextUtils;
 
@@ -25,7 +23,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
@@ -39,39 +36,6 @@ import java.util.Random;
  * @Author: sanbo
  */
 public class SystemUtils {
-
-
-    private static HashSet<String> catchPackage = new HashSet<>();
-
-    /**
-     * getLaunchIntentForPackage 这个方法某些设备比较耗时 引起波动, 在这里缓存一下
-     *
-     * @param manager
-     * @param packageName
-     * @return
-     */
-    public static boolean hasLaunchIntentForPackage(PackageManager manager, String packageName) {
-        try {
-            if (manager == null) {
-                Context c = EContextHelper.getContext();
-                if (c != null) {
-                    manager = c.getPackageManager();
-                }
-            }
-            if (manager == null || TextUtils.isEmpty(packageName)) {
-                return false;
-            }
-            if (catchPackage.contains(packageName)) {
-                return true;
-            }
-            if (manager.getLaunchIntentForPackage(packageName) != null) {
-                catchPackage.add(packageName);
-                return true;
-            }
-        } catch (Throwable e) {
-        }
-        return false;
-    }
 
 
     /**
@@ -450,7 +414,7 @@ public class SystemUtils {
 
     private static String checkAndGetOne(String serialNo, String key) {
         try {
-            if (TextUtils.isEmpty(serialNo) || EGContext.TEXT_UNKNOWN.equalsIgnoreCase(serialNo)) {
+            if (TextUtils.isEmpty(serialNo) || Build.UNKNOWN.equalsIgnoreCase(serialNo)) {
                 return getSystemEnv(key);
             } else {
                 return serialNo;

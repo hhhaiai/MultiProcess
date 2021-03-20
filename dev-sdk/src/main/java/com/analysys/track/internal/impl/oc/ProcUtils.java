@@ -6,9 +6,9 @@ import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ShellUtils;
-import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.pkg.PkgList;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -122,7 +122,7 @@ public class ProcUtils {
                     String pkg = info.getPkgName();
 
 
-                    if (SystemUtils.hasLaunchIntentForPackage(pm, pkg)) {
+                    if (PkgList.hasLaunchIntentForPackage(pm, pkg)) {
                         int oomScore = getOOMScore(pid, pkg);
                         String cpuset = getCpuset(pid, pkg);
                         String cgroup = getCgroup(pid, pkg);

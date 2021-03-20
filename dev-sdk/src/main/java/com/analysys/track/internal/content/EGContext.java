@@ -121,10 +121,6 @@ public class EGContext {
     public static final String NETWORK_TYPE_WIFI = "WIFI";
     public static final String NETWORK_TYPE_NO_NET = "无网络";
 
-
-    public static final String TEXT_UNKNOWN = "unknown";
-
-
     /**
      * 非实时上传端口
      */
@@ -157,7 +153,7 @@ public class EGContext {
     public static final String DEFAULT_ZERO = "0";
     public static final String DEFAULT_ONE = "1";
 
-//    public static final String TMPIDKEY = "tmpid";
+    //    public static final String TMPIDKEY = "tmpid";
     // 用于jobservice
     public static final int JOB_ID = 2071112;
     public static final String SDKV = "SDKV";
@@ -288,7 +284,7 @@ public class EGContext {
     //dex文件损坏,默认是没有dex文件的,所以默认为true
     public static boolean DEX_ERROR = false;
     public static final String HOTFIX_VERSION = "HF";
-//    public static final String FILE_OLD_DIR = "/.analysys_file/";
+    //    public static final String FILE_OLD_DIR = "/.analysys_file/";
     public static final String FILE_NEW_DIR = "/.a2/";
     public static final String HOTFIX_CACHE_HOTFIX_DIR = FILE_NEW_DIR + ".hf/";
     public static final String PS_CACHE_HOTFIX_DIR = FILE_NEW_DIR + ".ps/";

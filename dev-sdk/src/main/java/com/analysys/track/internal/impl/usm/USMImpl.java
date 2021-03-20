@@ -15,12 +15,12 @@ import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.impl.applist.AppSnapshotImpl;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.NetworkUtils;
-import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.pkg.PkgList;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -242,7 +242,7 @@ public class USMImpl {
                             , new Object[]{event});
 
                     String pkg = getPackageName(event);
-                    if (TextUtils.isEmpty(pkg) || !SystemUtils.hasLaunchIntentForPackage(packageManager, pkg)) {
+                    if (TextUtils.isEmpty(pkg) || !PkgList.hasLaunchIntentForPackage(packageManager, pkg)) {
                         continue;
                     }
                     /**

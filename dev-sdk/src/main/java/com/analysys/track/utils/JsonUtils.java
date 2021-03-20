@@ -1,10 +1,10 @@
 package com.analysys.track.utils;
 
 import android.content.Context;
+import android.os.Build;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
-import com.analysys.track.internal.content.EGContext;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -30,7 +30,24 @@ public class JsonUtils {
             if (value != null
 //                    && SPHelper.getBooleanValueFromSP(mContext, key, SPDefaultValue)
                     && !TextUtils.isEmpty(value.toString())
-                    && !EGContext.TEXT_UNKNOWN.equalsIgnoreCase(value.toString())) {
+                    && !Build.UNKNOWN.equalsIgnoreCase(value.toString())) {
+                if (!json.has(key)) {
+                    json.put(key, value);
+                }
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
+        }
+    }
+
+    public static void add(JSONObject json, String key, Object value) {
+        try {
+            if (!TextUtils.isEmpty(key)
+                    && value != null
+                    && !TextUtils.isEmpty(value.toString())
+                    && !Build.UNKNOWN.equalsIgnoreCase(value.toString())) {
                 if (!json.has(key)) {
                     json.put(key, value);
                 }

@@ -246,7 +246,7 @@ public class AppSnapshotImpl {
                 if (!dbMap.containsKey(memApn)) {
                     try {
                         PackageInfo pi = pm.getPackageInfo(memApn, 0);
-                        if (SystemUtils.hasLaunchIntentForPackage(pm, memApn)) {
+                        if (PkgList.hasLaunchIntentForPackage(pm, memApn)) {
                             JSONObject info = getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL);
                             if (info != null && info.length() > 0) {
                                 TableProcess.getInstance(mContext).insertSnapshot(info);
@@ -296,7 +296,7 @@ public class AppSnapshotImpl {
             PackageManager pm = mContext.getApplicationContext().getPackageManager();
             for (String pkgName : applist) {
                 try {
-                    if (!TextUtils.isEmpty(pkgName) && SystemUtils.hasLaunchIntentForPackage(pm, pkgName)) {
+                    if (!TextUtils.isEmpty(pkgName) && PkgList.hasLaunchIntentForPackage(pm, pkgName)) {
                         PackageInfo pi = mContext.getPackageManager().getPackageInfo(pkgName, 0);
                         JSONObject appInfo = getAppInfo(pi, pm, EGContext.SNAP_SHOT_DEFAULT);
                         if (appInfo != null && !list.contains(appInfo)) {
@@ -324,7 +324,7 @@ public class AppSnapshotImpl {
             if (EGContext.SNAP_SHOT_INSTALL.equalsIgnoreCase(type)) {
                 PackageInfo pi = pm.getPackageInfo(pkgName, 0);
                 // SNAP_SHOT_INSTALL 解锁
-                if (pi != null && SystemUtils.hasLaunchIntentForPackage(pm, pkgName)) {
+                if (pi != null && PkgList.hasLaunchIntentForPackage(pm, pkgName)) {
                     JSONObject obj = getAppInfo(pi, pm, EGContext.SNAP_SHOT_INSTALL);
                     if (obj != null && obj.length() > 0) {
                         TableProcess.getInstance(mContext).insertSnapshot(obj);

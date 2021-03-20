@@ -1,6 +1,7 @@
 package com.analysys.track.utils;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -29,6 +30,7 @@ public class NetworkUtils {
      * 获取当前的网络状态
      */
     @SuppressWarnings("deprecation")
+    @SuppressLint("MissingPermission")
     public static String getNetworkType(Context context) {
         String netType = EGContext.NETWORK_TYPE_NO_NET;
 

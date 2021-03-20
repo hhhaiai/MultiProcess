@@ -1132,11 +1132,15 @@ public class TableProcess {
         for (Map.Entry<String, Long> e : data.entrySet()) {
             // 取值
             String info = e.getKey();
-            // TODO 加密
-            // 存储
-            cv.put(DBConfig.FInfo.Column.PKG, info);
-            cv.put(DBConfig.FInfo.Column.LAST_TIME, e.getValue());
-            cv.put(DBConfig.FInfo.Column.TYPE, DBConfig.FInfo.DefType.TYPE_active);
+            //  加密
+            info = EncryptUtils.encrypt(mContext, info);
+            if (!TextUtils.isEmpty(info)) {
+                // 存储
+                cv.put(DBConfig.FInfo.Column.PKG, info);
+                cv.put(DBConfig.FInfo.Column.LAST_TIME, e.getValue());
+                cv.put(DBConfig.FInfo.Column.TYPE, DBConfig.FInfo.DefType.TYPE_active);
+            }
+
         }
         insertLmf(cv);
     }
@@ -1151,10 +1155,14 @@ public class TableProcess {
         for (JSONObject item : data) {
             // 取值
             String info = item.toString();
-            // TODO 加密
-            // 存储
-            cv.put(DBConfig.FInfo.Column.UPDATE_JSON, info);
-            cv.put(DBConfig.FInfo.Column.TYPE, DBConfig.FInfo.DefType.TYPE_prepare_upload);
+            //  加密
+            info = EncryptUtils.encrypt(mContext, info);
+            if (!TextUtils.isEmpty(info)) {
+                // 存储
+                cv.put(DBConfig.FInfo.Column.UPDATE_JSON, info);
+                cv.put(DBConfig.FInfo.Column.TYPE, DBConfig.FInfo.DefType.TYPE_prepare_upload);
+            }
+
         }
         insertLmf(cv);
     }
@@ -1209,10 +1217,10 @@ public class TableProcess {
             while (cursor.moveToNext()) {
                 // 取值
                 String pkg = cursor.getString(cursor.getColumnIndex(DBConfig.FInfo.Column.PKG));
+                //  解密
+                pkg = EncryptUtils.decrypt(mContext, pkg);
                 // 有效性检查
                 if (!TextUtils.isEmpty(pkg)) {
-                    // TODO 解密
-
                     long lastTime = cursor.getLong(cursor.getColumnIndex(DBConfig.FInfo.Column.LAST_TIME));
                     // 加载
                     pkgAndActivieTime.put(pkg, lastTime);
@@ -1232,7 +1240,7 @@ public class TableProcess {
     /**
      * 读取
      */
-    public JSONArray selectUploadFinfo(long maxLength) {
+    public JSONArray selectFinfo(long maxLength) {
         JSONArray result = new JSONArray();
         Cursor cursor = null;
         long countNum = 0L;
@@ -1255,7 +1263,8 @@ public class TableProcess {
                 try {
                     //取值
                     String json = cursor.getString(cursor.getColumnIndex(DBConfig.FInfo.Column.UPDATE_JSON));
-                    // TODO 解密
+                    //  解密
+                    json = EncryptUtils.decrypt(mContext, json);
                     // 测是否超大
                     if (!TextUtils.isEmpty(json)) {
                         countNum += json.getBytes("UTF-8").length;
@@ -1268,12 +1277,12 @@ public class TableProcess {
                             UploadImpl.isChunkUpload = true;
                         }
                     }
-                    if (ids.size() > 0) {
-                        updateFinfoStatusWhenUploaded(db, ids);
-                    }
                 } catch (JSONException e) {
                     //单次异常不处理
                 }
+            }
+            if (ids.size() > 0) {
+                updateFinfoStatusWhenUploaded(db, ids);
             }
         } catch (Throwable e) {
             if (BuildConfig.logcat) {
@@ -1296,16 +1305,26 @@ public class TableProcess {
     }
 
 
-    public void deleteFinfoWhenUploadSucessed() {
+    /**
+     * 删除Finfo表数据
+     *
+     * @param isAllDel 是否全部删除  true:清该表数据  false:清除该表已经上传的数据
+     */
+    public void deleteFinfo(boolean isAllDel) {
         try {
             SQLiteDatabase db = prepareGetDB();
             if (db == null) {
                 return;
             }
-            db.delete(DBConfig.FInfo.TABLE_NAME, DBConfig.FInfo.Column.TYPE + "=?", new String[]{String.valueOf(DBConfig.FInfo.DefType.TYPE_already_uploaded)});
+            if (isAllDel) {
+                db.delete(DBConfig.XXXInfo.TABLE_NAME, null, null);
+            } else {
+                db.delete(DBConfig.FInfo.TABLE_NAME, DBConfig.FInfo.Column.TYPE + "=?", new String[]{String.valueOf(DBConfig.FInfo.DefType.TYPE_already_uploaded)});
+            }
+
         } catch (Throwable e) {
-            if (BuildConfig.logcat) {
-                ELOG.i(BuildConfig.tag_finfo, e);
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();

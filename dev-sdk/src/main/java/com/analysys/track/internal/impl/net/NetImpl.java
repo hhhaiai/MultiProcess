@@ -16,6 +16,7 @@ import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.SystemUtils;
+import com.analysys.track.utils.pkg.PkgList;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -38,7 +39,7 @@ public class NetImpl {
     private Context context;
     private static volatile NetImpl instance;
 
-    private static final String[] CMDS = {
+    private static final String[] Net_PATH = {
             "/proc/net/tcp",
             "/proc/net/tcp6",
             "/proc/net/udp",
@@ -162,7 +163,7 @@ public class NetImpl {
             //本次扫描的时间戳
             long time = System.currentTimeMillis();
             //扫描
-            for (String cmd : CMDS) {
+            for (String cmd : Net_PATH) {
                 try {
 
                     String result = SystemUtils.getContent(cmd);
@@ -305,7 +306,7 @@ public class NetImpl {
                         && pkgName.contains(".")
                         && !pkgName.contains(":")
                         && !pkgName.contains("/")
-                        && SystemUtils.hasLaunchIntentForPackage(manager, pkgName)) {
+                        && PkgList.hasLaunchIntentForPackage(manager, pkgName)) {
 
                     NetInfo info = pkgs.get(pkgName);
                     if (info == null) {

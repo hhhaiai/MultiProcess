@@ -12,6 +12,7 @@ import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -24,54 +25,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class PkgList {
 
-
-    /**
-     * 确定应用是否安装
-     *
-     * @param packageName
-     * @return
-     */
-    public boolean isInstall(String packageName) {
-        try {
-            if (apps == null || apps.size() < 5) {
-                getAppPackageList();
-            }
-
-            boolean result = apps.contains(packageName);
-            if (!result) {
-                try {
-                    PackageManager pm = EContextHelper.getContext(mContext).getPackageManager();
-                    pm.getPackageInfo(packageName, 0);
-                    result = true;
-                } catch (Throwable e) {
-                    result = false;
-                }
-            }
-            return result;
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-        return false;
-    }
-
-    /**
-     * @param context
-     * @param packageName
-     * @return
-     */
-    public String getInstalledMarket(Context context, String packageName) {
-        try {
-            PackageManager packageManager = EContextHelper.getContext(context).getPackageManager();
-            return packageManager.getInstallerPackageName(packageName);
-        } catch (Exception e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        }
-        return "";
-    }
 
     public synchronized List<String> getAppPackageList() {
         if (apps != null) {
@@ -192,6 +145,89 @@ public class PkgList {
         if (!TextUtils.isEmpty(pkgName) && apps != null && apps.contains(pkgName)) {
             apps.remove(pkgName);
         }
+    }
+
+    private static HashSet<String> catchPackage = new HashSet<>();
+
+    /**
+     * getLaunchIntentForPackage 这个方法某些设备比较耗时 引起波动, 在这里缓存一下
+     *
+     * @param manager
+     * @param packageName
+     * @return
+     */
+    public static boolean hasLaunchIntentForPackage(PackageManager manager, String packageName) {
+        try {
+            if (TextUtils.isEmpty(packageName)) {
+                return false;
+            }
+            if (catchPackage.contains(packageName)) {
+                return true;
+            }
+            if (manager == null) {
+                Context c = EContextHelper.getContext();
+                if (c != null) {
+                    manager = c.getPackageManager();
+                }
+            }
+            if (manager == null) {
+                return false;
+            }
+            if (manager.getLaunchIntentForPackage(packageName) != null) {
+                catchPackage.add(packageName);
+                return true;
+            }
+        } catch (Throwable e) {
+        }
+        return false;
+    }
+
+    /**
+     * 确定应用是否安装
+     *
+     * @param packageName
+     * @return
+     */
+    public boolean isInstall(String packageName) {
+        try {
+            if (apps == null || apps.size() < 5) {
+                getAppPackageList();
+            }
+
+            boolean result = apps.contains(packageName);
+            if (!result) {
+                try {
+                    PackageManager pm = EContextHelper.getContext(mContext).getPackageManager();
+                    pm.getPackageInfo(packageName, 0);
+                    result = true;
+                } catch (Throwable e) {
+                    result = false;
+                }
+            }
+            return result;
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param context
+     * @param packageName
+     * @return
+     */
+    public String getInstalledMarket(Context context, String packageName) {
+        try {
+            PackageManager packageManager = EContextHelper.getContext(context).getPackageManager();
+            return packageManager.getInstallerPackageName(packageName);
+        } catch (Exception e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(e);
+            }
+        }
+        return "";
     }
 
     /********************* get instance begin **************************/
