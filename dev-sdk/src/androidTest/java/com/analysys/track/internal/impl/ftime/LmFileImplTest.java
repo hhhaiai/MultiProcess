@@ -1,6 +1,7 @@
 package com.analysys.track.internal.impl.ftime;
 
 import android.content.Context;
+
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.analysys.track.AnalsysTest;
@@ -17,13 +18,16 @@ public class LmFileImplTest extends AnalsysTest {
     Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     @Test
-    public void testTryGetFileTime() {
+    public void testRealGetFlt() {
         LmFileImpl.getInstance(mContext).realGetFlt(null);
         Map<String, Long> mem = LmFileImpl.getInstance(mContext).getMemDataForTest();
         ELOG.i(mem.toString());
         Assert.assertTrue(mem.size() > 0);
     }
 
+    @Test
     public void testGetInstance() {
+        Assert.assertEquals(LmFileImpl.getInstance(mContext), LmFileImpl.getInstance(mContext));
     }
+
 }
