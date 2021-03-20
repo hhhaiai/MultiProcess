@@ -1,10 +1,17 @@
 package com.analysys.track.db;
 
+import android.content.Context;
+
+import androidx.test.platform.app.InstrumentationRegistry;
+
+import com.analysys.track.AnalsysTest;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class TableProcessTest {
+public class TableProcessTest extends AnalsysTest {
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     @Test
     public void insertXXX() {
@@ -92,5 +99,29 @@ public class TableProcessTest {
 
     @Test
     public void getInstance() {
+    }
+
+    /*************************************************************************************************************/
+    /************************************ Finfo的数据库测试 ********************************************/
+    /*************************************************************************************************************/
+
+    @Test
+    public void testFlushMemFInfo() {
+    }
+
+    @Test
+    public void testFlushUploadFInfo() {
+    }
+
+    @Test
+    public void testLoadMemFinfo() {
+    }
+
+    @Test
+    public void testSelectFinfo() {
+    }
+
+    @Test
+    public void testDeleteFinfo() {
     }
 }

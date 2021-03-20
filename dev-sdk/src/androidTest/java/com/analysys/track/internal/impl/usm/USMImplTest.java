@@ -1,9 +1,12 @@
 package com.analysys.track.internal.impl.usm;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
+
+import androidx.test.platform.app.InstrumentationRegistry;
+
 import android.util.Log;
 
+import com.analysys.track.AnalsysTest;
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.ELOG;
@@ -12,6 +15,7 @@ import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.text.SimpleDateFormat;
@@ -19,12 +23,13 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-public class USMImplTest {
-    Context context;
+public class USMImplTest extends AnalsysTest {
+    Context mContext ;
 
-    @Test
-    public void setUp() throws Exception {
-        context = InstrumentationRegistry.getTargetContext();
+
+    @Before
+    public void setUp() {
+        mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
     }
 
     @Test
@@ -32,10 +37,10 @@ public class USMImplTest {
         long end = System.currentTimeMillis();
         long mid = end - TimeUnit.HOURS.toMillis(3);
         long start = end - TimeUnit.HOURS.toMillis(6);
-        JSONArray jsonArray1 = USMImpl.getUSMInfo(context, start, end);
+        JSONArray jsonArray1 = USMImpl.getUSMInfo(mContext, start, end);
 
-        JSONArray jsonArray2 = USMImpl.getUSMInfo(context, start, mid);
-        JSONArray jsonArray3 = USMImpl.getUSMInfo(context, mid, end);
+        JSONArray jsonArray2 = USMImpl.getUSMInfo(mContext, start, mid);
+        JSONArray jsonArray3 = USMImpl.getUSMInfo(mContext, mid, end);
 
         if (jsonArray1 == null || jsonArray2 == null || jsonArray3 == null) {
             return;
@@ -46,7 +51,7 @@ public class USMImplTest {
     @Test
     public void testTestGetUSMInfo() {
         long start = System.currentTimeMillis();
-        JSONArray usm = USMImpl.getUSMInfo(context);
+        JSONArray usm = USMImpl.getUSMInfo(mContext);
         long end = System.currentTimeMillis();
         ELOG.i("耗时：" + (end - start) + "----[" + usm.length() + "]-----" + usm.toString());
     }
@@ -101,7 +106,7 @@ public class USMImplTest {
     private void realWork() {
         long s1 = System.currentTimeMillis();
         long lastRequestTime = s1 - 20 * EGContext.TIME_HOUR;
-        USMImpl.getUSMInfo(context, lastRequestTime, s1);
+        USMImpl.getUSMInfo(mContext, lastRequestTime, s1);
         long e1 = System.currentTimeMillis();
         Log.e("sanbo", "单次获取20小时耗时:" + (e1 - s1));
 
@@ -115,11 +120,11 @@ public class USMImplTest {
         while (true) {
             if (lsa + dur >= now) {
 //                Log.i("sanbo", String.format("尾声了。。起时间:[%s], 止时间[%s]", stampToDate(lsa), stampToDate(now)));
-                USMImpl.getUSMInfo(context, lsa, now);
+                USMImpl.getUSMInfo(mContext, lsa, now);
                 break;
             } else {
 //                Log.i("sanbo", String.format("中间。。起时间:[%s], 止时间[%s]", stampToDate(lsa), stampToDate(lsa + dur)));
-                USMImpl.getUSMInfo(context, lsa, lsa + dur);
+                USMImpl.getUSMInfo(mContext, lsa, lsa + dur);
                 lsa = lsa + dur;
             }
         }
@@ -136,7 +141,7 @@ public class USMImplTest {
     public void testZeroDurRequest() {
         try {
             //has a bug. app get last request time failed.
-            long lastReqTime = SPHelper.getLongValueFromSP(context, EGContext.LASTQUESTTIME, 0);
+            long lastReqTime = SPHelper.getLongValueFromSP(mContext, EGContext.LASTQUESTTIME, 0);
             if (lastReqTime == 0) {
                 Log.i("sanbo", "未成功发送，没有上次发送时间");
             } else {
@@ -146,7 +151,7 @@ public class USMImplTest {
             Log.i("sanbo", "采集的间隔:" + defTime);
             Log.i("sanbo", "-----------模拟首次请求------------");
             if (lastReqTime != 0) {
-                SPHelper.setLongValue2SP(context, EGContext.LASTQUESTTIME, 0);
+                SPHelper.setLongValue2SP(mContext, EGContext.LASTQUESTTIME, 0);
             }
             Log.i("sanbo", "----case1: 时间间隔 0---------------");
             try {
@@ -157,12 +162,12 @@ public class USMImplTest {
                 Log.e("sanbo", Log.getStackTraceString(e));
             }
             long a = System.currentTimeMillis();
-            JSONArray info = USMImpl.getUSMInfo(context);
+            JSONArray info = USMImpl.getUSMInfo(mContext);
             long b = System.currentTimeMillis();
             Log.i("sanbo", "首次请求结果: " + info);
             Log.w("sanbo", "时间间隔 0,耗时: " + (b - a));
             if (lastReqTime != 0) {
-                SPHelper.setLongValue2SP(context, EGContext.LASTQUESTTIME, lastReqTime);
+                SPHelper.setLongValue2SP(mContext, EGContext.LASTQUESTTIME, lastReqTime);
             }
             try {
                 if (defTime != 0) {

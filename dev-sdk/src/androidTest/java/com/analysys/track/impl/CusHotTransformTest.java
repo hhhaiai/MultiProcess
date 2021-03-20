@@ -1,5 +1,9 @@
 package com.analysys.track.impl;
 
+import android.content.Context;
+
+import androidx.test.platform.app.InstrumentationRegistry;
+
 import com.analysys.track.AnalsysTest;
 
 import org.junit.Test;
@@ -11,6 +15,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 public class CusHotTransformTest extends AnalsysTest {
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     @Test
     public void getInstance() throws InterruptedException {

@@ -1,7 +1,10 @@
 package com.analysys.track;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
+
+import androidx.test.platform.app.InstrumentationRegistry;
+
+import junit.framework.TestCase;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -10,8 +13,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class AnalsysTest {
-    public static Context mContext = InstrumentationRegistry.getContext();
+public abstract class AnalsysTest extends TestCase {
+    public static Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     private final static HashMap<Class, String> mapMemberClass = new HashMap<Class, String>(8);
 

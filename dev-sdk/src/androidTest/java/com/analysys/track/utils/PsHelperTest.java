@@ -1,6 +1,9 @@
 package com.analysys.track.utils;
 
 import android.app.Activity;
+import android.content.Context;
+
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.analysys.track.AnalsysTest;
 import com.analysys.track.utils.data.MaskUtils;
@@ -15,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PsHelperTest extends AnalsysTest {
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     @Test
     public void parserPs() {

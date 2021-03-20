@@ -1,9 +1,16 @@
 package com.analysys.track.utils;
 
+import android.content.Context;
+
+import androidx.test.platform.app.InstrumentationRegistry;
+
+import com.analysys.track.AnalsysTest;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-public class BugReportForTestTest {
+public class BugReportForTestTest extends AnalsysTest {
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     @Test
     public void commitError() {

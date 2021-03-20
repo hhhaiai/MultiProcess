@@ -1,10 +1,15 @@
 package com.analysys.track.utils;
 
+import android.content.Context;
+
+import androidx.test.platform.app.InstrumentationRegistry;
+
 import com.analysys.track.AnalsysTest;
 
 import org.junit.Test;
 
 public class CutOffUtilsTest extends AnalsysTest {
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     @Test
     public void cutOff() {

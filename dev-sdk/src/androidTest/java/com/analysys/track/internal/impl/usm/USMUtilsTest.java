@@ -1,6 +1,9 @@
 package com.analysys.track.internal.impl.usm;
 
 import android.app.usage.UsageEvents;
+import android.content.Context;
+
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.analysys.track.AnalsysTest;
 import com.analysys.track.internal.content.EGContext;
@@ -9,7 +12,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class USMUtilsTest extends AnalsysTest {
-
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
     @Test
     public void isOption() {
     }

@@ -2,9 +2,12 @@ package com.analysys.track.utils.reflectinon;
 
 import android.app.Instrumentation;
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
+
+import androidx.test.platform.app.InstrumentationRegistry;
+
 import android.util.Log;
 
+import com.analysys.track.AnalsysTest;
 import com.analysys.track.impl.CusHotTransform;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.utils.ELOG;
@@ -21,12 +24,12 @@ import java.lang.reflect.Method;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class EContextHelperTest {
+public class EContextHelperTest extends AnalsysTest {
     Context context;
 
     @Before
     public void start() {
-        context = InstrumentationRegistry.getTargetContext();
+        InstrumentationRegistry.getInstrumentation().getTargetContext();
     }
 
     @Test

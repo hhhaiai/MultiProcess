@@ -1,20 +1,21 @@
 package com.analysys.track.utils.reflectinon;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.analysys.track.AnalsysTest;
 import com.analysys.track.utils.ELOG;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-public class DoubleCardSupportTest {
+public class DoubleCardSupportTest extends AnalsysTest {
 
     private Context context;
 
     @Test
     public void init() {
-        context = InstrumentationRegistry.getTargetContext();
+        context = InstrumentationRegistry.getInstrumentation().getTargetContext();
     }
     @Test
     public void getIMEIS() {

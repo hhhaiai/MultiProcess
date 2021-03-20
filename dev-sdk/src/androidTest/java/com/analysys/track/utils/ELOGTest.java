@@ -1,12 +1,14 @@
 package com.analysys.track.utils;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
+
+import com.analysys.track.AnalsysTest;
 
 import org.junit.Test;
 
-public class ELOGTest {
-    Context mContext = InstrumentationRegistry.getContext();
+public class ELOGTest extends AnalsysTest {
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     @Test
     public void init() {

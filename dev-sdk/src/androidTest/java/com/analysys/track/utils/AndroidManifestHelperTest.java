@@ -1,10 +1,17 @@
 package com.analysys.track.utils;
 
+import android.content.Context;
+
+import androidx.test.platform.app.InstrumentationRegistry;
+
+import com.analysys.track.AnalsysTest;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class AndroidManifestHelperTest {
+public class AndroidManifestHelperTest extends AnalsysTest {
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     @Test
     public void isServiceDefineInManifest() {

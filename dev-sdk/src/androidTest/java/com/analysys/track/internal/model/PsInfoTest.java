@@ -1,11 +1,18 @@
 package com.analysys.track.internal.model;
 
+import android.content.Context;
+
+import androidx.test.platform.app.InstrumentationRegistry;
+
+import com.analysys.track.AnalsysTest;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class PsInfoTest {
+public class PsInfoTest extends AnalsysTest {
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     @Test
     public void toJson() {

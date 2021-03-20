@@ -1,8 +1,11 @@
 package com.analysys.track.utils;
 
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
+
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.analysys.track.AnalsysTest;
 
@@ -12,6 +15,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class SystemUtilsTest extends AnalsysTest {
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     @Test
     public void getDay() {

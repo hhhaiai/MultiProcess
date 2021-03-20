@@ -1,8 +1,9 @@
 package com.analysys.track.internal.impl.ftime;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.analysys.track.AnalsysTest;
 import com.analysys.track.utils.ELOG;
 
 import junit.framework.TestCase;
@@ -12,8 +13,8 @@ import org.junit.Test;
 
 import java.util.Map;
 
-public class LmFileImplTest extends TestCase {
-    Context mContext = InstrumentationRegistry.getContext();
+public class LmFileImplTest extends AnalsysTest {
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     @Test
     public void testTryGetFileTime() {

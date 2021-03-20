@@ -1,10 +1,15 @@
 package com.analysys.track.utils.reflectinon;
 
+import android.content.Context;
 import android.view.View;
 
-import java.text.SimpleDateFormat;
+import androidx.test.platform.app.InstrumentationRegistry;
 
-public class ClazzUtilsTargetTestClass extends SimpleDateFormat implements View.OnClickListener {
+import com.analysys.track.AnalsysTest;
+
+public class ClazzUtilsTargetTestClass extends AnalsysTest implements View.OnClickListener {
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+
     private int a = 100;
     private static int a2 = 100;
     private static final int a3 = 100;

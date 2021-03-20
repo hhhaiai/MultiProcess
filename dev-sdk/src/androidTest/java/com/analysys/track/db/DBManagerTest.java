@@ -1,5 +1,9 @@
 package com.analysys.track.db;
 
+import android.content.Context;
+
+import androidx.test.platform.app.InstrumentationRegistry;
+
 import com.analysys.track.AnalsysTest;
 
 import org.json.JSONArray;
@@ -22,6 +26,7 @@ public class DBManagerTest extends AnalsysTest {
 //            f.delete();
 //        }
     }
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     @Test
     public void getInstance() throws InterruptedException {

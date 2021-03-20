@@ -1,13 +1,19 @@
 package com.analysys.track.utils;
 
+import android.content.Context;
 import android.util.Log;
+
+import androidx.test.platform.app.InstrumentationRegistry;
+
+import com.analysys.track.AnalsysTest;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class ShellUtilsTest {
+public class ShellUtilsTest extends AnalsysTest {
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     @Test
     public void shell() {

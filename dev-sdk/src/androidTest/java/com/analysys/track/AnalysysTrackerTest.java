@@ -1,16 +1,16 @@
 package com.analysys.track;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
 
-import com.analysys.track.internal.content.EGContext;
+import androidx.test.platform.app.InstrumentationRegistry;
+
 import com.analysys.track.utils.SystemUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-public class AnalysysTrackerTest {
-    Context mContext = InstrumentationRegistry.getContext();
+public class AnalysysTrackerTest extends AnalsysTest {
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     @Test
     public void testInit() {

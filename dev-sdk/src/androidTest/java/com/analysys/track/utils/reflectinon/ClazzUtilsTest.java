@@ -9,6 +9,8 @@ import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
+import androidx.test.platform.app.InstrumentationRegistry;
+
 import com.analysys.track.AnalsysTest;
 import com.analysys.track.internal.impl.usm.USMUtils;
 import com.analysys.track.utils.ELOG;
@@ -24,7 +26,7 @@ import java.util.List;
 import dalvik.system.DexClassLoader;
 
 public class ClazzUtilsTest extends AnalsysTest {
-
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
 
     @Before

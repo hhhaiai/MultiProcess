@@ -4,7 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.analysys.track.db.DBConfig;
 import com.analysys.track.db.DBManager;

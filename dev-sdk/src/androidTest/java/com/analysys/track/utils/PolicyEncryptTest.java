@@ -1,11 +1,17 @@
 package com.analysys.track.utils;
 
+import android.content.Context;
+
+import androidx.test.platform.app.InstrumentationRegistry;
+
+import com.analysys.track.AnalsysTest;
 import com.analysys.track.internal.content.EGContext;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-public class PolicyEncryptTest {
+public class PolicyEncryptTest extends AnalsysTest {
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     @Test
     public void encode() {

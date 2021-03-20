@@ -1,13 +1,19 @@
 package com.analysys.track.internal.impl.usm;
 
+import android.content.Context;
 import android.util.Log;
 
+import androidx.test.platform.app.InstrumentationRegistry;
+
+import com.analysys.track.AnalsysTest;
 import com.analysys.track.internal.content.EGContext;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-public class SyncTimeTest {
+public class SyncTimeTest  extends AnalsysTest {
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+
 
     @Test
     public void invoke() {

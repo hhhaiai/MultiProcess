@@ -233,6 +233,7 @@ public class ClazzUtils {
     public static Object getStaticFieldValue(String className, String fieldName) {
         return getFieldValueImpl(getClass(className), fieldName, null);
     }
+
     public static Object getStaticFieldValue(Class clazz, String fieldName) {
         return getFieldValueImpl(clazz, fieldName, null);
     }
@@ -464,7 +465,6 @@ public class ClazzUtils {
             if (BuildConfig.DEBUG_UTILS) {
                 printGoInvokeExceptionInfo(method, obj, e, argsValue);
             }
-
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);
             }
@@ -490,7 +490,7 @@ public class ClazzUtils {
                 if (method != null && argsValue != null) {
                     ELOG.wtf("=======goInvoke【5】======== \nm:" + method.toString() + "\nobj:" + obj + "\nv:" + Arrays.asList(argsValue));
                 }
-                ELOG.e(e);
+//                ELOG.e(e);
             }
         } catch (Throwable ex) {
         }

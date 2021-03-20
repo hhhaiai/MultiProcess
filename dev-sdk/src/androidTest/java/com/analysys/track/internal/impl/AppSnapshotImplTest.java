@@ -1,10 +1,10 @@
 package com.analysys.track.internal.impl;
 
-import android.os.Debug;
+import android.content.Context;
+
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.analysys.track.AnalsysTest;
-import com.analysys.track.db.TableProcess;
-import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.applist.AppSnapshotImpl;
 
@@ -17,10 +17,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import static org.junit.Assert.*;
-
 public class AppSnapshotImplTest extends AnalsysTest {
-
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
     @Test
     public void snapshotsInfo() {
     }

@@ -1,5 +1,9 @@
 package com.analysys.track.utils.data;
 
+import android.content.Context;
+
+import androidx.test.platform.app.InstrumentationRegistry;
+
 import com.analysys.track.AnalsysTest;
 
 import org.junit.Assert;
@@ -9,6 +13,7 @@ import java.io.File;
 import java.util.Arrays;
 
 public class MaskUtilsTest extends AnalsysTest {
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     @Test
     public void getDex() {

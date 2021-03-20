@@ -1,15 +1,16 @@
 package com.analysys.track.internal.impl.oc;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.analysys.track.AnalsysTest;
 import com.analysys.track.internal.work.ECallBack;
 
 import org.json.JSONArray;
 import org.junit.Test;
 
-public class OCImplTest {
-    Context mContext = InstrumentationRegistry.getContext();
+public class OCImplTest  extends AnalsysTest {
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     @Test
     public void processOCMsg() {

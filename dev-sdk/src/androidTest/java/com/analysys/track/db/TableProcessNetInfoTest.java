@@ -1,6 +1,9 @@
 package com.analysys.track.db;
 
+import android.content.Context;
 import android.text.TextUtils;
+
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.analysys.track.AnalsysTest;
 import com.analysys.track.internal.impl.net.NetInfo;
@@ -16,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class TableProcessNetInfoTest extends AnalsysTest {
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     @Before
     public void setUp() throws Exception {

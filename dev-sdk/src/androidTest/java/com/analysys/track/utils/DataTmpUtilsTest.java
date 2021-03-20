@@ -1,11 +1,16 @@
 package com.analysys.track.utils;
 
+import android.content.Context;
+
+import androidx.test.platform.app.InstrumentationRegistry;
+
 import com.analysys.track.AnalsysTest;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 public class DataTmpUtilsTest extends AnalsysTest {
+    Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     String path = "/data/local/tmp/kvs";
 

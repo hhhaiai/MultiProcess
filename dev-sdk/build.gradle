@@ -129,7 +129,7 @@ android {
         buildConfigField "String", "tag_finfo", "\"${tag_finfo}\""
 
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
         debug {
@@ -190,8 +190,8 @@ tasks.withType(Javadoc) {
 
 dependencies {
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
     testImplementation 'org.robolectric:robolectric:3.0'
     compileOnly files("libs/miit_mdid_1.0.10.aar")
 }
