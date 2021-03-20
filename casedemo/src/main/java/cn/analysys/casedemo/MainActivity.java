@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         new Thread(() -> {
             try {
                 SDKHelper.shell("setprop log.tag.sanbo VERBOSE");
+                SDKHelper.shell("setprop log.tag.analysys VERBOSE");
             } catch (Throwable e) {
                 L.e(e);
             }
