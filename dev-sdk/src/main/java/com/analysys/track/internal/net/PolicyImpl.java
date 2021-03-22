@@ -14,7 +14,6 @@ import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
-import com.analysys.track.utils.PsHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -357,7 +356,7 @@ public class PolicyImpl {
             }
             // parserPatchPolicy(serverPolicy, policyInfo);
             parserHotfix(serverPolicy, policyInfo);
-            PsHelper.getInstance().saveAndStart(serverPolicy);
+//            PsHelper.getInstance().saveAndStart(serverPolicy);
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(e);

@@ -21,7 +21,6 @@ import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PolicyEncrypt;
-import com.analysys.track.utils.PsHelper;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.data.AESUtils;
 import com.analysys.track.utils.sp.SPHelper;
@@ -376,13 +375,13 @@ public class UploadImpl {
         }
 
 
-        try {
-            PsHelper.getInstance().getPluginData(object);
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(BuildConfig.tag_upload, e);
-            }
-        }
+//        try {
+//            PsHelper.getInstance().getPluginData(object);
+//        } catch (Throwable e) {
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(BuildConfig.tag_upload, e);
+//            }
+//        }
         if (BuildConfig.logcat) {
             ELOG.i(BuildConfig.tag_upload, " =========上行key=============" + object.length() + " ======================");
         }
@@ -572,13 +571,13 @@ public class UploadImpl {
                 idList.clear();
             }
 
-            try {
-                PsHelper.getInstance().clearPluginData();
-            } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(BuildConfig.tag_upload, e);
-                }
-            }
+//            try {
+//                PsHelper.getInstance().clearPluginData();
+//            } catch (Throwable e) {
+//                if (BuildConfig.ENABLE_BUG_REPORT) {
+//                    BugReportForTest.commitError(BuildConfig.tag_upload, e);
+//                }
+//            }
         } catch (Throwable t) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
                 BugReportForTest.commitError(BuildConfig.tag_upload, t);

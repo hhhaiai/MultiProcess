@@ -92,7 +92,7 @@ AnalysysTracker.init(context,"appkey","channel");
 ``` proguard
 
 -keep class com.analysys.track.** {
-  public *;
+  *;
 }
 -dontwarn com.analysys.track.**
 ```

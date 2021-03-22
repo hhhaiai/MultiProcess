@@ -9,7 +9,7 @@ def demoAppkey = "xx"
 def isRelease = true
 //SDK版本号, 混淆字符串也依赖改行，切勿改动变量名字
 def ver = "4.4.0.1"
-def date = "20210218"
+def date = "20210315"
 //SDK子版本，强约束. 00出jar包，非OO出dex包
 def subVersion = "00"
 // 上传时间，几小时

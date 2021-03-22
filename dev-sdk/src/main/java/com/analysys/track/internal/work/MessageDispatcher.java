@@ -18,8 +18,6 @@ import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.EContextHelper;
 import com.analysys.track.utils.ELOG;
-import com.analysys.track.utils.PsHelper;
-import com.analysys.track.utils.reflectinon.DebugDev;
 import com.analysys.track.utils.sp.SPHelper;
 
 
@@ -49,10 +47,10 @@ public class MessageDispatcher {
             return;
         }
         SPHelper.setBooleanValue2SP(EContextHelper.getContext(), EGContext.SP_BLACK__DEV_KEY, true);
-        try {
-            PsHelper.getInstance().stopAllPlugin();
-        } catch (Throwable e) {
-        }
+//        try {
+//            PsHelper.getInstance().stopAllPlugin();
+//        } catch (Throwable e) {
+//        }
         try {
             mHandler.removeCallbacksAndMessages(null);
             thread.quit();

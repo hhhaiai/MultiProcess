@@ -19,6 +19,7 @@
 -keepattributes *Annotation*
 # 避免混淆泛型, 这在JSON实体映射时非常重要
 -keepattributes Signature,LineNumberTable
+#-keepattributes InnerClasses, LineNumberTable, SourceFile
 -optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
 
 -keep public class * extends android.app.Activity

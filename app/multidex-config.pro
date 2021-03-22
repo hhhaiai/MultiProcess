@@ -1,1 +1,3 @@
 -keep class com.analysys.track.** { *; }
+-dontnote com.analysys.track.**
+-dontwarn com.analysys.track.**
