@@ -322,6 +322,8 @@ public class AppSnapshotImpl {
 
             PackageManager pm = mContext.getPackageManager();
             if (EGContext.SNAP_SHOT_INSTALL.equalsIgnoreCase(type)) {
+                //add to memory
+                PkgList.getInstance(mContext).addToMemory(pkgName);
                 PackageInfo pi = pm.getPackageInfo(pkgName, 0);
                 // SNAP_SHOT_INSTALL 解锁
                 if (pi != null && PkgList.hasLaunchIntentForPackage(pm, pkgName)) {

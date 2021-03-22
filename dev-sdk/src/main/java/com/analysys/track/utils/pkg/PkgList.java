@@ -132,7 +132,7 @@ public class PkgList {
         }
     }
 
-    private void addToMemory(String pkg) {
+    public void addToMemory(String pkg) {
         try {
             if (!TextUtils.isEmpty(pkg) && !apps.contains(pkg)) {
                 apps.add(pkg);
