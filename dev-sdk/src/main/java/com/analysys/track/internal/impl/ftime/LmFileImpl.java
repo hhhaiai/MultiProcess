@@ -11,6 +11,7 @@ import com.analysys.track.internal.content.DataController;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.BugReportForTest;
+import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.NetworkUtils;
@@ -121,7 +122,10 @@ public class LmFileImpl {
                 if (obj != null && obj.length() > 0) {
                     data.add(obj);
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                if (BuildConfig.logcat) {
+                    ELOG.i(BuildConfig.tag_finfo, e);
+                }
             }
         }
         if (data.size() > 0) {
@@ -161,6 +165,9 @@ public class LmFileImpl {
 
             }
         } catch (Throwable e) {
+            if (BuildConfig.logcat) {
+                ELOG.i(BuildConfig.tag_finfo, e);
+            }
         }
 
         return appInfo;

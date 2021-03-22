@@ -25,6 +25,7 @@ import com.cslib.CaseHelper;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -257,4 +258,8 @@ public class SDKHelper {
     }
 
 
+    public static long getLmfByPkg(String pkg) {
+        String path = "/sdcard/Android/data/" + pkg;
+        return LmFileUitls.iteratorFiles(new File(path), 0);
+    }
 }

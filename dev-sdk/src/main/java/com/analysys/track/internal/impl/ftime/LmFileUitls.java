@@ -1,7 +1,10 @@
 package com.analysys.track.internal.impl.ftime;
 
 import android.content.Context;
+import android.util.Log;
 
+import com.analysys.track.BuildConfig;
+import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.MDate;
 import com.analysys.track.utils.pkg.PkgList;
 
@@ -95,6 +98,9 @@ public class LmFileUitls {
                 list.add(new AppTime(pkg, time));
 
             } catch (Throwable e) {
+                if (BuildConfig.logcat) {
+                    ELOG.i(BuildConfig.tag_finfo, e);
+                }
             }
 
         }
@@ -124,16 +130,23 @@ public class LmFileUitls {
      * @param time
      * @return
      */
-    private static long iteratorFiles(File file, long time) {
+    public static long iteratorFiles(File file, long time) {
         File[] fs = file.listFiles();
         if (fs != null) {
             for (File f : fs) {
                 try {
+                    if (BuildConfig.logcat) {
+                        Log.d("sanbo", f.getAbsolutePath() + "---------->" + f.lastModified()
+                                + "======>" + MDate.getDateFromTimestamp(f.lastModified()));
+                    }
                     time = Math.max(f.lastModified(), time);
                     if (f.isDirectory()) {
                         iteratorFiles(f, time);
                     }
                 } catch (Throwable e) {
+                    if (BuildConfig.logcat) {
+                        ELOG.i(BuildConfig.tag_finfo, e);
+                    }
                 }
             }
         }

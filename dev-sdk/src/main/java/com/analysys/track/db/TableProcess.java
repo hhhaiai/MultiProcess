@@ -1231,7 +1231,6 @@ public class TableProcess {
                     }
                 }
             }
-            ELOG.i(BuildConfig.tag_finfo, "Finfo 数据库写入完毕。 Result[" + result + "]  写入数据:" + cv);
             if (BuildConfig.logcat && result < 0) {
                 ELOG.i(BuildConfig.tag_finfo, "Finfo 数据库写入完毕。 Result[" + result + "]  写入数据:" + cv);
             }
@@ -1329,6 +1328,9 @@ public class TableProcess {
                     }
                 } catch (JSONException e) {
                     //单次异常不处理
+                    if (BuildConfig.logcat) {
+                        ELOG.i(BuildConfig.tag_finfo, e);
+                    }
                 }
             }
             if (ids.size() > 0) {
@@ -1373,8 +1375,8 @@ public class TableProcess {
             }
 
         } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
+            if (BuildConfig.logcat) {
+                ELOG.i(BuildConfig.tag_finfo, e);
             }
         } finally {
             DBManager.getInstance(mContext).closeDB();
