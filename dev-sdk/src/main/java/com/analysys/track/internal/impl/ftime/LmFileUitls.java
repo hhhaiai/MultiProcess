@@ -104,11 +104,16 @@ public class LmFileUitls {
 
 
     public static long getDirsRealActiveTime(File file, boolean isLog) {
+        zero();
+        iteratorFiles(file, isLog);
+        long result = Math.max(newDirTime, newFileTime);
+        zero();
+        return result;
+    }
+
+    private static void zero() {
         newDirTime = 0;
         newFileTime = 0;
-        iteratorFiles(file, isLog);
-        return Math.max(newDirTime, newFileTime);
-
     }
 
     /**
