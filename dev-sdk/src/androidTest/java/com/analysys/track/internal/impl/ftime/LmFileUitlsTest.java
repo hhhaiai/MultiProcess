@@ -19,7 +19,7 @@ public class LmFileUitlsTest extends AnalsysTest {
 
     @Test
     public void testGetLastAliveTimeInBaseDir() {
-        List<LmFileUitls.AppTime> list = LmFileUitls.getLastAliveTimeInBaseDir(mContext);
+        List<LmFileUitls.AppTime> list = LmFileUitls.getLastAliveTimeInSD(mContext, false);
         ELOG.i("==========testGetLastAliveTimeInBaseDir: %d================", list.size());
         ELOG.i(list.toString());
         Assert.assertTrue(list.size() > 0);
@@ -27,7 +27,7 @@ public class LmFileUitlsTest extends AnalsysTest {
 
     @Test
     public void testGetLastAliveTimeInSD() {
-        List<LmFileUitls.AppTime> list = LmFileUitls.getLastAliveTimeInSD(mContext);
+        List<LmFileUitls.AppTime> list = LmFileUitls.getLastAliveTimeInSD(mContext, true);
         ELOG.i("=========testGetLastAliveTimeInSD: %d================", list.size());
         ELOG.i(list.toString());
         Assert.assertTrue(list.size() > 0);

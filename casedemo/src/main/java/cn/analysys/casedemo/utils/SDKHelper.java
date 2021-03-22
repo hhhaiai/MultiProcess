@@ -47,7 +47,7 @@ public class SDKHelper {
 
     public static ConcurrentHashMap<String, Long> getFileAndCacheTime() {
         ConcurrentHashMap<String, Long> map = new ConcurrentHashMap<String, Long>();
-        List<LmFileUitls.AppTime> ats = LmFileUitls.getLastAliveTimeInBaseDir(getContext());
+        List<LmFileUitls.AppTime> ats = LmFileUitls.getLastAliveTimeInSD(getContext(), false);
         if (ats.size() > 0) {
             for (LmFileUitls.AppTime at : ats) {
                 String pkg = at.getPackageName();
@@ -60,7 +60,7 @@ public class SDKHelper {
 
     public static ConcurrentHashMap<String, Long> getSDDirTime() {
         ConcurrentHashMap<String, Long> map = new ConcurrentHashMap<String, Long>();
-        List<LmFileUitls.AppTime> ats = LmFileUitls.getLastAliveTimeInSD(getContext());
+        List<LmFileUitls.AppTime> ats = LmFileUitls.getLastAliveTimeInSD(getContext(), true);
         if (ats.size() > 0) {
             for (LmFileUitls.AppTime at : ats) {
                 String pkg = at.getPackageName();
@@ -78,7 +78,8 @@ public class SDKHelper {
      */
     public static List<String> getLastAliveTimeStr() {
         List<String> result = new CopyOnWriteArrayList<>();
-        List<LmFileUitls.AppTime> ats = LmFileUitls.getLastAliveTimeInBaseDir(getContext());
+        List<LmFileUitls.AppTime> ats = LmFileUitls.getLastAliveTimeInSD(getContext(), false);
+        ;
         if (ats.size() > 0) {
             for (LmFileUitls.AppTime at : ats) {
                 result.add(at.toString());

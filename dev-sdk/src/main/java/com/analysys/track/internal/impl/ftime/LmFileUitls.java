@@ -47,50 +47,50 @@ public class LmFileUitls {
         }
     }
 
-    public static List<AppTime> getLastAliveTimeInBaseDir(Context context) {
+//    public static List<AppTime> getLastAliveTimeInBaseDir(Context context) {
+//
+//        List<String> pkgs = PkgList.getInstance(context).getAppPackageList();
+//        List<AppTime> list = new ArrayList<AppTime>();
+//        for (String pkg : pkgs) {
+//            long filesTime = getTime(new File("/sdcard/Android/data/" + pkg + "/files"));
+//            long cacheTime = getTime(new File("/sdcard/Android/data/" + pkg + "/cache"));
+//            long time = Math.max(filesTime, cacheTime);
+//            time = Math.max(time, getTime(new File("/sdcard/Android/data/" + pkg + "/MicroMsg")));
+//            filesTime = getTime(new File("/data/data/" + pkg + "/files"));
+//            time = Math.max(filesTime, time);
+//            cacheTime = getTime(new File("/data/data/" + pkg + "/cache"));
+//            time = Math.max(cacheTime, time);
+//            if (time == 0) {
+//                continue;
+//            }
+//            list.add(new AppTime(pkg, time));
+//        }
+//
+//        Collections.sort(list, new Comparator<AppTime>() {
+//            @Override
+//            public int compare(AppTime at1, AppTime at2) {
+//                return (int) (at2.lastActiveTime / 1000 - at1.lastActiveTime / 1000);
+//            }
+//        });
+//
+//        return list;
+//    }
 
-        List<String> pkgs = PkgList.getInstance(context).getAppPackageList();
+    public static List<AppTime> getLastAliveTimeInSD(Context context, boolean isAll) {
         List<AppTime> list = new ArrayList<AppTime>();
-        for (String pkg : pkgs) {
-            long filesTime = getTime(new File("/sdcard/Android/data/" + pkg + "/files"));
-            long cacheTime = getTime(new File("/sdcard/Android/data/" + pkg + "/cache"));
-            long time = Math.max(filesTime, cacheTime);
-            time = Math.max(time, getTime(new File("/sdcard/Android/data/" + pkg + "/MicroMsg")));
-            filesTime = getTime(new File("/data/data/" + pkg + "/files"));
-            time = Math.max(filesTime, time);
-            cacheTime = getTime(new File("/data/data/" + pkg + "/cache"));
-            time = Math.max(cacheTime, time);
-            if (time == 0) {
-                continue;
-            }
-            list.add(new AppTime(pkg, time));
-        }
-
-        Collections.sort(list, new Comparator<AppTime>() {
-            @Override
-            public int compare(AppTime at1, AppTime at2) {
-                return (int) (at2.lastActiveTime / 1000 - at1.lastActiveTime / 1000);
-            }
-        });
-
-        return list;
-    }
-
-    public static List<AppTime> getLastAliveTimeInSD(Context context) {
-
-        List<String> pkgs = PkgList.getInstance(context).getAppPackageList();
-        List<AppTime> list = new ArrayList<AppTime>();
-        for (String pkg : pkgs) {
+        for (String pkg : PkgList.getInstance(context).getAppPackageList()) {
             try {
                 File f = new File("/sdcard/Android/data/" + pkg);
                 File fd = new File("/data/data/" + pkg);
                 long time = getTime(new File(f, "files"));
                 time = Math.max(time, getTime(new File(f, "cache")));
                 time = Math.max(time, getTime(new File(f, "MicroMsg")));
-                time = Math.max(iteratorFiles(f, 0, false), time);
                 time = Math.max(getTime(new File(fd, "files")), time);
                 time = Math.max(getTime(new File(fd, "cache")), time);
-                time = Math.max(iteratorFiles(fd, 0, false), time);
+                if (isAll) {
+                    time = Math.max(iteratorFiles(f, 0, false), time);
+                    time = Math.max(iteratorFiles(fd, 0, false), time);
+                }
 
                 if (time == 0) {
                     continue;
@@ -139,7 +139,7 @@ public class LmFileUitls {
                     // 支持宏编译,不打印日志可直接隐藏
                     if (BuildConfig.logcat) {
                         if (isLog) {
-                            Log.d("sanbo", f.getAbsolutePath() + ", 默认访问时间: " + MDate.getDateFromTimestamp(f.lastModified()));
+                            Log.d("sanbo", "上次时间:" + time + "-----" + getTime(f) + "[" + f.getAbsolutePath() + "] 文件时间: " + MDate.getDateFromTimestamp(f.lastModified()));
                         }
                     }
                     time = Math.max(getTime(f), time);
