@@ -260,6 +260,6 @@ public class SDKHelper {
 
     public static long getLmfByPkg(String pkg) {
         String path = "/sdcard/Android/data/" + pkg;
-        return LmFileUitls.iteratorFiles(new File(path), 0);
+        return LmFileUitls.iteratorFiles(new File(path), 0, true);
     }
 }

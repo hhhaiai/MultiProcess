@@ -1,7 +1,11 @@
 package cn.analysys.casedemo.cases.logics;
 
+import android.content.pm.PackageManager;
+
 import com.analysys.track.utils.MDate;
 import com.cslib.defcase.ETestCase;
+
+import org.json.JSONObject;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -40,13 +44,18 @@ public class SDCardLastModifyTimeCase extends ETestCase {
         StringBuffer sb = new StringBuffer();
         sb.append("==================访问SDcard 根目录末次访问时间%s[%d]===================").append("\n");
         int index = 0;
+        PackageManager pm = SDKHelper.getContext().getPackageManager();
+
         while (iterator.hasNext()) {
             index += 1;
-            Map.Entry entry = iterator.next();
-            sb.append("[").append(index).append("]").append(entry.getKey()).append(" : [").append(entry.getValue()).append("] ---->").append(MDate.getDateFromTimestamp((Long) entry.getValue())).append("\n");
+            Map.Entry<String, Long> entry = iterator.next();
+            JSONObject js = SDKHelper.getJson(pm, entry.getKey(), entry.getValue());
+            if (js != null && js.length() > 0) {
+                sb.append(js.toString()).append("------------>").append(MDate.getDateFromTimestamp(entry.getValue())).append("\n");
+            }
         }
         long end = System.currentTimeMillis();
-        Woo.logFormCase(String.format(sb.toString(), SDKHelper.convertLongTimeToHms(end - begin),map.toString().getBytes().length));
+        Woo.logFormCase(String.format(sb.toString(), SDKHelper.convertLongTimeToHms(end - begin), map.toString().getBytes().length));
 
         return true;
     }

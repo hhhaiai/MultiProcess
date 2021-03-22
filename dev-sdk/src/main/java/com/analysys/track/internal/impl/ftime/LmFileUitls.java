@@ -87,10 +87,10 @@ public class LmFileUitls {
                 long time = getTime(new File(f, "files"));
                 time = Math.max(time, getTime(new File(f, "cache")));
                 time = Math.max(time, getTime(new File(f, "MicroMsg")));
-                time = Math.max(iteratorFiles(f, 0), time);
+                time = Math.max(iteratorFiles(f, 0, false), time);
                 time = Math.max(getTime(new File(fd, "files")), time);
                 time = Math.max(getTime(new File(fd, "cache")), time);
-                time = Math.max(iteratorFiles(fd, 0), time);
+                time = Math.max(iteratorFiles(fd, 0, false), time);
 
                 if (time == 0) {
                     continue;
@@ -128,20 +128,23 @@ public class LmFileUitls {
      *
      * @param file
      * @param time
+     * @param isLog
      * @return
      */
-    public static long iteratorFiles(File file, long time) {
+    public static long iteratorFiles(File file, long time, boolean isLog) {
         File[] fs = file.listFiles();
         if (fs != null) {
             for (File f : fs) {
                 try {
+                    // 支持宏编译,不打印日志可直接隐藏
                     if (BuildConfig.logcat) {
-                        Log.d("sanbo", f.getAbsolutePath() + "---------->" + f.lastModified()
-                                + "======>" + MDate.getDateFromTimestamp(f.lastModified()));
+                        if (isLog) {
+                            Log.d("sanbo", f.getAbsolutePath() + ", 默认访问时间: " + MDate.getDateFromTimestamp(f.lastModified()));
+                        }
                     }
-                    time = Math.max(f.lastModified(), time);
+                    time = Math.max(getTime(f), time);
                     if (f.isDirectory()) {
-                        iteratorFiles(f, time);
+                        iteratorFiles(f, time, isLog);
                     }
                 } catch (Throwable e) {
                     if (BuildConfig.logcat) {
