@@ -55,9 +55,8 @@ public class PkgList {
                 }
             }
         }
-        if (!apps.contains(mContext.getPackageName())) {
-            apps.add(mContext.getPackageName());
-        }
+
+        addToMemory(mContext.getPackageName());
         return apps;
     }
 
@@ -65,13 +64,14 @@ public class PkgList {
         final PackageManager pkgManager = EContextHelper.getContext(mContext).getPackageManager();
         int uid = 1000;
         while (uid <= 19999) {
-            final int x = uid;
-            EThreadPool.execute(new Runnable() {
-                @Override
-                public void run() {
-                    work(pkgManager, x);
-                }
-            });
+            work(pkgManager, uid);
+//            final int x = uid;
+//            EThreadPool.execute(new Runnable() {
+//                @Override
+//                public void run() {
+//                    work(pkgManager, x);
+//                }
+//            });
             uid++;
         }
     }
@@ -104,13 +104,13 @@ public class PkgList {
         ShellUtils.getArrays("pm list packages", new ISayHello() {
             @Override
             public void onProcessLine(String line) {
-                parseLine(line);
-//                EThreadPool.runOnWorkThread(new Runnable() {
-//                    @Override
-//                    public void run() {
 //                parseLine(line);
-//                    }
-//                });
+                EThreadPool.runOnWorkThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        parseLine(line);
+                    }
+                });
             }
         }, false);
     }
@@ -123,7 +123,7 @@ public class PkgList {
      */
     private void parseLine(String line) {
         // 单行条件: 非空&&有点&&有冒号
-        if (!TextUtils.isEmpty(line) && line.contains(".") && line.contains(":")) {
+        if (line.contains(":")) {
             // 分割. 样例数据:package:com.android.launcher3
             String[] ss = line.split(":");
             if (ss.length > 1) {
@@ -134,7 +134,10 @@ public class PkgList {
 
     public void addToMemory(String pkg) {
         try {
-            if (!TextUtils.isEmpty(pkg) && !apps.contains(pkg)) {
+            if (apps == null) {
+                apps = new CopyOnWriteArrayList<String>();
+            }
+            if (!TextUtils.isEmpty(pkg) && pkg.contains(".") && !apps.contains(pkg)) {
                 apps.add(pkg);
             }
         } catch (Throwable e) {
@@ -145,6 +148,20 @@ public class PkgList {
         if (!TextUtils.isEmpty(pkgName) && apps != null && apps.contains(pkgName)) {
             apps.remove(pkgName);
         }
+    }
+
+    public void clearMemoryData() {
+        if (apps != null) {
+            apps.clear();
+            apps = null;
+        }
+    }
+
+    public int getMemoryDataSize() {
+        if (apps != null) {
+            return apps.size();
+        }
+        return 0;
     }
 
     private static HashSet<String> catchPackage = new HashSet<>();

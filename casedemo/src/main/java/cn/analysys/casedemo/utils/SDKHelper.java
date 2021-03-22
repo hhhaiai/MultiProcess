@@ -129,11 +129,7 @@ public class SDKHelper {
      * @return
      */
     public static int getInstallAppSize() {
-        List<String> pkgs = PkgList.getInstance(getContext()).getAppPackageList();
-        if (pkgs == null || pkgs.size() < 0) {
-            return 0;
-        }
-        return pkgs.size();
+        return PkgList.getInstance(getContext()).getMemoryDataSize();
     }
 
     public static void getInstallAppSizeByApi() {
@@ -148,6 +144,13 @@ public class SDKHelper {
         PkgList.getInstance(getContext()).getByUid();
     }
 
+    public static List<String> getPkgList() {
+        return PkgList.getInstance(getContext()).getAppPackageList();
+    }
+
+    public static void clearMemoryPkgList() {
+        PkgList.getInstance(getContext()).clearMemoryData();
+    }
 
     /**
      * 判断是否两个类是否是有祖、父类关系
@@ -250,6 +253,8 @@ public class SDKHelper {
     }
 
     public static JSONObject getJson(PackageManager pm, String pkg, Long value) {
-       return LmFileImpl.getInstance(getContext()).getAppInfo(pm, pkg, value);
+        return LmFileImpl.getInstance(getContext()).getAppInfo(pm, pkg, value);
     }
+
+
 }
