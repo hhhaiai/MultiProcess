@@ -29,6 +29,7 @@ public class PkglmfCase extends ETestCase {
     public boolean predicate() {
         String info = readInfoForPkgName("com.taobao.taobao");
         Woo.logFormCase(info);
+
         return true;
     }
 

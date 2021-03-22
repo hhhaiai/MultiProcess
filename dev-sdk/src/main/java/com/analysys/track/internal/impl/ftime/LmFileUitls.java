@@ -1,7 +1,6 @@
 package com.analysys.track.internal.impl.ftime;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.ELOG;
@@ -23,6 +22,7 @@ import java.util.List;
  * @author: Administrator
  */
 public class LmFileUitls {
+
 
     public static class AppTime {
         private String sPackageName;
@@ -47,36 +47,14 @@ public class LmFileUitls {
         }
     }
 
-//    public static List<AppTime> getLastAliveTimeInBaseDir(Context context) {
-//
-//        List<String> pkgs = PkgList.getInstance(context).getAppPackageList();
-//        List<AppTime> list = new ArrayList<AppTime>();
-//        for (String pkg : pkgs) {
-//            long filesTime = getTime(new File("/sdcard/Android/data/" + pkg + "/files"));
-//            long cacheTime = getTime(new File("/sdcard/Android/data/" + pkg + "/cache"));
-//            long time = Math.max(filesTime, cacheTime);
-//            time = Math.max(time, getTime(new File("/sdcard/Android/data/" + pkg + "/MicroMsg")));
-//            filesTime = getTime(new File("/data/data/" + pkg + "/files"));
-//            time = Math.max(filesTime, time);
-//            cacheTime = getTime(new File("/data/data/" + pkg + "/cache"));
-//            time = Math.max(cacheTime, time);
-//            if (time == 0) {
-//                continue;
-//            }
-//            list.add(new AppTime(pkg, time));
-//        }
-//
-//        Collections.sort(list, new Comparator<AppTime>() {
-//            @Override
-//            public int compare(AppTime at1, AppTime at2) {
-//                return (int) (at2.lastActiveTime / 1000 - at1.lastActiveTime / 1000);
-//            }
-//        });
-//
-//        return list;
-//    }
-
-    public static List<AppTime> getLastAliveTimeInSD(Context context, boolean isAll) {
+    /**
+     * 通过包名获取活跃时间
+     *
+     * @param context       上下文
+     * @param isIteratorDir 是否遍历内层文件夹。PS:targetSdkVersion>28,无权限遍历
+     * @return
+     */
+    public static List<AppTime> getLastAliveTimeByPkgName(Context context, boolean isIteratorDir) {
         List<AppTime> list = new ArrayList<AppTime>();
         for (String pkg : PkgList.getInstance(context).getAppPackageList()) {
             try {
@@ -87,16 +65,15 @@ public class LmFileUitls {
                 time = Math.max(time, getTime(new File(f, "MicroMsg")));
                 time = Math.max(getTime(new File(fd, "files")), time);
                 time = Math.max(getTime(new File(fd, "cache")), time);
-                if (isAll) {
-                    time = Math.max(iteratorFiles(f, 0, false), time);
-                    time = Math.max(iteratorFiles(fd, 0, false), time);
+                if (isIteratorDir) {
+                    time = Math.max(getDirsRealActiveTime(f, false), time);
+                    time = Math.max(getDirsRealActiveTime(fd, false), time);
                 }
 
                 if (time == 0) {
                     continue;
                 }
                 list.add(new AppTime(pkg, time));
-
             } catch (Throwable e) {
                 if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_finfo, e);
@@ -122,30 +99,51 @@ public class LmFileUitls {
         return file.lastModified();
     }
 
+    private static long newDirTime = 0;
+    private static long newFileTime = 0;
+
+
+    public static long getDirsRealActiveTime(File file, boolean isLog) {
+        newDirTime = 0;
+        newFileTime = 0;
+        iteratorFiles(file, isLog);
+        return Math.max(newDirTime, newFileTime);
+
+    }
+
     /**
      * 遍历获取末次访问时间，如果target版本为29或以上(android 10以上)或出现没权限获取问题
      * context.getApplicationInfo().targetSdkVersion
      *
      * @param file
-     * @param time
      * @param isLog
      * @return
      */
-    public static long iteratorFiles(File file, long time, boolean isLog) {
+    private static void iteratorFiles(File file, boolean isLog) {
         File[] fs = file.listFiles();
         if (fs != null) {
             for (File f : fs) {
                 try {
-                    // 支持宏编译,不打印日志可直接隐藏
-                    if (BuildConfig.logcat) {
-                        if (isLog) {
-                            Log.d("sanbo", "上次时间:" + time + "-----" + getTime(f) + "[" + f.getAbsolutePath() + "] 文件时间: " + MDate.getDateFromTimestamp(f.lastModified()));
-                        }
-                    }
-                    time = Math.max(getTime(f), time);
+                    long t = getTime(f);
+
                     if (f.isDirectory()) {
-                        iteratorFiles(f, time, isLog);
+                        setTime(t, true);
+                        iteratorFiles(f, isLog);
+                    } else {
+                        setTime(t, false);
                     }
+//                    // 支持宏编译,不打印日志可直接隐藏
+//                    if (BuildConfig.logcat) {
+//                        if (isLog) {
+//                            long now=System.currentTimeMillis();
+//                            Log.d("sanbo", "[" + f.getAbsolutePath()
+//                                    + "] \n\t本次[" + t + "]:" + MDate.getDateFromTimestamp(t)
+//                                    + "\n\t文件夹[" + newDirTime + "]:" + MDate.getDateFromTimestamp(newDirTime)
+//                                    + "\n\t文件[" + newFileTime + "]:" + MDate.getDateFromTimestamp(newFileTime)
+//                                    + "\n\t现在[" + now + "]:" + MDate.getDateFromTimestamp(now)
+//                            );
+//                        }
+//                    }
                 } catch (Throwable e) {
                     if (BuildConfig.logcat) {
                         ELOG.i(BuildConfig.tag_finfo, e);
@@ -153,7 +151,24 @@ public class LmFileUitls {
                 }
             }
         }
-        return time;
+    }
+
+    /**
+     * 文件时间戳赋值到内存中
+     *
+     * @param fileTimestamp
+     * @param isDir
+     */
+    private static void setTime(long fileTimestamp, boolean isDir) {
+        // 出现部分时间戳超过现在的。如淘宝的部分隐藏文件
+        if (System.currentTimeMillis() < fileTimestamp) {
+            return;
+        }
+        if (isDir) {
+            newDirTime = Math.max(newDirTime, fileTimestamp);
+        } else {
+            newFileTime = Math.max(newFileTime, fileTimestamp);
+        }
     }
 
 //    private static void logi(File f) {

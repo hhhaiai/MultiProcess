@@ -7,7 +7,6 @@ import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
-import com.analysys.track.internal.content.DataController;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.BugReportForTest;
@@ -75,7 +74,7 @@ public class LmFileImpl {
         if (mMapAndTimes.size() == 0) {
             mMapAndTimes = new ConcurrentHashMap<String, Long>(TableProcess.getInstance(mContext).loadMemFinfo());
         }
-        List<LmFileUitls.AppTime> ats = LmFileUitls.getLastAliveTimeInSD(mContext, true);
+        List<LmFileUitls.AppTime> ats = LmFileUitls.getLastAliveTimeByPkgName(mContext, true);
         Map<String, Long> willFlushData = new ConcurrentHashMap<String, Long>();
         Map<String, Long> uploadData = new ConcurrentHashMap<String, Long>();
         for (LmFileUitls.AppTime at : ats) {
