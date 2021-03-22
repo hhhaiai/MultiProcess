@@ -157,6 +157,9 @@ public class LmFileImpl {
                     JsonUtils.add(appInfo, UploadKey.FInfo.ApplicationName,
                             String.valueOf(pi.applicationInfo.loadLabel(packageManager)));
                 } catch (Throwable e) {
+                    if (BuildConfig.logcat) {
+                        ELOG.v(BuildConfig.tag_finfo, e);
+                    }
                 }
                 JsonUtils.add(appInfo, UploadKey.FInfo.ApplicationVersionCode,
                         pi.versionName + "|" + pi.versionCode);
@@ -166,7 +169,7 @@ public class LmFileImpl {
             }
         } catch (Throwable e) {
             if (BuildConfig.logcat) {
-                ELOG.i(BuildConfig.tag_finfo, e);
+                ELOG.v(BuildConfig.tag_finfo, e);
             }
         }
 
