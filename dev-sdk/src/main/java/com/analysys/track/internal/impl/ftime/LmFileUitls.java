@@ -52,6 +52,7 @@ public class LmFileUitls {
             long filesTime = getTime(new File("/sdcard/Android/data/" + pkg + "/files"));
             long cacheTime = getTime(new File("/sdcard/Android/data/" + pkg + "/cache"));
             long time = Math.max(filesTime, cacheTime);
+            time = Math.max(time, getTime(new File("/sdcard/Android/data/" + pkg + "/MicroMsg")));
             filesTime = getTime(new File("/data/data/" + pkg + "/files"));
             time = Math.max(filesTime, time);
             cacheTime = getTime(new File("/data/data/" + pkg + "/cache"));
