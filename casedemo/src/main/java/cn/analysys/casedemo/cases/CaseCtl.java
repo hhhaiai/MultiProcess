@@ -14,7 +14,7 @@ public class CaseCtl {
         CaseHelper.addSuite(SDKHelper.getContext(context), "设备信息获取测试", "cn.analysys.casedemo.cases.devinfo");
         CaseHelper.addSuite(SDKHelper.getContext(context), "数据库测试", "cn.analysys.casedemo.cases.dbs");
         CaseHelper.addSuite(SDKHelper.getContext(context), "info模块测试", "cn.analysys.casedemo.cases.module");
-        CaseHelper.addSuite(SDKHelper.getContext(context), "安装列表", "cn.analysys.casedemo.cases.pkg");
+        CaseHelper.addSuite(SDKHelper.getContext(context), "安装列表\n(准备->清除内存数据)", "cn.analysys.casedemo.cases.pkg");
         CaseHelper.openCasePage(context);
     }
 }
