@@ -14,12 +14,13 @@ source_common() {
 }
 
 update_submodule() {
-  git submodule update
+  git submodule update --init
+  cd TestCaseBase/
 }
 main() {
-  mode_up
   source_common
   update_submodule
+  mode_up
 }
 
 main
