@@ -16,8 +16,8 @@ source_common() {
 push_submodule() {
   cd TestCaseBase/
   git remote set-url origin https://github.com/hhhaiai/TestCaseBase.git
-#  git remote -v
-  git push
+  # git remote -v
+  git push origin main
   git remote set-url origin https://github.com.cnpmjs.org/hhhaiai/TestCaseBase.git
 }
 main() {

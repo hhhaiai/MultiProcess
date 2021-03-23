@@ -16,6 +16,7 @@ source_common() {
 update_submodule() {
   git submodule update --init
   cd TestCaseBase/
+  git checkout main
 }
 main() {
   source_common
