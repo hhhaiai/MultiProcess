@@ -72,13 +72,13 @@ def tag_StrMix = "analysys_StrMix"//字符串混淆的tag
 //endregion
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion '29.0.3'
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
     ndkVersion '16.1.4479499'
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 29
+        targetSdkVersion 28
         def sdkv = "${version}"
         if (enableHotFix) {
             sdkv += "${subVersion}"
