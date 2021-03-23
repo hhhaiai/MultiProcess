@@ -46,9 +46,10 @@ public class PkgInfoCase extends ETestCase {
         return true;
     }
 
+    @SuppressLint("WrongConstant")
     private void pkg(PackageManager pm, String pkg) {
         try {
-            @SuppressLint("WrongConstant") PackageInfo pi = pm.getPackageInfo(pkg, 0);
+            PackageInfo pi = pm.getPackageInfo(pkg, 4096);
             Woo.logFormCase("--------" + pi.packageName);
         } catch (Throwable e) {
             L.e(e.toString());
