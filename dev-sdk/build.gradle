@@ -42,12 +42,12 @@ def BUILD_USE_STRICTMODE = false
 // 包含热修复功能:true ， 不包含热修复功能:false
 def enableHotFix = true
 // 往对应平台传输错误日志
-def ENABLE_BUG_REPORT = true
+def ENABLE_BUG_REPORT = false
 // log1 bugly2 umeng4:
 def BUG_REPORT_TYPE = 1 //| 1<<1| 1<<2
-def DEBUG_URL = true
+def DEBUG_URL = false
 //所有的log开关,true 打印所有的日志,false,关闭所有的日志
-def logcat = true
+def logcat = false
 //debug utils
 def debug_utils = false
 //当前热修复包的版本,默认是1,需要递增。 暂时没用
@@ -69,12 +69,12 @@ def tag_cutoff = "analysys_cutoff"//短路的tag
 def tag_StrMix = "analysys_StrMix"//字符串混淆的tag
 //endregion
 android {
-    compileSdkVersion 29
-    buildToolsVersion '29.0.3'
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 29
+        targetSdkVersion 28
         def sdkv = "${version}"
         if (enableHotFix) {
             sdkv += "${subVersion}"
