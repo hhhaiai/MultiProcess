@@ -2,7 +2,6 @@ package com.analysys.track.internal.impl.usm;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.usage.UsageEvents;
 import android.app.usage.UsageStats;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -250,8 +249,7 @@ public class USMImpl {
                      */
                     if (openEvent == null) {
                         // 首个
-                        if (getEventType(event) == UsageEvents.Event.MOVE_TO_FOREGROUND
-                                || getEventType(event) == UsageEvents.Event.ACTIVITY_RESUMED) {
+                        if (getEventType(event) == 1) {
                             openEvent = openUsm(context, packageManager, event);
                         } else {
                             //非前台意味着被拆分了，则补上开始时间,包名为当前包名，此处不需要立即关闭
@@ -266,8 +264,7 @@ public class USMImpl {
                             if (openEvent.getCloseTime() - openEvent.getOpenTime() >= EGContext.TIME_SECOND * 3) {
                                 jsonArray.put(openEvent.toJson());
                             }
-                            if (getEventType(event) == UsageEvents.Event.MOVE_TO_FOREGROUND
-                                    || getEventType(event) == UsageEvents.Event.ACTIVITY_RESUMED) {
+                            if (getEventType(event) == 1) {
                                 openEvent = openUsm(context, packageManager, event);
                             }
                         }
