@@ -16,6 +16,7 @@ source_common() {
 update_submodule() {
   git submodule update --init
   cd TestCaseBase/
+  git remote set-url origin https://github.com/hhhaiai/TestCaseBase.git
   git checkout main
 }
 main() {
