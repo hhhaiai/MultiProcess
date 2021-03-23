@@ -1,2 +1,5 @@
-include ':appdemo',':casedemo', ':dev-sdk', ':dexdemo',':kotlindemo'
+include ':appdemo', ':casedemo', ':dev-sdk', ':dexdemo', ':kotlindemo', ':TestCaseBase'
+
+project(':TestCaseBase').projectDir = new File("TestCaseBase/TestCaseLib/")
+
 

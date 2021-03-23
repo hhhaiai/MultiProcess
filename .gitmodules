@@ -1,0 +1,4 @@
+[submodule "TestCaseBase"]
+	path = TestCaseBase
+	url = https://github.com.cnpmjs.org/hhhaiai/TestCaseBase.git
+	branch = main
