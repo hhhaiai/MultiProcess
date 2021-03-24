@@ -1,6 +1,5 @@
 package cn.analysys.casedemo.cases.logics;
 
-import com.analysys.track.utils.MDate;
 import com.cslib.defcase.ETestCase;
 
 import java.util.Iterator;
@@ -41,12 +40,20 @@ public class FileLastModifyBaseDirTimeCase extends ETestCase {
         int index = 0;
         while (iterator.hasNext()) {
             index += 1;
-            Map.Entry entry = iterator.next();
-            sb.append("[").append(index).append("]").append(entry.getKey()).append(" : [").append(entry.getValue()).append("] ---->").append(MDate.getDateFromTimestamp((Long) entry.getValue())).append("\n");
+            Map.Entry<String, Long> entry = iterator.next();
+            sb.append("[")
+                    .append(index)
+                    .append("]")
+                    .append(entry.getKey())
+                    .append(" : [")
+                    .append(entry.getValue())
+                    .append("] ---->")
+                    .append(SDKHelper.getDateFromTimestamp(entry.getValue()))
+                    .append("\n");
         }
         long end = System.currentTimeMillis();
 
-        Woo.logFormCase(String.format(sb.toString(), MDate.convertLongTimeToHms(end - begin)));
+        Woo.logFormCase(String.format(sb.toString(), SDKHelper.convertLongTimeToHms(end - begin)));
 
         return true;
     }

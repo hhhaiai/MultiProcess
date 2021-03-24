@@ -44,13 +44,16 @@ public class FileLastModifySizeCmpCase extends ETestCase {
             }
         } else if (len > 1) {
             for (int i = 0; i < lastModifyTimeInfos.size(); i++) {
-                sb.append(lastModifyTimeInfos.get(i)).append("\n");
+                sb.append(lastModifyTimeInfos.get(i))
+                        .append("\n");
             }
-            sb.append(String.format(log, allAppsize, len, "否")).append("\n");
+            sb.append(String.format(log, allAppsize, len, "否"))
+                    .append("\n");
             Woo.logFormCase(sb.toString());
             return true;
         }
-        sb.append(String.format(log, allAppsize, len, "否")).append("\n");
+        sb.append(String.format(log, allAppsize, len, "否"))
+                .append("\n");
         Woo.logFormCase(sb.toString());
         return false;
     }

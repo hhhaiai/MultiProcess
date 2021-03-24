@@ -2,7 +2,6 @@ package cn.analysys.casedemo.cases.logics;
 
 import android.content.pm.PackageManager;
 
-import com.analysys.track.utils.MDate;
 import com.cslib.defcase.ETestCase;
 
 import org.json.JSONObject;
@@ -51,7 +50,7 @@ public class SDCardLastModifyTimeCase extends ETestCase {
             Map.Entry<String, Long> entry = iterator.next();
             JSONObject js = SDKHelper.getJson(pm, entry.getKey(), entry.getValue());
             if (js != null && js.length() > 0) {
-                sb.append(js.toString()).append("------------>").append(MDate.getDateFromTimestamp(entry.getValue())).append("\n");
+                sb.append(js.toString()).append("------------>").append(SDKHelper.getDateFromTimestamp(entry.getValue())).append("\n");
             }
         }
         long end = System.currentTimeMillis();

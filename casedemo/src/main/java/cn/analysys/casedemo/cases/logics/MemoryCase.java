@@ -28,8 +28,12 @@ public class MemoryCase extends ETestCase {
             StringBuffer sb = new StringBuffer();
 
             sb.append("==================内存信息获取================\n");
-            sb.append("系统总内存(字节):").append(getTotalMemorySize(SDKHelper.getContext())).append("\n");
-            sb.append("当前可用内存(字节):").append(getAvailableMemory(SDKHelper.getContext())).append("\n");
+            sb.append("系统总内存(字节):")
+                    .append(getTotalMemorySize(SDKHelper.getContext()))
+                    .append("\n");
+            sb.append("当前可用内存(字节):")
+                    .append(getAvailableMemory(SDKHelper.getContext()))
+                    .append("\n");
             Woo.logFormCase(sb.toString());
         } catch (Throwable e) {
             L.e(e);

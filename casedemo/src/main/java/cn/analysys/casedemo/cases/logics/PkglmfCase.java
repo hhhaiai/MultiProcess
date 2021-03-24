@@ -1,6 +1,5 @@
 package cn.analysys.casedemo.cases.logics;
 
-import com.analysys.track.utils.MDate;
 import com.cslib.defcase.ETestCase;
 
 import cn.analysys.casedemo.utils.SDKHelper;
@@ -43,7 +42,12 @@ public class PkglmfCase extends ETestCase {
         long begin = System.currentTimeMillis();
         long time = SDKHelper.getLmfByPkg(pkg);
         long end = System.currentTimeMillis();
-        return String.format("包名的末次访问[%s] 耗时: %s,  time: %d ---->%s", pkg, MDate.convertLongTimeToHms(end - begin), time, MDate.getDateFromTimestamp(time));
+        return String.format("包名的末次访问[%s] 耗时: %s,  time: %d ---->%s"
+                , pkg
+                , SDKHelper.convertLongTimeToHms(end - begin)
+                , time
+                , SDKHelper.getDateFromTimestamp(time)
+        );
     }
 
 

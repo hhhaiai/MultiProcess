@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
-import com.analysys.track.utils.MDate;
 import com.cslib.defcase.ETestCase;
 import com.cslib.utils.L;
 

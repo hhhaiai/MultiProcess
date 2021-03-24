@@ -54,6 +54,10 @@ public class MDate {
         return Integer.valueOf(new SimpleDateFormat("dd").format(timestamp));
     }
 
+    public static final boolean isToday(long timestamp) {
+        return getDaysFromTimestamp(timestamp) == getDaysFromTimestamp(System.currentTimeMillis());
+    }
+
     public static final long getDuration(long timeA, long timeB) {
         return Math.abs(timeB - timeA);
     }

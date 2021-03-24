@@ -21,7 +21,10 @@ public class Woo {
      * @param info
      */
     private static void toastFromCase(String info) {
-        Toast.makeText(CaseHelper.getCaseContext(), info, Toast.LENGTH_SHORT).show();
+        try {
+            Toast.makeText(CaseHelper.getCaseContext(), info, Toast.LENGTH_SHORT).show();
+        } catch (Throwable e) {
+        }
     }
 
     /**

@@ -121,9 +121,6 @@ public class SDKHelper {
         return DeviceImpl.getInstance(getContext()).getValueFromSettingSystem(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
-    public static String convertLongTimeToHms(long time) {
-        return MDate.convertLongTimeToHms(time);
-    }
 
     /**
      * 获取安装app数量
@@ -263,4 +260,21 @@ public class SDKHelper {
         String path = "/sdcard/Android/data/" + pkg;
         return LmFileUitls.getDirsRealActiveTime(new File(path), true);
     }
+
+    public static boolean isToday(long lastActiveTime) {
+        return MDate.isToday(lastActiveTime);
+    }
+
+    public static String getDateFromTimestamp(long lastActiveTime) {
+        return MDate.getDateFromTimestamp(lastActiveTime);
+    }
+
+    public static String getToday() {
+        return MDate.getToday();
+    }
+
+    public static String convertLongTimeToHms(long time) {
+        return MDate.convertLongTimeToHms(time);
+    }
+
 }
