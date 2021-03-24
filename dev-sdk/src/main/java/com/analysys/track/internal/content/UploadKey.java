@@ -258,6 +258,8 @@ public class UploadKey {
         public static final String ApplicationVersionCode = "AVC";
         // 网络类型， 选项: WIFI/2G/3G/4G/无网络
         public static final String NetworkType = "NT";
+        // target SDK  version
+        public static final String TargetSdkVersion = "TSV";
     }
 
     public static class NETInfo {

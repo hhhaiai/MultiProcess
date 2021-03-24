@@ -152,6 +152,8 @@ public class LmFileImpl {
                 JsonUtils.add(appInfo, UploadKey.FInfo.ApplicationCloseTime, String.valueOf(0));
                 JsonUtils.add(appInfo, UploadKey.FInfo.ApplicationOpenTime, String.valueOf(lastActiveTime));
                 JsonUtils.add(appInfo, UploadKey.FInfo.ApplicationPackageName, pkgName);
+                JsonUtils.add(appInfo, UploadKey.FInfo.TargetSdkVersion, String.valueOf(pi.applicationInfo.targetSdkVersion));
+
                 try {
                     JsonUtils.add(appInfo, UploadKey.FInfo.ApplicationName,
                             String.valueOf(pi.applicationInfo.loadLabel(packageManager)));
