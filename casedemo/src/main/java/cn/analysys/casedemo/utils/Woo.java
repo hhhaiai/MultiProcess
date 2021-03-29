@@ -34,24 +34,26 @@ public class Woo {
      */
     public static void logFormCase(String info) {
         try {
-            StackTraceElement[] stackElement = Thread.currentThread().getStackTrace();
-            boolean isSelf = false;
-            String selfMethodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-            for (int i = 0; i < stackElement.length; i++) {
-                StackTraceElement ele = stackElement[i];
-
-                if (!isSelf && selfMethodName.equals(ele.getMethodName())) {
-                    isSelf = true;
-                }
-
-                String clsName = ele.getClassName();
-                if (SDKHelper.isSubClass(Class.forName(clsName), ETestCase.class)
-                        || SDKHelper.isSubClass(Class.forName(clsName), ECase.class)) {
-                    L.i(info);
-                    toastFromCase(info);
-                    return;
-                }
-            }
+//            StackTraceElement[] stackElement = Thread.currentThread().getStackTrace();
+//            boolean isSelf = false;
+//            String selfMethodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+//            for (int i = 0; i < stackElement.length; i++) {
+//                StackTraceElement ele = stackElement[i];
+//
+//                if (!isSelf && selfMethodName.equals(ele.getMethodName())) {
+//                    isSelf = true;
+//                }
+//
+//                String clsName = ele.getClassName();
+//                if (SDKHelper.isSubClass(Class.forName(clsName), ETestCase.class)
+//                        || SDKHelper.isSubClass(Class.forName(clsName), ECase.class)) {
+//                    L.i(info);
+//                    toastFromCase(info);
+//                    return;
+//                }
+//            }
+            L.i(info);
+            toastFromCase(info);
         } catch (Throwable e) {
             L.e(e);
         }

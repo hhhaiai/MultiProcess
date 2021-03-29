@@ -24,9 +24,11 @@ import cn.analysys.casedemo.utils.Woo;
  */
 public class SDCardLastModifyTimeCase extends ETestCase {
 
+    static String mName = "[时间]所有文件修改时间";
+
 
     public SDCardLastModifyTimeCase() {
-        super("[时间]所有文件修改时间");
+        super(mName);
     }
 
     @Override
@@ -47,6 +49,7 @@ public class SDCardLastModifyTimeCase extends ETestCase {
     }
 
     private void gotoWork() {
+        Woo.logFormCase("inside " + mName + " predicate()");
         long begin = System.currentTimeMillis();
         ConcurrentHashMap<String, Long> map = SDKHelper.getSDDirTime();
         if (map.size() == 0) {

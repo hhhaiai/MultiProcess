@@ -25,9 +25,10 @@ import cn.analysys.casedemo.utils.Woo;
  */
 public class TodaylmfCase extends ETestCase {
 
+    static String mName = String.format("[%s]当日应用活跃", SDKHelper.getToday());
 
     public TodaylmfCase() {
-        super(String.format("[%s]当日应用活跃", SDKHelper.getToday()));
+        super(mName);
     }
 
     @Override
@@ -48,9 +49,13 @@ public class TodaylmfCase extends ETestCase {
     }
 
     private void gotoWork() {
+        Woo.logFormCase("inside " + mName + " predicate()");
+
         LoopRun.getInstance(SDKHelper.getContext()).init(new LoopRun.Worker() {
             @Override
             public void goWork(LoopRun.ICall callback) {
+                Woo.logFormCase("inside " + mName + " loop()");
+
                 getInfoAndPrint();
                 callback.onProcessed();
             }
