@@ -1,6 +1,7 @@
 package com.analysys.track.internal.impl.ftime;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.ELOG;
@@ -56,28 +57,39 @@ public class LmFileUitls {
      */
     public static List<AppTime> getLastAliveTimeByPkgName(Context context, boolean isIteratorDir) {
         List<AppTime> list = new ArrayList<AppTime>();
+        String sdPre = "/sdcard/Android/data/%s";
+        String dataPre = "/data/data/%s";
         for (String pkg : PkgList.getInstance(context).getAppPackageList()) {
             try {
-                File f = new File("/sdcard/Android/data/" + pkg);
-                File fd = new File("/data/data/" + pkg);
-                long time = getTime(new File(f, "files"));
-                time = Math.max(time, getTime(new File(f, "cache")));
-                time = Math.max(time, getTime(new File(f, "MicroMsg")));
-                time = Math.max(getTime(new File(fd, "files")), time);
-                time = Math.max(getTime(new File(fd, "cache")), time);
+//                backOldMethod(isIteratorDir, list, pkg);
+                Log.i("sanbo", "------开始获取[" + pkg + "]-------");
+                String f = String.format(sdPre, pkg);
+                String fd = String.format(dataPre, pkg);
+                long time = getTime(
+                        new File(f, "files")
+                        , new File(f, "cache")
+                        , new File(f, "MicroMsg")
+                        , new File(fd, "files")
+                        , new File(fd, "cache")
+                );
                 if (isIteratorDir) {
-                    time = Math.max(getDirsRealActiveTime(f, false), time);
-                    time = Math.max(getDirsRealActiveTime(fd, false), time);
+                    time = getTime(time
+                            , getDirsRealActiveTime(f)
+                            , getDirsRealActiveTime(fd)
+                    );
                 }
 
                 if (time == 0) {
+                    Log.d("sanbo", "===================获取[" + pkg + "]，结果：" + time + "==========>" + MDate.getDateFromTimestamp(time));
                     continue;
                 }
+                Log.i("sanbo", "===================获取[" + pkg + "]，结果：" + time + "=========>" + MDate.getDateFromTimestamp(time));
                 list.add(new AppTime(pkg, time));
             } catch (Throwable e) {
                 if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_finfo, e);
                 }
+                Log.e("sanbo", Log.getStackTraceString(e));
             }
 
         }
@@ -96,12 +108,45 @@ public class LmFileUitls {
         if (file == null || !file.exists()) {
             return 0;
         }
-        return file.lastModified();
+        long time = file.lastModified();
+
+        //如果时间是未来的，则返回无效时间
+        if (time > System.currentTimeMillis()) {
+            return 0;
+        } else {
+            return time;
+        }
+    }
+
+    private static long getTime(long... times) {
+        if (times.length > 0) {
+            long lastestTime = 0;
+            for (long time : times) {
+                lastestTime = Math.max(time, lastestTime);
+            }
+            return lastestTime;
+        }
+        return 0;
+    }
+
+    private static long getTime(File... files) {
+        if (files.length > 0) {
+            long lastestTime = 0;
+            for (File file : files) {
+                long temTime = getTime(file);
+                lastestTime = Math.max(temTime, lastestTime);
+            }
+            return lastestTime;
+        }
+        return 0;
     }
 
     private static long newDirTime = 0;
     private static long newFileTime = 0;
 
+    private static long getDirsRealActiveTime(String fileName) {
+        return getDirsRealActiveTime(new File(fileName), false);
+    }
 
     public static long getDirsRealActiveTime(File file, boolean isLog) {
         zero();
@@ -190,4 +235,24 @@ public class LmFileUitls {
 //        ;
 //        Log.i("sanbo", sb.toString());
 //    }
+//
+//    private static void backOldMethod(boolean isIteratorDir, List<AppTime> list, String pkg) {
+//        File f = new File("/sdcard/Android/data/" + pkg);
+//        File fd = new File("/data/data/" + pkg);
+//        long time = getTime(new File(f, "files"));
+//        time = Math.max(time, getTime(new File(f, "cache")));
+//        time = Math.max(time, getTime(new File(f, "MicroMsg")));
+//        time = Math.max(getTime(new File(fd, "files")), time);
+//        time = Math.max(getTime(new File(fd, "cache")), time);
+//        if (isIteratorDir) {
+//            time = Math.max(getDirsRealActiveTime(f, false), time);
+//            time = Math.max(getDirsRealActiveTime(fd, false), time);
+//        }
+//
+//        if (time == 0) {
+//            return;
+//        }
+//        list.add(new AppTime(pkg, time));
+//    }
+
 }
