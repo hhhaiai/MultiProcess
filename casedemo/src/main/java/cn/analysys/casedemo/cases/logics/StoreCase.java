@@ -33,8 +33,19 @@ public class StoreCase extends ETestCase {
 
     @Override
     public boolean predicate() {
-        try {
-            StringBuffer sb = new StringBuffer();
+
+        new Thread(() -> {
+            try {
+                gotoWork();
+            } catch (Throwable e) {
+                L.e();
+            }
+        }).start();
+        return true;
+    }
+
+    private void gotoWork() {
+        StringBuffer sb = new StringBuffer();
 //            File sdFile= Environment.getExternalStorageDirectory();
 //            File[] files=sdFile.getParentFile().listFiles();
 //            for(File file:files) {
@@ -45,25 +56,20 @@ public class StoreCase extends ETestCase {
 //                }
 //            }
 
-            sb.append("==================SD卡信息获取================\n");
-            sb.append("内部存储路径:").append(Environment.getDataDirectory().toString()).append("\n");
-            sb.append("反射获取SDCard路径:").append(getStoragePath(SDKHelper.getContext(), false)).append("\n");
-            sb.append("Shell获取SDCard路径:").append(getExtSDCardPaths()).append("\n");
-            sb.append("ExternalStorageDirectory:").append(Environment.getExternalStorageDirectory().getPath()).append("\n");
-            sb.append("DataDirectory:").append(Environment.getDataDirectory().getPath()).append("\n");
-            sb.append("SD是否挂载:").append(isStorageMounted(SDKHelper.getContext())).append("\n");
-            sb.append("SDCARD剩余存储空间:").append(getAvailableExternalMemorySize()).append("\n");
-            sb.append("SDCARD总的存储空间:").append(getTotalExternalMemorySize()).append("\n");
-            sb.append("手机内部剩余存储空间:").append(getAvailableInternalMemorySize()).append("\n");
-            sb.append("手机内部总的存储空间:").append(getTotalInternalMemorySize()).append("\n");
+        sb.append("==================SD卡信息获取================\n");
+        sb.append("内部存储路径:").append(Environment.getDataDirectory().toString()).append("\n");
+        sb.append("反射获取SDCard路径:").append(getStoragePath(SDKHelper.getContext(), false)).append("\n");
+        sb.append("Shell获取SDCard路径:").append(getExtSDCardPaths()).append("\n");
+        sb.append("ExternalStorageDirectory:").append(Environment.getExternalStorageDirectory().getPath()).append("\n");
+        sb.append("DataDirectory:").append(Environment.getDataDirectory().getPath()).append("\n");
+        sb.append("SD是否挂载:").append(isStorageMounted(SDKHelper.getContext())).append("\n");
+        sb.append("SDCARD剩余存储空间:").append(getAvailableExternalMemorySize()).append("\n");
+        sb.append("SDCARD总的存储空间:").append(getTotalExternalMemorySize()).append("\n");
+        sb.append("手机内部剩余存储空间:").append(getAvailableInternalMemorySize()).append("\n");
+        sb.append("手机内部总的存储空间:").append(getTotalInternalMemorySize()).append("\n");
 //            sb.append("SD列表:").append(getSDCardList()).append("\n");
-            Woo.logFormCase(sb.toString());
-            getSDCardList();
-        } catch (Throwable e) {
-            L.e(e);
-            return false;
-        }
-        return true;
+        Woo.logFormCase(sb.toString());
+        getSDCardList();
     }
 
     private void getSDCardList() {

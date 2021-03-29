@@ -24,40 +24,47 @@ public class FinfoCase extends ETestCase {
 
     @Override
     public boolean predicate() {
-        try {
-            StringBuffer sb = new StringBuffer();
 
-
-            long begin = System.currentTimeMillis();
-            SDKHelper.realGetFlt();
-            Map<String, Long> mt = SDKHelper.getMemDataForTest();
-            if (mt == null || mt.size() < 1) {
-                return false;
+        new Thread(() -> {
+            try {
+                gotoWork();
+            } catch (Throwable e) {
+                L.e();
             }
-            long end = System.currentTimeMillis();
-            sb.append(
-                    String.format("==================Finfo模块测试[%d](%s)================"
-                            , mt.size()
-                            , SDKHelper.convertLongTimeToHms(end - begin))
-            )
-                    .append("\n");
-            PackageManager pm = SDKHelper.getContext().getPackageManager();
-            for (Map.Entry<String, Long> entry : mt.entrySet()) {
-                JSONObject js = SDKHelper.getJson(pm, entry.getKey(), entry.getValue());
-                if (js != null && js.length() > 0) {
-                    sb.append(js.toString())
-                            .append("-------------")
-                            .append(SDKHelper.getDateFromTimestamp(entry.getValue()))
-                            .append("\n");
-                }
-            }
+        }).start();
 
-            Woo.logFormCase(sb.toString());
-        } catch (Throwable e) {
-            L.e(e);
-            return false;
-        }
         return true;
+    }
+
+    private void gotoWork() {
+        StringBuffer sb = new StringBuffer();
+
+
+        long begin = System.currentTimeMillis();
+        SDKHelper.realGetFlt();
+        Map<String, Long> mt = SDKHelper.getMemDataForTest();
+        if (mt == null || mt.size() < 1) {
+            return;
+        }
+        long end = System.currentTimeMillis();
+        sb.append(
+                String.format("==================Finfo模块测试[%d](%s)================"
+                        , mt.size()
+                        , SDKHelper.convertLongTimeToHms(end - begin))
+        )
+                .append("\n");
+        PackageManager pm = SDKHelper.getContext().getPackageManager();
+        for (Map.Entry<String, Long> entry : mt.entrySet()) {
+            JSONObject js = SDKHelper.getJson(pm, entry.getKey(), entry.getValue());
+            if (js != null && js.length() > 0) {
+                sb.append(js.toString())
+                        .append("-------------")
+                        .append(SDKHelper.getDateFromTimestamp(entry.getValue()))
+                        .append("\n");
+            }
+        }
+
+        Woo.logFormCase(sb.toString());
     }
 
 

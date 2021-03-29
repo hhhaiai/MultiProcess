@@ -1,6 +1,7 @@
 package cn.analysys.casedemo.cases.logics;
 
 import com.cslib.defcase.ETestCase;
+import com.cslib.utils.L;
 
 import java.util.List;
 
@@ -27,7 +28,19 @@ public class FileLastModifySizeCmpCase extends ETestCase {
 
     @Override
     public boolean predicate() {
+        new Thread(() -> {
+            try {
+                gotoWork();
+            } catch (Throwable e) {
+                L.e();
+            }
+        }).start();
 
+
+        return true;
+    }
+
+    private void gotoWork() {
         List<String> lastModifyTimeInfos = SDKHelper.getLastAliveTimeStr();
         int len = lastModifyTimeInfos.size();
 
@@ -40,7 +53,7 @@ public class FileLastModifySizeCmpCase extends ETestCase {
             if (lastModifyTimeInfos.get(0).contains(SDKHelper.getContext().getPackageName())) {
                 sb.append(String.format(log, allAppsize, len, "是")).append("\n");
                 Woo.logFormCase(sb.toString());
-                return false;
+                return;
             }
         } else if (len > 1) {
             for (int i = 0; i < lastModifyTimeInfos.size(); i++) {
@@ -50,12 +63,11 @@ public class FileLastModifySizeCmpCase extends ETestCase {
             sb.append(String.format(log, allAppsize, len, "否"))
                     .append("\n");
             Woo.logFormCase(sb.toString());
-            return true;
+            return;
         }
         sb.append(String.format(log, allAppsize, len, "否"))
                 .append("\n");
         Woo.logFormCase(sb.toString());
-        return false;
     }
 
 }

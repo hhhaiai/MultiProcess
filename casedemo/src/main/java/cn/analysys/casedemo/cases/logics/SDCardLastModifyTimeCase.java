@@ -3,6 +3,7 @@ package cn.analysys.casedemo.cases.logics;
 import android.content.pm.PackageManager;
 
 import com.cslib.defcase.ETestCase;
+import com.cslib.utils.L;
 
 import org.json.JSONObject;
 
@@ -34,10 +35,22 @@ public class SDCardLastModifyTimeCase extends ETestCase {
 
     @Override
     public boolean predicate() {
+        new Thread(() -> {
+            try {
+                gotoWork();
+            } catch (Throwable e) {
+                L.e();
+            }
+        }).start();
+
+        return true;
+    }
+
+    private void gotoWork() {
         long begin = System.currentTimeMillis();
         ConcurrentHashMap<String, Long> map = SDKHelper.getSDDirTime();
         if (map.size() == 0) {
-            return false;
+            return;
         }
         Iterator<Map.Entry<String, Long>> iterator = map.entrySet().iterator();
         StringBuffer sb = new StringBuffer();
@@ -55,8 +68,6 @@ public class SDCardLastModifyTimeCase extends ETestCase {
         }
         long end = System.currentTimeMillis();
         Woo.logFormCase(String.format(sb.toString(), SDKHelper.convertLongTimeToHms(end - begin), map.toString().getBytes().length));
-
-        return true;
     }
 
 

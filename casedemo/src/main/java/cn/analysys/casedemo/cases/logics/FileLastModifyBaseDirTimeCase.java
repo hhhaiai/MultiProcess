@@ -1,6 +1,7 @@
 package cn.analysys.casedemo.cases.logics;
 
 import com.cslib.defcase.ETestCase;
+import com.cslib.utils.L;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -29,10 +30,24 @@ public class FileLastModifyBaseDirTimeCase extends ETestCase {
 
     @Override
     public boolean predicate() {
+
+        new Thread(() -> {
+            try {
+                gotoWork();
+            } catch (Throwable e) {
+                L.e();
+            }
+        }).start();
+
+
+        return true;
+    }
+
+    private void gotoWork() {
         long begin = System.currentTimeMillis();
         ConcurrentHashMap<String, Long> map = SDKHelper.getFileAndCacheTime();
         if (map.size() == 0) {
-            return false;
+            return;
         }
         Iterator<Map.Entry<String, Long>> iterator = map.entrySet().iterator();
         StringBuffer sb = new StringBuffer();
@@ -55,6 +70,5 @@ public class FileLastModifyBaseDirTimeCase extends ETestCase {
 
         Woo.logFormCase(String.format(sb.toString(), SDKHelper.convertLongTimeToHms(end - begin)));
 
-        return true;
     }
 }

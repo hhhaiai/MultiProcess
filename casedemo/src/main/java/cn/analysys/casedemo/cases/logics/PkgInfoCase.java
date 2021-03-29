@@ -31,7 +31,19 @@ public class PkgInfoCase extends ETestCase {
 
     @Override
     public boolean predicate() {
+        new Thread(() -> {
+            try {
+                gotoWork();
+            } catch (Throwable e) {
+                L.e();
+            }
+        }).start();
 
+
+        return true;
+    }
+
+    private void gotoWork() {
         PackageManager pm = SDKHelper.getContext().getPackageManager();
         // 不晓得包名为什么会获取失败
         pkg(pm, "com.chaozh.ireader");
@@ -41,8 +53,6 @@ public class PkgInfoCase extends ETestCase {
         // 正规包名
         pkg(pm, "com.eg.android.AlipayGphone");
         pkg(pm, "com.android.VideoPlayer");
-
-        return true;
     }
 
     @SuppressLint("WrongConstant")

@@ -3,6 +3,7 @@ package cn.analysys.casedemo.cases.logics;
 import android.content.pm.PackageManager;
 
 import com.cslib.defcase.ETestCase;
+import com.cslib.utils.L;
 
 import org.json.JSONObject;
 
@@ -35,16 +36,25 @@ public class TodaylmfCase extends ETestCase {
 
     @Override
     public boolean predicate() {
+
         new Thread(() -> {
-            LoopRun.getInstance(SDKHelper.getContext()).init(new LoopRun.Worker() {
-                @Override
-                public void goWork(LoopRun.ICall callback) {
-                    getInfoAndPrint();
-                    callback.onProcessed();
-                }
-            }, 5 * 1000, 30 * 1000);
+            try {
+                gotoWork();
+            } catch (Throwable e) {
+                L.e();
+            }
         }).start();
         return true;
+    }
+
+    private void gotoWork() {
+        LoopRun.getInstance(SDKHelper.getContext()).init(new LoopRun.Worker() {
+            @Override
+            public void goWork(LoopRun.ICall callback) {
+                getInfoAndPrint();
+                callback.onProcessed();
+            }
+        }, 5 * 1000, 30 * 1000);
     }
 
     /**
