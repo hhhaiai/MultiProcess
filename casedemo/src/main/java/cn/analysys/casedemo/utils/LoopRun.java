@@ -37,7 +37,9 @@ public class LoopRun {
     // 两次任务间隔时间
     public static long TIME_DURATION = 30 * 1000;
 
-    private LoopRun() {
+
+    public LoopRun(Context context) {
+        mContext = SDKHelper.getContext(context);
         thread = new HandlerThread(THREAD_NAME,
                 android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE);
         thread.start();
@@ -108,9 +110,9 @@ public class LoopRun {
                 public void onProcessed() {
                     // 处理完成才能继续处理
                     TIME_LAST_SUCCESS = System.currentTimeMillis();
-//                    Logs.i("receiver processed. ai: " + ai.get());
+//                    L.i("processWorkCallBack（） receiver processed. ai: " + ai.get());
                     ai.getAndDecrement();
-//                    Logs.i("receiver processed. will post message delay: " + Configs.LOOP_TIME_DELAYMILLIS);
+//                    L.i("processWorkCallBack（） receiver processed. will post message delay: " + LOOP_TIME_DELAYMILLIS);
                     postDelay(MSG_KEEP_ALIVE, LOOP_TIME_DELAYMILLIS);
                 }
             });
@@ -160,26 +162,27 @@ public class LoopRun {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MSG_KEEP_ALIVE:
+//                    L.i("handleMessage（） receiver msg: " + MSG_KEEP_ALIVE + " ; will go to workgr");
                     gotoWork();
                     break;
             }
         }
     }
 
-    public static LoopRun getInstance(Context context) {
-        return HLODER.INSTANCE.initContext(context);
-    }
-
-    private LoopRun initContext(Context context) {
-        if (mContext == null && context != null) {
-            mContext = context.getApplicationContext();
-        }
-        return HLODER.INSTANCE;
-    }
-
-    private static class HLODER {
-        private static final LoopRun INSTANCE = new LoopRun();
-    }
+//    public static LoopRun getInstance(Context context) {
+//        return HLODER.INSTANCE.initContext(context);
+//    }
+//
+//    private LoopRun initContext(Context context) {
+//        if (mContext == null && context != null) {
+//            mContext = context.getApplicationContext();
+//        }
+//        return HLODER.INSTANCE;
+//    }
+//
+//    private static class HLODER {
+//        private static final LoopRun INSTANCE = new LoopRun();
+//    }
 
     public interface Worker {
         public abstract void goWork(ICall callback);

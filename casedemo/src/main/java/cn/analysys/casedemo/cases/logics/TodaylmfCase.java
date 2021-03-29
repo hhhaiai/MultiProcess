@@ -49,14 +49,15 @@ public class TodaylmfCase extends ETestCase {
     }
 
     private void gotoWork() {
-        Woo.logFormCase("inside " + mName + " predicate()");
+//        Woo.logFormCase("inside " + mName + " predicate()");
 
-        LoopRun.getInstance(SDKHelper.getContext()).init(new LoopRun.Worker() {
+        new LoopRun(SDKHelper.getContext()).init(new LoopRun.Worker() {
             @Override
             public void goWork(LoopRun.ICall callback) {
                 Woo.logFormCase("inside " + mName + " loop()");
 
                 getInfoAndPrint();
+//                L.i("测试完成，即将进入下次测试....");
                 callback.onProcessed();
             }
         }, 5 * 1000, 30 * 1000);
@@ -70,6 +71,8 @@ public class TodaylmfCase extends ETestCase {
 
         long begin = System.currentTimeMillis();
         ConcurrentHashMap<String, Long> map = SDKHelper.getSDDirTime();
+//        Woo.logFormCase("inside getInfoAndPrint map.size: " + map.size());
+
         if (map.size() == 0) {
             return;
         }
@@ -82,10 +85,12 @@ public class TodaylmfCase extends ETestCase {
         while (iterator.hasNext()) {
             index += 1;
             Map.Entry<String, Long> entry = iterator.next();
+            Woo.logFormCase("inside getInfoAndPrint entry: " + entry.toString());
+
             String pkg = entry.getKey();
             long lastT = entry.getValue();
             boolean isToday = SDKHelper.isToday(lastT);
-//            L.v("[" + pkg + "] " + lastT + "----->" + isToday);
+            L.v("[" + pkg + "] " + lastT + "----->" + isToday);
 
             if (isToday) {
                 JSONObject js = SDKHelper.getJson(pm, pkg, lastT);
