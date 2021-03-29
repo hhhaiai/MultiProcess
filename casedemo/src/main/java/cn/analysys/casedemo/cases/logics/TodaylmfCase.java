@@ -54,7 +54,7 @@ public class TodaylmfCase extends ETestCase {
         new LoopRun(SDKHelper.getContext(),"_todyLmf").init(new LoopRun.Worker() {
             @Override
             public void goWork(LoopRun.ICall callback) {
-                Woo.logFormCase("inside " + mName + " loop()");
+//                Woo.logFormCase("inside " + mName + " loop()");
 
                 getInfoAndPrint();
 //                L.i("测试完成，即将进入下次测试....");
@@ -85,12 +85,11 @@ public class TodaylmfCase extends ETestCase {
         while (iterator.hasNext()) {
             index += 1;
             Map.Entry<String, Long> entry = iterator.next();
-            Woo.logFormCase("inside getInfoAndPrint entry: " + entry.toString());
-
+//            Woo.logFormCase("inside getInfoAndPrint entry: " + entry.toString());
             String pkg = entry.getKey();
             long lastT = entry.getValue();
             boolean isToday = SDKHelper.isToday(lastT);
-            L.v("[" + pkg + "] " + lastT + "----->" + isToday);
+//            L.v("[" + pkg + "] " + lastT + "----->" + isToday);
 
             if (isToday) {
                 JSONObject js = SDKHelper.getJson(pm, pkg, lastT);
