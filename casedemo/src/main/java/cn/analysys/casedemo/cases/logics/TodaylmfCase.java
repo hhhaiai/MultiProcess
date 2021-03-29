@@ -51,7 +51,7 @@ public class TodaylmfCase extends ETestCase {
     private void gotoWork() {
 //        Woo.logFormCase("inside " + mName + " predicate()");
 
-        new LoopRun(SDKHelper.getContext()).init(new LoopRun.Worker() {
+        new LoopRun(SDKHelper.getContext(),"_todyLmf").init(new LoopRun.Worker() {
             @Override
             public void goWork(LoopRun.ICall callback) {
                 Woo.logFormCase("inside " + mName + " loop()");

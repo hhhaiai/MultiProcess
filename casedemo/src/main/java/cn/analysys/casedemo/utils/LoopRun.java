@@ -39,8 +39,12 @@ public class LoopRun {
 
 
     public LoopRun(Context context) {
+        this(context, THREAD_NAME);
+    }
+
+    public LoopRun(Context context, String threadName) {
         mContext = SDKHelper.getContext(context);
-        thread = new HandlerThread(THREAD_NAME,
+        thread = new HandlerThread(threadName,
                 android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE);
         thread.start();
         mHandler = new FHandler(thread.getLooper());
