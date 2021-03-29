@@ -1,7 +1,6 @@
 package com.analysys.track.internal.impl.ftime;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.utils.ELOG;
@@ -24,6 +23,7 @@ import java.util.List;
  */
 public class LmFileUitls {
 
+    private static int ITERATOR_LAYER_COUNT = 5;
 
     public static class AppTime {
         private String sPackageName;
@@ -62,7 +62,7 @@ public class LmFileUitls {
         for (String pkg : PkgList.getInstance(context).getAppPackageList()) {
             try {
 //                backOldMethod(isIteratorDir, list, pkg);
-                Log.i("sanbo", "------开始获取[" + pkg + "]-------");
+//                Log.i("sanbo", "------开始获取[" + pkg + "]-------");
                 String f = String.format(sdPre, pkg);
                 String fd = String.format(dataPre, pkg);
                 long time = getTime(
@@ -80,16 +80,16 @@ public class LmFileUitls {
                 }
 
                 if (time == 0) {
-                    Log.d("sanbo", "===================获取[" + pkg + "]，结果：" + time + "==========>" + MDate.getDateFromTimestamp(time));
+//                    Log.d("sanbo", "===================获取[" + pkg + "]，结果：" + time + "==========>" + MDate.getDateFromTimestamp(time));
                     continue;
                 }
-                Log.i("sanbo", "===================获取[" + pkg + "]，结果：" + time + "=========>" + MDate.getDateFromTimestamp(time));
+//                Log.i("sanbo", "===================获取[" + pkg + "]，结果：" + time + "=========>" + MDate.getDateFromTimestamp(time));
                 list.add(new AppTime(pkg, time));
             } catch (Throwable e) {
                 if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_finfo, e);
                 }
-                Log.e("sanbo", Log.getStackTraceString(e));
+//                Log.e("sanbo", Log.getStackTraceString(e));
             }
 
         }
@@ -150,7 +150,7 @@ public class LmFileUitls {
 
     public static long getDirsRealActiveTime(File file, boolean isLog) {
         zero();
-        iteratorFiles(file, isLog);
+        iteratorFiles(file, isLog, ITERATOR_LAYER_COUNT);
         long result = Math.max(newDirTime, newFileTime);
         zero();
         return result;
@@ -167,18 +167,23 @@ public class LmFileUitls {
      *
      * @param file
      * @param isLog
+     * @param layerCount
      * @return
      */
-    private static void iteratorFiles(File file, boolean isLog) {
+    private static void iteratorFiles(File file, boolean isLog, int layerCount) {
         File[] fs = file.listFiles();
         if (fs != null) {
+            int count = 0;
             for (File f : fs) {
                 try {
                     long t = getTime(f);
 
                     if (f.isDirectory()) {
-                        setTime(t, true);
-                        iteratorFiles(f, isLog);
+                        if (count <= layerCount) {
+                            count += 1;
+                            setTime(t, true);
+                            iteratorFiles(f, isLog, layerCount);
+                        }
                     } else {
                         setTime(t, false);
                     }
