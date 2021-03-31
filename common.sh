@@ -32,7 +32,7 @@ checkEnvArgs() {
     endColor='\e[0m'
     ecs="echo -e"
     dx="dx.bat"
-    gw="./gradlew.bat"
+    gw="./gradlew"
     support_printf_os=""
     mdout="${ipwd}\\tools\\windows\\mdout.exe"
     sed="${ipwd}\\tools\\windows\\sed.exe"
