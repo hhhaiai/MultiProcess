@@ -55,14 +55,11 @@ build_check() {
 }
 remove_temp_file() {
   rm -rf doc/*.html
-}
-mode_up() {
-  chmod -R 777 *
-  git config core.filemode false
+  rm -rf doc/*.pdf
+  rm -rf doc/*.tmp
 }
 
 main() {
-  mode_up
   source_common
   clean
   mdout_build

@@ -9,7 +9,7 @@ source_common() {
     cd $(dirname $0)
     pwd
   )
-  source $pwd/common.sh md
+  source $pwd/common.sh
   #    bash $pwd/common.sh mdout
 }
 
