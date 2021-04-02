@@ -45,16 +45,19 @@ public class PkgList {
                 BugReportForTest.commitError(BuildConfig.tag_filetime, e);
             }
         }
-        if (apps.size() < 5) {
-            try {
+
+
+        try {
+            if (apps.size() < 5) {
                 // 基于弹框考虑,尽量少使用该api接口
                 getByApi();
-            } catch (Throwable e) {
-                if (BuildConfig.ENABLE_BUG_REPORT) {
-                    BugReportForTest.commitError(BuildConfig.tag_filetime, e);
-                }
+            }
+        } catch (Throwable e) {
+            if (BuildConfig.ENABLE_BUG_REPORT) {
+                BugReportForTest.commitError(BuildConfig.tag_filetime, e);
             }
         }
+
 
         addToMemory(mContext.getPackageName());
         return apps;
