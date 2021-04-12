@@ -10,7 +10,7 @@ source_common() {
 
 clean_task() {
   logw "[$filename]>>>>clean project<<<<"
-  dir=("appdemo" "casedemo" "dexdemo" "kotlindemo" "dev-sdk" "buildSrc")
+  dir=("appdemo" "casedemo" "dexdemo" "kotlindemo" "dev-sdk" "buildSrc" "TestCaseBase/app" "TestCaseBase/TestCaseLib")
   for element in "${dir[@]}"; do
     #clean task
     rm -rf $element/build/
@@ -22,15 +22,18 @@ clean_task() {
     logd "[$filename]clean $element over."
   done
 
-  rm -rf build/
-  rm -rf release/
-  rm -rf releasebak/
-  rm -rf sh.exe.stackdump
-  rm -rf classes.dex
-  rm -rf .vs/
-  rm -rf .vscode/
-  rm -rf .DS_Store
-  rm -rf __MACOSX
+  base_dir=("." "TestCaseBase")
+  for element in "${base_dir[@]}"; do
+    rm -rf $element/build/
+    rm -rf $element/release/
+    rm -rf $element/releasebak/
+    rm -rf $element/sh.exe.stackdump
+    rm -rf $element/classes.dex
+    rm -rf $element/.vs/
+    rm -rf $element/.vscode/
+    rm -rf $element/.DS_Store
+    rm -rf $element/__MACOSX
+  done
 
   if [ $# == 0 ]; then
     logi "[$filename]clean project success. "

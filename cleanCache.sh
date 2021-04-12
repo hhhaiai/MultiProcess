@@ -11,7 +11,7 @@ source_common() {
 clean_caches() {
 
   logw "[$filename]clean android studio cache!"
-  dir=("appdemo" "casedemo" "dexdemo" "kotlindemo" "dev-sdk" "buildSrc")
+  dir=("appdemo" "casedemo" "dexdemo" "kotlindemo" "dev-sdk" "buildSrc" "TestCaseBase/app" "TestCaseBase/TestCaseLib")
 
   for element in "${dir[@]}"; do
     #clean task
@@ -27,19 +27,22 @@ clean_caches() {
     logd "[$filename]clean $element over."
   done
 
-  rm -rf build/
-  rm -rf release/
-  rm -rf releasebak/
-  rm -rf *.iml
-  rm -rf .gradle/
-  rm -rf .idea/
-  rm -rf sh.exe.stackdump
-  rm -rf classes.dex
-  rm -rf local.properties
-  rm -rf .vs/
-  rm -rf .vscode/
-  rm -rf .DS_Store
-  rm -rf __MACOSX
+  base_dir=("." "TestCaseBase")
+  for element in "${base_dir[@]}"; do
+    rm -rf $element/build/
+    rm -rf $element/release/
+    rm -rf $element/releasebak/
+    rm -rf $element/*.iml
+    rm -rf $element/.gradle/
+    rm -rf $element/.idea/
+    rm -rf $element/sh.exe.stackdump
+    rm -rf $element/classes.dex
+    rm -rf $element/local.properties
+    rm -rf $element/.vs/
+    rm -rf $element/.vscode/
+    rm -rf $element/.DS_Store
+    rm -rf $element/__MACOSX
+  done
 
   if [ $# == 0 ]; then
     logw "[$filename]clean project success."
