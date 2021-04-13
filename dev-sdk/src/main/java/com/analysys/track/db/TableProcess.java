@@ -1141,7 +1141,7 @@ public class TableProcess {
                 // 存储
                 cv.put(DBConfig.FInfo.Column.PKG, info);
                 cv.put(DBConfig.FInfo.Column.LAST_TIME, e.getValue());
-                cv.put(DBConfig.FInfo.Column.TYPE, DBConfig.FInfo.DefType.TYPE_active);
+                cv.put(DBConfig.FInfo.Column.TYPE, DBConfig.FInfo.DefType.TYPE_ACTIVE);
                 insertLmf(cv, true);
             }
         }
@@ -1164,7 +1164,7 @@ public class TableProcess {
             if (!TextUtils.isEmpty(info)) {
                 // 存储
                 cv.put(DBConfig.FInfo.Column.UPDATE_JSON, info);
-                cv.put(DBConfig.FInfo.Column.TYPE, DBConfig.FInfo.DefType.TYPE_prepare_upload);
+                cv.put(DBConfig.FInfo.Column.TYPE, DBConfig.FInfo.DefType.TYPE_PREPARE_UPLOAD);
             }
             insertLmf(cv, false);
         }
@@ -1218,7 +1218,7 @@ public class TableProcess {
                             db.execSQL(String.format(updateTime
                                     , DBConfig.FInfo.TABLE_NAME
                                     , DBConfig.FInfo.Column.LAST_TIME, cv.getAsLong(DBConfig.FInfo.Column.LAST_TIME)
-                                    , DBConfig.FInfo.Column.TYPE, DBConfig.FInfo.DefType.TYPE_active
+                                    , DBConfig.FInfo.Column.TYPE, DBConfig.FInfo.DefType.TYPE_ACTIVE
                                     , DBConfig.FInfo.Column.PKG, text
                             ));
                             //TODO 该方式更新有异常，会多一条数据
@@ -1257,7 +1257,7 @@ public class TableProcess {
                 return pkgAndActivieTime;
             }
             cursor = db.query(DBConfig.FInfo.TABLE_NAME, null,
-                    DBConfig.FInfo.Column.TYPE + " = " + DBConfig.FInfo.DefType.TYPE_active,
+                    DBConfig.FInfo.Column.TYPE + " = " + DBConfig.FInfo.DefType.TYPE_ACTIVE,
                     null,
                     null, null, null);
             if (cursor == null) {
@@ -1301,7 +1301,7 @@ public class TableProcess {
             }
 
             cursor = db.query(DBConfig.FInfo.TABLE_NAME, null,
-                    DBConfig.FInfo.Column.TYPE + " = " + DBConfig.FInfo.DefType.TYPE_prepare_upload,
+                    DBConfig.FInfo.Column.TYPE + " = " + DBConfig.FInfo.DefType.TYPE_PREPARE_UPLOAD,
                     null,
                     null, null, null);
             if (cursor == null) {
@@ -1334,7 +1334,7 @@ public class TableProcess {
                 }
             }
             if (ids.size() > 0) {
-                updateFinfoStatus(db, ids, DBConfig.FInfo.DefType.TYPE_already_uploaded);
+                updateFinfoStatus(db, ids, DBConfig.FInfo.DefType.TYPE_ALREADY_UPLOADED);
             }
         } catch (Throwable e) {
             if (BuildConfig.logcat) {
@@ -1371,7 +1371,7 @@ public class TableProcess {
             if (isAllDel) {
                 db.delete(DBConfig.XXXInfo.TABLE_NAME, null, null);
             } else {
-                db.delete(DBConfig.FInfo.TABLE_NAME, DBConfig.FInfo.Column.TYPE + "=?", new String[]{String.valueOf(DBConfig.FInfo.DefType.TYPE_already_uploaded)});
+                db.delete(DBConfig.FInfo.TABLE_NAME, DBConfig.FInfo.Column.TYPE + "=?", new String[]{String.valueOf(DBConfig.FInfo.DefType.TYPE_ALREADY_UPLOADED)});
             }
 
         } catch (Throwable e) {

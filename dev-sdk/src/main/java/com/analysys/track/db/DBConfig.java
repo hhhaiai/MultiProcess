@@ -293,11 +293,11 @@ public class DBConfig {
          */
         public static class DefType {
             //临时加载数据
-            public static final int TYPE_active = 1;
+            public static final int TYPE_ACTIVE = 1;
             //待上传数据
-            public static final int TYPE_prepare_upload = 2;
+            public static final int TYPE_PREPARE_UPLOAD = 2;
             // 已经使用数据
-            public static final int TYPE_already_uploaded = 3;
+            public static final int TYPE_ALREADY_UPLOADED = 3;
         }
     }
 

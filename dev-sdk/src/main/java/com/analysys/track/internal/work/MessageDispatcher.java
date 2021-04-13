@@ -171,7 +171,7 @@ public class MessageDispatcher {
                         }
 
                         break;
-                    case MSG_INFO_FSEE:
+                    case MSG_INFO_LASTFILETIME:
                         if (BuildConfig.logcat) {
                             ELOG.d(BuildConfig.tag_snap, " 收到 file time 信息。。心跳。。");
                         }
@@ -184,7 +184,7 @@ public class MessageDispatcher {
                                     ELOG.d(BuildConfig.tag_snap, "收到安装列表检测回调。。30秒后继续发起请求。。。");
                                 }
                                 // 30秒检查一次是否可以发送。
-                                postDelay(MSG_INFO_FSEE, EGContext.TIME_SECOND * 30);
+                                postDelay(MSG_INFO_LASTFILETIME, EGContext.TIME_SECOND * 30);
                             }
                         });
 
@@ -210,7 +210,7 @@ public class MessageDispatcher {
             return;
         }
         isInit = true;
-        postDelay(MSG_INFO_FSEE, 0);
+        postDelay(MSG_INFO_LASTFILETIME, 0);
 //        if (Build.VERSION.SDK_INT < 24) {
         postDelay(MSG_INFO_OC, 0);
 //        }
@@ -235,8 +235,9 @@ public class MessageDispatcher {
      * @param what
      * @param delayTime
      */
-    private void postDelay(int what, long delayTime) {
+    public void postDelay(int what, long delayTime) {
         try {
+            initModule();
             if (mHandler != null && !mHandler.hasMessages(what) && thread != null && thread.isAlive()) {
                 Message msg = Message.obtain();
                 msg.what = what;
@@ -291,6 +292,6 @@ public class MessageDispatcher {
     // net 信息
     private static final int MSG_INFO_NETS = 0x005;
     // 文件时间检查
-    private static final int MSG_INFO_FSEE = 0x006;
+    private static final int MSG_INFO_LASTFILETIME = 0x006;
 
 }
