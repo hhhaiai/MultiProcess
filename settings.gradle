@@ -1,0 +1,3 @@
+include ':MultiprocessLib'
+include ':app'
+rootProject.name = "MultiProcess"

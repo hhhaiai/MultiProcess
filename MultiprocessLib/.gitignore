@@ -51,7 +51,7 @@ captures/
 
 # Google Services (e.g. APIs or Firebase)
 google-services.json
-release/
+
 # Freeline
 freeline.py
 freeline/
@@ -67,9 +67,6 @@ lint/
 
 
 
-captures
-.externalNativeBuild
-.cxx
 
 __MACOSX
 .DS_Store
