@@ -26,10 +26,10 @@ public class MultiThreadFinfoCase extends ETestCase {
     @Override
     public boolean predicate() {
 
-        for (int i = 0; i < 50; i++) {
-            SDKHelper.runOnWorkThread(() -> {
+        for (int i = 0; i < 10; i++) {
+            new Thread(() -> {
                 getInfoAndPrint();
-            });
+            }).start();
         }
 
         return true;
@@ -47,7 +47,7 @@ public class MultiThreadFinfoCase extends ETestCase {
         }
         Iterator<Map.Entry<String, Long>> iterator = map.entrySet().iterator();
         StringBuffer sb = new StringBuffer();
-        sb.append("===============[多线程测试当天数据] 所有数据获取时间:%s, 占用内存大小:%d [↓↓↓今天数据↓↓↓]==================").append("\n");
+        sb.append("===============[↓↓↓多线程测试当天数据↓↓↓] 所有数据获取时间:%s, 占用内存大小:%d [↓↓↓多线程测试当天数据↓↓↓]==================").append("\n");
         int index = 0;
         PackageManager pm = SDKHelper.getContext().getPackageManager();
 
