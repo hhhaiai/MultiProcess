@@ -1,22 +1,7 @@
 package cn.analysys.casedemo.cases.dbs;
 
-import android.content.Context;
-import android.os.Environment;
-import android.os.StatFs;
-import android.os.storage.StorageManager;
-
 import com.cslib.defcase.ETestCase;
 import com.cslib.utils.L;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Array;
-import java.lang.reflect.Method;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 import cn.analysys.casedemo.utils.SDKHelper;
 import cn.analysys.casedemo.utils.Woo;
