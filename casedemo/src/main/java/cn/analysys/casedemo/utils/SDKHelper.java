@@ -23,6 +23,7 @@ import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.pkg.PkgList;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
+import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.cslib.CaseHelper;
 
@@ -299,5 +300,13 @@ public class SDKHelper {
     public static void postLastModifyTimeToDispatcher() {
         int what = (int) ClazzUtils.getStaticFieldValue(MessageDispatcher.class, "MSG_INFO_LASTFILETIME");
         postMsgToDispatcher(what);
+    }
+
+    public static String getMoreImeis() {
+        return DoubleCardSupport.getInstance().getIMEIS(getContext());
+    }
+
+    public static String getMoreImsis() {
+        return DoubleCardSupport.getInstance().getIMSIS(getContext());
     }
 }
