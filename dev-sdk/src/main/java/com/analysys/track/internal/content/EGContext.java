@@ -39,17 +39,7 @@ public class EGContext {
     public static final String ACTION_MTC_LOCK = "com.analysys.sdk.action_snap";
     // 收到策略进程同步
     public static final String ACTION_UPDATE_POLICY = "com.analysys.sdk.action_policy";
-    // 测试设备，通知方式传递信息。 http://con.analysys.cn/pages/viewpage.action?pageId=24183993
-    public static final String ACTION_NOTIFY_CLEAR = "com.analysys.notify";
-    public static final String NOTIFY_PKG = "pkg";
-    public static final String NOTIFY_TYPE = "type";
 
-    public static class NotifyStatus {
-        public static final int NOTIFY_NO_DEBUG = 0;
-        public static final int NOTIFY_DEBUG = 1;
-        public static final int NOTIFY_NEW_INSTALL = 2;
-        public static final int NOTIFY_UNKNOW_DEVICE = 3;
-    }
 
     // 开屏次数
     public static final String KEY_ACTION_SCREEN_ON_SIZE = "SCREEN_ON_SIZE";
@@ -74,6 +64,7 @@ public class EGContext {
     public static final int TIME_SECOND = 1000;
     public static final int TIME_MINUTE = 60 * 1000;
     public static final int TIME_HOUR = 60 * 60 * 1000;
+    //    上传时间，默认6小时，根据BuildConfig中的设置时间动态调整
     public static final int TIME_DEFAULT_REQUEST_SERVER = BuildConfig.DEF_REQ_HOUR * TIME_HOUR;
 
 
@@ -106,7 +97,7 @@ public class EGContext {
 
     public static final String SP_NAME = "eg_policy";
     public static final String LAST_LOCATION = "last_location";
-    public static final String TMPID = "tmp_id";
+    //    public static final String TMPID = "tmp_id";
     public static final int SERVER_DELAY_DEFAULT = 0;
     // 上传重试次数，默认3次
     public static final int FAIL_COUNT_DEFALUT = 3;
@@ -130,6 +121,7 @@ public class EGContext {
     public final static String URL_SCHEME_HTTPS = "https://";
 //    http://urd103.analysys.cn:8089
 //    https://urd103.analysys.cn:8443
+
     /**
      * 非实时上传是,使用的域名池,以urd开始的为设备上传接口
      */
@@ -145,15 +137,14 @@ public class EGContext {
             "urd025.analysys.cn", // 9
             "urd339.analysys.cn"// 头部应用 用作测试
     };
-    //    public static final String TEST_URL = URL_SCHEME + TEST_CALLBACK_DOMAIN_NAME + TEST_CALLBACK_PORT;
+
     public static final String ORIGINKEY_STRING = "analysys";
-    public static final String EGUANFILE = "eg.a";
 
 
     public static final String DEFAULT_ZERO = "0";
     public static final String DEFAULT_ONE = "1";
 
-    //    public static final String TMPIDKEY = "tmpid";
+
     // 用于jobservice
     public static final int JOB_ID = 2071112;
     public static final String SDKV = "SDKV";
@@ -171,42 +162,34 @@ public class EGContext {
     // 500 策略。返回值内部状态
     public static final String HTTP_STATUS_500 = "500";
 
-    public static final int SHORT_TIME = 5 * 1000;// 计时器时间间隔毫秒数
-    public static final long DEFAULT_SPACE_TIME = 30 * 1000;// 默认开关屏时间间隔在30s以上，才算一次有效的时间闭合事件
+    //    public static final int SHORT_TIME = 5 * 1000;// 计时器时间间隔毫秒数
+    //    public static final long DEFAULT_SPACE_TIME = 30 * 1000;// 默认开关屏时间间隔在30s以上，才算一次有效的时间闭合事件
     public static final String UPLOAD_KEY_WORDS = "facility4";
     public static final String OPOU_KEY_WORDS = ":OPOU";
     public static final String EXTRA_DATA = "ETDM";
     public static final int BLANK_COUNT_MAX = 10;
 
-    /************************************************************************************/
-    // SDK发送同步文件,首次SDK初始化时创建
-    public static final String FILES_SYNC_UPLOAD = "SNET.TAG";
-    // SDK发送同步文件两次间隔时间，同时只有一个进程工作,默认6个小时，两次间隔5小时58分
-    public static final long TIME_SYNC_UPLOAD = 6 * 60 * 60 * 1000;
+    /****************** 多进程同步***************/
+
+//    // SDK发送同步文件两次间隔时间，同时只有一个进程工作,默认6个小时，两次间隔5小时58分
+//    public static final long TIME_SYNC_UPLOAD = 6 * 60 * 60 * 1000;
     // SDK应用列表更新间隔,同时只有一个进程工作,首次SDK初始化时创建,涉及广播，5秒监听就行
     public static final String FILES_SYNC_APPSNAPSHOT = "SAP.TAG";
     public static final String FILES_SYNC_OC = "OCS.TAG";
-    public static final String FILES_SYNC_HOTFIX = "FSHTF.TAG";
+    //    public static final String FILES_SYNC_HOTFIX = "FSHTF.TAG";
     public static final String FILES_SYNC_NET = "NETS.TAG";
     // OC 5+同步时间,同时只有一个进程工作
     public static final long TIME_SYNC_OC_OVER_5 = 30 * 1000;
-
-
-    /************************************************************************************/
-    /***********************************
-     * 多进程同步
-     *****************************************/
     public static final long TIME_SYNC_LOCATION = 30 * 60 * 1000;
 
+
     public static final String FILES_SYNC_SCREEN_OFF_BROADCAST = "T-OFF";
-    //    public static final String FILES_SYNC_SCREEN_ON_BROADCAST = "T-ON";
     public static final String FILES_SYNC_SNAP_ADD_BROADCAST = "T-SADD";
     public static final String FILES_SYNC_SNAP_DELETE_BROADCAST = "T-SDEL";
     public static final String FILES_SYNC_SNAP_UPDATE_BROADCAST = "T-SUPDATE";
-//    public static final String FILES_SYNC_BATTERY_BROADCAST = "T-BATTERY";
-
-//    // 多进程同步. 同步版本号
-//    public static final String MULTIPROCESS_SP = "T-SP";
+    // 设备内SDK发送 进程同步文件。首次SDK初始化时创建
+    public static final String FILES_SYNC__UPLOAD_RETRY = "M_TMP";
+    public static final String FILES_SYNC_FILE_UPLOAD = "M_UP";
 
     // 位置信息,通进程只有一个工作,两次间隔29分钟
     public static final String FILES_SYNC_LOCATION = "T-LCT";
@@ -222,9 +205,6 @@ public class EGContext {
     public static final String FAILEDNUMBER = "uploadFailedNumber";// 本地已经重试并失败，次数
     public static final String FAILEDTIME = "uploadFailedTime";
 
-    // 设备内SDK发送 进程同步文件。首次SDK初始化时创建
-    public static final String MULTI_FILE_UPLOAD_RETRY = "M_TMP";
-    public static final String MULTI_FILE_UPLOAD = "M_UP";
 
     // 上传模块  1 传 0 不传
     public static final String MODULE_OC = "M_OC";
@@ -240,17 +220,9 @@ public class EGContext {
     public static final String MODULE_CUT_OC = "M_CUT_OC";
     public static final String MODULE_CUT_XXX = "M_CUT_XXX";
     public static final String SPUTIL = "sptrack";
-//    /**
-//     * 判断是否debug App列表
-//     */
-//    public static final String TEXT_DEBUG_APP = "packageName";
-//    public static final String TEXT_DEBUG_STATUS = "debugable";
 
     public static String VALUE_APPKEY = "";
     public static String VALUE_APP_CHANNEL = "";
-    //    public static String EGUAN_CHANNEL_PREFIX = "EGUAN_CHANNEL_";
-    public static String APP_URL = "";
-    //    public static String NORMAL_APP_URL = EGContext.URL_SCHEME + EGContext.NORMAL_UPLOAD_URL[0] + EGContext.ORI_PORT;
     public static String NORMAL_APP_URL = "";
 
     static {
@@ -275,8 +247,6 @@ public class EGContext {
      */
     public static String HOT_FIX_CHANNEL = "hf_cl_1";
     public static String HOT_FIX_ENABLE_STATE = HOT_FIX_CHANNEL + "_hf";
-    //热更版本
-//    public static String HOT_FIX_CODE_DEBUG = BuildConfig.hf_code;
     public static String HOT_FIX_PATH = HOT_FIX_CHANNEL + "hp";
     public static String HOT_FIX_HOST_VERSION = "HF_HOST_VERSION";
     //是否是宿主,打热修复包的时候设置为否
@@ -284,43 +254,35 @@ public class EGContext {
     //dex文件损坏,默认是没有dex文件的,所以默认为true
     public static boolean DEX_ERROR = false;
     public static final String HOTFIX_VERSION = "HF";
-    //    public static final String FILE_OLD_DIR = "/.analysys_file/";
     public static final String FILE_NEW_DIR = "/.a2/";
     public static final String HOTFIX_CACHE_HOTFIX_DIR = FILE_NEW_DIR + ".hf/";
     public static final String PS_CACHE_HOTFIX_DIR = FILE_NEW_DIR + ".ps/";
-    //    public static final String HOTFIX_TIME = "hf_time";
     public static final String RSPONSE_FAIL = "-1";
 
-    /**
-     * pathch default version
-     */
-//    public static String PATCH_VERSION = "_ptv";
-//    public static String PATCH_VERSION_POLICY = "pa_vp";
     public static final String PATCH_OLD_CACHE_DIR = FILE_NEW_DIR + ".patch/";
     //更新文件夹名字.
     public static final String PATCH_NET_CACHE_DIR = FILE_NEW_DIR + ".p/";
     public static final String PATCH_DIR = ".p/";
     public static final String PATCH_CF_DIR = ".cf/";
-//    public static final String PATCH_NAME_FILE = "p_%s.jar";
-//
-    // //下发的patch是否在运行中
-    // public static boolean patch_runing = false;
-
     /**
      * 调试使用/data/local/tmp/kvs文件使用
      */
     // 忽略调试状态。大于等于0即表示忽略
     public static final String KVS_KEY_DEBUG = "i_debug";
+
+//    public static final String PATCH_NAME_FILE = "p_%s.jar";
+//
+//     //下发的patch是否在运行中
+//     public static boolean patch_runing = false;
 //    // 忽略新安装状态。大于等于0即表示忽略
 //    public static final String KVS_KEY_NEW_INSTALL = "i_new_install";
 //    // 忽略新设备状态。大于等于0即表示忽略
 //    public static final String KVS_KEY_NEW_DEVICE = "i_new_device";
-
-
+//
 //    // 执行上传URL控制
 //    public static final boolean DEBUG_URL = BuildConfig.DEBUG_URL;
-
-// 取消测试域名 http://apptest.analysys.cn:10031
+//
+//  // 取消测试域名 http://apptest.analysys.cn:10031
 //    /**
 //     * 测试回传接口.Debug模式
 //     */
@@ -329,5 +291,27 @@ public class EGContext {
 //     * 测试域名
 //     */
 //    public static final String TEST_CALLBACK_DOMAIN_NAME = "apptest.analysys.cn";
-
+//    /**
+//     * 判断是否debug App列表
+//     */
+//    public static final String TEXT_DEBUG_APP = "packageName";
+//    public static final String TEXT_DEBUG_STATUS = "debugable";
+//    public static String EGUAN_CHANNEL_PREFIX = "EGUAN_CHANNEL_";
+//    public static String APP_URL = "";
+//    public static String NORMAL_APP_URL = EGContext.URL_SCHEME + EGContext.NORMAL_UPLOAD_URL[0] + EGContext.ORI_PORT;
+//    public static final String TEST_URL = URL_SCHEME + TEST_CALLBACK_DOMAIN_NAME + TEST_CALLBACK_PORT;
+//    public static final String EGUANFILE = "eg.a";
+//    public static final String TMPIDKEY = "tmpid";
+//    // 清除设备使用的通道标志
+//    // 测试设备，通知方式传递信息。 http://con.analysys.cn/pages/viewpage.action?pageId=24183993
+//    public static final String ACTION_NOTIFY_CLEAR = "com.analysys.notify";
+//    public static final String NOTIFY_PKG = "pkg";
+//    public static final String NOTIFY_TYPE = "type";
+//
+//    public static class NotifyStatus {
+//        public static final int NOTIFY_NO_DEBUG = 0;
+//        public static final int NOTIFY_DEBUG = 1;
+//        public static final int NOTIFY_NEW_INSTALL = 2;
+//        public static final int NOTIFY_UNKNOW_DEVICE = 3;
+//    }
 }

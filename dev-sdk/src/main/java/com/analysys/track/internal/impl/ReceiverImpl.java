@@ -140,7 +140,7 @@ public class ReceiverImpl {
             EGContext.snap_complete = true;
         } else if (EGContext.ACTION_UPDATE_POLICY.equals(intent.getAction())) {
             PolicyImpl.getInstance(EContextHelper.getContext(context)).updatePolicyForReceiver();
-        } else if (EGContext.ACTION_NOTIFY_CLEAR.equals(intent.getAction())) {
+//        } else if (EGContext.ACTION_NOTIFY_CLEAR.equals(intent.getAction())) {
 //            makesureRunOnce(context, intent);
         }
     }

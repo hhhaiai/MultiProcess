@@ -81,8 +81,8 @@ public class UploadImpl {
 
                 long now = System.currentTimeMillis();
                 // 进程同步。2秒内只能请求一次
-                if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.MULTI_FILE_UPLOAD_RETRY, EGContext.TIME_SECOND * 2, now)) {
-                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.MULTI_FILE_UPLOAD_RETRY, now);
+                if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC__UPLOAD_RETRY, EGContext.TIME_SECOND * 2, now)) {
+                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC__UPLOAD_RETRY, now);
                     long dur = SPHelper.getLongValueFromSP(mContext, EGContext.RETRYTIME, 0);
                     if (dur <= 0) {
                         dur = SystemUtils.intervalTime(mContext);
@@ -116,14 +116,14 @@ public class UploadImpl {
 
             long now = System.currentTimeMillis();
             // 3. 多调用入口。增加进程锁同步。6小时只能发起一次(跟本地时间对比。可以忽略时间修改导致的不能上传)
-            if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.MULTI_FILE_UPLOAD, EGContext.TIME_SECOND * 3, now)) {
+            if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_FILE_UPLOAD, EGContext.TIME_SECOND * 3, now)) {
                 long lastReqTime = SPHelper.getLongValueFromSP(mContext, EGContext.LASTQUESTTIME, 0);
                 if (BuildConfig.logcat) {
                     ELOG.i(BuildConfig.tag_upload, "lastReqTime:" + lastReqTime + "--->上传间隔：" + (System.currentTimeMillis() - lastReqTime));
                 }
 
                 if ((now - lastReqTime) < EGContext.TIME_DEFAULT_REQUEST_SERVER) {
-                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.MULTI_FILE_UPLOAD, System.currentTimeMillis());
+                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_FILE_UPLOAD, System.currentTimeMillis());
 
                     if (BuildConfig.logcat) {
                         ELOG.e(BuildConfig.tag_upload, "小于6小时停止工作");
@@ -133,7 +133,7 @@ public class UploadImpl {
                     if (BuildConfig.logcat) {
                         ELOG.i(BuildConfig.tag_upload, "大于6小时可以工作");
                     }
-                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.MULTI_FILE_UPLOAD, System.currentTimeMillis());
+                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_FILE_UPLOAD, System.currentTimeMillis());
 
                     // 6. 正常请求
                     EThreadPool.post(new Runnable() {
@@ -445,7 +445,7 @@ public class UploadImpl {
                     }
                     if (EGContext.HTTP_STATUS_200.equals(code)) {
                         // 清除本地数据
-                        uploadSuccess(EGContext.SHORT_TIME);
+                        uploadSuccess(EGContext.TIME_SECOND*5);
                     } else if (EGContext.HTTP_STATUS_500.equals(code)) {
 
                         if (BuildConfig.logcat) {
