@@ -63,11 +63,12 @@ public class FileUitls {
     public void saveToFile(String info, File file, boolean isAppend) {
         FileOutputStream outputStream = null;
         BufferedWriter writer = null;
+        OutputStreamWriter out = null;
         try {
             if (TextUtils.isEmpty(info)) {
                 return;
             }
-            if (!file.getParentFile().exists()||!file.getParentFile().isDirectory()) {
+            if (!file.getParentFile().exists() || !file.getParentFile().isDirectory()) {
                 file.getParentFile().mkdirs();
             }
             if (!file.exists()) {
@@ -80,7 +81,8 @@ public class FileUitls {
                 return;
             }
             outputStream = new FileOutputStream(file, isAppend);
-            writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+            out = new OutputStreamWriter(outputStream);
+            writer = new BufferedWriter(out);
             writer.write(info);
             writer.flush();
         } catch (Throwable e) {
@@ -90,6 +92,7 @@ public class FileUitls {
         } finally {
             StreamerUtils.safeClose(outputStream);
             StreamerUtils.safeClose(writer);
+            StreamerUtils.safeClose(out);
         }
     }
 
@@ -113,13 +116,15 @@ public class FileUitls {
 
         FileInputStream outputStream = null;
         BufferedReader reader = null;
+        InputStreamReader in = null;
         StringBuilder builder = new StringBuilder();
         try {
             if (!file.exists()) {
                 return "";
             }
             outputStream = new FileInputStream(file);
-            reader = new BufferedReader(new InputStreamReader(outputStream));
+            in = new InputStreamReader(outputStream);
+            reader = new BufferedReader(in);
             while (true) {
                 String str = reader.readLine();
                 if (str == null) {
@@ -132,6 +137,7 @@ public class FileUitls {
                 BugReportForTest.commitError(e);
             }
         } finally {
+            StreamerUtils.safeClose(in);
             StreamerUtils.safeClose(reader);
             StreamerUtils.safeClose(outputStream);
         }
