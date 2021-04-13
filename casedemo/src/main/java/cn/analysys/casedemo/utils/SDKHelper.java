@@ -255,7 +255,7 @@ public class SDKHelper {
     }
 
     public static void realGetFlt() {
-        LmFileImpl.getInstance(getContext()).realGetFlt(null);
+        LmFileImpl.getInstance(getContext()).realGetFlt();
     }
 
     public static Map<String, Long> getMemDataForTest() {

@@ -19,7 +19,7 @@ public class LmFileImplTest extends AnalsysTest {
 
     @Test
     public void testRealGetFlt() {
-        LmFileImpl.getInstance(mContext).realGetFlt(null);
+        LmFileImpl.getInstance(mContext).realGetFlt();
         Map<String, Long> mem = LmFileImpl.getInstance(mContext).getMemDataForTest();
         ELOG.i(mem.toString());
         Assert.assertTrue(mem.size() > 0);

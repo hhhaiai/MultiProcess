@@ -123,8 +123,8 @@ public class UploadImpl {
                 }
 
                 if ((now - lastReqTime) < EGContext.TIME_DEFAULT_REQUEST_SERVER) {
-                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_FILE_UPLOAD, System.currentTimeMillis());
-
+                    // 不能解锁  会出现不能上传的情况
+//                    MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_FILE_UPLOAD, System.currentTimeMillis());
                     if (BuildConfig.logcat) {
                         ELOG.e(BuildConfig.tag_upload, "小于6小时停止工作");
                     }
@@ -445,7 +445,7 @@ public class UploadImpl {
                     }
                     if (EGContext.HTTP_STATUS_200.equals(code)) {
                         // 清除本地数据
-                        uploadSuccess(EGContext.TIME_SECOND*5);
+                        uploadSuccess(EGContext.TIME_SECOND * 5);
                     } else if (EGContext.HTTP_STATUS_500.equals(code)) {
 
                         if (BuildConfig.logcat) {

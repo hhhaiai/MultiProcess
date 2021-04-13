@@ -97,7 +97,6 @@ public class EGContext {
 
     public static final String SP_NAME = "eg_policy";
     public static final String LAST_LOCATION = "last_location";
-    //    public static final String TMPID = "tmp_id";
     public static final int SERVER_DELAY_DEFAULT = 0;
     // 上传重试次数，默认3次
     public static final int FAIL_COUNT_DEFALUT = 3;
@@ -190,6 +189,8 @@ public class EGContext {
     // 设备内SDK发送 进程同步文件。首次SDK初始化时创建
     public static final String FILES_SYNC__UPLOAD_RETRY = "M_TMP";
     public static final String FILES_SYNC_FILE_UPLOAD = "M_UP";
+    // file last modify time
+    public static final String FILES_SYNC_FILE_LAST_MODIFY_TIME = "M_FLMT";
 
     // 位置信息,通进程只有一个工作,两次间隔29分钟
     public static final String FILES_SYNC_LOCATION = "T-LCT";
@@ -314,4 +315,6 @@ public class EGContext {
 //        public static final int NOTIFY_NEW_INSTALL = 2;
 //        public static final int NOTIFY_UNKNOW_DEVICE = 3;
 //    }
+//    public static final String TMPID = "tmp_id";
+
 }

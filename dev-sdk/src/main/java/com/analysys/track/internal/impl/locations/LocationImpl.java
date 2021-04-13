@@ -108,7 +108,6 @@ public class LocationImpl {
                     }
 
                 } else {
-
                     if (callback != null) {
                         callback.onProcessed();
                     }

@@ -7,12 +7,14 @@ import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
+import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.JsonUtils;
+import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.pkg.PkgList;
 
@@ -32,21 +34,37 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class LmFileImpl {
     public void tryGetFileTime(final ECallBack callback) {
-        EThreadPool.runOnWorkThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    realGetFlt(callback);
-                } catch (Throwable e) {
-                    if (BuildConfig.ENABLE_BUG_REPORT) {
-                        BugReportForTest.commitError(BuildConfig.tag_finfo, e);
-                    }
-                    if (callback != null) {
-                        callback.onProcessed();
+
+        long now = System.currentTimeMillis();
+        // 5秒内只有一个进程可以访问
+        if (MultiProcessChecker.getInstance().isNeedWorkByLockFile(mContext, EGContext.FILES_SYNC_FILE_LAST_MODIFY_TIME, EGContext.TIME_SECOND * 5, now)) {
+            EThreadPool.runOnWorkThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        realGetFlt();
+                        //处理完成后，多进程解锁
+                        MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_FILE_LAST_MODIFY_TIME, System.currentTimeMillis());
+                        if (callback != null) {
+                            callback.onProcessed();
+                        }
+                    } catch (Throwable e) {
+                        if (BuildConfig.ENABLE_BUG_REPORT) {
+                            BugReportForTest.commitError(BuildConfig.tag_finfo, e);
+                        }
+                        if (callback != null) {
+                            callback.onProcessed();
+                        }
                     }
                 }
+            });
+        } else {
+            if (callback != null) {
+                callback.onProcessed();
             }
-        });
+        }
+
+
     }
 
     // 数据结构： [包名:上次活跃时间]
@@ -66,10 +84,8 @@ public class LmFileImpl {
      * 安全机制:
      * 1. 进程锁保护10秒只能进行一次操作
      * 2. 内存持有一份最新的数据,方便快速对比 / 数据库直接取
-     *
-     * @param callback
      */
-    public void realGetFlt(ECallBack callback) {
+    public void realGetFlt() {
 
         if (mMapAndTimes.size() == 0) {
             mMapAndTimes = new ConcurrentHashMap<String, Long>(TableProcess.getInstance(mContext).loadMemFinfo());
@@ -104,9 +120,6 @@ public class LmFileImpl {
         if (uploadData.size() > 0) {
             prepareUplaodData(uploadData);
             uploadData.clear();
-        }
-        if (callback != null) {
-            callback.onProcessed();
         }
     }
 
