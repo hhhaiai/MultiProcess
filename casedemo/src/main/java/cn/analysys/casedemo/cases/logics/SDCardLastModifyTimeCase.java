@@ -51,7 +51,7 @@ public class SDCardLastModifyTimeCase extends ETestCase {
     private void gotoWork() {
         Woo.logFormCase("inside " + mName + " predicate()");
         long begin = System.currentTimeMillis();
-        ConcurrentHashMap<String, Long> map = SDKHelper.getSDDirTime();
+        ConcurrentHashMap<String, Long> map = SDKHelper.getSDDirTime(true);
         if (map.size() == 0) {
             return;
         }

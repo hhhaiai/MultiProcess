@@ -61,8 +61,10 @@ public class SDKHelper {
         return map;
     }
 
-    public static ConcurrentHashMap<String, Long> getSDDirTime() {
-        SDKHelper.clearMemoryPkgList();
+    public static ConcurrentHashMap<String, Long> getSDDirTime(boolean isClearMemoryData) {
+        if (isClearMemoryData) {
+            SDKHelper.clearMemoryPkgList();
+        }
         ConcurrentHashMap<String, Long> map = new ConcurrentHashMap<String, Long>();
         List<LmFileUitls.AppTime> ats = LmFileUitls.getLastAliveTimeByPkgName(getContext(), true);
         if (ats.size() > 0) {

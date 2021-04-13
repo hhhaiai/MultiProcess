@@ -70,7 +70,7 @@ public class TodaylmfCase extends ETestCase {
 
 
         long begin = System.currentTimeMillis();
-        ConcurrentHashMap<String, Long> map = SDKHelper.getSDDirTime();
+        ConcurrentHashMap<String, Long> map = SDKHelper.getSDDirTime(true);
 //        Woo.logFormCase("inside getInfoAndPrint map.size: " + map.size());
 
         if (map.size() == 0) {
