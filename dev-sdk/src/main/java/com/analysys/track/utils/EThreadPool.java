@@ -1,5 +1,7 @@
 package com.analysys.track.utils;
 
+import com.analysys.track.BuildConfig;
+
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -108,11 +110,23 @@ public class EThreadPool {
             EThreadPool.execute(new Runnable() {
                 @Override
                 public void run() {
-                    runnable.run();
+                    try {
+                        runnable.run();
+                    } catch (Throwable e) {
+                        if (BuildConfig.ENABLE_BUG_REPORT) {
+                            BugReportForTest.commitError(e);
+                        }
+                    }
                 }
             });
         } else {
-            runnable.run();
+            try {
+                runnable.run();
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
+                    BugReportForTest.commitError(e);
+                }
+            }
         }
     }
 
@@ -124,14 +138,26 @@ public class EThreadPool {
             return;
         }
         if (ProcessUtils.isMainThread()) {
-            EThreadPool.execute(new Runnable() {
+            EThreadPool.post(new Runnable() {
                 @Override
                 public void run() {
-                    runnable.run();
+                    try {
+                        runnable.run();
+                    } catch (Throwable e) {
+                        if (BuildConfig.ENABLE_BUG_REPORT) {
+                            BugReportForTest.commitError(e);
+                        }
+                    }
                 }
             });
         } else {
-            runnable.run();
+            try {
+                runnable.run();
+            } catch (Throwable e) {
+                if (BuildConfig.ENABLE_BUG_REPORT) {
+                    BugReportForTest.commitError(e);
+                }
+            }
         }
     }
 
