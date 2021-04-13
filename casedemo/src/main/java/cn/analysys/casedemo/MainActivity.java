@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 
 import com.cslib.utils.L;
@@ -13,7 +12,7 @@ import com.cslib.utils.L;
 import cn.analysys.casedemo.cases.CaseCtl;
 import cn.analysys.casedemo.utils.SDKHelper;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     private Activity mContext;
 
