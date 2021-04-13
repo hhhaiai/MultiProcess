@@ -15,7 +15,7 @@ import cn.analysys.casedemo.utils.Woo;
 public class FinfoCase extends ETestCase {
 
     public FinfoCase() {
-        super("Finfo模块测试");
+        super("Finfo模块工作内容测试");
     }
 
     @Override

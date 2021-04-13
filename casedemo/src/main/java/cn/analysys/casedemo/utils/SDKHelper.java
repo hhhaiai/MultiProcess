@@ -14,12 +14,15 @@ import com.analysys.track.db.DBUtils;
 import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.impl.ftime.LmFileImpl;
 import com.analysys.track.internal.impl.ftime.LmFileUitls;
+import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MDate;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.pkg.PkgList;
+import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.cslib.CaseHelper;
 
@@ -70,6 +73,10 @@ public class SDKHelper {
             }
         }
         return map;
+    }
+
+    public static void runOnWorkThread(Runnable runnable) {
+        EThreadPool.runOnWorkThread(runnable);
     }
 
     /**
@@ -278,4 +285,17 @@ public class SDKHelper {
         return MDate.convertLongTimeToHms(time);
     }
 
+    /**
+     * 发送消息调用单独模快
+     *
+     * @param what
+     */
+    public static void postMsgToDispatcher(int what) {
+        MessageDispatcher.getInstance(getContext()).postDelay(what, 0);
+    }
+
+    public static void postLastModifyTimeToDispatcher() {
+        int what = (int) ClazzUtils.getStaticFieldValue(MessageDispatcher.class, "MSG_INFO_LASTFILETIME");
+        postMsgToDispatcher(what);
+    }
 }
