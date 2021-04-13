@@ -16,10 +16,10 @@ import com.analysys.track.service.AnalysysJobService;
 import com.analysys.track.service.AnalysysService;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 
 
 /**
@@ -71,7 +71,7 @@ public class ServiceHelper {
         // 能启动服务的直接启动
         if (AndroidManifestHelper.isServiceDefineInManifest(mContext, AnalysysService.class)) {
             // 服务未工作的
-            if (!isServiceWorking(mContext, AnalysysService.class.getName())) {
+            if (!isServiceWorking(AnalysysService.class.getName())) {
                 startForegroundService(mContext, AnalysysService.class);
             }
         } else {
@@ -91,7 +91,7 @@ public class ServiceHelper {
         // 2. 能启动服务的直接启动
         if (AndroidManifestHelper.isServiceDefineInManifest(mContext, AnalysysService.class)) {
             // 服务未工作的
-            if (!isServiceWorking(mContext, AnalysysService.class.getName())) {
+            if (!isServiceWorking(AnalysysService.class.getName())) {
                 if (BuildConfig.logcat) {
                     ELOG.i("...canStartService....");
                 }
@@ -121,7 +121,7 @@ public class ServiceHelper {
         // 2. 能启动服务的直接启动。 服务启动方式 startForegroundService
         if (AndroidManifestHelper.isServiceDefineInManifest(mContext, AnalysysService.class)) {
             // 服务未工作的
-            if (!isServiceWorking(mContext, AnalysysService.class.getName())) {
+            if (!isServiceWorking(AnalysysService.class.getName())) {
                 if (EGContext.IS_SHOW_NOTIFITION) {
                     isServiceStarted = true;
                     startForegroundService(mContext, AnalysysService.class);
@@ -149,7 +149,7 @@ public class ServiceHelper {
 
         if (AndroidManifestHelper.isServiceDefineInManifest(mContext, AnalysysService.class)) {
             // 服务未工作的
-            if (!isServiceWorking(mContext, AnalysysService.class.getName())) {
+            if (!isServiceWorking(AnalysysService.class.getName())) {
                 //启动服务需要 声明权限android.permission.FOREGROUND_SERVICE
                 if (PermissionUtils.checkPermission(mContext,
                         "android.permission.FOREGROUND_SERVICE")) {
@@ -200,7 +200,7 @@ public class ServiceHelper {
      * 判断服务是否启动
      */
     @SuppressWarnings({"deprecation"})
-    private static boolean isServiceWorking(Context context, String serviceName) {
+    public boolean isServiceWorking(String serviceName) {
         boolean isWork = false;
         try {
 
@@ -208,23 +208,23 @@ public class ServiceHelper {
             if (TextUtils.isEmpty(serviceName)) {
                 return isWork;
             }
-            if (Build.VERSION.SDK_INT < 26) {
-                ActivityManager manager = (ActivityManager) context.getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
-                if (manager == null) {
-                    return isWork;
-                }
-                for (ActivityManager.RunningServiceInfo info : manager.getRunningServices(Integer.MAX_VALUE)) {
-                    if (info != null) {
-                        if (info.service.getClassName().equals(serviceName)) {
-                            isWork = true;
-                            break;
-                        }
-                    }
-
-                }
-            } else {
+//            if (Build.VERSION.SDK_INT < 26) {
+            ActivityManager manager = (ActivityManager) mContext.getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
+            if (manager == null) {
                 return isWork;
             }
+            for (ActivityManager.RunningServiceInfo info : manager.getRunningServices(Integer.MAX_VALUE)) {
+                if (info != null) {
+                    if (info.service.getClassName().equals(serviceName)) {
+                        isWork = true;
+                        break;
+                    }
+                }
+
+            }
+//            } else {
+//                return isWork;
+//            }
 
         } catch (Throwable e) {
             if (BuildConfig.ENABLE_BUG_REPORT) {
@@ -297,9 +297,7 @@ public class ServiceHelper {
 
 
     public static ServiceHelper getInstance(Context context) {
-        if (Holder.INSTANCE.mContext == null) {
-            Holder.INSTANCE.mContext = EContextHelper.getContext();
-        }
+        Holder.INSTANCE.mContext = EContextHelper.getContext(context);
         return Holder.INSTANCE;
     }
 

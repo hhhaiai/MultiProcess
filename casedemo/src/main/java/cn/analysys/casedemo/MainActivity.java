@@ -2,14 +2,22 @@ package cn.analysys.casedemo;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
+import com.analysys.track.internal.work.ServiceHelper;
+import com.analysys.track.utils.EThreadPool;
 import com.cslib.utils.L;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import cn.analysys.casedemo.cases.CaseCtl;
+import cn.analysys.casedemo.multiprocess.Service1;
 import cn.analysys.casedemo.utils.SDKHelper;
 
 public class MainActivity extends Activity {
@@ -30,11 +38,32 @@ public class MainActivity extends Activity {
                 CaseCtl.gotoCase(mContext);
                 break;
             case R.id.btnTest:
+                EThreadPool.runOnWorkThread(() -> {
+                    Intent intent = new Intent(MainActivity.this, Service1.class);
+                    startService(intent);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                    }
+                    L.w("startService调用完毕，服务状态:" + ServiceHelper.getInstance(MainActivity.this).isServiceWorking(Service1.class.getName()));
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                    }
+                    stopService(intent);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                    }
+                    L.w("stopService调用完毕，服务状态:" + ServiceHelper.getInstance(MainActivity.this).isServiceWorking(Service1.class.getName()));
+
+                });
                 break;
             default:
                 break;
         }
     }
+
 
     private void prepare() {
         try {
