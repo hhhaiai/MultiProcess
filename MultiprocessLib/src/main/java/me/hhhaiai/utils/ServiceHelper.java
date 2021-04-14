@@ -18,7 +18,7 @@ public class ServiceHelper {
 
 
     /******************************开启服务***********************************/
-    public static void startService(Context context, List<Class<Service>> clazzs) {
+    public static void startService(Context context, List<Class<? extends  Service>> clazzs) {
         if (clazzs != null) {
             for (int i = 0; i < clazzs.size(); i++) {
                 startService(context, clazzs.get(i));
@@ -26,7 +26,7 @@ public class ServiceHelper {
         }
     }
 
-    public static void startService(Context context, Class<Service> clazz) {
+    public static void startService(Context context, Class<? extends  Service> clazz) {
         try {
             context = EContext.getContext(context);
             if (context == null) {
@@ -45,7 +45,7 @@ public class ServiceHelper {
         }
     }
 
-    private static void startForegroundServiceImpl(Context context, Class<Service> clazz) {
+    private static void startForegroundServiceImpl(Context context, Class<? extends  Service> clazz) {
         ComponentName cn = new ComponentName(context, clazz);
         Intent intent = new Intent();
         intent.setComponent(cn);
@@ -61,7 +61,7 @@ public class ServiceHelper {
 
     /******************************关闭服务***********************************/
 
-    public static void stopService(Context context, Class<Service> clazz) {
+    public static void stopService(Context context, Class<? extends  Service> clazz) {
         try {
             context = EContext.getContext(context);
             if (context == null) {
@@ -82,7 +82,7 @@ public class ServiceHelper {
     /******************************开启JobService***********************************/
 
     @TargetApi(21)
-    public static boolean startJobService(Context context, Class<JobService> clazz, int jobId, long intervalMillis) {
+    public static boolean startJobService(Context context, Class<? extends  JobService> clazz, int jobId, long intervalMillis) {
         try {
             context = EContext.getContext(context);
             if (context == null) {
@@ -140,7 +140,7 @@ public class ServiceHelper {
 
     /******************************Service运行状态判断***********************************/
 
-    public static boolean isServiceWorking(Context context, Class<Service> serviceClass) {
+    public static boolean isServiceWorking(Context context, Class<? extends  Service> serviceClass) {
         return isServiceWorking(context, serviceClass.getName());
     }
 

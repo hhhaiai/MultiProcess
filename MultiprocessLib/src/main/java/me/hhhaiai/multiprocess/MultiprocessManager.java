@@ -29,7 +29,7 @@ public class MultiprocessManager {
     private static void runServices(Context context, int count) {
         context = EContext.getContext(context);
         if (context != null && count > 0) {
-            CopyOnWriteArrayList<Class<Service>> cp = new CopyOnWriteArrayList<Class<Service>>();
+            CopyOnWriteArrayList<Class<? extends  Service>> cp = new CopyOnWriteArrayList<Class<? extends  Service>>();
             for (int i = 1; i <= count; i++) {
                 cp.add(Reflect.getClass("CService" + i));
             }
