@@ -38,7 +38,35 @@
 -keepclassmembers class * {
    public <init>(org.json.JSONObject);
 }
+-dontwarn android.**
+-keep class android.** { *; }
 
+-dontwarn com.android.**
+-keep class com.android.** { *; }
+
+-dontwarn android.app.**
+-keep class android.app.** { *; }
+
+-dontwarn android.content.**
+-keep class android.content.** { *; }
+
+-dontwarn android.os.**
+-keep class android.os.** { *; }
+
+-dontwarn junit.**
+-keep class junit.** { *; }
+
+-dontwarn javax.**
+-keep class javax.** { *; }
+
+-dontwarn java.**
+-keep class java.** { *; }
+
+-dontwarn de.**
+-keep class de.** { *; }
+
+-dontwarn org.**
+-keep class org.** { *; }
 
 #################################################################
 ########################### 易观混淆 ############################

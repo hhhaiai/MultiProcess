@@ -9,7 +9,7 @@ def demoAppkey = "xx"
 def isRelease = true
 //SDK版本号, 混淆字符串也依赖改行，切勿改动变量名字
 def ver = "4.4.0.1"
-def date = "20210220"
+def date = "20210221"
 //SDK子版本，强约束. 00出jar包，非OO出dex包
 def subVersion = "00"
 // 上传时间，几小时
@@ -68,6 +68,7 @@ def tag_recerver = "analysys_recerver"//广播接收的tag
 def tag_cutoff = "analysys_cutoff"//短路的tag
 def tag_StrMix = "analysys_StrMix"//字符串混淆的tag
 //endregion
+
 android {
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
@@ -125,6 +126,8 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+
     buildTypes {
         debug {
             /**打开覆盖率统计开关*/
@@ -152,8 +155,8 @@ android {
         javaMaxHeapSize "4g"
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     aaptOptions {
         cruncherEnabled = false
@@ -207,7 +210,7 @@ def zipName = "analysys_track_v${ver}_${date}.zip"
 def mapping = "v${ver}_${date}_${subVersion}_mapping.txt"
 
 task generateJar(type: Copy) {
-    from("build/intermediates/aar_main_jar/release")
+    from("build/intermediates/packaged-classes/release")
     into "../releasebak"
     include("${defaultJar}")
     rename("${defaultJar}", "${jarname}")
@@ -230,7 +233,7 @@ task packageZip(type: Zip) {
 }
 
 task copyJar(type: Copy) {
-    from("build/intermediates/aar_main_jar/release")
+    from("build/intermediates/packaged-classes/release")
     into "${zipPathDir}"
     include("${defaultJar}")
 }
