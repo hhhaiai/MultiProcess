@@ -5,12 +5,12 @@ def ver = "3.0.0"
 //demo appkey
 def demoAppkey = "test"
 android {
-    compileSdkVersion 29
-    buildToolsVersion '29.0.0'
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 26
+        targetSdkVersion 28
         versionCode 3
         versionName "${ver}"
         multiDexEnabled true

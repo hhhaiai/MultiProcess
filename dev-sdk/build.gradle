@@ -69,12 +69,12 @@ def tag_cutoff = "analysys_cutoff"//短路的tag
 def tag_StrMix = "analysys_StrMix"//字符串混淆的tag
 //endregion
 android {
-    compileSdkVersion 29
-    buildToolsVersion '29.0.3'
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 29
+        targetSdkVersion 28
         def sdkv = "${version}"
         if (enableHotFix) {
             sdkv += "${subVersion}"
@@ -183,11 +183,11 @@ tasks.withType(Javadoc) {
 }
 
 dependencies {
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     testImplementation 'org.robolectric:robolectric:3.0'
-    compileOnly files("libs/miit_mdid_1.0.10.aar")
+//    compileOnly files("libs/miit_mdid_1.0.10.aar")
 }
 
 //########################################################################
