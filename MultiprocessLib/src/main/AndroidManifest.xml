@@ -1,5 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.hhhaiai.multiprocess">
+    package="me.hhhaiai.multiprocess">
+
+    <application>
+        <service
+            android:name="me.hhhaiai.services.CService1"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService1">
+        </service>
+        <service
+            android:name="me.hhhaiai.services.CService2"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService1">
+        </service>
+        <service
+            android:name="me.hhhaiai.services.CService3"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService1">
+        </service>
+        <service
+            android:name="me.hhhaiai.services.CService4"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService1">
+        </service>
+    </application>
 
 </manifest>
