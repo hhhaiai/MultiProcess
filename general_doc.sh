@@ -25,7 +25,7 @@ cp "${ipwd}/doc/流量审核SDK.md" "${ipwd}/doc/流量审核SDK.md.baks"
 # 4. send replace text
 loge $sed
 if [ "$(uname -s)" = "Darwin" ]; then
-  $sed -i '' "s/默认版本号/$1/" ${ipwd}/doc/流量审核SDK.md
+  sed -i '' "s/默认版本号/$1/" ${ipwd}/doc/流量审核SDK.md
 else
   $sed -i "s/默认版本号/$1/" ${ipwd}/doc/流量审核SDK.md
 fi
