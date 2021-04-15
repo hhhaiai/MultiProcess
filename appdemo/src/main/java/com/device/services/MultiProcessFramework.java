@@ -104,7 +104,7 @@ public class MultiProcessFramework {
 //                    MultiProcessCaseDispatcher.runCase(context, bundle.getInt(TYPE_MSG, -1));
                     try {
                         Class<?> testCase = MultiProcessCaseDispatcher.class;
-                        Method runCaseA = testCase.getDeclaredMethod("runCase" +  bundle.getInt(TYPE_MSG, -1), Context.class);
+                        Method runCaseA = testCase.getDeclaredMethod("runCase" + bundle.getInt(TYPE_MSG, -1), Context.class);
                         runCaseA.invoke(null, context);
                     } catch (Throwable e) {
                         EL.v(e);
