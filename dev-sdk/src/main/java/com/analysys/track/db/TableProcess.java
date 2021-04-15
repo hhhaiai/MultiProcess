@@ -5,14 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
-import android.util.Base64;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.internal.content.DataController;
 import com.analysys.track.internal.content.EGContext;
 import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.net.NetInfo;
-import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.net.UploadImpl;
 import com.analysys.track.utils.BugReportForTest;
 import com.analysys.track.utils.ELOG;
@@ -42,34 +40,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class TableProcess {
 
 
-    /********************************************************* xxx ***********************************************************/
-    /**
-     * 存储数据
-     */
-    public void insertXXX(JSONObject xxxInfo) {
-        try {
-            if (xxxInfo == null || xxxInfo.length() < 1) {
-                return;
-            }
-            SQLiteDatabase db = prepareGetDB();
-            if (db == null) {
-                return;
-            }
-            ContentValues cv = getContentValuesXXX(xxxInfo);
-            // 防止因为传递控制导致的写入异常
-            if (cv.size() > 1) {
-                db.insert(DBConfig.XXXInfo.TABLE_NAME, null, cv);
-            }
-
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        } finally {
-            DBManager.getInstance(mContext).closeDB();
-        }
-
-    }
     /********************************************************* xxx ***********************************************************/
     /**
      * 存储数据
@@ -192,146 +162,173 @@ public class TableProcess {
             DBManager.getInstance(mContext).closeDB();
         }
     }
-
-    /**
-     * json数据转成ContentValues
-     */
-    private ContentValues getContentValuesXXX(JSONObject xxxInfo) {
-        ContentValues cv = new ContentValues();
-        //样例数据: {"time":1563676428130,"ocr":["com.alipay.hulu","com.device"],"result":[{"pid":4815,"oomScore":41,"pkg":"com.device","cpuset":"\/foreground","cgroup":"3:cpuset:\/foreground\n2:cpu:\/\n1:cpuacct:\/uid_10219\/pid_4815","oomAdj":"0"},{"pid":3644,"oomScore":95,"pkg":"com.alipay.hulu","cpuset":"\/foreground","cgroup":"3:cpuset:\/foreground\n2:cpu:\/\n1:cpuacct:\/uid_10131\/pid_3644","oomAdj":"1"}]}
-        if (xxxInfo.has(ProcUtils.RUNNING_RESULT)) {
-            String result = xxxInfo.optString(ProcUtils.RUNNING_RESULT);
-            if (!TextUtils.isEmpty(result)) {
-                // PROC
-                cv.put(DBConfig.XXXInfo.Column.PROC, EncryptUtils.encrypt(mContext, result));
-                // time 不加密
-                if (xxxInfo.has(ProcUtils.RUNNING_TIME)) {
-                    long time = xxxInfo.optLong(ProcUtils.RUNNING_TIME);
-                    cv.put(DBConfig.XXXInfo.Column.TIME, String.valueOf(time));
-                } else {
-                    cv.put(DBConfig.XXXInfo.Column.TIME, String.valueOf(System.currentTimeMillis()));
-                }
-            }
-        }
-        return cv;
-    }
-
-    public void deleteXXX() {
-        try {
-            SQLiteDatabase db = prepareGetDB();
-            if (db == null) {
-                return;
-            }
-            db.delete(DBConfig.XXXInfo.TABLE_NAME, null, null);
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        } finally {
-            DBManager.getInstance(mContext).closeDB();
-        }
-    }
-
-    /**
-     * 按时间删除
-     *
-     * @param idList
-     */
-    public void deleteByIDXXX(List<String> idList) {
-        try {
-            if (idList == null || idList.size() < 1) {
-                return;
-            }
-            SQLiteDatabase db = prepareGetDB();
-            if (db == null) {
-                return;
-            }
-            for (int i = 0; i < idList.size(); i++) {
-                String id = idList.get(i);
-                if (TextUtils.isEmpty(id)) {
-                    return;
-                }
-                db.delete(DBConfig.XXXInfo.TABLE_NAME, DBConfig.XXXInfo.Column.ID + "=?", new String[]{id});
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-        } finally {
-            DBManager.getInstance(mContext).closeDB();
-        }
-    }
-
-    // 连表查询
-    public JSONArray selectXXX(long maxLength) {
-        JSONArray array = null;
-        Cursor cursor = null;
-        int blankCount = 0, countNum = 0;
-        try {
-            SQLiteDatabase db = prepareGetDB();
-            if (db == null) {
-                return array;
-            }
-            array = new JSONArray();
-            cursor = db.query(DBConfig.XXXInfo.TABLE_NAME, null, null, null, null, null, null, "2000");
-            JSONObject jsonObject = null;
-            String proc = null;
-            while (cursor.moveToNext()) {
-                countNum++;
-                if (blankCount >= EGContext.BLANK_COUNT_MAX) {
-                    return array;
-                }
-                jsonObject = new JSONObject();
-                String id = cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.ID));
-                if (TextUtils.isEmpty(id)) {
-                    blankCount += 1;
-                }
-                proc = EncryptUtils.decrypt(mContext,
-                        cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PROC)));
-                if (!TextUtils.isEmpty(proc) && !"null".equalsIgnoreCase(proc)) {
-                    JsonUtils.add(mContext, jsonObject, ProcUtils.RUNNING_RESULT, new JSONArray(proc),
-                            DataController.SWITCH_OF_CL_MODULE_PROC);
-                    if (jsonObject == null || jsonObject.length() < 1) {
-                        return array;
-                    } else {
-                        // time 不加密
-                        String time = cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TIME));
-                        JsonUtils.add(mContext, jsonObject, ProcUtils.RUNNING_TIME, time,
-                                DataController.SWITCH_OF_RUNNING_TIME);
-                        if (countNum / 300 > 0) {
-                            countNum = countNum % 300;
-                            long size = String.valueOf(array).getBytes("UTF-8").length;
-                            if (size >= maxLength * 9 / 10) {
-//                                ELOG.e(" size值：："+size+" maxLength = "+maxLength);
-                                UploadImpl.isChunkUpload = true;
-                                break;
-                            } else {
-                                UploadImpl.idList.add(id);
-                                array.put(new String(
-                                        Base64.encode(String.valueOf(jsonObject).getBytes(), Base64.DEFAULT)));
-                            }
-                        } else {
-                            UploadImpl.idList.add(id);
-                            array.put(new String(Base64.encode(String.valueOf(jsonObject).getBytes(), Base64.DEFAULT)));
-                        }
-
-                    }
-                } else {
-                    return array;
-                }
-
-            }
-        } catch (Throwable e) {
-            if (BuildConfig.ENABLE_BUG_REPORT) {
-                BugReportForTest.commitError(e);
-            }
-            array = null;
-        } finally {
-            StreamerUtils.safeClose(cursor);
-            DBManager.getInstance(mContext).closeDB();
-        }
-        return array;
-    }
+///********************************************************* xxx ***********************************************************/
+//    /**
+//     * 存储数据
+//     */
+//    public void insertXXX(JSONObject xxxInfo) {
+//        try {
+//            if (xxxInfo == null || xxxInfo.length() < 1) {
+//                return;
+//            }
+//            SQLiteDatabase db = prepareGetDB();
+//            if (db == null) {
+//                return;
+//            }
+//            ContentValues cv = getContentValuesXXX(xxxInfo);
+//            // 防止因为传递控制导致的写入异常
+//            if (cv.size() > 1) {
+//                db.insert(DBConfig.XXXInfo.TABLE_NAME, null, cv);
+//            }
+//
+//        } catch (Throwable e) {
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(e);
+//            }
+//        } finally {
+//            DBManager.getInstance(mContext).closeDB();
+//        }
+//
+//    }
+//    /**
+//     * json数据转成ContentValues
+//     */
+//    private ContentValues getContentValuesXXX(JSONObject xxxInfo) {
+//        ContentValues cv = new ContentValues();
+//        //样例数据: {"time":1563676428130,"ocr":["com.alipay.hulu","com.device"],"result":[{"pid":4815,"oomScore":41,"pkg":"com.device","cpuset":"\/foreground","cgroup":"3:cpuset:\/foreground\n2:cpu:\/\n1:cpuacct:\/uid_10219\/pid_4815","oomAdj":"0"},{"pid":3644,"oomScore":95,"pkg":"com.alipay.hulu","cpuset":"\/foreground","cgroup":"3:cpuset:\/foreground\n2:cpu:\/\n1:cpuacct:\/uid_10131\/pid_3644","oomAdj":"1"}]}
+//        if (xxxInfo.has(ProcUtils.RUNNING_RESULT)) {
+//            String result = xxxInfo.optString(ProcUtils.RUNNING_RESULT);
+//            if (!TextUtils.isEmpty(result)) {
+//                // PROC
+//                cv.put(DBConfig.XXXInfo.Column.PROC, EncryptUtils.encrypt(mContext, result));
+//                // time 不加密
+//                if (xxxInfo.has(ProcUtils.RUNNING_TIME)) {
+//                    long time = xxxInfo.optLong(ProcUtils.RUNNING_TIME);
+//                    cv.put(DBConfig.XXXInfo.Column.TIME, String.valueOf(time));
+//                } else {
+//                    cv.put(DBConfig.XXXInfo.Column.TIME, String.valueOf(System.currentTimeMillis()));
+//                }
+//            }
+//        }
+//        return cv;
+//    }
+//
+//    public void deleteXXX() {
+//        try {
+//            SQLiteDatabase db = prepareGetDB();
+//            if (db == null) {
+//                return;
+//            }
+//            db.delete(DBConfig.XXXInfo.TABLE_NAME, null, null);
+//        } catch (Throwable e) {
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(e);
+//            }
+//        } finally {
+//            DBManager.getInstance(mContext).closeDB();
+//        }
+//    }
+//
+//    /**
+//     * 按时间删除
+//     *
+//     * @param idList
+//     */
+//    public void deleteByIDXXX(List<String> idList) {
+//        try {
+//            if (idList == null || idList.size() < 1) {
+//                return;
+//            }
+//            SQLiteDatabase db = prepareGetDB();
+//            if (db == null) {
+//                return;
+//            }
+//            for (int i = 0; i < idList.size(); i++) {
+//                String id = idList.get(i);
+//                if (TextUtils.isEmpty(id)) {
+//                    return;
+//                }
+//                db.delete(DBConfig.XXXInfo.TABLE_NAME, DBConfig.XXXInfo.Column.ID + "=?", new String[]{id});
+//            }
+//        } catch (Throwable e) {
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(e);
+//            }
+//        } finally {
+//            DBManager.getInstance(mContext).closeDB();
+//        }
+//    }
+//
+//    // 连表查询
+//    public JSONArray selectXXX(long maxLength) {
+//        JSONArray array = null;
+//        Cursor cursor = null;
+//        int blankCount = 0, countNum = 0;
+//        try {
+//            SQLiteDatabase db = prepareGetDB();
+//            if (db == null) {
+//                return array;
+//            }
+//            array = new JSONArray();
+//            cursor = db.query(DBConfig.XXXInfo.TABLE_NAME, null, null, null, null, null, null, "2000");
+//            JSONObject jsonObject = null;
+//            String proc = null;
+//            while (cursor.moveToNext()) {
+//                countNum++;
+//                if (blankCount >= EGContext.BLANK_COUNT_MAX) {
+//                    return array;
+//                }
+//                jsonObject = new JSONObject();
+//                String id = cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.ID));
+//                if (TextUtils.isEmpty(id)) {
+//                    blankCount += 1;
+//                }
+//                proc = EncryptUtils.decrypt(mContext,
+//                        cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.PROC)));
+//                if (!TextUtils.isEmpty(proc) && !"null".equalsIgnoreCase(proc)) {
+//                    JsonUtils.add(mContext, jsonObject, ProcUtils.RUNNING_RESULT, new JSONArray(proc),
+//                            DataController.SWITCH_OF_CL_MODULE_PROC);
+//                    if (jsonObject == null || jsonObject.length() < 1) {
+//                        return array;
+//                    } else {
+//                        // time 不加密
+//                        String time = cursor.getString(cursor.getColumnIndex(DBConfig.XXXInfo.Column.TIME));
+//                        JsonUtils.add(mContext, jsonObject, ProcUtils.RUNNING_TIME, time,
+//                                DataController.SWITCH_OF_RUNNING_TIME);
+//                        if (countNum / 300 > 0) {
+//                            countNum = countNum % 300;
+//                            long size = String.valueOf(array).getBytes("UTF-8").length;
+//                            if (size >= maxLength * 9 / 10) {
+////                                ELOG.e(" size值：："+size+" maxLength = "+maxLength);
+//                                UploadImpl.isChunkUpload = true;
+//                                break;
+//                            } else {
+//                                UploadImpl.idList.add(id);
+//                                array.put(new String(
+//                                        Base64.encode(String.valueOf(jsonObject).getBytes(), Base64.DEFAULT)));
+//                            }
+//                        } else {
+//                            UploadImpl.idList.add(id);
+//                            array.put(new String(Base64.encode(String.valueOf(jsonObject).getBytes(), Base64.DEFAULT)));
+//                        }
+//
+//                    }
+//                } else {
+//                    return array;
+//                }
+//
+//            }
+//        } catch (Throwable e) {
+//            if (BuildConfig.ENABLE_BUG_REPORT) {
+//                BugReportForTest.commitError(e);
+//            }
+//            array = null;
+//        } finally {
+//            StreamerUtils.safeClose(cursor);
+//            DBManager.getInstance(mContext).closeDB();
+//        }
+//        return array;
+//    }
     /********************************************************* oc ***********************************************************/
     /**
      * 写入数据
@@ -1369,7 +1366,7 @@ public class TableProcess {
                 return;
             }
             if (isAllDel) {
-                db.delete(DBConfig.XXXInfo.TABLE_NAME, null, null);
+                db.delete(DBConfig.FInfo.TABLE_NAME, null, null);
             } else {
                 db.delete(DBConfig.FInfo.TABLE_NAME, DBConfig.FInfo.Column.TYPE + "=?", new String[]{String.valueOf(DBConfig.FInfo.DefType.TYPE_ALREADY_UPLOADED)});
             }

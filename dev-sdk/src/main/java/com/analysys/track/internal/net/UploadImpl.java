@@ -327,28 +327,28 @@ public class UploadImpl {
                     TableProcess.getInstance(mContext).deleteScanningInfos();
                 }
             }
-            // 组装XXXInfo数据
-            if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true)) {
-
-                if (
-                        SPHelper.getBooleanValueFromSP(mContext,
-                                UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_XXX, false)) {
-                    //USM 可用并且控制短路打开,不上传
-                } else {
-                    //USM 不可用,XXXinfo上传
-                    // 计算离最大上线的差值
-                    long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
-                    if (useFulLength > 0 && !isChunkUpload) {
-                        JSONArray xxxInfo = getModuleInfos(mContext, object, MODULE_XXX, useFulLength);
-                        if (xxxInfo != null && xxxInfo.length() > 0) {
-                            object.put(UploadKey.XXXInfo.NAME, xxxInfo);
-                        }
-                    }
-                }
-
-            } else {
-                TableProcess.getInstance(mContext).deleteXXX();
-            }
+//            // 组装XXXInfo数据
+//            if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true)) {
+//
+//                if (
+//                        SPHelper.getBooleanValueFromSP(mContext,
+//                                UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_XXX, false)) {
+//                    //USM 可用并且控制短路打开,不上传
+//                } else {
+//                    //USM 不可用,XXXinfo上传
+//                    // 计算离最大上线的差值
+//                    long useFulLength = EGContext.LEN_MAX_UPDATE_SIZE * 8 / 10 - String.valueOf(object).getBytes().length;
+//                    if (useFulLength > 0 && !isChunkUpload) {
+//                        JSONArray xxxInfo = getModuleInfos(mContext, object, MODULE_XXX, useFulLength);
+//                        if (xxxInfo != null && xxxInfo.length() > 0) {
+//                            object.put(UploadKey.XXXInfo.NAME, xxxInfo);
+//                        }
+//                    }
+//                }
+//
+//            } else {
+//                TableProcess.getInstance(mContext).deleteXXX();
+//            }
             // 组装FInfo数据
             if (SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_FINFO, true)) {
 
@@ -543,8 +543,8 @@ public class UploadImpl {
             TableProcess.getInstance(mContext).resetSnapshot();
             // location全部删除已读的数据，最后一条无需保留，sp里有
             TableProcess.getInstance(mContext).deleteLocation();
-            // 按time值delete xxxinfo表和proc表
-            TableProcess.getInstance(mContext).deleteByIDXXX(idList);
+//            // 按time值delete xxxinfo表和proc表
+//            TableProcess.getInstance(mContext).deleteByIDXXX(idList);
             //删除上次扫描的包名
             TableProcess.getInstance(mContext).deleteNet();
             //删除上次上传的id
@@ -616,9 +616,9 @@ public class UploadImpl {
                 case MODULE_SNAPSHOT:
                     arr = TableProcess.getInstance(mContext).selectSnapshot(useFulLength);
                     break;
-                case MODULE_XXX:
-                    arr = TableProcess.getInstance(mContext).selectXXX(useFulLength);
-                    break;
+//                case MODULE_XXX:
+//                    arr = TableProcess.getInstance(mContext).selectXXX(useFulLength);
+//                    break;
                 case MODULE_NET:
                     arr = getNetData(mContext, useFulLength);
                     break;
@@ -707,7 +707,7 @@ public class UploadImpl {
     private final int MODULE_OC = 0;
     private final int MODULE_LOCATION = 1;
     private final int MODULE_SNAPSHOT = 2;
-    private final int MODULE_XXX = 3;
+    //    private final int MODULE_XXX = 3;
     private final int MODULE_NET = 4;
     private final int MODULE_FINFO = 5;
 

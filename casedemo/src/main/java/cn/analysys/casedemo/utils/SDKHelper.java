@@ -214,15 +214,15 @@ public class SDKHelper {
         return false;
     }
 
-    public static boolean checkXxxDB() {
-        try {
-            if (DBUtils.isTableExist(DBManager.getInstance(getContext()).openDB(), DBConfig.XXXInfo.TABLE_NAME)) {
-                return true;
-            }
-        } catch (Throwable e) {
-        }
-        return false;
-    }
+//    public static boolean checkXxxDB() {
+//        try {
+//            if (DBUtils.isTableExist(DBManager.getInstance(getContext()).openDB(), DBConfig.XXXInfo.TABLE_NAME)) {
+//                return true;
+//            }
+//        } catch (Throwable e) {
+//        }
+//        return false;
+//    }
 
     public static boolean checkScanDB() {
         try {

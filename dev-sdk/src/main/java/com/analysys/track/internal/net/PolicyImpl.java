@@ -1,7 +1,6 @@
 package com.analysys.track.internal.net;
 
 import android.content.Context;
-import android.content.Intent;
 import android.text.TextUtils;
 
 import com.analysys.track.BuildConfig;
@@ -11,10 +10,10 @@ import com.analysys.track.internal.content.UploadKey;
 import com.analysys.track.internal.impl.oc.ProcUtils;
 import com.analysys.track.internal.model.PolicyInfo;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.PsHelper;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -189,7 +188,7 @@ public class PolicyImpl {
 
         SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_NET);
         SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM);
-        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_XXX);
+//        SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_XXX);
         SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_NET);
         SPHelper.removeKey(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_OC);
 
@@ -565,14 +564,14 @@ public class PolicyImpl {
                         } else {// 1短路
                             SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_OC, true);
                         }
-                    } else if (EGContext.MODULE_CUT_XXX.equals(module)) {
-                        if (EGContext.DEFAULT_ZERO.equals(status)) {// 0不短路
-                            //                        setSp(UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, false);
-                            SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_XXX, false);
-                            continue;
-                        } else {// 1短路
-                            SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_XXX, true);
-                        }
+//                    } else if (EGContext.MODULE_CUT_XXX.equals(module)) {
+//                        if (EGContext.DEFAULT_ZERO.equals(status)) {// 0不短路
+//                            //                        setSp(UploadKey.Response.RES_POLICY_MODULE_CL_SNAPSHOT, false);
+//                            SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_XXX, false);
+//                            continue;
+//                        } else {// 1短路
+//                            SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_USM_CUTOF_XXX, true);
+//                        }
                     } else if (EGContext.MODULE_WIFI.equals(module)) {
                         if (EGContext.DEFAULT_ZERO.equals(status)) {// 0不收集，跳过
                             //                        setSp(UploadKey.Response.RES_POLICY_MODULE_CL_WIFI, false);
@@ -603,16 +602,16 @@ public class PolicyImpl {
                         }
                         array = obj.optJSONArray(UploadKey.Response.RES_POLICY_CTRL_SUB_CONTROL);
                         subModuleHandle(array, subList, "dev");
-                    } else if (EGContext.MODULE_XXX.equals(module)) {
-                        // 0不收集，跳过
-                        if (EGContext.DEFAULT_ZERO.equals(status)) {
-                            SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_XXX, false);
-                            continue;
-                        } else {
-                            SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true);
-                        }
-                        array = obj.optJSONArray(UploadKey.Response.RES_POLICY_CTRL_SUB_CONTROL);
-                        subModuleHandle(array, subList, "xxx");
+//                    } else if (EGContext.MODULE_XXX.equals(module)) {
+//                        // 0不收集，跳过
+//                        if (EGContext.DEFAULT_ZERO.equals(status)) {
+//                            SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_XXX, false);
+//                            continue;
+//                        } else {
+//                            SPHelper.setBooleanValue2SP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true);
+//                        }
+//                        array = obj.optJSONArray(UploadKey.Response.RES_POLICY_CTRL_SUB_CONTROL);
+//                        subModuleHandle(array, subList, "xxx");
                     }
 
                     responseCtrlInfo.put(UploadKey.Response.RES_POLICY_CTRL_STATUS, status);

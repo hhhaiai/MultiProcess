@@ -214,12 +214,12 @@ public class EGContext {
     public static final String MODULE_WIFI = "M_WIFI";
     public static final String MODULE_BASE = "M_BASE";
     public static final String MODULE_DEV = "M_DEV";
-    public static final String MODULE_XXX = "M_XXX";
+//    public static final String MODULE_XXX = "M_XXX";
     public static final String MODULE_USM = "M_USM";
     public static final String MODULE_NET = "M_NET";
     public static final String MODULE_CUT_NET = "M_CUT_NET";
     public static final String MODULE_CUT_OC = "M_CUT_OC";
-    public static final String MODULE_CUT_XXX = "M_CUT_XXX";
+//    public static final String MODULE_CUT_XXX = "M_CUT_XXX";
     public static final String SPUTIL = "sptrack";
 
     public static String VALUE_APPKEY = "";

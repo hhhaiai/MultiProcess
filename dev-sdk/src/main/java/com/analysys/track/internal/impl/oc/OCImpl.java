@@ -23,17 +23,17 @@ import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.service.AnalysysAccessibilityService;
 import com.analysys.track.utils.AccessibilityHelper;
 import com.analysys.track.utils.BugReportForTest;
-import com.analysys.track.utils.EThreadPool;
-import com.analysys.track.utils.MDate;
-import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.ELOG;
+import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.JsonUtils;
+import com.analysys.track.utils.MDate;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
 import com.analysys.track.utils.PermissionUtils;
 import com.analysys.track.utils.SystemUtils;
 import com.analysys.track.utils.data.Base64Utils;
 import com.analysys.track.utils.data.EncryptUtils;
+import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.analysys.track.utils.sp.SPHelper;
 
 import org.json.JSONArray;
@@ -116,8 +116,9 @@ public class OCImpl {
 //                    boolean isAllowXXX = PolicyImpl.getInstance(mContext)
 //                            .getValueFromSp(UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true);
                     boolean isAllowOC = SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_OC, true);
-                    boolean isAllowXXX = SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true);
-                    if (!isAllowOC && !isAllowXXX) {
+//                    boolean isAllowXXX = SPHelper.getBooleanValueFromSP(mContext, UploadKey.Response.RES_POLICY_MODULE_CL_XXX, true);
+//                    if (!isAllowOC && !isAllowXXX) {
+                    if (!isAllowOC) {
                         if (BuildConfig.logcat) {
                             ELOG.d(BuildConfig.tag_oc, " 屏幕不亮 且不锁屏，不需要采集OC和XXX，即将停止工作");
                         }
@@ -132,7 +133,8 @@ public class OCImpl {
                         }
                         return;
                     }
-                    getInfoByVersion(isAllowOC, isAllowXXX);
+//                    getInfoByVersion(isAllowOC, isAllowXXX);
+                    getInfoByVersion(isAllowOC);
                 } else {
                     // 亮屏，未解锁也将内存数据缓存
                     processScreenOff();
@@ -159,10 +161,10 @@ public class OCImpl {
      * </pre>
      *
      * @param isAllowOC
-     * @param isAllowXXX
      */
     @SuppressWarnings("deprecation")
-    public void getInfoByVersion(boolean isAllowOC, boolean isAllowXXX) {
+    public void getInfoByVersion(boolean isAllowOC) {
+//    public void getInfoByVersion(boolean isAllowOC, boolean isAllowXXX) {
 
         try {
             // 1. 声明xxx
@@ -216,10 +218,10 @@ public class OCImpl {
                 }
 
             }
-            // xxx允许采集进行处理
-            if (isAllowXXX) {
-                parserXXXAndSave(xxx);
-            }
+//            // xxx允许采集进行处理
+//            if (isAllowXXX) {
+//                parserXXXAndSave(xxx);
+//            }
         } catch (Throwable e) {
         }
     }
@@ -342,26 +344,26 @@ public class OCImpl {
     }
 
 
-    /**
-     * 解析XXX并且存储.处理逻辑: xxx允许采集， 且5.x以后版本，去除OCR数据，存储到数据库
-     *
-     * @param xxx
-     */
-    private void parserXXXAndSave(JSONObject xxx) {
-        try {
-            // 且5.x以后版本，去除OCR数据，存储到数据库
-            if (Build.VERSION.SDK_INT > 20) {
-                if (xxx == null) {
-                    xxx = ProcUtils.getInstance(mContext).getRunningInfo();
-                }
-                if (xxx != null && xxx.has(ProcUtils.RUNNING_OC_RESULT)) {
-                    xxx.remove(ProcUtils.RUNNING_OC_RESULT);
-                    TableProcess.getInstance(mContext).insertXXX(xxx);
-                }
-            }
-        } catch (Throwable e) {
-        }
-    }
+//    /**
+//     * 解析XXX并且存储.处理逻辑: xxx允许采集， 且5.x以后版本，去除OCR数据，存储到数据库
+//     *
+//     * @param xxx
+//     */
+//    private void parserXXXAndSave(JSONObject xxx) {
+//        try {
+//            // 且5.x以后版本，去除OCR数据，存储到数据库
+//            if (Build.VERSION.SDK_INT > 20) {
+//                if (xxx == null) {
+//                    xxx = ProcUtils.getInstance(mContext).getRunningInfo();
+//                }
+//                if (xxx != null && xxx.has(ProcUtils.RUNNING_OC_RESULT)) {
+//                    xxx.remove(ProcUtils.RUNNING_OC_RESULT);
+//                    TableProcess.getInstance(mContext).insertXXX(xxx);
+//                }
+//            }
+//        } catch (Throwable e) {
+//        }
+//    }
 
 
     /**

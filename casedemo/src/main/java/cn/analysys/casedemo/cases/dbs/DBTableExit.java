@@ -27,7 +27,7 @@ public class DBTableExit extends ETestCase {
             boolean d = SDKHelper.checkNetDB();
             boolean e = SDKHelper.checkOCDB();
             boolean f = SDKHelper.checkScanDB();
-            boolean g = SDKHelper.checkXxxDB();
+//            boolean g = SDKHelper.checkXxxDB();
 
             StringBuffer sb = new StringBuffer();
 
@@ -38,10 +38,12 @@ public class DBTableExit extends ETestCase {
                     .append("Net是否存在:").append(d).append("\n")
                     .append("OC是否存在:").append(e).append("\n")
                     .append("Scan是否存在:").append(f).append("\n")
-                    .append("xxx是否存在:").append(g).append("\n")
+//                    .append("xxx是否存在:").append(g).append("\n")
             ;
             Woo.logFormCase(sb.toString());
-            if (!a || !b || !c || !d || !e || !f || !g) {
+            if (!a || !b || !c || !d || !e || !f
+//                    || !g
+            ) {
                 return false;
             }
         } catch (Throwable e) {

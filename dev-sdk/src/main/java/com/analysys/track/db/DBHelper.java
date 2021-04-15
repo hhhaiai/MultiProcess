@@ -78,9 +78,9 @@ public class DBHelper extends SQLiteOpenHelper {
                 if (!DBUtils.isTableExist(db, DBConfig.ScanningInfo.TABLE_NAME)) {
                     db.execSQL(DBConfig.ScanningInfo.CREATE_TABLE);
                 }
-                if (!DBUtils.isTableExist(db, DBConfig.XXXInfo.TABLE_NAME)) {
-                    db.execSQL(DBConfig.XXXInfo.CREATE_TABLE);
-                }
+//                if (!DBUtils.isTableExist(db, DBConfig.XXXInfo.TABLE_NAME)) {
+//                    db.execSQL(DBConfig.XXXInfo.CREATE_TABLE);
+//                }
                 if (!DBUtils.isTableExist(db, DBConfig.NetInfo.TABLE_NAME)) {
                     db.execSQL(DBConfig.NetInfo.CREATE_TABLE);
                 }

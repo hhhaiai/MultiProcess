@@ -270,17 +270,17 @@ public class UploadKey {
         public static final String NAME = "USMInfo";
     }
 
-    /**
-     * @Copyright © 2019 sanbo Inc. All rights reserved.
-     * @Description: 内部使用的XXXinfo
-     * @Version: 1.0
-     * @Create: 2019-07-27 15:28:36
-     * @author: sanbo
-     * @mail: xueyongfu@analysys.com.cn
-     */
-    public static class XXXInfo {
-        public static final String NAME = "XXXInfo";
-    }
+//    /**
+//     * @Copyright © 2019 sanbo Inc. All rights reserved.
+//     * @Description: 内部使用的XXXinfo
+//     * @Version: 1.0
+//     * @Create: 2019-07-27 15:28:36
+//     * @author: sanbo
+//     * @mail: xueyongfu@analysys.com.cn
+//     */
+//    public static class XXXInfo {
+//        public static final String NAME = "XXXInfo";
+//    }
 
     /**
      * @Copyright © 2018 Analysys Inc. All rights reserved.
@@ -457,13 +457,13 @@ public class UploadKey {
         public static final String RES_POLICY_MODULE_CL_BASE = "module_cl_base";
         // DEV
         public static final String RES_POLICY_MODULE_CL_DEV = "module_cl_dev";
-        // XXX
-        public static final String RES_POLICY_MODULE_CL_XXX = "module_cl_xxx";
+//        // XXX
+//        public static final String RES_POLICY_MODULE_CL_XXX = "module_cl_xxx";
         //Finfo
         public static final String RES_POLICY_MODULE_CL_FINFO = "module_cl_finfo";
 
-        //控制是否短路xxx
-        public static final String RES_POLICY_MODULE_CL_USM_CUTOF_XXX = "module_cl_cutof_xxx";
+//        //控制是否短路xxx
+//        public static final String RES_POLICY_MODULE_CL_USM_CUTOF_XXX = "module_cl_cutof_xxx";
         //控制是否短路netinfo
         public static final String RES_POLICY_MODULE_CL_USM_CUTOF_NET = "module_cl_cutof_net";
         //控制是否短路ocinfo
