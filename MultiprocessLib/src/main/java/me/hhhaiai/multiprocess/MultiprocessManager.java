@@ -6,7 +6,9 @@ import android.content.Intent;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import me.hhhaiai.ImpTask;
 import me.hhhaiai.utils.EContext;
+import me.hhhaiai.utils.MpLog;
 import me.hhhaiai.utils.Reflect;
 import me.hhhaiai.utils.ServiceHelper;
 
@@ -20,21 +22,41 @@ import me.hhhaiai.utils.ServiceHelper;
 public class MultiprocessManager {
 
 
-    /**
-     * 启动服务
-     *
-     * @param context
-     * @param count
-     */
-    private static void runServices(Context context, int count) {
-        context = EContext.getContext(context);
-        if (context != null && count > 0) {
-            CopyOnWriteArrayList<Class<? extends  Service>> cp = new CopyOnWriteArrayList<Class<? extends  Service>>();
+    public void postMultiMessages(int count, ImpTask task) {
+        if (count > ServiceHelper.MAX_SERVICES) {
+            MpLog.e("超过最大支持进程数量，现阶段支持最大进程数:" + ServiceHelper.MAX_SERVICES);
+            return;
+        }
+        mContext = EContext.getContext();
+        if (mContext != null && count > 0) {
+            CopyOnWriteArrayList<Class<? extends Service>> cp = new CopyOnWriteArrayList<Class<? extends Service>>();
             for (int i = 1; i <= count; i++) {
-                cp.add(Reflect.getClass("CService" + i));
+                cp.add(Reflect.getClass("me.hhhaiai.services.CService" + i));
             }
-            ServiceHelper.startService(context, cp);
-
+            ServiceHelper.startService(mContext, cp, task);
         }
     }
+
+
+    /********************* get instance begin **************************/
+    public static MultiprocessManager getInstance(Context context) {
+        return HLODER.INSTANCE.initContext(context);
+    }
+
+    private MultiprocessManager initContext(Context context) {
+        mContext = EContext.getContext(context);
+        return HLODER.INSTANCE;
+    }
+
+    private static class HLODER {
+        private static final MultiprocessManager INSTANCE = new MultiprocessManager();
+    }
+
+    private MultiprocessManager() {
+    }
+
+    private Context mContext = null;
+    /********************* get instance end **************************/
+
+
 }

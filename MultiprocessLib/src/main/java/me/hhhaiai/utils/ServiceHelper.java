@@ -10,58 +10,67 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Bundle;
 import android.text.TextUtils;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import me.hhhaiai.ImpTask;
 
 public class ServiceHelper {
 
 
     /******************************开启服务***********************************/
-    public static void startService(Context context, List<Class<? extends  Service>> clazzs) {
+
+    public static void startService(Context context, List<Class<? extends Service>> clazzs, ImpTask task) {
         if (clazzs != null) {
             for (int i = 0; i < clazzs.size(); i++) {
-                startService(context, clazzs.get(i));
+                startService(context, clazzs.get(i), task);
             }
         }
     }
 
-    public static void startService(Context context, Class<? extends  Service> clazz) {
+
+    public static void startService(Context context, Class<? extends Service> clazz, ImpTask task) {
         try {
             context = EContext.getContext(context);
             if (context == null) {
                 return;
             }
+
             if (AndroidManifestHelper.isServiceDefineInManifest(context, clazz)) {
-                if (!isServiceWorking(context, clazz.getName())) {
-                    if (Build.VERSION.SDK_INT < 26) {
-                        startServiceImpl(context, clazz);
-                    } else {
-                        startForegroundServiceImpl(context, clazz);
-                    }
+//                if (!isServiceWorking(context, clazz.getName())) {
+                Intent intent = new Intent();
+                ComponentName cn = new ComponentName(context, clazz);
+                intent.setComponent(cn);
+                if (task != null) {
+                    intent.putExtra(MSG_CALLBACK, task);
                 }
+                MpLog.i("----->" + clazz.toString());
+                if (Build.VERSION.SDK_INT < 26) {
+                    startServiceImpl(context, intent);
+                } else {
+                    startForegroundServiceImpl(context, intent);
+                }
+//                }
             }
         } catch (Throwable e) {
+            MpLog.e(e);
         }
     }
 
-    private static void startForegroundServiceImpl(Context context, Class<? extends  Service> clazz) {
-        ComponentName cn = new ComponentName(context, clazz);
-        Intent intent = new Intent();
-        intent.setComponent(cn);
+    private static void startForegroundServiceImpl(Context context, Intent intent) {
         Reflect.invokeObjectMethod(context, "startForegroundService", new Class[]{Intent.class}, new Object[]{intent});
     }
 
-    private static void startServiceImpl(Context context, Class<?> clazz) {
-        ComponentName cn = new ComponentName(context, clazz);
-        Intent intent = new Intent();
-        intent.setComponent(cn);
+    private static void startServiceImpl(Context context, Intent intent) {
         context.startService(intent);
     }
 
     /******************************关闭服务***********************************/
 
-    public static void stopService(Context context, Class<? extends  Service> clazz) {
+    public static void stopService(Context context, Class<? extends Service> clazz) {
         try {
             context = EContext.getContext(context);
             if (context == null) {
@@ -82,7 +91,7 @@ public class ServiceHelper {
     /******************************开启JobService***********************************/
 
     @TargetApi(21)
-    public static boolean startJobService(Context context, Class<? extends  JobService> clazz, int jobId, long intervalMillis) {
+    public static boolean startJobService(Context context, Class<? extends JobService> clazz, int jobId, long intervalMillis) {
         try {
             context = EContext.getContext(context);
             if (context == null) {
@@ -140,7 +149,7 @@ public class ServiceHelper {
 
     /******************************Service运行状态判断***********************************/
 
-    public static boolean isServiceWorking(Context context, Class<? extends  Service> serviceClass) {
+    public static boolean isServiceWorking(Context context, Class<? extends Service> serviceClass) {
         return isServiceWorking(context, serviceClass.getName());
     }
 
@@ -172,7 +181,22 @@ public class ServiceHelper {
         return isWork;
     }
 
+    /**********************************回调处理*************************************/
+    public static void callback(String serviceName, Intent intent) {
+        if (intent == null) {
+            return;
+        }
+        ImpTask task = (ImpTask) intent.getSerializableExtra(MSG_CALLBACK);
+        if (task != null) {
+            task.work();
+        }
+    }
 
+
+    public static boolean isDebugService = false;
+    public static int MAX_SERVICES = 50;
     private static ActivityManager mActivityManager = null;
     private static JobScheduler mJobScheduler = null;
+    private static final String MSG_CALLBACK = "MSG_CALLBACK";
+
 }

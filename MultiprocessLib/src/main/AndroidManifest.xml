@@ -15,21 +15,21 @@
             android:enabled="true"
             android:exported="true"
             android:persistent="true"
-            android:process=":CService1">
+            android:process=":CService2">
         </service>
         <service
             android:name="me.hhhaiai.services.CService3"
             android:enabled="true"
             android:exported="true"
             android:persistent="true"
-            android:process=":CService1">
+            android:process=":CService3">
         </service>
         <service
             android:name="me.hhhaiai.services.CService4"
             android:enabled="true"
             android:exported="true"
             android:persistent="true"
-            android:process=":CService1">
+            android:process=":CService4">
         </service>
     </application>
 
