@@ -182,7 +182,7 @@ public class ServiceHelper {
     }
 
     /**********************************回调处理*************************************/
-    public static void callback(String serviceName, Intent intent) {
+    public static void callback(Service self, Intent intent) {
         try {
             if (intent == null) {
                 return;
@@ -191,8 +191,29 @@ public class ServiceHelper {
             if (task != null) {
                 task.work();
             }
+            //完成任务后50毫秒自动关闭
+            Thread.sleep(50);
         } catch (Throwable e) {
             MpLog.e(e);
+        } finally {
+            stopService(EContext.getContext(self.getApplicationContext()), self.getClass());
+        }
+    }
+    public static void callback(String self, Intent intent) {
+        try {
+            if (intent == null) {
+                return;
+            }
+            ImpTask task = (ImpTask) intent.getSerializableExtra(MSG_CALLBACK);
+            if (task != null) {
+                task.work();
+            }
+            //完成任务后50毫秒自动关闭
+            Thread.sleep(50);
+        } catch (Throwable e) {
+            MpLog.e(e);
+        } finally {
+//            stopService(EContext.getContext(self.getApplicationContext()), self.getClass());
         }
     }
 

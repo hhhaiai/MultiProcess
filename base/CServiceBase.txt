@@ -4,12 +4,13 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+
 import me.hhhaiai.utils.EThreadPool;
 import me.hhhaiai.utils.MpLog;
 import me.hhhaiai.utils.ServiceHelper;
 
-public class CService%d extends Service {
-    String NAME = CService%d.class.getName();
+public class CService1 extends Service {
+    String NAME = CService1.class.getName();
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -49,7 +50,7 @@ public class CService%d extends Service {
             MpLog.d(NAME + ".onStartCommand flags:" + flags + "; startId: " + startId + " ; intent: " + intent);
         }
         EThreadPool.runOnWorkThread(() -> {
-            ServiceHelper.callback(NAME, intent);
+            ServiceHelper.callback(CService1.this, intent);
         });
         return super.onStartCommand(intent, flags, startId);
     }

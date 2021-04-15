@@ -11,7 +11,7 @@ public class GenralClass {
     public static void main(String[] args) {
 //        testInsert();
 //        generalServiceInMainfast();
-//        generalServiceFile();
+        generalServiceFile();
     }
 
     private static void testInsert() {
@@ -21,7 +21,7 @@ public class GenralClass {
     private static void generalServiceFile() {
         String baseClass = loadToString("base/CServiceBase.text");
         for (int i = 1; i < 101; i++) {
-            saveTextToFile("base/CService" + i + ".java", String.format(baseClass, i, i), false);
+            saveTextToFile("base/CService" + i + ".java", String.format(baseClass, i, i, i), false);
         }
 
     }

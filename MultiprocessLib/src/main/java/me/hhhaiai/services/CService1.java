@@ -17,7 +17,6 @@ public class CService1 extends Service {
         if (ServiceHelper.isDebugService) {
             MpLog.d(NAME + ".onBind intent:" + intent);
         }
-
         return null;
     }
 
@@ -26,7 +25,6 @@ public class CService1 extends Service {
         if (ServiceHelper.isDebugService) {
             MpLog.d(NAME + ".onRebind intent:" + intent);
         }
-
         super.onRebind(intent);
     }
 
@@ -52,9 +50,8 @@ public class CService1 extends Service {
             MpLog.d(NAME + ".onStartCommand flags:" + flags + "; startId: " + startId + " ; intent: " + intent);
         }
         EThreadPool.runOnWorkThread(() -> {
-            ServiceHelper.callback(NAME, intent);
+            ServiceHelper.callback(CService1.this, intent);
         });
-
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -64,7 +61,6 @@ public class CService1 extends Service {
         if (ServiceHelper.isDebugService) {
             MpLog.d(NAME + ".onStart startId: " + startId + " ; intent: " + intent);
         }
-
     }
 
     @Override
@@ -81,7 +77,6 @@ public class CService1 extends Service {
         if (ServiceHelper.isDebugService) {
             MpLog.d(NAME + ".onTrimMemory level:" + level);
         }
-
     }
 
     @Override
@@ -90,7 +85,6 @@ public class CService1 extends Service {
         if (ServiceHelper.isDebugService) {
             MpLog.d(NAME + ".attachBaseContext newBase:" + newBase);
         }
-
     }
 
     @Override
@@ -99,6 +93,5 @@ public class CService1 extends Service {
         if (ServiceHelper.isDebugService) {
             MpLog.d(NAME + ".onDestroy ");
         }
-
     }
 }
