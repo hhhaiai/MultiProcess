@@ -97,12 +97,7 @@ public class ShellUtils {
                 BugReportForTest.commitError(e);
             }
         } finally {
-            StreamerUtils.safeClose(pos);
-            StreamerUtils.safeClose(ii);
-            StreamerUtils.safeClose(br);
-            StreamerUtils.safeClose(is);
-            StreamerUtils.safeClose(in);
-            StreamerUtils.safeClose(os);
+            StreamerUtils.safeClose(pos, ii, br, is, in, os);
         }
 
         return result;
@@ -167,12 +162,7 @@ public class ShellUtils {
                 BugReportForTest.commitError(e);
             }
         } finally {
-            StreamerUtils.safeClose(pos);
-            StreamerUtils.safeClose(ii);
-            StreamerUtils.safeClose(br);
-            StreamerUtils.safeClose(is);
-            StreamerUtils.safeClose(in);
-            StreamerUtils.safeClose(os);
+            StreamerUtils.safeClose(pos, ii, br, is, in, os);
         }
         return result;
 

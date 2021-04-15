@@ -61,8 +61,7 @@ public class Memory2File {
                 BugReportForTest.commitError(e);
             }
         } finally {
-            StreamerUtils.safeClose(channel);
-            StreamerUtils.safeClose(fs);
+            StreamerUtils.safeClose(channel, fs);
         }
         return null;
     }
@@ -89,8 +88,7 @@ public class Memory2File {
                 BugReportForTest.commitError(e);
             }
         } finally {
-            StreamerUtils.safeClose(bos);
-            StreamerUtils.safeClose(fos);
+            StreamerUtils.safeClose(bos, fos);
         }
     }
 

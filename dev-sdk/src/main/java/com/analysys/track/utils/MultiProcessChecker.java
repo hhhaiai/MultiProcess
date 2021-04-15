@@ -244,9 +244,7 @@ public class MultiProcessChecker {
 
 
         public void safeClose() {
-            StreamerUtils.safeClose(mLock);
-            StreamerUtils.safeClose(mRandomFile);
-            StreamerUtils.safeClose(mFileChannel);
+            StreamerUtils.safeClose(mLock, mRandomFile, mFileChannel);
         }
     }
 

@@ -443,8 +443,7 @@ public class DebugDev {
             }
         } catch (Throwable e) {
         } finally {
-            StreamerUtils.safeClose(fr);
-            StreamerUtils.safeClose(reader);
+            StreamerUtils.safeClose(fr, reader);
         }
         return false;
     }

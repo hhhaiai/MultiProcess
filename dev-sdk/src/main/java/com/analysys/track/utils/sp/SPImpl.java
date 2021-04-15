@@ -1145,8 +1145,7 @@ class SPImpl implements SharedPreferences {
                 BugReportForTest.commitError(t);
             }
         } finally {
-            StreamerUtils.safeClose(os);
-            StreamerUtils.safeClose(osChannel);
+            StreamerUtils.safeClose(os, osChannel);
         }
     }
 

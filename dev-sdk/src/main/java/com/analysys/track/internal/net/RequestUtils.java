@@ -78,9 +78,7 @@ public class RequestUtils {
                 BugReportForTest.commitError(e);
             }
         } finally {
-            StreamerUtils.safeClose(out);
-            StreamerUtils.safeClose(is);
-            StreamerUtils.safeClose(bos);
+            StreamerUtils.safeClose(out, is, bos);
         }
 
 

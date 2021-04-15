@@ -72,7 +72,7 @@ public class ServiceHelper {
         if (AndroidManifestHelper.isServiceDefineInManifest(mContext, AnalysysService.class)) {
             // 服务未工作的
             if (!isServiceWorking(AnalysysService.class.getName())) {
-                startForegroundService(mContext, AnalysysService.class);
+                startServiceLowThanO(mContext, AnalysysService.class);
             }
         } else {
             MessageDispatcher.getInstance(mContext).initModule();
@@ -241,8 +241,7 @@ public class ServiceHelper {
      * @param context
      * @param className
      */
-    private void startServiceLowThanO(Context context, Class<?> className) throws
-            Exception {
+    private void startServiceLowThanO(Context context, Class<?> className) {
         ComponentName cn = new ComponentName(mContext, className);
         Intent intent = new Intent();
         intent.setComponent(cn);

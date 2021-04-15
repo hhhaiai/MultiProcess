@@ -90,9 +90,7 @@ public class FileUitls {
                 BugReportForTest.commitError(e);
             }
         } finally {
-            StreamerUtils.safeClose(outputStream);
-            StreamerUtils.safeClose(writer);
-            StreamerUtils.safeClose(out);
+            StreamerUtils.safeClose(outputStream,writer,out);
         }
     }
 
@@ -137,9 +135,7 @@ public class FileUitls {
                 BugReportForTest.commitError(e);
             }
         } finally {
-            StreamerUtils.safeClose(in);
-            StreamerUtils.safeClose(reader);
-            StreamerUtils.safeClose(outputStream);
+            StreamerUtils.safeClose(in,reader,outputStream);
         }
         return builder.toString();
     }

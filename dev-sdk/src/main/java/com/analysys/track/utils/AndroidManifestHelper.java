@@ -36,7 +36,7 @@ public class AndroidManifestHelper {
      */
     public static boolean isServiceDefineInManifest(Context context, Class<?> clazz) {
         try {
-            context = EContextHelper.getContext();
+            context = EContextHelper.getContext(context);
             if (context != null) {
                 ServiceInfo info = getServiceInfo(context, clazz);
                 if (info != null) {
@@ -54,7 +54,7 @@ public class AndroidManifestHelper {
 
     public static boolean isJobServiceDefineInManifest(Context context, Class<?> clazz) {
         try {
-            context = EContextHelper.getContext();
+            context = EContextHelper.getContext(context);
             if (context != null) {
                 ServiceInfo info = getServiceInfo(context, clazz);
                 if (info != null && "android.permission.BIND_JOB_SERVICE".equals(info.permission)) {
@@ -183,7 +183,7 @@ public class AndroidManifestHelper {
 
     private static ServiceInfo getServiceInfo(Context context, Class<?> clazz) {
         try {
-            context = EContextHelper.getContext();
+            context = EContextHelper.getContext(context);
             if (context == null || clazz == null) {
                 return null;
             }

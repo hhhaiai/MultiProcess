@@ -206,9 +206,7 @@ public class SimulatorUtils {
                 BugReportForTest.commitError(e);
             }
         } finally {
-            StreamerUtils.safeClose(fis);
-            StreamerUtils.safeClose(isr);
-            StreamerUtils.safeClose(reader);
+            StreamerUtils.safeClose(fis,isr,reader);
         }
         return false;
     }
