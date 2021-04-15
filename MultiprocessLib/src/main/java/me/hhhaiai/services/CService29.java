@@ -13,8 +13,8 @@ import me.hhhaiai.utils.EThreadPool;
 import me.hhhaiai.utils.MpLog;
 import me.hhhaiai.utils.ServiceHelper;
 
-public class CService%d extends Service {
-    String NAME = CService%d.class.getName();
+public class CService29 extends Service {
+    String NAME = CService29.class.getName();
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -48,7 +48,7 @@ public class CService%d extends Service {
         }
 
         if (Build.VERSION.SDK_INT >= 26) {
-            String CHANNEL_ID = "channel%d";
+            String CHANNEL_ID = "channel29";
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
                     "Channel human readable title",
                     NotificationManager.IMPORTANCE_DEFAULT);
@@ -58,7 +58,7 @@ public class CService%d extends Service {
             Notification notification = new Notification.Builder(this, CHANNEL_ID).setContentTitle("")
                     .setContentText("").build();
 
-            startForeground(%d, notification);
+            startForeground(29, notification);
         }
     }
 
@@ -68,7 +68,7 @@ public class CService%d extends Service {
             MpLog.d(NAME + ".onStartCommand flags:" + flags + "; startId: " + startId + " ; intent: " + intent);
         }
         EThreadPool.runOnWorkThread(() -> {
-            ServiceHelper.callback(CService%d.this, intent);
+            ServiceHelper.callback(CService29.this, intent);
         });
         return super.onStartCommand(intent, flags, startId);
     }
@@ -113,3 +113,4 @@ public class CService%d extends Service {
         }
     }
 }
+

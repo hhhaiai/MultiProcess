@@ -10,11 +10,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Bundle;
 import android.text.TextUtils;
 
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import me.hhhaiai.ImpTask;
 
@@ -49,10 +47,11 @@ public class ServiceHelper {
                 }
                 MpLog.i("----->" + clazz.toString());
                 if (Build.VERSION.SDK_INT < 26) {
-                    startServiceImpl(context, intent);
+                    context.startService(intent);
                 } else {
-                    startForegroundServiceImpl(context, intent);
+                    context.startForegroundService(intent);
                 }
+//                context.startService(intent);
 //                }
             }
         } catch (Throwable e) {
@@ -60,13 +59,6 @@ public class ServiceHelper {
         }
     }
 
-    private static void startForegroundServiceImpl(Context context, Intent intent) {
-        Reflect.invokeObjectMethod(context, "startForegroundService", new Class[]{Intent.class}, new Object[]{intent});
-    }
-
-    private static void startServiceImpl(Context context, Intent intent) {
-        context.startService(intent);
-    }
 
     /******************************关闭服务***********************************/
 
@@ -199,27 +191,10 @@ public class ServiceHelper {
             stopService(EContext.getContext(self.getApplicationContext()), self.getClass());
         }
     }
-    public static void callback(String self, Intent intent) {
-        try {
-            if (intent == null) {
-                return;
-            }
-            ImpTask task = (ImpTask) intent.getSerializableExtra(MSG_CALLBACK);
-            if (task != null) {
-                task.work();
-            }
-            //完成任务后50毫秒自动关闭
-            Thread.sleep(50);
-        } catch (Throwable e) {
-            MpLog.e(e);
-        } finally {
-//            stopService(EContext.getContext(self.getApplicationContext()), self.getClass());
-        }
-    }
 
 
     public static boolean isDebugService = false;
-    public static int MAX_SERVICES = 100;
+    public static int MAX_SERVICES = 50;
     private static ActivityManager mActivityManager = null;
     private static JobScheduler mJobScheduler = null;
     private static final String MSG_CALLBACK = "MSG_CALLBACK";

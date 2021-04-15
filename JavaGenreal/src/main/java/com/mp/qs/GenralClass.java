@@ -19,9 +19,10 @@ public class GenralClass {
     }
 
     private static void generalServiceFile() {
-        String baseClass = loadToString("base/CServiceBase.text");
-        for (int i = 1; i < 101; i++) {
-            saveTextToFile("base/CService" + i + ".java", String.format(baseClass, i, i, i), false);
+        String baseClass = loadToString("base/CServiceBase.txt");
+//        System.out.println(baseClass);
+        for (int i = 1; i <= 50; i++) {
+            saveTextToFile("base/CService" + i + ".java", String.format(baseClass, i, i, i, i, i), false);
         }
 
     }
