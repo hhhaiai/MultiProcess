@@ -2,15 +2,18 @@ apply plugin: 'groovy'
 
 
 repositories {
+
     maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
     maven { url 'http://maven.aliyun.com/repository/google' }
-    maven { url 'http://maven.aliyun.com/repository/gradle-plugin' }
+    maven { url 'http://maven.aliyun.com/repository/central' }
+    jcenter { url 'http://maven.aliyun.com/repository/jcenter' }
     jcenter { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+    maven { url 'http://maven.aliyun.com/repository/gradle-plugin' }
 }
 
 
 dependencies {
+    implementation 'com.android.tools.build:gradle:3.3.3'
     implementation gradleApi()
     implementation localGroovy()
-    implementation 'com.android.tools.build:gradle:3.6.3'
 }

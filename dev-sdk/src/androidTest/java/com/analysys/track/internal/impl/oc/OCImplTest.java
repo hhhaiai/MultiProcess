@@ -1,6 +1,7 @@
 package com.analysys.track.internal.impl.oc;
 
 import android.content.Context;
+
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.analysys.track.AnalsysTest;
@@ -9,7 +10,7 @@ import com.analysys.track.internal.work.ECallBack;
 import org.json.JSONArray;
 import org.junit.Test;
 
-public class OCImplTest  extends AnalsysTest {
+public class OCImplTest extends AnalsysTest {
     Context mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     @Test
@@ -29,10 +30,8 @@ public class OCImplTest  extends AnalsysTest {
 
     @Test
     public void getInfoByVersion() {
-        OCImpl.getInstance(mContext).getInfoByVersion(false, false);
-        OCImpl.getInstance(mContext).getInfoByVersion(true, false);
-        OCImpl.getInstance(mContext).getInfoByVersion(false, true);
-        OCImpl.getInstance(mContext).getInfoByVersion(true, true);
+        OCImpl.getInstance(mContext).getInfoByVersion(false);
+        OCImpl.getInstance(mContext).getInfoByVersion(true);
     }
 
     @Test
