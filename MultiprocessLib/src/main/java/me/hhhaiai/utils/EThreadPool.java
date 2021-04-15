@@ -78,8 +78,7 @@ public class EThreadPool {
             executorUpload = Executors.newSingleThreadScheduledExecutor();
         }
 
-        queue.add(
-                new WeakReference<ScheduledFuture<?>>(executorUpload.schedule(command, delay, TimeUnit.MILLISECONDS)));
+        queue.add(new WeakReference<ScheduledFuture<?>>(executorUpload.schedule(command, delay, TimeUnit.MILLISECONDS)));
     }
 
 //    public synchronized static void postSync(Runnable command) {
@@ -109,6 +108,7 @@ public class EThreadPool {
                     try {
                         runnable.run();
                     } catch (Throwable e) {
+                        MpLog.e(e);
                     }
                 }
             });
@@ -116,6 +116,7 @@ public class EThreadPool {
             try {
                 runnable.run();
             } catch (Throwable e) {
+                MpLog.e(e);
             }
         }
     }
@@ -134,6 +135,7 @@ public class EThreadPool {
                     try {
                         runnable.run();
                     } catch (Throwable e) {
+                        MpLog.e(e);
                     }
                 }
             });
@@ -141,6 +143,7 @@ public class EThreadPool {
             try {
                 runnable.run();
             } catch (Throwable e) {
+                MpLog.e(e);
             }
         }
     }

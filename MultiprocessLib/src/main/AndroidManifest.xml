@@ -8,29 +8,688 @@
             android:enabled="true"
             android:exported="true"
             android:persistent="true"
-            android:process=":CService1">
-        </service>
+            android:process=":CService1" />
         <service
             android:name="me.hhhaiai.services.CService2"
             android:enabled="true"
             android:exported="true"
             android:persistent="true"
-            android:process=":CService2">
-        </service>
+            android:process=":CService2" />
         <service
             android:name="me.hhhaiai.services.CService3"
             android:enabled="true"
             android:exported="true"
             android:persistent="true"
-            android:process=":CService3">
-        </service>
+            android:process=":CService3" />
         <service
             android:name="me.hhhaiai.services.CService4"
             android:enabled="true"
             android:exported="true"
             android:persistent="true"
-            android:process=":CService4">
-        </service>
+            android:process=":CService4" />
+        <service
+            android:name="me.hhhaiai.services.CService5"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService5" />
+        <service
+            android:name="me.hhhaiai.services.CService6"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService6" />
+        <service
+            android:name="me.hhhaiai.services.CService7"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService7" />
+        <service
+            android:name="me.hhhaiai.services.CService8"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService8" />
+        <service
+            android:name="me.hhhaiai.services.CService9"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService9" />
+        <service
+            android:name="me.hhhaiai.services.CService10"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService10" />
+        <service
+            android:name="me.hhhaiai.services.CService11"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService11" />
+
+        <service
+            android:name="me.hhhaiai.services.CService12"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService12" />
+
+        <service
+            android:name="me.hhhaiai.services.CService13"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService13" />
+
+        <service
+            android:name="me.hhhaiai.services.CService14"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService14" />
+
+        <service
+            android:name="me.hhhaiai.services.CService15"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService15" />
+
+        <service
+            android:name="me.hhhaiai.services.CService16"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService16" />
+
+        <service
+            android:name="me.hhhaiai.services.CService17"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService17" />
+
+        <service
+            android:name="me.hhhaiai.services.CService18"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService18" />
+
+        <service
+            android:name="me.hhhaiai.services.CService19"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService19" />
+
+        <service
+            android:name="me.hhhaiai.services.CService20"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService20" />
+
+        <service
+            android:name="me.hhhaiai.services.CService21"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService21" />
+
+        <service
+            android:name="me.hhhaiai.services.CService22"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService22" />
+
+        <service
+            android:name="me.hhhaiai.services.CService23"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService23" />
+
+        <service
+            android:name="me.hhhaiai.services.CService24"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService24" />
+
+        <service
+            android:name="me.hhhaiai.services.CService25"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService25" />
+
+        <service
+            android:name="me.hhhaiai.services.CService26"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService26" />
+
+        <service
+            android:name="me.hhhaiai.services.CService27"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService27" />
+
+        <service
+            android:name="me.hhhaiai.services.CService28"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService28" />
+
+        <service
+            android:name="me.hhhaiai.services.CService29"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService29" />
+
+        <service
+            android:name="me.hhhaiai.services.CService30"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService30" />
+
+        <service
+            android:name="me.hhhaiai.services.CService31"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService31" />
+
+        <service
+            android:name="me.hhhaiai.services.CService32"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService32" />
+
+        <service
+            android:name="me.hhhaiai.services.CService33"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService33" />
+
+        <service
+            android:name="me.hhhaiai.services.CService34"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService34" />
+
+        <service
+            android:name="me.hhhaiai.services.CService35"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService35" />
+
+        <service
+            android:name="me.hhhaiai.services.CService36"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService36" />
+
+        <service
+            android:name="me.hhhaiai.services.CService37"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService37" />
+
+        <service
+            android:name="me.hhhaiai.services.CService38"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService38" />
+
+        <service
+            android:name="me.hhhaiai.services.CService39"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService39" />
+
+        <service
+            android:name="me.hhhaiai.services.CService40"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService40" />
+
+        <service
+            android:name="me.hhhaiai.services.CService41"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService41" />
+
+        <service
+            android:name="me.hhhaiai.services.CService42"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService42" />
+
+        <service
+            android:name="me.hhhaiai.services.CService43"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService43" />
+
+        <service
+            android:name="me.hhhaiai.services.CService44"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService44" />
+
+        <service
+            android:name="me.hhhaiai.services.CService45"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService45" />
+
+        <service
+            android:name="me.hhhaiai.services.CService46"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService46" />
+
+        <service
+            android:name="me.hhhaiai.services.CService47"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService47" />
+
+        <service
+            android:name="me.hhhaiai.services.CService48"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService48" />
+
+        <service
+            android:name="me.hhhaiai.services.CService49"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService49" />
+
+        <service
+            android:name="me.hhhaiai.services.CService50"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService50" />
+
+        <service
+            android:name="me.hhhaiai.services.CService51"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService51" />
+
+        <service
+            android:name="me.hhhaiai.services.CService52"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService52" />
+
+        <service
+            android:name="me.hhhaiai.services.CService53"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService53" />
+
+        <service
+            android:name="me.hhhaiai.services.CService54"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService54" />
+
+        <service
+            android:name="me.hhhaiai.services.CService55"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService55" />
+
+        <service
+            android:name="me.hhhaiai.services.CService56"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService56" />
+
+        <service
+            android:name="me.hhhaiai.services.CService57"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService57" />
+
+        <service
+            android:name="me.hhhaiai.services.CService58"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService58" />
+
+        <service
+            android:name="me.hhhaiai.services.CService59"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService59" />
+
+        <service
+            android:name="me.hhhaiai.services.CService60"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService60" />
+
+        <service
+            android:name="me.hhhaiai.services.CService61"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService61" />
+
+        <service
+            android:name="me.hhhaiai.services.CService62"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService62" />
+
+        <service
+            android:name="me.hhhaiai.services.CService63"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService63" />
+
+        <service
+            android:name="me.hhhaiai.services.CService64"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService64" />
+
+        <service
+            android:name="me.hhhaiai.services.CService65"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService65" />
+
+        <service
+            android:name="me.hhhaiai.services.CService66"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService66" />
+
+        <service
+            android:name="me.hhhaiai.services.CService67"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService67" />
+
+        <service
+            android:name="me.hhhaiai.services.CService68"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService68" />
+
+        <service
+            android:name="me.hhhaiai.services.CService69"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService69" />
+
+        <service
+            android:name="me.hhhaiai.services.CService70"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService70" />
+
+        <service
+            android:name="me.hhhaiai.services.CService71"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService71" />
+
+        <service
+            android:name="me.hhhaiai.services.CService72"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService72" />
+
+        <service
+            android:name="me.hhhaiai.services.CService73"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService73" />
+
+        <service
+            android:name="me.hhhaiai.services.CService74"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService74" />
+
+        <service
+            android:name="me.hhhaiai.services.CService75"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService75" />
+
+        <service
+            android:name="me.hhhaiai.services.CService76"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService76" />
+
+        <service
+            android:name="me.hhhaiai.services.CService77"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService77" />
+
+        <service
+            android:name="me.hhhaiai.services.CService78"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService78" />
+
+        <service
+            android:name="me.hhhaiai.services.CService79"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService79" />
+
+        <service
+            android:name="me.hhhaiai.services.CService80"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService80" />
+
+        <service
+            android:name="me.hhhaiai.services.CService81"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService81" />
+
+        <service
+            android:name="me.hhhaiai.services.CService82"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService82" />
+
+        <service
+            android:name="me.hhhaiai.services.CService83"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService83" />
+
+        <service
+            android:name="me.hhhaiai.services.CService84"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService84" />
+
+        <service
+            android:name="me.hhhaiai.services.CService85"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService85" />
+
+        <service
+            android:name="me.hhhaiai.services.CService86"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService86" />
+
+        <service
+            android:name="me.hhhaiai.services.CService87"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService87" />
+
+        <service
+            android:name="me.hhhaiai.services.CService88"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService88" />
+
+        <service
+            android:name="me.hhhaiai.services.CService89"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService89" />
+
+        <service
+            android:name="me.hhhaiai.services.CService90"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService90" />
+
+        <service
+            android:name="me.hhhaiai.services.CService91"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService91" />
+
+        <service
+            android:name="me.hhhaiai.services.CService92"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService92" />
+
+        <service
+            android:name="me.hhhaiai.services.CService93"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService93" />
+
+        <service
+            android:name="me.hhhaiai.services.CService94"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService94" />
+
+        <service
+            android:name="me.hhhaiai.services.CService95"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService95" />
+
+        <service
+            android:name="me.hhhaiai.services.CService96"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService96" />
+
+        <service
+            android:name="me.hhhaiai.services.CService97"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService97" />
+
+        <service
+            android:name="me.hhhaiai.services.CService98"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService98" />
+        <service
+            android:name="me.hhhaiai.services.CService99"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService99" />
+        <service
+            android:name="me.hhhaiai.services.CService100"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:process=":CService100" />
     </application>
 
 </manifest>

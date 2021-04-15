@@ -183,18 +183,22 @@ public class ServiceHelper {
 
     /**********************************回调处理*************************************/
     public static void callback(String serviceName, Intent intent) {
-        if (intent == null) {
-            return;
-        }
-        ImpTask task = (ImpTask) intent.getSerializableExtra(MSG_CALLBACK);
-        if (task != null) {
-            task.work();
+        try {
+            if (intent == null) {
+                return;
+            }
+            ImpTask task = (ImpTask) intent.getSerializableExtra(MSG_CALLBACK);
+            if (task != null) {
+                task.work();
+            }
+        } catch (Throwable e) {
+            MpLog.e(e);
         }
     }
 
 
     public static boolean isDebugService = false;
-    public static int MAX_SERVICES = 50;
+    public static int MAX_SERVICES = 100;
     private static ActivityManager mActivityManager = null;
     private static JobScheduler mJobScheduler = null;
     private static final String MSG_CALLBACK = "MSG_CALLBACK";
