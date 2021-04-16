@@ -1,5 +1,7 @@
-include ':appdemo', ':casedemo', ':dev-sdk', ':dexdemo', ':kotlindemo', ':TestCaseBase'
+include ':appdemo', ':casedemo', ':dev-sdk', ':dexdemo', ':kotlindemo', ':TestCaseLib',':MultiProcessLib'
+project(':TestCaseLib').projectDir = new File("TestCaseBase/TestCaseLib/")
+project(':MultiProcessLib').projectDir = new File("MultiProcess/MultiprocessLib")
 
-project(':TestCaseBase').projectDir = new File("TestCaseBase/TestCaseLib/")
+
 
 
