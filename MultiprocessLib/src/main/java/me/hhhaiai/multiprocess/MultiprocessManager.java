@@ -2,15 +2,14 @@ package me.hhhaiai.multiprocess;
 
 import android.app.Service;
 import android.content.Context;
-import android.content.Intent;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import me.hhhaiai.ImpTask;
-import me.hhhaiai.utils.EContext;
-import me.hhhaiai.utils.MpLog;
-import me.hhhaiai.utils.Reflect;
-import me.hhhaiai.utils.ServiceHelper;
+import me.hhhaiai.mptils.EContext;
+import me.hhhaiai.mptils.MpLog;
+import me.hhhaiai.mptils.Reflect;
+import me.hhhaiai.mptils.MpServiceHelper;
 
 /**
  * @Copyright © 2021 analsys Inc. All rights reserved.
@@ -23,8 +22,8 @@ public class MultiprocessManager {
 
 
     public void postMultiMessages(int count, ImpTask task) {
-        if (count > ServiceHelper.MAX_SERVICES) {
-            MpLog.e("超过最大支持进程数量，现阶段支持最大进程数:" + ServiceHelper.MAX_SERVICES);
+        if (count > MpServiceHelper.MAX_SERVICES) {
+            MpLog.e("超过最大支持进程数量，现阶段支持最大进程数:" + MpServiceHelper.MAX_SERVICES);
             return;
         }
         mContext = EContext.getContext();
@@ -33,7 +32,7 @@ public class MultiprocessManager {
             for (int i = 1; i <= count; i++) {
                 cp.add(Reflect.getClass("me.hhhaiai.services.CService" + i));
             }
-            ServiceHelper.startService(mContext, cp, task);
+            MpServiceHelper.startService(mContext, cp, task);
         }
     }
 

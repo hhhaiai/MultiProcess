@@ -1,4 +1,4 @@
-package me.hhhaiai.utils;
+package me.hhhaiai.mptils;
 
 import android.os.Looper;
 
@@ -11,7 +11,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-public class EThreadPool {
+public class MpThreadPool {
 
     private static ExecutorService executor = Executors.newSingleThreadExecutor();
     private static ScheduledExecutorService executorUpload = Executors.newSingleThreadScheduledExecutor();

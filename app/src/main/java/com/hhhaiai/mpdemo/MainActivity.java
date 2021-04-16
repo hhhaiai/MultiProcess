@@ -6,8 +6,8 @@ import android.view.View;
 
 import me.hhhaiai.multiprocess.MultiprocessManager;
 import me.hhhaiai.services.CService1;
-import me.hhhaiai.utils.MpLog;
-import me.hhhaiai.utils.ServiceHelper;
+import me.hhhaiai.mptils.MpLog;
+import me.hhhaiai.mptils.ServiceHelper;
 
 public class MainActivity extends Activity {
 

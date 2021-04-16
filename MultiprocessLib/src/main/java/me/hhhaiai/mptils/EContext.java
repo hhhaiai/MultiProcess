@@ -1,8 +1,7 @@
-package me.hhhaiai.utils;
+package me.hhhaiai.mptils;
 
 import android.app.Application;
 import android.content.Context;
-import android.util.Log;
 
 public class EContext {
     private static Context mContext = null;

@@ -1,4 +1,4 @@
-package me.hhhaiai.utils;
+package me.hhhaiai.mptils;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class AndroidManifestHelper {
+public class MpAndroidManifestHelper {
 
     /**
      * 判断AndroidManifest中是否声明该服务

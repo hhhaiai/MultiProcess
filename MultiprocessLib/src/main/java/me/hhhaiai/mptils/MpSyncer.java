@@ -1,4 +1,4 @@
-package me.hhhaiai.utils;
+package me.hhhaiai.mptils;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -22,7 +22,7 @@ import java.util.Map;
  * @Create: 2019-08-04 17:26:07
  * @author: sanbo
  */
-public class MPSupport1 {
+public class MpSyncer {
 
     /**
      * 获取当前进程的名称
@@ -256,13 +256,13 @@ public class MPSupport1 {
     }
 
     private static class HOLDER {
-        private static MPSupport1 INSTANCE = new MPSupport1();
+        private static MpSyncer INSTANCE = new MpSyncer();
     }
 
-    private MPSupport1() {
+    private MpSyncer() {
     }
 
-    public static MPSupport1 getInstance() {
+    public static MpSyncer getInstance() {
         return HOLDER.INSTANCE;
     }
 

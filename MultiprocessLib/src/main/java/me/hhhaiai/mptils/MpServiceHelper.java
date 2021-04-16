@@ -1,4 +1,4 @@
-package me.hhhaiai.utils;
+package me.hhhaiai.mptils;
 
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
@@ -16,7 +16,7 @@ import java.util.List;
 
 import me.hhhaiai.ImpTask;
 
-public class ServiceHelper {
+public class MpServiceHelper {
 
 
     /******************************开启服务***********************************/
@@ -37,7 +37,7 @@ public class ServiceHelper {
                 return;
             }
 
-            if (AndroidManifestHelper.isServiceDefineInManifest(context, clazz)) {
+            if (MpAndroidManifestHelper.isServiceDefineInManifest(context, clazz)) {
 //                if (!isServiceWorking(context, clazz.getName())) {
                 Intent intent = new Intent();
                 ComponentName cn = new ComponentName(context, clazz);
@@ -68,7 +68,7 @@ public class ServiceHelper {
             if (context == null) {
                 return;
             }
-            if (AndroidManifestHelper.isServiceDefineInManifest(context, clazz)) {
+            if (MpAndroidManifestHelper.isServiceDefineInManifest(context, clazz)) {
                 if (isServiceWorking(context, clazz.getName())) {
                     ComponentName cn = new ComponentName(context, clazz);
                     Intent intent = new Intent();
@@ -89,7 +89,7 @@ public class ServiceHelper {
             if (context == null) {
                 return false;
             }
-            if (!AndroidManifestHelper.isJobServiceDefineInManifest(context, clazz)) {
+            if (!MpAndroidManifestHelper.isJobServiceDefineInManifest(context, clazz)) {
                 return false;
             } else {
                 boolean runJobService = isJobPollServiceOn(context, jobId);
