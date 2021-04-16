@@ -17,6 +17,8 @@ push_submodule() {
   cd TestCaseBase/
   # git remote -v
   git push
+  cd ../MultiProcess
+  git push
 }
 main() {
   mode_up

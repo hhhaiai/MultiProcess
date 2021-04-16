@@ -18,6 +18,9 @@ update_submodule() {
   cd TestCaseBase/
   git remote set-url origin https://github.com/hhhaiai/TestCaseBase.git
   git checkout main
+  cd ../MultiProcess
+  git remote set-url origin https://github.com/hhhaiai/MultiProcess.git
+  git checkout main
 }
 main() {
   source_common

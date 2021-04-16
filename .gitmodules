@@ -2,3 +2,7 @@
 	path = TestCaseBase
 	url = https://github.com.cnpmjs.org/hhhaiai/TestCaseBase.git
 	branch = main
+[submodule "MultiProcess"]
+	path = MultiProcess
+	url = https://github.com.cnpmjs.org/hhhaiai/MultiProcess.git
+	branch = main
