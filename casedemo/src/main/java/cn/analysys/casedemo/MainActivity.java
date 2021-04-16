@@ -13,17 +13,14 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.cslib.utils.ClazzUtils;
-import com.cslib.utils.L;
-
 import cn.analysys.casedemo.cases.CaseCtl;
 import cn.analysys.casedemo.utils.SDKHelper;
+import me.hhhaiai.testcaselib.utils.L;
+import me.hhhaiai.testcaselib.utils.TcaseClazzUtils;
 
 public class MainActivity extends Activity {
 
@@ -95,7 +92,7 @@ public class MainActivity extends Activity {
 
     private void showAddr() {
         try {
-            addr = (String) ClazzUtils.invokeStaticMethod("com.amitshekhar.DebugDB", "getAddressLog");
+            addr = (String) TcaseClazzUtils.invokeStaticMethod("com.amitshekhar.DebugDB", "getAddressLog");
 
             if (!TextUtils.isEmpty(addr)) {
                 addr = addr.replaceAll("Open\\s+", "").replaceAll("\\s+in your browser", "");

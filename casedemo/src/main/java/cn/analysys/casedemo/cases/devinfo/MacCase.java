@@ -2,10 +2,6 @@ package cn.analysys.casedemo.cases.devinfo;
 
 import android.annotation.TargetApi;
 import android.text.TextUtils;
-
-import com.cslib.defcase.ETestCase;
-import com.cslib.utils.L;
-
 import java.net.NetworkInterface;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -14,6 +10,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import cn.analysys.casedemo.utils.Woo;
+import me.hhhaiai.testcaselib.defcase.ETestCase;
+import me.hhhaiai.testcaselib.utils.L;
 
 
 public class MacCase extends ETestCase {

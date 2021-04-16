@@ -1,11 +1,9 @@
 package cn.analysys.casedemo.cases.devinfo;
 
 import android.text.TextUtils;
-
-import com.cslib.defcase.ETestCase;
-
 import cn.analysys.casedemo.utils.SDKHelper;
 import cn.analysys.casedemo.utils.Woo;
+import me.hhhaiai.testcaselib.defcase.ETestCase;
 
 public class ImsisCase extends ETestCase {
     public ImsisCase() {

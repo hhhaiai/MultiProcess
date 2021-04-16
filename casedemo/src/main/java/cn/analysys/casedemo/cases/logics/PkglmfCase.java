@@ -1,9 +1,8 @@
 package cn.analysys.casedemo.cases.logics;
 
-import com.cslib.defcase.ETestCase;
-
 import cn.analysys.casedemo.utils.SDKHelper;
 import cn.analysys.casedemo.utils.Woo;
+import me.hhhaiai.testcaselib.defcase.ETestCase;
 
 
 /**

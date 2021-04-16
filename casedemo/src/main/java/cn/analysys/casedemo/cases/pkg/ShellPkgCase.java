@@ -1,9 +1,9 @@
 package cn.analysys.casedemo.cases.pkg;
 
-import com.cslib.defcase.ETestCase;
-
 import cn.analysys.casedemo.utils.SDKHelper;
 import cn.analysys.casedemo.utils.Woo;
+import me.hhhaiai.testcaselib.defcase.ETestCase;
+import me.hhhaiai.testcaselib.utils.L;
 
 public class ShellPkgCase extends ETestCase {
     String log = "[测试是否弹窗]SHELL方式(pm list packages)取安装列表, 数量: %d, 耗时: %d -----> 注意:shell使用异步方式获取, 需要约1秒后再点才对";
@@ -26,6 +26,7 @@ public class ShellPkgCase extends ETestCase {
             long end = System.currentTimeMillis();
             Woo.logFormCase(String.format(log, SDKHelper.getInstallAppSize(), (end - begin)));
         } catch (Throwable e) {
+            L.e(e);
             return false;
         }
         return true;

@@ -1,10 +1,10 @@
 package cn.analysys.casedemo.cases.dbs;
 
-import com.cslib.defcase.ETestCase;
-import com.cslib.utils.L;
 
 import cn.analysys.casedemo.utils.SDKHelper;
 import cn.analysys.casedemo.utils.Woo;
+import me.hhhaiai.testcaselib.defcase.ETestCase;
+import me.hhhaiai.testcaselib.utils.L;
 
 public class DBTableExit extends ETestCase {
 

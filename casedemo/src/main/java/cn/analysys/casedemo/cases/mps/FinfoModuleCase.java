@@ -2,9 +2,6 @@ package cn.analysys.casedemo.cases.mps;
 
 import android.content.pm.PackageManager;
 
-import com.cslib.defcase.ETestCase;
-import com.cslib.utils.L;
-
 import org.json.JSONObject;
 
 import java.util.Map;
@@ -13,6 +10,8 @@ import cn.analysys.casedemo.utils.SDKHelper;
 import cn.analysys.casedemo.utils.Woo;
 import me.hhhaiai.ImpTask;
 import me.hhhaiai.multiprocess.MultiprocessManager;
+import me.hhhaiai.testcaselib.defcase.ETestCase;
+import me.hhhaiai.testcaselib.utils.L;
 
 
 /**

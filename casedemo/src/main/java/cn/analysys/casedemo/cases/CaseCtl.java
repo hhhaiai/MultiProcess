@@ -2,8 +2,9 @@ package cn.analysys.casedemo.cases;
 
 import android.content.Context;
 
-import com.cslib.CaseHelper;
-import com.cslib.utils.L;
+import me.hhhaiai.testcaselib.CaseHelper;
+import me.hhhaiai.testcaselib.utils.L;
+
 
 public class CaseCtl {
 

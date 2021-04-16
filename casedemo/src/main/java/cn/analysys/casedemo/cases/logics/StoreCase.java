@@ -5,9 +5,6 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.os.storage.StorageManager;
 
-import com.cslib.defcase.ETestCase;
-import com.cslib.utils.L;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
@@ -20,6 +17,8 @@ import java.util.List;
 
 import cn.analysys.casedemo.utils.SDKHelper;
 import cn.analysys.casedemo.utils.Woo;
+import me.hhhaiai.testcaselib.defcase.ETestCase;
+import me.hhhaiai.testcaselib.utils.L;
 
 public class StoreCase extends ETestCase {
 

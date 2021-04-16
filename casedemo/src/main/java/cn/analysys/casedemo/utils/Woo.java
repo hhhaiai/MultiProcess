@@ -2,10 +2,8 @@ package cn.analysys.casedemo.utils;
 
 import android.widget.Toast;
 
-import com.cslib.CaseHelper;
-import com.cslib.cuscase.ECase;
-import com.cslib.defcase.ETestCase;
-import com.cslib.utils.L;
+import me.hhhaiai.testcaselib.CaseHelper;
+import me.hhhaiai.testcaselib.utils.L;
 
 /**
  * @Copyright © 2021 analsys Inc. All rights reserved.

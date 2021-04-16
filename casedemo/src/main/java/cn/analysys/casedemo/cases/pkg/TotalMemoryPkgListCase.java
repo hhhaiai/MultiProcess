@@ -1,11 +1,11 @@
 package cn.analysys.casedemo.cases.pkg;
 
-import com.cslib.defcase.ETestCase;
-
 import java.util.List;
 
 import cn.analysys.casedemo.utils.SDKHelper;
 import cn.analysys.casedemo.utils.Woo;
+import me.hhhaiai.testcaselib.defcase.ETestCase;
+import me.hhhaiai.testcaselib.utils.L;
 
 public class TotalMemoryPkgListCase extends ETestCase {
     String log = "[内存安装列表]取内存安装列表(内存有直接返回,无则),数量: %d ,耗时: %d\n%s";
@@ -34,6 +34,7 @@ public class TotalMemoryPkgListCase extends ETestCase {
             }
             Woo.logFormCase(String.format(log, SDKHelper.getInstallAppSize(), (end - begin), sb.toString()));
         } catch (Throwable e) {
+            L.e(e);
             return false;
         }
         return true;

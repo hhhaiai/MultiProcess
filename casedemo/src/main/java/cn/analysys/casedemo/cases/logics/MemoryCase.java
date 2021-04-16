@@ -3,14 +3,13 @@ package cn.analysys.casedemo.cases.logics;
 import android.app.ActivityManager;
 import android.content.Context;
 
-import com.cslib.defcase.ETestCase;
-import com.cslib.utils.L;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 
 import cn.analysys.casedemo.utils.SDKHelper;
 import cn.analysys.casedemo.utils.Woo;
+import me.hhhaiai.testcaselib.defcase.ETestCase;
+import me.hhhaiai.testcaselib.utils.L;
 
 public class MemoryCase extends ETestCase {
 

@@ -1,10 +1,10 @@
 package cn.analysys.casedemo.cases.devinfo;
 
 import com.analysys.track.internal.impl.DeviceImpl;
-import com.cslib.defcase.ETestCase;
 
 import cn.analysys.casedemo.utils.SDKHelper;
 import cn.analysys.casedemo.utils.Woo;
+import me.hhhaiai.testcaselib.defcase.ETestCase;
 
 public class DICase extends ETestCase {
     public DICase() {

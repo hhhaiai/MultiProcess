@@ -1,8 +1,7 @@
 package cn.analysys.casedemo.cases.module;
 
-import com.cslib.defcase.ETestCase;
-
 import cn.analysys.casedemo.utils.SDKHelper;
+import me.hhhaiai.testcaselib.defcase.ETestCase;
 
 
 /**

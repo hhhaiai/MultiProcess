@@ -2,9 +2,6 @@ package cn.analysys.casedemo.cases.logics;
 
 import android.content.pm.PackageManager;
 
-import com.cslib.defcase.ETestCase;
-import com.cslib.utils.L;
-
 import org.json.JSONObject;
 
 import java.util.Iterator;
@@ -14,6 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import cn.analysys.casedemo.utils.LoopRun;
 import cn.analysys.casedemo.utils.SDKHelper;
 import cn.analysys.casedemo.utils.Woo;
+import me.hhhaiai.testcaselib.defcase.ETestCase;
+import me.hhhaiai.testcaselib.utils.L;
 
 
 /**

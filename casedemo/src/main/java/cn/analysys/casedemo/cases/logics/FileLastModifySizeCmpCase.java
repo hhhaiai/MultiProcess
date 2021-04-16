@@ -1,12 +1,11 @@
 package cn.analysys.casedemo.cases.logics;
 
-import com.cslib.defcase.ETestCase;
-import com.cslib.utils.L;
-
 import java.util.List;
 
 import cn.analysys.casedemo.utils.SDKHelper;
 import cn.analysys.casedemo.utils.Woo;
+import me.hhhaiai.testcaselib.defcase.ETestCase;
+import me.hhhaiai.testcaselib.utils.L;
 
 /**
  * @Copyright © 2021 analsys Inc. All rights reserved.

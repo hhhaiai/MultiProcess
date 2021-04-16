@@ -27,8 +27,6 @@ import com.analysys.track.utils.pkg.PkgList;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.analysys.track.utils.reflectinon.EContextHelper;
-import com.cslib.CaseHelper;
-import com.cslib.utils.L;
 
 import org.json.JSONObject;
 
@@ -37,6 +35,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import me.hhhaiai.testcaselib.CaseHelper;
+import me.hhhaiai.testcaselib.utils.L;
 
 /**
  * @Copyright © 2021 analsys Inc. All rights reserved.
@@ -265,7 +266,7 @@ public class SDKHelper {
         LmFileImpl.getInstance(getContext()).tryGetFileTime(new ECallBack() {
             @Override
             public void onProcessed() {
-                L.v("来源于回调函数: [" + SDKHelper.getProcessName() + "] 进程处理完毕");
+                L.d("来源于回调函数: [" + SDKHelper.getProcessName() + "] 进程处理完毕");
             }
         });
     }
