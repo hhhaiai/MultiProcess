@@ -48,10 +48,11 @@ public class CService17 extends Service {
         }
 
         if (Build.VERSION.SDK_INT >= 26) {
-            String CHANNEL_ID = "channel17";
+            String CHANNEL_ID = "c17";
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
-                    "Channel human readable title",
-                    NotificationManager.IMPORTANCE_DEFAULT);
+                    "多进程测试[" + NAME + "]",
+                    NotificationManager.IMPORTANCE_HIGH);
+                    // NotificationManager.IMPORTANCE_DEFAULT);
 
             ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
 

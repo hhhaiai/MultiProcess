@@ -45,7 +45,7 @@ public class ServiceHelper {
                 if (task != null) {
                     intent.putExtra(MSG_CALLBACK, task);
                 }
-                MpLog.i("----->" + clazz.toString());
+//                MpLog.i("----->" + clazz.toString());
                 if (Build.VERSION.SDK_INT < 26) {
                     context.startService(intent);
                 } else {
