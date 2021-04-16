@@ -57,7 +57,7 @@ public class SDCardLastModifyTimeCase extends ETestCase {
         }
         Iterator<Map.Entry<String, Long>> iterator = map.entrySet().iterator();
         StringBuffer sb = new StringBuffer();
-        sb.append("==================访问SDcard 根目录末次访问时间%s[%d]===================").append("\n");
+        sb.append("["+SDKHelper.getProcessName()+"]==================访问SDcard 根目录末次访问时间%s[%d]===================").append("\n");
         int index = 0;
         PackageManager pm = SDKHelper.getContext().getPackageManager();
 

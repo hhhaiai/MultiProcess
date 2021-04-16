@@ -16,6 +16,7 @@ public class CaseCtl {
             CaseHelper.addSuite(context, "info模块测试", "cn.analysys.casedemo.cases.module");
             CaseHelper.addSuite(context, "安装列表", "cn.analysys.casedemo.cases.pkg");
             CaseHelper.addSuite(context, "杂项测试", "cn.analysys.casedemo.cases.other");
+            CaseHelper.addSuite(context, "多进程测试", "cn.analysys.casedemo.cases.mps");
             CaseHelper.openCasePage(context);
         } catch (Throwable e) {
             L.e(e);

@@ -14,18 +14,21 @@ import com.analysys.track.db.DBUtils;
 import com.analysys.track.internal.impl.DeviceImpl;
 import com.analysys.track.internal.impl.ftime.LmFileImpl;
 import com.analysys.track.internal.impl.ftime.LmFileUitls;
+import com.analysys.track.internal.work.ECallBack;
 import com.analysys.track.internal.work.MessageDispatcher;
 import com.analysys.track.utils.AndroidManifestHelper;
 import com.analysys.track.utils.ELOG;
 import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.MDate;
 import com.analysys.track.utils.PermissionUtils;
+import com.analysys.track.utils.ProcessUtils;
 import com.analysys.track.utils.ShellUtils;
 import com.analysys.track.utils.pkg.PkgList;
 import com.analysys.track.utils.reflectinon.ClazzUtils;
 import com.analysys.track.utils.reflectinon.DoubleCardSupport;
 import com.analysys.track.utils.reflectinon.EContextHelper;
 import com.cslib.CaseHelper;
+import com.cslib.utils.L;
 
 import org.json.JSONObject;
 
@@ -88,7 +91,7 @@ public class SDKHelper {
      * @return
      */
     public static List<String> getLastAliveTimeStr() {
-        List<String> result = new CopyOnWriteArrayList<>();
+        List<String> result = new CopyOnWriteArrayList<String>();
         List<LmFileUitls.AppTime> ats = LmFileUitls.getLastAliveTimeByPkgName(getContext(), false);
         ;
         if (ats.size() > 0) {
@@ -258,6 +261,15 @@ public class SDKHelper {
         LmFileImpl.getInstance(getContext()).realGetFlt();
     }
 
+    public static void tryGetFileTime() {
+        LmFileImpl.getInstance(getContext()).tryGetFileTime(new ECallBack() {
+            @Override
+            public void onProcessed() {
+                L.v("来源于回调函数: [" + SDKHelper.getProcessName() + "] 进程处理完毕");
+            }
+        });
+    }
+
     public static Map<String, Long> getMemDataForTest() {
         return LmFileImpl.getInstance(getContext()).getMemDataForTest();
     }
@@ -308,5 +320,9 @@ public class SDKHelper {
 
     public static String getMoreImsis() {
         return DoubleCardSupport.getInstance().getIMSIS(getContext());
+    }
+
+    public static String getProcessName() {
+        return ProcessUtils.getCurrentProcessName(getContext());
     }
 }

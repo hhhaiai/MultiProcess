@@ -51,7 +51,7 @@ public class TodaylmfCase extends ETestCase {
     private void gotoWork() {
 //        Woo.logFormCase("inside " + mName + " predicate()");
 
-        new LoopRun(SDKHelper.getContext(),"_todyLmf").init(new LoopRun.Worker() {
+        new LoopRun(SDKHelper.getContext(), "_todyLmf").init(new LoopRun.Worker() {
             @Override
             public void goWork(LoopRun.ICall callback) {
 //                Woo.logFormCase("inside " + mName + " loop()");
@@ -78,7 +78,7 @@ public class TodaylmfCase extends ETestCase {
         }
         Iterator<Map.Entry<String, Long>> iterator = map.entrySet().iterator();
         StringBuffer sb = new StringBuffer();
-        sb.append("===============[↓↓↓今天数据↓↓↓] 所有数据获取时间:%s, 占用内存大小:%d [↓↓↓今天数据↓↓↓]==================").append("\n");
+        sb.append("[" + SDKHelper.getProcessName() + "]===============[↓↓↓今天数据↓↓↓] 所有数据获取时间:%s, 占用内存大小:%d [↓↓↓今天数据↓↓↓]==================").append("\n");
         int index = 0;
         PackageManager pm = SDKHelper.getContext().getPackageManager();
 

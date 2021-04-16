@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.analysys.track.BuildConfig;
 import com.analysys.track.db.TableProcess;
@@ -16,6 +17,7 @@ import com.analysys.track.utils.EThreadPool;
 import com.analysys.track.utils.JsonUtils;
 import com.analysys.track.utils.MultiProcessChecker;
 import com.analysys.track.utils.NetworkUtils;
+import com.analysys.track.utils.ProcessUtils;
 import com.analysys.track.utils.pkg.PkgList;
 
 import org.json.JSONObject;
@@ -42,13 +44,17 @@ public class LmFileImpl {
                 @Override
                 public void run() {
                     try {
+                        Log.i("sanbo", "+++++++++++++工作进程++++++++" + ProcessUtils.getCurrentProcessName(mContext));
                         realGetFlt();
+                        Log.i("sanbo", "+++++++++++++工作 完毕。内存数量: " + mMapAndTimes.size());
+
                         //处理完成后，多进程解锁
                         MultiProcessChecker.getInstance().setLockLastModifyTime(mContext, EGContext.FILES_SYNC_FILE_LAST_MODIFY_TIME, System.currentTimeMillis());
                         if (callback != null) {
                             callback.onProcessed();
                         }
                     } catch (Throwable e) {
+                        Log.e("sanbo", ProcessUtils.getCurrentProcessName(mContext) + " 发生异常了！！！");
                         if (BuildConfig.ENABLE_BUG_REPORT) {
                             BugReportForTest.commitError(BuildConfig.tag_finfo, e);
                         }
@@ -59,6 +65,7 @@ public class LmFileImpl {
                 }
             });
         } else {
+            Log.e("sanbo", "------------无法工作进程： " + ProcessUtils.getCurrentProcessName(mContext));
             if (callback != null) {
                 callback.onProcessed();
             }
