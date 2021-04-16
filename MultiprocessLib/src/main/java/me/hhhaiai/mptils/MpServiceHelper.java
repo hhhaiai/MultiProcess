@@ -187,8 +187,8 @@ public class MpServiceHelper {
             Thread.sleep(50);
         } catch (Throwable e) {
             MpLog.e(e);
-        } finally {
-            stopService(EContext.getContext(self.getApplicationContext()), self.getClass());
+//        } finally {
+//            stopService(EContext.getContext(self.getApplicationContext()), self.getClass());
         }
     }
 
