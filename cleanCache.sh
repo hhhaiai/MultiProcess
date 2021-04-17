@@ -11,7 +11,7 @@ source_common() {
 clean_caches() {
 
   logw "[$filename]clean android studio cache!"
-  dir=("appdemo" "casedemo" "dexdemo" "kotlindemo" "dev-sdk" "buildSrc" "TestCaseBase/app" "TestCaseBase/TestCaseLib")
+  dir=("appdemo" "casedemo" "dexdemo" "kotlindemo" "dev-sdk" "buildSrc" "TestCaseBase/app" "TestCaseBase/TestCaseLib" "MultiProcess/app" "MultiProcess/MultiprocessLib" "MultiProcess/JavaGenreal")
 
   for element in "${dir[@]}"; do
     #clean task
@@ -27,7 +27,7 @@ clean_caches() {
     logd "[$filename]clean $element over."
   done
 
-  base_dir=("." "TestCaseBase")
+  base_dir=("." "TestCaseBase" "MultiProcess")
   for element in "${base_dir[@]}"; do
     rm -rf $element/build/
     rm -rf $element/release/
