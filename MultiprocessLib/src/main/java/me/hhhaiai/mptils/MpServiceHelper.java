@@ -12,23 +12,22 @@ import android.content.Intent;
 import android.os.Build;
 import android.text.TextUtils;
 
-import java.util.List;
-
 import me.hhhaiai.ImpTask;
+
+import java.util.List;
 
 public class MpServiceHelper {
 
-
     /******************************开启服务***********************************/
 
-    public static void startService(Context context, List<Class<? extends Service>> clazzs, ImpTask task) {
+    public static void startService(
+            Context context, List<Class<? extends Service>> clazzs, ImpTask task) {
         if (clazzs != null) {
             for (int i = 0; i < clazzs.size(); i++) {
                 startService(context, clazzs.get(i), task);
             }
         }
     }
-
 
     public static void startService(Context context, Class<? extends Service> clazz, ImpTask task) {
         try {
@@ -38,27 +37,26 @@ public class MpServiceHelper {
             }
 
             if (MpAndroidManifestHelper.isServiceDefineInManifest(context, clazz)) {
-//                if (!isServiceWorking(context, clazz.getName())) {
+                //                if (!isServiceWorking(context, clazz.getName())) {
                 Intent intent = new Intent();
                 ComponentName cn = new ComponentName(context, clazz);
                 intent.setComponent(cn);
                 if (task != null) {
                     intent.putExtra(MSG_CALLBACK, task);
                 }
-//                MpLog.i("----->" + clazz.toString());
+                //                MpLog.i("----->" + clazz.toString());
                 if (Build.VERSION.SDK_INT < 26) {
                     context.startService(intent);
                 } else {
                     context.startForegroundService(intent);
                 }
-//                context.startService(intent);
-//                }
+                //                context.startService(intent);
+                //                }
             }
         } catch (Throwable e) {
             MpLog.e(e);
         }
     }
-
 
     /******************************关闭服务***********************************/
 
@@ -83,7 +81,8 @@ public class MpServiceHelper {
     /******************************开启JobService***********************************/
 
     @TargetApi(21)
-    public static boolean startJobService(Context context, Class<? extends JobService> clazz, int jobId, long intervalMillis) {
+    public static boolean startJobService(
+            Context context, Class<? extends JobService> clazz, int jobId, long intervalMillis) {
         try {
             context = EContext.getContext(context);
             if (context == null) {
@@ -96,10 +95,15 @@ public class MpServiceHelper {
                 if (!runJobService) {
                     try {
                         if (mJobScheduler == null) {
-                            mJobScheduler = (JobScheduler) context.getApplicationContext().getSystemService(Context.JOB_SCHEDULER_SERVICE);
+                            mJobScheduler =
+                                    (JobScheduler)
+                                            context.getApplicationContext()
+                                                    .getSystemService(
+                                                            Context.JOB_SCHEDULER_SERVICE);
                         }
-                        JobInfo.Builder builder = new JobInfo.Builder(jobId,
-                                new ComponentName(context, clazz.getName()));
+                        JobInfo.Builder builder =
+                                new JobInfo.Builder(
+                                        jobId, new ComponentName(context, clazz.getName()));
                         builder.setPeriodic(intervalMillis);
                         builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
                         mJobScheduler.schedule(builder.build());
@@ -124,7 +128,10 @@ public class MpServiceHelper {
                 if (context == null) {
                     return false;
                 }
-                mJobScheduler = (JobScheduler) context.getApplicationContext().getSystemService(Context.JOB_SCHEDULER_SERVICE);
+                mJobScheduler =
+                        (JobScheduler)
+                                context.getApplicationContext()
+                                        .getSystemService(Context.JOB_SCHEDULER_SERVICE);
             }
             // getAllPendingJobs得到是当前Package对应的已经安排的任务
             for (JobInfo jobInfo : mJobScheduler.getAllPendingJobs()) { // 获取所有挂起(即尚未执行)的任务
@@ -145,7 +152,6 @@ public class MpServiceHelper {
         return isServiceWorking(context, serviceClass.getName());
     }
 
-
     @SuppressWarnings({"deprecation"})
     public static boolean isServiceWorking(Context context, String serviceName) {
         boolean isWork = false;
@@ -156,16 +162,19 @@ public class MpServiceHelper {
                 return isWork;
             }
             if (mActivityManager == null) {
-                mActivityManager = (ActivityManager) context.getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
+                mActivityManager =
+                        (ActivityManager)
+                                context.getApplicationContext()
+                                        .getSystemService(Context.ACTIVITY_SERVICE);
             }
-            for (ActivityManager.RunningServiceInfo info : mActivityManager.getRunningServices(Integer.MAX_VALUE)) {
+            for (ActivityManager.RunningServiceInfo info :
+                    mActivityManager.getRunningServices(Integer.MAX_VALUE)) {
                 if (info != null) {
                     if (info.service.getClassName().equals(serviceName)) {
                         isWork = true;
                         break;
                     }
                 }
-
             }
 
         } catch (Throwable e) {
@@ -183,20 +192,19 @@ public class MpServiceHelper {
             if (task != null) {
                 task.work();
             }
-            //完成任务后50毫秒自动关闭
+            // 完成任务后50毫秒自动关闭
             Thread.sleep(50);
         } catch (Throwable e) {
             MpLog.e(e);
-//        } finally {
-//            stopService(EContext.getContext(self.getApplicationContext()), self.getClass());
+            //        } finally {
+            //            stopService(EContext.getContext(self.getApplicationContext()),
+            // self.getClass());
         }
     }
-
 
     public static boolean isDebugService = false;
     public static int MAX_SERVICES = 50;
     private static ActivityManager mActivityManager = null;
     private static JobScheduler mJobScheduler = null;
     private static final String MSG_CALLBACK = "MSG_CALLBACK";
-
 }

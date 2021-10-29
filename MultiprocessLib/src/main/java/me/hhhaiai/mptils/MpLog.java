@@ -1,6 +1,5 @@
 package me.hhhaiai.mptils;
 
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -105,6 +104,7 @@ public class MpLog {
      * 行首为该符号时，不增加行首封闭符
      */
     private static String CONTENT_A;
+
     private static String CONTENT_B;
     private static String CONTENT_C;
     private static String CONTENT_D;
@@ -150,13 +150,19 @@ public class MpLog {
         CONTENT_SPACE = "  ";
         CONTENT_LOG_INFO = "log info:";
         CONTENT_LOG_EMPTY = "打印的日志信息为空!";
-        content_title_begin = "╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
-        content_title_info_callstack = "╔══════════════════════════════════════════════════════════════调用详情══════════════════════════════════════════════════════════════";
-        content_title_info_log = "╔══════════════════════════════════════════════════════════════日志详情══════════════════════════════════════════════════════════════";
-        content_title_info_error = "╔══════════════════════════════════════════════════════════════异常详情══════════════════════════════════════════════════════════════";
-        content_title_info_type = "╔════════════════════════════════════════════════════「%s"
-                + "」════════════════════════════════════════════════════";
-        content_title_end = "╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
+        content_title_begin =
+                "╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
+        content_title_info_callstack =
+                "╔══════════════════════════════════════════════════════════════调用详情══════════════════════════════════════════════════════════════";
+        content_title_info_log =
+                "╔══════════════════════════════════════════════════════════════日志详情══════════════════════════════════════════════════════════════";
+        content_title_info_error =
+                "╔══════════════════════════════════════════════════════════════异常详情══════════════════════════════════════════════════════════════";
+        content_title_info_type =
+                "╔════════════════════════════════════════════════════「%s"
+                        + "」════════════════════════════════════════════════════";
+        content_title_end =
+                "╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════";
         /**
          * 行首为该符号时，不增加行首封闭符
          */
@@ -167,10 +173,10 @@ public class MpLog {
         CONTENT_E = " ╚";
         FORMATER = '%';
         CONTENT_WARNNING_SHELL =
-                "Wranning....不够打印级别,请在命令行设置指令后重新尝试打印,命令行指令: adb shell setprop log.tag." + DEFAULT_TAG + " ";
-
+                "Wranning....不够打印级别,请在命令行设置指令后重新尝试打印,命令行指令: adb shell setprop log.tag."
+                        + DEFAULT_TAG
+                        + " ";
     }
-
 
     /*********************************************************************************************************/
     /**
@@ -186,7 +192,6 @@ public class MpLog {
         }
 
         parserArgsMain(MLEVEL.VERBOSE, args);
-
     }
 
     public static void d(Object... args) {
@@ -208,9 +213,7 @@ public class MpLog {
             }
         }
         parserArgsMain(MLEVEL.INFO, args);
-
     }
-
 
     public static void w(Object... args) {
 
@@ -222,7 +225,6 @@ public class MpLog {
         }
 
         parserArgsMain(MLEVEL.WARN, args);
-
     }
 
     public static void e(Object... args) {
@@ -234,7 +236,6 @@ public class MpLog {
             }
         }
         parserArgsMain(MLEVEL.ERROR, args);
-
     }
 
     public static void wtf(Object... args) {
@@ -246,9 +247,7 @@ public class MpLog {
             }
         }
         parserArgsMain(MLEVEL.WTF, args);
-
     }
-
 
     /**
      * 解析参数入口.这步骤开始忽略类型.解析所有参数,参数检查逻辑：
@@ -267,7 +266,6 @@ public class MpLog {
                 return;
             }
             StringBuilder sb = new StringBuilder();
-
 
             // 开始
             if (isFormat) {
@@ -369,7 +367,6 @@ public class MpLog {
             preparePrint(tag, level, sb.toString());
         } catch (Throwable e) {
         }
-
     }
 
     /**
@@ -388,13 +385,13 @@ public class MpLog {
                 // 2.打印行头
                 header(obj, sb);
                 // 3.打印内容
-                sb.append(wrapperString(result));// .append("\n");
+                sb.append(wrapperString(result)); // .append("\n");
             } else {
                 // 需要支持""或null
                 if (isNeedWrapper) {
                     sb.append(content_title_info_log).append("\n");
                 }
-                sb.append(wrapperString(""));// .append("\n");
+                sb.append(wrapperString("")); // .append("\n");
             }
         } catch (Throwable e) {
         }
@@ -442,7 +439,8 @@ public class MpLog {
             } else if (obj instanceof Throwable) {
                 sb.append(content_title_info_error).append("\n");
             } else {
-                sb.append(String.format(content_title_info_type, obj.getClass().getName())).append("\n");
+                sb.append(String.format(content_title_info_type, obj.getClass().getName()))
+                        .append("\n");
             }
         }
     }
@@ -480,7 +478,9 @@ public class MpLog {
                         String[] tempArray = cc.split("\n");
                         StringBuilder tempSB = new StringBuilder();
                         for (int i = 1; i < tempArray.length; i++) {
-                            tempSB.append(CONTENT_SPACE).append(CONTENT_SPACE).append(CONTENT_SPACE)
+                            tempSB.append(CONTENT_SPACE)
+                                    .append(CONTENT_SPACE)
+                                    .append(CONTENT_SPACE)
                                     .append(tempArray[i]);
                             if (i != tempArray.length - 1) {
                                 tempSB.append("\n");
@@ -492,15 +492,33 @@ public class MpLog {
                     if (isNeedWrapper) {
                         if (isNeedCallstackInfo) {
 
-                            sb.append("\n").append(content_title_info_callstack).append("\n").append(CONTENT_LINE)
-                                    .append(CONTENT_SPACE).append("文件名:     " + ste.getFileName()).append("\n")
-                                    .append(CONTENT_LINE).append(CONTENT_SPACE).append("类名:      " + ste.getClassName())
-                                    .append("\n").append(CONTENT_LINE).append(CONTENT_SPACE)
-                                    .append("方法名:     " + ste.getMethodName()).append("\n").append(CONTENT_LINE)
-                                    .append(CONTENT_SPACE).append("行号:      " + ste.getLineNumber()).append("\n")
-                                    .append(CONTENT_LINE).append(CONTENT_SPACE)
-                                    .append("Native方法:" + (!ste.isNativeMethod() ? "不是" : "是")).append("\n")
-                                    .append(CONTENT_LINE).append(CONTENT_SPACE).append("调用堆栈详情:").append("\n")
+                            sb.append("\n")
+                                    .append(content_title_info_callstack)
+                                    .append("\n")
+                                    .append(CONTENT_LINE)
+                                    .append(CONTENT_SPACE)
+                                    .append("文件名:     " + ste.getFileName())
+                                    .append("\n")
+                                    .append(CONTENT_LINE)
+                                    .append(CONTENT_SPACE)
+                                    .append("类名:      " + ste.getClassName())
+                                    .append("\n")
+                                    .append(CONTENT_LINE)
+                                    .append(CONTENT_SPACE)
+                                    .append("方法名:     " + ste.getMethodName())
+                                    .append("\n")
+                                    .append(CONTENT_LINE)
+                                    .append(CONTENT_SPACE)
+                                    .append("行号:      " + ste.getLineNumber())
+                                    .append("\n")
+                                    .append(CONTENT_LINE)
+                                    .append(CONTENT_SPACE)
+                                    .append("Native方法:" + (!ste.isNativeMethod() ? "不是" : "是"))
+                                    .append("\n")
+                                    .append(CONTENT_LINE)
+                                    .append(CONTENT_SPACE)
+                                    .append("调用堆栈详情:")
+                                    .append("\n")
                                     .append(wrapperString(cc));
                         } else {
                             try {
@@ -508,13 +526,29 @@ public class MpLog {
                             } catch (Throwable e) {
                             }
                             if (mContext != null) {
-                                sb.append("\n").append(content_title_begin).append("\n").append(CONTENT_LINE)
-                                        .append(String.format(content_simple_callstack, getCurrentProcessName(mContext), ste.getClassName(),
-                                                ste.getMethodName(), ste.getLineNumber()));
+                                sb.append("\n")
+                                        .append(content_title_begin)
+                                        .append("\n")
+                                        .append(CONTENT_LINE)
+                                        .append(
+                                                String.format(
+                                                        content_simple_callstack,
+                                                        getCurrentProcessName(mContext),
+                                                        ste.getClassName(),
+                                                        ste.getMethodName(),
+                                                        ste.getLineNumber()));
                             } else {
-                                sb.append("\n").append(content_title_begin).append("\n").append(CONTENT_LINE)
-                                        .append(String.format(content_simple_callstack, "", ste.getClassName(),
-                                                ste.getMethodName(), ste.getLineNumber()));
+                                sb.append("\n")
+                                        .append(content_title_begin)
+                                        .append("\n")
+                                        .append(CONTENT_LINE)
+                                        .append(
+                                                String.format(
+                                                        content_simple_callstack,
+                                                        "",
+                                                        ste.getClassName(),
+                                                        ste.getMethodName(),
+                                                        ste.getLineNumber()));
                             }
 
                             // 上一层会处理
@@ -522,25 +556,41 @@ public class MpLog {
                         }
                     } else {
                         if (isNeedCallstackInfo) {
-                            sb.append("文件名:    " + ste.getFileName()).append("\n")
-                                    .append("类名:      " + ste.getClassName()).append("\n")
-                                    .append("方法名:    " + ste.getMethodName()).append("\n")
-                                    .append("行号:      " + ste.getLineNumber()).append("\n")
-                                    .append("Native方法:" + (!ste.isNativeMethod() ? "不是" : "是")).append("\n")
-                                    .append("调用堆栈详情:").append("\n").append(wrapperString(cc));
+                            sb.append("文件名:    " + ste.getFileName())
+                                    .append("\n")
+                                    .append("类名:      " + ste.getClassName())
+                                    .append("\n")
+                                    .append("方法名:    " + ste.getMethodName())
+                                    .append("\n")
+                                    .append("行号:      " + ste.getLineNumber())
+                                    .append("\n")
+                                    .append("Native方法:" + (!ste.isNativeMethod() ? "不是" : "是"))
+                                    .append("\n")
+                                    .append("调用堆栈详情:")
+                                    .append("\n")
+                                    .append(wrapperString(cc));
                         } else {
                             try {
                                 mContext = getContext();
                             } catch (Throwable e) {
                             }
                             if (mContext != null) {
-                                sb.append(String.format(content_simple_callstack, getCurrentProcessName(mContext), ste.getClassName(),
-                                        ste.getMethodName(), ste.getLineNumber()));
+                                sb.append(
+                                        String.format(
+                                                content_simple_callstack,
+                                                getCurrentProcessName(mContext),
+                                                ste.getClassName(),
+                                                ste.getMethodName(),
+                                                ste.getLineNumber()));
                             } else {
-                                sb.append(String.format(content_simple_callstack, "", ste.getClassName(),
-                                        ste.getMethodName(), ste.getLineNumber()));
+                                sb.append(
+                                        String.format(
+                                                content_simple_callstack,
+                                                "",
+                                                ste.getClassName(),
+                                                ste.getMethodName(),
+                                                ste.getLineNumber()));
                             }
-
                         }
                     }
 
@@ -695,7 +745,10 @@ public class MpLog {
                             if (!Number.class.isAssignableFrom(subObject.getClass())) {
                                 subObject = objectToString(subObject, childOffset + 1);
                                 String s = (String) subObject;
-                                s = s.replaceAll("\n", "").replaceAll("\r", "").replaceAll("\r\n", "");
+                                s =
+                                        s.replaceAll("\n", "")
+                                                .replaceAll("\r", "")
+                                                .replaceAll("\r\n", "");
                                 try {
                                     JSONObject temp = new JSONObject(s);
                                     obj.put(fieldName, temp);
@@ -730,7 +783,8 @@ public class MpLog {
         // System.out.println(field.getName()+ "***" +subObject.getClass() + "啊啊啊啊啊啊" +
         // cla);
         if (!isStaticInnerClass(cla)
-                && ("$change".equalsIgnoreCase(fieldName) || "this$0".equalsIgnoreCase(fieldName))) {
+                && ("$change".equalsIgnoreCase(fieldName)
+                        || "this$0".equalsIgnoreCase(fieldName))) {
             return true;
         }
         return false;
@@ -886,7 +940,8 @@ public class MpLog {
         builder.append(BR);
         for (Field field : fields) {
             field.setAccessible(true);
-            if ("org.aspectj.lang.JoinPoint$StaticPart".equalsIgnoreCase(field.getType().getName())) {
+            if ("org.aspectj.lang.JoinPoint$StaticPart"
+                    .equalsIgnoreCase(field.getType().getName())) {
                 continue;
             }
             String fieldName = field.getName();
@@ -895,7 +950,10 @@ public class MpLog {
             }
             try {
                 Object fieldValue = field.get(activity);
-                builder.append(field.getName()).append("=>").append(objectToString(fieldValue)).append(BR);
+                builder.append(field.getName())
+                        .append("=>")
+                        .append(objectToString(fieldValue))
+                        .append(BR);
             } catch (IllegalAccessException e) {
             }
         }
@@ -943,7 +1001,6 @@ public class MpLog {
             }
         }
         return format(obj);
-
     }
 
     private static String parseString(Collection<?> collection) {
@@ -1119,7 +1176,8 @@ public class MpLog {
                 if (field.getName().startsWith("FLAG_")) {
                     int value = 0;
                     Object object = field.get(cla);
-                    if (object instanceof Integer || "int".equals(object.getClass().getSimpleName())) {
+                    if (object instanceof Integer
+                            || "int".equals(object.getClass().getSimpleName())) {
                         value = (Integer) object;
                     }
 
@@ -1204,7 +1262,7 @@ public class MpLog {
             sb.append(CONTENT_LOG_EMPTY);
             return String.valueOf(sb);
         }
-        String[] ss = new String[]{};
+        String[] ss = new String[] {};
         String temp = null;
         if (log.contains("\n")) {
             ss = log.split("\n");
@@ -1212,9 +1270,13 @@ public class MpLog {
                 sb = new StringBuilder();
                 for (int i = 0; i < ss.length; i++) {
                     temp = ss[i];
-                    if (isNeedWrapper && !temp.startsWith(CONTENT_A) && !temp.startsWith(CONTENT_B)
-                            && !temp.startsWith(CONTENT_C) && !temp.startsWith(CONTENT_D)
-                            && !temp.startsWith(CONTENT_LOG_INFO) && !TextUtils.isEmpty(temp)
+                    if (isNeedWrapper
+                            && !temp.startsWith(CONTENT_A)
+                            && !temp.startsWith(CONTENT_B)
+                            && !temp.startsWith(CONTENT_C)
+                            && !temp.startsWith(CONTENT_D)
+                            && !temp.startsWith(CONTENT_LOG_INFO)
+                            && !TextUtils.isEmpty(temp)
                             && !temp.startsWith(CONTENT_E)) {
                         sb.append(CONTENT_LINE);
                     }
@@ -1232,9 +1294,13 @@ public class MpLog {
                 for (int i = 0; i < ss.length; i++) {
                     temp = ss[i];
 
-                    if (isNeedWrapper && !temp.startsWith(CONTENT_A) && !temp.startsWith(CONTENT_B)
-                            && !temp.startsWith(CONTENT_D) && !temp.startsWith(CONTENT_E)
-                            && !temp.startsWith(CONTENT_LOG_INFO) && !TextUtils.isEmpty(temp)
+                    if (isNeedWrapper
+                            && !temp.startsWith(CONTENT_A)
+                            && !temp.startsWith(CONTENT_B)
+                            && !temp.startsWith(CONTENT_D)
+                            && !temp.startsWith(CONTENT_E)
+                            && !temp.startsWith(CONTENT_LOG_INFO)
+                            && !TextUtils.isEmpty(temp)
                             && !temp.startsWith(CONTENT_C)) {
                         sb.append(CONTENT_LINE);
                     }
@@ -1251,9 +1317,13 @@ public class MpLog {
                 for (int i = 0; i < ss.length; i++) {
                     temp = ss[i];
 
-                    if (isNeedWrapper && !temp.startsWith(CONTENT_A) && !temp.startsWith(CONTENT_B)
-                            && !temp.startsWith(CONTENT_D) && !temp.startsWith(CONTENT_E)
-                            && !temp.startsWith(CONTENT_LOG_INFO) && !TextUtils.isEmpty(temp)
+                    if (isNeedWrapper
+                            && !temp.startsWith(CONTENT_A)
+                            && !temp.startsWith(CONTENT_B)
+                            && !temp.startsWith(CONTENT_D)
+                            && !temp.startsWith(CONTENT_E)
+                            && !temp.startsWith(CONTENT_LOG_INFO)
+                            && !TextUtils.isEmpty(temp)
                             && !temp.startsWith(CONTENT_C)) {
                         sb.append(CONTENT_LINE);
                     }
@@ -1270,9 +1340,13 @@ public class MpLog {
                 sb = new StringBuilder();
                 for (int i = 0; i < ss.length; i++) {
                     temp = ss[i];
-                    if (isNeedWrapper && !temp.startsWith(CONTENT_A) && !temp.startsWith(CONTENT_B)
-                            && !temp.startsWith(CONTENT_D) && !temp.startsWith(CONTENT_E)
-                            && !temp.startsWith(CONTENT_LOG_INFO) && !TextUtils.isEmpty(temp)
+                    if (isNeedWrapper
+                            && !temp.startsWith(CONTENT_A)
+                            && !temp.startsWith(CONTENT_B)
+                            && !temp.startsWith(CONTENT_D)
+                            && !temp.startsWith(CONTENT_E)
+                            && !temp.startsWith(CONTENT_LOG_INFO)
+                            && !TextUtils.isEmpty(temp)
                             && !temp.startsWith(CONTENT_C)) {
                         sb.append(CONTENT_LINE);
                     }
@@ -1284,8 +1358,13 @@ public class MpLog {
                 }
             }
         } else {
-            if (isNeedWrapper && !log.startsWith(CONTENT_A) && !log.startsWith(CONTENT_B) && !log.startsWith(CONTENT_D)
-                    && !log.startsWith(CONTENT_LOG_INFO) && !TextUtils.isEmpty(log) && !log.startsWith(CONTENT_E)
+            if (isNeedWrapper
+                    && !log.startsWith(CONTENT_A)
+                    && !log.startsWith(CONTENT_B)
+                    && !log.startsWith(CONTENT_D)
+                    && !log.startsWith(CONTENT_LOG_INFO)
+                    && !TextUtils.isEmpty(log)
+                    && !log.startsWith(CONTENT_E)
                     && !log.startsWith(CONTENT_C)) {
                 sb.append(CONTENT_LINE);
             }
@@ -1453,13 +1532,18 @@ public class MpLog {
     private static Context getContextImpl() {
         try {
             if (mContext == null) {
-                Object at = Reflect.invokeStaticMethod("android.app.ActivityThread", "currentActivityThread");
+                Object at =
+                        Reflect.invokeStaticMethod(
+                                "android.app.ActivityThread", "currentActivityThread");
                 Application app = (Application) Reflect.invokeObjectMethod(at, "getApplication");
                 if (app != null) {
                     mContext = app.getApplicationContext();
                 }
                 if (mContext == null) {
-                    app = (Application) Reflect.invokeStaticMethod("android.app.AppGlobals", "getInitialApplication");
+                    app =
+                            (Application)
+                                    Reflect.invokeStaticMethod(
+                                            "android.app.AppGlobals", "getInitialApplication");
                     if (app != null) {
                         mContext = app.getApplicationContext();
                     }
@@ -1474,7 +1558,7 @@ public class MpLog {
     private static void safeClose(Object closeable) {
         if (closeable != null) {
             try {
-//                closeable.close();
+                //                closeable.close();
                 Reflect.invokeObjectMethod(closeable, "close");
             } catch (Throwable e) {
             }
@@ -1490,7 +1574,8 @@ public class MpLog {
     private static String getCurrentProcessName(Context context) {
         try {
             int pid = android.os.Process.myPid();
-            ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            ActivityManager am =
+                    (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
             if (am != null) {
                 for (ActivityManager.RunningAppProcessInfo info : am.getRunningAppProcesses()) {
                     if (info.pid == pid) {
@@ -1511,5 +1596,4 @@ public class MpLog {
         public static final int ERROR = 0x5;
         public static final int WTF = 0x6;
     }
-
 }

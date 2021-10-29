@@ -12,22 +12,21 @@ import java.net.HttpURLConnection;
  */
 public class Closer {
 
-	public static void close(Object... os) {
-		if (os != null && os.length > 0) {
-			for (Object o : os) {
-				if (o != null) {
-					try {
-						if (o instanceof HttpURLConnection) {
-							((HttpURLConnection) o).disconnect();
-						} else if (o instanceof Closeable) {
-							((Closeable) o).close();
-						}
-					} catch (Throwable e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-	}
-
+    public static void close(Object... os) {
+        if (os != null && os.length > 0) {
+            for (Object o : os) {
+                if (o != null) {
+                    try {
+                        if (o instanceof HttpURLConnection) {
+                            ((HttpURLConnection) o).disconnect();
+                        } else if (o instanceof Closeable) {
+                            ((Closeable) o).close();
+                        }
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
 }

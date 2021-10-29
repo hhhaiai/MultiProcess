@@ -13,6 +13,9 @@ public class ChinaPrint implements ImpTask {
 
     @Override
     public void work() {
-        MpLog.d("ChinaPrint. work ------------[" + MPSupport1.getCurrentProcessName(EContext.getContext()) + "]------print msg");
+        MpLog.d(
+                "ChinaPrint. work ------------["
+                        + MPSupport1.getCurrentProcessName(EContext.getContext())
+                        + "]------print msg");
     }
 }

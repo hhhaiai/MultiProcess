@@ -63,8 +63,10 @@ public class MpAndroidManifestHelper {
         try {
             context = EContext.getContext(context);
             if (context != null && !TextUtils.isEmpty(permission)) {
-                PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(),
-                        PackageManager.GET_PERMISSIONS);
+                PackageInfo packageInfo =
+                        context.getPackageManager()
+                                .getPackageInfo(
+                                        context.getPackageName(), PackageManager.GET_PERMISSIONS);
                 if (packageInfo != null) {
                     String[] permissions = packageInfo.requestedPermissions;
                     if (permissions.length <= 0) {
@@ -119,8 +121,9 @@ public class MpAndroidManifestHelper {
             context = EContext.getContext(context);
             if (context != null) {
                 PackageManager manager = context.getPackageManager();
-                ApplicationInfo info = manager.getApplicationInfo(context.getPackageName(),
-                        PackageManager.GET_META_DATA);
+                ApplicationInfo info =
+                        manager.getApplicationInfo(
+                                context.getPackageName(), PackageManager.GET_META_DATA);
                 if (info != null) {
                     return info.metaData;
                 }

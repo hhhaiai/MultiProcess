@@ -9,8 +9,8 @@ import java.util.List;
 
 public class GenralClass {
     public static void main(String[] args) {
-//        testInsert();
-//        generalServiceInMainfast();
+        //        testInsert();
+        //        generalServiceInMainfast();
         generalServiceFile();
     }
 
@@ -20,20 +20,21 @@ public class GenralClass {
 
     private static void generalServiceFile() {
         String baseClass = loadToString("base/CServiceBase.txt");
-//        System.out.println(baseClass);
+        //        System.out.println(baseClass);
         for (int i = 1; i <= 50; i++) {
-            saveTextToFile("base/CService" + i + ".java", String.format(baseClass, i, i, i, i, i), false);
+            saveTextToFile(
+                    "base/CService" + i + ".java", String.format(baseClass, i, i, i, i, i), false);
         }
-
     }
 
     private static void generalServiceInMainfast() {
-        String s = "        <service\n" +
-                "            android:name=\"me.hhhaiai.services.CService%d\"\n" +
-                "            android:enabled=\"true\"\n" +
-                "            android:exported=\"true\"\n" +
-                "            android:persistent=\"true\"\n" +
-                "            android:process=\":CService%d\" />\n";
+        String s =
+                "        <service\n"
+                        + "            android:name=\"me.hhhaiai.services.CService%d\"\n"
+                        + "            android:enabled=\"true\"\n"
+                        + "            android:exported=\"true\"\n"
+                        + "            android:persistent=\"true\"\n"
+                        + "            android:process=\":CService%d\" />\n";
 
         for (int i = 1; i < 101; i++) {
             System.out.println(String.format(s, i, i));
@@ -97,5 +98,4 @@ public class GenralClass {
             Closer.close(fileWriter);
         }
     }
-
 }

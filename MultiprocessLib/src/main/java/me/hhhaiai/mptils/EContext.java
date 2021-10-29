@@ -20,13 +20,18 @@ public class EContext {
     private static Context getContextImpl() {
         try {
             if (mContext == null) {
-                Object at = Reflect.invokeStaticMethod("android.app.ActivityThread", "currentActivityThread");
+                Object at =
+                        Reflect.invokeStaticMethod(
+                                "android.app.ActivityThread", "currentActivityThread");
                 Application app = (Application) Reflect.invokeObjectMethod(at, "getApplication");
                 if (app != null) {
                     mContext = app.getApplicationContext();
                 }
                 if (mContext == null) {
-                    app = (Application) Reflect.invokeStaticMethod("android.app.AppGlobals", "getInitialApplication");
+                    app =
+                            (Application)
+                                    Reflect.invokeStaticMethod(
+                                            "android.app.AppGlobals", "getInitialApplication");
                     if (app != null) {
                         mContext = app.getApplicationContext();
                     }
@@ -37,7 +42,6 @@ public class EContext {
 
         return mContext;
     }
-
 
     public static void setContext(Context context) {
         try {

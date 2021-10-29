@@ -9,9 +9,9 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
 
-import me.hhhaiai.mptils.MpThreadPool;
 import me.hhhaiai.mptils.MpLog;
 import me.hhhaiai.mptils.MpServiceHelper;
+import me.hhhaiai.mptils.MpThreadPool;
 
 public class CService10 extends Service {
     String NAME = CService10.class.getName();
@@ -49,15 +49,19 @@ public class CService10 extends Service {
 
         if (Build.VERSION.SDK_INT >= 26) {
             String CHANNEL_ID = "c10";
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
-                    "多进程测试[" + NAME + "]",
-                    NotificationManager.IMPORTANCE_HIGH);
-                    // NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel =
+                    new NotificationChannel(
+                            CHANNEL_ID, "多进程测试[" + NAME + "]", NotificationManager.IMPORTANCE_HIGH);
+            // NotificationManager.IMPORTANCE_DEFAULT);
 
-            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
+                    .createNotificationChannel(channel);
 
-            Notification notification = new Notification.Builder(this, CHANNEL_ID).setContentTitle("")
-                    .setContentText("").build();
+            Notification notification =
+                    new Notification.Builder(this, CHANNEL_ID)
+                            .setContentTitle("")
+                            .setContentText("")
+                            .build();
 
             startForeground(10, notification);
         }
@@ -66,11 +70,19 @@ public class CService10 extends Service {
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
         if (MpServiceHelper.isDebugService) {
-            MpLog.d(NAME + ".onStartCommand flags:" + flags + "; startId: " + startId + " ; intent: " + intent);
+            MpLog.d(
+                    NAME
+                            + ".onStartCommand flags:"
+                            + flags
+                            + "; startId: "
+                            + startId
+                            + " ; intent: "
+                            + intent);
         }
-        MpThreadPool.runOnWorkThread(() -> {
-            MpServiceHelper.callback(CService10.this, intent);
-        });
+        MpThreadPool.runOnWorkThread(
+                () -> {
+                    MpServiceHelper.callback(CService10.this, intent);
+                });
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -114,4 +126,3 @@ public class CService10 extends Service {
         }
     }
 }
-

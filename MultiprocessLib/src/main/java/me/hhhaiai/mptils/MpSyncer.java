@@ -4,7 +4,6 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -13,7 +12,6 @@ import java.nio.channels.FileLock;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 /**
  * @Copyright 2019 sanbo Inc. All rights reserved.
@@ -33,7 +31,8 @@ public class MpSyncer {
     public static String getCurrentProcessName(Context context) {
         try {
             int pid = android.os.Process.myPid();
-            ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            ActivityManager am =
+                    (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
             if (am != null) {
                 for (ActivityManager.RunningAppProcessInfo info : am.getRunningAppProcesses()) {
                     if (info.pid == pid) {
@@ -119,7 +118,6 @@ public class MpSyncer {
         return false;
     }
 
-
     /**
      * 获取锁文件的最后修改时间
      *
@@ -164,26 +162,30 @@ public class MpSyncer {
                 }
                 dev.setLastModified(time);
 
-//                if (EGContext.FLAG_DEBUG_INNER) {
-//                    ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----setLockLastModifyTime-----set  success-----");
-//                }
+                //                if (EGContext.FLAG_DEBUG_INNER) {
+                //                    ELOG.i(SystemUtils.getCurrentProcessName(cxt) +
+                // "-----setLockLastModifyTime-----set  success-----");
+                //                }
 
-//                if (dev.lastModified() == time) {
-////                    if (EGContext.FLAG_DEBUG_INNER) {
-////                        ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----setLockLastModifyTime-----haskey: " + mFilenameAndLocks.containsKey(fileName));
-////                    }
-//                    if (mFilenameAndLocks.containsKey(fileName)) {
-//
-//                        Locks locks = mFilenameAndLocks.get(fileName);
-////                        if (EGContext.FLAG_DEBUG_INNER) {
-////                            ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----setLockLastModifyTime-----locks: " + locks);
-////                        }
-//                        if (locks != null) {
-//                            locks.safeClose();
-//                        }
-//                    }
-//                    return true;
-//                }
+                //                if (dev.lastModified() == time) {
+                ////                    if (EGContext.FLAG_DEBUG_INNER) {
+                ////                        ELOG.i(SystemUtils.getCurrentProcessName(cxt) +
+                // "-----setLockLastModifyTime-----haskey: " +
+                // mFilenameAndLocks.containsKey(fileName));
+                ////                    }
+                //                    if (mFilenameAndLocks.containsKey(fileName)) {
+                //
+                //                        Locks locks = mFilenameAndLocks.get(fileName);
+                ////                        if (EGContext.FLAG_DEBUG_INNER) {
+                ////                            ELOG.i(SystemUtils.getCurrentProcessName(cxt) +
+                // "-----setLockLastModifyTime-----locks: " + locks);
+                ////                        }
+                //                        if (locks != null) {
+                //                            locks.safeClose();
+                //                        }
+                //                    }
+                //                    return true;
+                //                }
             }
         } catch (Throwable e) {
         }
@@ -191,7 +193,6 @@ public class MpSyncer {
     }
 
     private Map<String, Locks> mFilenameAndLocks = new HashMap<String, Locks>();
-
 
     /**
      * 根据锁文件时间，判断是否达到触发时间
@@ -202,7 +203,8 @@ public class MpSyncer {
      * @param now  本次时间
      * @return
      */
-    public synchronized boolean isNeedWorkByLockFile(Context cxt, String lock, long time, long now) {
+    public synchronized boolean isNeedWorkByLockFile(
+            Context cxt, String lock, long time, long now) {
         try {
             cxt = EContext.getContext(cxt);
             if (cxt == null) {
@@ -210,9 +212,10 @@ public class MpSyncer {
             }
 
             long lastModifyTime = getLockFileLastModifyTime(cxt, lock);
-//            if (EGContext.FLAG_DEBUG_INNER) {
-//                ELOG.i("-----isNeedWorkByLockFile----time dur: " + Math.abs(lastModifyTime - now));
-//            }
+            //            if (EGContext.FLAG_DEBUG_INNER) {
+            //                ELOG.i("-----isNeedWorkByLockFile----time dur: " +
+            // Math.abs(lastModifyTime - now));
+            //            }
             if (Math.abs(lastModifyTime - now) > time) {
                 // 文件同步
                 File f = new File(cxt.getFilesDir(), lock);
@@ -225,9 +228,10 @@ public class MpSyncer {
                 try {
                     // 持有锁
                     if (mFilenameAndLocks.containsKey(lock)) {
-//                        if (EGContext.FLAG_DEBUG_INNER) {
-//                            ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----getLockFileLastModifyTime-----has-----");
-//                        }
+                        //                        if (EGContext.FLAG_DEBUG_INNER) {
+                        //                            ELOG.i(SystemUtils.getCurrentProcessName(cxt)
+                        // + "-----getLockFileLastModifyTime-----has-----");
+                        //                        }
                         return true;
                     } else {
                         randomFile = new RandomAccessFile(f, "rw");
@@ -235,14 +239,15 @@ public class MpSyncer {
                         fl = fileChannel.tryLock();
                         if (fl != null) {
                             mFilenameAndLocks.put(lock, new Locks(fl, randomFile, fileChannel));
-//                            if (EGContext.FLAG_DEBUG_INNER) {
-//                                ELOG.i(SystemUtils.getCurrentProcessName(cxt) + "-----getLockFileLastModifyTime-----new-----");
-//                            }
+                            //                            if (EGContext.FLAG_DEBUG_INNER) {
+                            //
+                            // ELOG.i(SystemUtils.getCurrentProcessName(cxt) +
+                            // "-----getLockFileLastModifyTime-----new-----");
+                            //                            }
                             return true;
                         } else {
                             return false;
                         }
-
                     }
                 } catch (Throwable e) {
                 }
@@ -259,13 +264,11 @@ public class MpSyncer {
         private static MpSyncer INSTANCE = new MpSyncer();
     }
 
-    private MpSyncer() {
-    }
+    private MpSyncer() {}
 
     public static MpSyncer getInstance() {
         return HOLDER.INSTANCE;
     }
-
 
     /**
      * @Copyright © 2019 sanbo Inc. All rights reserved.
@@ -280,13 +283,11 @@ public class MpSyncer {
         private RandomAccessFile mRandomFile = null;
         private FileChannel mFileChannel = null;
 
-
         public Locks(FileLock lock, RandomAccessFile randomFile, FileChannel fileChannel) {
             this.mLock = lock;
             this.mRandomFile = randomFile;
             this.mFileChannel = fileChannel;
         }
-
 
         public void safeClose() {
             if (mLock != null) {
@@ -308,5 +309,4 @@ public class MpSyncer {
             }
         }
     }
-
 }

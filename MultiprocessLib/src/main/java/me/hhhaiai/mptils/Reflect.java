@@ -1,9 +1,10 @@
 package me.hhhaiai.mptils;
 
-
 import android.content.Context;
 import android.os.Build;
 import android.text.TextUtils;
+
+import dalvik.system.DexFile;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -12,10 +13,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-import dalvik.system.DexFile;
-
 public class Reflect {
-
 
     private static Method forName = null;
     private static Method getDeclaredMethod = null;
@@ -26,15 +24,15 @@ public class Reflect {
     private static Method getConstructor = null;
     private static Method newInstance = null;
 
-
     private Reflect() {
         // android p/9以上设备，使用元反射
-//        if (SDK_INT > 27) {
+        //        if (SDK_INT > 27) {
         try {
             forName = Class.class.getDeclaredMethod("forName", String.class);
             // invoke = Method.class.getMethod("invoke", Object.class, Object[].class);
             // 反射获取方法
-            getDeclaredMethod = Class.class.getDeclaredMethod("getDeclaredMethod", String.class, Class[].class);
+            getDeclaredMethod =
+                    Class.class.getDeclaredMethod("getDeclaredMethod", String.class, Class[].class);
             getMethod = Class.class.getDeclaredMethod("getMethod", String.class, Class[].class);
 
             // 反射获取变量
@@ -42,7 +40,8 @@ public class Reflect {
             getField = Class.class.getDeclaredMethod("getField", String.class);
 
             // 反射实例化代码
-            getDeclaredConstructor = Class.class.getDeclaredMethod("getDeclaredConstructor", Class[].class);
+            getDeclaredConstructor =
+                    Class.class.getDeclaredMethod("getDeclaredConstructor", Class[].class);
             getConstructor = Class.class.getDeclaredMethod("getConstructor", Class[].class);
             newInstance = Constructor.class.getDeclaredMethod("newInstance", Object[].class);
         } catch (Throwable igone) {
@@ -54,50 +53,62 @@ public class Reflect {
              * VMRuntime.getRuntime().setHiddenApiExemptions(new String[]{"L"});
              */
             try {
-                Class<?> vmRuntimeClass = (Class<?>) forName.invoke(null, "dalvik.system.VMRuntime");
-                Method getRuntime = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", null);
-                Method setHiddenApiExemptions = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class[]{String[].class});
+                Class<?> vmRuntimeClass =
+                        (Class<?>) forName.invoke(null, "dalvik.system.VMRuntime");
+                Method getRuntime =
+                        (Method) getDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", null);
+                Method setHiddenApiExemptions =
+                        (Method)
+                                getDeclaredMethod.invoke(
+                                        vmRuntimeClass,
+                                        "setHiddenApiExemptions",
+                                        new Class[] {String[].class});
                 Object sVmRuntime = getRuntime.invoke(null);
-                setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{"L"}});
+                setHiddenApiExemptions.invoke(sVmRuntime, new Object[] {new String[] {"L"}});
             } catch (Throwable igone) {
             }
         }
-//        }
+        //        }
     }
 
-
     public static Object invokeStaticMethod(String clazzName, String methodName) {
-        return invokeStaticMethod(getClass(clazzName), methodName, new Class<?>[]{}, new Object[]{});
+        return invokeStaticMethod(
+                getClass(clazzName), methodName, new Class<?>[] {}, new Object[] {});
     }
 
     public static Object invokeStaticMethod(Class clazz, String methodName) {
-        return invokeStaticMethod(clazz, methodName, new Class<?>[]{}, new Object[]{});
+        return invokeStaticMethod(clazz, methodName, new Class<?>[] {}, new Object[] {});
     }
 
-    public static Object invokeStaticMethod(String clazzName, String methodName, Class<?>[] argsClass, Object[] args) {
+    public static Object invokeStaticMethod(
+            String clazzName, String methodName, Class<?>[] argsClass, Object[] args) {
         return invokeStaticMethod(getClass(clazzName), methodName, argsClass, args);
     }
 
-    public static Object invokeStaticMethod(Class clazz, String methodName, Class<?>[] argsClass, Object[] args) {
+    public static Object invokeStaticMethod(
+            Class clazz, String methodName, Class<?>[] argsClass, Object[] args) {
         return getMethodProcess(clazz, methodName, null, argsClass, args);
     }
 
     public static Object invokeObjectMethod(Object o, String methodName) {
-        return invokeObjectMethod(o, methodName, new Class[]{}, new Object[]{});
+        return invokeObjectMethod(o, methodName, new Class[] {}, new Object[] {});
     }
 
-    public static Object invokeObjectMethod(Object o, String methodName, String[] argsClassNames, Object[] args) {
+    public static Object invokeObjectMethod(
+            Object o, String methodName, String[] argsClassNames, Object[] args) {
         return invokeObjectMethod(o, methodName, converStringToClass(argsClassNames), args);
     }
 
-    public static Object invokeObjectMethod(Object o, String methodName, Class<?>[] argsClass, Object[] args) {
+    public static Object invokeObjectMethod(
+            Object o, String methodName, Class<?>[] argsClass, Object[] args) {
         if (o == null || TextUtils.isEmpty(methodName)) {
             return null;
         }
         return getMethodProcess(o.getClass(), methodName, o, argsClass, args);
     }
 
-    private static Object getMethodProcess(Class clazz, String methodName, Object o, Class<?>[] types, Object[] values) {
+    private static Object getMethodProcess(
+            Class clazz, String methodName, Object o, Class<?>[] types, Object[] values) {
         if (clazz == null || TextUtils.isEmpty(methodName)) {
             return null;
         }
@@ -105,8 +116,8 @@ public class Reflect {
             return null;
         }
         if (types == null || values == null) {
-            types = new Class[]{};
-            values = new Object[]{};
+            types = new Class[] {};
+            values = new Object[] {};
         }
         return goInvoke(getMethod(clazz, methodName, types), o, values);
     }
@@ -167,11 +178,11 @@ public class Reflect {
      * @return
      */
     public static Object newInstance(String clazzName) {
-        return newInstance(clazzName, new Class[]{}, new Object[]{});
+        return newInstance(clazzName, new Class[] {}, new Object[] {});
     }
 
     public static Object newInstance(Class clazzName) {
-        return newInstance(clazzName, new Class[]{}, new Object[]{});
+        return newInstance(clazzName, new Class[] {}, new Object[] {});
     }
 
     public static Object newInstance(String clazzName, Class[] types, Object[] values) {
@@ -188,22 +199,22 @@ public class Reflect {
             }
             Constructor ctor = null;
             if (types == null || types.length == 0) {
-                ctor = (Constructor) goInvoke(getDeclaredConstructor, clazz, new Object[]{null});
+                ctor = (Constructor) goInvoke(getDeclaredConstructor, clazz, new Object[] {null});
                 if (ctor == null) {
-                    ctor = (Constructor) goInvoke(getConstructor, clazz, new Object[]{null});
+                    ctor = (Constructor) goInvoke(getConstructor, clazz, new Object[] {null});
                 }
             } else {
-                ctor = (Constructor) goInvoke(getDeclaredConstructor, clazz, new Object[]{types});
+                ctor = (Constructor) goInvoke(getDeclaredConstructor, clazz, new Object[] {types});
                 if (ctor == null) {
-                    ctor = (Constructor) goInvoke(getConstructor, clazz, new Object[]{types});
+                    ctor = (Constructor) goInvoke(getConstructor, clazz, new Object[] {types});
                 }
             }
             if (ctor != null) {
                 ctor.setAccessible(true);
                 if (types == null || types.length == 0) {
-                    return goInvoke(newInstance, ctor, new Object[]{null});
+                    return goInvoke(newInstance, ctor, new Object[] {null});
                 } else {
-                    return goInvoke(newInstance, ctor, new Object[]{values});
+                    return goInvoke(newInstance, ctor, new Object[] {values});
                 }
             } else {
                 return newInstanceImplB(clazz, types, values);
@@ -271,7 +282,8 @@ public class Reflect {
         setFieldValueImpl(o, o.getClass(), fieldName, value);
     }
 
-    private static void setFieldValueImpl(Object o, Class<?> clazz, String fieldName, Object value) {
+    private static void setFieldValueImpl(
+            Object o, Class<?> clazz, String fieldName, Object value) {
         try {
             Field field = getUpdateableFieldImpl(clazz, fieldName);
             if (field != null) {
@@ -292,7 +304,7 @@ public class Reflect {
         return null;
     }
 
-    //内部元反射获取变量，无须关注异常，不打印日志
+    // 内部元反射获取变量，无须关注异常，不打印日志
     private static Field getUpdateableFieldImpl(Class clazz, String fieldName) {
         Field field = null;
         try {
@@ -316,7 +328,7 @@ public class Reflect {
         }
     }
 
-    //内部常规反射获取变量，无须关注异常，不打印日志
+    // 内部常规反射获取变量，无须关注异常，不打印日志
     private static Field getFieldImplB(Class clazz, String fieldName) {
         Field field = null;
         try {
@@ -376,7 +388,13 @@ public class Reflect {
             for (int i = 0; i < loader.length; i++) {
                 try {
                     if (result == null) {
-                        result = (Class) invokeObjectMethod(loader[i], "loadClass", new Class[]{String.class}, new Object[]{className});
+                        result =
+                                (Class)
+                                        invokeObjectMethod(
+                                                loader[i],
+                                                "loadClass",
+                                                new Class[] {String.class},
+                                                new Object[] {className});
                     } else {
                         return result;
                     }
@@ -417,7 +435,7 @@ public class Reflect {
                 return method.invoke(obj, argsValue);
             }
         } catch (Throwable e) {
-//                printGoInvokeExceptionInfo(method, obj, e, argsValue);
+            //                printGoInvokeExceptionInfo(method, obj, e, argsValue);
 
         }
         return null;
@@ -434,7 +452,7 @@ public class Reflect {
             }
             return argsClass;
         }
-        return new Class[]{};
+        return new Class[] {};
     }
 
     public static Object getDexClassLoader(Context context, String path) {
@@ -442,9 +460,16 @@ public class Reflect {
             String dc = "dalvik.system.DexClassLoader";
             Class c = getClass("java.lang.ClassLoader");
             if (c != null) {
-//            Class[] types = new Class[]{String.class, String.class, String.class, ClassLoader.class};
-                Class[] types = new Class[]{String.class, String.class, String.class, c};
-                Object[] values = new Object[]{path, context.getCacheDir().getAbsolutePath(), null, invokeObjectMethod(context, "getClassLoader")};
+                //            Class[] types = new Class[]{String.class, String.class, String.class,
+                // ClassLoader.class};
+                Class[] types = new Class[] {String.class, String.class, String.class, c};
+                Object[] values =
+                        new Object[] {
+                            path,
+                            context.getCacheDir().getAbsolutePath(),
+                            null,
+                            invokeObjectMethod(context, "getClassLoader")
+                        };
                 return newInstance(dc, types, values);
             }
         } catch (Throwable igone) {
@@ -481,7 +506,11 @@ public class Reflect {
         if (TextUtils.isEmpty(key)) {
             return "";
         }
-        return invokeStaticMethod("android.os.SystemProperties", "get", new Class[]{String.class}, new Object[]{key});
+        return invokeStaticMethod(
+                "android.os.SystemProperties",
+                "get",
+                new Class[] {String.class},
+                new Object[] {key});
     }
 
     /**

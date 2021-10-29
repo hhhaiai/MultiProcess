@@ -14,9 +14,11 @@ import java.util.concurrent.TimeUnit;
 public class MpThreadPool {
 
     private static ExecutorService executor = Executors.newSingleThreadExecutor();
-    private static ScheduledExecutorService executorUpload = Executors.newSingleThreadScheduledExecutor();
+    private static ScheduledExecutorService executorUpload =
+            Executors.newSingleThreadScheduledExecutor();
     // 任务队列,为了最后的清理数据
-    private static List<WeakReference<ScheduledFuture<?>>> queue = new ArrayList<WeakReference<ScheduledFuture<?>>>();
+    private static List<WeakReference<ScheduledFuture<?>>> queue =
+            new ArrayList<WeakReference<ScheduledFuture<?>>>();
     private static long MAX_WAIT_SECONDS = 5;
 
     /**
@@ -38,61 +40,63 @@ public class MpThreadPool {
         executor.execute(command);
     }
 
-//    public static void waitForAsyncTask() {
-//        try {
-//            for (WeakReference<ScheduledFuture<?>> reference : queue) {
-//                ScheduledFuture<?> f = reference.get();
-//                if (f != null) {
-//                    f.cancel(false);
-//                }
-//            }
-//            queue.clear();
-//
-//            if (!executor.isShutdown()) {
-//                executor.shutdown();
-//            }
-//            if (!executorUpload.isShutdown()) {
-//                executorUpload.shutdown();
-//            }
-//
-//            executor.awaitTermination(MAX_WAIT_SECONDS, TimeUnit.SECONDS);
-//            executorUpload.awaitTermination(MAX_WAIT_SECONDS, TimeUnit.SECONDS);
-//        } catch (Exception ignore) {
-//        }
-//    }
+    //    public static void waitForAsyncTask() {
+    //        try {
+    //            for (WeakReference<ScheduledFuture<?>> reference : queue) {
+    //                ScheduledFuture<?> f = reference.get();
+    //                if (f != null) {
+    //                    f.cancel(false);
+    //                }
+    //            }
+    //            queue.clear();
+    //
+    //            if (!executor.isShutdown()) {
+    //                executor.shutdown();
+    //            }
+    //            if (!executorUpload.isShutdown()) {
+    //                executorUpload.shutdown();
+    //            }
+    //
+    //            executor.awaitTermination(MAX_WAIT_SECONDS, TimeUnit.SECONDS);
+    //            executorUpload.awaitTermination(MAX_WAIT_SECONDS, TimeUnit.SECONDS);
+    //        } catch (Exception ignore) {
+    //        }
+    //    }
 
     /**
      * 耗时服务线程池.处理网络,缓存和文件操作
      */
-    public synchronized static void post(Runnable command) {
+    public static synchronized void post(Runnable command) {
 
         if (executorUpload.isShutdown()) {
             executorUpload = Executors.newSingleThreadScheduledExecutor();
         }
-//        queue.add( new WeakReference<ScheduledFuture<?>>(executorUpload.schedule(command, 0, TimeUnit.MILLISECONDS)));
+        //        queue.add( new WeakReference<ScheduledFuture<?>>(executorUpload.schedule(command,
+        // 0, TimeUnit.MILLISECONDS)));
         executorUpload.execute(command);
     }
 
-    public synchronized static void postDelayed(Runnable command, long delay) {
+    public static synchronized void postDelayed(Runnable command, long delay) {
         if (executorUpload.isShutdown()) {
             executorUpload = Executors.newSingleThreadScheduledExecutor();
         }
 
-        queue.add(new WeakReference<ScheduledFuture<?>>(executorUpload.schedule(command, delay, TimeUnit.MILLISECONDS)));
+        queue.add(
+                new WeakReference<ScheduledFuture<?>>(
+                        executorUpload.schedule(command, delay, TimeUnit.MILLISECONDS)));
     }
 
-//    public synchronized static void postSync(Runnable command) {
-//        if (executorUpload.isShutdown()) {
-//            executorUpload = Executors.newSingleThreadScheduledExecutor();
-//        }
-//
-//        Future<?> f = executorUpload.submit(command);
-//        try {
-//            f.get(5, TimeUnit.SECONDS);
-//        } catch (Exception ignore) {
-//        }
-//    }
-
+    //    public synchronized static void postSync(Runnable command) {
+    //        if (executorUpload.isShutdown()) {
+    //            executorUpload = Executors.newSingleThreadScheduledExecutor();
+    //        }
+    //
+    //        Future<?> f = executorUpload.submit(command);
+    //        try {
+    //            f.get(5, TimeUnit.SECONDS);
+    //        } catch (Exception ignore) {
+    //        }
+    //    }
 
     /**
      * 非主线程调用
@@ -102,16 +106,17 @@ public class MpThreadPool {
             return;
         }
         if (isMainThread()) {
-            execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        runnable.run();
-                    } catch (Throwable e) {
-                        MpLog.e(e);
-                    }
-                }
-            });
+            execute(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                runnable.run();
+                            } catch (Throwable e) {
+                                MpLog.e(e);
+                            }
+                        }
+                    });
         } else {
             try {
                 runnable.run();
@@ -129,16 +134,17 @@ public class MpThreadPool {
             return;
         }
         if (isMainThread()) {
-            post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        runnable.run();
-                    } catch (Throwable e) {
-                        MpLog.e(e);
-                    }
-                }
-            });
+            post(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                runnable.run();
+                            } catch (Throwable e) {
+                                MpLog.e(e);
+                            }
+                        }
+                    });
         } else {
             try {
                 runnable.run();
@@ -147,5 +153,4 @@ public class MpThreadPool {
             }
         }
     }
-
 }
